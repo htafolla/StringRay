@@ -115,16 +115,31 @@ export const enforcer: AgentConfig = {
 
 #### Current Integration
 
-```yaml
-name: architect
-description: Complex planning and consolidation strategies for architectural design and dependency mapping. Use for system design, refactoring planning, and pattern selection.
-model: opencode/grok-code
-temperature: 0.3
-tools:
-  Read: true
-  Search: true
-  Bash: true
+**TypeScript AgentConfig Implementation:**
+
+```typescript
+export const architect: AgentConfig = {
+  name: "architect",
+  model: "opencode/grok-code",
+  description: "StrRay Framework architect with state management, delegation, and system design capabilities",
+  mode: "subagent",
+  system: `You are the StrRay Architect, a specialized agent responsible for system design...`,
+  temperature: 0.1,
+  tools: {
+    include: ["read", "grep", "lsp_*", "run_terminal_cmd", "background_task", "lsp_goto_definition", "lsp_find_references"]
+  },
+  permission: {
+    edit: "allow",
+    bash: {
+      git: "allow",
+      npm: "allow",
+      bun: "allow"
+    }
+  }
+};
 ```
+
+**Note**: oh-my-opencode loads agents from TypeScript files in `src/agents/`, not YAML configurations.
 
 #### Conceptual Framework Capabilities
 
@@ -176,17 +191,31 @@ tools:
 
 #### Current Integration
 
-```yaml
-name: orchestrator
-description: Coordinates complex multi-step tasks, manages async subagent delegation, and ensures completion. Use Sisyphus integration for relentless execution.
-model: opencode/grok-code
-temperature: 0.4
-tools:
-  Bash: true
-  Read: true
-  Edit: true
-  Search: true
+**TypeScript AgentConfig Implementation:**
+
+```typescript
+export const orchestrator: AgentConfig = {
+  name: "orchestrator",
+  model: "opencode/grok-code",
+  description: "StrRay Framework orchestrator with coordination, workflow management, and multi-agent orchestration",
+  mode: "subagent",
+  system: `You are the StrRay Orchestrator, a specialized agent responsible for coordinating complex multi-agent workflows...`,
+  temperature: 0.1,
+  tools: {
+    include: ["read", "grep", "lsp_*", "run_terminal_cmd", "background_task", "call_omo_agent", "session_list", "session_read", "session_search"]
+  },
+  permission: {
+    edit: "allow",
+    bash: {
+      git: "allow",
+      npm: "allow",
+      bun: "allow"
+    }
+  }
+};
 ```
+
+**Note**: oh-my-opencode loads agents from TypeScript files in `src/agents/`, not YAML configurations.
 
 #### Conceptual Framework Capabilities
 
@@ -237,15 +266,33 @@ tools:
 
 #### Current Integration
 
-```yaml
-name: code-reviewer
-description: Reviews code quality, best practices, and framework compliance. Triggers after code changes or before commits.
-model: opencode/grok-code
-temperature: 0.3
-tools:
-  Read: true
-  Search: true
+**TypeScript AgentConfig Implementation:**
+
+```typescript
+export const codeReviewer: AgentConfig = {
+  name: "code-reviewer",
+  model: "opencode/grok-code",
+  description: "StrRay Framework code reviewer with monitoring, analytics, and quality assurance capabilities",
+  mode: "subagent",
+  system: `You are the StrRay Code Reviewer, a specialized agent responsible for code quality assurance...`,
+  temperature: 0.1,
+  tools: {
+    include: ["read", "grep", "lsp_*", "run_terminal_cmd", "lsp_diagnostics", "lsp_code_actions", "lsp_code_action_resolve"]
+  },
+  permission: {
+    edit: "allow",
+    bash: {
+      git: "allow",
+      npm: "allow",
+      bun: "allow",
+      eslint: "allow",
+      prettier: "allow"
+    }
+  }
+};
 ```
+
+**Note**: oh-my-opencode loads agents from TypeScript files in `src/agents/`, not YAML configurations.
 
 #### Conceptual Framework Capabilities
 
@@ -295,17 +342,32 @@ tools:
 
 #### Current Integration
 
-```yaml
-name: bug-triage-specialist
-description: Systematically investigate bugs, identify root causes, and implement surgical fixes to prevent 90% of runtime errors.
-model: opencode/grok-code
-temperature: 0.3
-tools:
-  Bash: true
-  Read: true
-  Edit: true
-  Search: true
+**TypeScript AgentConfig Implementation:**
+
+```typescript
+export const bugTriageSpecialist: AgentConfig = {
+  name: "bug-triage-specialist",
+  model: "opencode/grok-code",
+  description: "StrRay Framework bug triage specialist with systematic error investigation and surgical fixes",
+  mode: "subagent",
+  system: `You are the StrRay Bug Triage Specialist, a specialized agent responsible for systematic error investigation...`,
+  temperature: 0.1,
+  tools: {
+    include: ["read", "grep", "lsp_*", "run_terminal_cmd", "ast_grep_search", "ast_grep_replace", "lsp_diagnostics", "lsp_code_actions"]
+  },
+  permission: {
+    edit: "allow",
+    bash: {
+      git: "allow",
+      npm: "allow",
+      bun: "allow",
+      test: "allow"
+    }
+  }
+};
 ```
+
+**Note**: oh-my-opencode loads agents from TypeScript files in `src/agents/`, not YAML configurations.
 
 #### Conceptual Framework Capabilities
 
@@ -355,16 +417,33 @@ tools:
 
 #### Current Integration
 
-```yaml
-name: security-auditor
-description: Identifies security vulnerabilities, assesses risks, and provides security recommendations through systematic analysis.
-model: opencode/grok-code
-temperature: 0.2
-tools:
-  Read: true
-  Search: true
-  Bash: true
+**TypeScript AgentConfig Implementation:**
+
+```typescript
+export const securityAuditor: AgentConfig = {
+  name: "security-auditor",
+  model: "opencode/grok-code",
+  description: "StrRay Framework security auditor with compliance monitoring and vulnerability detection",
+  mode: "subagent",
+  system: `You are the StrRay Security Auditor, a specialized agent responsible for comprehensive security validation...`,
+  temperature: 0.1,
+  tools: {
+    include: ["read", "grep", "lsp_*", "run_terminal_cmd", "grep_app_searchGitHub", "webfetch"]
+  },
+  permission: {
+    edit: "allow",
+    bash: {
+      git: "allow",
+      npm: "allow",
+      bun: "allow",
+      security: "allow",
+      audit: "allow"
+    }
+  }
+};
 ```
+
+**Note**: oh-my-opencode loads agents from TypeScript files in `src/agents/`, not YAML configurations.
 
 #### Conceptual Framework Capabilities
 
@@ -414,17 +493,32 @@ tools:
 
 #### Current Integration
 
-```yaml
-name: refactorer
-description: Improves code structure, eliminates technical debt, and consolidates logic. Triggers on debt, cleanup, optimize, consolidate.
-model: opencode/grok-code
-temperature: 0.3
-tools:
-  Bash: true
-  Read: true
-  Edit: true
-  Search: true
+**TypeScript AgentConfig Implementation:**
+
+```typescript
+export const refactorer: AgentConfig = {
+  name: "refactorer",
+  model: "opencode/grok-code",
+  description: "StrRay Framework refactorer with technical debt elimination and code consolidation capabilities",
+  mode: "subagent",
+  system: `You are the StrRay Refactorer, a specialized agent responsible for technical debt elimination...`,
+  temperature: 0.1,
+  tools: {
+    include: ["read", "grep", "lsp_*", "run_terminal_cmd", "ast_grep_search", "ast_grep_replace", "lsp_rename", "lsp_prepare_rename"]
+  },
+  permission: {
+    edit: "allow",
+    bash: {
+      git: "allow",
+      npm: "allow",
+      bun: "allow",
+      test: "allow"
+    }
+  }
+};
 ```
+
+**Note**: oh-my-opencode loads agents from TypeScript files in `src/agents/`, not YAML configurations.
 
 #### Conceptual Framework Capabilities
 
@@ -474,16 +568,33 @@ tools:
 
 #### Current Integration
 
-```yaml
-name: test-architect
-description: Designs comprehensive testing strategies, behavioral testing frameworks, and validation approaches to ensure 95% behavioral coverage.
-model: opencode/grok-code
-temperature: 0.3
-tools:
-  Read: true
-  Search: true
-  Bash: true
+**TypeScript AgentConfig Implementation:**
+
+```typescript
+export const testArchitect: AgentConfig = {
+  name: "test-architect",
+  model: "opencode/grok-code",
+  description: "StrRay Framework test architect with coverage optimization and behavioral testing capabilities",
+  mode: "subagent",
+  system: `You are the StrRay Test Architect, a specialized agent responsible for comprehensive testing strategy...`,
+  temperature: 0.1,
+  tools: {
+    include: ["read", "grep", "lsp_*", "run_terminal_cmd", "run_terminal_cmd"]
+  },
+  permission: {
+    edit: "allow",
+    bash: {
+      git: "allow",
+      npm: "allow",
+      bun: "allow",
+      test: "allow",
+      coverage: "allow"
+    }
+  }
+};
 ```
+
+**Note**: oh-my-opencode loads agents from TypeScript files in `src/agents/`, not YAML configurations.
 
 #### Conceptual Framework Capabilities
 

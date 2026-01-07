@@ -76,6 +76,7 @@ This guide explains how to configure and update AI models in the StrRay framewor
 ## Available Models
 
 - `opencode/grok-code` (recommended, cost-effective, updated standard)
+- Check [OpenCode](https://opencode.ai) for free models and update to your preferred option
 - `openai/gpt-4o` (versatile)
 - `openai/gpt-4o-mini` (fast, cost-effective)
 

@@ -35,17 +35,26 @@
 
 ### Installation
 
-bun install with bun
-bun install
+```bash
+# Install oh-my-opencode globally
+npm install -g oh-my-opencode
+# or
+bun install -g oh-my-opencode
+
+# Install StringRay dependencies
+npm install
+# or
 bun install
 
-# Initialize StrRay in your project
-
+# Initialize StringRay in your project
+oh-my-opencode init --framework strray
 ```
 
 ### Configuration
 
 Update your `.opencode/oh-my-opencode.json`:
+
+**First, update to your preferred AI model.** Check [OpenCode](https://opencode.ai) for free models and update the `model_routing` section in your config. See [Model Configuration Guide](./docs/StrRay_MODEL_CONFIG.md) for detailed instructions.
 
 ```json
 {
@@ -96,42 +105,9 @@ Update your `.opencode/oh-my-opencode.json`:
 ## Installation
 
 ```bash
-# Install oh-my-opencode
-# Install oh-my-opencode
-# Install StringRay dependencies
-npm install
-# or with bun
-bun install
-
-# Install StringRay dependencies
-npm install
-# or with bun
-bun install
-# Install StringRay dependencies
-npm install
-# or with bun
-bun install
-
-# Install StringRay dependencies
-npm install
-# or with bun
-bun install
-# Install oh-my-opencode
-# Install StringRay dependencies
-npm install
-# or with bun
-bun install
-
-# Install StringRay dependencies
-npm install
-# or with bun
-bun install
-npm install
-# or with bun
-bun install with bun
-bun install
-bun install
+npm install -g oh-my-opencode
 cd /path/to/project
+oh-my-opencode init --framework strray
 ```
 
 ## 📚 VERIFIED COMPREHENSIVE DOCUMENTATION (ALL DELIVERED)
@@ -170,6 +146,6 @@ MIT License - see [LICENSE](LICENSE) file.
 - [Installation Guide](./docs/StrRay_INSTALLATION_GUIDE.md)
 - [Model Configuration](./docs/StrRay_MODEL_CONFIG.md)
 - [API Reference](./docs/api/API_REFERENCE.md)
-- [Agent Documentation](./docs/agents/)
+- [Agent Documentation](./docs/agents/]
 - [Architecture](./docs/architecture/)
 - [Troubleshooting](./docs/troubleshooting/)

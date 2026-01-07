@@ -36,8 +36,10 @@
 ### Installation
 
 ```bash
-# Install dependencies
+# Install dependencies (npm or bun)
 npm install
+# or
+bun install
 
 # Initialize StrRay in your project
 
@@ -97,6 +99,8 @@ Update your `.opencode/oh-my-opencode.json`:
 
 ```bash
 npm install
+# or
+bun install
 cd /path/to/project
 ```
 

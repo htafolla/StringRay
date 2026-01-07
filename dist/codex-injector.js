@@ -27,7 +27,6 @@ function readFileContent(filePath) {
         }
     }
     catch (error) {
-        console.error(`Failed to read codex file ${filePath}:`, error);
     }
     return null;
 }
@@ -72,101 +71,81 @@ function loadCodexContext(sessionId) {
         if (content) {
             const entry = createCodexContextEntry(fullPath, content);
             codexContexts.push(entry);
-            console.error(`✅ StrRay Codex loaded: ${fullPath} (${entry.metadata.termCount} terms)`);
+            `✅ StrRay Codex loaded: ${fullPath} (${entry.metadata.termCount} terms)`,
+                `📁 Sources: ${stats.fileCount} file(s)`,
+                `🎯 Error Prevention Target: 90% runtime error prevention`,
+                "═════════════════════════════════════════════════════════════",
+                "",
+            ;
+            ;
         }
+        return parts.join("\n");
     }
-    codexCache.set(sessionId, codexContexts);
-    if (codexContexts.length === 0) {
-        console.error(`⚠️  No codex files found. Checked: ${CODEX_FILE_LOCATIONS.join(", ")}`);
-    }
-    return codexContexts;
-}
-/**
- * Format codex context for injection
- */
-function formatCodexContext(contexts) {
-    if (contexts.length === 0) {
-        return "";
-    }
-    const parts = [];
-    for (const context of contexts) {
-        parts.push(`# StrRay Codex Context v${context.metadata.version}`, `Source: ${context.source}`, `Terms Loaded: ${context.metadata.termCount}`, `Loaded At: ${context.metadata.loadedAt}`, "", context.content, "", "---", "");
-    }
-    return parts.join("\n");
-}
-/**
- * Create strray-codex-injector hook
- *
- * This hook injects codex context into tool outputs and displays
- * a welcome message on agent startup, following the production-tested
- * pattern from oh-my-opencode's rules-injector.
- */
-export function createStrRayCodexInjectorHook() {
-    return {
-        name: "strray-codex-injector",
-        hooks: {
-            "agent.start": (sessionId) => {
-                const stats = getCodexStats(sessionId);
-                if (stats.loaded) {
-                    console.error("");
-                    console.error("═════════════════════════════════════════════════════════════");
-                    console.error("🚀 StrRay Framework v1.0.0 - Ready");
-                    console.error("═════════════════════════════════════════════════════════════");
-                    console.error(`✅ Codex Loaded: ${stats.totalTerms} terms (v${stats.version})`);
-                    console.error(`📁 Sources: ${stats.fileCount} file(s)`);
-                    console.error(`🎯 Error Prevention Target: 90% runtime error prevention`);
-                    console.error("═════════════════════════════════════════════════════════════");
-                    console.error("");
-                }
-            },
-            "tool.execute.after": (input, output, sessionId) => {
-                if (!["read", "write", "edit", "multiedit", "batch"].includes(input.tool)) {
-                    return output;
-                }
-                const codexContexts = loadCodexContext(sessionId);
-                if (codexContexts.length === 0) {
-                    return output;
-                }
-                const formattedCodex = formatCodexContext(codexContexts);
-                const injectedOutput = {
-                    ...output,
-                    output: `${formattedCodex}\n${output.output || ""}`,
-                };
-                return injectedOutput;
-            },
-        },
-    };
-}
-/**
- * Get codex statistics for debugging
- */
-export function getCodexStats(sessionId) {
-    const contexts = codexCache.get(sessionId);
-    if (!contexts || contexts.length === 0) {
+    /**
+     * Create strray-codex-injector hook
+     *
+     * This hook injects codex context into tool outputs and displays
+     * a welcome message on agent startup, following the production-tested
+     * pattern from oh-my-opencode's rules-injector.
+     */
+    export function createStrRayCodexInjectorHook() {
         return {
-            loaded: false,
-            fileCount: 0,
-            totalTerms: 0,
-            version: "unknown",
+            name: "strray-codex-injector",
+            hooks: {
+                "agent.start": (sessionId) => {
+                    const stats = getCodexStats(sessionId);
+                    if (stats.loaded) {
+                    }
+                },
+                "tool.execute.after": (input, output, sessionId) => {
+                    if (!["read", "write", "edit", "multiedit", "batch"].includes(input.tool)) {
+                        return output;
+                    }
+                    const codexContexts = loadCodexContext(sessionId);
+                    if (codexContexts.length === 0) {
+                        return output;
+                    }
+                    const formattedCodex = formatCodexContext(codexContexts);
+                    const injectedOutput = {
+                        ...output,
+                        output: `${formattedCodex}\n${output.output || ""}`,
+                    };
+                    return injectedOutput;
+                },
+            },
         };
     }
-    const totalTerms = contexts.reduce((sum, ctx) => sum + ctx.metadata.termCount, 0);
-    return {
-        loaded: true,
-        fileCount: contexts.length,
-        totalTerms,
-        version: contexts[0].metadata.version,
-    };
-}
-/**
- * Clear codex cache (useful for testing or forced reload)
- */
-export function clearCodexCache(sessionId) {
-    if (sessionId) {
-        codexCache.delete(sessionId);
+    /**
+     * Get codex statistics for debugging
+     */
+    export function getCodexStats(sessionId) {
+        const contexts = codexCache.get(sessionId);
+        if (!contexts || contexts.length === 0) {
+            return {
+                loaded: false,
+                fileCount: 0,
+                totalTerms: 0,
+                version: "unknown",
+            };
+        }
+        const totalTerms = contexts.reduce((sum, ctx) => sum + ctx.metadata.termCount, 0);
+        return {
+            loaded: true,
+            fileCount: contexts.length,
+            totalTerms,
+            version: contexts[0].metadata.version,
+        };
     }
-    else {
-        codexCache.clear();
+    /**
+     * Clear codex cache (useful for testing or forced reload)
+     */
+    export function clearCodexCache(sessionId) {
+        if (sessionId) {
+            codexCache.delete(sessionId);
+        }
+        else {
+            codexCache.clear();
+        }
     }
 }
 //# sourceMappingURL=codex-injector.js.map

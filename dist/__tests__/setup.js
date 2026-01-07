@@ -1,9 +1,6 @@
 // Global test setup for StrRay Framework tests
 import { beforeAll, afterAll, afterEach, expect } from 'vitest';
 // Mock console methods to reduce noise during testing
-const originalConsoleLog = console.log;
-const originalConsoleError = console.error;
-const originalConsoleWarn = console.warn;
 beforeAll(() => {
     // Set up test environment
     process.env.NODE_ENV = 'test';
@@ -15,9 +12,6 @@ afterAll(() => {
 });
 // Reset console methods after each test
 afterEach(() => {
-    console.log = originalConsoleLog;
-    console.error = originalConsoleError;
-    console.warn = originalConsoleWarn;
 });
 // Global test utilities
 global.testUtils = {

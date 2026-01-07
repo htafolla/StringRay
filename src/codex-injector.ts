@@ -101,41 +101,12 @@ function loadCodexContext(sessionId: string): CodexContextEntry[] {
 		if (content) {
 			const entry = createCodexContextEntry(fullPath, content);
 			codexContexts.push(entry);
-				`✅ StrRay Codex loaded: ${fullPath} (${entry.metadata.termCount} terms)`,
-			);
-		}
-	}
-
-	codexCache.set(sessionId, codexContexts);
-
-	if (codexContexts.length === 0) {
-	}
-
-	return codexContexts;
-}
-
-/**
- * Format codex context for injection
- */
-function formatCodexContext(contexts: CodexContextEntry[]): string {
-	if (contexts.length === 0) {
-		return "";
-	}
-
-	const parts: string[] = [];
-
-	for (const context of contexts) {
-		parts.push(
-			`# StrRay Codex Context v${context.metadata.version}`,
-			`Source: ${context.source}`,
-			`Terms Loaded: ${context.metadata.termCount}`,
-			`Loaded At: ${context.metadata.loadedAt}`,
-			"",
-			context.content,
-			"",
-			"---",
-			"",
-		);
+		`✅ StrRay Codex loaded: ${fullPath} (${entry.metadata.termCount} terms)`,
+		`📁 Sources: ${stats.fileCount} file(s)`,
+		`🎯 Error Prevention Target: 90% runtime error prevention`,
+		"═════════════════════════════════════════════════════════════",
+		"",
+	);
 	}
 
 	return parts.join("\n");

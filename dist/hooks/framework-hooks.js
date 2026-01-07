@@ -1,7 +1,4 @@
 export const useFrameworkInitialization = () => {
-    return {
-        onInit: () => console.log('Framework initialized'),
-        onDestroy: () => console.log('Framework destroyed'),
-    };
+    return {};
 };
 //# sourceMappingURL=framework-hooks.js.map

@@ -1,6 +1,6 @@
 # ⚡ StringRay (StrRay) – The AI Agent
 
-[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/your-org/strray-framework)
+[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/htafolla/StringRay)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9+-blue.svg)](https://www.typescriptlang.org/)
@@ -31,7 +31,7 @@
 
 - Node.js 18+
 - npm or bun
-- oh-my-opencode framework installed
+- oh-my-opencode framework installed (StringRay loads as a plugin)
 
 ### Installation
 
@@ -47,7 +47,8 @@ npm install
 bun install
 
 # Initialize StringRay in your project
-oh-my-opencode init --framework strray
+# StringRay integrates with oh-my-opencode automatically via plugin system
+# No manual initialization needed - the plugin loads on first use
 ```
 
 ### Configuration

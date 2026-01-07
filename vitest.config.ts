@@ -33,7 +33,7 @@ export default defineConfig({
     hookTimeout: 10000,
     bail: 5, // Stop after 5 test failures
      // maxThreads: 4, // Removed unsupported option
-    minThreads: 1,
+     // minThreads: 1, // Removed unsupported option
     retry: 2,
   },
   resolve: {

@@ -51,6 +51,15 @@
 				"security": ["security-scan"],
 				"deployment": ["post-deployment-audit"]
 			},
+			"verification": {
+				"buildRequired": true,
+				"testsRequired": true,
+				"coverageRequired": 0.85,
+				"consoleLogBlocked": true,
+				"todoCommentsBlocked": true,
+				"serverStartupRequired": true,
+				"apiResponseRequired": true
+			},
 			"workflows": {
 				"ci": ["lint", "typecheck", "test", "security-scan"],
 				"cd": ["build", "post-deployment-audit"],

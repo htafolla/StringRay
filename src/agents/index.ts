@@ -1,12 +1,12 @@
-import type { AgentConfig } from "./types";
-import { enforcer } from "./enforcer";
-import { architect } from "./architect";
-import { orchestrator } from "./orchestrator";
-import { bugTriageSpecialist } from "./bug-triage-specialist";
-import { codeReviewer } from "./code-reviewer";
-import { securityAuditor } from "./security-auditor";
-import { refactorer } from "./refactorer";
-import { testArchitect } from "./test-architect";
+import type { AgentConfig } from "./types.js";
+import { enforcer } from "./enforcer.js";
+import { architect } from "./architect.js";
+import { orchestrator } from "./orchestrator.js";
+import { bugTriageSpecialist } from "./bug-triage-specialist.js";
+import { codeReviewer } from "./code-reviewer.js";
+import { securityAuditor } from "./security-auditor.js";
+import { refactorer } from "./refactorer.js";
+import { testArchitect } from "./test-architect.js";
 
 export const builtinAgents: Record<string, AgentConfig> = {
   enforcer,

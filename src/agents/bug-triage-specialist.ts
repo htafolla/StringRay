@@ -1,4 +1,4 @@
-import type { AgentConfig } from "./types";
+import type { AgentConfig } from "./types.js";
 
 export const bugTriageSpecialist: AgentConfig = {
   name: "bug-triage-specialist",

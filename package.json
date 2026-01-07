@@ -1,7 +1,7 @@
 {
 	"name": "stringray-framework",
 	"version": "1.0.0",
-	"description": "StringRay (StrRay) - The AI Sentinel: Guardian of Production-Ready Code. Eliminates Spaghetti Code & AI Hallucinations Through Vigilant Multi-Agent Coordination.",
+	"description": "StringRay (StrRay) - Ship Production-Ready Code & Eliminate Common Dead Ends for AI Devs. Eradicates Spaghetti Code, Hallucinations & Code Rot with Agentic AI Coordination & Automation.",
 	"type": "module",
 	"main": "./dist/index.js",
 	"types": "./dist/index.d.ts",

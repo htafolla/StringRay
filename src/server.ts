@@ -45,5 +45,4 @@ app.listen(PORT, () => {
   const start = process.platform === 'darwin' ? 'open' :
                 process.platform === 'win32' ? 'start' : 'xdg-open';
   exec(`${start} http://localhost:${PORT}`);
-});</content>
-<parameter name="filePath">/Users/blaze/dev/strray/src/server.ts
+});

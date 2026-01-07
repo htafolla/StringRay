@@ -26,6 +26,8 @@ oh-my-opencode v2.12.0
 
 - Uses oh-my-opencode's plugin architecture and configuration schema
 - Leverages "opencode/grok-code" model for all 8 AI agents: enforcer, architect, orchestrator, bug-triage-specialist, code-reviewer, security-auditor, refactorer, test-architect (or compatible models of your choice)
+- **Agent Implementation**: TypeScript AgentConfig objects in `src/agents/` directory (not YAML files)
+- **Agent Loading**: oh-my-opencode dynamically imports TypeScript modules, not YAML configurations
 - Extends oh-my-opencode with project-specific automation and validation
 - Maintains full compatibility with oh-my-opencode's ecosystem
 

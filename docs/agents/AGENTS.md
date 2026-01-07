@@ -24,6 +24,24 @@ Include direct code modification capabilities with surgical precision.
 - **Refactorer**: Eliminates technical debt and improves code structure
 - **Test Architect**: Designs testing strategies and frameworks
 
+## Agent Implementation
+
+**Important**: StrRay agents are implemented as TypeScript `AgentConfig` objects in the `src/agents/` directory, not YAML files. oh-my-opencode loads agents from compiled TypeScript modules, not YAML configurations.
+
+Example agent implementation:
+```typescript
+export const agentName: AgentConfig = {
+  name: "agent-name",
+  model: "opencode/grok-code",
+  description: "Agent description",
+  mode: "subagent",
+  system: "System prompt...",
+  temperature: 0.1,
+  tools: { include: ["tool1", "tool2"] },
+  permission: { edit: "allow" }
+};
+```
+
 ## Framework Principles
 
 StrRay implements Universal Development Codex v1.2.20 principles:

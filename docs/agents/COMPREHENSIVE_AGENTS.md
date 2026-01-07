@@ -39,15 +39,33 @@ Include direct code modification capabilities with surgical precision.
 
 #### Current Integration
 
-```yaml
-name: enforcer
-description: Automated framework compliance auditor and periodic introspection enforcer. Triggers on compliance checks, threshold violations, or scheduled audits.
-model: opencode/grok-code
-temperature: 0.2
-tools:
-  Bash: true
-  Read: true
-  Edit: true
+**TypeScript AgentConfig Implementation:**
+
+```typescript
+export const enforcer: AgentConfig = {
+  name: "enforcer",
+  model: "opencode/grok-code",
+  description: "StrRay Framework enforcer with error handling, performance facilities, and compliance monitoring",
+  mode: "subagent",
+  system: `You are the StrRay Enforcer, a specialized agent responsible for framework compliance...`,
+  temperature: 0.1,
+  tools: {
+    include: ["read", "grep", "lsp_*", "run_terminal_cmd", "lsp_diagnostics", "lsp_code_actions"]
+  },
+  permission: {
+    edit: "allow",
+    bash: {
+      git: "allow",
+      npm: "allow",
+      bun: "allow",
+      eslint: "allow",
+      prettier: "allow"
+    }
+  }
+};
+```
+
+**Note**: oh-my-opencode loads agents from TypeScript files in `src/agents/`, not YAML configurations. The YAML examples shown are for documentation purposes only.
   Search: true
 ```
 

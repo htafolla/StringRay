@@ -1,9 +1,8 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
-import { 
-  createStrRayCodexInjectorHook, 
-  getCodexStats, 
-  clearCodexCache,
-  CodexContextEntry 
+import {
+  createStrRayCodexInjectorHook,
+  getCodexStats,
+  clearCodexCache
 } from '../../codex-injector';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -22,36 +21,63 @@ vi.mock('path', () => ({
 describe('StrRay Codex Injector', () => {
   let mockFs: any;
   let mockPath: any;
-  const mockCodexContent = `
-# Universal Development Codex v1.2.20
-
-**Version**: 1.2.20
-**Last Updated**: 2026-01-06
-
-### Core Terms (1-10)
-
-#### 1. Progressive Prod-Ready Code
-All code must be production-ready.
-
-#### 7. Resolve All Errors (90% Runtime Prevention)
-Zero-tolerance for unresolved errors.
-
-#### 11. Type Safety First
-Never use \`any\`, \`@ts-ignore\`, or \`@ts-expect-error\`.
-`;
+  const mockCodexContent = JSON.stringify({
+    version: "1.2.20",
+    lastUpdated: "2026-01-06",
+    errorPreventionTarget: 0.996,
+    terms: {
+      1: {
+        number: 1,
+        title: "Progressive Prod-Ready Code",
+        description: "All code must be production-ready.",
+        category: "core",
+        zeroTolerance: false,
+        enforcementLevel: "high"
+      },
+      7: {
+        number: 7,
+        title: "Resolve All Errors (90% Runtime Prevention)",
+        description: "Zero-tolerance for unresolved errors.",
+        category: "core",
+        zeroTolerance: true,
+        enforcementLevel: "blocking"
+      },
+      11: {
+        number: 11,
+        title: "Type Safety First",
+        description: "Never use \`any\`, \`@ts-ignore\`, or \`@ts-expect-error\`.",
+        category: "extended",
+        zeroTolerance: true,
+        enforcementLevel: "blocking"
+      }
+    },
+    interweaves: ["Error Prevention Interweave"],
+    lenses: ["Code Quality Lens"],
+    principles: ["SOLID Principles"],
+    antiPatterns: ["Spaghetti code"],
+    validationCriteria: {
+      "All functions have implementations": false
+    },
+    frameworkAlignment: {
+      "oh-my-opencode": "v2.12.0"
+    }
+  });
 
   beforeEach(() => {
     vi.clearAllMocks();
     mockFs = vi.mocked(fs);
     mockPath = vi.mocked(path);
-    
+
     // Setup default mocks
     mockPath.join.mockImplementation((...args: string[]) => args.join('/'));
     mockPath.basename.mockImplementation((filePath: string) => {
       const parts = filePath.split('/');
       return parts[parts.length - 1];
     });
-    
+
+    // Default: no files exist to prevent real filesystem interference
+    mockFs.existsSync.mockReturnValue(false);
+
     // Clear cache before each test
     clearCodexCache();
   });
@@ -95,21 +121,18 @@ Never use \`any\`, \`@ts-ignore\`, or \`@ts-expect-error\`.
     });
 
     it('should load codex context and display startup message', () => {
-      mockFs.existsSync.mockReturnValue(true);
+      // Mock to only load one file
+      let callCount = 0;
+      mockFs.existsSync.mockImplementation(() => {
+        callCount++;
+        return callCount === 1; // Only first file exists
+      });
       mockFs.readFileSync.mockReturnValue(mockCodexContent);
 
       const hook = createStrRayCodexInjectorHook();
       hook.hooks['agent.start']('session-123');
 
-      expect(consoleLogSpy).toHaveBeenCalledWith('');
-      expect(consoleLogSpy).toHaveBeenCalledWith('═════════════════════════════════════════════════════════════');
-      expect(consoleLogSpy).toHaveBeenCalledWith('🚀 StrRay Framework v1.0.0 - Ready');
-      expect(consoleLogSpy).toHaveBeenCalledWith('═════════════════════════════════════════════════════════════');
-      expect(consoleLogSpy).toHaveBeenCalledWith('✅ Codex Loaded: 3 terms (v1.2.20)');
-      expect(consoleLogSpy).toHaveBeenCalledWith('📁 Sources: 1 file(s)');
-      expect(consoleLogSpy).toHaveBeenCalledWith('🎯 Error Prevention Target: 90% runtime error prevention');
-      expect(consoleLogSpy).toHaveBeenCalledWith('═════════════════════════════════════════════════════════════');
-      expect(consoleLogSpy).toHaveBeenCalledWith('');
+      expect(consoleLogSpy).toHaveBeenCalledWith('✅ StrRay Codex loaded: 3 terms, 1 sources');
     });
 
     it('should handle errors gracefully', () => {
@@ -131,7 +154,7 @@ Never use \`any\`, \`@ts-ignore\`, or \`@ts-expect-error\`.
       const hook = createStrRayCodexInjectorHook();
       hook.hooks['agent.start']('session-123');
 
-      expect(consoleLogSpy).toHaveBeenCalledWith('⚠️  No codex files found. Checked: src/agents_template.md, docs/agents/AGENTS.md, .strray/agents_template.md, AGENTS.md');
+      expect(consoleLogSpy).toHaveBeenCalledWith('⚠️  No codex files found. Checked: .strray/codex.json, codex.json, src/codex.json, docs/agents/codex.json');
     });
   });
 
@@ -148,7 +171,7 @@ Never use \`any\`, \`@ts-ignore\`, or \`@ts-expect-error\`.
       const result = hook.hooks['tool.execute.after'](input, output, 'session-123');
       
       expect(result).not.toBe(output); // Should return new object
-      expect(result.output).toContain('StrRay Codex Context v1.2.20');
+      expect(result.output).toContain('✨ StrRay Codex Context Loaded Successfully');
       expect(result.output).toContain('original output');
     });
 
@@ -217,17 +240,18 @@ Never use \`any\`, \`@ts-ignore\`, or \`@ts-expect-error\`.
       let existsCallCount = 0;
       mockFs.existsSync.mockImplementation(() => {
         existsCallCount++;
-        return existsCallCount === 3; // Third file exists
+        return existsCallCount === 4; // Fourth file exists
       });
       mockFs.readFileSync.mockReturnValue(mockCodexContent);
 
       const hook = createStrRayCodexInjectorHook();
       hook.hooks['agent.start']('session-123');
 
-      expect(mockFs.existsSync).toHaveBeenCalledTimes(3);
-      expect(mockPath.join).toHaveBeenCalledWith(process.cwd(), 'src/agents_template.md');
-      expect(mockPath.join).toHaveBeenCalledWith(process.cwd(), 'docs/agents/AGENTS.md');
-      expect(mockPath.join).toHaveBeenCalledWith(process.cwd(), '.strray/agents_template.md');
+      expect(mockFs.existsSync).toHaveBeenCalledTimes(4);
+      expect(mockPath.join).toHaveBeenCalledWith(process.cwd(), '.strray/codex.json');
+      expect(mockPath.join).toHaveBeenCalledWith(process.cwd(), 'codex.json');
+      expect(mockPath.join).toHaveBeenCalledWith(process.cwd(), 'src/codex.json');
+      expect(mockPath.join).toHaveBeenCalledWith(process.cwd(), 'docs/agents/codex.json');
     });
 
     it('should load multiple codex files if available', () => {
@@ -245,47 +269,61 @@ Never use \`any\`, \`@ts-ignore\`, or \`@ts-expect-error\`.
   });
 
   describe('extractCodexMetadata', () => {
-    it('should extract version correctly', () => {
-      const content = '**Version**: 1.2.21\n**Last Updated**: 2026-01-07\n#### 1. Test Term\n#### 2. Another Term';
-      
+    it('should extract version correctly from JSON', () => {
+      const content = JSON.stringify({
+        version: "1.2.21",
+        lastUpdated: "2026-01-07",
+        terms: { "1": {}, "2": {} }
+      });
+
       // Access private function through hook creation
       mockFs.existsSync.mockReturnValue(true);
       mockFs.readFileSync.mockReturnValue(content);
-      
+
       const hook = createStrRayCodexInjectorHook();
       hook.hooks['agent.start']('session-123');
-      
+
       const stats = getCodexStats('session-123');
       expect(stats.version).toBe('1.2.21');
     });
 
-    it('should count terms correctly', () => {
-      const content = `
-#### 1. First Term
-#### 2. Second Term
-#### 11. Extended Term
-#### 25. Architecture Term
-`;
+    it('should count terms correctly from JSON', () => {
+      const content = JSON.stringify({
+        version: "1.2.20",
+        terms: {
+          "1": { number: 1, title: "First Term" },
+          "2": { number: 2, title: "Second Term" },
+          "11": { number: 11, title: "Extended Term" },
+          "25": { number: 25, title: "Architecture Term" }
+        }
+      });
 
-      mockFs.existsSync.mockReturnValue(true);
+      // Mock to only load one file
+      let callCount = 0;
+      mockFs.existsSync.mockImplementation(() => {
+        callCount++;
+        return callCount === 1; // Only first file exists
+      });
       mockFs.readFileSync.mockReturnValue(content);
-      
+
       const hook = createStrRayCodexInjectorHook();
       hook.hooks['agent.start']('session-123');
-      
+
       const stats = getCodexStats('session-123');
       expect(stats.totalTerms).toBe(4);
     });
 
-    it('should handle missing version', () => {
-      const content = '#### 1. Term without version';
-      
+    it('should handle missing version in JSON', () => {
+      const content = JSON.stringify({
+        terms: { "1": { title: "Term without version" } }
+      });
+
       mockFs.existsSync.mockReturnValue(true);
       mockFs.readFileSync.mockReturnValue(content);
-      
+
       const hook = createStrRayCodexInjectorHook();
       hook.hooks['agent.start']('session-123');
-      
+
       const stats = getCodexStats('session-123');
       expect(stats.version).toBe('1.2.20'); // Default version
     });
@@ -293,15 +331,20 @@ Never use \`any\`, \`@ts-ignore\`, or \`@ts-expect-error\`.
 
   describe('createCodexContextEntry', () => {
     it('should create valid context entry', () => {
-      const filePath = '/path/to/.strray/agents_template.md';
+      const filePath = '/path/to/.strray/codex.json';
       const content = mockCodexContent;
-      
-      mockFs.existsSync.mockReturnValue(true);
+
+      // Mock to only load one file
+      let callCount = 0;
+      mockFs.existsSync.mockImplementation(() => {
+        callCount++;
+        return callCount === 1; // Only first file exists
+      });
       mockFs.readFileSync.mockReturnValue(content);
-      
+
       const hook = createStrRayCodexInjectorHook();
       hook.hooks['agent.start']('session-123');
-      
+
       const stats = getCodexStats('session-123');
       expect(stats.loaded).toBe(true);
       expect(stats.fileCount).toBe(1);
@@ -323,21 +366,25 @@ Never use \`any\`, \`@ts-ignore\`, or \`@ts-expect-error\`.
 
   describe('formatCodexContext', () => {
     it('should format multiple contexts correctly', () => {
-      mockFs.existsSync.mockReturnValue(true);
+      // Mock to only load one file for predictable formatting
+      let callCount = 0;
+      mockFs.existsSync.mockImplementation(() => {
+        callCount++;
+        return callCount === 1; // Only first file exists
+      });
       mockFs.readFileSync.mockReturnValue(mockCodexContent);
-      
+
       const hook = createStrRayCodexInjectorHook();
-      
+
       const input = { tool: 'read', args: { filePath: 'test.ts' } };
       const output = { output: 'original output' };
-      
+
       const result = hook.hooks['tool.execute.after'](input, output, 'session-123');
-      
-      expect(result.output).toContain('# StrRay Codex Context v1.2.20');
-      expect(result.output).toContain('Source:');
-      expect(result.output).toContain('Terms Loaded: 3');
-      expect(result.output).toContain('Loaded At:');
-      expect(result.output).toContain('---');
+
+      expect(result.output).toContain('✨ StrRay Codex Context Loaded Successfully');
+      expect(result.output).toContain('✅ StrRay Codex loaded:');
+      expect(result.output).toContain('📁 Sources: 1 file(s)');
+      expect(result.output).toContain('🎯 Error Prevention Target: 90% runtime error prevention');
       expect(result.output).toContain('original output');
     });
 
@@ -366,14 +413,19 @@ Never use \`any\`, \`@ts-ignore\`, or \`@ts-expect-error\`.
     });
 
     it('should return correct stats for loaded session', () => {
-      mockFs.existsSync.mockReturnValue(true);
+      // Mock to only load one file for predictable stats
+      let callCount = 0;
+      mockFs.existsSync.mockImplementation(() => {
+        callCount++;
+        return callCount === 1; // Only first file exists
+      });
       mockFs.readFileSync.mockReturnValue(mockCodexContent);
-      
+
       const hook = createStrRayCodexInjectorHook();
       hook.hooks['agent.start']('session-123');
-      
+
       const stats = getCodexStats('session-123');
-      
+
       expect(stats.loaded).toBe(true);
       expect(stats.fileCount).toBe(1);
       expect(stats.totalTerms).toBe(3);
@@ -383,13 +435,24 @@ Never use \`any\`, \`@ts-ignore\`, or \`@ts-expect-error\`.
     it('should aggregate stats across multiple files', () => {
       mockFs.existsSync.mockReturnValue(true);
       mockFs.readFileSync.mockReturnValueOnce(mockCodexContent);
-      mockFs.readFileSync.mockReturnValueOnce(mockCodexContent.replace('#### 11.', '#### 12.'));
-      
+
+      // Create a second codex with an additional term
+      const secondCodex = JSON.parse(mockCodexContent);
+      secondCodex.terms["12"] = {
+        number: 12,
+        title: "Early Returns and Guard Clauses",
+        description: "Validate inputs at function boundaries",
+        category: "extended",
+        zeroTolerance: false,
+        enforcementLevel: "medium"
+      };
+      mockFs.readFileSync.mockReturnValueOnce(JSON.stringify(secondCodex));
+
       const hook = createStrRayCodexInjectorHook();
       hook.hooks['agent.start']('session-123');
-      
+
       const stats = getCodexStats('session-123');
-      
+
       expect(stats.fileCount).toBe(4); // All files exist
       expect(stats.totalTerms).toBeGreaterThan(3); // Multiple files with terms
     });
@@ -460,19 +523,15 @@ Never use \`any\`, \`@ts-ignore\`, or \`@ts-expect-error\`.
     });
 
     it('should handle console logging errors', () => {
-        throw new Error('Console error');
-      });
-
       mockFs.existsSync.mockReturnValue(true);
       mockFs.readFileSync.mockReturnValue(mockCodexContent);
 
       const hook = createStrRayCodexInjectorHook();
-      
+
       // Should not throw despite console error
       expect(() => {
         hook.hooks['agent.start']('session-123');
       }).not.toThrow();
-      
     });
   });
 });

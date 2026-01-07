@@ -96,123 +96,243 @@ export class MockCodexGenerator {
    * Generate a complete mock codex content
    */
   static createCompleteCodex(version = '1.2.20'): string {
-    return `# Universal Development Codex v${version}
-
-**Version**: ${version}
-**Last Updated**: 2026-01-06
-**Purpose**: Systematic error prevention and production-ready development framework
-
-## Overview
-
-This codex defines the 30+ mandatory terms that guide AI-assisted development under the StrRay Framework.
-
-### Core Terms (1-10)
-
-#### 1. Progressive Prod-Ready Code
-All code must be production-ready from the first commit. No placeholder, stub, or incomplete implementations.
-
-#### 2. No Patches/Boiler/Stubs/Bridge Code
-Prohibit temporary patches that are "meant to be fixed later"
-
-#### 3. Do Not Over-Engineer the Solution
-Solutions should be simple and direct.
-
-#### 7. Resolve All Errors (90% Runtime Prevention)
-Zero-tolerance for unresolved errors: TODO, FIXME, XXX comments are blocking violations.
-
-#### 8. Prevent Infinite Loops
-Guarantee termination in all iterative processes: while(true), for(;;) are blocking violations.
-
-#### 11. Type Safety First
-Never use \`any\`, \`@ts-ignore\`, or \`@ts-expect-error\` - these are high-priority violations.
-
-### Extended Terms (11-20)
-
-#### 12. Early Returns and Guard Clauses
-Validate inputs at function boundaries with early returns.
-
-#### 15. Separation of Concerns
-Keep UI separate from business logic, isolate side effects.
-
-### Architecture Terms (21-30)
-
-#### 21. Dependency Injection
-Pass dependencies as parameters, avoid hardcoded dependencies.
-
-#### 24. Single Responsibility Principle
-Each class/module should have one reason to change.
-
-#### 26. Test Coverage >85%
-Maintain 85%+ behavioral test coverage.
-
-### Advanced Terms (31-43)
-
-#### 31. Async/Await Over Callbacks
-Use async/await for asynchronous code, avoid callback hell.
-
-#### 32. Proper Error Handling
-Never ignore errors, provide context in error messages.
-
-#### 35. Version Control Best Practices
-Atomic commits, descriptive commit messages, use feature branches.
-
-## Error Prevention Target
-
-**Error Prevention Target**: 99.6% (systematic runtime error prevention through zero-tolerance policies and comprehensive validation).
-`;
+    return JSON.stringify({
+      version: version,
+      lastUpdated: "2026-01-06",
+      errorPreventionTarget: 0.996,
+      terms: {
+        "1": {
+          number: 1,
+          title: "Progressive Prod-Ready Code",
+          description: "All code must be production-ready from the first commit. No placeholder, stub, or incomplete implementations.",
+          category: "core",
+          zeroTolerance: false,
+          enforcementLevel: "high"
+        },
+        "2": {
+          number: 2,
+          title: "No Patches/Boiler/Stubs/Bridge Code",
+          description: "Prohibit temporary patches that are \"meant to be fixed later\"",
+          category: "core",
+          zeroTolerance: false,
+          enforcementLevel: "high"
+        },
+        "3": {
+          number: 3,
+          title: "Do Not Over-Engineer the Solution",
+          description: "Solutions should be simple and direct.",
+          category: "core",
+          zeroTolerance: false,
+          enforcementLevel: "medium"
+        },
+        "7": {
+          number: 7,
+          title: "Resolve All Errors (90% Runtime Prevention)",
+          description: "Zero-tolerance for unresolved errors: TODO, FIXME, XXX comments are blocking violations.",
+          category: "core",
+          zeroTolerance: true,
+          enforcementLevel: "blocking"
+        },
+        "8": {
+          number: 8,
+          title: "Prevent Infinite Loops",
+          description: "Guarantee termination in all iterative processes: while(true), for(;;) are blocking violations.",
+          category: "core",
+          zeroTolerance: true,
+          enforcementLevel: "blocking"
+        },
+        "11": {
+          number: 11,
+          title: "Type Safety First",
+          description: "Never use \`any\`, \`@ts-ignore\`, or \`@ts-expect-error\` - these are high-priority violations.",
+          category: "extended",
+          zeroTolerance: true,
+          enforcementLevel: "blocking"
+        },
+        "12": {
+          number: 12,
+          title: "Early Returns and Guard Clauses",
+          description: "Validate inputs at function boundaries with early returns.",
+          category: "extended",
+          zeroTolerance: false,
+          enforcementLevel: "medium"
+        },
+        "15": {
+          number: 15,
+          title: "Separation of Concerns",
+          description: "Keep UI separate from business logic, isolate side effects.",
+          category: "extended",
+          zeroTolerance: false,
+          enforcementLevel: "high"
+        },
+        "21": {
+          number: 21,
+          title: "Dependency Injection",
+          description: "Pass dependencies as parameters, avoid hardcoded dependencies.",
+          category: "architecture",
+          zeroTolerance: false,
+          enforcementLevel: "medium"
+        },
+        "24": {
+          number: 24,
+          title: "Single Responsibility Principle",
+          description: "Each class/module should have one reason to change.",
+          category: "architecture",
+          zeroTolerance: false,
+          enforcementLevel: "high"
+        },
+        "26": {
+          number: 26,
+          title: "Test Coverage >85%",
+          description: "Maintain 85%+ behavioral test coverage.",
+          category: "architecture",
+          zeroTolerance: false,
+          enforcementLevel: "high"
+        },
+        "31": {
+          number: 31,
+          title: "Async/Await Over Callbacks",
+          description: "Use async/await for asynchronous code, avoid callback hell.",
+          category: "advanced",
+          zeroTolerance: false,
+          enforcementLevel: "medium"
+        },
+        "32": {
+          number: 32,
+          title: "Proper Error Handling",
+          description: "Never ignore errors, provide context in error messages.",
+          category: "advanced",
+          zeroTolerance: true,
+          enforcementLevel: "blocking"
+        },
+        "35": {
+          number: 35,
+          title: "Version Control Best Practices",
+          description: "Atomic commits, descriptive commit messages, use feature branches.",
+          category: "advanced",
+          zeroTolerance: false,
+          enforcementLevel: "medium"
+        }
+      },
+      interweaves: ["Error Prevention Interweave", "Performance Interweave"],
+      lenses: ["Code Quality Lens", "Maintainability Lens"],
+      principles: ["SOLID Principles", "DRY Principles"],
+      antiPatterns: ["Spaghetti code", "God classes"],
+      validationCriteria: {
+        "All functions have implementations": false,
+        "No TODO comments in production code": false,
+        "TypeScript compilation succeeds": true
+      },
+      frameworkAlignment: {
+        "oh-my-opencode": "v2.12.0",
+        "strray-framework": "v1.0.0"
+      }
+    });
   }
 
   /**
    * Generate minimal codex content for testing
    */
   static createMinimalCodex(): string {
-    return `# Universal Development Codex v1.2.20
-
-**Version**: 1.2.20
-
-#### 1. Progressive Prod-Ready Code
-All code must be production-ready.
-
-#### 7. Resolve All Errors
-Zero-tolerance for unresolved errors.
-
-#### 8. Prevent Infinite Loops
-Guarantee termination in all iterative processes.
-`;
+    return JSON.stringify({
+      version: "1.2.20",
+      lastUpdated: "2026-01-06",
+      errorPreventionTarget: 0.996,
+      terms: {
+        "1": {
+          number: 1,
+          title: "Progressive Prod-Ready Code",
+          description: "All code must be production-ready.",
+          category: "core",
+          zeroTolerance: false,
+          enforcementLevel: "high"
+        },
+        "7": {
+          number: 7,
+          title: "Resolve All Errors",
+          description: "Zero-tolerance for unresolved errors.",
+          category: "core",
+          zeroTolerance: true,
+          enforcementLevel: "blocking"
+        },
+        "8": {
+          number: 8,
+          title: "Prevent Infinite Loops",
+          description: "Guarantee termination in all iterative processes.",
+          category: "core",
+          zeroTolerance: true,
+          enforcementLevel: "blocking"
+        }
+      },
+      interweaves: [],
+      lenses: [],
+      principles: [],
+      antiPatterns: [],
+      validationCriteria: {},
+      frameworkAlignment: {}
+    });
   }
 
   /**
    * Generate codex with specific violations for testing
    */
   static createCodexWithViolations(): string {
-    return `# Universal Development Codex v1.2.20
-
-**Version**: 1.2.20
-
-#### 1. Progressive Prod-Ready Code
-All code must be production-ready.
-
-#### 7. Resolve All Errors
-Zero-tolerance for unresolved errors - TODO and FIXME are violations.
-
-#### 8. Prevent Infinite Loops
-Guarantee termination - while(true) is a violation.
-
-#### 11. Type Safety First
-Never use \`any\` or type suppressions.
-`;
+    return JSON.stringify({
+      version: "1.2.20",
+      lastUpdated: "2026-01-06",
+      errorPreventionTarget: 0.996,
+      terms: {
+        "1": {
+          number: 1,
+          title: "Progressive Prod-Ready Code",
+          description: "All code must be production-ready.",
+          category: "core",
+          zeroTolerance: false,
+          enforcementLevel: "high"
+        },
+        "7": {
+          number: 7,
+          title: "Resolve All Errors",
+          description: "Zero-tolerance for unresolved errors - TODO and FIXME are violations.",
+          category: "core",
+          zeroTolerance: true,
+          enforcementLevel: "blocking"
+        },
+        "8": {
+          number: 8,
+          title: "Prevent Infinite Loops",
+          description: "Guarantee termination - while(true) is a violation.",
+          category: "core",
+          zeroTolerance: true,
+          enforcementLevel: "blocking"
+        },
+        "11": {
+          number: 11,
+          title: "Type Safety First",
+          description: "Never use \`any\` or type suppressions.",
+          category: "extended",
+          zeroTolerance: true,
+          enforcementLevel: "blocking"
+        }
+      },
+      interweaves: [],
+      lenses: [],
+      principles: [],
+      antiPatterns: [],
+      validationCriteria: {},
+      frameworkAlignment: {}
+    });
   }
 
   /**
    * Generate invalid codex content for error testing
    */
   static createInvalidCodex(): string {
-    return `# Invalid Codex
-
-No version specified.
-
-No terms defined.
-`;
+    return JSON.stringify({
+      invalid: "codex",
+      noVersion: true,
+      noTerms: true
+    });
   }
 }
 

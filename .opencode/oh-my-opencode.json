@@ -3,7 +3,7 @@
 	"google_auth": false,
 	"preemptive_compaction": true,
 
-	"plugins": [],
+	"plugins": ["stringray-framework"],
 	"model_routing": {
 		"enforcer": "opencode/grok-code",
 		"architect": "opencode/grok-code",

@@ -46,7 +46,7 @@ describe('StrRayStateManager', () => {
       };
 
       stateManager.set('complex', complexObject);
-      const result = stateManager.get('complex');
+      const result = stateManager.get('complex') as any;
       expect(result).toEqual(complexObject);
       expect(typeof result.functions).toBe('function');
     });
@@ -80,12 +80,12 @@ describe('StrRayStateManager', () => {
 
     it('should handle different key types', () => {
       stateManager.set('string', 'value');
-      stateManager.set(123, 'number key');
-      stateManager.set(true, 'boolean key');
+      stateManager.set('123', 'number key');
+      stateManager.set('true', 'boolean key');
 
       expect(stateManager.get('string')).toBe('value');
-      expect(stateManager.get(123)).toBe('number key');
-      expect(stateManager.get(true)).toBe('boolean key');
+      expect(stateManager.get('123')).toBe('number key');
+      expect(stateManager.get('true')).toBe('boolean key');
     });
   });
 
@@ -133,7 +133,7 @@ describe('StrRayStateManager', () => {
       const largeArray = new Array(10000).fill('test');
       stateManager.set('large', largeArray);
       
-      const result = stateManager.get('large');
+      const result = stateManager.get('large') as any[];
       expect(result).toHaveLength(10000);
       expect(result[0]).toBe('test');
     });
@@ -144,8 +144,8 @@ describe('StrRayStateManager', () => {
       obj1.ref = obj2;
 
       stateManager.set('circular', obj1);
-      const result = stateManager.get('circular');
-      
+      const result = stateManager.get('circular') as any;
+
       expect(result.name).toBe('obj1');
       expect(result.ref.name).toBe('obj2');
       expect(result.ref.ref).toBe(result); // Circular reference preserved

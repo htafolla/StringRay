@@ -9,19 +9,21 @@
  * @author StrRay Framework
  */
 
-import * as fs from "fs";
-import * as path from "path";
-import { spawn } from "child_process";
+const fs = require("fs");
+const path = require("path");
+const { spawn } = require("child_process");
 
-function spawnPromise(
-	command: string,
-	args: string[],
-	cwd: string,
-): Promise<{ stdout: string; stderr: string }> {
+function spawnPromise(command, args, cwd) {
 	return new Promise((resolve, reject) => {
-		const child = spawn(command, args, { cwd, stdio: ["ignore", "inherit", "pipe"] });
-		const stdout = "";
+		const child = spawn(command, args, { cwd, stdio: ["ignore", "pipe", "pipe"] });
+		let stdout = "";
 		let stderr = "";
+
+		if (child.stdout) {
+			child.stdout.on("data", (data) => {
+				stdout += data.toString();
+			});
+		}
 
 		if (child.stderr) {
 			child.stderr.on("data", (data) => {
@@ -30,11 +32,8 @@ function spawnPromise(
 		}
 
 		child.on("close", (code) => {
-			if (code === 0) {
-				resolve({ stdout: "", stderr });
-			} else {
-				reject(new Error(`Process exited with code ${code}: ${stderr}`));
-			}
+			// Always resolve with the output, let caller decide based on exit code
+			resolve({ stdout, stderr, code });
 		});
 
 		child.on("error", (error) => {
@@ -44,9 +43,7 @@ function spawnPromise(
 }
 
 class PluginLogger {
-	private logPath: string;
-
-	constructor(directory: string) {
+	constructor(directory) {
 		const logsDir = path.join(directory, ".opencode", "logs");
 		if (!fs.existsSync(logsDir)) {
 			fs.mkdirSync(logsDir, { recursive: true });
@@ -56,7 +53,7 @@ class PluginLogger {
 		this.logPath = path.join(logsDir, `strray-plugin-${today}.log`);
 	}
 
-	async logAsync(message: string): Promise<void> {
+	async logAsync(message) {
 		try {
 			const timestamp = new Date().toISOString();
 			const logEntry = `[${timestamp}] ${message}\n`;
@@ -66,20 +63,20 @@ class PluginLogger {
 		}
 	}
 
-	log(message: string): void {
+	log(message) {
 		void this.logAsync(message);
 	}
 
-	error(message: string, error?: unknown): void {
+	error(message, error) {
 		const errorDetail = error instanceof Error ? `: ${error.message}` : "";
 		this.log(`ERROR: ${message}${errorDetail}`);
 	}
 }
 
-let loggerInstance: PluginLogger | null = null;
-let loggerInitPromise: Promise<PluginLogger> | null = null;
+let loggerInstance = null;
+let loggerInitPromise = null;
 
-async function getOrCreateLogger(directory: string): Promise<PluginLogger> {
+async function getOrCreateLogger(directory) {
 	if (loggerInstance) {
 		return loggerInstance;
 	}
@@ -98,24 +95,9 @@ async function getOrCreateLogger(directory: string): Promise<PluginLogger> {
 }
 
 /**
- * Codex context entry with metadata
- */
-interface CodexContextEntry {
-	id: string;
-	source: string;
-	content: string;
-	priority: "critical" | "high" | "normal" | "low";
-	metadata: {
-		version: string;
-		termCount: number;
-		loadedAt: string;
-	};
-}
-
-/**
  * Global codex context cache (loaded once)
  */
-let cachedCodexContexts: CodexContextEntry[] | null = null;
+let cachedCodexContexts = null;
 
 /**
  * Codex file locations to search
@@ -125,7 +107,7 @@ const CODEX_FILE_LOCATIONS = [".strray/agents_template.md", "AGENTS.md"];
 /**
  * Read file content safely
  */
-function readFileContent(filePath: string): string | null {
+function readFileContent(filePath) {
 	try {
 		return fs.readFileSync(filePath, "utf-8");
 	} catch (error) {
@@ -138,10 +120,7 @@ function readFileContent(filePath: string): string | null {
 /**
  * Extract codex metadata from content
  */
-function extractCodexMetadata(content: string): {
-	version: string;
-	termCount: number;
-} {
+function extractCodexMetadata(content) {
 	const versionMatch = content.match(/\*\*Version\*\*:\s*(\d+\.\d+\.\d+)/);
 	const version = versionMatch ? versionMatch[1] : "1.2.20";
 
@@ -154,7 +133,7 @@ function extractCodexMetadata(content: string): {
 /**
  * Create codex context entry
  */
-function createCodexContextEntry(filePath: string, content: string): CodexContextEntry {
+function createCodexContextEntry(filePath, content) {
 	const metadata = extractCodexMetadata(content);
 
 	return {
@@ -173,12 +152,12 @@ function createCodexContextEntry(filePath: string, content: string): CodexContex
 /**
  * Load codex context (cached globally, loaded once)
  */
-function loadCodexContext(): CodexContextEntry[] {
+function loadCodexContext() {
 	if (cachedCodexContexts) {
 		return cachedCodexContexts;
 	}
 
-	const codexContexts: CodexContextEntry[] = [];
+	const codexContexts = [];
 
 	for (const relativePath of CODEX_FILE_LOCATIONS) {
 		const fullPath = path.join(process.cwd(), relativePath);
@@ -206,12 +185,12 @@ function loadCodexContext(): CodexContextEntry[] {
 /**
  * Format codex context for injection
  */
-function formatCodexContext(contexts: CodexContextEntry[]): string {
+function formatCodexContext(contexts) {
 	if (contexts.length === 0) {
 		return "";
 	}
 
-	const parts: string[] = [];
+	const parts = [];
 
 	for (const context of contexts) {
 		parts.push(
@@ -236,19 +215,12 @@ function formatCodexContext(contexts: CodexContextEntry[]): string {
  * This plugin hooks into experimental.chat.system.transform event
  * to inject codex terms into system prompt before it's sent to LLM.
  */
-export default async function strrayCodexPlugin(input: {
-	client?: string;
-	directory?: string;
-	worktree?: string;
-}) {
+async function strrayCodexPlugin(input) {
 	const { directory: inputDirectory } = input;
 	const directory = inputDirectory || process.cwd();
 
 	return {
-		"experimental.chat.system.transform": async (
-			_input: Record<string, unknown>,
-			output: { system?: string[] },
-		) => {
+		"experimental.chat.system.transform": async (_input, output) => {
 			const codexContexts = loadCodexContext();
 
 			if (codexContexts.length === 0) {
@@ -266,13 +238,7 @@ export default async function strrayCodexPlugin(input: {
 			}
 		},
 
-		"tool.execute.before": async (
-			input: {
-				tool: string;
-				args?: { content?: string; filePath?: string };
-			},
-			_output: unknown,
-		) => {
+		"tool.execute.before": async (input, _output) => {
 			const { tool, args } = input;
 
 			if (["write", "edit", "multiedit"].includes(tool)) {
@@ -289,59 +255,46 @@ export default async function strrayCodexPlugin(input: {
 
 					if (fs.existsSync(validationScript)) {
 						const logger = await getOrCreateLogger(directory);
-						try {
-							const { stdout } = await spawnPromise(
-								"python3",
-								[validationScript, "--code", code, "--file", filePath],
-								directory,
+						const { stdout, code } = await spawnPromise(
+							"python3",
+							[validationScript, "--code", code, "--file", filePath],
+							directory,
+						);
+
+						if (!stdout || stdout.trim().length === 0) {
+							logger.error(
+								`Validation script returned no output for ${filePath}`,
 							);
+							return;
+						}
 
-							if (!stdout || stdout.trim().length === 0) {
+						const result = JSON.parse(stdout.trim());
+
+						if (!result || typeof result !== "object") {
+							logger.error(
+								`Validation script returned malformed data for ${filePath}`,
+							);
+							return;
+						}
+
+						if (!result.compliant) {
+							logger.error(`CODEX VIOLATION in ${filePath}`);
+							for (const violation of result.violations) {
 								logger.error(
-									`Validation script returned no output for ${filePath}`,
-								);
-								return;
-							}
-
-							const result = JSON.parse(stdout);
-
-							if (!result || typeof result !== "object") {
-								logger.error(
-									`Validation script returned malformed data for ${filePath}`,
-								);
-								return;
-							}
-
-							if (!result.compliant) {
-								logger.error(`CODEX VIOLATION in ${filePath}`);
-								for (const violation of result.violations) {
-									logger.error(
-										`  Term ${violation.term_id}: ${violation.term_title} - ${violation.message}`,
-									);
-								}
-
-								throw new Error(
-									`Codex violation: ${result.violation_count} violations detected. Review logs for details.`,
+									`  Term ${violation.term_id}: ${violation.term_title} - ${violation.message}`,
 								);
 							}
-						} catch (error: unknown) {
-							const errorMessage =
-								error instanceof Error ? error.message : String(error);
-							if (
-								errorMessage.includes("Codex violation") ||
-								errorMessage.includes("violations detected")
-							) {
-								throw error;
-							}
 
-							logger.error(`Validation failed for ${filePath}: ${errorMessage}`);
+							throw new Error(
+								`Codex violation: ${result.violation_count} violations detected. Review logs for details.`,
+							);
 						}
 					}
 				}
 			}
 		},
 
-		config: async (_config: Record<string, unknown>) => {
+		config: async (_config) => {
 			const logger = await getOrCreateLogger(directory);
 			const initScriptPath = path.join(directory, ".opencode", "init.sh");
 			if (fs.existsSync(initScriptPath)) {
@@ -351,10 +304,12 @@ export default async function strrayCodexPlugin(input: {
 					if (stderr) {
 						logger.error(`Framework init error: ${stderr}`);
 					}
-				} catch (error: unknown) {
+				} catch (error) {
 					logger.error("Framework initialization failed", error);
 				}
 			}
 		},
 	};
 }
+
+module.exports = strrayCodexPlugin;

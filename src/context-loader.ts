@@ -10,6 +10,7 @@
 
 import * as fs from "fs";
 import * as path from "path";
+import { parseCodexContent, detectContentFormat } from "./utils/codex-parser";
 
 /**
  * Codex term structure
@@ -49,9 +50,16 @@ export interface ContextLoadResult {
 }
 
 /**
+ * Type guard for regex match results
+ */
+function isValidMatch(match: RegExpMatchArray | null, index: number): match is RegExpMatchArray & { [K in keyof RegExpMatchArray]: K extends typeof index ? string : RegExpMatchArray[K] } {
+	return match !== null && match[index] !== undefined;
+}
+
+/**
  * StrRay Context Loader
  *
- * Loads and parses the Universal Development Codex v1.2.20 from agents_template.md
+	 * Loads and parses the Universal Development Codex v1.2.20 from codex.json
  */
 export class StrRayContextLoader {
 	private static instance: StrRayContextLoader;
@@ -59,7 +67,7 @@ export class StrRayContextLoader {
 	private codexFilePaths: string[] = [];
 
 	private constructor() {
-		this.codexFilePaths = [".strray/agents_template.md", "AGENTS.md"];
+		this.codexFilePaths = [".strray/codex.json", "codex.json"];
 	}
 
 	/**
@@ -80,6 +88,15 @@ export class StrRayContextLoader {
 	 */
 	public async loadCodexContext(projectRoot: string): Promise<ContextLoadResult> {
 		const warnings: string[] = [];
+
+		// Validate project root
+		if (!projectRoot || projectRoot.trim() === '') {
+			return {
+				success: false,
+				error: 'Invalid project root path: path cannot be empty',
+				warnings,
+			};
+		}
 
 		if (this.cachedContext) {
 			return {
@@ -116,132 +133,45 @@ export class StrRayContextLoader {
 		};
 	}
 
-	/**
-	 * Parse codex content from markdown
-	 *
-	 * Extracts all 30+ codex terms, interweaves, lenses, and principles from markdown.
-	 */
-	private parseCodexContent(content: string, sourcePath: string): CodexContext {
-		const context: CodexContext = {
-			version: "1.2.20",
-			lastUpdated: new Date().toISOString(),
-			terms: new Map(),
-			interweaves: [],
-			lenses: [],
-			principles: [],
-			antiPatterns: [],
-			validationCriteria: {},
-			frameworkAlignment: {},
-			errorPreventionTarget: 0.996,
-		};
+  /**
+   * Parse codex content from JSON or Markdown
+   *
+   * Extracts all 30+ codex terms, interweaves, lenses, and principles from content.
+   * Supports both JSON and Markdown formats with explicit format detection.
+   */
+  private parseCodexContent(content: string, sourcePath: string): CodexContext {
+    // Validate inputs before format detection
+    if (!content || content.trim() === '') {
+      throw new Error('Invalid content provided');
+    }
 
-		const lines = content.split("\n");
-		let currentSection: string | null = null;
-		let currentTerm: Partial<CodexTerm> | null = null;
-		let termDescriptionLines: string[] = [];
+    if (!sourcePath || sourcePath.trim() === '') {
+      throw new Error('Invalid source path provided');
+    }
 
-		for (let i = 0; i < lines.length; i++) {
-			const line = lines[i].trim();
+    // Detect format before parsing
+    const formatResult = detectContentFormat(content);
 
-			if (line.startsWith("###") || line.startsWith("##")) {
-				currentSection = line.replace(/#+\s*/, "").toLowerCase();
+    if (formatResult.format === 'unknown') {
+      throw new Error(`Unable to detect content format for ${sourcePath}. Content appears to be neither valid JSON nor Markdown.`);
+    }
 
-				const versionMatch = line.match(/\*\*Version\*\*:\s*(\d+\.\d+\.\d+)/);
-				if (versionMatch) {
-					context.version = versionMatch[1] as string;
-				}
+    // Log format detection for debugging
+    console.log(`StrRay: Detected ${formatResult.format} format for ${sourcePath} (confidence: ${formatResult.confidence})`);
 
-				const targetMatch = line.match(/Error Prevention Target:\s*([\d.]+)/);
-				if (targetMatch) {
-					context.errorPreventionTarget = parseFloat(targetMatch[1]);
-				}
+    const result = parseCodexContent(content, sourcePath);
 
-				continue;
-			}
+    if (!result.success) {
+      throw new Error(result.error || 'Failed to parse codex content');
+    }
 
-			const termMatch = line.match(/^####\s*(\d+)\.\s*(.+)$/);
-			if (termMatch) {
-				if (currentTerm && currentTerm.number !== undefined) {
-					currentTerm.description = termDescriptionLines.join(" ").trim();
-					if (currentTerm.description) {
-						context.terms.set(currentTerm.number, currentTerm as CodexTerm);
-					}
-				}
+    if (!result.context) {
+      throw new Error('Parsing succeeded but no context was returned');
+    }
 
-				const termNum = parseInt(termMatch[1], 10);
-				const termName = termMatch[2] as string;
+    return result.context;
+  }
 
-				currentTerm = {
-					number: termNum,
-					description: "",
-					category: this.inferTermCategory(termNum, termName),
-				};
-
-				if (line.includes("zero-tolerance") || line.includes("blocking")) {
-					(currentTerm as any).violations = (currentTerm as any).violations || [];
-					(currentTerm as any).violations.push("zero-tolerance");
-				}
-
-				termDescriptionLines = [];
-
-				termDescriptionLines = [];
-				continue;
-			}
-
-			if (currentTerm && line && !line.startsWith("#") && !line.startsWith("```")) {
-				termDescriptionLines.push(line);
-			}
-
-			if (line.toLowerCase().includes("lens")) {
-				context.lenses.push(line);
-			}
-
-			if (line.toLowerCase().includes("principle") && !line.toLowerCase().includes("anti")) {
-				context.principles.push(line);
-			}
-
-			if (line.toLowerCase().includes("anti-pattern")) {
-				context.antiPatterns.push(line);
-			}
-
-			const checkboxMatch = line.match(/^\s*-\s*\[\s*\]\s*(.+)$/);
-			if (checkboxMatch) {
-				context.validationCriteria[checkboxMatch[1].trim()] = false;
-			}
-		}
-
-		// Add the last term if exists
-		if (currentTerm && currentTerm.number !== undefined) {
-			currentTerm.description = termDescriptionLines.join(" ").trim();
-			if (currentTerm.description) {
-				context.terms.set(currentTerm.number, currentTerm as CodexTerm);
-			}
-		}
-
-		return context;
-
-		for (let i = 1; i <= 10; i++) {
-			if (!context.terms.has(i)) {
-				context.terms.set(i, {
-					number: i,
-					description: `Core Term ${i} - Not found in ${sourcePath}`,
-					category: "core",
-				});
-			}
-		}
-
-		context.frameworkAlignment = {
-			"oh-my-opencode": "v2.12.0",
-			"StrRay Framework": "v1.0.0",
-			"Codex Version": context.version,
-		};
-
-		return context;
-	}
-
-	/**
-	 * Infer term category based on number and content
-	 */
 	private inferTermCategory(termNumber: number, termName: string): CodexTerm["category"] {
 		if (termNumber <= 10) {
 			return "core";
@@ -298,6 +228,15 @@ export class StrRayContextLoader {
 		}>;
 		recommendations: string[];
 	} {
+		// Input validation
+		if (!context || !context.terms) {
+			throw new Error('Invalid codex context provided');
+		}
+
+		if (!action || action.trim() === '') {
+			throw new Error('Invalid action provided');
+		}
+
 		const violations: Array<{
 			term: CodexTerm;
 			reason: string;
@@ -313,13 +252,16 @@ export class StrRayContextLoader {
 					violations.push({
 						term: term11,
 						reason: 'Type safety violation detected - using "any" or type suppression',
-						severity: "high",
+						severity: term11.enforcementLevel || "high",
 					});
 				}
 			}
 		}
 
-		if (action.includes("TODO") || action.includes("FIXME") || action.includes("XXX")) {
+		// Check for unresolved tasks in code
+		const codeContent = typeof actionDetails.code === 'string' ? actionDetails.code : '';
+		if (codeContent.includes("TODO") || codeContent.includes("FIXME") || codeContent.includes("XXX") ||
+		    action.includes("TODO") || action.includes("FIXME") || action.includes("XXX")) {
 			const term7 = context.terms.get(7);
 			if (term7) {
 				violations.push({
@@ -336,26 +278,27 @@ export class StrRayContextLoader {
 				violations.push({
 					term: term3,
 					reason: "Solution appears over-engineered - violates simplicity principle",
-					severity: "medium",
+					severity: term3.enforcementLevel || "medium",
 				});
 				recommendations.push("Simplify the solution by removing unnecessary abstractions");
 			}
 		}
 
-		if (action.includes("while(true)") || action.includes("for(;;)")) {
+		if (actionDetails.isInfiniteLoop ||
+		    action.includes("while(true)") || action.includes("for(;;)")) {
 			const term8 = context.terms.get(8);
 			if (term8) {
 				violations.push({
 					term: term8,
-					reason: "Potential infinite loop detected",
-					severity: "blocking",
+					reason: "Infinite loop detected - violates termination principle",
+					severity: term8.enforcementLevel || "blocking",
 				});
-				recommendations.push("Add clear termination conditions to the loop");
+				recommendations.push("Add clear termination conditions to prevent infinite loops");
 			}
 		}
 
 		return {
-			compliant: violations.filter((v) => v.severity === "blocking").length === 0,
+			compliant: violations.length === 0,
 			violations,
 			recommendations,
 		};
@@ -393,7 +336,8 @@ export class StrRayContextLoader {
 			};
 		}
 
-		const terms = Array.from(this.cachedContext.terms.values());
+		const context = this.cachedContext!;
+		const terms = Array.from(context.terms.values());
 		const categoryBreakdown: Record<string, number> = {};
 
 		terms.forEach((term) => {
@@ -402,9 +346,9 @@ export class StrRayContextLoader {
 
 		return {
 			loaded: true,
-			termCount: this.cachedContext.terms.size,
+			termCount: context.terms.size,
 			categoryBreakdown,
-			zeroToleranceCount: this.getZeroToleranceTerms(this.cachedContext).length,
+			zeroToleranceCount: this.getZeroToleranceTerms(context).length,
 		};
 	}
 }

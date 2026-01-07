@@ -35,7 +35,7 @@ npm install
 bun install
 
 # Initialize StringRay for Grok
-oh-my-opencode init --framework strray
+npm run init
 ```
 
 ### 2. Configure for Grok
@@ -185,7 +185,7 @@ npm run dev
 
 ### Step 1: Initialize
 ```bash
-oh-my-opencode init --framework strray
+npm run init
 ```
 
 ### Step 2: Configure Grok

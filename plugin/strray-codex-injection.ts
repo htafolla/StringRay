@@ -24,7 +24,7 @@ export class StrRayCodexInjectionPlugin {
   constructor(config: PluginConfig) {
     this.config = config;
     this.injector = new CodexInjector();
-    this.contextLoader = new StrRayContextLoader();
+    this.contextLoader = StrRayContextLoader.getInstance();
   }
 
   async initialize(): Promise<void> {
@@ -87,5 +87,4 @@ export default {
     await plugin.initialize();
     return plugin;
   }
-};</content>
-<parameter name="filePath">/Users/blaze/dev/strray/plugin/strray-codex-injection.ts
+};

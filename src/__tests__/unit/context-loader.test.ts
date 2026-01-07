@@ -14,20 +14,118 @@ vi.mock('path', () => ({
   join: vi.fn(),
 }));
 
+/**
+ * Removes common leading indentation from template literals
+ * Prevents parsing issues with indented multiline strings in tests
+ */
+function dedent(strings: TemplateStringsArray, ...values: unknown[]): string {
+  const raw = strings.raw?.[0] ?? strings[0] ?? '';
+  const lines = raw.split('\n');
+
+  // Find minimum indentation from non-empty lines
+  const nonEmptyLines = lines.filter(line => line.trim().length > 0);
+  if (nonEmptyLines.length === 0) return raw;
+
+  const minIndent = Math.min(
+    ...nonEmptyLines.map(line => {
+      const match = line.match(/^(\s*)/);
+      return match?.[1]?.length ?? 0;
+    })
+  );
+
+  // Remove common indentation and trim
+  const dedented = lines
+    .map(line => line.startsWith(' '.repeat(minIndent)) ? line.slice(minIndent) : line)
+    .join('\n')
+    .trim();
+
+  return dedented;
+}
+
 describe('StrRayContextLoader', () => {
   let loader: StrRayContextLoader;
   let mockFs: any;
   let mockPath: any;
 
+  const mockCodexContent = JSON.stringify({
+    version: "1.2.22",
+    lastUpdated: "2026-01-06",
+    errorPreventionTarget: 0.996,
+    terms: {
+      1: {
+        number: 1,
+        title: "Progressive Prod-Ready Code",
+        description: "All code must be production-ready from the first commit. No placeholder, stub, or incomplete implementations. Every function, class, and module must be fully functional and ready for deployment.",
+        category: "core",
+        zeroTolerance: false,
+        enforcementLevel: "high"
+      },
+      2: {
+        number: 2,
+        title: "No Patches/Boiler/Stubs/Bridge Code",
+        description: "Prohibit: Temporary patches, Boilerplate code, Stub implementations, Bridge code. All code must have clear, permanent purpose and complete implementation.",
+        category: "core",
+        zeroTolerance: false,
+        enforcementLevel: "high"
+      },
+      3: {
+        number: 3,
+        title: "Do Not Over-Engineer the Solution",
+        description: "Solutions should be simple and direct, focused on the actual problem, free of unnecessary abstractions.",
+        category: "core",
+        zeroTolerance: false,
+        enforcementLevel: "low"
+      },
+      7: {
+        number: 7,
+        title: "Resolve All Errors (90% Runtime Prevention)",
+        description: "Zero-tolerance for unresolved errors: All errors must be resolved, No console.log debugging, Systematic error handling, Error prevention through type safety, 90% of runtime errors prevented.",
+        category: "core",
+        zeroTolerance: true,
+        enforcementLevel: "blocking"
+      },
+      8: {
+        number: 8,
+        title: "Prevent Infinite Loops",
+        description: "Guarantee termination: Clear termination conditions, Base cases for recursion, Exit strategies for events, Timeout mechanisms for async, No indefinite iteration patterns.",
+        category: "core",
+        zeroTolerance: true,
+        enforcementLevel: "blocking"
+      },
+      11: {
+        number: 11,
+        title: "Type Safety First",
+        description: "Never use any/@ts-ignore/@ts-expect-error, Leverage TypeScript fully, Use discriminated unions, Prefer type inference, Type errors are blocking.",
+        category: "extended",
+        zeroTolerance: true,
+        enforcementLevel: "blocking"
+      }
+    },
+    interweaves: ["Error Prevention Interweave"],
+    lenses: ["Code Quality Lens"],
+    principles: ["SOLID Principles"],
+    antiPatterns: ["Spaghetti code"],
+    validationCriteria: {
+      "All functions have implementations": false,
+      "No TODO comments in production code": false,
+      "All error paths are handled": false
+    },
+    frameworkAlignment: {
+      "oh-my-opencode": "v2.12.0"
+    }
+  });
+
   beforeEach(() => {
     vi.clearAllMocks();
-    loader = new StrRayContextLoader();
+    // Reset singleton instance for clean test state
+    (StrRayContextLoader as any).instance = null;
+    loader = StrRayContextLoader.getInstance();
     mockFs = vi.mocked(fs);
     mockPath = vi.mocked(path);
-    
-    // Reset singleton instance
-    (StrRayContextLoader as any).instance = null;
-    
+
+    // Clear cache to ensure fresh state
+    loader.clearCache();
+
     // Default path.join behavior
     mockPath.join.mockImplementation((...args: string[]) => args.join('/'));
   });
@@ -51,35 +149,118 @@ describe('StrRayContextLoader', () => {
   });
 
   describe('loadCodexContext', () => {
-    const mockCodexContent = `
-# Universal Development Codex v1.2.20
-
-**Version**: 1.2.20
-**Last Updated**: 2026-01-06
-
-### Core Terms (1-10)
-
-#### 1. Progressive Prod-Ready Code
-All code must be production-ready.
-
-#### 2. No Patches/Boiler/Stubs/Bridge Code
-Prohibit temporary patches.
-
-#### 7. Resolve All Errors (90% Runtime Prevention)
-Zero-tolerance for unresolved errors.
-
-#### 8. Prevent Infinite Loops
-Guarantee termination in all iterative processes.
-
-#### 11. Type Safety First
-Never use \`any\`, \`@ts-ignore\`, or \`@ts-expect-error\`.
-
-**Error Prevention Target**: 99.6%
-`;
 
     beforeEach(() => {
       mockFs.existsSync.mockReturnValue(true);
       mockFs.readFileSync.mockReturnValue(mockCodexContent);
+    });
+
+    it('should return error for invalid project root', async () => {
+      const result = await loader.loadCodexContext('');
+
+      expect(result.success).toBe(false);
+      expect(result.error).toContain('Invalid project root path');
+    });
+
+    it('should return cached context on subsequent calls', async () => {
+      const firstResult = await loader.loadCodexContext('/test/project');
+      expect(firstResult.success).toBe(true);
+
+      // Second call should return cached result
+      mockFs.existsSync.mockClear();
+      mockFs.readFileSync.mockClear();
+
+      const secondResult = await loader.loadCodexContext('/test/project');
+      expect(secondResult.success).toBe(true);
+      expect(mockFs.existsSync).not.toHaveBeenCalled();
+      expect(mockFs.readFileSync).not.toHaveBeenCalled();
+    });
+
+    it('should load context from first available file', async () => {
+      mockFs.existsSync.mockImplementation((path: string) =>
+        path.includes('.strray/codex.json')
+      );
+
+      const result = await loader.loadCodexContext('/test/project');
+
+      expect(result.success).toBe(true);
+      expect(result.context).toBeDefined();
+      expect(result.context!.version).toBe('1.2.22');
+    });
+
+    it('should try all file paths until one succeeds', async () => {
+      let callCount = 0;
+      mockFs.existsSync.mockImplementation(() => {
+        callCount++;
+        return callCount === 2; // Second file exists
+      });
+
+      const result = await loader.loadCodexContext('/test/project');
+
+      expect(result.success).toBe(true);
+      expect(mockFs.existsSync).toHaveBeenCalledTimes(2);
+    });
+
+    it('should return error when no files found', async () => {
+      mockFs.existsSync.mockReturnValue(false);
+
+      const result = await loader.loadCodexContext('/test/project');
+
+      expect(result.success).toBe(false);
+      expect(result.error).toContain('No valid codex file found');
+    });
+
+    it('should handle file read errors gracefully', async () => {
+      mockFs.existsSync.mockReturnValue(true);
+      mockFs.readFileSync.mockImplementation(() => {
+        throw new Error('File read error');
+      });
+
+      const result = await loader.loadCodexContext('/test/project');
+
+      expect(result.success).toBe(false);
+      expect(result.warnings).toHaveLength(2); // Two file paths attempted
+      expect(result.warnings[0]).toContain('Failed to parse');
+    });
+
+    it('should parse codex content correctly', () => {
+      const jsonContent = JSON.stringify({
+        version: "1.2.22",
+        lastUpdated: "2026-01-06",
+        errorPreventionTarget: 0.996,
+        terms: {
+          1: {
+            number: 1,
+            title: "Progressive Prod-Ready Code",
+            description: "All code must be production-ready from the first commit.",
+            category: "core",
+            zeroTolerance: false,
+            enforcementLevel: "high"
+          },
+          2: {
+            number: 2,
+            title: "No Patches/Boiler/Stubs/Bridge Code",
+            description: "Prohibit temporary patches and boilerplate code.",
+            category: "core",
+            zeroTolerance: false,
+            enforcementLevel: "high"
+          }
+        },
+        interweaves: ["Error Prevention Interweave"],
+        lenses: ["Code Quality Lens"],
+        principles: [],
+        antiPatterns: [],
+        validationCriteria: {},
+        frameworkAlignment: {}
+      });
+
+      const context = loader['parseCodexContent'](jsonContent, 'test.json');
+
+      expect(context.version).toBe('1.2.22');
+      expect(context.errorPreventionTarget).toBe(0.996);
+      expect(context.terms.size).toBe(2);
+      expect(context.interweaves).toContain('Error Prevention Interweave');
+      expect(context.lenses).toContain('Code Quality Lens');
     });
 
     it('should return error for invalid project root', async () => {
@@ -104,15 +285,15 @@ Never use \`any\`, \`@ts-ignore\`, or \`@ts-expect-error\`.
     });
 
     it('should load context from first available file', async () => {
-      mockFs.existsSync.mockImplementation((path: string) => 
-        path.includes('.strray/agents_template.md')
+      mockFs.existsSync.mockImplementation((path: string) =>
+        path.includes('.strray/codex.json')
       );
 
       const result = await loader.loadCodexContext('/test/project');
-      
+
       expect(result.success).toBe(true);
       expect(result.context).toBeDefined();
-      expect(result.context!.version).toBe('1.2.20');
+      expect(result.context!.version).toBe('1.2.22');
     });
 
     it('should try all file paths until one succeeds', async () => {
@@ -144,29 +325,19 @@ Never use \`any\`, \`@ts-ignore\`, or \`@ts-expect-error\`.
       });
 
       const result = await loader.loadCodexContext('/test/project');
-      
+
       expect(result.success).toBe(false);
-      expect(result.warnings).toHaveLength(1);
+      expect(result.warnings).toHaveLength(2); // Two file paths attempted
       expect(result.warnings[0]).toContain('Failed to parse');
     });
 
-    it('should parse codex content correctly', async () => {
-      const result = await loader.loadCodexContext('/test/project');
-      
-      expect(result.success).toBe(true);
-      const context = result.context!;
-      
-      expect(context.version).toBe('1.2.20');
-      expect(context.errorPreventionTarget).toBe(0.996);
-      expect(context.terms.size).toBeGreaterThan(0);
-      expect(context.interweaves).toContain('Error Prevention Interweave');
-    });
+
   });
 
   describe('parseCodexContent', () => {
     it('should throw error for invalid content', () => {
       expect(() => {
-        loader['parseCodexContent']('', 'test.md');
+        loader['parseCodexContent']('', 'test.json');
       }).toThrow('Invalid content provided');
     });
 
@@ -177,36 +348,51 @@ Never use \`any\`, \`@ts-ignore\`, or \`@ts-expect-error\`.
     });
 
     it('should parse version correctly', () => {
-      const content = `
-# Universal Development Codex v1.2.21
-**Version**: 1.2.21
-`;
-      const context = loader['parseCodexContent'](content, 'test.md');
+      const content = JSON.stringify({
+        version: "1.2.21",
+        terms: {}
+      });
+      const context = loader['parseCodexContent'](content, 'test.json');
       expect(context.version).toBe('1.2.21');
     });
 
     it('should parse error prevention target', () => {
-      const content = '**Error Prevention Target**: 95.5%';
-      const context = loader['parseCodexContent'](content, 'test.md');
+      const content = JSON.stringify({
+        errorPreventionTarget: 0.955,
+        terms: {}
+      });
+      const context = loader['parseCodexContent'](content, 'test.json');
       expect(context.errorPreventionTarget).toBe(0.955);
     });
 
     it('should parse codex terms correctly', () => {
-      const content = `
-#### 1. Test Term One
-This is the first term description.
+      const content = JSON.stringify({
+        terms: {
+          1: {
+            number: 1,
+            title: "Test Term One",
+            description: "This is the first term description.",
+            category: "core"
+          },
+          2: {
+            number: 2,
+            title: "Test Term Two",
+            description: "This is the second term description.",
+            category: "core"
+          },
+          11: {
+            number: 11,
+            title: "Extended Term",
+            description: "This is an extended term.",
+            category: "extended"
+          }
+        }
+      });
 
-#### 2. Test Term Two  
-This is the second term description.
+      const context = loader['parseCodexContent'](content, 'test.json');
 
-#### 11. Extended Term
-This is an extended term.
-`;
-
-      const context = loader['parseCodexContent'](content, 'test.md');
-      
       expect(context.terms.size).toBe(3);
-      
+
       const term1 = context.terms.get(1);
       expect(term1).toBeDefined();
       expect(term1!.number).toBe(1);
@@ -218,15 +404,17 @@ This is an extended term.
     });
 
     it('should infer term categories correctly', () => {
-      const content = `
-#### 1. Core Term
-#### 15. Extended Term
-#### 25. Architecture Term
-#### 35. Advanced Term
-`;
+      const content = JSON.stringify({
+        terms: {
+          1: { number: 1, title: "Core Term", description: "Description", category: "core" },
+          15: { number: 15, title: "Extended Term", description: "Description", category: "extended" },
+          25: { number: 25, title: "Architecture Term", description: "Description", category: "architecture" },
+          35: { number: 35, title: "Advanced Term", description: "Description", category: "advanced" }
+        }
+      });
 
-      const context = loader['parseCodexContent'](content, 'test.md');
-      
+      const context = loader['parseCodexContent'](content, 'test.json');
+
       expect(context.terms.get(1)!.category).toBe('core');
       expect(context.terms.get(15)!.category).toBe('extended');
       expect(context.terms.get(25)!.category).toBe('architecture');
@@ -234,70 +422,70 @@ This is an extended term.
     });
 
     it('should set enforcement levels correctly', () => {
-      const content = `
-#### 7. Zero Tolerance Term
-Blocking level term.
+      const content = JSON.stringify({
+        terms: {
+          7: { number: 7, title: "Zero Tolerance Term", description: "Description", category: "core", zeroTolerance: true, enforcementLevel: "blocking" },
+          8: { number: 8, title: "Another Zero Tolerance Term", description: "Description", category: "core", zeroTolerance: true, enforcementLevel: "blocking" },
+          11: { number: 11, title: "High Enforcement Term", description: "Description", category: "extended", enforcementLevel: "low" }
+        }
+      });
 
-#### 8. Another Zero Tolerance Term
-Also blocking.
+      const context = loader['parseCodexContent'](content, 'test.json');
 
-#### 11. High Enforcement Term
-High level term.
-`;
-
-      const context = loader['parseCodexContent'](content, 'test.md');
-      
       expect(context.terms.get(7)!.zeroTolerance).toBe(true);
       expect(context.terms.get(7)!.enforcementLevel).toBe('blocking');
       expect(context.terms.get(8)!.zeroTolerance).toBe(true);
-      expect(context.terms.get(11)!.enforcementLevel).toBe('low'); // Default
+      expect(context.terms.get(11)!.enforcementLevel).toBe('low');
     });
 
     it('should parse interweaves and lenses', () => {
-      const content = `
-## Error Prevention Interweave
-Some content here.
+      const content = JSON.stringify({
+        interweaves: ["Error Prevention Interweave"],
+        lenses: ["Code Quality Lens", "Performance Lens"],
+        terms: {}
+      });
 
-## Code Quality Lens
-More content.
+      const context = loader['parseCodexContent'](content, 'test.json');
 
-## Performance Lens
-Even more content.
-`;
-
-      const context = loader['parseCodexContent'](content, 'test.md');
-      
       expect(context.interweaves).toContain('Error Prevention Interweave');
       expect(context.lenses).toContain('Code Quality Lens');
       expect(context.lenses).toContain('Performance Lens');
     });
 
     it('should parse validation criteria', () => {
-      const content = `
-### Code Completeness
-- [ ] All functions have implementations
-- [ ] No TODO comments in production code
-- [ ] All error paths are handled
-`;
+      const content = JSON.stringify({
+        validationCriteria: {
+          "All functions have implementations": false,
+          "No TODO comments in production code": false,
+          "All error paths are handled": false
+        },
+        terms: {}
+      });
 
-      const context = loader['parseCodexContent'](content, 'test.md');
-      
+      const context = loader['parseCodexContent'](content, 'test.json');
+
       expect(context.validationCriteria['All functions have implementations']).toBe(false);
       expect(context.validationCriteria['No TODO comments in production code']).toBe(false);
     });
 
-    it('should fill missing core terms', () => {
-      const content = `
-#### 5. Term Five
-Description for term 5.
-`;
+    it('should handle missing optional fields', () => {
+      const content = JSON.stringify({
+        version: "1.2.20",
+        terms: {
+          1: { number: 1, title: "Test Term", description: "Description", category: "core" }
+        }
+      });
 
-      const context = loader['parseCodexContent'](content, 'test.md');
-      
-      // Should have terms 1-10 even if not in content
-      for (let i = 1; i <= 10; i++) {
-        expect(context.terms.has(i)).toBe(true);
-      }
+      const context = loader['parseCodexContent'](content, 'test.json');
+
+      expect(context.version).toBe('1.2.20');
+      expect(context.interweaves).toEqual([]);
+      expect(context.lenses).toEqual([]);
+      expect(context.principles).toEqual([]);
+      expect(context.antiPatterns).toEqual([]);
+      expect(context.validationCriteria).toEqual({});
+      expect(context.frameworkAlignment).toEqual({});
+      expect(context.errorPreventionTarget).toBe(0.996); // default value
     });
   });
 
@@ -305,6 +493,10 @@ Description for term 5.
     let context: CodexContext;
 
     beforeEach(async () => {
+      // Ensure mocks are set up for context loading
+      mockFs.existsSync.mockReturnValue(true);
+      mockFs.readFileSync.mockReturnValue(mockCodexContent);
+
       const result = await loader.loadCodexContext('/test/project');
       context = result.context!;
     });
@@ -342,7 +534,9 @@ Description for term 5.
       const coreTerms = loader.getCoreTerms(context);
       
       for (let i = 1; i < coreTerms.length; i++) {
-        expect(coreTerms[i].number).toBeGreaterThan(coreTerms[i - 1].number);
+        const currentTerm = coreTerms[i];
+        const previousTerm = coreTerms[i - 1];
+        expect(currentTerm!.number).toBeGreaterThan(previousTerm!.number);
       }
     });
   });
@@ -385,12 +579,13 @@ Description for term 5.
     });
 
     it('should detect type safety violations', () => {
-      const result = loader.validateAgainstCodex(context, 'test', {
+      const result = loader.validateAgainstCodex(context, 'use any type here', {
+        includesAny: true
       });
 
       expect(result.compliant).toBe(false);
       expect(result.violations).toHaveLength(1);
-      expect(result.violations[0].term.number).toBe(11);
+      expect(result.violations[0]?.term.number).toBe(11);
     });
 
     it('should detect unresolved tasks', () => {
@@ -409,16 +604,17 @@ Description for term 5.
 
       expect(result.compliant).toBe(false);
       expect(result.violations.some(v => v.term.number === 3)).toBe(true);
-      expect(result.recommendations).toContain('Simplify the solution');
+      expect(result.recommendations).toContain('Simplify the solution by removing unnecessary abstractions');
     });
 
     it('should detect infinite loops', () => {
       const result = loader.validateAgainstCodex(context, 'test', {
+        isInfiniteLoop: true
       });
 
       expect(result.compliant).toBe(false);
       expect(result.violations.some(v => v.term.number === 8)).toBe(true);
-      expect(result.recommendations).toContain('Add clear termination conditions');
+      expect(result.recommendations).toContain('Add clear termination conditions to prevent infinite loops');
     });
 
     it('should return compliant for valid code', () => {

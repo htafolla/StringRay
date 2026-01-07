@@ -1,0 +1,73 @@
+name: Security Monitoring Dashboard
+
+on:
+  workflow_run:
+    workflows: ["Security Audit"]
+    types:
+      - completed
+  schedule:
+    # Daily security monitoring
+    - cron: '0 6 * * *'  # Every day at 6 AM UTC
+
+jobs:
+  security-monitoring:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Build framework
+      run: npm run build
+
+    - name: Run comprehensive security audit
+      run: |
+        node scripts/basic-security-audit.cjs > security-report.txt || true
+        echo "## Security Audit Report" >> $GITHUB_STEP_SUMMARY
+        echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+        cat security-report.txt >> $GITHUB_STEP_SUMMARY
+        echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+
+    - name: Check security score threshold
+      run: |
+        SCORE=$(grep "Security Score:" security-report.txt | sed 's/.*Security Score: \([0-9]*\).*/\1/')
+        if [ "$SCORE" -lt 70 ]; then
+          echo "Security score below threshold: $SCORE/100"
+          echo "🔴 SECURITY ALERT: Score below acceptable threshold" >> $GITHUB_STEP_SUMMARY
+          exit 1
+        else
+          echo "✅ Security score acceptable: $SCORE/100"
+          echo "✅ Security score within acceptable range" >> $GITHUB_STEP_SUMMARY
+        fi
+
+    - name: Generate security metrics
+      run: |
+        ISSUES=$(grep "Total Issues:" security-report.txt | sed 's/.*Total Issues: \([0-9]*\).*/\1/')
+        CRITICAL=$(grep "Critical:" security-report.txt | sed 's/.*Critical: \([0-9]*\).*/\1/')
+        HIGH=$(grep "High:" security-report.txt | sed 's/.*High: \([0-9]*\).*/\1/')
+
+        echo "SECURITY_METRICS<<EOF" >> $GITHUB_ENV
+        echo "{ \"score\": $SCORE, \"issues\": $ISSUES, \"critical\": $CRITICAL, \"high\": $HIGH }" >> $GITHUB_ENV
+        echo "EOF" >> $GITHUB_ENV
+
+    - name: Upload security report
+      uses: actions/upload-artifact@v4
+      with:
+        name: security-monitoring-report
+        path: security-report.txt
+
+    - name: Security alert on failures
+      if: failure()
+      run: |
+        echo "🚨 SECURITY ALERT 🚨"
+        echo "Security audit failed or score below threshold"
+        echo "Check the security report for details"

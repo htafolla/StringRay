@@ -44,7 +44,7 @@ export interface ContextLoadResult {
 /**
  * StrRay Context Loader
  *
- * Loads and parses the Universal Development Codex v1.2.20 from agents_template.md
+     * Loads and parses the Universal Development Codex v1.2.20 from codex.json
  */
 export declare class StrRayContextLoader {
     private static instance;
@@ -63,14 +63,12 @@ export declare class StrRayContextLoader {
      */
     loadCodexContext(projectRoot: string): Promise<ContextLoadResult>;
     /**
-     * Parse codex content from markdown
+     * Parse codex content from JSON or Markdown
      *
-     * Extracts all 30+ codex terms, interweaves, lenses, and principles from markdown.
+     * Extracts all 30+ codex terms, interweaves, lenses, and principles from content.
+     * Supports both JSON and Markdown formats with explicit format detection.
      */
     private parseCodexContent;
-    /**
-     * Infer term category based on number and content
-     */
     private inferTermCategory;
     /**
      * Get specific codex term by number

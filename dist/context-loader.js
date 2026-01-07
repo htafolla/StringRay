@@ -9,17 +9,24 @@
  */
 import * as fs from "fs";
 import * as path from "path";
+import { parseCodexContent, detectContentFormat } from "./utils/codex-parser";
+/**
+ * Type guard for regex match results
+ */
+function isValidMatch(match, index) {
+    return match !== null && match[index] !== undefined;
+}
 /**
  * StrRay Context Loader
  *
- * Loads and parses the Universal Development Codex v1.2.20 from agents_template.md
+     * Loads and parses the Universal Development Codex v1.2.20 from codex.json
  */
 export class StrRayContextLoader {
     static instance;
     cachedContext = null;
     codexFilePaths = [];
     constructor() {
-        this.codexFilePaths = [".strray/agents_template.md", "AGENTS.md"];
+        this.codexFilePaths = [".strray/codex.json", "codex.json"];
     }
     /**
      * Get singleton instance
@@ -38,6 +45,14 @@ export class StrRayContextLoader {
      */
     async loadCodexContext(projectRoot) {
         const warnings = [];
+        // Validate project root
+        if (!projectRoot || projectRoot.trim() === '') {
+            return {
+                success: false,
+                error: 'Invalid project root path: path cannot be empty',
+                warnings,
+            };
+        }
         if (this.cachedContext) {
             return {
                 success: true,
@@ -71,108 +86,35 @@ export class StrRayContextLoader {
         };
     }
     /**
-     * Parse codex content from markdown
+     * Parse codex content from JSON or Markdown
      *
-     * Extracts all 30+ codex terms, interweaves, lenses, and principles from markdown.
+     * Extracts all 30+ codex terms, interweaves, lenses, and principles from content.
+     * Supports both JSON and Markdown formats with explicit format detection.
      */
     parseCodexContent(content, sourcePath) {
-        const context = {
-            version: "1.2.20",
-            lastUpdated: new Date().toISOString(),
-            terms: new Map(),
-            interweaves: [],
-            lenses: [],
-            principles: [],
-            antiPatterns: [],
-            validationCriteria: {},
-            frameworkAlignment: {},
-            errorPreventionTarget: 0.996,
-        };
-        const lines = content.split("\n");
-        let currentSection = null;
-        let currentTerm = null;
-        let termDescriptionLines = [];
-        for (let i = 0; i < lines.length; i++) {
-            const line = lines[i].trim();
-            if (line.startsWith("###") || line.startsWith("##")) {
-                currentSection = line.replace(/#+\s*/, "").toLowerCase();
-                const versionMatch = line.match(/\*\*Version\*\*:\s*(\d+\.\d+\.\d+)/);
-                if (versionMatch) {
-                    context.version = versionMatch[1];
-                }
-                const targetMatch = line.match(/Error Prevention Target:\s*([\d.]+)/);
-                if (targetMatch) {
-                    context.errorPreventionTarget = parseFloat(targetMatch[1]);
-                }
-                continue;
-            }
-            const termMatch = line.match(/^####\s*(\d+)\.\s*(.+)$/);
-            if (termMatch) {
-                if (currentTerm && currentTerm.number !== undefined) {
-                    currentTerm.description = termDescriptionLines.join(" ").trim();
-                    if (currentTerm.description) {
-                        context.terms.set(currentTerm.number, currentTerm);
-                    }
-                }
-                const termNum = parseInt(termMatch[1], 10);
-                const termName = termMatch[2];
-                currentTerm = {
-                    number: termNum,
-                    description: "",
-                    category: this.inferTermCategory(termNum, termName),
-                };
-                if (line.includes("zero-tolerance") || line.includes("blocking")) {
-                    currentTerm.violations = currentTerm.violations || [];
-                    currentTerm.violations.push("zero-tolerance");
-                }
-                termDescriptionLines = [];
-                termDescriptionLines = [];
-                continue;
-            }
-            if (currentTerm && line && !line.startsWith("#") && !line.startsWith("```")) {
-                termDescriptionLines.push(line);
-            }
-            if (line.toLowerCase().includes("lens")) {
-                context.lenses.push(line);
-            }
-            if (line.toLowerCase().includes("principle") && !line.toLowerCase().includes("anti")) {
-                context.principles.push(line);
-            }
-            if (line.toLowerCase().includes("anti-pattern")) {
-                context.antiPatterns.push(line);
-            }
-            const checkboxMatch = line.match(/^\s*-\s*\[\s*\]\s*(.+)$/);
-            if (checkboxMatch) {
-                context.validationCriteria[checkboxMatch[1].trim()] = false;
-            }
+        // Validate inputs before format detection
+        if (!content || content.trim() === '') {
+            throw new Error('Invalid content provided');
         }
-        // Add the last term if exists
-        if (currentTerm && currentTerm.number !== undefined) {
-            currentTerm.description = termDescriptionLines.join(" ").trim();
-            if (currentTerm.description) {
-                context.terms.set(currentTerm.number, currentTerm);
-            }
+        if (!sourcePath || sourcePath.trim() === '') {
+            throw new Error('Invalid source path provided');
         }
-        return context;
-        for (let i = 1; i <= 10; i++) {
-            if (!context.terms.has(i)) {
-                context.terms.set(i, {
-                    number: i,
-                    description: `Core Term ${i} - Not found in ${sourcePath}`,
-                    category: "core",
-                });
-            }
+        // Detect format before parsing
+        const formatResult = detectContentFormat(content);
+        if (formatResult.format === 'unknown') {
+            throw new Error(`Unable to detect content format for ${sourcePath}. Content appears to be neither valid JSON nor Markdown.`);
         }
-        context.frameworkAlignment = {
-            "oh-my-opencode": "v2.12.0",
-            "StrRay Framework": "v1.0.0",
-            "Codex Version": context.version,
-        };
-        return context;
+        // Log format detection for debugging
+        console.log(`StrRay: Detected ${formatResult.format} format for ${sourcePath} (confidence: ${formatResult.confidence})`);
+        const result = parseCodexContent(content, sourcePath);
+        if (!result.success) {
+            throw new Error(result.error || 'Failed to parse codex content');
+        }
+        if (!result.context) {
+            throw new Error('Parsing succeeded but no context was returned');
+        }
+        return result.context;
     }
-    /**
-     * Infer term category based on number and content
-     */
     inferTermCategory(termNumber, termName) {
         if (termNumber <= 10) {
             return "core";
@@ -216,6 +158,13 @@ export class StrRayContextLoader {
      * Returns validation result with violations and recommendations.
      */
     validateAgainstCodex(context, action, actionDetails) {
+        // Input validation
+        if (!context || !context.terms) {
+            throw new Error('Invalid codex context provided');
+        }
+        if (!action || action.trim() === '') {
+            throw new Error('Invalid action provided');
+        }
         const violations = [];
         const recommendations = [];
         if (actionDetails.includesAny) {
@@ -226,12 +175,15 @@ export class StrRayContextLoader {
                     violations.push({
                         term: term11,
                         reason: 'Type safety violation detected - using "any" or type suppression',
-                        severity: "high",
+                        severity: term11.enforcementLevel || "high",
                     });
                 }
             }
         }
-        if (action.includes("TODO") || action.includes("FIXME") || action.includes("XXX")) {
+        // Check for unresolved tasks in code
+        const codeContent = typeof actionDetails.code === 'string' ? actionDetails.code : '';
+        if (codeContent.includes("TODO") || codeContent.includes("FIXME") || codeContent.includes("XXX") ||
+            action.includes("TODO") || action.includes("FIXME") || action.includes("XXX")) {
             const term7 = context.terms.get(7);
             if (term7) {
                 violations.push({
@@ -247,24 +199,25 @@ export class StrRayContextLoader {
                 violations.push({
                     term: term3,
                     reason: "Solution appears over-engineered - violates simplicity principle",
-                    severity: "medium",
+                    severity: term3.enforcementLevel || "medium",
                 });
                 recommendations.push("Simplify the solution by removing unnecessary abstractions");
             }
         }
-        if (action.includes("while(true)") || action.includes("for(;;)")) {
+        if (actionDetails.isInfiniteLoop ||
+            action.includes("while(true)") || action.includes("for(;;)")) {
             const term8 = context.terms.get(8);
             if (term8) {
                 violations.push({
                     term: term8,
-                    reason: "Potential infinite loop detected",
-                    severity: "blocking",
+                    reason: "Infinite loop detected - violates termination principle",
+                    severity: term8.enforcementLevel || "blocking",
                 });
-                recommendations.push("Add clear termination conditions to the loop");
+                recommendations.push("Add clear termination conditions to prevent infinite loops");
             }
         }
         return {
-            compliant: violations.filter((v) => v.severity === "blocking").length === 0,
+            compliant: violations.length === 0,
             violations,
             recommendations,
         };
@@ -293,16 +246,17 @@ export class StrRayContextLoader {
                 zeroToleranceCount: 0,
             };
         }
-        const terms = Array.from(this.cachedContext.terms.values());
+        const context = this.cachedContext;
+        const terms = Array.from(context.terms.values());
         const categoryBreakdown = {};
         terms.forEach((term) => {
             categoryBreakdown[term.category] = (categoryBreakdown[term.category] || 0) + 1;
         });
         return {
             loaded: true,
-            termCount: this.cachedContext.terms.size,
+            termCount: context.terms.size,
             categoryBreakdown,
-            zeroToleranceCount: this.getZeroToleranceTerms(this.cachedContext).length,
+            zeroToleranceCount: this.getZeroToleranceTerms(context).length,
         };
     }
 }

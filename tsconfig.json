@@ -2,7 +2,7 @@
 	"compilerOptions": {
 		"target": "ES2022",
 		"module": "ESNext",
-		"moduleResolution": "node",
+		"moduleResolution": "bundler",
 		"esModuleInterop": true,
 		"allowSyntheticDefaultImports": true,
 		"strict": true,
@@ -20,8 +20,9 @@
 		"noImplicitReturns": true,
 		"noFallthroughCasesInSwitch": true,
 		"noUncheckedIndexedAccess": true,
-		"exactOptionalPropertyTypes": true
+		"exactOptionalPropertyTypes": true,
+		"allowImportingTsExtensions": false
 	},
 	"include": ["src/**/*"],
-	"exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.spec.ts"]
+	"exclude": ["node_modules", "dist", "src/**/*.test.ts", "src/**/*.spec.ts", "src/__tests__/**/*"]
 }

@@ -17,7 +17,15 @@
 		"test": "vitest run",
 		"test:watch": "vitest",
 		"test:coverage": "vitest run --coverage --reporter=verbose",
-		"test:unit": "vitest run --config vitest.unit.config.ts"
+		"test:unit": "vitest run --config vitest.unit.config.ts",
+		"test:performance": "node scripts/performance-test.cjs",
+		"audit": "npm audit",
+		"security-audit": "node scripts/basic-security-audit.cjs",
+		"security-check": "npm run security-audit && npm audit --audit-level=moderate",
+		"security-monitor": "node scripts/basic-security-audit.cjs --monitor",
+		"deps:check": "npm audit && npm outdated",
+		"deps:update": "npm update && npm audit fix",
+		"deps:scan": "node scripts/dependency-scan.cjs"
 	},
 	"keywords": [
 		"ai",
@@ -39,17 +47,17 @@
 		"url": "https://github.com/strray-framework/stringray/issues"
 	},
 	"dependencies": {
-		"@opencode-ai/plugin": "^1.1.4",
-		"@types/express": "^5.0.6",
-		"express": "^5.2.1",
-		"open": "^11.0.0",
-		"zod": "^4.1.8"
+		"@opencode-ai/plugin": "~1.1.4",
+		"@types/express": "~5.0.6",
+		"express": "~5.2.1",
+		"open": "~11.0.0",
+		"zod": "~4.1.8"
 	},
 	"devDependencies": {
-		"@types/node": "^22.19.3",
-		"@vitest/coverage-v8": "^4.0.16",
-		"typescript": "^5.9.3",
-		"vitest": "^4.0.16"
+		"@types/node": "~22.19.3",
+		"@vitest/coverage-v8": "~4.0.16",
+		"typescript": "~5.9.3",
+		"vitest": "~4.0.16"
 	},
 	"engines": {
 		"node": ">=18.0.0"

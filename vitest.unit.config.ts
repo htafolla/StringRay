@@ -14,8 +14,6 @@ export default defineConfig({
     testTimeout: 5000,
     hookTimeout: 5000,
     bail: 1,
-    maxThreads: 4,
-    minThreads: 1,
   },
   resolve: {
     alias: {

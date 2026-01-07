@@ -32,7 +32,7 @@ bun install -g oh-my-opencode
 cd /path/to/your/project
 
 # Initialize StrRay framework
-oh-my-opencode init --framework strray
+npm run init
 
 # This creates:
 # - .opencode/ directory with framework files

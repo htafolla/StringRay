@@ -9,6 +9,27 @@ const __dirname = dirname(__filename);
 const app = express();
 const PORT = 3000;
 
+// Lazy load security headers middleware
+let securityMiddleware: any = null;
+const getSecurityMiddleware = async () => {
+  if (!securityMiddleware) {
+    const { securityHeadersMiddleware } = await import('./security/security-headers');
+    securityMiddleware = securityHeadersMiddleware.getExpressMiddleware();
+  }
+  return securityMiddleware;
+};
+
+// Apply security headers middleware lazily
+app.use(async (req, res, next) => {
+  try {
+    const middleware = await getSecurityMiddleware();
+    return middleware(req, res, next);
+  } catch (error) {
+    console.warn('Security middleware failed to load, continuing without it:', error);
+    next();
+  }
+});
+
 // Serve static files
 app.use(express.static(join(__dirname, 'public')));
 
@@ -38,6 +59,17 @@ app.get('/api/agents', (req: any, res: any) => {
       'test-architect'
     ]
   });
+});
+
+// Performance monitoring middleware
+app.use((req: any, res: any, next: any) => {
+  const start = process.hrtime.bigint();
+  res.on('finish', () => {
+    const end = process.hrtime.bigint();
+    const duration = Number(end - start) / 1e6; // Convert to milliseconds
+    console.log(`${req.method} ${req.url} - ${duration.toFixed(2)}ms`);
+  });
+  next();
 });
 
 // Add route for root path

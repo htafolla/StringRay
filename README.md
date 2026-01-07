@@ -36,9 +36,14 @@
 ### Installation
 
 ```bash
-# Install dependencies (npm or bun)
+# Install oh-my-opencode (if not already installed)
+# Install oh-my-opencode
+npm install -g oh-my-opencode
+
+# Install StringRay dependencies
 npm install
-# or
+# or with bun
+bun install
 bun install
 
 # Initialize StrRay in your project
@@ -98,8 +103,13 @@ Update your `.opencode/oh-my-opencode.json`:
 ## Installation
 
 ```bash
+# Install oh-my-opencode
+npm install -g oh-my-opencode
+
+# Install StringRay dependencies
 npm install
-# or
+# or with bun
+bun install
 bun install
 cd /path/to/project
 ```

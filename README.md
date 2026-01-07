@@ -36,8 +36,8 @@
 ### Installation
 
 ```bash
-# Install oh-my-opencode (if not already installed)
-npm install -g oh-my-opencode
+# Install dependencies
+npm install
 
 # Initialize StrRay in your project
 cd /path/to/your/project
@@ -100,7 +100,7 @@ Update your `.opencode/oh-my-opencode.json`:
 ## Installation
 
 ```bash
-npm install -g oh-my-opencode
+npm install
 cd /path/to/project
 oh-my-opencode init --framework strray
 ```

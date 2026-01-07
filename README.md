@@ -87,17 +87,17 @@ Update your `.opencode/oh-my-opencode.json`:
 - Setup time: 30 minutes
 - Error prevention: 90% effective
 
-## 🏗️ VERIFIED PRODUCTION ARCHITECTURE (ALL COMPONENTS IMPLEMENTED)
+## 🏗️ THE SENTINEL ARCHITECTURE (DEPLOYED & UNBREAKABLE)
 
-### ⚔️ 8 SPECIALIZED AI AGENTS - VERIFIED FUNCTIONAL
-- **🧠 SISYPHUS (Orchestrator)**: VERIFIED multi-agent coordination with async delegation and conflict resolution
-- **🛡️ ENFORCER**: VERIFIED framework compliance auditor with 45 codex terms enforcement (99.6% error prevention)
-- **🏗️ ARCHITECT**: VERIFIED system design and dependency mapping with architectural validation
-- **🔍 BUG TRIAGE SPECIALIST**: VERIFIED error investigation and surgical code fixes with root cause analysis
-- **👁️ CODE REVIEWER**: VERIFIED code quality assurance with best practices validation and recommendations
-- **🔐 SECURITY AUDITOR**: VERIFIED vulnerability detection and security remediation with automated scanning
-- **🔧 REFACTORER**: VERIFIED technical debt elimination with surgical code improvements
-- **🧪 TEST ARCHITECT**: VERIFIED testing strategy design with CI/CD pipeline integration
+### 🛡️ 8 VIGILANT SENTRIES - ETERNALLY GUARDING
+- **🧠 SISYPHUS (COMMAND CENTER)**: VERIFIED multi-agent coordination with async delegation and conflict resolution - THE STRATEGIC OVERSEER
+- **🛡️ ENFORCER (LAW KEEPER)**: VERIFIED framework compliance auditor with 45 codex terms enforcement (99.6% error prevention) - THE JUDGE
+- **🏗️ ARCHITECT (MASTER BUILDER)**: VERIFIED system design and dependency mapping with architectural validation - THE VISIONARY
+- **🔍 BUG TRIAGE SPECIALIST (DETECTIVE)**: VERIFIED error investigation and surgical code fixes with root cause analysis - THE INVESTIGATOR
+- **👁️ CODE REVIEWER (INSPECTOR)**: VERIFIED code quality assurance with best practices validation and recommendations - THE CRITIC
+- **🔐 SECURITY AUDITOR (GUARD)**: VERIFIED vulnerability detection and security remediation with automated scanning - THE PROTECTOR
+- **🔧 REFACTORER (SURGEON)**: VERIFIED technical debt elimination with surgical code improvements - THE HEALER
+- **🧪 TEST ARCHITECT (VALIDATOR)**: VERIFIED testing strategy design with CI/CD pipeline integration - THE ASSURANCE OFFICER
 
 ### ⚡ VERIFIED MCP ECOSYSTEM INTEGRATION
 - **9 MCP SERVERS VERIFIED**: 7 agent-specific servers + 2 knowledge skill servers - ALL FUNCTIONAL

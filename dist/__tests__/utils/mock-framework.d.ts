@@ -90,13 +90,13 @@ export declare class FrameworkSpies {
      * Create spy for ContextLoader
      */
     static createContextLoaderSpy(): {
-        loadCodexContext: import("vitest").Mock<import("@vitest/spy").Procedure>;
-        getTerm: import("vitest").Mock<import("@vitest/spy").Procedure>;
-        getCoreTerms: import("vitest").Mock<import("@vitest/spy").Procedure>;
-        validateAgainstCodex: import("vitest").Mock<import("@vitest/spy").Procedure>;
-        clearCache: import("vitest").Mock<import("@vitest/spy").Procedure>;
-        isContextLoaded: import("vitest").Mock<import("@vitest/spy").Procedure>;
-        getContextStats: import("vitest").Mock<import("@vitest/spy").Procedure>;
+        loadCodexContext: any;
+        getTerm: any;
+        getCoreTerms: any;
+        validateAgainstCodex: any;
+        clearCache: any;
+        isContextLoaded: any;
+        getContextStats: any;
     };
     /**
      * Create spy for CodexInjector hook
@@ -105,13 +105,13 @@ export declare class FrameworkSpies {
         hook: {
             name: string;
             hooks: {
-                'agent.start': import("vitest").Mock<import("@vitest/spy").Procedure>;
-                'tool.execute.after': import("vitest").Mock<import("@vitest/spy").Procedure>;
+                'agent.start': any;
+                'tool.execute.after': any;
             };
         };
         spies: {
-            agentStart: import("vitest").Mock<import("@vitest/spy").Procedure>;
-            toolExecute: import("vitest").Mock<import("@vitest/spy").Procedure>;
+            agentStart: any;
+            toolExecute: any;
         };
     };
 }

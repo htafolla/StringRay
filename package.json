@@ -1,7 +1,7 @@
 {
-	"name": "strray-standalone",
+	"name": "stringray-framework",
 	"version": "1.0.0",
-	"description": "StrRay Framework Standalone Template - AI-Assisted Development Framework",
+	"description": "StringRay (StrRay) - THE DEFINITIVE AI-Assisted Development Framework That ELIMINATES Catastrophic Errors and Guarantees Production-Ready Code",
 	"type": "module",
 	"main": "./dist/index.js",
 	"types": "./dist/index.d.ts",
@@ -30,11 +30,11 @@
 	"license": "MIT",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/strray-framework/strray.git"
+		"url": "https://github.com/strray-framework/stringray.git"
 	},
-	"homepage": "https://github.com/strray-framework/strray#readme",
+	"homepage": "https://github.com/strray-framework/stringray#readme",
 	"bugs": {
-		"url": "https://github.com/strray-framework/strray/issues"
+		"url": "https://github.com/strray-framework/stringray/issues"
 	},
 	"dependencies": {
 		"@opencode-ai/plugin": "^1.1.4",

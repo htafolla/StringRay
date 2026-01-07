@@ -40,11 +40,7 @@
 npm install
 
 # Initialize StrRay in your project
-cd /path/to/your/project
-oh-my-opencode init --framework strray
 
-# Verify installation
-oh-my-opencode status
 ```
 
 ### Configuration
@@ -102,7 +98,6 @@ Update your `.opencode/oh-my-opencode.json`:
 ```bash
 npm install
 cd /path/to/project
-oh-my-opencode init --framework strray
 ```
 
 ## 📚 VERIFIED COMPREHENSIVE DOCUMENTATION (ALL DELIVERED)

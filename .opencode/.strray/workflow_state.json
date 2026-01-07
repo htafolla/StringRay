@@ -1,0 +1,28 @@
+{
+	"workflows": [
+		{
+			"id": "test_workflow",
+			"name": "Test Workflow",
+			"status": "pending",
+			"created_at": 1767638764.2219672,
+			"completed_at": null,
+			"metadata": {},
+			"tasks": {
+				"test_task_1": {
+					"id": "test_task_1",
+					"name": "Test analysis task",
+					"agent_type": "analyst",
+					"priority": "high",
+					"dependencies": [],
+					"status": "pending",
+					"result": null,
+					"error": null,
+					"start_time": null,
+					"end_time": null,
+					"retry_count": 0,
+					"max_retries": 3
+				}
+			}
+		}
+	]
+}

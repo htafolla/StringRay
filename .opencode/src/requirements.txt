@@ -1,0 +1,4 @@
+# StrRay Python Backend Requirements
+
+# Core Python dependencies for StrRay backend
+structlog>=23.0.0

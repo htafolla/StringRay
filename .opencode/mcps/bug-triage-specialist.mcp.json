@@ -1,0 +1,8 @@
+{
+	"mcpServers": {
+		"bug-triage-specialist": {
+			"command": "node",
+			"args": ["mcps/bug-triage-specialist.server.js"]
+		}
+	}
+}

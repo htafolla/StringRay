@@ -1,0 +1,25 @@
+{
+	"lite_mode_metrics": {
+		"version": "1.0.0",
+		"performance_targets": {
+			"initialization_time": "<1 second",
+			"validation_speed": "<5 seconds",
+			"error_prevention": "80%"
+		},
+		"current_metrics": {
+			"initialization_time": "8 seconds",
+			"validation_speed": "2 seconds",
+			"error_prevention": "99.6% test pass rate"
+		},
+		"agent_count": 4,
+		"disabled_features": [
+			"oracle",
+			"librarian",
+			"explore",
+			"orchestrator",
+			"bug-triage-specialist",
+			"refactorer",
+			"test-architect"
+		]
+	}
+}

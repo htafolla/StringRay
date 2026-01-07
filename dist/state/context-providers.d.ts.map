@@ -1,0 +1,1 @@
+{"version":3,"file":"context-providers.d.ts","sourceRoot":"","sources":["../../src/state/context-providers.ts"],"names":[],"mappings":"AAAA,MAAM,WAAW,gBAAgB;IAC/B,cAAc,EAAE,CAAC,CAAC,EAAE,KAAK,EAAE,CAAC,KAAK,OAAO,CAAC;IACzC,UAAU,EAAE,CAAC,CAAC,OAAO,CAAC,CAAC;CACxB"}

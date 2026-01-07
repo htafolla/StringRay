@@ -1,0 +1,60 @@
+{
+	"name": "strray-standalone",
+	"version": "1.0.0",
+	"description": "StrRay Framework Standalone Template - AI-Assisted Development Framework",
+	"type": "module",
+	"main": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"scripts": {
+		"build": "tsc",
+		"dev": "tsc --watch",
+		"init": "bash scripts/init.sh",
+		"validate": "node scripts/validate-codex.js",
+		"clean": "rm -rf dist",
+		"prepublishOnly": "npm run build",
+		"test": "vitest run",
+		"test:watch": "vitest",
+		"test:coverage": "vitest run --coverage --reporter=verbose",
+		"test:unit": "vitest run --config vitest.unit.config.ts"
+	},
+	"keywords": [
+		"ai",
+		"development",
+		"framework",
+		"typescript",
+		"codex",
+		"error-prevention",
+		"oh-my-opencode"
+	],
+	"author": "StrRay Framework Team",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/strray-framework/strray.git"
+	},
+	"homepage": "https://github.com/strray-framework/strray#readme",
+	"bugs": {
+		"url": "https://github.com/strray-framework/strray/issues"
+	},
+	"dependencies": {
+		"@opencode-ai/plugin": "^1.1.4",
+		"zod": "^4.1.8"
+	},
+	"devDependencies": {
+		"@types/node": "^22.19.3",
+		"@vitest/coverage-v8": "^4.0.16",
+		"typescript": "^5.9.3",
+		"vitest": "^4.0.16"
+	},
+	"engines": {
+		"node": ">=18.0.0"
+	},
+	"files": [
+		"dist",
+		"src",
+		"scripts",
+		"config",
+		"docs",
+		"README.md"
+	]
+}

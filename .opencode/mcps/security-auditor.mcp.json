@@ -1,0 +1,8 @@
+{
+	"mcpServers": {
+		"security-auditor": {
+			"command": "node",
+			"args": ["mcps/security-auditor.server.js"]
+		}
+	}
+}

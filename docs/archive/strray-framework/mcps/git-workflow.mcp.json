@@ -1,0 +1,12 @@
+{
+	"mcpServers": {
+		"git-workflow": {
+			"command": "node",
+			"args": [
+				"-e",
+				"console.log('Version control best practices and conventional commit enforcement tool')"
+			],
+			"env": {}
+		}
+	}
+}

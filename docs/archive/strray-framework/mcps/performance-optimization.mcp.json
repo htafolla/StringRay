@@ -1,0 +1,12 @@
+{
+	"mcpServers": {
+		"performance-optimization": {
+			"command": "node",
+			"args": [
+				"-e",
+				"console.log('Application performance optimization and bottleneck identification tool')"
+			],
+			"env": {}
+		}
+	}
+}

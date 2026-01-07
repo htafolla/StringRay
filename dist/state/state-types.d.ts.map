@@ -1,0 +1,1 @@
+{"version":3,"file":"state-types.d.ts","sourceRoot":"","sources":["../../src/state/state-types.ts"],"names":[],"mappings":"AAAA,MAAM,MAAM,UAAU,GAAG,MAAM,GAAG,MAAM,GAAG,OAAO,GAAG,MAAM,GAAG,IAAI,CAAC;AAEnE,MAAM,WAAW,UAAU;IACzB,KAAK,EAAE,UAAU,CAAC;IAClB,SAAS,EAAE,MAAM,CAAC;CACnB"}

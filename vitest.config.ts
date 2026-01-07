@@ -32,7 +32,7 @@ export default defineConfig({
     testTimeout: 10000,
     hookTimeout: 10000,
     bail: 5, // Stop after 5 test failures
-    maxThreads: 4,
+     // maxThreads: 4, // Removed unsupported option
     minThreads: 1,
     retry: 2,
   },

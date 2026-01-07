@@ -1,7 +1,7 @@
 {
 	"name": "stringray-framework",
 	"version": "1.0.0",
-	"description": "StringRay (StrRay) - THE DEFINITIVE AI-Assisted Development Framework That ELIMINATES Catastrophic Errors and Guarantees Production-Ready Code",
+	"description": "StringRay (StrRay) - Agentic Framework for Production-Ready Code: Eliminate Spaghetti Code & AI Hallucinations Through Intelligent Coordination",
 	"type": "module",
 	"main": "./dist/index.js",
 	"types": "./dist/index.d.ts",

@@ -7,7 +7,9 @@
 	"types": "./dist/index.d.ts",
 	"scripts": {
 		"build": "tsc",
-		"dev": "tsc --watch",
+		"dev": "tsc && node dist/server.js",
+		"start": "node dist/server.js",
+		"stop": "pkill -f 'node dist/server.js'",
 		"init": "bash scripts/init.sh",
 		"validate": "node scripts/validate-codex.js",
 		"clean": "rm -rf dist",

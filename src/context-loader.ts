@@ -178,8 +178,8 @@ export class StrRayContextLoader {
 				};
 
 				if (line.includes("zero-tolerance") || line.includes("blocking")) {
-					currentTerm.violations = currentTerm.violations || [];
-					currentTerm.violations.push("zero-tolerance");
+					(currentTerm as any).violations = (currentTerm as any).violations || [];
+					(currentTerm as any).violations.push("zero-tolerance");
 				}
 
 				termDescriptionLines = [];

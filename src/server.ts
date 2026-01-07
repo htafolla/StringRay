@@ -1,7 +1,10 @@
 import express from 'express';
 import { exec } from 'child_process';
-import { readFileSync } from 'fs';
-import { join } from 'path';
+import { join, dirname } from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const app = express();
 const PORT = 3000;
@@ -10,7 +13,7 @@ const PORT = 3000;
 app.use(express.static(join(__dirname, 'public')));
 
 // API endpoints
-app.get('/api/status', (req, res) => {
+app.get('/api/status', (req: any, res: any) => {
   // Return framework status
   res.json({
     framework: 'StringRay',
@@ -21,7 +24,7 @@ app.get('/api/status', (req, res) => {
   });
 });
 
-app.get('/api/agents', (req, res) => {
+app.get('/api/agents', (req: any, res: any) => {
   // Return agent configurations
   res.json({
     agents: [
@@ -37,9 +40,15 @@ app.get('/api/agents', (req, res) => {
   });
 });
 
+// Add route for root path
+app.get('/', (req: any, res: any) => {
+  res.sendFile(join(__dirname, 'public', 'index.html'));
+});
+
 app.listen(PORT, () => {
   console.log(`🛡️ StringRay Dashboard running at http://localhost:${PORT}`);
   console.log(`⚡ Open your browser to view the interface`);
+  console.log(`📁 Serving files from: ${join(__dirname, 'public')}`);
 
   // Auto-open browser
   const start = process.platform === 'darwin' ? 'open' :

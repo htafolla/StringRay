@@ -1,4 +1,4 @@
-# StringRay (StrRay) – The AI Agent
+# ⚡ StringRay (StrRay) – The AI Agent
 
 [![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/your-org/strray-framework)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -15,7 +15,7 @@
 
 **StringRay orchestrates 8 specialized agents with 45 codex rules to eliminate them — before they take root.**
 
-**Dead Ends Eliminated**
+**🛡️ Dead Ends Eliminated**
 - **Spaghetti & Monoliths** → Clean lines + single sources of truth
 - **Hallucinations** → Grounded, verifiable output
 - **Code Rot** → Modular, maintainable components

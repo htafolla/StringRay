@@ -99,10 +99,13 @@ Update your `.opencode/oh-my-opencode.json`:
 - **🔧 REFACTORER (SURGEON)**: VERIFIED technical debt elimination with surgical code improvements - THE HEALER
 - **🧪 TEST ARCHITECT (VALIDATOR)**: VERIFIED testing strategy design with CI/CD pipeline integration - THE ASSURANCE OFFICER
 
-### ⚡ VERIFIED MCP ECOSYSTEM INTEGRATION
-- **9 MCP SERVERS VERIFIED**: 7 agent-specific servers + 2 knowledge skill servers - ALL FUNCTIONAL
-- **STANDARDIZED MCP PROTOCOL**: VERIFIED seamless AI integration with Model Context Protocol
-- **6 KNOWLEDGE SKILLS VERIFIED**: project-analysis, testing-strategy, architecture-patterns, performance-optimization, git-workflow, api-design
+## Installation
+
+```bash
+npm install -g oh-my-opencode
+cd /path/to/project
+oh-my-opencode init --framework strray
+```
 
 ## 📚 VERIFIED COMPREHENSIVE DOCUMENTATION (ALL DELIVERED)
 
@@ -115,52 +118,31 @@ Update your `.opencode/oh-my-opencode.json`:
 
 ## 🛠️ DEVELOPMENT WEAPONS
 
-### Building - VERIFIED TYPESCRIPT COMPILATION
+## Development
 
 ```bash
-npm run build              # VERIFIED: TypeScript compilation with strict error checking
+npm run build     # TypeScript compilation
+npm test          # Run tests
+npm run dev       # Watch mode
 ```
 
-### Testing - VERIFIED COMPREHENSIVE TEST SUITE
+## Contributing
 
-```bash
-npm test                   # VERIFIED: Vitest framework with parallel execution (4 threads max)
-npm run test:coverage     # VERIFIED: 85%+ coverage requirement with detailed reporting
-npm run test:unit         # VERIFIED: Unit tests with custom matchers and utilities
-```
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Push to the branch
+5. Open a Pull Request
 
-### Development - VERIFIED WATCH MODE
+## License
 
-```bash
-npm run dev               # VERIFIED: TypeScript watch compilation with instant feedback
-```
+MIT License - see [LICENSE](LICENSE) file.
 
-## 🤝 JOIN THE REVOLUTION
+## Documentation
 
-1. **Fork the repository** - BECOME PART OF THE MISSION
-2. **Create a feature branch** (`git checkout -b feature/amazing-feature`) - YOUR BATTLEFIELD
-3. **Commit your changes** (`git commit -m 'Add some amazing feature'`) - LEAVE YOUR MARK
-4. **Push to the branch** (`git push origin feature/amazing-feature`) - SHARE YOUR POWER
-5. **Open a Pull Request** - CHANGE THE WORLD
-
-## 📄 LICENSE
-
-This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details. **USE IT. BUILD WITH IT. CHANGE THE WORLD.**
-
-## 🙏 ACKNOWLEDGMENTS
-
-- **BUILT ON** the [oh-my-opencode](https://github.com/opencode-ai/oh-my-opencode) ecosystem - THE FOUNDATION
-- **Agent architecture developed over 6+ months across 5+ projects** - BATTLE-TESTED
-- **PROVEN on production applications** - REAL WORLD VALIDATION
-
-## 📞 SUPPORT - WE'VE GOT YOUR BACK
-
-- **Issues**: [GitHub Issues](https://github.com/your-org/strray-framework/issues) - REPORT AND RESOLVE
-- **Documentation**: See `docs/` directory - EVERYTHING YOU NEED
-- **Troubleshooting**: Check [TROUBLESHOOTING.md](./docs/troubleshooting/TROUBLESHOOTING.md) - NEVER GET STUCK
-
----
-
-**⚡ StringRay (StrRay) - VERIFIED AGENTIC FRAMEWORK: ELIMINATES SPAGHETTI CODE & AI HALLUCINATIONS THROUGH INTELLIGENT COORDINATION** 🔥🚀💪
-
-**ALL CLAIMS VERIFIED • ALL FEATURES IMPLEMENTED • PRODUCTION-READY GUARANTEE** ✨
+- [Installation Guide](./docs/StrRay_INSTALLATION_GUIDE.md)
+- [Model Configuration](./docs/StrRay_MODEL_CONFIG.md)
+- [API Reference](./docs/api/API_REFERENCE.md)
+- [Agent Documentation](./docs/agents/)
+- [Architecture](./docs/architecture/)
+- [Troubleshooting](./docs/troubleshooting/)

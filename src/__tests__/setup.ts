@@ -18,9 +18,6 @@ declare global {
 }
 
 // Mock console methods to reduce noise during testing
-const originalConsoleLog = console.log;
-const originalConsoleError = console.error;
-const originalConsoleWarn = console.warn;
 
 beforeAll(() => {
   // Set up test environment
@@ -35,9 +32,6 @@ afterAll(() => {
 
 // Reset console methods after each test
 afterEach(() => {
-  console.log = originalConsoleLog;
-  console.error = originalConsoleError;
-  console.warn = originalConsoleWarn;
 });
 
 // Global test utilities

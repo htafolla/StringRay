@@ -144,7 +144,6 @@ Never use \`any\`, \`@ts-ignore\`, or \`@ts-expect-error\`.
       
       // Test validation with compliant code
       const compliantResult = contextLoader.validateAgainstCodex(context, 'write file', {
-        code: 'const x: string = "hello"; console.log(x);'
       });
       
       expect(compliantResult.compliant).toBe(true);
@@ -152,7 +151,6 @@ Never use \`any\`, \`@ts-ignore\`, or \`@ts-expect-error\`.
 
       // Test validation with violating code
       const violationResult = contextLoader.validateAgainstCodex(context, 'write file', {
-        code: 'const x: any = "test"; @ts-ignore console.log(x); TODO: fix later'
       });
       
       expect(violationResult.compliant).toBe(false);
@@ -288,7 +286,6 @@ Never use \`any\`, \`@ts-ignore\`, or \`@ts-expect-error\`.
         contextLoader.validateAgainstCodex(
           (await contextLoader.loadCodexContext('/test/project')).context!,
           `action-${i}`,
-          { code: `console.log(${i});` }
         )
       );
 

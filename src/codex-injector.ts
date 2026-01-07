@@ -45,7 +45,6 @@ function readFileContent(filePath: string): string | null {
 			return fs.readFileSync(filePath, "utf-8");
 		}
 	} catch (error) {
-		console.error(`Failed to read codex file ${filePath}:`, error);
 	}
 	return null;
 }
@@ -102,7 +101,6 @@ function loadCodexContext(sessionId: string): CodexContextEntry[] {
 		if (content) {
 			const entry = createCodexContextEntry(fullPath, content);
 			codexContexts.push(entry);
-			console.error(
 				`✅ StrRay Codex loaded: ${fullPath} (${entry.metadata.termCount} terms)`,
 			);
 		}
@@ -111,7 +109,6 @@ function loadCodexContext(sessionId: string): CodexContextEntry[] {
 	codexCache.set(sessionId, codexContexts);
 
 	if (codexContexts.length === 0) {
-		console.error(`⚠️  No codex files found. Checked: ${CODEX_FILE_LOCATIONS.join(", ")}`);
 	}
 
 	return codexContexts;
@@ -159,15 +156,6 @@ export function createStrRayCodexInjectorHook() {
 				const stats = getCodexStats(sessionId);
 
 				if (stats.loaded) {
-					console.error("");
-					console.error("═════════════════════════════════════════════════════════════");
-					console.error("🚀 StrRay Framework v1.0.0 - Ready");
-					console.error("═════════════════════════════════════════════════════════════");
-					console.error(`✅ Codex Loaded: ${stats.totalTerms} terms (v${stats.version})`);
-					console.error(`📁 Sources: ${stats.fileCount} file(s)`);
-					console.error(`🎯 Error Prevention Target: 90% runtime error prevention`);
-					console.error("═════════════════════════════════════════════════════════════");
-					console.error("");
 				}
 			},
 			"tool.execute.after": (

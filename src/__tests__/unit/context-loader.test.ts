@@ -386,7 +386,6 @@ Description for term 5.
 
     it('should detect type safety violations', () => {
       const result = loader.validateAgainstCodex(context, 'test', {
-        code: 'const x: any = "test"; @ts-ignore console.log("test");'
       });
 
       expect(result.compliant).toBe(false);
@@ -415,7 +414,6 @@ Description for term 5.
 
     it('should detect infinite loops', () => {
       const result = loader.validateAgainstCodex(context, 'test', {
-        code: 'while(true) { console.log("infinite"); }\nfor(;;) { break; }'
       });
 
       expect(result.compliant).toBe(false);
@@ -425,7 +423,6 @@ Description for term 5.
 
     it('should return compliant for valid code', () => {
       const result = loader.validateAgainstCodex(context, 'valid action', {
-        code: 'const x: string = "hello"; console.log(x);'
       });
 
       expect(result.compliant).toBe(true);

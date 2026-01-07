@@ -46,9 +46,6 @@ app.get('/', (req: any, res: any) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`🛡️ StringRay Dashboard running at http://localhost:${PORT}`);
-  console.log(`⚡ Open your browser to view the interface`);
-  console.log(`📁 Serving files from: ${join(__dirname, 'public')}`);
 
   // Auto-open browser
   const start = process.platform === 'darwin' ? 'open' :

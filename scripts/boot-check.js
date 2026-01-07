@@ -20,11 +20,9 @@ try {
 	if (fs.existsSync(frameworkPath)) {
 		initializeStrRay = require(frameworkPath).initializeStrRay;
 	} else {
-		console.error('❌ Framework build not found. Run "npm run build" first.');
 		process.exit(1);
 	}
 } catch (error) {
-	console.error("❌ Failed to load framework:", error.message);
 	process.exit(1);
 }
 
@@ -38,7 +36,6 @@ class BootChecker {
 	log(message, type = "info") {
 		const timestamp = new Date().toISOString();
 		const prefix = type === "error" ? "❌" : type === "success" ? "✅" : "ℹ️";
-		console.log(`${prefix} [${timestamp}] ${message}`);
 	}
 
 	async runCheck(name, checkFn) {
@@ -143,8 +140,6 @@ class BootChecker {
 	}
 
 	async run() {
-		console.log("🚀 StrRay Framework Boot Health Check");
-		console.log("=====================================");
 
 		try {
 			// Run all checks
@@ -160,30 +155,20 @@ class BootChecker {
 			const duration = Date.now() - this.startTime;
 
 			// Report results
-			console.log("\n📊 Health Check Results");
-			console.log("=======================");
 
 			const passedChecks = this.checks.filter((c) => c.success).length;
 			const totalChecks = this.checks.length;
 
-			console.log(`✅ Passed: ${passedChecks}/${totalChecks}`);
-			console.log(`❌ Failed: ${this.errors.length}`);
-			console.log(`⏱️  Duration: ${duration}ms`);
 
 			if (bootResult) {
-				console.log(`📚 Codex Terms: ${bootResult.codex?.terms?.size || "unknown"}`);
-				console.log(`🔧 Context Loaded: ${!!bootResult.context}`);
 			}
 
 			if (this.errors.length === 0) {
-				console.log("\n🎉 All checks passed! Framework is healthy.");
 				process.exit(0);
 			} else {
-				console.log("\n💥 Some checks failed. See details above.");
 				process.exit(1);
 			}
 		} catch (error) {
-			console.error("\n💥 Health check failed with error:", error);
 			process.exit(1);
 		}
 	}
@@ -192,6 +177,5 @@ class BootChecker {
 // Run the health check
 const checker = new BootChecker();
 checker.run().catch((error) => {
-	console.error("Unexpected error during health check:", error);
 	process.exit(1);
 });

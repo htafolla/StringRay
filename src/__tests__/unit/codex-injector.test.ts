@@ -460,8 +460,6 @@ Never use \`any\`, \`@ts-ignore\`, or \`@ts-expect-error\`.
     });
 
     it('should handle console logging errors', () => {
-      const originalConsoleLog = console.log;
-      console.log = vi.fn(() => {
         throw new Error('Console error');
       });
 
@@ -475,7 +473,6 @@ Never use \`any\`, \`@ts-ignore\`, or \`@ts-expect-error\`.
         hook.hooks['agent.start']('session-123');
       }).not.toThrow();
       
-      console.log = originalConsoleLog;
     });
   });
 });

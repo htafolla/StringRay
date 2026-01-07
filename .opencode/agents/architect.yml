@@ -1,0 +1,119 @@
+name: architect
+description: "Architect agent for design and architecture validation"
+version: "2.0.0"
+model: opencode/grok-code
+
+# State Management Configuration
+state_management:
+  enabled: true
+  namespaces:
+    - architecture_decisions
+    - design_sessions
+    - pattern_library
+    - validation_results
+  persistence: true
+  recovery: automatic
+  backup_interval: 1h
+  retention_days: 90
+
+# Delegation System Configuration
+delegation:
+  enabled: true
+  capabilities:
+    - design_delegation
+    - review_coordination
+    - implementation_planning
+    - dependency_analysis
+  complexity_threshold: 7
+  conflict_resolution: consensus_based
+  monitoring_interval: 60s
+  max_chain_depth: 3
+
+# Logging Configuration
+logging:
+  level: info
+  format: json
+  destinations:
+    - console
+    - file
+    - monitoring
+  retention_days: 30
+  sensitive_data_filtering: true
+  audit_trail: true
+
+# Processor Pipeline Configuration
+processor_pipeline:
+  - name: architectural-validation
+    type: validation
+    priority: high
+    timeout_ms: 15000
+    retry_attempts: 2
+  - name: design-pattern-analysis
+    type: analysis
+    priority: medium
+    timeout_ms: 10000
+    retry_attempts: 1
+  - name: scalability-assessment
+    type: validation
+    priority: medium
+    timeout_ms: 12000
+    retry_attempts: 2
+  - name: codex-compliance-check
+    type: validation
+    priority: critical
+    timeout_ms: 8000
+    retry_attempts: 3
+
+# Agent Capabilities
+capabilities:
+  - architectural_design
+  - system_modeling
+  - design_patterns
+  - technical_leadership
+  - scalability_planning
+  - dependency_analysis
+
+# Error Handling Configuration
+error_handling:
+  retry_attempts: 3
+  circuit_breaker:
+    enabled: true
+    failure_threshold: 3
+    recovery_timeout_ms: 30000
+  fallback_strategy: degrade
+  alert_on_failure: true
+
+# Performance Configuration
+performance:
+  timeout_ms: 30000
+  concurrency_limit: 3
+  memory_limit_mb: 256
+  cpu_limit_percent: 40
+
+# Integration Hooks
+integration:
+  pre_design_validation: true
+  post_architecture_commit: true
+  design_change_notification: true
+  codex_compliance_check: true
+  webhook_endpoints:
+    - url: "https://architecture-validation.example.com/webhook"
+      events: ["design_completed", "validation_failed"]
+
+# Security Configuration
+security:
+  sandboxed_execution: true
+  permission_level: elevated
+  data_classification: internal
+  encryption_required: false
+
+# Monitoring Configuration
+monitoring:
+  metrics_collection: true
+  health_checks: true
+  performance_tracking: true
+  alert_thresholds:
+    response_time_ms: 25000
+    error_rate_percent: 2
+    memory_usage_mb: 200</content>
+<parameter name="filePath">.opencode/agents/architect.yml

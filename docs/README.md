@@ -25,7 +25,7 @@ oh-my-opencode v2.12.0
 **Integration Points:**
 
 - Uses oh-my-opencode's plugin architecture and configuration schema
-- Leverages "opencode/grok-code" model for all AI agents (or compatible models of your choice)
+- Leverages "opencode/grok-code" model for all 8 AI agents: enforcer, architect, orchestrator, bug-triage-specialist, code-reviewer, security-auditor, refactorer, test-architect (or compatible models of your choice)
 - Extends oh-my-opencode with project-specific automation and validation
 - Maintains full compatibility with oh-my-opencode's ecosystem
 

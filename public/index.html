@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚡ StringRay Dashboard</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .card h3 {
+            margin-top: 0;
+            color: #ffd700;
+        }
+        .agent-list {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .agent-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 12px;
+            border-radius: 5px;
+            font-size: 0.9em;
+        }
+        .status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+        .status.active {
+            background: #4CAF50;
+            color: white;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            opacity: 0.7;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⚡ StringRay</h1>
+            <p>AI Agent Orchestration Framework - Production-Ready Code, No Dead Ends</p>
+        </div>
+
+        <div class="grid">
+            <div class="card">
+                <h3>🛡️ Framework Status</h3>
+                <p><strong>Version:</strong> 1.0.0</p>
+                <p><strong>Status:</strong> <span class="status active">Active</span></p>
+                <p><strong>Agents:</strong> 8 Specialized</p>
+                <p><strong>Error Prevention:</strong> 99.6%</p>
+            </div>
+
+            <div class="card">
+                <h3>🤖 AI Agents</h3>
+                <div class="agent-list" id="agents-list">
+                    <!-- Agents loaded via JavaScript -->
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>🎯 Dead Ends Eliminated</h3>
+                <ul>
+                    <li>Spaghetti Code → Clean Lines</li>
+                    <li>AI Hallucinations → Grounded Output</li>
+                    <li>Code Rot → Modular Components</li>
+                    <li>Concurrency Chaos → Safe Patterns</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h3>⚡ Quick Actions</h3>
+                <p><strong>Production-Ready Code:</strong> Every time</p>
+                <p><strong>99.6% Error Prevention:</strong> Built-in</p>
+                <p><strong>8 Agent Coordination:</strong> Seamless</p>
+                <p><strong>Ship Immediately:</strong> Clean. Tested. Modular. Done.</p>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>🛡️ StringRay - The AI Sentinel: Your Unwavering Guardian Against AI Development Catastrophes</p>
+        </div>
+    </div>
+
+    <script>
+        // Load agents list
+        fetch('/api/agents')
+            .then(response => response.json())
+            .then(data => {
+                const agentsList = document.getElementById('agents-list');
+                data.agents.forEach(agent => {
+                    const agentItem = document.createElement('div');
+                    agentItem.className = 'agent-item';
+                    agentItem.textContent = agent.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                    agentsList.appendChild(agentItem);
+                });
+            })
+            .catch(error => console.error('Error loading agents:', error));
+    </script>
+</body>
+</html></content>
+<parameter name="filePath">/Users/blaze/dev/strray/public/index.html

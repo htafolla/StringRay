@@ -35,22 +35,6 @@
 
 ### Installation
 
-```bash
-# Install oh-my-opencode (if not already installed)
-# Install oh-my-opencode
-# Install oh-my-opencode
-npm install -g oh-my-opencode
-
-# Install StringRay dependencies
-npm install -g oh-my-opencode
-
-# Install StringRay dependencies
-# Install oh-my-opencode
-npm install -g oh-my-opencode
-
-# Install StringRay dependencies
-npm install
-# or with bun
 bun install with bun
 bun install
 bun install
@@ -114,16 +98,34 @@ Update your `.opencode/oh-my-opencode.json`:
 ```bash
 # Install oh-my-opencode
 # Install oh-my-opencode
-npm install -g oh-my-opencode
+# Install StringRay dependencies
+npm install
+# or with bun
+bun install
 
 # Install StringRay dependencies
-npm install -g oh-my-opencode
+npm install
+# or with bun
+bun install
+# Install StringRay dependencies
+npm install
+# or with bun
+bun install
 
 # Install StringRay dependencies
+npm install
+# or with bun
+bun install
 # Install oh-my-opencode
-npm install -g oh-my-opencode
+# Install StringRay dependencies
+npm install
+# or with bun
+bun install
 
 # Install StringRay dependencies
+npm install
+# or with bun
+bun install
 npm install
 # or with bun
 bun install with bun

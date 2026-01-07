@@ -172,6 +172,143 @@
 		},
 		"multimodal-looker": {
 			"model": "opencode/grok-code"
+		},
+		"enforcer": {
+			"model": "opencode/grok-code",
+			"description": "StrRay Framework enforcer with error handling and performance facilities",
+			"mode": "subagent",
+			"temperature": 0.1,
+			"tools": {
+				"include": ["read", "grep", "lsp_*", "run_terminal_cmd"]
+			},
+			"permission": {
+				"edit": "allow",
+				"bash": {
+					"git": "allow",
+					"npm": "allow",
+					"bun": "allow"
+				}
+			}
+		},
+		"architect": {
+			"model": "opencode/grok-code",
+			"description": "StrRay Framework architect with state management and delegation",
+			"mode": "subagent",
+			"temperature": 0.1,
+			"tools": {
+				"include": ["read", "grep", "lsp_*", "run_terminal_cmd", "background_task"]
+			},
+			"permission": {
+				"edit": "allow",
+				"bash": {
+					"git": "allow",
+					"npm": "allow",
+					"bun": "allow"
+				}
+			}
+		},
+		"orchestrator": {
+			"model": "opencode/grok-code",
+			"description": "StrRay Framework orchestrator with coordination and workflow management",
+			"mode": "subagent",
+			"temperature": 0.1,
+			"tools": {
+				"include": ["read", "grep", "lsp_*", "run_terminal_cmd", "background_task", "call_omo_agent"]
+			},
+			"permission": {
+				"edit": "allow",
+				"bash": {
+					"git": "allow",
+					"npm": "allow",
+					"bun": "allow"
+				}
+			}
+		},
+		"bug-triage-specialist": {
+			"model": "opencode/grok-code",
+			"description": "StrRay Framework bug triage specialist with error investigation and surgical fixes",
+			"mode": "subagent",
+			"temperature": 0.1,
+			"tools": {
+				"include": ["read", "grep", "lsp_*", "run_terminal_cmd", "ast_grep_search", "ast_grep_replace"]
+			},
+			"permission": {
+				"edit": "allow",
+				"bash": {
+					"git": "allow",
+					"npm": "allow",
+					"bun": "allow"
+				}
+			}
+		},
+		"code-reviewer": {
+			"model": "opencode/grok-code",
+			"description": "StrRay Framework code reviewer with monitoring and analytics capabilities",
+			"mode": "subagent",
+			"temperature": 0.1,
+			"tools": {
+				"include": ["read", "grep", "lsp_*", "run_terminal_cmd", "lsp_diagnostics", "lsp_code_actions"]
+			},
+			"permission": {
+				"edit": "allow",
+				"bash": {
+					"git": "allow",
+					"npm": "allow",
+					"bun": "allow"
+				}
+			}
+		},
+		"security-auditor": {
+			"model": "opencode/grok-code",
+			"description": "StrRay Framework security auditor with compliance and vulnerability detection",
+			"mode": "subagent",
+			"temperature": 0.1,
+			"tools": {
+				"include": ["read", "grep", "lsp_*", "run_terminal_cmd", "grep_app_searchGitHub"]
+			},
+			"permission": {
+				"edit": "allow",
+				"bash": {
+					"git": "allow",
+					"npm": "allow",
+					"bun": "allow"
+				}
+			}
+		},
+		"refactorer": {
+			"model": "opencode/grok-code",
+			"description": "StrRay Framework refactorer with technical debt elimination and code consolidation",
+			"mode": "subagent",
+			"temperature": 0.1,
+			"tools": {
+				"include": ["read", "grep", "lsp_*", "run_terminal_cmd", "ast_grep_search", "ast_grep_replace", "lsp_rename"]
+			},
+			"permission": {
+				"edit": "allow",
+				"bash": {
+					"git": "allow",
+					"npm": "allow",
+					"bun": "allow"
+				}
+			}
+		},
+		"test-architect": {
+			"model": "opencode/grok-code",
+			"description": "StrRay Framework test architect with coverage optimization and behavioral testing",
+			"mode": "subagent",
+			"temperature": 0.1,
+			"tools": {
+				"include": ["read", "grep", "lsp_*", "run_terminal_cmd", "run_terminal_cmd"]
+			},
+			"permission": {
+				"edit": "allow",
+				"bash": {
+					"git": "allow",
+					"npm": "allow",
+					"bun": "allow",
+					"test": "allow"
+				}
+			}
 		}
 	}
 }

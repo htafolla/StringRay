@@ -8,12 +8,12 @@
  * @since 2026-01-08
  */
 
-import { EventEmitter } from 'events';
-import * as os from 'os';
-import * as fs from 'fs';
-import * as path from 'path';
-import { performance } from 'perf_hooks';
-import { securityHardeningSystem } from '../security/security-hardening-system';
+import { EventEmitter } from "events";
+import * as os from "os";
+import * as fs from "fs";
+import * as path from "path";
+import { performance } from "perf_hooks";
+import { securityHardeningSystem } from "../security/security-hardening-system";
 
 export interface SystemMetrics {
   timestamp: number;
@@ -78,7 +78,7 @@ export interface ApplicationMetrics {
 
 export interface HealthCheckResult {
   service: string;
-  status: 'healthy' | 'degraded' | 'unhealthy' | 'unknown';
+  status: "healthy" | "degraded" | "unhealthy" | "unknown";
   timestamp: number;
   responseTime: number;
   details: Record<string, any>;
@@ -90,9 +90,9 @@ export interface AlertRule {
   name: string;
   description: string;
   metric: string;
-  condition: 'gt' | 'lt' | 'eq' | 'ne' | 'gte' | 'lte';
+  condition: "gt" | "lt" | "eq" | "ne" | "gte" | "lte";
   threshold: number;
-  severity: 'low' | 'medium' | 'high' | 'critical';
+  severity: "low" | "medium" | "high" | "critical";
   enabled: boolean;
   cooldownMinutes: number;
   lastTriggered?: number;
@@ -101,7 +101,7 @@ export interface AlertRule {
 export interface Alert {
   id: string;
   ruleId: string;
-  severity: 'low' | 'medium' | 'high' | 'critical';
+  severity: "low" | "medium" | "high" | "critical";
   message: string;
   metric: string;
   value: number;
@@ -125,7 +125,7 @@ export interface MonitoringConfig {
       name: string;
       url?: string;
       command?: string;
-      type: 'http' | 'tcp' | 'command' | 'custom';
+      type: "http" | "tcp" | "command" | "custom";
       expectedStatus?: number;
       expectedResponse?: string;
     }>;
@@ -164,7 +164,7 @@ export interface ClusterNode {
   hostname: string;
   ip: string;
   port: number;
-  status: 'online' | 'offline' | 'degraded';
+  status: "online" | "offline" | "degraded";
   lastHeartbeat: number;
   metrics: SystemMetrics;
   health: HealthCheckResult[];
@@ -206,7 +206,7 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
         enabled: true,
         interval: 60000, // 1 minute
         timeout: 5000, // 5 seconds
-        services: []
+        services: [],
       },
       integrations: {},
       thresholds: {
@@ -217,9 +217,9 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
         diskWarning: 80,
         diskCritical: 95,
         responseTimeWarning: 1000, // 1 second
-        responseTimeCritical: 5000 // 5 seconds
+        responseTimeCritical: 5000, // 5 seconds
       },
-      ...config
+      ...config,
     };
 
     this.setupEventHandlers();
@@ -229,9 +229,9 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
    * Setup event handlers
    */
   private setupEventHandlers(): void {
-    this.on('alert-triggered', this.handleAlertTriggered.bind(this));
-    this.on('health-check-failed', this.handleHealthCheckFailed.bind(this));
-    this.on('metrics-collected', this.handleMetricsCollected.bind(this));
+    this.on("alert-triggered", this.handleAlertTriggered.bind(this));
+    this.on("health-check-failed", this.handleHealthCheckFailed.bind(this));
+    this.on("metrics-collected", this.handleMetricsCollected.bind(this));
   }
 
   /**
@@ -242,10 +242,12 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
       return;
     }
 
-    console.log('🚀 Starting Enterprise Monitoring System...');
+    console.log("🚀 Starting Enterprise Monitoring System...");
     console.log(`   Instance ID: ${this.instanceId}`);
     console.log(`   Collection Interval: ${this.config.collectionInterval}ms`);
-    console.log(`   Health Check Interval: ${this.config.healthChecks.interval}ms`);
+    console.log(
+      `   Health Check Interval: ${this.config.healthChecks.interval}ms`,
+    );
 
     this.isRunning = true;
 
@@ -272,8 +274,8 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
     // Start data cleanup
     this.startDataCleanup();
 
-    console.log('✅ Enterprise Monitoring System started successfully');
-    this.emit('started');
+    console.log("✅ Enterprise Monitoring System started successfully");
+    this.emit("started");
   }
 
   /**
@@ -284,7 +286,7 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
       return;
     }
 
-    console.log('⏹️ Stopping Enterprise Monitoring System...');
+    console.log("⏹️ Stopping Enterprise Monitoring System...");
     this.isRunning = false;
 
     if (this.collectionTimer) {
@@ -297,8 +299,8 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
       this.healthCheckTimer = undefined;
     }
 
-    console.log('✅ Enterprise Monitoring System stopped');
-    this.emit('stopped');
+    console.log("✅ Enterprise Monitoring System stopped");
+    this.emit("stopped");
   }
 
   /**
@@ -316,17 +318,19 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
       const retentionMs = this.config.retentionPeriod * 60 * 60 * 1000;
       const cutoffTime = Date.now() - retentionMs;
 
-      this.metrics = this.metrics.filter(m => m.timestamp > cutoffTime);
-      this.appMetrics = this.appMetrics.filter(m => m.timestamp > cutoffTime);
+      this.metrics = this.metrics.filter((m) => m.timestamp > cutoffTime);
+      this.appMetrics = this.appMetrics.filter((m) => m.timestamp > cutoffTime);
 
       // Check alert rules
       await this.checkAlertRules(systemMetrics, appMetrics);
 
-      this.emit('metrics-collected', { system: systemMetrics, application: appMetrics });
-
+      this.emit("metrics-collected", {
+        system: systemMetrics,
+        application: appMetrics,
+      });
     } catch (error) {
-      console.error('❌ Failed to collect metrics:', error);
-      this.emit('error', error);
+      console.error("❌ Failed to collect metrics:", error);
+      this.emit("error", error);
     }
   }
 
@@ -342,7 +346,7 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
     // Calculate CPU usage (simplified)
     let totalIdle = 0;
     let totalTick = 0;
-    cpus.forEach(cpu => {
+    cpus.forEach((cpu) => {
       for (const type in cpu.times) {
         totalTick += (cpu.times as any)[type];
       }
@@ -351,7 +355,7 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
 
     const idle = totalIdle / cpus.length;
     const total = totalTick / cpus.length;
-    const cpuUsage = 100 - ~~(100 * idle / total);
+    const cpuUsage = 100 - ~~((100 * idle) / total);
 
     // Get disk usage (simplified - would use systeminformation in production)
     const diskUsage = this.getDiskUsage();
@@ -364,13 +368,13 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
       cpu: {
         usage: cpuUsage,
         loadAverage: os.loadavg(),
-        cores: cpus.length
+        cores: cpus.length,
       },
       memory: {
         total: totalMemory,
         used: usedMemory,
         free: freeMemory,
-        usagePercent: (usedMemory / totalMemory) * 100
+        usagePercent: (usedMemory / totalMemory) * 100,
       },
       disk: diskUsage,
       network: networkStats,
@@ -378,8 +382,8 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
         pid: process.pid,
         uptime: process.uptime(),
         memoryUsage: process.memoryUsage(),
-        cpuUsage: process.cpuUsage()
-      }
+        cpuUsage: process.cpuUsage(),
+      },
     };
   }
 
@@ -396,25 +400,25 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
         active: Math.floor(Math.random() * 50),
         completed: Math.floor(Math.random() * 950),
         failed: Math.floor(Math.random() * 50),
-        averageResponseTime: Math.random() * 1000 + 100
+        averageResponseTime: Math.random() * 1000 + 100,
       },
       agents: {
         total: 8,
         active: Math.floor(Math.random() * 8),
         idle: Math.floor(Math.random() * 8),
-        failed: Math.floor(Math.random() * 2)
+        failed: Math.floor(Math.random() * 2),
       },
       sessions: {
         total: Math.floor(Math.random() * 100),
         active: Math.floor(Math.random() * 50),
-        expired: Math.floor(Math.random() * 25)
+        expired: Math.floor(Math.random() * 25),
       },
       performance: {
         averageLatency: Math.random() * 500 + 50,
         p95Latency: Math.random() * 1000 + 200,
         p99Latency: Math.random() * 2000 + 500,
-        throughput: Math.random() * 1000 + 500
-      }
+        throughput: Math.random() * 1000 + 500,
+      },
     };
   }
 
@@ -432,36 +436,39 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
       const startTime = performance.now();
 
       try {
-        let status: HealthCheckResult['status'] = 'unknown';
+        let status: HealthCheckResult["status"] = "unknown";
         const details: Record<string, any> = {};
 
         switch (service.type) {
-          case 'http':
+          case "http":
             if (service.url) {
-              const response = await this.checkHttpHealth(service.url, service.expectedStatus);
-              status = response.healthy ? 'healthy' : 'unhealthy';
+              const response = await this.checkHttpHealth(
+                service.url,
+                service.expectedStatus,
+              );
+              status = response.healthy ? "healthy" : "unhealthy";
               details.responseTime = response.responseTime;
               details.statusCode = response.statusCode;
             }
             break;
 
-          case 'tcp':
+          case "tcp":
             // TCP health check implementation would go here
-            status = 'healthy'; // Placeholder
+            status = "healthy"; // Placeholder
             break;
 
-          case 'command':
+          case "command":
             if (service.command) {
               const result = await this.checkCommandHealth(service.command);
-              status = result.success ? 'healthy' : 'unhealthy';
+              status = result.success ? "healthy" : "unhealthy";
               details.exitCode = result.exitCode;
               details.output = result.output;
             }
             break;
 
-          case 'custom':
+          case "custom":
             // Custom health check logic
-            status = 'healthy'; // Placeholder
+            status = "healthy"; // Placeholder
             break;
         }
 
@@ -472,19 +479,18 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
           status,
           timestamp: Date.now(),
           responseTime,
-          details
+          details,
         });
-
       } catch (error) {
         const responseTime = performance.now() - startTime;
 
         results.push({
           service: service.name,
-          status: 'unhealthy',
+          status: "unhealthy",
           timestamp: Date.now(),
           responseTime,
           details: {},
-          error: error instanceof Error ? error.message : String(error)
+          error: error instanceof Error ? error.message : String(error),
         });
       }
     }
@@ -495,22 +501,27 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
     // Keep only recent results
     const retentionMs = this.config.retentionPeriod * 60 * 60 * 1000;
     const cutoffTime = Date.now() - retentionMs;
-    this.healthResults = this.healthResults.filter(r => r.timestamp > cutoffTime);
+    this.healthResults = this.healthResults.filter(
+      (r) => r.timestamp > cutoffTime,
+    );
 
     // Emit events for failed health checks
-    results.forEach(result => {
-      if (result.status !== 'healthy') {
-        this.emit('health-check-failed', result);
+    results.forEach((result) => {
+      if (result.status !== "healthy") {
+        this.emit("health-check-failed", result);
       }
     });
 
-    this.emit('health-checks-completed', results);
+    this.emit("health-checks-completed", results);
   }
 
   /**
    * Check HTTP health
    */
-  private async checkHttpHealth(url: string, expectedStatus?: number): Promise<{
+  private async checkHttpHealth(
+    url: string,
+    expectedStatus?: number,
+  ): Promise<{
     healthy: boolean;
     responseTime: number;
     statusCode?: number;
@@ -520,11 +531,15 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
     try {
       // In a real implementation, this would make an HTTP request
       // For demo purposes, simulate a health check
-      await new Promise(resolve => setTimeout(resolve, Math.random() * 100 + 50));
+      await new Promise((resolve) =>
+        setTimeout(resolve, Math.random() * 100 + 50),
+      );
 
       const responseTime = performance.now() - startTime;
       const statusCode = Math.random() > 0.1 ? 200 : 500; // 90% success rate
-      const healthy = expectedStatus ? statusCode === expectedStatus : statusCode < 400;
+      const healthy = expectedStatus
+        ? statusCode === expectedStatus
+        : statusCode < 400;
 
       return { healthy, responseTime, statusCode };
     } catch (error) {
@@ -544,19 +559,21 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
     try {
       // In a real implementation, this would execute the command
       // For demo purposes, simulate command execution
-      await new Promise(resolve => setTimeout(resolve, Math.random() * 200 + 100));
+      await new Promise((resolve) =>
+        setTimeout(resolve, Math.random() * 200 + 100),
+      );
 
       const success = Math.random() > 0.2; // 80% success rate
       return {
         success,
         exitCode: success ? 0 : 1,
-        output: success ? 'OK' : 'Command failed'
+        output: success ? "OK" : "Command failed",
       };
     } catch (error) {
       return {
         success: false,
         exitCode: 1,
-        output: error instanceof Error ? error.message : String(error)
+        output: error instanceof Error ? error.message : String(error),
       };
     }
   }
@@ -564,12 +581,18 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
   /**
    * Check alert rules against current metrics
    */
-  private async checkAlertRules(systemMetrics: SystemMetrics, appMetrics: ApplicationMetrics): Promise<void> {
+  private async checkAlertRules(
+    systemMetrics: SystemMetrics,
+    appMetrics: ApplicationMetrics,
+  ): Promise<void> {
     for (const rule of this.config.alertRules) {
       if (!rule.enabled) continue;
 
       // Check cooldown
-      if (rule.lastTriggered && Date.now() - rule.lastTriggered < rule.cooldownMinutes * 60 * 1000) {
+      if (
+        rule.lastTriggered &&
+        Date.now() - rule.lastTriggered < rule.cooldownMinutes * 60 * 1000
+      ) {
         continue;
       }
 
@@ -578,19 +601,19 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
 
       // Extract metric value
       switch (rule.metric) {
-        case 'cpu.usage':
+        case "cpu.usage":
           value = systemMetrics.cpu.usage;
           break;
-        case 'memory.usagePercent':
+        case "memory.usagePercent":
           value = systemMetrics.memory.usagePercent;
           break;
-        case 'disk.usagePercent':
+        case "disk.usagePercent":
           value = systemMetrics.disk.usagePercent;
           break;
-        case 'requests.averageResponseTime':
+        case "requests.averageResponseTime":
           value = appMetrics.requests.averageResponseTime;
           break;
-        case 'performance.averageLatency':
+        case "performance.averageLatency":
           value = appMetrics.performance.averageLatency;
           break;
       }
@@ -599,22 +622,22 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
 
       // Check condition
       switch (rule.condition) {
-        case 'gt':
+        case "gt":
           triggered = value > rule.threshold;
           break;
-        case 'lt':
+        case "lt":
           triggered = value < rule.threshold;
           break;
-        case 'gte':
+        case "gte":
           triggered = value >= rule.threshold;
           break;
-        case 'lte':
+        case "lte":
           triggered = value <= rule.threshold;
           break;
-        case 'eq':
+        case "eq":
           triggered = value === rule.threshold;
           break;
-        case 'ne':
+        case "ne":
           triggered = value !== rule.threshold;
           break;
       }
@@ -630,13 +653,13 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
           threshold: rule.threshold,
           timestamp: Date.now(),
           resolved: false,
-          instanceId: this.instanceId
+          instanceId: this.instanceId,
         };
 
         this.alerts.push(alert);
         rule.lastTriggered = Date.now();
 
-        this.emit('alert-triggered', alert);
+        this.emit("alert-triggered", alert);
 
         // Send to external monitoring if configured
         await this.sendAlertToExternalSystems(alert);
@@ -646,7 +669,9 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
     // Keep only recent alerts
     const retentionMs = this.config.retentionPeriod * 60 * 60 * 1000;
     const cutoffTime = Date.now() - retentionMs;
-    this.alerts = this.alerts.filter(a => !a.resolved || a.timestamp > cutoffTime);
+    this.alerts = this.alerts.filter(
+      (a) => !a.resolved || a.timestamp > cutoffTime,
+    );
   }
 
   /**
@@ -678,71 +703,71 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
   private getDefaultAlertRules(): AlertRule[] {
     return [
       {
-        id: 'cpu-high',
-        name: 'High CPU Usage',
-        description: 'CPU usage is above warning threshold',
-        metric: 'cpu.usage',
-        condition: 'gte',
+        id: "cpu-high",
+        name: "High CPU Usage",
+        description: "CPU usage is above warning threshold",
+        metric: "cpu.usage",
+        condition: "gte",
         threshold: this.config.thresholds.cpuWarning,
-        severity: 'medium',
+        severity: "medium",
         enabled: true,
-        cooldownMinutes: 5
+        cooldownMinutes: 5,
       },
       {
-        id: 'cpu-critical',
-        name: 'Critical CPU Usage',
-        description: 'CPU usage is above critical threshold',
-        metric: 'cpu.usage',
-        condition: 'gte',
+        id: "cpu-critical",
+        name: "Critical CPU Usage",
+        description: "CPU usage is above critical threshold",
+        metric: "cpu.usage",
+        condition: "gte",
         threshold: this.config.thresholds.cpuCritical,
-        severity: 'critical',
+        severity: "critical",
         enabled: true,
-        cooldownMinutes: 2
+        cooldownMinutes: 2,
       },
       {
-        id: 'memory-high',
-        name: 'High Memory Usage',
-        description: 'Memory usage is above warning threshold',
-        metric: 'memory.usagePercent',
-        condition: 'gte',
+        id: "memory-high",
+        name: "High Memory Usage",
+        description: "Memory usage is above warning threshold",
+        metric: "memory.usagePercent",
+        condition: "gte",
         threshold: this.config.thresholds.memoryWarning,
-        severity: 'medium',
+        severity: "medium",
         enabled: true,
-        cooldownMinutes: 5
+        cooldownMinutes: 5,
       },
       {
-        id: 'memory-critical',
-        name: 'Critical Memory Usage',
-        description: 'Memory usage is above critical threshold',
-        metric: 'memory.usagePercent',
-        condition: 'gte',
+        id: "memory-critical",
+        name: "Critical Memory Usage",
+        description: "Memory usage is above critical threshold",
+        metric: "memory.usagePercent",
+        condition: "gte",
         threshold: this.config.thresholds.memoryCritical,
-        severity: 'critical',
+        severity: "critical",
         enabled: true,
-        cooldownMinutes: 2
+        cooldownMinutes: 2,
       },
       {
-        id: 'response-time-high',
-        name: 'High Response Time',
-        description: 'Average response time is above warning threshold',
-        metric: 'requests.averageResponseTime',
-        condition: 'gte',
+        id: "response-time-high",
+        name: "High Response Time",
+        description: "Average response time is above warning threshold",
+        metric: "requests.averageResponseTime",
+        condition: "gte",
         threshold: this.config.thresholds.responseTimeWarning,
-        severity: 'medium',
+        severity: "medium",
         enabled: true,
-        cooldownMinutes: 5
+        cooldownMinutes: 5,
       },
       {
-        id: 'response-time-critical',
-        name: 'Critical Response Time',
-        description: 'Average response time is above critical threshold',
-        metric: 'requests.averageResponseTime',
-        condition: 'gte',
+        id: "response-time-critical",
+        name: "Critical Response Time",
+        description: "Average response time is above critical threshold",
+        metric: "requests.averageResponseTime",
+        condition: "gte",
         threshold: this.config.thresholds.responseTimeCritical,
-        severity: 'critical',
+        severity: "critical",
         enabled: true,
-        cooldownMinutes: 2
-      }
+        cooldownMinutes: 2,
+      },
     ];
   }
 
@@ -760,7 +785,7 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
       total,
       used,
       free,
-      usagePercent: (used / total) * 100
+      usagePercent: (used / total) * 100,
     };
   }
 
@@ -774,7 +799,7 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
       bytesReceived: Math.floor(Math.random() * 1000000),
       bytesTransmitted: Math.floor(Math.random() * 1000000),
       packetsReceived: Math.floor(Math.random() * 10000),
-      packetsTransmitted: Math.floor(Math.random() * 10000)
+      packetsTransmitted: Math.floor(Math.random() * 10000),
     };
   }
 
@@ -790,9 +815,12 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
    */
   private startDataCleanup(): void {
     // Clean up old data every hour
-    setInterval(() => {
-      this.cleanupOldData();
-    }, 60 * 60 * 1000);
+    setInterval(
+      () => {
+        this.cleanupOldData();
+      },
+      60 * 60 * 1000,
+    );
   }
 
   /**
@@ -802,12 +830,16 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
     const retentionMs = this.config.retentionPeriod * 60 * 60 * 1000;
     const cutoffTime = Date.now() - retentionMs;
 
-    this.metrics = this.metrics.filter(m => m.timestamp > cutoffTime);
-    this.appMetrics = this.appMetrics.filter(m => m.timestamp > cutoffTime);
-    this.healthResults = this.healthResults.filter(r => r.timestamp > cutoffTime);
-    this.alerts = this.alerts.filter(a => !a.resolved || a.timestamp > cutoffTime);
+    this.metrics = this.metrics.filter((m) => m.timestamp > cutoffTime);
+    this.appMetrics = this.appMetrics.filter((m) => m.timestamp > cutoffTime);
+    this.healthResults = this.healthResults.filter(
+      (r) => r.timestamp > cutoffTime,
+    );
+    this.alerts = this.alerts.filter(
+      (a) => !a.resolved || a.timestamp > cutoffTime,
+    );
 
-    console.log('🧹 Cleaned up old monitoring data');
+    console.log("🧹 Cleaned up old monitoring data");
   }
 
   /**
@@ -820,13 +852,20 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
   }
 
   private handleHealthCheckFailed(result: HealthCheckResult): void {
-    console.warn(`⚠️ Health check failed: ${result.service} - ${result.error || 'Unknown error'}`);
+    console.warn(
+      `⚠️ Health check failed: ${result.service} - ${result.error || "Unknown error"}`,
+    );
   }
 
-  private handleMetricsCollected(data: { system: SystemMetrics; application: ApplicationMetrics }): void {
+  private handleMetricsCollected(data: {
+    system: SystemMetrics;
+    application: ApplicationMetrics;
+  }): void {
     // Optional: Log periodic metrics collection
     if (process.env.DEBUG_MONITORING) {
-      console.log(`📊 Metrics collected - CPU: ${data.system.cpu.usage.toFixed(1)}%, Memory: ${data.system.memory.usagePercent.toFixed(1)}%`);
+      console.log(
+        `📊 Metrics collected - CPU: ${data.system.cpu.usage.toFixed(1)}%, Memory: ${data.system.memory.usagePercent.toFixed(1)}%`,
+      );
     }
   }
 
@@ -836,7 +875,7 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
   getMetrics(): { system: SystemMetrics[]; application: ApplicationMetrics[] } {
     return {
       system: [...this.metrics],
-      application: [...this.appMetrics]
+      application: [...this.appMetrics],
     };
   }
 
@@ -851,14 +890,16 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
    * Get active alerts
    */
   getAlerts(includeResolved = false): Alert[] {
-    return includeResolved ? [...this.alerts] : this.alerts.filter(a => !a.resolved);
+    return includeResolved
+      ? [...this.alerts]
+      : this.alerts.filter((a) => !a.resolved);
   }
 
   /**
    * Resolve alert
    */
   resolveAlert(alertId: string): boolean {
-    const alert = this.alerts.find(a => a.id === alertId);
+    const alert = this.alerts.find((a) => a.id === alertId);
     if (alert && !alert.resolved) {
       alert.resolved = true;
       alert.resolvedAt = Date.now();
@@ -871,13 +912,15 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
   /**
    * Add cluster node
    */
-  addClusterNode(node: Omit<ClusterNode, 'status' | 'lastHeartbeat' | 'metrics' | 'health'>): void {
+  addClusterNode(
+    node: Omit<ClusterNode, "status" | "lastHeartbeat" | "metrics" | "health">,
+  ): void {
     const clusterNode: ClusterNode = {
       ...node,
-      status: 'offline',
+      status: "offline",
       lastHeartbeat: Date.now(),
       metrics: this.collectSystemMetrics(),
-      health: []
+      health: [],
     };
 
     this.clusterNodes.set(node.id, clusterNode);
@@ -887,11 +930,15 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
   /**
    * Update cluster node heartbeat
    */
-  updateClusterNodeHeartbeat(nodeId: string, metrics?: SystemMetrics, health?: HealthCheckResult[]): void {
+  updateClusterNodeHeartbeat(
+    nodeId: string,
+    metrics?: SystemMetrics,
+    health?: HealthCheckResult[],
+  ): void {
     const node = this.clusterNodes.get(nodeId);
     if (node) {
       node.lastHeartbeat = Date.now();
-      node.status = 'online';
+      node.status = "online";
 
       if (metrics) {
         node.metrics = metrics;
@@ -910,18 +957,34 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
     const nodes = Array.from(this.clusterNodes.values());
 
     // Calculate cluster-wide metrics
-    const totalRequests = this.appMetrics.reduce((sum, m) => sum + m.requests.total, 0);
-    const averageLatency = this.appMetrics.length > 0
-      ? this.appMetrics.reduce((sum, m) => sum + m.performance.averageLatency, 0) / this.appMetrics.length
-      : 0;
+    const totalRequests = this.appMetrics.reduce(
+      (sum, m) => sum + m.requests.total,
+      0,
+    );
+    const averageLatency =
+      this.appMetrics.length > 0
+        ? this.appMetrics.reduce(
+            (sum, m) => sum + m.performance.averageLatency,
+            0,
+          ) / this.appMetrics.length
+        : 0;
 
-    const totalCompleted = this.appMetrics.reduce((sum, m) => sum + m.requests.completed, 0);
-    const totalFailed = this.appMetrics.reduce((sum, m) => sum + m.requests.failed, 0);
-    const errorRate = totalCompleted + totalFailed > 0 ? (totalFailed / (totalCompleted + totalFailed)) * 100 : 0;
+    const totalCompleted = this.appMetrics.reduce(
+      (sum, m) => sum + m.requests.completed,
+      0,
+    );
+    const totalFailed = this.appMetrics.reduce(
+      (sum, m) => sum + m.requests.failed,
+      0,
+    );
+    const errorRate =
+      totalCompleted + totalFailed > 0
+        ? (totalFailed / (totalCompleted + totalFailed)) * 100
+        : 0;
 
     // Load distribution
     const loadDistribution: Record<string, number> = {};
-    nodes.forEach(node => {
+    nodes.forEach((node) => {
       loadDistribution[node.id] = node.metrics.cpu.usage;
     });
 
@@ -930,7 +993,7 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
       totalRequests,
       averageLatency,
       errorRate,
-      loadDistribution
+      loadDistribution,
     };
   }
 
@@ -950,10 +1013,12 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
       running: this.isRunning,
       instanceId: this.instanceId,
       metricsCollected: this.metrics.length,
-      alertsActive: this.alerts.filter(a => !a.resolved).length,
+      alertsActive: this.alerts.filter((a) => !a.resolved).length,
       healthChecksPerformed: this.healthResults.length,
       clusterNodes: this.clusterNodes.size,
-      uptime: this.isRunning ? Date.now() - (this.metrics[0]?.timestamp || Date.now()) : 0
+      uptime: this.isRunning
+        ? Date.now() - (this.metrics[0]?.timestamp || Date.now())
+        : 0,
     };
   }
 
@@ -962,7 +1027,7 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
    */
   updateConfig(newConfig: Partial<MonitoringConfig>): void {
     this.config = { ...this.config, ...newConfig };
-    console.log('⚙️ Monitoring system configuration updated');
+    console.log("⚙️ Monitoring system configuration updated");
   }
 
   /**
@@ -982,7 +1047,7 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
       alerts: this.alerts,
       healthResults: this.healthResults,
       clusterMetrics: this.getClusterMetrics(),
-      status: this.getStatus()
+      status: this.getStatus(),
     };
   }
 }

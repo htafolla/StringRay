@@ -15,15 +15,15 @@ import * as path from "path";
  * Codex context entry with metadata
  */
 interface CodexContextEntry {
-	id: string;
-	source: string;
-	content: string;
-	priority: "critical" | "high" | "normal" | "low";
-	metadata: {
-		version: string;
-		termCount: number;
-		loadedAt: string;
-	};
+  id: string;
+  source: string;
+  content: string;
+  priority: "critical" | "high" | "normal" | "low";
+  metadata: {
+    version: string;
+    termCount: number;
+    loadedAt: string;
+  };
 }
 
 /**
@@ -40,108 +40,113 @@ const CODEX_FILE_LOCATIONS = [".strray/agents_template.md", "AGENTS.md"];
  * Read file content safely
  */
 function readFileContent(filePath: string): string | null {
-	try {
-		if (fs.existsSync(filePath)) {
-			return fs.readFileSync(filePath, "utf-8");
-		}
-	} catch (error) {
-		console.error(`Failed to read codex file ${filePath}:`, error);
-	}
-	return null;
+  try {
+    if (fs.existsSync(filePath)) {
+      return fs.readFileSync(filePath, "utf-8");
+    }
+  } catch (error) {
+    console.error(`Failed to read codex file ${filePath}:`, error);
+  }
+  return null;
 }
 
 /**
  * Extract codex metadata from content
  */
 function extractCodexMetadata(content: string): {
-	version: string;
-	termCount: number;
+  version: string;
+  termCount: number;
 } {
-	const versionMatch = content.match(/\*\*Version\*\*:\s*(\d+\.\d+\.\d+)/);
-	const version = versionMatch ? versionMatch[1] : "1.2.20";
+  const versionMatch = content.match(/\*\*Version\*\*:\s*(\d+\.\d+\.\d+)/);
+  const version = versionMatch ? versionMatch[1] : "1.2.20";
 
-	const termMatches = content.match(/####\s*\d+\.\s/g);
-	const termCount = termMatches ? termMatches.length : 0;
+  const termMatches = content.match(/####\s*\d+\.\s/g);
+  const termCount = termMatches ? termMatches.length : 0;
 
-	return { version, termCount };
+  return { version, termCount };
 }
 
 /**
  * Create codex context entry
  */
-function createCodexContextEntry(filePath: string, content: string): CodexContextEntry {
-	const metadata = extractCodexMetadata(content);
+function createCodexContextEntry(
+  filePath: string,
+  content: string,
+): CodexContextEntry {
+  const metadata = extractCodexMetadata(content);
 
-	return {
-		id: `strray-codex-${path.basename(filePath)}`,
-		source: filePath,
-		content,
-		priority: "critical",
-		metadata: {
-			version: metadata.version,
-			termCount: metadata.termCount,
-			loadedAt: new Date().toISOString(),
-		},
-	};
+  return {
+    id: `strray-codex-${path.basename(filePath)}`,
+    source: filePath,
+    content,
+    priority: "critical",
+    metadata: {
+      version: metadata.version,
+      termCount: metadata.termCount,
+      loadedAt: new Date().toISOString(),
+    },
+  };
 }
 
 /**
  * Load codex context for current session
  */
 function loadCodexContext(sessionId: string): CodexContextEntry[] {
-	if (codexCache.has(sessionId)) {
-		return codexCache.get(sessionId)!;
-	}
+  if (codexCache.has(sessionId)) {
+    return codexCache.get(sessionId)!;
+  }
 
-	const codexContexts: CodexContextEntry[] = [];
+  const codexContexts: CodexContextEntry[] = [];
 
-	for (const relativePath of CODEX_FILE_LOCATIONS) {
-		const fullPath = path.join(process.cwd(), relativePath);
-		const content = readFileContent(fullPath);
+  for (const relativePath of CODEX_FILE_LOCATIONS) {
+    const fullPath = path.join(process.cwd(), relativePath);
+    const content = readFileContent(fullPath);
 
-		if (content) {
-			const entry = createCodexContextEntry(fullPath, content);
-			codexContexts.push(entry);
-			console.error(
-				`✅ StrRay Codex loaded: ${fullPath} (${entry.metadata.termCount} terms)`,
-			);
-		}
-	}
+    if (content) {
+      const entry = createCodexContextEntry(fullPath, content);
+      codexContexts.push(entry);
+      console.error(
+        `✅ StrRay Codex loaded: ${fullPath} (${entry.metadata.termCount} terms)`,
+      );
+    }
+  }
 
-	codexCache.set(sessionId, codexContexts);
+  codexCache.set(sessionId, codexContexts);
 
-	if (codexContexts.length === 0) {
-		console.error(`⚠️  No codex files found. Checked: ${CODEX_FILE_LOCATIONS.join(", ")}`);
-	}
+  if (codexContexts.length === 0) {
+    console.error(
+      `⚠️  No codex files found. Checked: ${CODEX_FILE_LOCATIONS.join(", ")}`,
+    );
+  }
 
-	return codexContexts;
+  return codexContexts;
 }
 
 /**
  * Format codex context for injection
  */
 function formatCodexContext(contexts: CodexContextEntry[]): string {
-	if (contexts.length === 0) {
-		return "";
-	}
+  if (contexts.length === 0) {
+    return "";
+  }
 
-	const parts: string[] = [];
+  const parts: string[] = [];
 
-	for (const context of contexts) {
-		parts.push(
-			`# StrRay Codex Context v${context.metadata.version}`,
-			`Source: ${context.source}`,
-			`Terms Loaded: ${context.metadata.termCount}`,
-			`Loaded At: ${context.metadata.loadedAt}`,
-			"",
-			context.content,
-			"",
-			"---",
-			"",
-		);
-	}
+  for (const context of contexts) {
+    parts.push(
+      `# StrRay Codex Context v${context.metadata.version}`,
+      `Source: ${context.source}`,
+      `Terms Loaded: ${context.metadata.termCount}`,
+      `Loaded At: ${context.metadata.loadedAt}`,
+      "",
+      context.content,
+      "",
+      "---",
+      "",
+    );
+  }
 
-	return parts.join("\n");
+  return parts.join("\n");
 }
 
 /**
@@ -152,89 +157,104 @@ function formatCodexContext(contexts: CodexContextEntry[]): string {
  * pattern from oh-my-opencode's rules-injector.
  */
 export function createStrRayCodexInjectorHook() {
-	return {
-		name: "strray-codex-injector" as const,
-		hooks: {
-			"agent.start": (sessionId: string) => {
-				const stats = getCodexStats(sessionId);
+  return {
+    name: "strray-codex-injector" as const,
+    hooks: {
+      "agent.start": (sessionId: string) => {
+        const stats = getCodexStats(sessionId);
 
-				if (stats.loaded) {
-					console.error("");
-					console.error("═════════════════════════════════════════════════════════════");
-					console.error("🚀 StrRay Framework v1.0.0 - Ready");
-					console.error("═════════════════════════════════════════════════════════════");
-					console.error(`✅ Codex Loaded: ${stats.totalTerms} terms (v${stats.version})`);
-					console.error(`📁 Sources: ${stats.fileCount} file(s)`);
-					console.error(`🎯 Error Prevention Target: 90% runtime error prevention`);
-					console.error("═════════════════════════════════════════════════════════════");
-					console.error("");
-				}
-			},
-			"tool.execute.after": (
-				input: { tool: string; args?: Record<string, unknown> },
-				output: { output?: string; [key: string]: unknown },
-				sessionId: string,
-			) => {
-				if (!["read", "write", "edit", "multiedit", "batch"].includes(input.tool)) {
-					return output;
-				}
+        if (stats.loaded) {
+          console.error("");
+          console.error(
+            "═════════════════════════════════════════════════════════════",
+          );
+          console.error("🚀 StrRay Framework v1.0.0 - Ready");
+          console.error(
+            "═════════════════════════════════════════════════════════════",
+          );
+          console.error(
+            `✅ Codex Loaded: ${stats.totalTerms} terms (v${stats.version})`,
+          );
+          console.error(`📁 Sources: ${stats.fileCount} file(s)`);
+          console.error(
+            `🎯 Error Prevention Target: 90% runtime error prevention`,
+          );
+          console.error(
+            "═════════════════════════════════════════════════════════════",
+          );
+          console.error("");
+        }
+      },
+      "tool.execute.after": (
+        input: { tool: string; args?: Record<string, unknown> },
+        output: { output?: string; [key: string]: unknown },
+        sessionId: string,
+      ) => {
+        if (
+          !["read", "write", "edit", "multiedit", "batch"].includes(input.tool)
+        ) {
+          return output;
+        }
 
-				const codexContexts = loadCodexContext(sessionId);
+        const codexContexts = loadCodexContext(sessionId);
 
-				if (codexContexts.length === 0) {
-					return output;
-				}
+        if (codexContexts.length === 0) {
+          return output;
+        }
 
-				const formattedCodex = formatCodexContext(codexContexts);
+        const formattedCodex = formatCodexContext(codexContexts);
 
-				const injectedOutput = {
-					...output,
-					output: `${formattedCodex}\n${output.output || ""}`,
-				};
+        const injectedOutput = {
+          ...output,
+          output: `${formattedCodex}\n${output.output || ""}`,
+        };
 
-				return injectedOutput;
-			},
-		},
-	};
+        return injectedOutput;
+      },
+    },
+  };
 }
 
 /**
  * Get codex statistics for debugging
  */
 export function getCodexStats(sessionId: string): {
-	loaded: boolean;
-	fileCount: number;
-	totalTerms: number;
-	version: string;
+  loaded: boolean;
+  fileCount: number;
+  totalTerms: number;
+  version: string;
 } {
-	const contexts = codexCache.get(sessionId);
+  const contexts = codexCache.get(sessionId);
 
-	if (!contexts || contexts.length === 0) {
-		return {
-			loaded: false,
-			fileCount: 0,
-			totalTerms: 0,
-			version: "unknown",
-		};
-	}
+  if (!contexts || contexts.length === 0) {
+    return {
+      loaded: false,
+      fileCount: 0,
+      totalTerms: 0,
+      version: "unknown",
+    };
+  }
 
-	const totalTerms = contexts.reduce((sum, ctx) => sum + ctx.metadata.termCount, 0);
+  const totalTerms = contexts.reduce(
+    (sum, ctx) => sum + ctx.metadata.termCount,
+    0,
+  );
 
-	return {
-		loaded: true,
-		fileCount: contexts.length,
-		totalTerms,
-		version: contexts[0].metadata.version,
-	};
+  return {
+    loaded: true,
+    fileCount: contexts.length,
+    totalTerms,
+    version: contexts[0].metadata.version,
+  };
 }
 
 /**
  * Clear codex cache (useful for testing or forced reload)
  */
 export function clearCodexCache(sessionId?: string): void {
-	if (sessionId) {
-		codexCache.delete(sessionId);
-	} else {
-		codexCache.clear();
-	}
+  if (sessionId) {
+    codexCache.delete(sessionId);
+  } else {
+    codexCache.clear();
+  }
 }

@@ -8,15 +8,32 @@
  * @since 2026-01-08
  */
 
-import { App, createApp, reactive, ref, computed, watch, onMounted, onUnmounted } from 'vue';
-import { StrRayIntegration, StrRayIntegrationConfig, FrameworkAdapter } from '../core';
+import {
+  App,
+  createApp,
+  reactive,
+  ref,
+  computed,
+  watch,
+  onMounted,
+  onUnmounted,
+} from "vue";
+import {
+  StrRayIntegration,
+  StrRayIntegrationConfig,
+  FrameworkAdapter,
+} from "../core";
 
 // Vue Framework Adapter
 class VueFrameworkAdapter implements FrameworkAdapter {
-  name = 'vue';
-  version = '3.x';
+  name = "vue";
+  version = "3.x";
 
-  mount(container: HTMLElement, component: any, props?: Record<string, any>): void {
+  mount(
+    container: HTMLElement,
+    component: any,
+    props?: Record<string, any>,
+  ): void {
     const app = createApp(component, props);
     app.mount(container);
   }
@@ -25,7 +42,11 @@ class VueFrameworkAdapter implements FrameworkAdapter {
     // Vue 3 unmounting is handled by the app instance
   }
 
-  createElement(type: string, props?: Record<string, any>, ...children: any[]): any {
+  createElement(
+    type: string,
+    props?: Record<string, any>,
+    ...children: any[]
+  ): any {
     return { type, props, children };
   }
 
@@ -40,24 +61,26 @@ export const StrRayVuePlugin = {
   install(app: App, options: StrRayIntegrationConfig) {
     const integration = new StrRayIntegration({
       ...options,
-      framework: 'vue'
+      framework: "vue",
     });
 
     // Override framework adapter with Vue-specific implementation
     (integration as any).context.framework = new VueFrameworkAdapter();
 
     // Provide integration globally
-    app.provide('strRay', integration);
+    app.provide("strRay", integration);
     app.config.globalProperties.$strRay = integration;
-  }
+  },
 };
 
 // Composition functions for Vue 3
 
 export function useStrRay() {
-  const integration = inject<StrRayIntegration>('strRay');
+  const integration = inject<StrRayIntegration>("strRay");
   if (!integration) {
-    throw new Error('StrRay plugin not installed. Use app.use(StrRayVuePlugin, config)');
+    throw new Error(
+      "StrRay plugin not installed. Use app.use(StrRayVuePlugin, config)",
+    );
   }
   return integration;
 }
@@ -86,7 +109,7 @@ export function useStrRayAgent(agentName: string) {
     execute,
     loading: readonly(loading),
     error: readonly(error),
-    result: readonly(result)
+    result: readonly(result),
   };
 }
 
@@ -95,12 +118,12 @@ export function useStrRayCodex() {
   const codexStats = ref<any>(null);
 
   onMounted(async () => {
-    const stats = await integration.getHook('codex:stats')?.();
+    const stats = await integration.getHook("codex:stats")?.();
     codexStats.value = stats;
   });
 
   const injectCodex = async (code: string) => {
-    const injectHook = integration.getHook('codex:inject');
+    const injectHook = integration.getHook("codex:inject");
     if (injectHook) {
       return await injectHook(code);
     }
@@ -108,7 +131,7 @@ export function useStrRayCodex() {
 
   return {
     codexStats: readonly(codexStats),
-    injectCodex
+    injectCodex,
   };
 }
 
@@ -116,7 +139,7 @@ export function useStrRayValidation() {
   const integration = useStrRay();
 
   const validateCode = async (code: string) => {
-    return await integration.validateCode(code, 'vue');
+    return await integration.validateCode(code, "vue");
   };
 
   return { validateCode };
@@ -126,14 +149,14 @@ export function useStrRayMonitoring() {
   const integration = useStrRay();
 
   const startMonitoring = () => {
-    const monitorHook = integration.getHook('monitor:performance');
+    const monitorHook = integration.getHook("monitor:performance");
     if (monitorHook) {
       return monitorHook();
     }
   };
 
   const trackError = (error: Error) => {
-    const errorHook = integration.getHook('monitor:errors');
+    const errorHook = integration.getHook("monitor:errors");
     if (errorHook) {
       return errorHook(error);
     }
@@ -146,14 +169,14 @@ export function useStrRayAnalytics() {
   const integration = useStrRay();
 
   const predict = async (data: any) => {
-    const predictHook = integration.getHook('analytics:predict');
+    const predictHook = integration.getHook("analytics:predict");
     if (predictHook) {
       return await predictHook(data);
     }
   };
 
   const optimize = async (task: any) => {
-    const optimizeHook = integration.getHook('analytics:optimize');
+    const optimizeHook = integration.getHook("analytics:optimize");
     if (optimizeHook) {
       return await optimizeHook(task);
     }
@@ -172,21 +195,23 @@ export function useStrRayStore() {
     currentSession: null as any,
     codex: {
       rules: [] as any[],
-      stats: null as any
+      stats: null as any,
     },
     monitoring: {
       active: false,
-      metrics: {} as Record<string, any>
+      metrics: {} as Record<string, any>,
     },
     analytics: {
       predictions: [] as any[],
-      optimizations: [] as any[]
-    }
+      optimizations: [] as any[],
+    },
   });
 
   // Computed properties
   const activeAgents = computed(() => {
-    return Object.keys(state.agents).filter(name => state.agents[name]?.active);
+    return Object.keys(state.agents).filter(
+      (name) => state.agents[name]?.active,
+    );
   });
 
   const sessionCount = computed(() => state.sessions.length);
@@ -200,12 +225,16 @@ export function useStrRayStore() {
       state.agents[name] = {
         active: true,
         instance: agent,
-        lastUsed: null
+        lastUsed: null,
       };
     }
   };
 
-  const executeAgentAction = async (agentName: string, action: string, params: any = {}) => {
+  const executeAgentAction = async (
+    agentName: string,
+    action: string,
+    params: any = {},
+  ) => {
     const agent = state.agents[agentName];
     if (!agent?.active) {
       throw new Error(`Agent ${agentName} not available`);
@@ -214,11 +243,11 @@ export function useStrRayStore() {
     try {
       let result;
       switch (action) {
-        case 'execute':
+        case "execute":
           result = await integration.executeAgent(agentName, params.task);
           break;
-        case 'validate':
-          result = await integration.validateCode(params.code, 'vue');
+        case "validate":
+          result = await integration.validateCode(params.code, "vue");
           break;
         default:
           throw new Error(`Unknown action: ${action}`);
@@ -233,12 +262,12 @@ export function useStrRayStore() {
   };
 
   const updateCodexStats = async () => {
-    const stats = await integration.getHook('codex:stats')?.();
+    const stats = await integration.getHook("codex:stats")?.();
     state.codex.stats = stats;
   };
 
   const startMonitoring = () => {
-    const monitorHook = integration.getHook('monitor:performance');
+    const monitorHook = integration.getHook("monitor:performance");
     if (monitorHook) {
       state.monitoring.active = true;
       return monitorHook();
@@ -269,7 +298,7 @@ export function useStrRayStore() {
     executeAgentAction,
     updateCodexStats,
     startMonitoring,
-    stopMonitoring
+    stopMonitoring,
   };
 }
 
@@ -279,18 +308,18 @@ export const StrRayMixin = {
     return {
       strRayLoading: false,
       strRayError: null,
-      strRayResult: null
+      strRayResult: null,
     };
   },
   computed: {
     $strRay() {
       return (this as any).$strRay || null;
-    }
+    },
   },
   methods: {
     async $executeStrRayAgent(agentName: string, task: any) {
       if (!this.$strRay) {
-        throw new Error('StrRay not available');
+        throw new Error("StrRay not available");
       }
 
       this.strRayLoading = true;
@@ -309,12 +338,12 @@ export const StrRayMixin = {
 
     async $validateStrRayCode(code: string) {
       if (!this.$strRay) {
-        throw new Error('StrRay not available');
+        throw new Error("StrRay not available");
       }
 
-      return await this.$strRay.validateCode(code, 'vue');
-    }
-  }
+      return await this.$strRay.validateCode(code, "vue");
+    },
+  },
 };
 
 // Export types

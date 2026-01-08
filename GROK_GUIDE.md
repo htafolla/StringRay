@@ -17,6 +17,7 @@ StringRay is **optimized for Grok** and other advanced AI models. It leverages G
 ## 🛠️ Quick Start for Grok Users
 
 ### Prerequisites
+
 - **Node.js 18+** (for framework runtime)
 - **npm or bun** (package manager)
 - **Grok API access** (via xAI or compatible provider)
@@ -76,41 +77,49 @@ npm run dev
 ## 🤖 The 8 Grok-Powered Agents
 
 ### 1. **Enforcer** - The Guardian
+
 - **Role**: Framework compliance and error prevention
 - **Grok Integration**: Uses Grok's reasoning to detect and prevent violations
 - **Triggers**: Compliance checks, threshold violations, scheduled audits
 
 ### 2. **Architect** - The Visionary
+
 - **Role**: System design and dependency mapping
 - **Grok Integration**: Leverages Grok's architectural reasoning for optimal designs
 - **Use Cases**: Complex planning, refactoring strategies, pattern selection
 
 ### 3. **Orchestrator** - The Conductor
+
 - **Role**: Multi-agent coordination and workflow management
 - **Grok Integration**: Grok's coordination capabilities for seamless agent interaction
 - **Features**: Async delegation, conflict resolution, task distribution
 
 ### 4. **Bug Triage Specialist** - The Detective
+
 - **Role**: Error investigation and surgical fixes
 - **Grok Integration**: Grok's analytical skills for root cause analysis
 - **Capabilities**: Automated bug detection, fix suggestions, impact assessment
 
 ### 5. **Code Reviewer** - The Critic
+
 - **Role**: Code quality assurance and best practices
 - **Grok Integration**: Grok's code understanding for comprehensive reviews
 - **Focus**: Quality metrics, security validation, performance optimization
 
 ### 6. **Security Auditor** - The Sentinel
+
 - **Role**: Vulnerability detection and threat analysis
 - **Grok Integration**: Grok's security reasoning for comprehensive audits
 - **Coverage**: Injection attacks, data leaks, compliance violations
 
 ### 7. **Refactorer** - The Surgeon
+
 - **Role**: Technical debt elimination and code modernization
 - **Grok Integration**: Grok's refactoring intelligence for clean transformations
 - **Operations**: Safe refactoring, consolidation, performance improvements
 
 ### 8. **Test Architect** - The Validator
+
 - **Role**: Testing strategy design and coverage optimization
 - **Grok Integration**: Grok's testing expertise for comprehensive validation
 - **Output**: 85%+ coverage, behavioral testing, integration suites
@@ -118,18 +127,22 @@ npm run dev
 ## 🎯 Dead Ends StringRay Eliminates
 
 ### Spaghetti Code & Monoliths
+
 **Problem**: Tangled, unmaintainable code structures
 **StringRay Solution**: Coordinated agents enforce clean architecture and single sources of truth
 
 ### AI Hallucinations
+
 **Problem**: Inconsistent or incorrect AI-generated code
 **StringRay Solution**: Cross-agent validation and Grok's reasoning prevent false assumptions
 
 ### Code Rot
+
 **Problem**: Quality degradation over time
 **StringRay Solution**: Systematic maintenance and modernization prevent entropy
 
 ### Concurrency & State Chaos
+
 **Problem**: Race conditions and tangled state management
 **StringRay Solution**: Safe patterns and disciplined flow enforced by agents
 
@@ -143,6 +156,7 @@ npm run dev
 ## 🔧 Advanced Configuration for Grok
 
 ### Custom Model Routing
+
 ```json
 {
   "model_routing": {
@@ -159,6 +173,7 @@ npm run dev
 ```
 
 ### Framework Thresholds
+
 ```json
 {
   "framework_thresholds": {
@@ -171,6 +186,7 @@ npm run dev
 ```
 
 ### Agent Coordination
+
 ```json
 {
   "sisyphus_orchestrator": {
@@ -184,14 +200,17 @@ npm run dev
 ## 🚀 Getting Started with Your First Project
 
 ### Step 1: Initialize
+
 ```bash
 npm run init
 ```
 
 ### Step 2: Configure Grok
+
 Update `.opencode/oh-my-opencode.json` with your Grok model settings.
 
 ### Step 3: Start Developing
+
 ```bash
 # Launch dashboard
 npm start
@@ -200,16 +219,19 @@ npm start
 ```
 
 ### Step 4: Monitor Progress
+
 Visit http://localhost:3000 to see real-time agent coordination and project status.
 
 ## 🎉 Why Grok + StringRay = Perfect Match
 
 **Grok's Strengths:**
+
 - Advanced reasoning and code understanding
 - Helpful and truthful responses
 - Real-time learning capabilities
 
 **StringRay's Strengths:**
+
 - Multi-agent coordination and validation
 - Systematic error prevention
 - Production-ready code guarantees
@@ -233,5 +255,5 @@ Visit http://localhost:3000 to see real-time agent coordination and project stat
 
 **StringRay + Grok = The Future of AI-Assisted Development** ⚡🤖
 
-*Eliminate dead ends. Ship production-ready code. Every time.*</content>
+_Eliminate dead ends. Ship production-ready code. Every time._</content>
 <parameter name="filePath">/Users/blaze/dev/strray/GROK_GUIDE.md

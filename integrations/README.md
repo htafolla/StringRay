@@ -33,20 +33,24 @@ The StrRay Cross-Framework Integration Architecture provides seamless integratio
 ### React Integration
 
 #### Installation
+
 ```bash
 npm install @strray/react
 ```
 
 #### Basic Usage
+
 ```tsx
-import { StrRayProvider, useStrRay, useStrRayAgent } from '@strray/react';
+import { StrRayProvider, useStrRay, useStrRayAgent } from "@strray/react";
 
 function App() {
   return (
-    <StrRayProvider config={{
-      framework: 'react',
-      features: { agents: true, codex: true }
-    }}>
+    <StrRayProvider
+      config={{
+        framework: "react",
+        features: { agents: true, codex: true },
+      }}
+    >
       <MyComponent />
     </StrRayProvider>
   );
@@ -54,13 +58,13 @@ function App() {
 
 function MyComponent() {
   const integration = useStrRay();
-  const { execute, loading, error } = useStrRayAgent('enforcer');
+  const { execute, loading, error } = useStrRayAgent("enforcer");
 
   const validateCode = async () => {
     const result = await execute({
-      task: 'validate',
-      code: 'const x = 1;',
-      framework: 'react'
+      task: "validate",
+      code: "const x = 1;",
+      framework: "react",
     });
     console.log(result);
   };
@@ -68,7 +72,7 @@ function MyComponent() {
   return (
     <div>
       <button onClick={validateCode} disabled={loading}>
-        {loading ? 'Validating...' : 'Validate Code'}
+        {loading ? "Validating..." : "Validate Code"}
       </button>
       {error && <div>Error: {error.message}</div>}
     </div>
@@ -77,13 +81,14 @@ function MyComponent() {
 ```
 
 #### Advanced Features
+
 ```tsx
 import {
   useStrRayCodex,
   useStrRayMonitoring,
   useStrRayValidation,
-  StrRayErrorBoundary
-} from '@strray/react';
+  StrRayErrorBoundary,
+} from "@strray/react";
 
 function AdvancedComponent() {
   const { codexStats, injectCodex } = useStrRayCodex();
@@ -111,16 +116,18 @@ function AdvancedComponent() {
 ### Vue Integration
 
 #### Installation
+
 ```bash
 npm install @strray/vue
 ```
 
 #### Basic Usage
+
 ```vue
 <template>
   <div>
     <button @click="validateCode" :disabled="loading">
-      {{ loading ? 'Validating...' : 'Validate Code' }}
+      {{ loading ? "Validating..." : "Validate Code" }}
     </button>
     <div v-if="error">Error: {{ error.message }}</div>
     <pre v-if="result">{{ result }}</pre>
@@ -128,82 +135,85 @@ npm install @strray/vue
 </template>
 
 <script setup>
-import { useStrRayAgent } from '@strray/vue';
+import { useStrRayAgent } from "@strray/vue";
 
-const { execute, loading, error, result } = useStrRayAgent('enforcer');
+const { execute, loading, error, result } = useStrRayAgent("enforcer");
 
 const validateCode = async () => {
   result.value = await execute({
-    task: 'validate',
-    code: 'const x = 1;',
-    framework: 'vue'
+    task: "validate",
+    code: "const x = 1;",
+    framework: "vue",
   });
 };
 </script>
 ```
 
 #### Plugin Installation
+
 ```ts
-import { createApp } from 'vue';
-import { StrRayVuePlugin } from '@strray/vue';
-import App from './App.vue';
+import { createApp } from "vue";
+import { StrRayVuePlugin } from "@strray/vue";
+import App from "./App.vue";
 
 const app = createApp(App);
 
 app.use(StrRayVuePlugin, {
-  framework: 'vue',
-  features: { agents: true, codex: true, monitoring: true }
+  framework: "vue",
+  features: { agents: true, codex: true, monitoring: true },
 });
 
-app.mount('#app');
+app.mount("#app");
 ```
 
 ### Angular Integration
 
 #### Installation
+
 ```bash
 npm install @strray/angular
 ```
 
 #### Module Setup
+
 ```ts
-import { NgModule } from '@angular/core';
-import { StrRayModule } from '@strray/angular';
+import { NgModule } from "@angular/core";
+import { StrRayModule } from "@strray/angular";
 
 @NgModule({
   imports: [
     StrRayModule.forRoot({
-      framework: 'angular',
-      features: { agents: true, codex: true }
-    })
-  ]
+      framework: "angular",
+      features: { agents: true, codex: true },
+    }),
+  ],
 })
 export class AppModule {}
 ```
 
 #### Component Usage
+
 ```ts
-import { Component } from '@angular/core';
-import { StrRayService } from '@strray/angular';
+import { Component } from "@angular/core";
+import { StrRayService } from "@strray/angular";
 
 @Component({
-  selector: 'app-strray-demo',
+  selector: "app-strray-demo",
   template: `
     <strray-agent-response
       agentName="enforcer"
       [task]="task"
-      (resultChange)="onResult($event)">
+      (resultChange)="onResult($event)"
+    >
     </strray-agent-response>
 
-    <button
-      (click)="validateCode()"
-      [disabled]="loading">
-      {{ loading ? 'Validating...' : 'Validate Code' }}
+    <button (click)="validateCode()" [disabled]="loading">
+      {{ loading ? "Validating..." : "Validate Code" }}
     </button>
-  `
+  `,
 })
 export class StrRayDemoComponent {
-  task = { code: 'const x = 1;', framework: 'angular' };
+  task = { code: "const x = 1;", framework: "angular" };
   loading = false;
 
   constructor(private strRayService: StrRayService) {}
@@ -211,7 +221,7 @@ export class StrRayDemoComponent {
   async validateCode() {
     this.loading = true;
     try {
-      const result = await this.strRayService.validateCode('const x = 1;');
+      const result = await this.strRayService.validateCode("const x = 1;");
       console.log(result);
     } finally {
       this.loading = false;
@@ -219,7 +229,7 @@ export class StrRayDemoComponent {
   }
 
   onResult(result: any) {
-    console.log('Validation result:', result);
+    console.log("Validation result:", result);
   }
 }
 ```
@@ -227,11 +237,13 @@ export class StrRayDemoComponent {
 ### Svelte Integration
 
 #### Installation
+
 ```bash
 npm install @strray/svelte
 ```
 
 #### Basic Usage
+
 ```svelte
 <script>
   import { strRayStore, createStrRayAction } from '@strray/svelte';
@@ -282,6 +294,7 @@ npm install @strray/svelte
 ```
 
 #### Store Integration
+
 ```svelte
 <script>
   import { codexStats, agentList } from '@strray/svelte';
@@ -313,8 +326,9 @@ The StrRay component library provides framework-agnostic UI components with unif
 #### Usage Across Frameworks
 
 **React:**
+
 ```tsx
-import { Button, Card } from '@strray/components/react';
+import { Button, Card } from "@strray/components/react";
 
 function MyComponent() {
   return (
@@ -326,6 +340,7 @@ function MyComponent() {
 ```
 
 **Vue:**
+
 ```vue
 <template>
   <Card>
@@ -334,11 +349,12 @@ function MyComponent() {
 </template>
 
 <script>
-import { Button, Card } from '@strray/components/vue';
+import { Button, Card } from "@strray/components/vue";
 </script>
 ```
 
 **Angular:**
+
 ```ts
 import { ButtonComponent, CardComponent } from '@strray/components/angular';
 
@@ -352,6 +368,7 @@ import { ButtonComponent, CardComponent } from '@strray/components/angular';
 ```
 
 **Svelte:**
+
 ```svelte
 <script>
   import { Button, Card } from '@strray/components/svelte';
@@ -385,46 +402,46 @@ componentRegistry.registerTheme('custom', customTheme);
 ### Internationalization
 
 ```ts
-import { strRayI18n, createStrRayI18n } from '@strray/shared';
+import { strRayI18n, createStrRayI18n } from "@strray/shared";
 
 // Use global instance
-const message = strRayI18n.t('strray.loading');
+const message = strRayI18n.t("strray.loading");
 
 // Create custom instance
 const customI18n = createStrRayI18n({
-  locale: 'fr',
+  locale: "fr",
   messages: {
     fr: {
-      custom: { message: 'Message personnalisé' }
-    }
-  }
+      custom: { message: "Message personnalisé" },
+    },
+  },
 });
 
-const customMessage = customI18n.t('custom.message');
+const customMessage = customI18n.t("custom.message");
 ```
 
 ### Accessibility
 
 ```ts
-import { strRayA11y, ariaPatterns } from '@strray/shared';
+import { strRayA11y, ariaPatterns } from "@strray/shared";
 
 // Create accessible button
 const buttonProps = strRayA11y.createAriaProps({
-  'aria-label': 'Close dialog',
-  'aria-expanded': false
+  "aria-label": "Close dialog",
+  "aria-expanded": false,
 });
 
 // Use ARIA patterns
-const menuProps = ariaPatterns.menu({ label: 'Main navigation' });
+const menuProps = ariaPatterns.menu({ label: "Main navigation" });
 
 // Focus management
 const cleanup = strRayA11y.trapFocus(dialogElement, {
   restoreFocus: true,
-  initialFocus: firstInputElement
+  initialFocus: firstInputElement,
 });
 
 // Screen reader announcements
-strRayA11y.announce('Form submitted successfully', 'polite');
+strRayA11y.announce("Form submitted successfully", "polite");
 ```
 
 ## Developer Experience
@@ -454,8 +471,8 @@ import type {
   StrRayIntegrationConfig,
   FrameworkAdapter,
   ComponentTheme,
-  AriaProps
-} from '@strray/core';
+  AriaProps,
+} from "@strray/core";
 
 interface CustomConfig extends StrRayIntegrationConfig {
   customFeature: boolean;
@@ -467,19 +484,19 @@ interface CustomConfig extends StrRayIntegrationConfig {
 ```ts
 // Development configuration
 const devConfig: StrRayIntegrationConfig = {
-  framework: 'react',
-  mode: 'development',
+  framework: "react",
+  mode: "development",
   features: {
     agents: true,
     codex: true,
     monitoring: true,
-    analytics: true
+    analytics: true,
   },
   hotReload: {
     enabled: true,
     debounceMs: 300,
-    ignorePatterns: ['*.test.*', '*.spec.*']
-  }
+    ignorePatterns: ["*.test.*", "*.spec.*"],
+  },
 };
 ```
 
@@ -508,17 +525,17 @@ test('validates code correctly', async () => {
 
 ```ts
 // Vite configuration
-import { strRayVitePlugin } from '@strray/build/vite';
+import { strRayVitePlugin } from "@strray/build/vite";
 
 export default {
   plugins: [
     strRayVitePlugin({
-      framework: 'react',
-      features: ['agents', 'codex'],
+      framework: "react",
+      features: ["agents", "codex"],
       minify: true,
-      sourcemap: false
-    })
-  ]
+      sourcemap: false,
+    }),
+  ],
 };
 ```
 
@@ -528,8 +545,8 @@ export default {
 // Dynamic imports for better code splitting
 const loadStrRayFeatures = async () => {
   const [agents, codex] = await Promise.all([
-    import('@strray/core/agents'),
-    import('@strray/core/codex')
+    import("@strray/core/agents"),
+    import("@strray/core/codex"),
   ]);
 
   return { agents, codex };
@@ -542,8 +559,8 @@ StrRay integrations are designed for optimal tree shaking:
 
 ```ts
 // Only imports what you use
-import { useStrRayAgent } from '@strray/react'; // Only agent hook
-import { StrRayProvider } from '@strray/react'; // Only provider
+import { useStrRayAgent } from "@strray/react"; // Only agent hook
+import { StrRayProvider } from "@strray/react"; // Only provider
 
 // Not imported: monitoring, analytics, codex hooks, etc.
 ```
@@ -574,7 +591,7 @@ export default function App({ Component, pageProps }) {
 <!-- Optimized CDN delivery -->
 <script src="https://cdn.strray.dev/v1.0.0/core.js"></script>
 <script src="https://cdn.strray.dev/v1.0.0/react.js"></script>
-<link rel="stylesheet" href="https://cdn.strray.dev/v1.0.0/theme.css">
+<link rel="stylesheet" href="https://cdn.strray.dev/v1.0.0/theme.css" />
 ```
 
 ## Performance Optimization
@@ -584,10 +601,10 @@ export default function App({ Component, pageProps }) {
 ```ts
 // Performance budgets
 const performanceBudget = {
-  core: '50KB',      // Core integration
-  react: '75KB',     // React adapter
-  components: '120KB', // Component library
-  total: '200KB'     // Total budget
+  core: "50KB", // Core integration
+  react: "75KB", // React adapter
+  components: "120KB", // Component library
+  total: "200KB", // Total budget
 };
 ```
 
@@ -622,18 +639,18 @@ function App() {
 
 ```ts
 // Before: Direct framework usage
-import { SomeLibrary } from 'some-library';
+import { SomeLibrary } from "some-library";
 
 // After: StrRay-wrapped
-import { SomeLibrary } from '@strray/wrapped/some-library';
+import { SomeLibrary } from "@strray/wrapped/some-library";
 ```
 
 ### Version Compatibility
 
-| StrRay Version | React | Vue | Angular | Svelte | Node.js |
-|----------------|-------|-----|---------|--------|---------|
-| 1.0.0         | 16.8+ | 3.0+ | 12.0+ | 3.0+ | 18.0+ |
-| 1.1.0         | 17.0+ | 3.2+ | 13.0+ | 4.0+ | 18.0+ |
+| StrRay Version | React | Vue  | Angular | Svelte | Node.js |
+| -------------- | ----- | ---- | ------- | ------ | ------- |
+| 1.0.0          | 16.8+ | 3.0+ | 12.0+   | 3.0+   | 18.0+   |
+| 1.1.0          | 17.0+ | 3.2+ | 13.0+   | 4.0+   | 18.0+   |
 
 ## Best Practices
 
@@ -676,9 +693,7 @@ const memoizedValidation = useMemo(() => {
 }, [code]);
 
 // Lazy loading for heavy features
-const HeavyComponent = lazy(() =>
-  import('@strray/components/HeavyChart')
-);
+const HeavyComponent = lazy(() => import("@strray/components/HeavyChart"));
 ```
 
 ## Troubleshooting
@@ -701,13 +716,13 @@ const HeavyComponent = lazy(() =>
 
 ```ts
 const debugConfig: StrRayIntegrationConfig = {
-  framework: 'react',
-  mode: 'development',
+  framework: "react",
+  mode: "development",
   debug: {
     enabled: true,
-    logLevel: 'verbose',
-    performanceTracing: true
-  }
+    logLevel: "verbose",
+    performanceTracing: true,
+  },
 };
 ```
 

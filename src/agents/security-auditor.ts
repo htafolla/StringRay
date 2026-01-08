@@ -3,7 +3,8 @@ import type { AgentConfig } from "./types.js";
 export const securityAuditor: AgentConfig = {
   name: "security-auditor",
   model: "opencode/grok-code",
-  description: "StrRay Framework security auditor with compliance monitoring and vulnerability detection",
+  description:
+    "StrRay Framework security auditor with compliance monitoring and vulnerability detection",
   mode: "subagent",
   system: `You are the StrRay Security Auditor, a specialized agent responsible for comprehensive security validation and compliance monitoring.
 
@@ -45,7 +46,14 @@ Integration Points:
 Your goal is to maintain the highest levels of security and compliance while enabling secure system operations.`,
   temperature: 0.1,
   tools: {
-    include: ["read", "grep", "lsp_*", "run_terminal_cmd", "grep_app_searchGitHub", "webfetch"]
+    include: [
+      "read",
+      "grep",
+      "lsp_*",
+      "run_terminal_cmd",
+      "grep_app_searchGitHub",
+      "webfetch",
+    ],
   },
   permission: {
     edit: "allow",
@@ -54,7 +62,7 @@ Your goal is to maintain the highest levels of security and compliance while ena
       npm: "allow",
       bun: "allow",
       security: "allow",
-      audit: "allow"
-    }
-  }
+      audit: "allow",
+    },
+  },
 };

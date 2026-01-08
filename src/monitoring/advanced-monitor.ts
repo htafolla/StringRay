@@ -23,7 +23,7 @@ export interface AgentMetrics {
   failedTasks: number;
   averageResponseTime: number;
   lastActivity: number;
-  healthStatus: 'healthy' | 'degraded' | 'unhealthy';
+  healthStatus: "healthy" | "degraded" | "unhealthy";
   memoryUsage?: number;
   cpuUsage?: number;
 }
@@ -65,7 +65,7 @@ export interface ErrorMetrics {
     agentId: string;
     errorType: string;
     message: string;
-    severity: 'low' | 'medium' | 'high' | 'critical';
+    severity: "low" | "medium" | "high" | "critical";
   }>;
 }
 
@@ -74,7 +74,7 @@ export interface AlertRule {
   name: string;
   description: string;
   condition: (metrics: MonitoringMetrics) => boolean;
-  severity: 'info' | 'warning' | 'error' | 'critical';
+  severity: "info" | "warning" | "error" | "critical";
   cooldown: number; // ms between alerts
   enabled: boolean;
   lastTriggered?: number;
@@ -84,7 +84,7 @@ export interface Alert {
   id: string;
   ruleId: string;
   timestamp: number;
-  severity: 'info' | 'warning' | 'error' | 'critical';
+  severity: "info" | "warning" | "error" | "critical";
   message: string;
   metrics: Partial<MonitoringMetrics>;
   acknowledged: boolean;
@@ -99,7 +99,7 @@ export interface AnomalyDetectionResult {
   description: string;
   affectedComponents: string[];
   recommendedActions: string[];
-  severity: 'low' | 'medium' | 'high' | 'critical';
+  severity: "low" | "medium" | "high" | "critical";
 }
 
 export class AnomalyDetector {
@@ -149,13 +149,23 @@ export class AnomalyDetector {
     }
   }
 
-  private detectPerformanceAnomaly(metrics: MonitoringMetrics): AnomalyDetectionResult {
+  private detectPerformanceAnomaly(
+    metrics: MonitoringMetrics,
+  ): AnomalyDetectionResult {
     const recentMetrics = this.historicalData.slice(-20);
-    const avgLatency = recentMetrics.reduce((sum, m) => sum + m.performanceMetrics.latency.p95, 0) / recentMetrics.length;
+    const avgLatency =
+      recentMetrics.reduce(
+        (sum, m) => sum + m.performanceMetrics.latency.p95,
+        0,
+      ) / recentMetrics.length;
     const currentLatency = metrics.performanceMetrics.latency.p95;
 
     const stdDev = Math.sqrt(
-      recentMetrics.reduce((sum, m) => sum + Math.pow(m.performanceMetrics.latency.p95 - avgLatency, 2), 0) / recentMetrics.length
+      recentMetrics.reduce(
+        (sum, m) =>
+          sum + Math.pow(m.performanceMetrics.latency.p95 - avgLatency, 2),
+        0,
+      ) / recentMetrics.length,
     );
 
     const zScore = Math.abs(currentLatency - avgLatency) / stdDev;
@@ -163,50 +173,88 @@ export class AnomalyDetector {
     if (zScore > this.anomalyThreshold) {
       return {
         detected: true,
-        anomalyType: 'performance_degradation',
+        anomalyType: "performance_degradation",
         confidence: Math.min(zScore / 3, 1),
         description: `Latency spike detected: ${currentLatency.toFixed(0)}ms (normal: ${avgLatency.toFixed(0)}ms)`,
-        affectedComponents: ['system'],
+        affectedComponents: ["system"],
         recommendedActions: [
-          'Check system resources',
-          'Review recent task patterns',
-          'Consider scaling agents'
+          "Check system resources",
+          "Review recent task patterns",
+          "Consider scaling agents",
         ],
-        severity: zScore > 4 ? 'critical' : zScore > 3 ? 'high' : 'medium'
+        severity: zScore > 4 ? "critical" : zScore > 3 ? "high" : "medium",
       };
     }
 
-    return { detected: false, anomalyType: '', confidence: 0, description: '', affectedComponents: [], recommendedActions: [], severity: 'low' };
+    return {
+      detected: false,
+      anomalyType: "",
+      confidence: 0,
+      description: "",
+      affectedComponents: [],
+      recommendedActions: [],
+      severity: "low",
+    };
   }
 
-  private detectErrorAnomaly(metrics: MonitoringMetrics): AnomalyDetectionResult {
+  private detectErrorAnomaly(
+    metrics: MonitoringMetrics,
+  ): AnomalyDetectionResult {
     const recentMetrics = this.historicalData.slice(-10);
-    const avgErrorRate = recentMetrics.reduce((sum, m) => sum + m.performanceMetrics.errorRate, 0) / recentMetrics.length;
+    const avgErrorRate =
+      recentMetrics.reduce(
+        (sum, m) => sum + m.performanceMetrics.errorRate,
+        0,
+      ) / recentMetrics.length;
     const currentErrorRate = metrics.performanceMetrics.errorRate;
 
-    if (currentErrorRate > avgErrorRate * 3 && currentErrorRate > 0.05) { // 5% error rate threshold
+    if (currentErrorRate > avgErrorRate * 3 && currentErrorRate > 0.05) {
+      // 5% error rate threshold
       return {
         detected: true,
-        anomalyType: 'error_rate_spike',
+        anomalyType: "error_rate_spike",
         confidence: Math.min(currentErrorRate / avgErrorRate / 2, 1),
         description: `Error rate spike: ${(currentErrorRate * 100).toFixed(1)}% (normal: ${(avgErrorRate * 100).toFixed(1)}%)`,
         affectedComponents: this.identifyErrorSources(metrics),
         recommendedActions: [
-          'Check recent error logs',
-          'Review agent health status',
-          'Investigate failing tasks'
+          "Check recent error logs",
+          "Review agent health status",
+          "Investigate failing tasks",
         ],
-        severity: currentErrorRate > 0.2 ? 'critical' : currentErrorRate > 0.1 ? 'high' : 'medium'
+        severity:
+          currentErrorRate > 0.2
+            ? "critical"
+            : currentErrorRate > 0.1
+              ? "high"
+              : "medium",
       };
     }
 
-    return { detected: false, anomalyType: '', confidence: 0, description: '', affectedComponents: [], recommendedActions: [], severity: 'low' };
+    return {
+      detected: false,
+      anomalyType: "",
+      confidence: 0,
+      description: "",
+      affectedComponents: [],
+      recommendedActions: [],
+      severity: "low",
+    };
   }
 
-  private detectResourceAnomaly(metrics: MonitoringMetrics): AnomalyDetectionResult {
+  private detectResourceAnomaly(
+    metrics: MonitoringMetrics,
+  ): AnomalyDetectionResult {
     const recentMetrics = this.historicalData.slice(-5);
-    const avgMemory = recentMetrics.reduce((sum, m) => sum + m.performanceMetrics.resourceUtilization.memory, 0) / recentMetrics.length;
-    const avgCpu = recentMetrics.reduce((sum, m) => sum + m.performanceMetrics.resourceUtilization.cpu, 0) / recentMetrics.length;
+    const avgMemory =
+      recentMetrics.reduce(
+        (sum, m) => sum + m.performanceMetrics.resourceUtilization.memory,
+        0,
+      ) / recentMetrics.length;
+    const avgCpu =
+      recentMetrics.reduce(
+        (sum, m) => sum + m.performanceMetrics.resourceUtilization.cpu,
+        0,
+      ) / recentMetrics.length;
 
     const currentMemory = metrics.performanceMetrics.resourceUtilization.memory;
     const currentCpu = metrics.performanceMetrics.resourceUtilization.cpu;
@@ -216,64 +264,86 @@ export class AnomalyDetector {
 
     if (memorySpike || cpuSpike) {
       const issues = [];
-      if (memorySpike) issues.push(`memory usage: ${currentMemory.toFixed(1)}%`);
+      if (memorySpike)
+        issues.push(`memory usage: ${currentMemory.toFixed(1)}%`);
       if (cpuSpike) issues.push(`CPU usage: ${currentCpu.toFixed(1)}%`);
 
       return {
         detected: true,
-        anomalyType: 'resource_overload',
+        anomalyType: "resource_overload",
         confidence: 0.8,
-        description: `Resource overload detected: ${issues.join(', ')}`,
-        affectedComponents: ['system'],
+        description: `Resource overload detected: ${issues.join(", ")}`,
+        affectedComponents: ["system"],
         recommendedActions: [
-          'Monitor resource-intensive tasks',
-          'Consider resource optimization',
-          'Check for memory leaks',
-          'Evaluate load balancing'
+          "Monitor resource-intensive tasks",
+          "Consider resource optimization",
+          "Check for memory leaks",
+          "Evaluate load balancing",
         ],
-        severity: (memorySpike && currentMemory > 95) || (cpuSpike && currentCpu > 95) ? 'critical' : 'high'
+        severity:
+          (memorySpike && currentMemory > 95) || (cpuSpike && currentCpu > 95)
+            ? "critical"
+            : "high",
       };
     }
 
-    return { detected: false, anomalyType: '', confidence: 0, description: '', affectedComponents: [], recommendedActions: [], severity: 'low' };
+    return {
+      detected: false,
+      anomalyType: "",
+      confidence: 0,
+      description: "",
+      affectedComponents: [],
+      recommendedActions: [],
+      severity: "low",
+    };
   }
 
-  private detectAgentAnomalies(metrics: MonitoringMetrics): AnomalyDetectionResult[] {
+  private detectAgentAnomalies(
+    metrics: MonitoringMetrics,
+  ): AnomalyDetectionResult[] {
     const anomalies: AnomalyDetectionResult[] = [];
 
-    for (const [agentId, agentMetrics] of Object.entries(metrics.agentMetrics)) {
+    for (const [agentId, agentMetrics] of Object.entries(
+      metrics.agentMetrics,
+    )) {
       // Check for unresponsive agents
-      if (Date.now() - agentMetrics.lastActivity > 300000) { // 5 minutes
+      if (Date.now() - agentMetrics.lastActivity > 300000) {
+        // 5 minutes
         anomalies.push({
           detected: true,
-          anomalyType: 'agent_unresponsive',
+          anomalyType: "agent_unresponsive",
           confidence: 0.9,
           description: `Agent ${agentId} has been inactive for ${(Date.now() - agentMetrics.lastActivity) / 60000} minutes`,
           affectedComponents: [agentId],
           recommendedActions: [
-            'Check agent health status',
-            'Restart unresponsive agent',
-            'Review agent logs'
+            "Check agent health status",
+            "Restart unresponsive agent",
+            "Review agent logs",
           ],
-          severity: 'high'
+          severity: "high",
         });
       }
 
       // Check for high failure rates
-      const failureRate = agentMetrics.failedTasks / (agentMetrics.completedTasks + agentMetrics.failedTasks);
-      if (failureRate > 0.3 && agentMetrics.completedTasks + agentMetrics.failedTasks > 5) {
+      const failureRate =
+        agentMetrics.failedTasks /
+        (agentMetrics.completedTasks + agentMetrics.failedTasks);
+      if (
+        failureRate > 0.3 &&
+        agentMetrics.completedTasks + agentMetrics.failedTasks > 5
+      ) {
         anomalies.push({
           detected: true,
-          anomalyType: 'agent_high_failure_rate',
+          anomalyType: "agent_high_failure_rate",
           confidence: 0.85,
           description: `Agent ${agentId} has ${(failureRate * 100).toFixed(1)}% failure rate`,
           affectedComponents: [agentId],
           recommendedActions: [
-            'Review agent error logs',
-            'Check agent configuration',
-            'Consider agent replacement'
+            "Review agent error logs",
+            "Check agent configuration",
+            "Consider agent replacement",
           ],
-          severity: failureRate > 0.5 ? 'critical' : 'high'
+          severity: failureRate > 0.5 ? "critical" : "high",
         });
       }
     }
@@ -284,13 +354,15 @@ export class AnomalyDetector {
   private identifyErrorSources(metrics: MonitoringMetrics): string[] {
     const sources: string[] = [];
 
-    for (const [agentId, agentMetrics] of Object.entries(metrics.agentMetrics)) {
+    for (const [agentId, agentMetrics] of Object.entries(
+      metrics.agentMetrics,
+    )) {
       if (agentMetrics.failedTasks > agentMetrics.completedTasks * 0.1) {
         sources.push(agentId);
       }
     }
 
-    return sources.length > 0 ? sources : ['system'];
+    return sources.length > 0 ? sources : ["system"];
   }
 }
 
@@ -321,22 +393,25 @@ export class AlertManager {
       if (!rule.enabled) continue;
 
       // Check cooldown
-      if (rule.lastTriggered && Date.now() - rule.lastTriggered < rule.cooldown) {
+      if (
+        rule.lastTriggered &&
+        Date.now() - rule.lastTriggered < rule.cooldown
+      ) {
         continue;
       }
 
       // Evaluate condition
       if (rule.condition(metrics)) {
-        const crypto = require('crypto');
+        const crypto = require("crypto");
         const alert: Alert = {
-          id: `alert_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`,
+          id: `alert_${Date.now()}_${crypto.randomBytes(4).toString("hex")}`,
           ruleId: rule.id,
           timestamp: Date.now(),
           severity: rule.severity,
           message: rule.description,
           metrics: this.extractRelevantMetrics(metrics, rule),
           acknowledged: false,
-          resolved: false
+          resolved: false,
         };
 
         this.activeAlerts.set(alert.id, alert);
@@ -396,12 +471,15 @@ export class AlertManager {
     return limit ? history.slice(0, limit) : history;
   }
 
-  private extractRelevantMetrics(metrics: MonitoringMetrics, rule: AlertRule): Partial<MonitoringMetrics> {
+  private extractRelevantMetrics(
+    metrics: MonitoringMetrics,
+    rule: AlertRule,
+  ): Partial<MonitoringMetrics> {
     // Extract metrics relevant to the rule - simplified implementation
     return {
       timestamp: metrics.timestamp,
       systemMetrics: metrics.systemMetrics,
-      performanceMetrics: metrics.performanceMetrics
+      performanceMetrics: metrics.performanceMetrics,
     };
   }
 }
@@ -413,7 +491,9 @@ export class AdvancedMonitor {
   private readonly maxHistorySize = 1000;
   private monitoringInterval?: NodeJS.Timeout | undefined;
   private alertCallbacks: Array<(alerts: Alert[]) => void> = [];
-  private anomalyCallbacks: Array<(anomalies: AnomalyDetectionResult[]) => void> = [];
+  private anomalyCallbacks: Array<
+    (anomalies: AnomalyDetectionResult[]) => void
+  > = [];
 
   constructor() {
     this.anomalyDetector = new AnomalyDetector();
@@ -429,7 +509,9 @@ export class AdvancedMonitor {
       this.collectAndAnalyzeMetrics();
     }, intervalMs);
 
-    console.log(`🔍 Advanced Monitor: Started monitoring with ${intervalMs}ms interval`);
+    console.log(
+      `🔍 Advanced Monitor: Started monitoring with ${intervalMs}ms interval`,
+    );
   }
 
   /**
@@ -440,7 +522,7 @@ export class AdvancedMonitor {
       clearInterval(this.monitoringInterval);
       this.monitoringInterval = undefined;
     }
-    console.log('🔍 Advanced Monitor: Stopped monitoring');
+    console.log("🔍 Advanced Monitor: Stopped monitoring");
   }
 
   /**
@@ -462,11 +544,11 @@ export class AdvancedMonitor {
 
     this.anomalyDetector.updateHistory(metrics);
     if (alerts.length > 0) {
-      this.alertCallbacks.forEach(callback => callback(alerts));
+      this.alertCallbacks.forEach((callback) => callback(alerts));
     }
 
     if (anomalies.length > 0) {
-      this.anomalyCallbacks.forEach(callback => callback(anomalies));
+      this.anomalyCallbacks.forEach((callback) => callback(anomalies));
     }
 
     return { metrics, alerts, anomalies };
@@ -490,36 +572,41 @@ export class AdvancedMonitor {
    * Get current system health status
    */
   getHealthStatus(): {
-    overall: 'healthy' | 'degraded' | 'unhealthy';
+    overall: "healthy" | "degraded" | "unhealthy";
     activeAlerts: number;
     recentAnomalies: number;
     uptime: number;
     lastCheck: number;
   } {
     const activeAlerts = this.alertManager.getActiveAlerts();
-    const criticalAlerts = activeAlerts.filter(a => a.severity === 'critical');
-    const highAlerts = activeAlerts.filter(a => a.severity === 'error');
+    const criticalAlerts = activeAlerts.filter(
+      (a) => a.severity === "critical",
+    );
+    const highAlerts = activeAlerts.filter((a) => a.severity === "error");
 
-    let overall: 'healthy' | 'degraded' | 'unhealthy' = 'healthy';
+    let overall: "healthy" | "degraded" | "unhealthy" = "healthy";
 
     if (criticalAlerts.length > 0) {
-      overall = 'unhealthy';
+      overall = "unhealthy";
     } else if (highAlerts.length > 0) {
-      overall = 'degraded';
+      overall = "degraded";
     }
 
     // Check recent anomalies (last hour)
     const oneHourAgo = Date.now() - 3600000;
     const recentAnomalies = this.metricsHistory
-      .filter(m => m.timestamp > oneHourAgo)
-      .reduce((count, m) => count + this.anomalyDetector.detectAnomalies(m).length, 0);
+      .filter((m) => m.timestamp > oneHourAgo)
+      .reduce(
+        (count, m) => count + this.anomalyDetector.detectAnomalies(m).length,
+        0,
+      );
 
     return {
       overall,
       activeAlerts: activeAlerts.length,
       recentAnomalies,
       uptime: process.uptime() * 1000,
-      lastCheck: Date.now()
+      lastCheck: Date.now(),
     };
   }
 
@@ -533,16 +620,19 @@ export class AdvancedMonitor {
     activeRules: number;
     monitoringActive: boolean;
   } {
-    const allAnomalies = this.metricsHistory.reduce((count, m) =>
-      count + this.anomalyDetector.detectAnomalies(m).length, 0
+    const allAnomalies = this.metricsHistory.reduce(
+      (count, m) => count + this.anomalyDetector.detectAnomalies(m).length,
+      0,
     );
 
     return {
       totalMetrics: this.metricsHistory.length,
       totalAlerts: this.alertManager.getAlertHistory().length,
       totalAnomalies: allAnomalies,
-      activeRules: Array.from(this.alertManager['rules'].values()).filter(r => r.enabled).length,
-      monitoringActive: this.monitoringInterval !== undefined
+      activeRules: Array.from(this.alertManager["rules"].values()).filter(
+        (r) => r.enabled,
+      ).length,
+      monitoringActive: this.monitoringInterval !== undefined,
     };
   }
 
@@ -565,77 +655,79 @@ export class AdvancedMonitor {
         averageTaskDuration: 250,
         uptime: process.uptime() * 1000,
         memoryUsage: (memUsage.heapUsed / memUsage.heapTotal) * 100,
-        cpuUsage: (cpuUsage.user + cpuUsage.system) / 1000000 // Convert to seconds
+        cpuUsage: (cpuUsage.user + cpuUsage.system) / 1000000, // Convert to seconds
       },
       performanceMetrics: {
         throughput: 2.5,
         latency: {
           p50: 200,
           p95: 500,
-          p99: 1000
+          p99: 1000,
         },
         errorRate: 0.033,
         resourceUtilization: {
           memory: (memUsage.heapUsed / memUsage.heapTotal) * 100,
           cpu: (cpuUsage.user + cpuUsage.system) / 10000,
-          network: 0 // Placeholder
-        }
+          network: 0, // Placeholder
+        },
       },
       errorMetrics: {
         totalErrors: 5,
         errorRate: 0.033,
-        errorTypes: { 'timeout': 3, 'validation': 2 },
-        recentErrors: []
-      }
+        errorTypes: { timeout: 3, validation: 2 },
+        recentErrors: [],
+      },
     };
   }
 
   private initializeDefaultRules(): void {
     // High error rate alert
     this.alertManager.addRule({
-      id: 'high_error_rate',
-      name: 'High Error Rate',
-      description: 'System error rate exceeds 5%',
+      id: "high_error_rate",
+      name: "High Error Rate",
+      description: "System error rate exceeds 5%",
       condition: (metrics) => metrics.performanceMetrics.errorRate > 0.05,
-      severity: 'error',
+      severity: "error",
       cooldown: 300000, // 5 minutes
-      enabled: true
+      enabled: true,
     });
 
     // High latency alert
     this.alertManager.addRule({
-      id: 'high_latency',
-      name: 'High Latency',
-      description: 'P95 latency exceeds 1 second',
+      id: "high_latency",
+      name: "High Latency",
+      description: "P95 latency exceeds 1 second",
       condition: (metrics) => metrics.performanceMetrics.latency.p95 > 1000,
-      severity: 'warning',
+      severity: "warning",
       cooldown: 600000, // 10 minutes
-      enabled: true
+      enabled: true,
     });
 
     // Resource overload alert
     this.alertManager.addRule({
-      id: 'resource_overload',
-      name: 'Resource Overload',
-      description: 'Memory or CPU usage exceeds 90%',
+      id: "resource_overload",
+      name: "Resource Overload",
+      description: "Memory or CPU usage exceeds 90%",
       condition: (metrics) =>
         metrics.performanceMetrics.resourceUtilization.memory > 90 ||
         metrics.performanceMetrics.resourceUtilization.cpu > 90,
-      severity: 'critical',
+      severity: "critical",
       cooldown: 120000, // 2 minutes
-      enabled: true
+      enabled: true,
     });
 
     // Agent failure alert
     this.alertManager.addRule({
-      id: 'agent_failures',
-      name: 'Agent Failures',
-      description: 'Multiple agents are failing tasks',
+      id: "agent_failures",
+      name: "Agent Failures",
+      description: "Multiple agents are failing tasks",
       condition: (metrics) =>
-        Object.values(metrics.agentMetrics).filter(a => a.healthStatus === 'unhealthy').length > 2,
-      severity: 'error',
+        Object.values(metrics.agentMetrics).filter(
+          (a) => a.healthStatus === "unhealthy",
+        ).length > 2,
+      severity: "error",
       cooldown: 300000, // 5 minutes
-      enabled: true
+      enabled: true,
     });
   }
 }

@@ -9,24 +9,28 @@ This document outlines the procedures for responding to security incidents in St
 ### Severity Levels
 
 #### Critical (P0) - Immediate Response Required
+
 - **Data Breach**: Unauthorized access to sensitive data (PII, financial, health)
 - **System Compromise**: Complete system takeover or root access gained
 - **Service Disruption**: Widespread outage affecting all users
 - **Active Exploitation**: Real-time attack in progress
 
 #### High (P1) - Response within 1 hour
+
 - **Unauthorized Access**: Single user account compromise with elevated privileges
 - **Malware Infection**: Malicious code detected on systems
 - **Data Exposure**: Sensitive data accessible without authorization
 - **Denial of Service**: Targeted attack impacting service availability
 
 #### Medium (P2) - Response within 4 hours
+
 - **Suspicious Activity**: Unusual patterns that may indicate compromise
 - **Configuration Error**: Security misconfiguration exposing data
 - **Failed Attack**: Attempted exploit that was blocked
 - **Policy Violation**: Internal security policy breach
 
 #### Low (P3) - Response within 24 hours
+
 - **Probing**: Port scanning or vulnerability testing
 - **Minor Exposure**: Non-sensitive data exposure
 - **False Positive**: Security alert that proves benign
@@ -34,6 +38,7 @@ This document outlines the procedures for responding to security incidents in St
 ## Incident Response Team
 
 ### Core Response Team
+
 - **Incident Response Coordinator**: Overall coordination and communication
 - **Security Lead**: Technical security assessment and containment
 - **Engineering Lead**: System access and technical fixes
@@ -41,6 +46,7 @@ This document outlines the procedures for responding to security incidents in St
 - **Communications Lead**: Internal/external communications
 
 ### Extended Team (As Needed)
+
 - **DevOps/SRE**: Infrastructure access and monitoring
 - **Database Administrators**: Data recovery and forensics
 - **External Experts**: Specialized security consultants
@@ -51,20 +57,25 @@ This document outlines the procedures for responding to security incidents in St
 ### Phase 1: Detection & Assessment (0-15 minutes)
 
 #### 1.1 Incident Detection
+
 **Automated Detection:**
+
 - StrRay SecurityAuditor alerts
 - Framework monitoring dashboards
 - Log analysis and anomaly detection
 - User reports and system alerts
 
 **Manual Detection:**
+
 - Security code reviews
 - Penetration testing results
 - Compliance audits
 - Internal security monitoring
 
 #### 1.2 Initial Assessment
+
 **Gather Information:**
+
 ```bash
 # Collect initial evidence
 date
@@ -76,19 +87,23 @@ netstat -tlnp | grep -E ":(3000|443|80)"
 ```
 
 **Assess Impact:**
+
 - What systems/data are affected?
 - How many users impacted?
 - What is the potential damage?
 - Is the incident ongoing?
 
 #### 1.3 Classification & Notification
+
 **Immediate Actions:**
+
 - [ ] Assign incident severity level
 - [ ] Notify incident response team
 - [ ] Start incident response log
 - [ ] Preserve evidence (don't modify affected systems)
 
 **Notification Template:**
+
 ```
 INCIDENT ALERT - [SEVERITY LEVEL]
 
@@ -110,7 +125,9 @@ Response Team:
 ### Phase 2: Containment (15-60 minutes)
 
 #### 2.1 Short-term Containment
+
 **Isolate Affected Systems:**
+
 ```bash
 # Disconnect compromised systems from network
 sudo iptables -A INPUT -s [COMPROMISED_IP] -j DROP
@@ -126,13 +143,16 @@ sudo cp -r /var/log/strray/ /var/forensics/$(date +%Y%m%d_%H%M%S)/
 ```
 
 **Access Control:**
+
 - Revoke compromised credentials
 - Implement emergency access controls
 - Disable affected user accounts
 - Update firewall rules
 
 #### 2.2 Evidence Preservation
+
 **Framework-Specific Evidence:**
+
 ```bash
 # Preserve StrRay session data
 sudo cp -r /opt/strray/sessions/ /var/forensics/sessions/
@@ -147,6 +167,7 @@ sudo cp -r /opt/strray/plugins/active/ /var/forensics/plugins/
 ```
 
 **Chain of Custody:**
+
 - Document who collected what evidence
 - Timestamp all evidence collection
 - Use write-once media for evidence storage
@@ -155,13 +176,16 @@ sudo cp -r /opt/strray/plugins/active/ /var/forensics/plugins/
 ### Phase 3: Eradication (1-4 hours)
 
 #### 3.1 Root Cause Analysis
+
 **Technical Investigation:**
+
 - Analyze attack vectors and methods
 - Identify exploited vulnerabilities
 - Determine attacker access level and duration
 - Map complete compromise scope
 
 **Framework-Specific Analysis:**
+
 ```bash
 # Run comprehensive security audit
 cd /opt/strray
@@ -176,13 +200,16 @@ sudo find /opt/strray -name "*.js" -exec grep -l "eval\|Function\|child_process"
 ```
 
 #### 3.2 Vulnerability Remediation
+
 **Immediate Fixes:**
+
 - Apply security patches
 - Update vulnerable dependencies
 - Reconfigure security settings
 - Implement additional controls
 
 **Framework Updates:**
+
 ```bash
 # Update StrRay Framework
 cd /opt/strray
@@ -199,7 +226,9 @@ nano config/security-headers.json
 ```
 
 #### 3.3 System Cleanup
+
 **Remove Malicious Code:**
+
 ```bash
 # Remove identified malware
 sudo rm -f /tmp/malicious_file
@@ -218,12 +247,15 @@ sudo chage -d 0 compromised_user
 ### Phase 4: Recovery (4-24 hours)
 
 #### 4.1 System Restoration
+
 **Gradual Recovery:**
+
 - Restore from clean backups
 - Verify system integrity before reconnection
 - Monitor for re-compromise during recovery
 
 **Framework Recovery:**
+
 ```bash
 # Restore from clean backup
 sudo systemctl stop strray-framework
@@ -241,7 +273,9 @@ sudo systemctl start strray-framework
 ```
 
 #### 4.2 Validation Testing
+
 **Security Testing:**
+
 ```bash
 # Run comprehensive security tests
 npm run security-test-suite
@@ -257,7 +291,9 @@ npm run test:data-integrity
 ```
 
 #### 4.3 Monitoring Implementation
+
 **Enhanced Monitoring:**
+
 ```bash
 # Enable additional logging
 nano config/monitoring.json
@@ -274,7 +310,9 @@ npm run setup-behavioral-monitoring
 ### Phase 5: Post-Incident Analysis (1-7 days)
 
 #### 5.1 Incident Documentation
+
 **Complete Incident Report:**
+
 ```
 INCIDENT REPORT - IR-[YYYY]-[NNN]
 
@@ -304,13 +342,16 @@ Recommendations:
 ```
 
 #### 5.2 Process Improvement
+
 **Review and Update:**
+
 - Update incident response procedures
 - Enhance monitoring and detection
 - Implement additional security controls
 - Train team on lessons learned
 
 **Framework Improvements:**
+
 ```bash
 # Update security policies
 nano docs/security/SECURITY_POLICY.md
@@ -326,7 +367,9 @@ nano config/monitoring-rules.json
 ```
 
 #### 5.3 Communication
+
 **Stakeholder Notifications:**
+
 - Executive leadership update
 - Team debrief and lessons learned
 - Customer notifications (if required)
@@ -337,11 +380,13 @@ nano config/monitoring-rules.json
 ### Plugin Compromise Response
 
 **Detection:**
+
 - Monitor plugin execution anomalies
 - Check plugin permission violations
 - Audit plugin data access patterns
 
 **Containment:**
+
 ```bash
 # Isolate compromised plugin
 sudo mv /opt/strray/plugins/active/compromised-plugin /opt/strray/plugins/quarantined/
@@ -355,6 +400,7 @@ nano config/plugin-permissions.json
 ```
 
 **Recovery:**
+
 ```bash
 # Validate plugin integrity
 node scripts/validate-plugin.js compromised-plugin
@@ -369,11 +415,13 @@ nano docs/plugins/SECURITY_REQUIREMENTS.md
 ### Session Security Incident
 
 **Detection:**
+
 - Monitor for session anomalies
 - Check for cross-session data leakage
 - Audit agent coordination logs
 
 **Response:**
+
 ```bash
 # Invalidate compromised sessions
 node scripts/invalidate-sessions.js --pattern compromised_criteria
@@ -389,11 +437,13 @@ nano config/session-security.json
 ### Dependency Vulnerability
 
 **Detection:**
+
 - Automated dependency scanning alerts
 - Security audit failures
 - Vulnerability database notifications
 
 **Response:**
+
 ```bash
 # Identify vulnerable dependencies
 npm audit --audit-level=moderate
@@ -413,18 +463,21 @@ npx audit-ci --config audit-ci.json
 ## Communication Protocols
 
 ### Internal Communication
+
 - Use dedicated incident response Slack channel
 - Regular status updates (every 30 minutes for critical incidents)
 - Clear escalation procedures
 - Document all decisions and actions
 
 ### External Communication
+
 - Prepare customer notification templates
 - Coordinate with legal for regulatory requirements
 - Maintain transparency with stakeholders
 - Control message release timing
 
 ### Media Relations
+
 - Designate single spokesperson
 - Prepare holding statements
 - Coordinate with PR team
@@ -433,18 +486,21 @@ npx audit-ci --config audit-ci.json
 ## Legal and Regulatory Considerations
 
 ### Data Breach Notification
+
 - Identify applicable regulations (GDPR, CCPA, HIPAA)
 - Determine notification timelines
 - Prepare breach notification letters
 - Document notification process
 
 ### Evidence Preservation
+
 - Maintain chain of custody
 - Preserve digital evidence properly
 - Document collection procedures
 - Prepare for potential legal proceedings
 
 ### Law Enforcement Coordination
+
 - Know when to involve authorities
 - Preserve evidence for investigation
 - Provide requested information
@@ -453,12 +509,14 @@ npx audit-ci --config audit-ci.json
 ## Recovery and Continuity
 
 ### Business Continuity
+
 - Activate backup systems
 - Implement manual processes if needed
 - Communicate with customers
 - Monitor service restoration
 
 ### Service Restoration
+
 - Gradual rollout of recovered systems
 - Monitor for performance issues
 - Validate security controls
@@ -467,12 +525,14 @@ npx audit-ci --config audit-ci.json
 ## Testing and Validation
 
 ### Incident Response Testing
+
 - Regular tabletop exercises
 - Automated response testing
 - Team training and drills
 - Process documentation updates
 
 ### Security Control Validation
+
 - Post-incident security assessment
 - Control effectiveness review
 - Gap analysis and remediation
@@ -481,12 +541,14 @@ npx audit-ci --config audit-ci.json
 ## Tools and Resources
 
 ### StrRay Framework Tools
+
 - SecurityAuditor: Automated vulnerability scanning
 - SecurityHardener: Automated fix application
 - Monitoring Dashboard: Real-time security monitoring
 - Incident Response Scripts: Automated containment tools
 
 ### External Tools
+
 - Forensic analysis tools (Autopsy, Volatility)
 - Log analysis tools (ELK Stack, Splunk)
 - Network analysis tools (Wireshark, tcpdump)
@@ -495,12 +557,14 @@ npx audit-ci --config audit-ci.json
 ## Continuous Improvement
 
 ### Lessons Learned Process
+
 - Conduct post-incident review within 1 week
 - Identify process improvements
 - Update procedures and training
 - Implement preventive measures
 
 ### Metrics and KPIs
+
 - Mean time to detect (MTTD)
 - Mean time to respond (MTTR)
 - False positive rate
@@ -510,11 +574,13 @@ npx audit-ci --config audit-ci.json
 ## Emergency Contacts
 
 ### Internal Contacts
+
 - Security Team: security@company.com
 - Incident Response Coordinator: irc@company.com
 - Legal: legal@company.com
 
 ### External Contacts
+
 - Law Enforcement: [Local police cyber unit]
 - Regulatory Bodies: [Applicable regulators]
 - Security Vendors: [Vendor support contacts]
@@ -522,30 +588,35 @@ npx audit-ci --config audit-ci.json
 ## Checklist Summary
 
 ### Immediate Response (First 15 minutes)
+
 - [ ] Assess and classify incident severity
 - [ ] Notify incident response team
 - [ ] Start incident logging
 - [ ] Preserve initial evidence
 
 ### Containment (15-60 minutes)
+
 - [ ] Isolate affected systems
 - [ ] Stop incident spread
 - [ ] Preserve evidence
 - [ ] Notify stakeholders
 
 ### Eradication (1-4 hours)
+
 - [ ] Identify root cause
 - [ ] Remove malicious components
 - [ ] Fix vulnerabilities
 - [ ] Validate eradication
 
 ### Recovery (4-24 hours)
+
 - [ ] Restore systems from clean backups
 - [ ] Test and validate recovery
 - [ ] Monitor for reoccurrence
 - [ ] Gradually restore service
 
 ### Analysis (1-7 days)
+
 - [ ] Complete incident documentation
 - [ ] Conduct lessons learned session
 - [ ] Implement improvements

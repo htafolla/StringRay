@@ -32,17 +32,17 @@ The StrRay Framework provides comprehensive APIs for enterprise integration, cov
 ```typescript
 // API key authentication
 const client = new StrRayClient({
-  apiKey: 'your-api-key',
-  baseUrl: 'https://api.strray.framework'
+  apiKey: "your-api-key",
+  baseUrl: "https://api.strray.framework",
 });
 
 // OAuth2 authentication
 const client = new StrRayClient({
   oauth2: {
-    clientId: 'your-client-id',
-    clientSecret: 'your-client-secret',
-    tokenUrl: 'https://auth.strray.framework/oauth2/token'
-  }
+    clientId: "your-client-id",
+    clientSecret: "your-client-secret",
+    tokenUrl: "https://auth.strray.framework/oauth2/token",
+  },
 });
 ```
 
@@ -61,6 +61,7 @@ constructor(config: StrRayClientConfig)
 ```
 
 **Parameters:**
+
 - `config.apiKey?: string` - API key for authentication
 - `config.oauth2?: OAuth2Config` - OAuth2 configuration
 - `config.baseUrl?: string` - Base URL for API calls (default: 'https://api.strray.framework')
@@ -70,27 +71,33 @@ constructor(config: StrRayClientConfig)
 #### Methods
 
 ##### initialize()
+
 ```typescript
 async initialize(): Promise<void>
 ```
+
 Initializes the client connection and validates authentication.
 
 **Throws:**
+
 - `AuthenticationError` - Invalid credentials
 - `NetworkError` - Connection issues
 - `FrameworkError` - Framework not available
 
 ##### getStatus()
+
 ```typescript
 async getStatus(): Promise<SystemStatus>
 ```
+
 Retrieves current system status and health information.
 
 **Returns:**
+
 ```typescript
 interface SystemStatus {
   version: string;
-  status: 'healthy' | 'degraded' | 'unhealthy';
+  status: "healthy" | "degraded" | "unhealthy";
   agents: AgentStatus[];
   uptime: number;
   lastHealthCheck: Date;
@@ -98,9 +105,11 @@ interface SystemStatus {
 ```
 
 ##### shutdown()
+
 ```typescript
 async shutdown(): Promise<void>
 ```
+
 Gracefully shuts down the client and cleans up resources.
 
 ### Framework Configuration
@@ -128,40 +137,47 @@ interface StrRayClientConfig {
 ### Agent Management
 
 #### listAgents()
+
 ```typescript
 async listAgents(): Promise<AgentInfo[]>
 ```
+
 Lists all available agents and their capabilities.
 
 **Returns:**
+
 ```typescript
 interface AgentInfo {
   id: string;
   name: string;
   description: string;
   capabilities: string[];
-  status: 'active' | 'inactive' | 'error';
+  status: "active" | "inactive" | "error";
   version: string;
   lastActive: Date;
 }
 ```
 
 #### getAgentStatus()
+
 ```typescript
 async getAgentStatus(agentId: string): Promise<AgentStatus>
 ```
+
 Gets detailed status information for a specific agent.
 
 **Parameters:**
+
 - `agentId: string` - Unique agent identifier
 
 **Returns:**
+
 ```typescript
 interface AgentStatus {
   id: string;
   name: string;
-  status: 'active' | 'inactive' | 'error';
-  health: 'healthy' | 'degraded' | 'unhealthy';
+  status: "active" | "inactive" | "error";
+  health: "healthy" | "degraded" | "unhealthy";
   tasksProcessed: number;
   averageResponseTime: number;
   errorRate: number;
@@ -173,17 +189,20 @@ interface AgentStatus {
 ### Task Execution
 
 #### submitTask()
+
 ```typescript
 async submitTask(task: TaskRequest): Promise<TaskResponse>
 ```
+
 Submits a task for agent processing.
 
 **Parameters:**
+
 ```typescript
 interface TaskRequest {
   type: string;
   agent?: string; // Specific agent, or auto-assigned
-  priority?: 'low' | 'normal' | 'high' | 'critical';
+  priority?: "low" | "normal" | "high" | "critical";
   payload: any;
   timeout?: number;
   callbacks?: {
@@ -195,29 +214,34 @@ interface TaskRequest {
 ```
 
 **Returns:**
+
 ```typescript
 interface TaskResponse {
   taskId: string;
-  status: 'queued' | 'processing' | 'completed' | 'failed';
+  status: "queued" | "processing" | "completed" | "failed";
   estimatedDuration: number;
   assignedAgent: string;
 }
 ```
 
 #### getTaskStatus()
+
 ```typescript
 async getTaskStatus(taskId: string): Promise<TaskStatus>
 ```
+
 Retrieves the current status of a submitted task.
 
 **Parameters:**
+
 - `taskId: string` - Task identifier returned from submitTask()
 
 **Returns:**
+
 ```typescript
 interface TaskStatus {
   taskId: string;
-  status: 'queued' | 'processing' | 'completed' | 'failed' | 'cancelled';
+  status: "queued" | "processing" | "completed" | "failed" | "cancelled";
   progress: number; // 0-100
   startTime: Date;
   estimatedCompletion: Date;
@@ -228,21 +252,26 @@ interface TaskStatus {
 ```
 
 #### cancelTask()
+
 ```typescript
 async cancelTask(taskId: string): Promise<boolean>
 ```
+
 Cancels a running or queued task.
 
 **Parameters:**
+
 - `taskId: string` - Task identifier
 
 **Returns:**
+
 - `true` if cancellation was successful
 - `false` if task could not be cancelled
 
 ### Agent-Specific APIs
 
 #### Code Review Agent
+
 ```typescript
 interface CodeReviewRequest {
   code: string;
@@ -256,7 +285,7 @@ interface CodeReviewRequest {
 }
 
 interface CodeReviewResult {
-  overall: 'pass' | 'fail' | 'needs-improvement';
+  overall: "pass" | "fail" | "needs-improvement";
   score: number; // 0-100
   issues: CodeIssue[];
   suggestions: CodeSuggestion[];
@@ -265,11 +294,12 @@ interface CodeReviewResult {
 ```
 
 #### Security Audit Agent
+
 ```typescript
 interface SecurityAuditRequest {
-  target: 'code' | 'dependencies' | 'infrastructure';
+  target: "code" | "dependencies" | "infrastructure";
   scope: string | string[];
-  severity: 'info' | 'low' | 'medium' | 'high' | 'critical';
+  severity: "info" | "low" | "medium" | "high" | "critical";
   includeRemediation?: boolean;
 }
 
@@ -288,21 +318,25 @@ interface SecurityAuditResult {
 ### Performance Monitoring
 
 #### getPerformanceMetrics()
+
 ```typescript
 async getPerformanceMetrics(timeRange?: TimeRange): Promise<PerformanceMetrics>
 ```
+
 Retrieves comprehensive performance metrics.
 
 **Parameters:**
+
 ```typescript
 interface TimeRange {
   start: Date;
   end?: Date;
-  granularity?: '1m' | '5m' | '1h' | '1d';
+  granularity?: "1m" | "5m" | "1h" | "1d";
 }
 ```
 
 **Returns:**
+
 ```typescript
 interface PerformanceMetrics {
   bundleSize: BundleMetrics;
@@ -314,12 +348,15 @@ interface PerformanceMetrics {
 ```
 
 #### startPerformanceMonitoring()
+
 ```typescript
 async startPerformanceMonitoring(config?: MonitoringConfig): Promise<string>
 ```
+
 Starts performance monitoring session.
 
 **Parameters:**
+
 ```typescript
 interface MonitoringConfig {
   duration?: number; // Monitoring duration in milliseconds
@@ -332,20 +369,25 @@ interface MonitoringConfig {
 **Returns:** Monitoring session ID
 
 #### stopPerformanceMonitoring()
+
 ```typescript
 async stopPerformanceMonitoring(sessionId: string): Promise<PerformanceReport>
 ```
+
 Stops performance monitoring and returns final report.
 
 ### Performance Budget Management
 
 #### setPerformanceBudget()
+
 ```typescript
 async setPerformanceBudget(budget: PerformanceBudget): Promise<void>
 ```
+
 Sets performance budget constraints.
 
 **Parameters:**
+
 ```typescript
 interface PerformanceBudget {
   bundleSize: {
@@ -364,15 +406,18 @@ interface PerformanceBudget {
 ```
 
 #### checkBudgetCompliance()
+
 ```typescript
 async checkBudgetCompliance(): Promise<BudgetCompliance>
 ```
+
 Checks current metrics against budget constraints.
 
 **Returns:**
+
 ```typescript
 interface BudgetCompliance {
-  overall: 'compliant' | 'warning' | 'violated';
+  overall: "compliant" | "warning" | "violated";
   violations: BudgetViolation[];
   recommendations: string[];
 }
@@ -381,12 +426,15 @@ interface BudgetCompliance {
 ### Regression Testing
 
 #### runPerformanceRegressionTest()
+
 ```typescript
 async runPerformanceRegressionTest(test: RegressionTest): Promise<RegressionResult>
 ```
+
 Runs a performance regression test.
 
 **Parameters:**
+
 ```typescript
 interface RegressionTest {
   name: string;
@@ -399,10 +447,11 @@ interface RegressionTest {
 ```
 
 **Returns:**
+
 ```typescript
 interface RegressionResult {
   testName: string;
-  status: 'passed' | 'failed' | 'baseline-updated';
+  status: "passed" | "failed" | "baseline-updated";
   deviation: number; // percentage from baseline
   duration: number;
   metrics: PerformanceMetrics;
@@ -416,15 +465,18 @@ interface RegressionResult {
 ### Security Auditing
 
 #### performSecurityAudit()
+
 ```typescript
 async performSecurityAudit(target: SecurityAuditTarget): Promise<SecurityAuditResult>
 ```
+
 Performs comprehensive security audit.
 
 **Parameters:**
+
 ```typescript
 interface SecurityAuditTarget {
-  type: 'code' | 'dependencies' | 'infrastructure' | 'configuration';
+  type: "code" | "dependencies" | "infrastructure" | "configuration";
   scope: string | string[];
   includeDependencies?: boolean;
   severity?: SecuritySeverity;
@@ -433,6 +485,7 @@ interface SecurityAuditTarget {
 ```
 
 **Returns:**
+
 ```typescript
 interface SecurityAuditResult {
   summary: {
@@ -453,39 +506,47 @@ interface SecurityAuditResult {
 #### Vulnerability Management
 
 #### getVulnerabilities()
+
 ```typescript
 async getVulnerabilities(filters?: VulnerabilityFilters): Promise<Vulnerability[]>
 ```
+
 Retrieves known vulnerabilities.
 
 **Parameters:**
+
 ```typescript
 interface VulnerabilityFilters {
   severity?: SecuritySeverity;
-  status?: 'open' | 'resolved' | 'mitigated';
+  status?: "open" | "resolved" | "mitigated";
   component?: string;
   dateRange?: DateRange;
 }
 ```
 
 #### updateVulnerabilityStatus()
+
 ```typescript
 async updateVulnerabilityStatus(vulnId: string, status: VulnerabilityStatus): Promise<void>
 ```
+
 Updates the status of a vulnerability.
 
 ### Security Hardening
 
 #### applySecurityHardening()
+
 ```typescript
 async applySecurityHardening(target: SecurityHardeningTarget): Promise<HardeningResult>
 ```
+
 Applies automated security hardening measures.
 
 **Parameters:**
+
 ```typescript
 interface SecurityHardeningTarget {
-  type: 'code' | 'configuration' | 'infrastructure';
+  type: "code" | "configuration" | "infrastructure";
   scope: string | string[];
   rules?: SecurityRule[];
   dryRun?: boolean;
@@ -493,6 +554,7 @@ interface SecurityHardeningTarget {
 ```
 
 **Returns:**
+
 ```typescript
 interface HardeningResult {
   appliedFixes: SecurityFix[];
@@ -509,12 +571,15 @@ interface HardeningResult {
 ### Security Monitoring
 
 #### getSecurityEvents()
+
 ```typescript
 async getSecurityEvents(filters?: SecurityEventFilters): Promise<SecurityEvent[]>
 ```
+
 Retrieves security events and incidents.
 
 **Parameters:**
+
 ```typescript
 interface SecurityEventFilters {
   type?: SecurityEventType;
@@ -525,9 +590,11 @@ interface SecurityEventFilters {
 ```
 
 #### createSecurityAlert()
+
 ```typescript
 async createSecurityAlert(alert: SecurityAlert): Promise<string>
 ```
+
 Creates a security alert for monitoring.
 
 ---
@@ -537,15 +604,18 @@ Creates a security alert for monitoring.
 ### System Monitoring
 
 #### getSystemHealth()
+
 ```typescript
 async getSystemHealth(): Promise<SystemHealth>
 ```
+
 Retrieves comprehensive system health information.
 
 **Returns:**
+
 ```typescript
 interface SystemHealth {
-  overall: 'healthy' | 'degraded' | 'unhealthy';
+  overall: "healthy" | "degraded" | "unhealthy";
   components: Record<string, ComponentHealth>;
   metrics: SystemMetrics;
   alerts: Alert[];
@@ -554,50 +624,62 @@ interface SystemHealth {
 ```
 
 #### getSystemMetrics()
+
 ```typescript
 async getSystemMetrics(timeRange?: TimeRange): Promise<SystemMetrics>
 ```
+
 Retrieves detailed system metrics.
 
 ### Alert Management
 
 #### getAlerts()
+
 ```typescript
 async getAlerts(filters?: AlertFilters): Promise<Alert[]>
 ```
+
 Retrieves active alerts.
 
 **Parameters:**
+
 ```typescript
 interface AlertFilters {
-  severity?: 'info' | 'warning' | 'error' | 'critical';
-  status?: 'active' | 'acknowledged' | 'resolved';
+  severity?: "info" | "warning" | "error" | "critical";
+  status?: "active" | "acknowledged" | "resolved";
   component?: string;
   timeRange?: DateRange;
 }
 ```
 
 #### acknowledgeAlert()
+
 ```typescript
 async acknowledgeAlert(alertId: string, userId?: string): Promise<void>
 ```
+
 Acknowledges an alert.
 
 #### resolveAlert()
+
 ```typescript
 async resolveAlert(alertId: string, resolution?: string): Promise<void>
 ```
+
 Resolves an alert with optional resolution notes.
 
 ### Dashboard APIs
 
 #### getDashboardData()
+
 ```typescript
 async getDashboardData(dashboardId: string, timeRange?: TimeRange): Promise<DashboardData>
 ```
+
 Retrieves dashboard data for visualization.
 
 **Returns:**
+
 ```typescript
 interface DashboardData {
   id: string;
@@ -609,9 +691,11 @@ interface DashboardData {
 ```
 
 #### createCustomDashboard()
+
 ```typescript
 async createCustomDashboard(config: DashboardConfig): Promise<string>
 ```
+
 Creates a custom monitoring dashboard.
 
 ---
@@ -621,12 +705,15 @@ Creates a custom monitoring dashboard.
 ### Plugin Management
 
 #### listPlugins()
+
 ```typescript
 async listPlugins(): Promise<PluginInfo[]>
 ```
+
 Lists all installed plugins.
 
 **Returns:**
+
 ```typescript
 interface PluginInfo {
   id: string;
@@ -635,21 +722,24 @@ interface PluginInfo {
   description: string;
   author: string;
   capabilities: string[];
-  status: 'active' | 'inactive' | 'error';
+  status: "active" | "inactive" | "error";
   security: PluginSecurity;
 }
 ```
 
 #### installPlugin()
+
 ```typescript
 async installPlugin(pluginPackage: PluginPackage): Promise<PluginInstallationResult>
 ```
+
 Installs a new plugin.
 
 **Parameters:**
+
 ```typescript
 interface PluginPackage {
-  source: 'npm' | 'git' | 'local';
+  source: "npm" | "git" | "local";
   identifier: string; // package name, git URL, or local path
   version?: string;
   config?: PluginConfig;
@@ -657,20 +747,25 @@ interface PluginPackage {
 ```
 
 #### uninstallPlugin()
+
 ```typescript
 async uninstallPlugin(pluginId: string): Promise<void>
 ```
+
 Uninstalls a plugin.
 
 ### Plugin Security
 
 #### validatePlugin()
+
 ```typescript
 async validatePlugin(pluginPath: string): Promise<PluginValidationResult>
 ```
+
 Validates plugin security and compatibility.
 
 **Returns:**
+
 ```typescript
 interface PluginValidationResult {
   valid: boolean;
@@ -689,9 +784,11 @@ interface PluginValidationResult {
 ```
 
 #### updatePluginPermissions()
+
 ```typescript
 async updatePluginPermissions(pluginId: string, permissions: PluginPermissions): Promise<void>
 ```
+
 Updates plugin permissions.
 
 ---
@@ -699,11 +796,13 @@ Updates plugin permissions.
 ## REST API Endpoints
 
 ### Base URL
+
 ```
 https://api.strray.framework/v1
 ```
 
 ### Authentication
+
 All endpoints require authentication via API key or OAuth2.
 
 ```
@@ -713,9 +812,11 @@ Authorization: Bearer <token>
 ### Core Endpoints
 
 #### GET /status
+
 Get system status.
 
 **Response:**
+
 ```json
 {
   "version": "1.0.0",
@@ -732,9 +833,11 @@ Get system status.
 ```
 
 #### POST /tasks
+
 Submit a task for processing.
 
 **Request:**
+
 ```json
 {
   "type": "code-review",
@@ -747,6 +850,7 @@ Submit a task for processing.
 ```
 
 **Response:**
+
 ```json
 {
   "taskId": "task_123456",
@@ -756,9 +860,11 @@ Submit a task for processing.
 ```
 
 #### GET /tasks/{taskId}
+
 Get task status.
 
 **Response:**
+
 ```json
 {
   "taskId": "task_123456",
@@ -775,34 +881,43 @@ Get task status.
 ### Performance Endpoints
 
 #### GET /performance/metrics
+
 Get performance metrics.
 
 #### POST /performance/budget
+
 Set performance budget.
 
 #### GET /performance/regressions
+
 Get regression test results.
 
 ### Security Endpoints
 
 #### POST /security/audit
+
 Perform security audit.
 
 #### GET /security/vulnerabilities
+
 Get vulnerabilities.
 
 #### POST /security/harden
+
 Apply security hardening.
 
 ### Monitoring Endpoints
 
 #### GET /monitoring/health
+
 Get system health.
 
 #### GET /monitoring/alerts
+
 Get active alerts.
 
 #### POST /monitoring/alerts/{alertId}/acknowledge
+
 Acknowledge alert.
 
 ---
@@ -810,41 +925,48 @@ Acknowledge alert.
 ## WebSocket APIs
 
 ### Connection
+
 ```javascript
-const ws = new WebSocket('wss://api.strray.framework/v1/ws');
+const ws = new WebSocket("wss://api.strray.framework/v1/ws");
 ```
 
 ### Authentication
+
 ```javascript
-ws.send(JSON.stringify({
-  type: 'auth',
-  token: 'your-jwt-token'
-}));
+ws.send(
+  JSON.stringify({
+    type: "auth",
+    token: "your-jwt-token",
+  }),
+);
 ```
 
 ### Real-time Events
 
 #### Task Updates
+
 ```javascript
 ws.onmessage = (event) => {
   const data = JSON.parse(event.data);
-  if (data.type === 'task-update') {
-    console.log('Task progress:', data.progress);
+  if (data.type === "task-update") {
+    console.log("Task progress:", data.progress);
   }
 };
 ```
 
 #### System Alerts
+
 ```javascript
-if (data.type === 'alert') {
-  console.log('Alert:', data.message);
+if (data.type === "alert") {
+  console.log("Alert:", data.message);
 }
 ```
 
 #### Performance Metrics
+
 ```javascript
-if (data.type === 'performance-metric') {
-  console.log('Metric:', data.metric, data.value);
+if (data.type === "performance-metric") {
+  console.log("Metric:", data.metric, data.value);
 }
 ```
 
@@ -855,84 +977,91 @@ if (data.type === 'performance-metric') {
 ### CI/CD Integration
 
 #### Webhook Endpoints
+
 ```typescript
 // GitHub Actions integration
 const result = await client.integrateWithCI({
-  provider: 'github-actions',
-  repository: 'my-org/my-repo',
-  workflow: 'ci.yml',
-  triggers: ['push', 'pull-request']
+  provider: "github-actions",
+  repository: "my-org/my-repo",
+  workflow: "ci.yml",
+  triggers: ["push", "pull-request"],
 });
 ```
 
 #### Pipeline Configuration
+
 ```typescript
 // Jenkins pipeline integration
 const pipeline = await client.generatePipelineConfig({
-  provider: 'jenkins',
+  provider: "jenkins",
   stages: [
-    { name: 'test', commands: ['npm test'] },
-    { name: 'security', commands: ['npm run security-audit'] },
-    { name: 'performance', commands: ['npm run performance:gates'] }
-  ]
+    { name: "test", commands: ["npm test"] },
+    { name: "security", commands: ["npm run security-audit"] },
+    { name: "performance", commands: ["npm run performance:gates"] },
+  ],
 });
 ```
 
 ### Cloud Platform Integration
 
 #### AWS Integration
+
 ```typescript
 const awsIntegration = await client.integrateWithAWS({
-  services: ['lambda', 'api-gateway', 'cloudwatch'],
-  region: 'us-east-1',
+  services: ["lambda", "api-gateway", "cloudwatch"],
+  region: "us-east-1",
   monitoring: true,
-  autoScaling: true
+  autoScaling: true,
 });
 ```
 
 #### Azure Integration
+
 ```typescript
 const azureIntegration = await client.integrateWithAzure({
-  subscriptionId: 'xxx-xxx-xxx',
-  resourceGroup: 'strray-rg',
-  services: ['functions', 'monitor', 'key-vault']
+  subscriptionId: "xxx-xxx-xxx",
+  resourceGroup: "strray-rg",
+  services: ["functions", "monitor", "key-vault"],
 });
 ```
 
 #### GCP Integration
+
 ```typescript
 const gcpIntegration = await client.integrateWithGCP({
-  projectId: 'my-project',
-  services: ['functions', 'monitoring', 'security-center']
+  projectId: "my-project",
+  services: ["functions", "monitoring", "security-center"],
 });
 ```
 
 ### Monitoring System Integration
 
 #### Prometheus Integration
+
 ```typescript
 const prometheusConfig = await client.generatePrometheusConfig({
-  metrics: ['response_time', 'error_rate', 'throughput'],
+  metrics: ["response_time", "error_rate", "throughput"],
   alerting: {
     rules: [
       {
-        alert: 'HighErrorRate',
-        expr: 'error_rate > 0.05',
-        for: '5m',
-        labels: { severity: 'warning' }
-      }
-    ]
-  }
+        alert: "HighErrorRate",
+        expr: "error_rate > 0.05",
+        for: "5m",
+        labels: { severity: "warning" },
+      },
+    ],
+  },
 });
 ```
 
 #### DataDog Integration
+
 ```typescript
 const datadogConfig = await client.integrateWithDataDog({
-  apiKey: 'your-datadog-api-key',
-  metrics: ['performance', 'security', 'system'],
+  apiKey: "your-datadog-api-key",
+  metrics: ["performance", "security", "system"],
   dashboards: true,
-  alerts: true
+  alerts: true,
 });
 ```
 

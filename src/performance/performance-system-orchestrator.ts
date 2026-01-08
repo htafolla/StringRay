@@ -8,11 +8,11 @@
  * @since 2026-01-08
  */
 
-import { EventEmitter } from 'events';
-import { PerformanceBudgetEnforcer } from './performance-budget-enforcer.js';
-import { PerformanceRegressionTester } from './performance-regression-tester.js';
-import { PerformanceMonitoringDashboard } from './performance-monitoring-dashboard.js';
-import { PerformanceCIGates } from './performance-ci-gates.js';
+import { EventEmitter } from "events";
+import { PerformanceBudgetEnforcer } from "./performance-budget-enforcer.js";
+import { PerformanceRegressionTester } from "./performance-regression-tester.js";
+import { PerformanceMonitoringDashboard } from "./performance-monitoring-dashboard.js";
+import { PerformanceCIGates } from "./performance-ci-gates.js";
 
 export interface PerformanceSystemConfig {
   budgetEnforcement: {
@@ -83,29 +83,29 @@ export class PerformanceSystemOrchestrator extends EventEmitter {
         thresholds: {
           warning: 90,
           error: 100,
-          critical: 110
-        }
+          critical: 110,
+        },
       },
       monitoring: {
         enabled: true,
         dashboard: true,
         updateInterval: 30000,
         retentionHours: 24,
-        anomalyDetection: true
+        anomalyDetection: true,
       },
       regressionTesting: {
         enabled: true,
-        baselineFile: './performance-baselines.json',
+        baselineFile: "./performance-baselines.json",
         updateBaselines: true,
-        tolerance: 10
+        tolerance: 10,
       },
       ciGates: {
         enabled: true,
         failPipeline: true,
         generateReports: true,
-        reportPath: './performance-reports'
+        reportPath: "./performance-reports",
       },
-      ...config
+      ...config,
     };
 
     this.status = {
@@ -116,10 +116,10 @@ export class PerformanceSystemOrchestrator extends EventEmitter {
         budgetEnforcer: false,
         regressionTester: false,
         dashboard: false,
-        ciGates: false
+        ciGates: false,
       },
       activeAlerts: 0,
-      recentViolations: 0
+      recentViolations: 0,
     };
   }
 
@@ -131,21 +131,23 @@ export class PerformanceSystemOrchestrator extends EventEmitter {
       return;
     }
 
-    console.log('🚀 Initializing StrRay Performance System');
+    console.log("🚀 Initializing StrRay Performance System");
 
     try {
       // Initialize budget enforcer
       if (this.config.budgetEnforcement.enabled) {
         this.components.budgetEnforcer = new PerformanceBudgetEnforcer();
         this.status.components.budgetEnforcer = true;
-        console.log('   ✅ Budget enforcer initialized');
+        console.log("   ✅ Budget enforcer initialized");
       }
 
       // Initialize regression tester
       if (this.config.regressionTesting.enabled) {
-        this.components.regressionTester = new PerformanceRegressionTester(this.components.budgetEnforcer);
+        this.components.regressionTester = new PerformanceRegressionTester(
+          this.components.budgetEnforcer,
+        );
         this.status.components.regressionTester = true;
-        console.log('   ✅ Regression tester initialized');
+        console.log("   ✅ Regression tester initialized");
       }
 
       // Initialize monitoring dashboard
@@ -155,16 +157,16 @@ export class PerformanceSystemOrchestrator extends EventEmitter {
             updateInterval: this.config.monitoring.updateInterval,
             historyRetention: this.config.monitoring.retentionHours,
             alertThresholds: {
-              budgetViolation: 'error',
+              budgetViolation: "error",
               regressionThreshold: this.config.regressionTesting.tolerance,
-              anomalySensitivity: 'medium'
-            }
+              anomalySensitivity: "medium",
+            },
           },
           this.components.budgetEnforcer,
-          this.components.regressionTester
+          this.components.regressionTester,
         );
         this.status.components.dashboard = true;
-        console.log('   ✅ Monitoring dashboard initialized');
+        console.log("   ✅ Monitoring dashboard initialized");
       }
 
       // Initialize CI gates
@@ -174,13 +176,13 @@ export class PerformanceSystemOrchestrator extends EventEmitter {
             failOnBudgetViolation: this.config.ciGates.failPipeline,
             failOnRegression: this.config.ciGates.failPipeline,
             generateReports: this.config.ciGates.generateReports,
-            reportPath: this.config.ciGates.reportPath
+            reportPath: this.config.ciGates.reportPath,
           },
           this.components.budgetEnforcer,
-          this.components.regressionTester
+          this.components.regressionTester,
         );
         this.status.components.ciGates = true;
-        console.log('   ✅ CI gates initialized');
+        console.log("   ✅ CI gates initialized");
       }
 
       // Setup event forwarding
@@ -189,10 +191,9 @@ export class PerformanceSystemOrchestrator extends EventEmitter {
       this.initialized = true;
       this.status.initialized = true;
 
-      console.log('✅ Performance system initialized successfully');
-
+      console.log("✅ Performance system initialized successfully");
     } catch (error) {
-      console.error('❌ Failed to initialize performance system:', error);
+      console.error("❌ Failed to initialize performance system:", error);
       throw error;
     }
   }
@@ -205,30 +206,30 @@ export class PerformanceSystemOrchestrator extends EventEmitter {
       await this.initialize();
     }
 
-    console.log('▶️ Starting performance monitoring');
+    console.log("▶️ Starting performance monitoring");
 
     if (this.components.dashboard && this.config.monitoring.enabled) {
       this.components.dashboard.start();
       this.status.monitoringActive = true;
-      console.log('   📊 Dashboard monitoring started');
+      console.log("   📊 Dashboard monitoring started");
     }
 
-    this.emit('started');
+    this.emit("started");
   }
 
   /**
    * Stop the performance monitoring system
    */
   stop(): void {
-    console.log('⏹️ Stopping performance monitoring');
+    console.log("⏹️ Stopping performance monitoring");
 
     if (this.components.dashboard) {
       this.components.dashboard.stop();
       this.status.monitoringActive = false;
-      console.log('   📊 Dashboard monitoring stopped');
+      console.log("   📊 Dashboard monitoring stopped");
     }
 
-    this.emit('stopped');
+    this.emit("stopped");
   }
 
   /**
@@ -236,14 +237,14 @@ export class PerformanceSystemOrchestrator extends EventEmitter {
    */
   async runGates(): Promise<any> {
     if (!this.components.ciGates) {
-      throw new Error('CI gates not initialized');
+      throw new Error("CI gates not initialized");
     }
 
-    console.log('🚪 Running performance gates');
+    console.log("🚪 Running performance gates");
     const result = await this.components.ciGates.runPerformanceGates();
 
     if (!result.success && this.config.ciGates.failPipeline) {
-      console.error('❌ Performance gates failed');
+      console.error("❌ Performance gates failed");
     }
 
     return result;
@@ -254,17 +255,18 @@ export class PerformanceSystemOrchestrator extends EventEmitter {
    */
   async generateReport(): Promise<any> {
     if (!this.components.budgetEnforcer) {
-      throw new Error('Budget enforcer not initialized');
+      throw new Error("Budget enforcer not initialized");
     }
 
-    const report = await this.components.budgetEnforcer.generatePerformanceReport();
+    const report =
+      await this.components.budgetEnforcer.generatePerformanceReport();
 
     if (this.components.dashboard) {
       const dashboardData = this.components.dashboard.exportData();
       return {
         ...report,
         dashboard: dashboardData,
-        systemStatus: this.status
+        systemStatus: this.status,
       };
     }
 
@@ -292,24 +294,24 @@ export class PerformanceSystemOrchestrator extends EventEmitter {
   private setupEventForwarding(): void {
     // Forward budget enforcer events
     if (this.components.budgetEnforcer) {
-      this.components.budgetEnforcer.on('violation', (violation) => {
-        this.emit('budget-violation', violation);
+      this.components.budgetEnforcer.on("violation", (violation) => {
+        this.emit("budget-violation", violation);
         this.status.recentViolations++;
       });
 
-      this.components.budgetEnforcer.on('budget-exceeded', (violation) => {
-        this.emit('budget-exceeded', violation);
+      this.components.budgetEnforcer.on("budget-exceeded", (violation) => {
+        this.emit("budget-exceeded", violation);
       });
     }
 
     // Forward dashboard events
     if (this.components.dashboard) {
-      this.components.dashboard.on('alert', (alert) => {
-        this.emit('alert', alert);
+      this.components.dashboard.on("alert", (alert) => {
+        this.emit("alert", alert);
       });
 
-      this.components.dashboard.on('metrics-updated', (metrics) => {
-        this.emit('metrics-updated', metrics);
+      this.components.dashboard.on("metrics-updated", (metrics) => {
+        this.emit("metrics-updated", metrics);
       });
     }
   }
@@ -326,14 +328,14 @@ export class PerformanceSystemOrchestrator extends EventEmitter {
    */
   updateConfig(newConfig: Partial<PerformanceSystemConfig>): void {
     this.config = { ...this.config, ...newConfig };
-    console.log('🔄 Performance system configuration updated');
+    console.log("🔄 Performance system configuration updated");
   }
 
   /**
    * Cleanup and shutdown
    */
   async shutdown(): Promise<void> {
-    console.log('🔌 Shutting down performance system');
+    console.log("🔌 Shutting down performance system");
 
     this.stop();
 
@@ -342,7 +344,7 @@ export class PerformanceSystemOrchestrator extends EventEmitter {
     this.initialized = false;
     this.status.initialized = false;
 
-    console.log('✅ Performance system shutdown complete');
+    console.log("✅ Performance system shutdown complete");
   }
 }
 

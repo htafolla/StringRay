@@ -8,19 +8,19 @@
  * @since 2026-01-08
  */
 
-import { defineConfig } from 'vitest/config';
-import { resolve } from 'path';
+import { defineConfig } from "vitest/config";
+import { resolve } from "path";
 
 export default defineConfig({
   test: {
     // Integration test configuration
-    name: 'StrRay Integration Tests',
-    environment: 'node',
+    name: "StrRay Integration Tests",
+    environment: "node",
     globals: true,
-    setupFiles: ['./src/__tests__/setup/integration-setup.ts'],
+    setupFiles: ["./src/__tests__/setup/integration-setup.ts"],
 
     // Parallel execution with thread pooling
-    pool: 'threads',
+    pool: "threads",
 
     // Test execution
     testTimeout: 30000, // 30 seconds for integration tests
@@ -29,21 +29,21 @@ export default defineConfig({
     // Coverage for integration tests
     coverage: {
       enabled: true,
-      provider: 'v8',
-      reporter: ['text', 'json', 'html', 'lcov'],
-      reportsDirectory: './coverage/integration',
+      provider: "v8",
+      reporter: ["text", "json", "html", "lcov"],
+      reportsDirectory: "./coverage/integration",
       include: [
-        'src/**/*.ts',
-        '!src/**/*.d.ts',
-        '!src/**/__tests__/**',
-        '!src/**/__mocks__/**',
+        "src/**/*.ts",
+        "!src/**/*.d.ts",
+        "!src/**/__tests__/**",
+        "!src/**/__mocks__/**",
       ],
       exclude: [
-        'node_modules/**',
-        'dist/**',
-        'coverage/**',
-        '**/*.config.ts',
-        '**/*.config.js',
+        "node_modules/**",
+        "dist/**",
+        "coverage/**",
+        "**/*.config.ts",
+        "**/*.config.js",
       ],
       thresholds: {
         global: {
@@ -57,22 +57,17 @@ export default defineConfig({
 
     // Reporting
     reporters: [
-      'default',
-      ['html', { outputFile: 'reports/integration/index.html' }],
-      ['junit', { outputFile: 'reports/integration/results.xml' }],
+      "default",
+      ["html", { outputFile: "reports/integration/index.html" }],
+      ["junit", { outputFile: "reports/integration/results.xml" }],
     ],
 
     // File patterns
     include: [
-      'src/__tests__/integration/**/*.test.ts',
-      'src/__tests__/integration/**/*.spec.ts',
+      "src/__tests__/integration/**/*.test.ts",
+      "src/__tests__/integration/**/*.spec.ts",
     ],
-    exclude: [
-      'node_modules/**',
-      'dist/**',
-      'coverage/**',
-      '**/*.config.ts',
-    ],
+    exclude: ["node_modules/**", "dist/**", "coverage/**", "**/*.config.ts"],
 
     // Watch mode
     watch: false,
@@ -84,17 +79,17 @@ export default defineConfig({
 
     // Environment variables
     env: {
-      NODE_ENV: 'test',
-      INTEGRATION_TEST: 'true',
-      LOG_LEVEL: 'warn',
+      NODE_ENV: "test",
+      INTEGRATION_TEST: "true",
+      LOG_LEVEL: "warn",
     },
   },
 
   resolve: {
     alias: {
-      '@': resolve(__dirname, './src'),
-      '@tests': resolve(__dirname, './src/__tests__'),
-      '@utils': resolve(__dirname, './src/__tests__/utils'),
+      "@": resolve(__dirname, "./src"),
+      "@tests": resolve(__dirname, "./src/__tests__"),
+      "@utils": resolve(__dirname, "./src/__tests__/utils"),
     },
   },
 });

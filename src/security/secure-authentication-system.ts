@@ -8,10 +8,10 @@
  * @since 2026-01-08
  */
 
-import { EventEmitter } from 'events';
-import * as crypto from 'crypto';
-import * as jwt from 'jsonwebtoken';
-import { securityHardeningSystem } from './security-hardening-system';
+import { EventEmitter } from "events";
+import * as crypto from "crypto";
+import * as jwt from "jsonwebtoken";
+import { securityHardeningSystem } from "./security-hardening-system";
 
 export interface User {
   id: string;
@@ -29,7 +29,7 @@ export interface AuthenticationRequest {
   username?: string;
   email?: string;
   password: string;
-  method: 'password' | 'oauth2' | 'saml' | 'api_key';
+  method: "password" | "oauth2" | "saml" | "api_key";
   metadata?: Record<string, any>;
 }
 
@@ -92,7 +92,10 @@ export class SecureAuthenticationSystem extends EventEmitter {
   private jwtExpiresIn: string;
   private refreshTokenExpiresIn: string;
   private users: Map<string, User> = new Map();
-  private sessions: Map<string, { userId: string; expiresAt: Date; metadata: any }> = new Map();
+  private sessions: Map<
+    string,
+    { userId: string; expiresAt: Date; metadata: any }
+  > = new Map();
   private rbacConfig: RBACConfig;
   private oauth2Config: OAuth2Config | undefined;
   private mfaEnabled: boolean = false;
@@ -105,14 +108,14 @@ export class SecureAuthenticationSystem extends EventEmitter {
       refreshTokenExpiresIn?: string;
       oauth2Config?: OAuth2Config;
       mfaEnabled?: boolean;
-    } = {}
+    } = {},
   ) {
     super();
 
     this.jwtSecret = jwtSecret;
     this.rbacConfig = rbacConfig;
-    this.jwtExpiresIn = options.jwtExpiresIn || '1h';
-    this.refreshTokenExpiresIn = options.refreshTokenExpiresIn || '7d';
+    this.jwtExpiresIn = options.jwtExpiresIn || "1h";
+    this.refreshTokenExpiresIn = options.refreshTokenExpiresIn || "7d";
     this.oauth2Config = options.oauth2Config || undefined;
     this.mfaEnabled = options.mfaEnabled || false;
 
@@ -123,59 +126,63 @@ export class SecureAuthenticationSystem extends EventEmitter {
    * Setup event handlers
    */
   private setupEventHandlers(): void {
-    this.on('authentication-success', this.handleAuthSuccess.bind(this));
-    this.on('authentication-failure', this.handleAuthFailure.bind(this));
-    this.on('authorization-denied', this.handleAuthzDenied.bind(this));
-    this.on('session-created', this.handleSessionCreated.bind(this));
-    this.on('session-destroyed', this.handleSessionDestroyed.bind(this));
+    this.on("authentication-success", this.handleAuthSuccess.bind(this));
+    this.on("authentication-failure", this.handleAuthFailure.bind(this));
+    this.on("authorization-denied", this.handleAuthzDenied.bind(this));
+    this.on("session-created", this.handleSessionCreated.bind(this));
+    this.on("session-destroyed", this.handleSessionDestroyed.bind(this));
   }
 
   /**
    * Authenticate user
    */
-  async authenticate(request: AuthenticationRequest): Promise<AuthenticationResult> {
+  async authenticate(
+    request: AuthenticationRequest,
+  ): Promise<AuthenticationResult> {
     try {
       let user: User | undefined;
 
       switch (request.method) {
-        case 'password':
+        case "password":
           user = await this.authenticateWithPassword(request);
           break;
-        case 'oauth2':
+        case "oauth2":
           user = await this.authenticateWithOAuth2(request);
           break;
-        case 'api_key':
+        case "api_key":
           user = await this.authenticateWithApiKey(request);
           break;
         default:
-          throw new Error(`Unsupported authentication method: ${request.method}`);
+          throw new Error(
+            `Unsupported authentication method: ${request.method}`,
+          );
       }
 
       if (!user) {
-        this.emit('authentication-failure', {
+        this.emit("authentication-failure", {
           method: request.method,
           username: request.username,
           email: request.email,
-          reason: 'Invalid credentials'
+          reason: "Invalid credentials",
         });
 
         return {
           success: false,
-          error: 'Invalid credentials'
+          error: "Invalid credentials",
         };
       }
 
       // Check if user is active
       if (!user.isActive) {
-        this.emit('authentication-failure', {
+        this.emit("authentication-failure", {
           method: request.method,
           userId: user.id,
-          reason: 'Account disabled'
+          reason: "Account disabled",
         });
 
         return {
           success: false,
-          error: 'Account is disabled'
+          error: "Account is disabled",
         };
       }
 
@@ -184,7 +191,7 @@ export class SecureAuthenticationSystem extends EventEmitter {
         return {
           success: false,
           requiresMFA: true,
-          user
+          user,
         };
       }
 
@@ -199,10 +206,10 @@ export class SecureAuthenticationSystem extends EventEmitter {
       // Create session
       const sessionId = this.createSession(user, request.metadata);
 
-      this.emit('authentication-success', {
+      this.emit("authentication-success", {
         userId: user.id,
         method: request.method,
-        sessionId
+        sessionId,
       });
 
       return {
@@ -210,24 +217,24 @@ export class SecureAuthenticationSystem extends EventEmitter {
         user,
         token,
         refreshToken,
-        expiresAt: this.getTokenExpiration()
+        expiresAt: this.getTokenExpiration(),
       };
-
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Authentication failed';
+      const errorMessage =
+        error instanceof Error ? error.message : "Authentication failed";
 
-      this.emit('authentication-failure', {
+      this.emit("authentication-failure", {
         method: request.method,
         username: request.username,
         email: request.email,
-        reason: errorMessage
+        reason: errorMessage,
       });
 
-        console.log(`[SECURITY] Authentication failed: ${errorMessage}`);
+      console.log(`[SECURITY] Authentication failed: ${errorMessage}`);
 
       return {
         success: false,
-        error: errorMessage
+        error: errorMessage,
       };
     }
   }
@@ -235,16 +242,20 @@ export class SecureAuthenticationSystem extends EventEmitter {
   /**
    * Authenticate with password
    */
-  private async authenticateWithPassword(request: AuthenticationRequest): Promise<User | undefined> {
+  private async authenticateWithPassword(
+    request: AuthenticationRequest,
+  ): Promise<User | undefined> {
     if (!request.username && !request.email) {
-      throw new Error('Username or email is required');
+      throw new Error("Username or email is required");
     }
 
     // Find user by username or email
     let user: User | undefined;
     for (const u of this.users.values()) {
-      if ((request.username && u.username === request.username) ||
-          (request.email && u.email === request.email)) {
+      if (
+        (request.username && u.username === request.username) ||
+        (request.email && u.email === request.email)
+      ) {
         user = u;
         break;
       }
@@ -256,7 +267,10 @@ export class SecureAuthenticationSystem extends EventEmitter {
 
     // In a real implementation, this would verify against stored password hash
     // For demo purposes, we'll assume password verification
-    const isValidPassword = await this.verifyPassword(request.password, user.id);
+    const isValidPassword = await this.verifyPassword(
+      request.password,
+      user.id,
+    );
 
     return isValidPassword ? user : undefined;
   }
@@ -264,23 +278,27 @@ export class SecureAuthenticationSystem extends EventEmitter {
   /**
    * Authenticate with OAuth2
    */
-  private async authenticateWithOAuth2(request: AuthenticationRequest): Promise<User | undefined> {
+  private async authenticateWithOAuth2(
+    request: AuthenticationRequest,
+  ): Promise<User | undefined> {
     if (!this.oauth2Config) {
-      throw new Error('OAuth2 not configured');
+      throw new Error("OAuth2 not configured");
     }
 
     // OAuth2 flow would be implemented here
     // For demo purposes, return undefined
-    throw new Error('OAuth2 authentication not implemented');
+    throw new Error("OAuth2 authentication not implemented");
   }
 
   /**
    * Authenticate with API key
    */
-  private async authenticateWithApiKey(request: AuthenticationRequest): Promise<User | undefined> {
+  private async authenticateWithApiKey(
+    request: AuthenticationRequest,
+  ): Promise<User | undefined> {
     // API key authentication would be implemented here
     // For demo purposes, return undefined
-    throw new Error('API key authentication not implemented');
+    throw new Error("API key authentication not implemented");
   }
 
   /**
@@ -294,39 +312,43 @@ export class SecureAuthenticationSystem extends EventEmitter {
       const requiredPermissions = this.getRequiredPermissions(resource, action);
       const userPermissions = this.getUserPermissions(user);
 
-      const hasPermission = requiredPermissions.every(perm => userPermissions.includes(perm));
+      const hasPermission = requiredPermissions.every((perm) =>
+        userPermissions.includes(perm),
+      );
 
       if (!hasPermission) {
-        const missingPermissions = requiredPermissions.filter(perm => !userPermissions.includes(perm));
+        const missingPermissions = requiredPermissions.filter(
+          (perm) => !userPermissions.includes(perm),
+        );
 
-        this.emit('authorization-denied', {
+        this.emit("authorization-denied", {
           userId: user.id,
           resource,
           action,
           requiredPermissions,
-          missingPermissions
+          missingPermissions,
         });
 
         return {
           allowed: false,
-          reason: 'Insufficient permissions',
+          reason: "Insufficient permissions",
           requiredPermissions,
-          missingPermissions
+          missingPermissions,
         };
       }
 
       return {
-        allowed: true
+        allowed: true,
       };
-
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Authorization failed';
+      const errorMessage =
+        error instanceof Error ? error.message : "Authorization failed";
 
-        console.log(`[SECURITY] Authorization failed: ${errorMessage}`);
+      console.log(`[SECURITY] Authorization failed: ${errorMessage}`);
 
       return {
         allowed: false,
-        reason: errorMessage
+        reason: errorMessage,
       };
     }
   }
@@ -334,18 +356,23 @@ export class SecureAuthenticationSystem extends EventEmitter {
   /**
    * Verify JWT token
    */
-  verifyToken(token: string): { valid: boolean; payload?: JWTPayload; error?: string } {
+  verifyToken(token: string): {
+    valid: boolean;
+    payload?: JWTPayload;
+    error?: string;
+  } {
     try {
       const payload = jwt.verify(token, this.jwtSecret) as JWTPayload;
 
       // Additional validation
       if (payload.exp && payload.exp < Date.now() / 1000) {
-        return { valid: false, error: 'Token expired' };
+        return { valid: false, error: "Token expired" };
       }
 
       return { valid: true, payload };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Token verification failed';
+      const errorMessage =
+        error instanceof Error ? error.message : "Token verification failed";
       return { valid: false, error: errorMessage };
     }
   }
@@ -353,7 +380,11 @@ export class SecureAuthenticationSystem extends EventEmitter {
   /**
    * Refresh access token
    */
-  refreshToken(refreshToken: string): { success: boolean; token?: string; error?: string } {
+  refreshToken(refreshToken: string): {
+    success: boolean;
+    token?: string;
+    error?: string;
+  } {
     try {
       // Verify refresh token (simplified - in production use proper refresh token validation)
       const payload = jwt.verify(refreshToken, this.jwtSecret) as any;
@@ -361,7 +392,7 @@ export class SecureAuthenticationSystem extends EventEmitter {
       // Find user
       const user = this.users.get(payload.userId);
       if (!user) {
-        return { success: false, error: 'User not found' };
+        return { success: false, error: "User not found" };
       }
 
       // Generate new token
@@ -369,7 +400,8 @@ export class SecureAuthenticationSystem extends EventEmitter {
 
       return { success: true, token: newToken };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Token refresh failed';
+      const errorMessage =
+        error instanceof Error ? error.message : "Token refresh failed";
       return { success: false, error: errorMessage };
     }
   }
@@ -384,10 +416,10 @@ export class SecureAuthenticationSystem extends EventEmitter {
     this.sessions.set(sessionId, {
       userId: user.id,
       expiresAt,
-      metadata: metadata || {}
+      metadata: metadata || {},
     });
 
-    this.emit('session-created', { sessionId, userId: user.id });
+    this.emit("session-created", { sessionId, userId: user.id });
     return sessionId;
   }
 
@@ -398,7 +430,7 @@ export class SecureAuthenticationSystem extends EventEmitter {
     const session = this.sessions.get(sessionId);
     if (session) {
       this.sessions.delete(sessionId);
-      this.emit('session-destroyed', { sessionId, userId: session.userId });
+      this.emit("session-destroyed", { sessionId, userId: session.userId });
       return true;
     }
     return false;
@@ -407,21 +439,25 @@ export class SecureAuthenticationSystem extends EventEmitter {
   /**
    * Validate session
    */
-  validateSession(sessionId: string): { valid: boolean; user?: User; error?: string } {
+  validateSession(sessionId: string): {
+    valid: boolean;
+    user?: User;
+    error?: string;
+  } {
     const session = this.sessions.get(sessionId);
 
     if (!session) {
-      return { valid: false, error: 'Session not found' };
+      return { valid: false, error: "Session not found" };
     }
 
     if (session.expiresAt < new Date()) {
       this.sessions.delete(sessionId);
-      return { valid: false, error: 'Session expired' };
+      return { valid: false, error: "Session expired" };
     }
 
     const user = this.users.get(session.userId);
     if (!user) {
-      return { valid: false, error: 'User not found' };
+      return { valid: false, error: "User not found" };
     }
 
     return { valid: true, user };
@@ -438,31 +474,39 @@ export class SecureAuthenticationSystem extends EventEmitter {
     metadata?: Record<string, any>;
   }): Promise<User> {
     // Validate input
-    const validation = securityHardeningSystem.validateInput(userData, 'user-creation');
+    const validation = securityHardeningSystem.validateInput(
+      userData,
+      "user-creation",
+    );
     if (!validation.isValid) {
-      throw new Error(`Invalid user data: ${validation.errors.join(', ')}`);
+      throw new Error(`Invalid user data: ${validation.errors.join(", ")}`);
     }
 
     // Check if user already exists
     for (const user of this.users.values()) {
-      if (user.username === userData.username || user.email === userData.email) {
-        throw new Error('User already exists');
+      if (
+        user.username === userData.username ||
+        user.email === userData.email
+      ) {
+        throw new Error("User already exists");
       }
     }
 
     // Hash password
-    const passwordHash = await securityHardeningSystem.hashPassword(userData.password);
+    const passwordHash = await securityHardeningSystem.hashPassword(
+      userData.password,
+    );
 
     // Create user
     const user: User = {
       id: securityHardeningSystem.generateSecureToken(16),
       username: userData.username,
       email: userData.email,
-      roles: userData.roles || ['user'],
-      permissions: this.getPermissionsForRoles(userData.roles || ['user']),
+      roles: userData.roles || ["user"],
+      permissions: this.getPermissionsForRoles(userData.roles || ["user"]),
       metadata: userData.metadata || {},
       createdAt: new Date(),
-      isActive: true
+      isActive: true,
     };
 
     // Store user (in production, this would be in a database)
@@ -490,15 +534,15 @@ export class SecureAuthenticationSystem extends EventEmitter {
     const permissions = new Set(user.permissions);
 
     // Add permissions from roles
-    user.roles.forEach(role => {
+    user.roles.forEach((role) => {
       const rolePermissions = this.rbacConfig.permissions[role] || [];
-      rolePermissions.forEach(perm => permissions.add(perm));
+      rolePermissions.forEach((perm) => permissions.add(perm));
 
       // Add permissions from parent roles
       const parentRoles = this.rbacConfig.roleHierarchy[role] || [];
-      parentRoles.forEach(parentRole => {
+      parentRoles.forEach((parentRole) => {
         const parentPermissions = this.rbacConfig.permissions[parentRole] || [];
-        parentPermissions.forEach(perm => permissions.add(perm));
+        parentPermissions.forEach((perm) => permissions.add(perm));
       });
     });
 
@@ -511,15 +555,15 @@ export class SecureAuthenticationSystem extends EventEmitter {
   private getPermissionsForRoles(roles: string[]): string[] {
     const permissions = new Set<string>();
 
-    roles.forEach(role => {
+    roles.forEach((role) => {
       const rolePermissions = this.rbacConfig.permissions[role] || [];
-      rolePermissions.forEach(perm => permissions.add(perm));
+      rolePermissions.forEach((perm) => permissions.add(perm));
 
       // Add permissions from parent roles
       const parentRoles = this.rbacConfig.roleHierarchy[role] || [];
-      parentRoles.forEach(parentRole => {
+      parentRoles.forEach((parentRole) => {
         const parentPermissions = this.rbacConfig.permissions[parentRole] || [];
-        parentPermissions.forEach(perm => permissions.add(perm));
+        parentPermissions.forEach((perm) => permissions.add(perm));
       });
     });
 
@@ -530,18 +574,18 @@ export class SecureAuthenticationSystem extends EventEmitter {
    * Generate JWT token
    */
   private generateJWT(user: User): string {
-    const payload: Omit<JWTPayload, 'iat' | 'exp'> = {
+    const payload: Omit<JWTPayload, "iat" | "exp"> = {
       userId: user.id,
       username: user.username,
       email: user.email,
       roles: user.roles,
       permissions: Array.from(new Set(user.permissions)),
-      iss: 'strray-framework',
-      aud: 'strray-api'
+      iss: "strray-framework",
+      aud: "strray-api",
     };
 
     return jwt.sign(payload, this.jwtSecret, {
-      expiresIn: '1h'
+      expiresIn: "1h",
     });
   }
 
@@ -551,13 +595,13 @@ export class SecureAuthenticationSystem extends EventEmitter {
   private generateRefreshToken(user: User): string {
     const payload = {
       userId: user.id,
-      type: 'refresh',
-      iss: 'strray-framework',
-      aud: 'strray-api'
+      type: "refresh",
+      iss: "strray-framework",
+      aud: "strray-api",
     };
 
     return jwt.sign(payload, this.jwtSecret, {
-      expiresIn: '7d'
+      expiresIn: "7d",
     });
   }
 
@@ -576,13 +620,16 @@ export class SecureAuthenticationSystem extends EventEmitter {
    */
   private requiresMFA(user: User): boolean {
     // Implement MFA requirement logic based on user roles, risk level, etc.
-    return user.roles.includes('admin') || user.roles.includes('manager');
+    return user.roles.includes("admin") || user.roles.includes("manager");
   }
 
   /**
    * Verify password (placeholder - in production, verify against stored hash)
    */
-  private async verifyPassword(password: string, userId: string): Promise<boolean> {
+  private async verifyPassword(
+    password: string,
+    userId: string,
+  ): Promise<boolean> {
     // In production, retrieve stored hash and verify
     // For demo purposes, return true
     return true;
@@ -600,15 +647,21 @@ export class SecureAuthenticationSystem extends EventEmitter {
   }
 
   private handleAuthzDenied(event: any): void {
-    console.warn(`🚫 Authorization denied for user ${event.userId}: ${event.resource}:${event.action}`);
+    console.warn(
+      `🚫 Authorization denied for user ${event.userId}: ${event.resource}:${event.action}`,
+    );
   }
 
   private handleSessionCreated(event: any): void {
-    console.log(`📋 Session created: ${event.sessionId} for user ${event.userId}`);
+    console.log(
+      `📋 Session created: ${event.sessionId} for user ${event.userId}`,
+    );
   }
 
   private handleSessionDestroyed(event: any): void {
-    console.log(`📋 Session destroyed: ${event.sessionId} for user ${event.userId}`);
+    console.log(
+      `📋 Session destroyed: ${event.sessionId} for user ${event.userId}`,
+    );
   }
 
   /**
@@ -653,13 +706,15 @@ export class SecureAuthenticationSystem extends EventEmitter {
     totalSessions: number;
     recentEvents: any[];
   } {
-    const activeUsers = Array.from(this.users.values()).filter(u => u.isActive).length;
+    const activeUsers = Array.from(this.users.values()).filter(
+      (u) => u.isActive,
+    ).length;
 
     return {
       totalUsers: this.users.size,
       activeUsers,
       totalSessions: this.sessions.size,
-      recentEvents: [] // Would track recent auth events
+      recentEvents: [], // Would track recent auth events
     };
   }
 }

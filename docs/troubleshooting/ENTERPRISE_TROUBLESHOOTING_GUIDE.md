@@ -22,6 +22,7 @@ The StrRay Framework includes comprehensive diagnostic capabilities and troubles
 ### Diagnostic Tools
 
 #### Framework Health Check
+
 ```bash
 # Comprehensive health check
 npm run health-check
@@ -34,23 +35,25 @@ npm run check:security
 ```
 
 #### Logging Configuration
+
 ```typescript
 // Enable debug logging
-process.env.DEBUG = 'strray:*';
+process.env.DEBUG = "strray:*";
 
 // Structured logging configuration
 const logger = {
-  level: process.env.LOG_LEVEL || 'info',
-  format: 'json',
+  level: process.env.LOG_LEVEL || "info",
+  format: "json",
   outputs: [
-    { type: 'console' },
-    { type: 'file', path: './logs/strray.log' },
-    { type: 'syslog', host: 'logs.papertrailapp.com', port: 12345 }
-  ]
+    { type: "console" },
+    { type: "file", path: "./logs/strray.log" },
+    { type: "syslog", host: "logs.papertrailapp.com", port: 12345 },
+  ],
 };
 ```
 
 #### Diagnostic Commands
+
 ```bash
 # Generate diagnostic report
 npm run diagnostics > diagnostics-$(date +%Y%m%d-%H%M%S).txt
@@ -72,11 +75,13 @@ npm run test:agents
 ### Bootstrap Failure
 
 **Symptoms:**
+
 - Framework fails to start
 - Error messages about missing dependencies
 - Codex injection failures
 
 **Diagnostic Steps:**
+
 ```bash
 # Check Node.js version
 node --version
@@ -95,6 +100,7 @@ npm run validate:config
 **Common Solutions:**
 
 #### Missing Dependencies
+
 ```bash
 # Clean and reinstall dependencies
 rm -rf node_modules package-lock.json
@@ -105,6 +111,7 @@ npm ls --depth=0
 ```
 
 #### Configuration Issues
+
 ```json
 // .opencode/oh-my-opencode.json - Validate structure
 {
@@ -127,6 +134,7 @@ npm ls --depth=0
 ```
 
 #### Codex Injection Failure
+
 ```bash
 # Check codex file exists
 ls -la .opencode/agents_template.md
@@ -141,11 +149,13 @@ npm run init:codex
 ### Agent Loading Issues
 
 **Symptoms:**
+
 - Agents fail to initialize
 - Missing agent capabilities
 - Model routing errors
 
 **Diagnostic Steps:**
+
 ```bash
 # Check agent registration
 npm run list:agents
@@ -161,10 +171,11 @@ npm run check:model-routing
 **Solutions:**
 
 #### Agent Registration Issues
+
 ```typescript
 // Check agent exports in src/agents/index.ts
-export { StrRayEnforcer } from './enforcer';
-export { StrRayArchitect } from './architect';
+export { StrRayEnforcer } from "./enforcer";
+export { StrRayArchitect } from "./architect";
 // ... ensure all agents are exported
 
 // Validate agent interfaces
@@ -176,6 +187,7 @@ interface Agent {
 ```
 
 #### Model Routing Problems
+
 ```bash
 # Check oh-my-opencode model availability
 oh-my-opencode models list
@@ -194,11 +206,13 @@ oh-my-opencode config set model_routing.enforcer "opencode/grok-code"
 ### Task Execution Failures
 
 **Symptoms:**
+
 - Tasks fail to execute
 - Agent communication errors
 - Task timeout issues
 
 **Diagnostic Steps:**
+
 ```bash
 # Monitor task execution
 npm run monitor:tasks
@@ -216,38 +230,40 @@ npm run test:task-submission
 **Solutions:**
 
 #### Task Queue Issues
+
 ```typescript
 // Check task queue configuration
 const taskQueue = {
   maxConcurrency: 10,
   timeout: 30000, // 30 seconds
   retryAttempts: 3,
-  backoffMultiplier: 2
+  backoffMultiplier: 2,
 };
 
 // Monitor queue status
 const queueStatus = await taskQueue.getStatus();
-console.log('Active tasks:', queueStatus.active);
-console.log('Queued tasks:', queueStatus.queued);
-console.log('Failed tasks:', queueStatus.failed);
+console.log("Active tasks:", queueStatus.active);
+console.log("Queued tasks:", queueStatus.queued);
+console.log("Failed tasks:", queueStatus.failed);
 ```
 
 #### Agent Communication Problems
+
 ```typescript
 // Test inter-agent communication
 const testCommunication = async () => {
-  const agent1 = await agentRegistry.getAgent('enforcer');
-  const agent2 = await agentRegistry.getAgent('architect');
+  const agent1 = await agentRegistry.getAgent("enforcer");
+  const agent2 = await agentRegistry.getAgent("architect");
 
   try {
     const result = await orchestrator.coordinate({
-      task: 'cross-agent-validation',
+      task: "cross-agent-validation",
       agents: [agent1, agent2],
-      strategy: 'consensus'
+      strategy: "consensus",
     });
-    console.log('Communication test passed');
+    console.log("Communication test passed");
   } catch (error) {
-    console.error('Communication test failed:', error);
+    console.error("Communication test failed:", error);
   }
 };
 ```
@@ -255,11 +271,13 @@ const testCommunication = async () => {
 ### Conflict Resolution Issues
 
 **Symptoms:**
+
 - Agents disagree on decisions
 - Task execution stalls
 - Inconsistent results
 
 **Diagnostic Steps:**
+
 ```bash
 # Check conflict resolution strategy
 npm run check:conflict-strategy
@@ -274,37 +292,39 @@ npm run test:consensus
 **Solutions:**
 
 #### Consensus Algorithm Tuning
+
 ```typescript
 const consensusConfig = {
-  strategy: 'weighted-voting', // majority-vote, expert-priority, consensus
+  strategy: "weighted-voting", // majority-vote, expert-priority, consensus
   weights: {
     enforcer: 1.0,
     architect: 1.2,
-    'code-reviewer': 1.1,
-    'security-auditor': 1.3
+    "code-reviewer": 1.1,
+    "security-auditor": 1.3,
   },
   threshold: 0.7, // 70% agreement required
-  timeout: 60000  // 60 seconds
+  timeout: 60000, // 60 seconds
 };
 
 // Adjust weights based on domain expertise
-consensusConfig.weights['security-auditor'] = 1.5; // Higher weight for security
+consensusConfig.weights["security-auditor"] = 1.5; // Higher weight for security
 ```
 
 #### Expert Priority Configuration
+
 ```typescript
 const expertConfig = {
   domains: {
-    security: ['security-auditor'],
-    architecture: ['architect'],
-    code_quality: ['code-reviewer', 'enforcer'],
-    testing: ['test-architect']
+    security: ["security-auditor"],
+    architecture: ["architect"],
+    code_quality: ["code-reviewer", "enforcer"],
+    testing: ["test-architect"],
   },
   priority_rules: [
-    { domain: 'security', priority: 'high' },
-    { domain: 'architecture', priority: 'medium' },
-    { condition: 'breaking_changes', priority: 'high' }
-  ]
+    { domain: "security", priority: "high" },
+    { domain: "architecture", priority: "medium" },
+    { condition: "breaking_changes", priority: "high" },
+  ],
 };
 ```
 
@@ -315,11 +335,13 @@ const expertConfig = {
 ### Memory Leaks
 
 **Symptoms:**
+
 - Gradual memory usage increase
 - Application restarts due to OOM
 - Performance degradation over time
 
 **Diagnostic Steps:**
+
 ```bash
 # Monitor memory usage
 npm run monitor:memory
@@ -337,25 +359,27 @@ npm run check:retention
 **Solutions:**
 
 #### Memory Leak Detection
+
 ```typescript
 // Enable memory monitoring
-const memwatch = require('memwatch-next');
+const memwatch = require("memwatch-next");
 
-memwatch.on('leak', (info) => {
-  console.error('Memory leak detected:', info);
+memwatch.on("leak", (info) => {
+  console.error("Memory leak detected:", info);
   // Log leak information
-  logger.error('Memory leak', {
+  logger.error("Memory leak", {
     growth: info.growth,
     reason: info.reason,
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   });
 });
 
 // Periodic heap analysis
 setInterval(() => {
   const memUsage = process.memoryUsage();
-  if (memUsage.heapUsed > 500 * 1024 * 1024) { // 500MB
-    console.warn('High memory usage detected');
+  if (memUsage.heapUsed > 500 * 1024 * 1024) {
+    // 500MB
+    console.warn("High memory usage detected");
 
     // Force garbage collection if available
     if (global.gc) {
@@ -363,12 +387,13 @@ setInterval(() => {
     }
 
     // Generate heap dump for analysis
-    require('heapdump').writeSnapshot('./heap-' + Date.now() + '.heapsnapshot');
+    require("heapdump").writeSnapshot("./heap-" + Date.now() + ".heapsnapshot");
   }
 }, 300000); // Check every 5 minutes
 ```
 
 #### Object Pool Optimization
+
 ```typescript
 class ObjectPool<T> {
   private pool: T[] = [];
@@ -402,25 +427,27 @@ class ObjectPool<T> {
 
 // Usage example
 const taskPool = new ObjectPool(
-  () => ({ id: '', type: '', payload: null, startTime: 0 }),
+  () => ({ id: "", type: "", payload: null, startTime: 0 }),
   (task) => {
-    task.id = '';
-    task.type = '';
+    task.id = "";
+    task.type = "";
     task.payload = null;
     task.startTime = 0;
   },
-  100
+  100,
 );
 ```
 
 ### Slow Response Times
 
 **Symptoms:**
+
 - API responses >100ms
 - Database query timeouts
 - High CPU usage
 
 **Diagnostic Steps:**
+
 ```bash
 # Profile response times
 npm run profile:responses
@@ -438,22 +465,27 @@ npm run load:test
 **Solutions:**
 
 #### Response Time Optimization
+
 ```typescript
 // Add response time monitoring middleware
-const responseTimeMiddleware = (req: Request, res: Response, next: Function) => {
+const responseTimeMiddleware = (
+  req: Request,
+  res: Response,
+  next: Function,
+) => {
   const start = process.hrtime.bigint();
 
-  res.on('finish', () => {
+  res.on("finish", () => {
     const end = process.hrtime.bigint();
     const duration = Number(end - start) / 1e6; // Convert to milliseconds
 
     // Log slow responses
     if (duration > 100) {
-      logger.warn('Slow response', {
+      logger.warn("Slow response", {
         method: req.method,
         url: req.url,
         duration,
-        statusCode: res.statusCode
+        statusCode: res.statusCode,
       });
     }
 
@@ -475,63 +507,64 @@ const optimizeQuery = async (query: string, params: any[]) => {
 
     // Log slow queries
     if (duration > 50) {
-      logger.warn('Slow query', { query, duration, params });
+      logger.warn("Slow query", { query, duration, params });
     }
 
     return result;
   } catch (error) {
-    logger.error('Query error', { query, error, params });
+    logger.error("Query error", { query, error, params });
     throw error;
   }
 };
 ```
 
 #### CPU Bottlenecks
+
 ```typescript
 // CPU profiling
-const profiler = require('v8-profiler-node8');
+const profiler = require("v8-profiler-node8");
 
 const startCPUProfiling = () => {
-  profiler.startProfiling('cpu-profile', true);
+  profiler.startProfiling("cpu-profile", true);
   return profiler;
 };
 
 const stopCPUProfiling = (profilerInstance: any) => {
-  const profile = profilerInstance.stopProfiling('cpu-profile');
+  const profile = profilerInstance.stopProfiling("cpu-profile");
 
   profile.export((error: Error, result: any) => {
     if (error) {
-      logger.error('Profile export error', error);
+      logger.error("Profile export error", error);
     } else {
       // Save profile for analysis
       const fileName = `./profiles/cpu-${Date.now()}.cpuprofile`;
-      require('fs').writeFileSync(fileName, JSON.stringify(result));
-      logger.info('CPU profile saved', { fileName });
+      require("fs").writeFileSync(fileName, JSON.stringify(result));
+      logger.info("CPU profile saved", { fileName });
     }
     profile.delete();
   });
 };
 
 // Worker thread implementation for CPU-intensive tasks
-const { Worker } = require('worker_threads');
+const { Worker } = require("worker_threads");
 
 const runInWorker = (task: any): Promise<any> => {
   return new Promise((resolve, reject) => {
-    const worker = new Worker('./worker.js');
+    const worker = new Worker("./worker.js");
 
     worker.postMessage(task);
 
-    worker.on('message', (result: any) => {
+    worker.on("message", (result: any) => {
       resolve(result);
       worker.terminate();
     });
 
-    worker.on('error', (error: Error) => {
+    worker.on("error", (error: Error) => {
       reject(error);
       worker.terminate();
     });
 
-    worker.on('exit', (code: number) => {
+    worker.on("exit", (code: number) => {
       if (code !== 0) {
         reject(new Error(`Worker stopped with exit code ${code}`));
       }
@@ -547,11 +580,13 @@ const runInWorker = (task: any): Promise<any> => {
 ### Authentication Failures
 
 **Symptoms:**
+
 - Login attempts failing
 - Token validation errors
 - Session timeout issues
 
 **Diagnostic Steps:**
+
 ```bash
 # Test authentication flow
 npm run test:auth
@@ -569,53 +604,55 @@ npm run test:sessions
 **Solutions:**
 
 #### JWT Token Issues
+
 ```typescript
 // Validate JWT configuration
 const jwtConfig = {
   secret: process.env.JWT_SECRET,
-  algorithm: 'HS256',
-  expiresIn: '24h',
-  issuer: 'strray-framework',
-  audience: 'strray-api'
+  algorithm: "HS256",
+  expiresIn: "24h",
+  issuer: "strray-framework",
+  audience: "strray-api",
 };
 
 // Test token generation and validation
 const testJWT = () => {
   const token = jwt.sign(
-    { userId: 'test-user', roles: ['user'] },
+    { userId: "test-user", roles: ["user"] },
     jwtConfig.secret,
     {
       algorithm: jwtConfig.algorithm,
       expiresIn: jwtConfig.expiresIn,
       issuer: jwtConfig.issuer,
-      audience: jwtConfig.audience
-    }
+      audience: jwtConfig.audience,
+    },
   );
 
   try {
     const decoded = jwt.verify(token, jwtConfig.secret, {
       issuer: jwtConfig.issuer,
-      audience: jwtConfig.audience
+      audience: jwtConfig.audience,
     });
-    console.log('JWT validation successful');
+    console.log("JWT validation successful");
   } catch (error) {
-    console.error('JWT validation failed:', error);
+    console.error("JWT validation failed:", error);
   }
 };
 ```
 
 #### Authorization Problems
+
 ```typescript
 // Check permission configuration
 const permissions = {
-  'user.create': ['admin', 'manager'],
-  'user.read': ['admin', 'manager', 'user'],
-  'user.update': ['admin', 'manager'],
-  'user.delete': ['admin'],
+  "user.create": ["admin", "manager"],
+  "user.read": ["admin", "manager", "user"],
+  "user.update": ["admin", "manager"],
+  "user.delete": ["admin"],
 
-  'agent.execute': ['admin', 'developer'],
-  'agent.configure': ['admin'],
-  'system.monitor': ['admin', 'operator']
+  "agent.execute": ["admin", "developer"],
+  "agent.configure": ["admin"],
+  "system.monitor": ["admin", "operator"],
 };
 
 // Validate user permissions
@@ -629,18 +666,20 @@ const hasPermission = (user: User, permission: string): boolean => {
     return false; // Permission not defined
   }
 
-  return user.roles.some(role => allowedRoles.includes(role));
+  return user.roles.some((role) => allowedRoles.includes(role));
 };
 ```
 
 ### Security Audit Failures
 
 **Symptoms:**
+
 - Security scans failing
 - Vulnerability alerts
 - Compliance violations
 
 **Diagnostic Steps:**
+
 ```bash
 # Run security audit
 npm run audit:security
@@ -658,6 +697,7 @@ npm run test:security
 **Solutions:**
 
 #### Dependency Vulnerability Management
+
 ```bash
 # Check for vulnerable dependencies
 npm audit
@@ -672,6 +712,7 @@ npm update --save
 ```
 
 #### Code Security Issues
+
 ```typescript
 // Common security fixes
 
@@ -680,7 +721,7 @@ npm update --save
 const query = `SELECT * FROM users WHERE id = ${userId}`;
 
 // ✅ Good
-const query = 'SELECT * FROM users WHERE id = $1';
+const query = "SELECT * FROM users WHERE id = $1";
 const result = await db.query(query, [userId]);
 
 // 2. XSS Prevention
@@ -695,7 +736,7 @@ res.send(`<div>Hello ${escapeHtml(userInput)}</div>`);
 exec(`ls ${userPath}`);
 
 // ✅ Good
-exec('ls', [userPath]); // Use array form
+exec("ls", [userPath]); // Use array form
 // or
 exec(escapeShellArg(`ls ${userPath}`));
 ```
@@ -703,11 +744,13 @@ exec(escapeShellArg(`ls ${userPath}`));
 ### Encryption Problems
 
 **Symptoms:**
+
 - Data decryption failures
 - Certificate validation errors
 - TLS handshake failures
 
 **Diagnostic Steps:**
+
 ```bash
 # Test encryption/decryption
 npm run test:encryption
@@ -725,17 +768,18 @@ grep "ENCRYPTION" logs/security.log
 **Solutions:**
 
 #### Certificate Management
+
 ```typescript
 // SSL/TLS configuration
 const tlsConfig = {
-  key: fs.readFileSync('server.key'),
-  cert: fs.readFileSync('server.crt'),
-  ca: fs.readFileSync('ca.crt'),
-  ciphers: 'ECDHE-RSA-AES128-GCM-SHA256:!RC4',
+  key: fs.readFileSync("server.key"),
+  cert: fs.readFileSync("server.crt"),
+  ca: fs.readFileSync("ca.crt"),
+  ciphers: "ECDHE-RSA-AES128-GCM-SHA256:!RC4",
   honorCipherOrder: true,
-  secureProtocol: 'TLSv1_2_method',
+  secureProtocol: "TLSv1_2_method",
   requestCert: true,
-  rejectUnauthorized: true
+  rejectUnauthorized: true,
 };
 
 // Certificate validation
@@ -748,18 +792,18 @@ const validateCertificate = (cert: any): boolean => {
     }
 
     // Check issuer
-    if (cert.issuer.CN !== 'Expected CA') {
+    if (cert.issuer.CN !== "Expected CA") {
       return false;
     }
 
     // Check subject
-    if (!cert.subject.CN.includes('strray-framework')) {
+    if (!cert.subject.CN.includes("strray-framework")) {
       return false;
     }
 
     return true;
   } catch (error) {
-    logger.error('Certificate validation error', error);
+    logger.error("Certificate validation error", error);
     return false;
   }
 };
@@ -772,11 +816,13 @@ const validateCertificate = (cert: any): boolean => {
 ### Connection Problems
 
 **Symptoms:**
+
 - Database connection failures
 - Connection pool exhaustion
 - Query timeouts
 
 **Diagnostic Steps:**
+
 ```bash
 # Test database connectivity
 npm run test:db-connection
@@ -794,53 +840,56 @@ npm run test:db-queries
 **Solutions:**
 
 #### Connection Pool Configuration
+
 ```typescript
 // Database connection configuration
 const dbConfig = {
-  host: process.env.DB_HOST || 'localhost',
-  port: parseInt(process.env.DB_PORT || '5432'),
-  database: process.env.DB_NAME || 'strray',
-  user: process.env.DB_USER || 'strray',
+  host: process.env.DB_HOST || "localhost",
+  port: parseInt(process.env.DB_PORT || "5432"),
+  database: process.env.DB_NAME || "strray",
+  user: process.env.DB_USER || "strray",
   password: process.env.DB_PASSWORD,
-  ssl: process.env.NODE_ENV === 'production',
+  ssl: process.env.NODE_ENV === "production",
 
   // Connection pool settings
-  max: 20,                    // Maximum connections
-  min: 5,                     // Minimum connections
-  idleTimeoutMillis: 30000,   // Close idle connections after 30s
+  max: 20, // Maximum connections
+  min: 5, // Minimum connections
+  idleTimeoutMillis: 30000, // Close idle connections after 30s
   connectionTimeoutMillis: 2000, // Connection timeout 2s
 
   // Retry configuration
   retry: {
-    max: 3,                   // Maximum retry attempts
-    timeout: 5000             // Timeout between retries
-  }
+    max: 3, // Maximum retry attempts
+    timeout: 5000, // Timeout between retries
+  },
 };
 
 // Connection pool monitoring
 const pool = new Pool(dbConfig);
 
-pool.on('connect', (client) => {
-  logger.info('New database connection established');
+pool.on("connect", (client) => {
+  logger.info("New database connection established");
 });
 
-pool.on('error', (err, client) => {
-  logger.error('Database connection error', err);
+pool.on("error", (err, client) => {
+  logger.error("Database connection error", err);
 });
 
-pool.on('remove', (client) => {
-  logger.info('Database connection removed from pool');
+pool.on("remove", (client) => {
+  logger.info("Database connection removed from pool");
 });
 ```
 
 ### Query Performance Issues
 
 **Symptoms:**
+
 - Slow query execution
 - Database lock contention
 - Index inefficiency
 
 **Diagnostic Steps:**
+
 ```bash
 # Analyze query performance
 npm run analyze:queries
@@ -858,6 +907,7 @@ tail -f logs/slow-queries.log
 **Solutions:**
 
 #### Query Optimization
+
 ```sql
 -- Add performance indexes
 CREATE INDEX CONCURRENTLY idx_users_email ON users(email);
@@ -882,6 +932,7 @@ LIMIT 100;
 ```
 
 #### Database Maintenance
+
 ```bash
 # Vacuum and analyze tables
 VACUUM ANALYZE users;
@@ -909,11 +960,13 @@ ORDER BY bloat_ratio DESC;
 ### API Connectivity Problems
 
 **Symptoms:**
+
 - API request failures
 - Timeout errors
 - Network partition issues
 
 **Diagnostic Steps:**
+
 ```bash
 # Test API connectivity
 npm run test:api-connectivity
@@ -931,6 +984,7 @@ npm run test:load-balancer
 **Solutions:**
 
 #### Network Configuration
+
 ```typescript
 // HTTP client configuration with retries and timeouts
 const httpClient = axios.create({
@@ -948,24 +1002,25 @@ const httpClient = axios.create({
 
   // Security
   httpsAgent: new https.Agent({
-    rejectUnauthorized: process.env.NODE_ENV === 'production',
+    rejectUnauthorized: process.env.NODE_ENV === "production",
     keepAlive: true,
-    maxSockets: 100
-  })
+    maxSockets: 100,
+  }),
 });
 
 // Circuit breaker pattern
 class CircuitBreaker {
   private failures = 0;
   private lastFailureTime = 0;
-  private state: 'closed' | 'open' | 'half-open' = 'closed';
+  private state: "closed" | "open" | "half-open" = "closed";
 
   async execute<T>(fn: () => Promise<T>): Promise<T> {
-    if (this.state === 'open') {
-      if (Date.now() - this.lastFailureTime > 60000) { // 1 minute timeout
-        this.state = 'half-open';
+    if (this.state === "open") {
+      if (Date.now() - this.lastFailureTime > 60000) {
+        // 1 minute timeout
+        this.state = "half-open";
       } else {
-        throw new Error('Circuit breaker is open');
+        throw new Error("Circuit breaker is open");
       }
     }
 
@@ -983,14 +1038,15 @@ class CircuitBreaker {
     this.failures++;
     this.lastFailureTime = Date.now();
 
-    if (this.failures >= 5) { // Open circuit after 5 failures
-      this.state = 'open';
+    if (this.failures >= 5) {
+      // Open circuit after 5 failures
+      this.state = "open";
     }
   }
 
   private reset(): void {
     this.failures = 0;
-    this.state = 'closed';
+    this.state = "closed";
   }
 }
 ```
@@ -998,11 +1054,13 @@ class CircuitBreaker {
 ### Load Balancer Issues
 
 **Symptoms:**
+
 - Uneven request distribution
 - Session persistence problems
 - Health check failures
 
 **Diagnostic Steps:**
+
 ```bash
 # Check load balancer configuration
 npm run check:load-balancer
@@ -1020,6 +1078,7 @@ tail -f /var/log/nginx/access.log
 **Solutions:**
 
 #### Load Balancer Configuration
+
 ```nginx
 # Nginx load balancer configuration
 upstream strray_backend {
@@ -1079,11 +1138,13 @@ server {
 ### Plugin Loading Failures
 
 **Symptoms:**
+
 - Plugin installation errors
 - Sandbox initialization failures
 - Permission denied errors
 
 **Diagnostic Steps:**
+
 ```bash
 # Check plugin status
 npm run list:plugins
@@ -1101,23 +1162,33 @@ tail -f logs/plugins.log
 **Solutions:**
 
 #### Plugin Sandbox Configuration
+
 ```typescript
 // Plugin sandbox configuration
 const sandboxConfig = {
-  memoryLimit: 50 * 1024 * 1024,  // 50MB
-  timeout: 30000,                 // 30 seconds
+  memoryLimit: 50 * 1024 * 1024, // 50MB
+  timeout: 30000, // 30 seconds
   allowedModules: [
-    'fs', 'path', 'crypto', 'util',
-    'events', 'stream', 'buffer'
+    "fs",
+    "path",
+    "crypto",
+    "util",
+    "events",
+    "stream",
+    "buffer",
   ],
   restrictedGlobals: [
-    'process', 'global', 'console', '__dirname', '__filename'
+    "process",
+    "global",
+    "console",
+    "__dirname",
+    "__filename",
   ],
   networkAccess: false,
   fileSystemAccess: {
-    read: ['./data', './config'],
-    write: ['./temp']
-  }
+    read: ["./data", "./config"],
+    write: ["./temp"],
+  },
 };
 
 // Plugin validation
@@ -1125,12 +1196,12 @@ const validatePlugin = (pluginCode: string): ValidationResult => {
   const issues: string[] = [];
 
   // Check for dangerous patterns
-  if (pluginCode.includes('eval(')) {
-    issues.push('Use of eval() is not allowed');
+  if (pluginCode.includes("eval(")) {
+    issues.push("Use of eval() is not allowed");
   }
 
-  if (pluginCode.includes('require(\'child_process\')')) {
-    issues.push('Child process execution is not allowed');
+  if (pluginCode.includes("require('child_process')")) {
+    issues.push("Child process execution is not allowed");
   }
 
   // Check syntax
@@ -1142,7 +1213,7 @@ const validatePlugin = (pluginCode: string): ValidationResult => {
 
   return {
     valid: issues.length === 0,
-    issues
+    issues,
   };
 };
 ```
@@ -1150,11 +1221,13 @@ const validatePlugin = (pluginCode: string): ValidationResult => {
 ### Plugin Compatibility Issues
 
 **Symptoms:**
+
 - Plugin API version mismatches
 - Framework compatibility errors
 - Extension loading failures
 
 **Diagnostic Steps:**
+
 ```bash
 # Check plugin compatibility
 npm run check:plugin-compatibility
@@ -1172,19 +1245,20 @@ grep "COMPATIBILITY" logs/framework.log
 **Solutions:**
 
 #### Plugin Version Management
+
 ```typescript
 // Plugin version compatibility matrix
 const compatibilityMatrix = {
-  'strray-1.0': {
-    supportedPluginVersions: ['1.0.x', '1.1.x'],
+  "strray-1.0": {
+    supportedPluginVersions: ["1.0.x", "1.1.x"],
     deprecatedFeatures: [],
-    breakingChanges: []
+    breakingChanges: [],
   },
-  'strray-1.1': {
-    supportedPluginVersions: ['1.1.x', '1.2.x'],
-    deprecatedFeatures: ['oldApiMethod'],
-    breakingChanges: ['configFormatChanged']
-  }
+  "strray-1.1": {
+    supportedPluginVersions: ["1.1.x", "1.2.x"],
+    deprecatedFeatures: ["oldApiMethod"],
+    breakingChanges: ["configFormatChanged"],
+  },
 };
 
 // Plugin migration helper
@@ -1199,11 +1273,14 @@ class PluginMigrator {
     return plugin;
   }
 
-  private getMigrationPath(fromVersion: string, toVersion: string): Migration[] {
+  private getMigrationPath(
+    fromVersion: string,
+    toVersion: string,
+  ): Migration[] {
     // Calculate migration steps
     const migrations: Migration[] = [];
 
-    if (fromVersion === '1.0.x' && toVersion === '1.1.x') {
+    if (fromVersion === "1.0.x" && toVersion === "1.1.x") {
       migrations.push(new ConfigFormatMigration());
     }
 
@@ -1219,11 +1296,13 @@ class PluginMigrator {
 ### Alert Configuration Problems
 
 **Symptoms:**
+
 - Missing alerts
 - False positive alerts
 - Alert delivery failures
 
 **Diagnostic Steps:**
+
 ```bash
 # Check alert configuration
 npm run validate:alerts
@@ -1241,78 +1320,81 @@ npm run monitor:alert-queue
 **Solutions:**
 
 #### Alert Configuration
+
 ```typescript
 // Alert rule configuration
 const alertRules = {
   performance: {
     highCpuUsage: {
-      condition: 'cpu_usage > 80',
-      duration: '5m',
-      severity: 'warning',
-      channels: ['email', 'slack'],
-      cooldown: '10m'
+      condition: "cpu_usage > 80",
+      duration: "5m",
+      severity: "warning",
+      channels: ["email", "slack"],
+      cooldown: "10m",
     },
     memoryLeak: {
-      condition: 'memory_growth_rate > 10',
-      duration: '10m',
-      severity: 'error',
-      channels: ['email', 'slack', 'pagerduty'],
-      cooldown: '30m'
-    }
+      condition: "memory_growth_rate > 10",
+      duration: "10m",
+      severity: "error",
+      channels: ["email", "slack", "pagerduty"],
+      cooldown: "30m",
+    },
   },
   security: {
     failedLoginAttempts: {
-      condition: 'failed_logins > 5',
-      duration: '1m',
-      severity: 'warning',
-      channels: ['email'],
-      cooldown: '15m'
+      condition: "failed_logins > 5",
+      duration: "1m",
+      severity: "warning",
+      channels: ["email"],
+      cooldown: "15m",
     },
     suspiciousActivity: {
-      condition: 'suspicious_requests > 10',
-      duration: '5m',
-      severity: 'critical',
-      channels: ['email', 'slack', 'pagerduty'],
-      cooldown: '5m'
-    }
-  }
+      condition: "suspicious_requests > 10",
+      duration: "5m",
+      severity: "critical",
+      channels: ["email", "slack", "pagerduty"],
+      cooldown: "5m",
+    },
+  },
 };
 
 // Alert delivery configuration
 const alertDelivery = {
   email: {
     smtp: {
-      host: 'smtp.gmail.com',
+      host: "smtp.gmail.com",
       port: 587,
       secure: false,
       auth: {
         user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS
-      }
+        pass: process.env.SMTP_PASS,
+      },
     },
-    from: 'alerts@strray-framework.com',
-    to: ['team@company.com']
+    from: "alerts@strray-framework.com",
+    to: ["team@company.com"],
   },
   slack: {
     webhookUrl: process.env.SLACK_WEBHOOK_URL,
-    channel: '#alerts',
-    username: 'StrRay Monitor'
+    channel: "#alerts",
+    username: "StrRay Monitor",
   },
   pagerduty: {
     integrationKey: process.env.PAGERDUTY_KEY,
-    severity: 'error'
-  }
+    severity: "error",
+  },
 };
 ```
 
 ### Dashboard Configuration Issues
 
 **Symptoms:**
+
 - Dashboard not loading
 - Metrics not displaying
 - Visualization errors
 
 **Diagnostic Steps:**
+
 ```bash
 # Test dashboard connectivity
 npm run test:dashboard
@@ -1330,57 +1412,58 @@ npm run test:visualizations
 **Solutions:**
 
 #### Dashboard Configuration
+
 ```typescript
 // Grafana dashboard configuration
 const grafanaDashboard = {
-  title: 'StrRay Framework Overview',
-  tags: ['strray', 'framework', 'monitoring'],
-  timezone: 'browser',
+  title: "StrRay Framework Overview",
+  tags: ["strray", "framework", "monitoring"],
+  timezone: "browser",
   panels: [
     {
-      title: 'Response Time',
-      type: 'graph',
+      title: "Response Time",
+      type: "graph",
       targets: [
         {
-          expr: 'histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m]))',
-          legendFormat: '95th percentile'
-        }
+          expr: "histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m]))",
+          legendFormat: "95th percentile",
+        },
       ],
       yAxes: {
-        unit: 'seconds',
-        min: 0
-      }
+        unit: "seconds",
+        min: 0,
+      },
     },
     {
-      title: 'Error Rate',
-      type: 'graph',
+      title: "Error Rate",
+      type: "graph",
       targets: [
         {
           expr: 'rate(http_requests_total{status=~"5.."}[5m]) / rate(http_requests_total[5m]) * 100',
-          legendFormat: 'Error %'
-        }
+          legendFormat: "Error %",
+        },
       ],
       yAxes: {
-        unit: 'percent',
-        max: 100
-      }
+        unit: "percent",
+        max: 100,
+      },
     },
     {
-      title: 'Active Agents',
-      type: 'stat',
+      title: "Active Agents",
+      type: "stat",
       targets: [
         {
           expr: 'count(strray_agent_status{status="active"})',
-          legendFormat: 'Active Agents'
-        }
-      ]
-    }
+          legendFormat: "Active Agents",
+        },
+      ],
+    },
   ],
   time: {
-    from: 'now-1h',
-    to: 'now'
+    from: "now-1h",
+    to: "now",
   },
-  refresh: '30s'
+  refresh: "30s",
 };
 ```
 
@@ -1391,6 +1474,7 @@ const grafanaDashboard = {
 ### Service Outage Response
 
 #### Immediate Actions
+
 ```bash
 # 1. Assess the situation
 curl -f http://localhost:3000/api/status || echo "Service is down"
@@ -1411,10 +1495,11 @@ npm run restart
 ```
 
 #### Escalation Procedures
+
 ```typescript
 // Automated incident response
 class IncidentResponse {
-  async handleOutage(severity: 'minor' | 'major' | 'critical'): Promise<void> {
+  async handleOutage(severity: "minor" | "major" | "critical"): Promise<void> {
     // 1. Gather diagnostic information
     const diagnostics = await this.collectDiagnostics();
 
@@ -1423,13 +1508,13 @@ class IncidentResponse {
 
     // 3. Execute response plan
     switch (severity) {
-      case 'critical':
+      case "critical":
         await this.executeCriticalResponse(impact);
         break;
-      case 'major':
+      case "major":
         await this.executeMajorResponse(impact);
         break;
-      case 'minor':
+      case "minor":
         await this.executeMinorResponse(impact);
         break;
     }
@@ -1441,7 +1526,9 @@ class IncidentResponse {
     await this.initiateRecovery(severity);
   }
 
-  private async executeCriticalResponse(impact: ImpactAssessment): Promise<void> {
+  private async executeCriticalResponse(
+    impact: ImpactAssessment,
+  ): Promise<void> {
     // Immediate actions for critical incidents
     await this.enableEmergencyMode();
     await this.scaleResources(impact.requiredCapacity);
@@ -1467,6 +1554,7 @@ class IncidentResponse {
 ### Data Recovery Procedures
 
 #### Database Recovery
+
 ```bash
 # 1. Stop the application
 docker-compose stop strray-app
@@ -1486,6 +1574,7 @@ tail -f logs/framework.log
 ```
 
 #### Configuration Recovery
+
 ```bash
 # 1. Backup current configuration
 cp .opencode/oh-my-opencode.json .opencode/backup.json
@@ -1506,9 +1595,10 @@ npm run test:smoke
 ### Communication Templates
 
 #### Incident Notification
+
 ```typescript
 const incidentNotification = {
-  subject: '🚨 CRITICAL: StrRay Framework Service Outage',
+  subject: "🚨 CRITICAL: StrRay Framework Service Outage",
   body: `
 INCIDENT SUMMARY
 ================
@@ -1540,16 +1630,17 @@ NEXT STEPS
 
 For real-time updates, join #incident-response Slack channel.
   `,
-  priority: 'high',
+  priority: "high",
   recipients: [
-    'devops@company.com',
-    'management@company.com',
-    'customers@company.com'
-  ]
+    "devops@company.com",
+    "management@company.com",
+    "customers@company.com",
+  ],
 };
 ```
 
 #### Post-Incident Review
+
 ```typescript
 const postIncidentReview = {
   template: `
@@ -1564,9 +1655,9 @@ INCIDENT DETAILS
 
 TIMELINE
 ========
-${incident.timeline.map(entry =>
-  `${entry.timestamp}: ${entry.event}`
-).join('\n')}
+${incident.timeline
+  .map((entry) => `${entry.timestamp}: ${entry.event}`)
+  .join("\n")}
 
 ROOT CAUSE
 ==========
@@ -1580,22 +1671,21 @@ IMPACT ASSESSMENT
 
 LESSONS LEARNED
 ==============
-${incident.lessonsLearned.map(lesson =>
-  `- ${lesson}`
-).join('\n')}
+${incident.lessonsLearned.map((lesson) => `- ${lesson}`).join("\n")}
 
 PREVENTIVE MEASURES
 ==================
-${incident.preventiveMeasures.map(measure =>
-  `- ${measure}`
-).join('\n')}
+${incident.preventiveMeasures.map((measure) => `- ${measure}`).join("\n")}
 
 ACTION ITEMS
 ============
-${incident.actionItems.map((item, index) =>
-  `${index + 1}. ${item.description} (Owner: ${item.owner}, Due: ${item.dueDate})`
-).join('\n')}
-  `
+${incident.actionItems
+  .map(
+    (item, index) =>
+      `${index + 1}. ${item.description} (Owner: ${item.owner}, Due: ${item.dueDate})`,
+  )
+  .join("\n")}
+  `,
 };
 ```
 

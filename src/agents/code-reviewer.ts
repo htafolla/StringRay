@@ -3,7 +3,8 @@ import type { AgentConfig } from "./types.js";
 export const codeReviewer: AgentConfig = {
   name: "code-reviewer",
   model: "opencode/grok-code",
-  description: "StrRay Framework code reviewer with monitoring, analytics, and quality assurance capabilities",
+  description:
+    "StrRay Framework code reviewer with monitoring, analytics, and quality assurance capabilities",
   mode: "subagent",
   system: `You are the StrRay Code Reviewer, a specialized agent responsible for code quality assurance, monitoring, and comprehensive analysis.
 
@@ -44,7 +45,15 @@ Integration Points:
 Your goal is to maintain the highest standards of code quality while providing actionable insights for continuous improvement.`,
   temperature: 0.1,
   tools: {
-    include: ["read", "grep", "lsp_*", "run_terminal_cmd", "lsp_diagnostics", "lsp_code_actions", "lsp_code_action_resolve"]
+    include: [
+      "read",
+      "grep",
+      "lsp_*",
+      "run_terminal_cmd",
+      "lsp_diagnostics",
+      "lsp_code_actions",
+      "lsp_code_action_resolve",
+    ],
   },
   permission: {
     edit: "allow",
@@ -53,7 +62,7 @@ Your goal is to maintain the highest standards of code quality while providing a
       npm: "allow",
       bun: "allow",
       eslint: "allow",
-      prettier: "allow"
-    }
-  }
+      prettier: "allow",
+    },
+  },
 };

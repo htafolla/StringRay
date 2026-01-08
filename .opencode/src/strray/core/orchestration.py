@@ -19,6 +19,7 @@ from strray.config.manager import ConfigManager
 
 class WorkflowStatus(Enum):
     """Workflow execution status."""
+
     PENDING = "pending"
     RUNNING = "running"
     COMPLETED = "completed"
@@ -28,6 +29,7 @@ class WorkflowStatus(Enum):
 
 class TaskPriority(Enum):
     """Task priority levels."""
+
     LOW = "low"
     MEDIUM = "medium"
     HIGH = "high"
@@ -37,6 +39,7 @@ class TaskPriority(Enum):
 @dataclass
 class WorkflowTask:
     """Represents a task within a workflow."""
+
     id: str
     name: str
     agent_type: str
@@ -54,6 +57,7 @@ class WorkflowTask:
 @dataclass
 class Workflow:
     """Represents a multi-agent workflow."""
+
     id: str
     name: str
     tasks: Dict[str, WorkflowTask] = field(default_factory=dict)
@@ -65,6 +69,7 @@ class Workflow:
 
 class ConflictResolutionStrategy(Enum):
     """Strategies for resolving agent conflicts."""
+
     MAJORITY_VOTE = "majority_vote"
     EXPERT_PRIORITY = "expert_priority"
     CONSENSUS = "consensus"
@@ -91,15 +96,17 @@ class AsyncCoordinator:
         self.logger = logging.getLogger(__name__)
 
         # Load configuration
-        self.max_concurrent_tasks = self.config.get('max_concurrent_tasks', 5)
-        self.task_timeout = self.config.get('task_timeout', 300)
-        self.retry_delay = self.config.get('retry_delay', 1.0)
+        self.max_concurrent_tasks = self.config.get("max_concurrent_tasks", 5)
+        self.task_timeout = self.config.get("task_timeout", 300)
+        self.retry_delay = self.config.get("retry_delay", 1.0)
         self.conflict_resolution = ConflictResolutionStrategy(
-            self.config.get('conflict_resolution', ConflictResolutionStrategy.MAJORITY_VOTE.value)
+            self.config.get(
+                "conflict_resolution", ConflictResolutionStrategy.MAJORITY_VOTE.value
+            )
         )
 
         # Initialize state persistence
-        self.state_file = self.config.get('state_file', '.strray/workflow_state.json')
+        self.state_file = self.config.get("state_file", ".strray/workflow_state.json")
         self._load_state()
 
     def register_agent(self, agent_type: str, agent: BaseAgent) -> None:
@@ -107,13 +114,11 @@ class AsyncCoordinator:
         self.agents[agent_type] = agent
         self.logger.info(f"Registered agent: {agent_type}")
 
-    def create_workflow(self, workflow_id: str, name: str, metadata: Optional[Dict[str, Any]] = None) -> Workflow:
+    def create_workflow(
+        self, workflow_id: str, name: str, metadata: Optional[Dict[str, Any]] = None
+    ) -> Workflow:
         """Create a new workflow."""
-        workflow = Workflow(
-            id=workflow_id,
-            name=name,
-            metadata=metadata or {}
-        )
+        workflow = Workflow(id=workflow_id, name=name, metadata=metadata or {})
         self.workflows[workflow_id] = workflow
         self._save_state()
         self.logger.info(f"Created workflow: {workflow_id}")
@@ -143,21 +148,21 @@ class AsyncCoordinator:
         Returns:
             Workflow execution results
         """
-        workflow_id = workflow.get('id', f"workflow_{int(time.time())}")
-        workflow_name = workflow.get('name', 'Unnamed Workflow')
+        workflow_id = workflow.get("id", f"workflow_{int(time.time())}")
+        workflow_name = workflow.get("name", "Unnamed Workflow")
 
         # Create workflow object
-        wf = self.create_workflow(workflow_id, workflow_name, workflow.get('metadata'))
+        wf = self.create_workflow(workflow_id, workflow_name, workflow.get("metadata"))
 
         # Add tasks
-        tasks = workflow.get('tasks', [])
+        tasks = workflow.get("tasks", [])
         for task_def in tasks:
             task = WorkflowTask(
-                id=task_def['id'],
-                name=task_def['name'],
-                agent_type=task_def['agent_type'],
-                priority=TaskPriority(task_def.get('priority', 'medium')),
-                dependencies=task_def.get('dependencies', [])
+                id=task_def["id"],
+                name=task_def["name"],
+                agent_type=task_def["agent_type"],
+                priority=TaskPriority(task_def.get("priority", "medium")),
+                dependencies=task_def.get("dependencies", []),
             )
             self.add_task(workflow_id, task)
 
@@ -188,7 +193,9 @@ class AsyncCoordinator:
                         executable_tasks.append(task_id)
 
                 if not executable_tasks:
-                    raise ValueError(f"Circular dependency detected in workflow {workflow_id}")
+                    raise ValueError(
+                        f"Circular dependency detected in workflow {workflow_id}"
+                    )
 
                 # Execute tasks concurrently (up to max_concurrent_tasks)
                 batch_size = min(len(executable_tasks), self.max_concurrent_tasks)
@@ -205,7 +212,10 @@ class AsyncCoordinator:
 
                 # Remove completed tasks
                 for task_id in batch_tasks:
-                    if workflow.tasks[task_id].status in [WorkflowStatus.COMPLETED, WorkflowStatus.FAILED]:
+                    if workflow.tasks[task_id].status in [
+                        WorkflowStatus.COMPLETED,
+                        WorkflowStatus.FAILED,
+                    ]:
                         remaining_tasks.remove(task_id)
 
             # Mark workflow as completed
@@ -236,10 +246,10 @@ class AsyncCoordinator:
 
             # Create task payload
             task_payload = {
-                'id': task.id,
-                'content': task.name,
-                'priority': task.priority.value,
-                'workflow_id': workflow_id
+                "id": task.id,
+                "content": task.name,
+                "priority": task.priority.value,
+                "workflow_id": workflow_id,
             }
 
             # Execute task with timeout
@@ -247,7 +257,7 @@ class AsyncCoordinator:
                 asyncio.get_event_loop().run_in_executor(
                     None, agent.execute_task, task_payload
                 ),
-                timeout=self.task_timeout
+                timeout=self.task_timeout,
             )
 
             task.result = result
@@ -263,7 +273,9 @@ class AsyncCoordinator:
             # Retry logic
             if task.retry_count < task.max_retries:
                 task.retry_count += 1
-                self.logger.info(f"Retrying task {task_id} (attempt {task.retry_count})")
+                self.logger.info(
+                    f"Retrying task {task_id} (attempt {task.retry_count})"
+                )
                 await asyncio.sleep(self.retry_delay * task.retry_count)
                 await self._execute_task(workflow_id, task_id)
                 return
@@ -282,7 +294,9 @@ class AsyncCoordinator:
                 return False
         return True
 
-    async def delegate_task(self, task: Dict[str, Any], agent_type: str) -> Dict[str, Any]:
+    async def delegate_task(
+        self, task: Dict[str, Any], agent_type: str
+    ) -> Dict[str, Any]:
         """
         Delegate a task to a specific agent type.
 
@@ -328,17 +342,23 @@ class AsyncCoordinator:
             # Default to first response
             return conflicts[0]
 
-    def _resolve_by_majority_vote(self, conflicts: List[Dict[str, Any]]) -> Dict[str, Any]:
+    def _resolve_by_majority_vote(
+        self, conflicts: List[Dict[str, Any]]
+    ) -> Dict[str, Any]:
         """Resolve conflicts by majority vote."""
         # Simplified majority vote - return most common response
-        responses = [c.get('response') for c in conflicts]
+        responses = [c.get("response") for c in conflicts]
         most_common = max(set(responses), key=responses.count)
-        return next(c for c in conflicts if c.get('response') == most_common)
+        return next(c for c in conflicts if c.get("response") == most_common)
 
-    def _resolve_by_expert_priority(self, conflicts: List[Dict[str, Any]]) -> Dict[str, Any]:
+    def _resolve_by_expert_priority(
+        self, conflicts: List[Dict[str, Any]]
+    ) -> Dict[str, Any]:
         """Resolve conflicts by agent expertise priority."""
         # Sort by agent priority/expertise score
-        sorted_conflicts = sorted(conflicts, key=lambda x: x.get('expertise_score', 0), reverse=True)
+        sorted_conflicts = sorted(
+            conflicts, key=lambda x: x.get("expertise_score", 0), reverse=True
+        )
         return sorted_conflicts[0]
 
     def _resolve_by_consensus(self, conflicts: List[Dict[str, Any]]) -> Dict[str, Any]:
@@ -355,29 +375,33 @@ class AsyncCoordinator:
         workflow = self.workflows[workflow_id]
 
         return {
-            'workflow_id': workflow_id,
-            'status': workflow.status.value,
-            'tasks': {
+            "workflow_id": workflow_id,
+            "status": workflow.status.value,
+            "tasks": {
                 task_id: {
-                    'status': task.status.value,
-                    'result': task.result,
-                    'error': task.error,
-                    'duration': task.end_time - task.start_time if task.start_time and task.end_time else None
+                    "status": task.status.value,
+                    "result": task.result,
+                    "error": task.error,
+                    "duration": (
+                        task.end_time - task.start_time
+                        if task.start_time and task.end_time
+                        else None
+                    ),
                 }
                 for task_id, task in workflow.tasks.items()
             },
-            'created_at': workflow.created_at,
-            'completed_at': workflow.completed_at,
-            'metadata': workflow.metadata
+            "created_at": workflow.created_at,
+            "completed_at": workflow.completed_at,
+            "metadata": workflow.metadata,
         }
 
     def _load_state(self) -> None:
         """Load workflow state from persistent storage."""
         try:
-            with open(self.state_file, 'r') as f:
+            with open(self.state_file, "r") as f:
                 state_data = json.load(f)
                 # Restore workflows from state
-                for wf_data in state_data.get('workflows', []):
+                for wf_data in state_data.get("workflows", []):
                     workflow = Workflow(**wf_data)
                     self.workflows[workflow.id] = workflow
         except (FileNotFoundError, json.JSONDecodeError):
@@ -389,40 +413,41 @@ class AsyncCoordinator:
         try:
             # Create directory if needed
             import os
+
             os.makedirs(os.path.dirname(self.state_file), exist_ok=True)
 
             state_data = {
-                'workflows': [
+                "workflows": [
                     {
-                        'id': wf.id,
-                        'name': wf.name,
-                        'status': wf.status.value,
-                        'created_at': wf.created_at,
-                        'completed_at': wf.completed_at,
-                        'metadata': wf.metadata,
-                        'tasks': {
+                        "id": wf.id,
+                        "name": wf.name,
+                        "status": wf.status.value,
+                        "created_at": wf.created_at,
+                        "completed_at": wf.completed_at,
+                        "metadata": wf.metadata,
+                        "tasks": {
                             tid: {
-                                'id': t.id,
-                                'name': t.name,
-                                'agent_type': t.agent_type,
-                                'priority': t.priority.value,
-                                'dependencies': t.dependencies,
-                                'status': t.status.value,
-                                'result': t.result,
-                                'error': t.error,
-                                'start_time': t.start_time,
-                                'end_time': t.end_time,
-                                'retry_count': t.retry_count,
-                                'max_retries': t.max_retries
+                                "id": t.id,
+                                "name": t.name,
+                                "agent_type": t.agent_type,
+                                "priority": t.priority.value,
+                                "dependencies": t.dependencies,
+                                "status": t.status.value,
+                                "result": t.result,
+                                "error": t.error,
+                                "start_time": t.start_time,
+                                "end_time": t.end_time,
+                                "retry_count": t.retry_count,
+                                "max_retries": t.max_retries,
                             }
                             for tid, t in wf.tasks.items()
-                        }
+                        },
                     }
                     for wf in self.workflows.values()
                 ]
             }
 
-            with open(self.state_file, 'w') as f:
+            with open(self.state_file, "w") as f:
                 json.dump(state_data, f, indent=2)
 
         except Exception as e:
@@ -442,9 +467,11 @@ class AsyncCoordinator:
         to_remove = []
 
         for wf_id, workflow in self.workflows.items():
-            if (workflow.status in [WorkflowStatus.COMPLETED, WorkflowStatus.FAILED] and
-                workflow.completed_at and
-                current_time - workflow.completed_at > max_age):
+            if (
+                workflow.status in [WorkflowStatus.COMPLETED, WorkflowStatus.FAILED]
+                and workflow.completed_at
+                and current_time - workflow.completed_at > max_age
+            ):
                 to_remove.append(wf_id)
 
         for wf_id in to_remove:

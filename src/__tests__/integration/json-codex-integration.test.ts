@@ -1,7 +1,16 @@
-import { describe, it, expect } from 'vitest';
-import { StrRayContextLoader } from '../../context-loader';
-import { parseCodexContent, detectContentFormat, validateJsonSyntax, extractCodexMetadata } from '../../utils/codex-parser';
-import { createStrRayCodexInjectorHook, getCodexStats, clearCodexCache } from '../../codex-injector';
+import { describe, it, expect } from "vitest";
+import { StrRayContextLoader } from "../../context-loader";
+import {
+  parseCodexContent,
+  detectContentFormat,
+  validateJsonSyntax,
+  extractCodexMetadata,
+} from "../../utils/codex-parser";
+import {
+  createStrRayCodexInjectorHook,
+  getCodexStats,
+  clearCodexCache,
+} from "../../codex-injector";
 
 const testProjectRoot = process.cwd();
 const validJsonCodex = JSON.stringify({
@@ -15,7 +24,7 @@ const validJsonCodex = JSON.stringify({
       description: "All code must be production-ready from the first commit.",
       category: "core",
       zeroTolerance: false,
-      enforcementLevel: "high"
+      enforcementLevel: "high",
     },
     "7": {
       number: 7,
@@ -23,7 +32,7 @@ const validJsonCodex = JSON.stringify({
       description: "Zero-tolerance for unresolved errors.",
       category: "core",
       zeroTolerance: true,
-      enforcementLevel: "blocking"
+      enforcementLevel: "blocking",
     },
     "11": {
       number: 11,
@@ -31,15 +40,15 @@ const validJsonCodex = JSON.stringify({
       description: "Never use any, @ts-ignore, or @ts-expect-error.",
       category: "extended",
       zeroTolerance: true,
-      enforcementLevel: "blocking"
-    }
+      enforcementLevel: "blocking",
+    },
   },
   interweaves: ["Error Prevention Interweave"],
   lenses: ["Code Quality Lens"],
   principles: ["SOLID Principles"],
   antiPatterns: ["Spaghetti code"],
   validationCriteria: { "TypeScript compilation succeeds": false },
-  frameworkAlignment: { "oh-my-opencode": "v2.12.0" }
+  frameworkAlignment: { "oh-my-opencode": "v2.12.0" },
 });
 
 const invalidJsonCodex = '{"invalid": json syntax}';
@@ -58,11 +67,9 @@ All code must be production-ready from the first commit.
 Zero-tolerance for unresolved errors.
 `;
 
-describe('JSON Codex System - Comprehensive Integration Testing', () => {
-
-  describe('Rules Engine Validation', () => {
-
-    it('Verify codex.json is loaded correctly on framework startup', async () => {
+describe("JSON Codex System - Comprehensive Integration Testing", () => {
+  describe("Rules Engine Validation", () => {
+    it("Verify codex.json is loaded correctly on framework startup", async () => {
       const loader = StrRayContextLoader.getInstance();
       const result = await loader.loadCodexContext(testProjectRoot);
 
@@ -71,7 +78,7 @@ describe('JSON Codex System - Comprehensive Integration Testing', () => {
       expect(result.context!.version).toBe("1.2.22");
     });
 
-    it('Test that all 45 terms are accessible to the rules engine', async () => {
+    it("Test that all 45 terms are accessible to the rules engine", async () => {
       const loader = StrRayContextLoader.getInstance();
       const result = await loader.loadCodexContext(testProjectRoot);
 
@@ -82,7 +89,7 @@ describe('JSON Codex System - Comprehensive Integration Testing', () => {
       expect(result.context!.terms.has(45)).toBe(true);
     });
 
-    it('Confirm category-based filtering works', async () => {
+    it("Confirm category-based filtering works", async () => {
       const loader = StrRayContextLoader.getInstance();
       const result = await loader.loadCodexContext(testProjectRoot);
 
@@ -92,80 +99,81 @@ describe('JSON Codex System - Comprehensive Integration Testing', () => {
       const zeroToleranceTerms = loader.getZeroToleranceTerms(result.context!);
 
       expect(coreTerms.length).toBeGreaterThan(0);
-      expect(coreTerms.every(term => term.category === 'core')).toBe(true);
+      expect(coreTerms.every((term) => term.category === "core")).toBe(true);
       expect(zeroToleranceTerms.length).toBeGreaterThan(0);
     });
 
-    it('Validate enforcement level logic', async () => {
+    it("Validate enforcement level logic", async () => {
       const loader = StrRayContextLoader.getInstance();
       const result = await loader.loadCodexContext(testProjectRoot);
 
       expect(result.success).toBe(true);
 
       const zeroToleranceTerms = loader.getZeroToleranceTerms(result.context!);
-      const blockingTerms = zeroToleranceTerms.filter(term =>
-        term.enforcementLevel === 'blocking' || term.zeroTolerance
+      const blockingTerms = zeroToleranceTerms.filter(
+        (term) => term.enforcementLevel === "blocking" || term.zeroTolerance,
       );
 
       expect(blockingTerms.length).toBeGreaterThan(0);
-      expect(blockingTerms.every(term =>
-        term.zeroTolerance === true || term.enforcementLevel === 'blocking'
-      )).toBe(true);
+      expect(
+        blockingTerms.every(
+          (term) =>
+            term.zeroTolerance === true || term.enforcementLevel === "blocking",
+        ),
+      ).toBe(true);
     });
   });
 
-  describe('Format Detection Testing', () => {
-
-    it('Test that .json files are parsed as JSON (primary)', () => {
+  describe("Format Detection Testing", () => {
+    it("Test that .json files are parsed as JSON (primary)", () => {
       const result = detectContentFormat(validJsonCodex);
-      expect(result.format).toBe('json');
+      expect(result.format).toBe("json");
       expect(result.confidence).toBe(1.0);
     });
 
-    it('Verify .md files still work as Markdown fallback', () => {
+    it("Verify .md files still work as Markdown fallback", () => {
       const result = detectContentFormat(markdownCodex);
-      expect(result.format).toBe('markdown');
+      expect(result.format).toBe("markdown");
       expect(result.confidence).toBeGreaterThan(0.1);
     });
 
-    it('Confirm format auto-detection prioritizes JSON', () => {
+    it("Confirm format auto-detection prioritizes JSON", () => {
       const jsonResult = detectContentFormat(validJsonCodex);
-      expect(jsonResult.format).toBe('json');
+      expect(jsonResult.format).toBe("json");
       expect(jsonResult.confidence).toBe(1.0);
 
       const mdResult = detectContentFormat(markdownCodex);
-      expect(mdResult.format).toBe('markdown');
+      expect(mdResult.format).toBe("markdown");
       expect(mdResult.confidence).toBeLessThan(jsonResult.confidence);
     });
 
-    it('Test mixed file scenarios', () => {
-      const mixedContent = validJsonCodex + '\n\n' + markdownCodex;
+    it("Test mixed file scenarios", () => {
+      const mixedContent = validJsonCodex + "\n\n" + markdownCodex;
       const result = detectContentFormat(mixedContent);
 
       // Mixed content may be detected as either format depending on the detection logic
       // The important thing is that it's detected as one of the valid formats
-      expect(['json', 'markdown']).toContain(result.format);
+      expect(["json", "markdown"]).toContain(result.format);
       expect(result.confidence).toBeGreaterThan(0);
     });
   });
 
-  describe('Functional Integration', () => {
-
-    it('Test codex validation in tool execution hooks', () => {
+  describe("Functional Integration", () => {
+    it("Test codex validation in tool execution hooks", () => {
       const hook = createStrRayCodexInjectorHook();
 
       expect(hook).toBeDefined();
-      expect(hook.name).toBe('strray-codex-injector');
+      expect(hook.name).toBe("strray-codex-injector");
       expect(hook.hooks).toBeDefined();
-      expect(hook.hooks['tool.execute.after']).toBeDefined();
+      expect(hook.hooks["tool.execute.after"]).toBeDefined();
     });
 
-    it('Verify agent startup loads JSON codex correctly', () => {
+    it("Verify agent startup loads JSON codex correctly", () => {
       const hook = createStrRayCodexInjectorHook();
-      const sessionId = 'test-session';
+      const sessionId = "test-session";
 
       expect(() => {
-        hook.hooks['agent.start'](sessionId);
+        hook.hooks["agent.start"](sessionId);
       }).not.toThrow();
 
       const stats = getCodexStats(sessionId);
@@ -173,12 +181,12 @@ describe('JSON Codex System - Comprehensive Integration Testing', () => {
       expect(stats.totalTerms).toBeGreaterThan(0);
     });
 
-    it('Confirm session-based codex caching works with JSON', () => {
-      const sessionId = 'cache-test-session';
+    it("Confirm session-based codex caching works with JSON", () => {
+      const sessionId = "cache-test-session";
 
       // First trigger the hook to load codex
       const hook = createStrRayCodexInjectorHook();
-      hook.hooks['agent.start'](sessionId);
+      hook.hooks["agent.start"](sessionId);
 
       const stats1 = getCodexStats(sessionId);
       expect(stats1.loaded).toBe(true);
@@ -191,24 +199,23 @@ describe('JSON Codex System - Comprehensive Integration Testing', () => {
       expect(stats3.loaded).toBe(false);
     });
 
-    it('Test error handling when JSON parsing fails', () => {
-      const result = parseCodexContent(invalidJsonCodex, 'invalid.json');
+    it("Test error handling when JSON parsing fails", () => {
+      const result = parseCodexContent(invalidJsonCodex, "invalid.json");
 
       expect(result.success).toBe(false);
-      expect(result.error).toContain('Failed to parse JSON content');
+      expect(result.error).toContain("Failed to parse JSON content");
       expect(result.warnings).toBeDefined();
     });
   });
 
-  describe('Performance Validation', () => {
-
-    it('Measure JSON parsing performance vs Markdown', () => {
+  describe("Performance Validation", () => {
+    it("Measure JSON parsing performance vs Markdown", () => {
       const startJson = performance.now();
-      const jsonResult = parseCodexContent(validJsonCodex, 'test.json');
+      const jsonResult = parseCodexContent(validJsonCodex, "test.json");
       const jsonTime = performance.now() - startJson;
 
       const startMd = performance.now();
-      const mdResult = parseCodexContent(markdownCodex, 'test.md');
+      const mdResult = parseCodexContent(markdownCodex, "test.md");
       const mdTime = performance.now() - startMd;
 
       expect(jsonResult.success).toBe(true);
@@ -220,7 +227,7 @@ describe('JSON Codex System - Comprehensive Integration Testing', () => {
       console.log(`Markdown parsing: ${mdTime.toFixed(2)}ms`);
     });
 
-    it('Verify startup time remains acceptable', async () => {
+    it("Verify startup time remains acceptable", async () => {
       const startTime = performance.now();
 
       const loader = StrRayContextLoader.getInstance();
@@ -234,16 +241,23 @@ describe('JSON Codex System - Comprehensive Integration Testing', () => {
       console.log(`Codex load time: ${loadTime.toFixed(2)}ms`);
     });
 
-    it('Test memory usage with large JSON codex files', () => {
+    it("Test memory usage with large JSON codex files", () => {
       const largeTerms: any = {};
       for (let i = 1; i <= 100; i++) {
         largeTerms[i.toString()] = {
           number: i,
           title: `Term ${i}`,
           description: `Description for term ${i}. `.repeat(10),
-          category: i <= 10 ? 'core' : i <= 20 ? 'extended' : i <= 30 ? 'architecture' : 'advanced',
+          category:
+            i <= 10
+              ? "core"
+              : i <= 20
+                ? "extended"
+                : i <= 30
+                  ? "architecture"
+                  : "advanced",
           zeroTolerance: i % 10 === 0,
-          enforcementLevel: i % 10 === 0 ? 'blocking' : 'medium'
+          enforcementLevel: i % 10 === 0 ? "blocking" : "medium",
         };
       }
 
@@ -255,11 +269,11 @@ describe('JSON Codex System - Comprehensive Integration Testing', () => {
         principles: [],
         antiPatterns: [],
         validationCriteria: {},
-        frameworkAlignment: {}
+        frameworkAlignment: {},
       });
 
       const startTime = performance.now();
-      const result = parseCodexContent(largeJsonCodex, 'large.json');
+      const result = parseCodexContent(largeJsonCodex, "large.json");
       const parseTime = performance.now() - startTime;
 
       expect(result.success).toBe(true);
@@ -270,9 +284,8 @@ describe('JSON Codex System - Comprehensive Integration Testing', () => {
     });
   });
 
-  describe('End-to-End Testing', () => {
-
-    it('Complete framework initialization with JSON codex', async () => {
+  describe("End-to-End Testing", () => {
+    it("Complete framework initialization with JSON codex", async () => {
       const loader = StrRayContextLoader.getInstance();
       loader.clearCache();
 
@@ -285,7 +298,7 @@ describe('JSON Codex System - Comprehensive Integration Testing', () => {
       expect(result.context!.errorPreventionTarget).toBe(0.996);
     });
 
-    it('Execute tool operations with codex validation', async () => {
+    it("Execute tool operations with codex validation", async () => {
       const loader = StrRayContextLoader.getInstance();
       const result = await loader.loadCodexContext(testProjectRoot);
 
@@ -293,8 +306,8 @@ describe('JSON Codex System - Comprehensive Integration Testing', () => {
 
       const validation = loader.validateAgainstCodex(
         result.context!,
-        'test action',
-        { includesAny: true }
+        "test action",
+        { includesAny: true },
       );
 
       expect(validation).toBeDefined();
@@ -302,7 +315,7 @@ describe('JSON Codex System - Comprehensive Integration Testing', () => {
       expect(validation.recommendations).toBeDefined();
     });
 
-    it('Verify all codex rules are enforced correctly', async () => {
+    it("Verify all codex rules are enforced correctly", async () => {
       const loader = StrRayContextLoader.getInstance();
       const result = await loader.loadCodexContext(testProjectRoot);
 
@@ -310,8 +323,8 @@ describe('JSON Codex System - Comprehensive Integration Testing', () => {
 
       const typeSafetyValidation = loader.validateAgainstCodex(
         result.context!,
-        'using any type',
-        { includesAny: true }
+        "using any type",
+        { includesAny: true },
       );
 
       expect(typeSafetyValidation.violations.length).toBeGreaterThan(0);
@@ -319,24 +332,24 @@ describe('JSON Codex System - Comprehensive Integration Testing', () => {
 
       const todoValidation = loader.validateAgainstCodex(
         result.context!,
-        'TODO: fix this later',
-        { code: 'TODO: fix this later' }
+        "TODO: fix this later",
+        { code: "TODO: fix this later" },
       );
 
       expect(todoValidation.violations.length).toBeGreaterThan(0);
-      expect(todoValidation.violations[0]?.severity).toBe('blocking');
+      expect(todoValidation.violations[0]?.severity).toBe("blocking");
 
       const loopValidation = loader.validateAgainstCodex(
         result.context!,
-        'while(true) loop',
-        { isInfiniteLoop: true }
+        "while(true) loop",
+        { isInfiniteLoop: true },
       );
 
       expect(loopValidation.violations.length).toBeGreaterThan(0);
-      expect(loopValidation.violations[0]?.severity).toBe('blocking');
+      expect(loopValidation.violations[0]?.severity).toBe("blocking");
     });
 
-    it('Confirm no functionality regressions', async () => {
+    it("Confirm no functionality regressions", async () => {
       const loader = StrRayContextLoader.getInstance();
 
       const result = await loader.loadCodexContext(testProjectRoot);
@@ -353,7 +366,7 @@ describe('JSON Codex System - Comprehensive Integration Testing', () => {
 
       const coreTerms = loader.getCoreTerms(context);
       expect(coreTerms.length).toBeGreaterThan(0);
-      expect(coreTerms.every(term => term.category === 'core')).toBe(true);
+      expect(coreTerms.every((term) => term.category === "core")).toBe(true);
 
       const zeroToleranceTerms = loader.getZeroToleranceTerms(context);
       expect(zeroToleranceTerms.length).toBeGreaterThan(0);
@@ -365,9 +378,8 @@ describe('JSON Codex System - Comprehensive Integration Testing', () => {
     });
   });
 
-  describe('Additional Validation Tests', () => {
-
-    it('JSON Syntax Validation', () => {
+  describe("Additional Validation Tests", () => {
+    it("JSON Syntax Validation", () => {
       const validResult = validateJsonSyntax(validJsonCodex);
       expect(validResult.valid).toBe(true);
       expect(validResult.errors).toHaveLength(0);
@@ -377,32 +389,36 @@ describe('JSON Codex System - Comprehensive Integration Testing', () => {
       expect(invalidResult.errors.length).toBeGreaterThan(0);
     });
 
-    it('Codex Metadata Extraction', () => {
+    it("Codex Metadata Extraction", () => {
       const metadata = extractCodexMetadata(validJsonCodex);
       expect(metadata.version).toBe("1.2.22");
       expect(metadata.termCount).toBe(3);
     });
 
-    it('Injector Hook Functionality', () => {
+    it("Injector Hook Functionality", () => {
       const hook = createStrRayCodexInjectorHook();
-      const sessionId = 'hook-test';
+      const sessionId = "hook-test";
 
-      const mockInput = { tool: 'read', args: {} };
-      const mockOutput = { output: 'original output' };
+      const mockInput = { tool: "read", args: {} };
+      const mockOutput = { output: "original output" };
 
-      const result = hook.hooks['tool.execute.after'](mockInput, mockOutput, sessionId);
+      const result = hook.hooks["tool.execute.after"](
+        mockInput,
+        mockOutput,
+        sessionId,
+      );
 
       // Verify hook exists and is callable (hooks are disabled during testing to prevent hangs)
       expect(result).toBeDefined();
-      expect(result.output).toBe('original output'); // In test mode, output is unchanged
+      expect(result.output).toBe("original output"); // In test mode, output is unchanged
     });
 
-    it('Cache Management', () => {
-      const sessionId = 'cache-mgmt-test';
+    it("Cache Management", () => {
+      const sessionId = "cache-mgmt-test";
 
       // First trigger the hook to load codex
       const hook = createStrRayCodexInjectorHook();
-      hook.hooks['agent.start'](sessionId);
+      hook.hooks["agent.start"](sessionId);
 
       const stats1 = getCodexStats(sessionId);
       expect(stats1.loaded).toBe(true);
@@ -412,7 +428,7 @@ describe('JSON Codex System - Comprehensive Integration Testing', () => {
       expect(stats2.loaded).toBe(false);
 
       // Load again
-      hook.hooks['agent.start'](sessionId);
+      hook.hooks["agent.start"](sessionId);
       const stats3 = getCodexStats(sessionId);
       expect(stats3.loaded).toBe(true);
 

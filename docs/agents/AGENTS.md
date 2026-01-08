@@ -29,6 +29,7 @@ Include direct code modification capabilities with surgical precision.
 **Important**: StrRay agents are implemented as TypeScript `AgentConfig` objects in the `src/agents/` directory, not YAML files. oh-my-opencode loads agents from compiled TypeScript modules, not YAML configurations.
 
 Example agent implementation:
+
 ```typescript
 export const agentName: AgentConfig = {
   name: "agent-name",
@@ -38,7 +39,7 @@ export const agentName: AgentConfig = {
   system: "System prompt...",
   temperature: 0.1,
   tools: { include: ["tool1", "tool2"] },
-  permission: { edit: "allow" }
+  permission: { edit: "allow" },
 };
 ```
 

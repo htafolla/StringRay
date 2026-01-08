@@ -29,6 +29,7 @@ The StrRay Framework implements multiple security layers that work together to p
 ### Security by Design Principle
 
 StrRay enforces "Security by Design" through:
+
 - **Secure defaults**: All security features enabled by default
 - **Framework validation**: Automated security checks in CI/CD
 - **Codex compliance**: 45 mandatory security terms enforced
@@ -41,7 +42,7 @@ StrRay enforces "Security by Design" through:
 **Use StrRay's session management patterns:**
 
 ```typescript
-import { SessionManager } from './security/session-manager';
+import { SessionManager } from "./security/session-manager";
 
 class SecureAuthService {
   private sessionManager = new SessionManager();
@@ -50,12 +51,15 @@ class SecureAuthService {
     // Validate input
     if (!this.validateCredentials(credentials)) {
       await this.logFailedAttempt(credentials.username);
-      throw new Error('Invalid credentials');
+      throw new Error("Invalid credentials");
     }
 
     // Create secure session
     const user = await this.getUser(credentials.username);
-    const sessionId = await this.sessionManager.createSecureSession(user.id, user.roles);
+    const sessionId = await this.sessionManager.createSecureSession(
+      user.id,
+      user.roles,
+    );
 
     // Log successful authentication
     await this.logAuthSuccess(user.id, sessionId);
@@ -63,7 +67,7 @@ class SecureAuthService {
     return {
       sessionId,
       user: this.sanitizeUserData(user),
-      expiresAt: Date.now() + (24 * 60 * 60 * 1000) // 24 hours
+      expiresAt: Date.now() + 24 * 60 * 60 * 1000, // 24 hours
     };
   }
 
@@ -72,9 +76,11 @@ class SecureAuthService {
   }
 
   private validateCredentials(credentials: LoginCredentials): boolean {
-    return credentials.username?.length >= 3 &&
-           credentials.password?.length >= 8 &&
-           /^[a-zA-Z0-9_]+$/.test(credentials.username);
+    return (
+      credentials.username?.length >= 3 &&
+      credentials.password?.length >= 8 &&
+      /^[a-zA-Z0-9_]+$/.test(credentials.username)
+    );
   }
 
   private sanitizeUserData(user: User): SanitizedUser {
@@ -90,21 +96,29 @@ class SecureAuthService {
 
 ```typescript
 enum Permission {
-  READ_PROJECTS = 'read:projects',
-  WRITE_PROJECTS = 'write:projects',
-  DELETE_PROJECTS = 'delete:projects',
-  MANAGE_USERS = 'manage:users',
-  ADMIN_SYSTEM = 'admin:system'
+  READ_PROJECTS = "read:projects",
+  WRITE_PROJECTS = "write:projects",
+  DELETE_PROJECTS = "delete:projects",
+  MANAGE_USERS = "manage:users",
+  ADMIN_SYSTEM = "admin:system",
 }
 
 class RBACService {
   private rolePermissions: Record<string, Permission[]> = {
-    'developer': [Permission.READ_PROJECTS, Permission.WRITE_PROJECTS],
-    'project_manager': [Permission.READ_PROJECTS, Permission.WRITE_PROJECTS, Permission.MANAGE_USERS],
-    'admin': Object.values(Permission)
+    developer: [Permission.READ_PROJECTS, Permission.WRITE_PROJECTS],
+    project_manager: [
+      Permission.READ_PROJECTS,
+      Permission.WRITE_PROJECTS,
+      Permission.MANAGE_USERS,
+    ],
+    admin: Object.values(Permission),
   };
 
-  async checkPermission(userId: string, permission: Permission, resource?: string): Promise<boolean> {
+  async checkPermission(
+    userId: string,
+    permission: Permission,
+    resource?: string,
+  ): Promise<boolean> {
     const user = await this.getUser(userId);
     if (!user) return false;
 
@@ -116,7 +130,10 @@ class RBACService {
     }
 
     // Additional resource-specific checks
-    if (resource && !(await this.checkResourceAccess(user, permission, resource))) {
+    if (
+      resource &&
+      !(await this.checkResourceAccess(user, permission, resource))
+    ) {
       await this.logAccessDenied(userId, permission, resource);
       return false;
     }
@@ -124,10 +141,14 @@ class RBACService {
     return true;
   }
 
-  private async checkResourceAccess(user: User, permission: Permission, resource: string): Promise<boolean> {
+  private async checkResourceAccess(
+    user: User,
+    permission: Permission,
+    resource: string,
+  ): Promise<boolean> {
     // Implement resource ownership or sharing logic
     const resourceOwner = await this.getResourceOwner(resource);
-    return resourceOwner === user.id || user.role === 'admin';
+    return resourceOwner === user.id || user.role === "admin";
   }
 }
 ```
@@ -142,15 +163,20 @@ class SecureSessionManager {
   private readonly maxSessionsPerUser = 5;
   private readonly sessionTimeout = 24 * 60 * 60 * 1000; // 24 hours
 
-  async createSession(userId: string, metadata: SessionMetadata): Promise<string> {
+  async createSession(
+    userId: string,
+    metadata: SessionMetadata,
+  ): Promise<string> {
     // Enforce session limits
-    const userSessions = Array.from(this.sessions.values())
-      .filter(session => session.userId === userId);
+    const userSessions = Array.from(this.sessions.values()).filter(
+      (session) => session.userId === userId,
+    );
 
     if (userSessions.length >= this.maxSessionsPerUser) {
       // Remove oldest session
-      const oldestSession = userSessions
-        .sort((a, b) => a.createdAt - b.createdAt)[0];
+      const oldestSession = userSessions.sort(
+        (a, b) => a.createdAt - b.createdAt,
+      )[0];
       this.sessions.delete(oldestSession.id);
     }
 
@@ -162,7 +188,7 @@ class SecureSessionManager {
       expiresAt: Date.now() + this.sessionTimeout,
       ipAddress: metadata.ipAddress,
       userAgent: metadata.userAgent,
-      lastActivity: Date.now()
+      lastActivity: Date.now(),
     };
 
     this.sessions.set(sessionId, session);
@@ -210,18 +236,26 @@ class InputValidator {
   // Schema-based validation
   private schemas = {
     userProfile: {
-      username: { type: 'string', minLength: 3, maxLength: 50, pattern: /^[a-zA-Z0-9_]+$/ },
-      email: { type: 'string', format: 'email' },
-      age: { type: 'number', minimum: 13, maximum: 120 }
+      username: {
+        type: "string",
+        minLength: 3,
+        maxLength: 50,
+        pattern: /^[a-zA-Z0-9_]+$/,
+      },
+      email: { type: "string", format: "email" },
+      age: { type: "number", minimum: 13, maximum: 120 },
     },
     projectCreate: {
-      name: { type: 'string', minLength: 1, maxLength: 100 },
-      description: { type: 'string', maxLength: 1000 },
-      visibility: { type: 'string', enum: ['public', 'private', 'internal'] }
-    }
+      name: { type: "string", minLength: 1, maxLength: 100 },
+      description: { type: "string", maxLength: 1000 },
+      visibility: { type: "string", enum: ["public", "private", "internal"] },
+    },
   };
 
-  async validate<T>(data: any, schemaName: string): Promise<ValidationResult<T>> {
+  async validate<T>(
+    data: any,
+    schemaName: string,
+  ): Promise<ValidationResult<T>> {
     const schema = this.schemas[schemaName];
     if (!schema) {
       throw new Error(`Unknown validation schema: ${schemaName}`);
@@ -243,7 +277,8 @@ class InputValidator {
     return {
       isValid: errors.length === 0,
       errors,
-      sanitizedData: errors.length === 0 ? this.sanitizeData(data, schemaName) : null
+      sanitizedData:
+        errors.length === 0 ? this.sanitizeData(data, schemaName) : null,
     };
   }
 
@@ -262,7 +297,7 @@ class InputValidator {
     }
 
     // String validations
-    if (rules.type === 'string' && typeof value === 'string') {
+    if (rules.type === "string" && typeof value === "string") {
       if (rules.minLength && value.length < rules.minLength) {
         errors.push(`${field} must be at least ${rules.minLength} characters`);
       }
@@ -275,7 +310,7 @@ class InputValidator {
     }
 
     // Number validations
-    if (rules.type === 'number' && typeof value === 'number') {
+    if (rules.type === "number" && typeof value === "number") {
       if (rules.minimum !== undefined && value < rules.minimum) {
         errors.push(`${field} must be at least ${rules.minimum}`);
       }
@@ -286,29 +321,32 @@ class InputValidator {
 
     // Enum validation
     if (rules.enum && !rules.enum.includes(value)) {
-      errors.push(`${field} must be one of: ${rules.enum.join(', ')}`);
+      errors.push(`${field} must be one of: ${rules.enum.join(", ")}`);
     }
 
     return errors;
   }
 
-  private async validateBusinessLogic(data: any, schemaName: string): Promise<string[]> {
+  private async validateBusinessLogic(
+    data: any,
+    schemaName: string,
+  ): Promise<string[]> {
     const errors: string[] = [];
 
     switch (schemaName) {
-      case 'userProfile':
+      case "userProfile":
         if (data.username) {
           const existingUser = await this.checkUsernameExists(data.username);
           if (existingUser) {
-            errors.push('Username already exists');
+            errors.push("Username already exists");
           }
         }
         break;
-      case 'projectCreate':
+      case "projectCreate":
         if (data.name) {
           const existingProject = await this.checkProjectExists(data.name);
           if (existingProject) {
-            errors.push('Project name already exists');
+            errors.push("Project name already exists");
           }
         }
         break;
@@ -322,8 +360,8 @@ class InputValidator {
 
     // HTML escaping for string fields
     for (const [field, rules] of Object.entries(this.schemas[schemaName])) {
-      if (rules.type === 'string' && typeof sanitized[field] === 'string') {
-        sanitized[field] = sanitized[field].replace(/[<>]/g, '');
+      if (rules.type === "string" && typeof sanitized[field] === "string") {
+        sanitized[field] = sanitized[field].replace(/[<>]/g, "");
       }
     }
 
@@ -357,35 +395,35 @@ class DataSanitizer {
   // HTML sanitization
   sanitizeHtml(input: string): string {
     return input
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#x27;')
-      .replace(/\//g, '&#x2F;');
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#x27;")
+      .replace(/\//g, "&#x2F;");
   }
 
   // SQL-safe escaping (for cases where parameterized queries aren't available)
   sanitizeSql(input: string): string {
-    return input.replace(/['\\]/g, '\\$&');
+    return input.replace(/['\\]/g, "\\$&");
   }
 
   // File path sanitization
   sanitizePath(input: string): string {
     // Remove dangerous path components
     return input
-      .replace(/\.\./g, '') // Remove directory traversal
-      .replace(/[<>:"|?*]/g, '') // Remove Windows forbidden chars
-      .replace(/^\//, '') // Remove leading slash
+      .replace(/\.\./g, "") // Remove directory traversal
+      .replace(/[<>:"|?*]/g, "") // Remove Windows forbidden chars
+      .replace(/^\//, "") // Remove leading slash
       .substring(0, 255); // Limit length
   }
 
   // Log sanitization (prevent log injection)
   sanitizeForLogging(data: any): any {
-    if (typeof data === 'string') {
-      return data.replace(/[\r\n]/g, ' ');
+    if (typeof data === "string") {
+      return data.replace(/[\r\n]/g, " ");
     }
-    if (typeof data === 'object' && data !== null) {
+    if (typeof data === "object" && data !== null) {
       const sanitized = { ...data };
       // Remove sensitive fields
       delete sanitized.password;
@@ -407,28 +445,28 @@ class DataSanitizer {
 ```typescript
 // Secure plugin structure
 export class SecurePlugin {
-  name = 'secure-data-processor';
-  version = '1.0.0';
-  description = 'Processes sensitive data securely';
+  name = "secure-data-processor";
+  version = "1.0.0";
+  description = "Processes sensitive data securely";
 
   // Declare minimal required permissions
   permissions = [
-    'read:secure-data',
-    'write:processed-data'
+    "read:secure-data",
+    "write:processed-data",
     // Avoid requesting excessive permissions
   ];
 
   // Resource limits (framework-enforced)
   resourceLimits = {
-    memory: '50MB',
-    timeout: '30s',
-    maxConcurrent: 5
+    memory: "50MB",
+    timeout: "30s",
+    maxConcurrent: 5,
   };
 
   async initialize(context: PluginContext): Promise<void> {
     // Validate context
     if (!context.config.apiKey) {
-      throw new Error('API key required for plugin initialization');
+      throw new Error("API key required for plugin initialization");
     }
 
     // Initialize securely
@@ -438,7 +476,7 @@ export class SecurePlugin {
   async execute(input: PluginInput): Promise<PluginOutput> {
     // Input validation
     if (!this.validateInput(input)) {
-      throw new Error('Invalid input data');
+      throw new Error("Invalid input data");
     }
 
     try {
@@ -446,30 +484,32 @@ export class SecurePlugin {
       const result = await this.processData(input);
 
       // Log securely (no sensitive data)
-      context.logger.info('Data processed successfully', {
+      context.logger.info("Data processed successfully", {
         recordCount: result.recordsProcessed,
-        processingTime: result.duration
+        processingTime: result.duration,
       });
 
       return result;
     } catch (error) {
       // Secure error handling
-      context.logger.error('Processing failed', {
+      context.logger.error("Processing failed", {
         error: error.message,
-        inputSize: input.data?.length
+        inputSize: input.data?.length,
         // Don't log sensitive input data
       });
-      throw new Error('Data processing failed');
+      throw new Error("Data processing failed");
     }
   }
 
   private validateInput(input: PluginInput): boolean {
-    return input &&
-           typeof input === 'object' &&
-           input.data &&
-           Array.isArray(input.data) &&
-           input.data.length > 0 &&
-           input.data.length <= 1000; // Reasonable limit
+    return (
+      input &&
+      typeof input === "object" &&
+      input.data &&
+      Array.isArray(input.data) &&
+      input.data.length > 0 &&
+      input.data.length <= 1000
+    ); // Reasonable limit
   }
 
   private createSecureClient(apiKey: string) {
@@ -481,7 +521,7 @@ export class SecurePlugin {
         // - Validate SSL certificates
         // - Implement retry logic
         // - Add request timeouts
-      }
+      },
     };
   }
 
@@ -506,23 +546,28 @@ class PluginPermissionManager {
   registerPlugin(pluginId: string, permissions: string[]): void {
     // Validate permissions are reasonable
     const allowedPermissions = [
-      'read:public-data',
-      'read:secure-data',
-      'write:processed-data',
-      'network:external-api',
-      'storage:temp'
+      "read:public-data",
+      "read:secure-data",
+      "write:processed-data",
+      "network:external-api",
+      "storage:temp",
     ];
 
-    const validPermissions = permissions.filter(p => allowedPermissions.includes(p));
+    const validPermissions = permissions.filter((p) =>
+      allowedPermissions.includes(p),
+    );
 
     if (validPermissions.length !== permissions.length) {
-      throw new Error('Invalid permissions requested by plugin');
+      throw new Error("Invalid permissions requested by plugin");
     }
 
     this.pluginPermissions.set(pluginId, validPermissions);
   }
 
-  async checkPermission(pluginId: string, permission: string): Promise<boolean> {
+  async checkPermission(
+    pluginId: string,
+    permission: string,
+  ): Promise<boolean> {
     const permissions = this.pluginPermissions.get(pluginId) || [];
     return permissions.includes(permission);
   }
@@ -530,21 +575,27 @@ class PluginPermissionManager {
   async executeWithPermission<T>(
     pluginId: string,
     permission: string,
-    action: () => Promise<T>
+    action: () => Promise<T>,
   ): Promise<T> {
     if (!(await this.checkPermission(pluginId, permission))) {
       throw new Error(`Plugin ${pluginId} lacks permission: ${permission}`);
     }
 
     // Audit the permission usage
-    await this.auditLog(pluginId, permission, 'granted');
+    await this.auditLog(pluginId, permission, "granted");
 
     return await action();
   }
 
-  private async auditLog(pluginId: string, permission: string, action: string): Promise<void> {
+  private async auditLog(
+    pluginId: string,
+    permission: string,
+    action: string,
+  ): Promise<void> {
     // Log permission usage for security monitoring
-    console.log(`[AUDIT] Plugin ${pluginId} ${action} permission: ${permission}`);
+    console.log(
+      `[AUDIT] Plugin ${pluginId} ${action} permission: ${permission}`,
+    );
   }
 }
 ```
@@ -556,10 +607,10 @@ class PluginPermissionManager {
 **Implement encryption at rest:**
 
 ```typescript
-import { createCipher, createDecipher, randomBytes, scrypt } from 'crypto';
+import { createCipher, createDecipher, randomBytes, scrypt } from "crypto";
 
 class DataEncryption {
-  private algorithm = 'aes-256-gcm';
+  private algorithm = "aes-256-gcm";
   private keyLength = 32;
 
   async encryptData(data: string, password: string): Promise<EncryptedData> {
@@ -572,39 +623,47 @@ class DataEncryption {
 
     // Create cipher
     const cipher = createCipher(this.algorithm, key);
-    cipher.setAAD(Buffer.from('additional-auth-data'));
+    cipher.setAAD(Buffer.from("additional-auth-data"));
 
-    let encrypted = cipher.update(data, 'utf8', 'hex');
-    encrypted += cipher.final('hex');
+    let encrypted = cipher.update(data, "utf8", "hex");
+    encrypted += cipher.final("hex");
 
     const authTag = cipher.getAuthTag();
 
     return {
       encrypted,
-      iv: iv.toString('hex'),
-      salt: salt.toString('hex'),
-      authTag: authTag.toString('hex')
+      iv: iv.toString("hex"),
+      salt: salt.toString("hex"),
+      authTag: authTag.toString("hex"),
     };
   }
 
-  async decryptData(encryptedData: EncryptedData, password: string): Promise<string> {
+  async decryptData(
+    encryptedData: EncryptedData,
+    password: string,
+  ): Promise<string> {
     // Derive key from password
     const key = await this.deriveKey(password, encryptedData.salt);
 
     // Create decipher
     const decipher = createDecipher(this.algorithm, key);
-    decipher.setAAD(Buffer.from('additional-auth-data'));
-    decipher.setAuthTag(Buffer.from(encryptedData.authTag, 'hex'));
+    decipher.setAAD(Buffer.from("additional-auth-data"));
+    decipher.setAuthTag(Buffer.from(encryptedData.authTag, "hex"));
 
-    let decrypted = decipher.update(encryptedData.encrypted, 'hex', 'utf8');
-    decrypted += decipher.final('utf8');
+    let decrypted = decipher.update(encryptedData.encrypted, "hex", "utf8");
+    decrypted += decipher.final("utf8");
 
     return decrypted;
   }
 
-  private async deriveKey(password: string, salt: Buffer | string): Promise<Buffer> {
+  private async deriveKey(
+    password: string,
+    salt: Buffer | string,
+  ): Promise<Buffer> {
     return new Promise((resolve, reject) => {
-      const saltBuffer = Buffer.isBuffer(salt) ? salt : Buffer.from(salt, 'hex');
+      const saltBuffer = Buffer.isBuffer(salt)
+        ? salt
+        : Buffer.from(salt, "hex");
       scrypt(password, saltBuffer, this.keyLength, (err, derivedKey) => {
         if (err) reject(err);
         else resolve(derivedKey);
@@ -626,8 +685,8 @@ interface EncryptedData {
 **Implement HTTPS and secure API communication:**
 
 ```typescript
-import * as https from 'https';
-import * as tls from 'tls';
+import * as https from "https";
+import * as tls from "tls";
 
 class SecureHttpClient {
   private readonly caCertificate: string;
@@ -646,10 +705,10 @@ class SecureHttpClient {
         hostname: options.hostname,
         port: 443,
         path: options.path,
-        method: options.method || 'GET',
+        method: options.method || "GET",
         headers: {
-          'User-Agent': 'StrRay-Secure-Client/1.0',
-          ...options.headers
+          "User-Agent": "StrRay-Secure-Client/1.0",
+          ...options.headers,
         },
         // Security configurations
         rejectUnauthorized: true, // Reject invalid certificates
@@ -663,12 +722,12 @@ class SecureHttpClient {
         // Timeout protection
         timeout: 30000, // 30 seconds
         // Cipher suite restrictions
-        ciphers: 'ECDHE-RSA-AES128-GCM-SHA256:!RC4:!MD5:!DSS',
-        secureProtocol: 'TLSv1_2_method'
+        ciphers: "ECDHE-RSA-AES128-GCM-SHA256:!RC4:!MD5:!DSS",
+        secureProtocol: "TLSv1_2_method",
       };
 
       const req = https.request(requestOptions, (res) => {
-        let data = '';
+        let data = "";
 
         // Validate response
         if (res.statusCode !== 200) {
@@ -676,27 +735,27 @@ class SecureHttpClient {
           return;
         }
 
-        res.on('data', (chunk) => {
+        res.on("data", (chunk) => {
           data += chunk;
         });
 
-        res.on('end', () => {
+        res.on("end", () => {
           try {
             const parsed = JSON.parse(data);
             resolve(parsed);
           } catch (error) {
-            reject(new Error('Invalid JSON response'));
+            reject(new Error("Invalid JSON response"));
           }
         });
       });
 
-      req.on('error', (error) => {
+      req.on("error", (error) => {
         reject(new Error(`Request failed: ${error.message}`));
       });
 
-      req.on('timeout', () => {
+      req.on("timeout", () => {
         req.destroy();
-        reject(new Error('Request timeout'));
+        reject(new Error("Request timeout"));
       });
 
       // Send request body if provided
@@ -732,22 +791,22 @@ interface RequestOptions {
 
 ```typescript
 enum SecurityEventType {
-  AUTH_SUCCESS = 'auth_success',
-  AUTH_FAILURE = 'auth_failure',
-  ACCESS_DENIED = 'access_denied',
-  SUSPICIOUS_ACTIVITY = 'suspicious_activity',
-  DATA_ACCESS = 'data_access',
-  CONFIG_CHANGE = 'config_change'
+  AUTH_SUCCESS = "auth_success",
+  AUTH_FAILURE = "auth_failure",
+  ACCESS_DENIED = "access_denied",
+  SUSPICIOUS_ACTIVITY = "suspicious_activity",
+  DATA_ACCESS = "data_access",
+  CONFIG_CHANGE = "config_change",
 }
 
 class SecurityLogger {
-  private logFile = '/var/log/strray/security.log';
+  private logFile = "/var/log/strray/security.log";
   private maxFileSize = 10 * 1024 * 1024; // 10MB
   private maxFiles = 5;
 
   async logSecurityEvent(
     eventType: SecurityEventType,
-    details: SecurityEventDetails
+    details: SecurityEventDetails,
   ): Promise<void> {
     const event = {
       timestamp: new Date().toISOString(),
@@ -759,7 +818,7 @@ class SecurityLogger {
       resource: details.resource,
       action: details.action,
       success: details.success,
-      metadata: this.sanitizeMetadata(details.metadata)
+      metadata: this.sanitizeMetadata(details.metadata),
     };
 
     // Write to log file
@@ -821,13 +880,20 @@ class SecurityLogger {
     return 0; // Placeholder
   }
 
-  private async alertBruteForce(userId: string, ipAddress: string): Promise<void> {
-    console.error(`[ALERT] Brute force attack detected for user ${userId} from ${ipAddress}`);
+  private async alertBruteForce(
+    userId: string,
+    ipAddress: string,
+  ): Promise<void> {
+    console.error(
+      `[ALERT] Brute force attack detected for user ${userId} from ${ipAddress}`,
+    );
     // Implement alerting logic (email, Slack, etc.)
   }
 
   private async alertPotentialAttack(userId: string): Promise<void> {
-    console.error(`[ALERT] Potential attack pattern detected for user ${userId}`);
+    console.error(
+      `[ALERT] Potential attack pattern detected for user ${userId}`,
+    );
     // Implement alerting logic
   }
 }
@@ -865,7 +931,7 @@ class SecurityMonitor {
       this.checkSuspiciousFileAccess(),
       this.checkResourceUsage(),
       this.checkConfigurationChanges(),
-      this.checkDependencyVulnerabilities()
+      this.checkDependencyVulnerabilities(),
     ]);
   }
 
@@ -874,10 +940,10 @@ class SecurityMonitor {
 
     if (recentFailures >= 10) {
       this.createAlert({
-        severity: 'high',
-        type: 'brute_force_attempt',
+        severity: "high",
+        type: "brute_force_attempt",
         message: `${recentFailures} failed authentications in 5 minutes`,
-        details: { count: recentFailures }
+        details: { count: recentFailures },
       });
     }
   }
@@ -887,10 +953,10 @@ class SecurityMonitor {
 
     for (const access of suspiciousAccess) {
       this.createAlert({
-        severity: 'medium',
-        type: 'suspicious_file_access',
+        severity: "medium",
+        type: "suspicious_file_access",
         message: `Suspicious file access: ${access.file}`,
-        details: access
+        details: access,
       });
     }
   }
@@ -898,12 +964,13 @@ class SecurityMonitor {
   private async checkResourceUsage(): Promise<void> {
     const usage = await this.getResourceUsage();
 
-    if (usage.memory > 0.9) { // 90% memory usage
+    if (usage.memory > 0.9) {
+      // 90% memory usage
       this.createAlert({
-        severity: 'medium',
-        type: 'high_memory_usage',
+        severity: "medium",
+        type: "high_memory_usage",
         message: `High memory usage: ${(usage.memory * 100).toFixed(1)}%`,
-        details: usage
+        details: usage,
       });
     }
   }
@@ -913,10 +980,10 @@ class SecurityMonitor {
 
     for (const change of changes) {
       this.createAlert({
-        severity: 'low',
-        type: 'configuration_change',
+        severity: "low",
+        type: "configuration_change",
         message: `Configuration changed: ${change.file}`,
-        details: change
+        details: change,
       });
     }
   }
@@ -927,19 +994,19 @@ class SecurityMonitor {
 
     if (auditResult.vulnerabilities > 0) {
       this.createAlert({
-        severity: 'high',
-        type: 'dependency_vulnerabilities',
+        severity: "high",
+        type: "dependency_vulnerabilities",
         message: `${auditResult.vulnerabilities} dependency vulnerabilities found`,
-        details: auditResult
+        details: auditResult,
       });
     }
   }
 
-  private createAlert(alert: Omit<Alert, 'id' | 'timestamp'>): void {
+  private createAlert(alert: Omit<Alert, "id" | "timestamp">): void {
     const newAlert: Alert = {
       ...alert,
       id: crypto.randomUUID(),
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
 
     this.alerts.push(newAlert);
@@ -950,21 +1017,33 @@ class SecurityMonitor {
 
   private sendAlert(alert: Alert): void {
     // Implement alert delivery (email, Slack, webhook, etc.)
-    console.error(`[SECURITY ALERT] ${alert.severity.toUpperCase()}: ${alert.message}`);
+    console.error(
+      `[SECURITY ALERT] ${alert.severity.toUpperCase()}: ${alert.message}`,
+    );
   }
 
   // Placeholder implementations
-  private async getFailedAuthentications(timeWindow: number): Promise<number> { return 0; }
-  private async getSuspiciousFileAccess(timeWindow: number): Promise<any[]> { return []; }
-  private async getResourceUsage(): Promise<any> { return { memory: 0.5 }; }
-  private async getRecentConfigChanges(timeWindow: number): Promise<any[]> { return []; }
-  private async runDependencyAudit(): Promise<any> { return { vulnerabilities: 0 }; }
+  private async getFailedAuthentications(timeWindow: number): Promise<number> {
+    return 0;
+  }
+  private async getSuspiciousFileAccess(timeWindow: number): Promise<any[]> {
+    return [];
+  }
+  private async getResourceUsage(): Promise<any> {
+    return { memory: 0.5 };
+  }
+  private async getRecentConfigChanges(timeWindow: number): Promise<any[]> {
+    return [];
+  }
+  private async runDependencyAudit(): Promise<any> {
+    return { vulnerabilities: 0 };
+  }
 }
 
 interface Alert {
   id: string;
   timestamp: string;
-  severity: 'low' | 'medium' | 'high' | 'critical';
+  severity: "low" | "medium" | "high" | "critical";
   type: string;
   message: string;
   details: any;
@@ -980,8 +1059,8 @@ interface Alert {
 ```typescript
 class SecureConfig {
   private config: any = {};
-  private readonly configFile = '/etc/strray/config.json';
-  private readonly backupDir = '/etc/strray/backups/';
+  private readonly configFile = "/etc/strray/config.json";
+  private readonly backupDir = "/etc/strray/backups/";
 
   async loadConfig(): Promise<void> {
     // Validate file permissions
@@ -1004,20 +1083,21 @@ class SecureConfig {
     const stats = await fs.promises.stat(this.configFile);
 
     // Check ownership (should be root or strray user)
-    if (stats.uid !== 0 && stats.uid !== 1000) { // Adjust UIDs as needed
-      throw new Error('Config file has incorrect ownership');
+    if (stats.uid !== 0 && stats.uid !== 1000) {
+      // Adjust UIDs as needed
+      throw new Error("Config file has incorrect ownership");
     }
 
     // Check permissions (should be 600 or 640)
-    const permissions = (stats.mode & parseInt('777', 8)).toString(8);
-    if (!['600', '640'].includes(permissions)) {
-      throw new Error('Config file has incorrect permissions');
+    const permissions = (stats.mode & parseInt("777", 8)).toString(8);
+    if (!["600", "640"].includes(permissions)) {
+      throw new Error("Config file has incorrect permissions");
     }
   }
 
   private async readConfigFile(): Promise<string> {
     try {
-      return await fs.promises.readFile(this.configFile, 'utf8');
+      return await fs.promises.readFile(this.configFile, "utf8");
     } catch (error) {
       throw new Error(`Failed to read config file: ${error.message}`);
     }
@@ -1028,7 +1108,7 @@ class SecureConfig {
       const config = JSON.parse(configData);
 
       // Required fields
-      const requiredFields = ['database', 'security', 'logging'];
+      const requiredFields = ["database", "security", "logging"];
       for (const field of requiredFields) {
         if (!(field in config)) {
           throw new Error(`Missing required config field: ${field}`);
@@ -1039,10 +1119,9 @@ class SecureConfig {
       this.validateDatabaseConfig(config.database);
       this.validateSecurityConfig(config.security);
       this.validateLoggingConfig(config.logging);
-
     } catch (error) {
       if (error instanceof SyntaxError) {
-        throw new Error('Config file contains invalid JSON');
+        throw new Error("Config file contains invalid JSON");
       }
       throw error;
     }
@@ -1050,20 +1129,20 @@ class SecureConfig {
 
   private validateDatabaseConfig(dbConfig: any): void {
     if (!dbConfig.host || !dbConfig.database) {
-      throw new Error('Database configuration incomplete');
+      throw new Error("Database configuration incomplete");
     }
   }
 
   private validateSecurityConfig(secConfig: any): void {
     if (secConfig.encryptionKey?.length < 32) {
-      throw new Error('Encryption key too short (minimum 32 characters)');
+      throw new Error("Encryption key too short (minimum 32 characters)");
     }
   }
 
   private validateLoggingConfig(logConfig: any): void {
-    const validLevels = ['error', 'warn', 'info', 'debug'];
+    const validLevels = ["error", "warn", "info", "debug"];
     if (!validLevels.includes(logConfig.level)) {
-      throw new Error('Invalid log level');
+      throw new Error("Invalid log level");
     }
   }
 
@@ -1072,10 +1151,14 @@ class SecureConfig {
 
     // Decrypt encrypted fields
     if (config.database?.password) {
-      decrypted.database.password = await this.decryptValue(config.database.password);
+      decrypted.database.password = await this.decryptValue(
+        config.database.password,
+      );
     }
     if (config.security?.apiKey) {
-      decrypted.security.apiKey = await this.decryptValue(config.security.apiKey);
+      decrypted.security.apiKey = await this.decryptValue(
+        config.security.apiKey,
+      );
     }
 
     return decrypted;
@@ -1088,12 +1171,16 @@ class SecureConfig {
 
   private validateConfigValues(): void {
     // Business logic validation
-    if (this.config.database?.port < 1024 || this.config.database?.port > 65535) {
-      throw new Error('Database port out of valid range');
+    if (
+      this.config.database?.port < 1024 ||
+      this.config.database?.port > 65535
+    ) {
+      throw new Error("Database port out of valid range");
     }
 
-    if (this.config.security?.sessionTimeout < 300000) { // 5 minutes minimum
-      throw new Error('Session timeout too short');
+    if (this.config.security?.sessionTimeout < 300000) {
+      // 5 minutes minimum
+      throw new Error("Session timeout too short");
     }
   }
 
@@ -1108,14 +1195,17 @@ class SecureConfig {
     const encryptedConfig = await this.encryptSensitiveValues(newConfig);
 
     // Write configuration
-    await fs.promises.writeFile(this.configFile, JSON.stringify(encryptedConfig, null, 2));
+    await fs.promises.writeFile(
+      this.configFile,
+      JSON.stringify(encryptedConfig, null, 2),
+    );
 
     // Update in-memory config
     this.config = newConfig;
   }
 
   private async createBackup(): Promise<void> {
-    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
     const backupFile = `${this.backupDir}config-${timestamp}.json`;
 
     await fs.promises.copyFile(this.configFile, backupFile);
@@ -1127,7 +1217,7 @@ class SecureConfig {
   }
 
   get(key: string): any {
-    return key.split('.').reduce((obj, k) => obj?.[k], this.config);
+    return key.split(".").reduce((obj, k) => obj?.[k], this.config);
   }
 }
 ```
@@ -1171,16 +1261,17 @@ class DependencySecurity {
       npmAudit: auditResult,
       customChecks,
       overallRisk: this.calculateOverallRisk(auditResult, customChecks),
-      recommendations: this.generateRecommendations(auditResult, customChecks)
+      recommendations: this.generateRecommendations(auditResult, customChecks),
     };
   }
 
   private async runNpmAudit(): Promise<any> {
     // Run npm audit and parse results
-    const { exec } = require('child_process');
+    const { exec } = require("child_process");
     return new Promise((resolve, reject) => {
-      exec('npm audit --json', (error, stdout, stderr) => {
-        if (error && error.code !== 1) { // Code 1 means vulnerabilities found
+      exec("npm audit --json", (error, stdout, stderr) => {
+        if (error && error.code !== 1) {
+          // Code 1 means vulnerabilities found
           reject(error);
           return;
         }
@@ -1198,7 +1289,7 @@ class DependencySecurity {
     const checks = [
       this.checkForInsecureImports(),
       this.checkForHardcodedSecrets(),
-      this.checkForDangerousPatterns()
+      this.checkForDangerousPatterns(),
     ];
 
     return await Promise.all(checks);
@@ -1206,26 +1297,29 @@ class DependencySecurity {
 
   private async checkForInsecureImports(): Promise<any> {
     // Check for potentially dangerous imports
-    const dangerousImports = ['eval', 'child_process', 'fs', 'net'];
+    const dangerousImports = ["eval", "child_process", "fs", "net"];
     // Implementation would scan codebase
-    return { type: 'insecure_imports', findings: [] };
+    return { type: "insecure_imports", findings: [] };
   }
 
   private async checkForHardcodedSecrets(): Promise<any> {
     // Check for hardcoded secrets
     const secretPatterns = [/password\s*[:=]/, /api[_-]?key\s*[:=]/];
     // Implementation would scan codebase
-    return { type: 'hardcoded_secrets', findings: [] };
+    return { type: "hardcoded_secrets", findings: [] };
   }
 
   private async checkForDangerousPatterns(): Promise<any> {
     // Check for dangerous code patterns
     const patterns = [/eval\s*\(/, /Function\s*\(/, /setTimeout.*0/];
     // Implementation would scan codebase
-    return { type: 'dangerous_patterns', findings: [] };
+    return { type: "dangerous_patterns", findings: [] };
   }
 
-  private calculateOverallRisk(npmAudit: any, customChecks: any[]): 'low' | 'medium' | 'high' | 'critical' {
+  private calculateOverallRisk(
+    npmAudit: any,
+    customChecks: any[],
+  ): "low" | "medium" | "high" | "critical" {
     let riskScore = 0;
 
     // NPM audit scoring
@@ -1242,25 +1336,32 @@ class DependencySecurity {
       riskScore += check.findings.length * 3;
     }
 
-    if (riskScore >= 20) return 'critical';
-    if (riskScore >= 10) return 'high';
-    if (riskScore >= 5) return 'medium';
-    return 'low';
+    if (riskScore >= 20) return "critical";
+    if (riskScore >= 10) return "high";
+    if (riskScore >= 5) return "medium";
+    return "low";
   }
 
-  private generateRecommendations(npmAudit: any, customChecks: any[]): string[] {
+  private generateRecommendations(
+    npmAudit: any,
+    customChecks: any[],
+  ): string[] {
     const recommendations: string[] = [];
 
     if (npmAudit.metadata?.vulnerabilities) {
       const vuln = npmAudit.metadata.vulnerabilities;
       if (vuln.critical > 0 || vuln.high > 0) {
-        recommendations.push('Update dependencies with critical/high vulnerabilities immediately');
+        recommendations.push(
+          "Update dependencies with critical/high vulnerabilities immediately",
+        );
       }
     }
 
     for (const check of customChecks) {
       if (check.findings.length > 0) {
-        recommendations.push(`${check.type}: ${check.findings.length} issues found`);
+        recommendations.push(
+          `${check.type}: ${check.findings.length} issues found`,
+        );
       }
     }
 
@@ -1271,7 +1372,7 @@ class DependencySecurity {
 interface VulnerabilityReport {
   npmAudit: any;
   customChecks: any[];
-  overallRisk: 'low' | 'medium' | 'high' | 'critical';
+  overallRisk: "low" | "medium" | "high" | "critical";
   recommendations: string[];
 }
 ```

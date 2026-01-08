@@ -73,6 +73,7 @@ export const loadHooks = () => import("./hooks");
 ```
 
 **Responsibilities:**
+
 - Codex injection and context loading
 - Lazy loading of advanced features for bundle optimization
 - Unified API surface for framework consumers
@@ -80,6 +81,7 @@ export const loadHooks = () => import("./hooks");
 ### Boot Orchestrator (`src/boot-orchestrator.ts`)
 
 **Initialization Sequence:**
+
 1. Codex validation and injection
 2. Agent discovery and loading
 3. Configuration validation
@@ -87,6 +89,7 @@ export const loadHooks = () => import("./hooks");
 5. Monitoring system startup
 
 **Key Features:**
+
 - Dependency resolution and ordering
 - Health checks and readiness validation
 - Graceful degradation on component failures
@@ -94,6 +97,7 @@ export const loadHooks = () => import("./hooks");
 ### State Management System (`src/state/`)
 
 **Architecture:**
+
 ```
 StateManager (Central coordinator)
 ├── ContextProviders (React context integration)
@@ -103,6 +107,7 @@ StateManager (Central coordinator)
 ```
 
 **Features:**
+
 - Centralized state management
 - Session isolation and lifecycle
 - Cross-agent state sharing
@@ -128,25 +133,28 @@ Sisyphus (Command Center)
 ### Agent Communication Patterns
 
 #### Direct Communication
+
 ```typescript
 // Agent-to-agent direct calls
 const result = await enforcer.validateCompliance(code);
 ```
 
 #### Orchestrated Communication
+
 ```typescript
 // Through Sisyphus orchestrator
 const coordinatedResult = await sisyphus.orchestrateTask({
   task: "code-review",
   agents: ["enforcer", "architect", "code-reviewer"],
-  strategy: "consensus"
+  strategy: "consensus",
 });
 ```
 
 #### Event-Driven Communication
+
 ```typescript
 // Event-based coordination
-orchestrator.on('task-complete', (result) => {
+orchestrator.on("task-complete", (result) => {
   // Handle completion
 });
 ```
@@ -226,21 +234,25 @@ Dashboard Update
 ### Defense in Depth Layers
 
 #### 1. Plugin Sandboxing
+
 - **VM Isolation**: Separate execution contexts
 - **Resource Limits**: Memory, CPU, and timeout constraints
 - **Permission Validation**: Capability-based access control
 
 #### 2. Authentication & Authorization
+
 - **Multi-Factor Authentication**: Enhanced security for sensitive operations
 - **Role-Based Access Control**: Granular permissions per user/agent
 - **Session Security**: Secure session management with automatic expiration
 
 #### 3. Input Validation & Sanitization
+
 - **Schema Validation**: Zod-based request validation
 - **Content Sanitization**: XSS and injection prevention
 - **Type Safety**: TypeScript strict mode enforcement
 
 #### 4. Network Security
+
 - **HTTPS Enforcement**: TLS 1.3+ required
 - **Rate Limiting**: DDoS protection and abuse prevention
 - **CORS Configuration**: Strict origin policies
@@ -248,11 +260,13 @@ Dashboard Update
 ### Security Monitoring
 
 #### Real-time Threat Detection
+
 - **Pattern Matching**: Known vulnerability signatures
 - **Anomaly Detection**: Statistical analysis of system behavior
 - **Audit Logging**: Comprehensive security event tracking
 
 #### Automated Response
+
 - **Circuit Breakers**: Automatic system protection
 - **Alert Escalation**: Severity-based notification routing
 - **Incident Response**: Automated remediation workflows
@@ -267,28 +281,31 @@ Dashboard Update
 const PERFORMANCE_BUDGET = {
   bundleSize: { uncompressed: 2 * 1024 * 1024, gzipped: 700 * 1024 },
   webVitals: {
-    firstContentfulPaint: 2000,    // 2s
-    timeToInteractive: 5000,       // 5s
-    largestContentfulPaint: 2500,  // 2.5s
-    cumulativeLayoutShift: 0.1,    // 0.1
-    firstInputDelay: 100           // 100ms
-  }
+    firstContentfulPaint: 2000, // 2s
+    timeToInteractive: 5000, // 5s
+    largestContentfulPaint: 2500, // 2.5s
+    cumulativeLayoutShift: 0.1, // 0.1
+    firstInputDelay: 100, // 100ms
+  },
 };
 ```
 
 ### Optimization Strategies
 
 #### Bundle Optimization
+
 - **Lazy Loading**: Dynamic imports for advanced features
 - **Tree Shaking**: Dead code elimination
 - **Code Splitting**: Route-based and feature-based splitting
 
 #### Runtime Optimization
+
 - **Memory Pooling**: Object reuse and garbage collection optimization
 - **Caching Strategy**: LRU/LFU eviction with high hit rates (85%+)
 - **Parallel Processing**: Concurrent task execution
 
 #### Database Optimization
+
 - **Connection Pooling**: Efficient database connection management
 - **Query Optimization**: Indexed queries with result caching
 - **Batch Operations**: Bulk data operations for performance
@@ -296,12 +313,14 @@ const PERFORMANCE_BUDGET = {
 ### Performance Monitoring
 
 #### Real-time Metrics
+
 - **Response Times**: API endpoint performance tracking
 - **Resource Usage**: CPU, memory, and disk utilization
 - **Error Rates**: Application and system error monitoring
 - **Throughput**: Requests per second and concurrent users
 
 #### Performance Gates
+
 - **CI/CD Integration**: Automated performance validation
 - **Regression Detection**: Performance baseline comparisons
 - **Budget Compliance**: Automated budget violation detection
@@ -313,6 +332,7 @@ const PERFORMANCE_BUDGET = {
 ### Containerized Deployment
 
 #### Docker Configuration
+
 ```dockerfile
 FROM node:18-alpine
 WORKDIR /app
@@ -324,8 +344,9 @@ CMD ["npm", "start"]
 ```
 
 #### Docker Compose Orchestration
+
 ```yaml
-version: '3.8'
+version: "3.8"
 services:
   strray-app:
     build: .
@@ -340,6 +361,7 @@ services:
 ### Orchestrated Deployment
 
 #### Kubernetes Manifests
+
 ```yaml
 apiVersion: apps/v1
 kind: Deployment
@@ -356,18 +378,19 @@ spec:
         app: strray
     spec:
       containers:
-      - name: strray
-        image: strray/strray:latest
-        ports:
-        - containerPort: 3000
-        env:
-        - name: NODE_ENV
-          value: "production"
+        - name: strray
+          image: strray/strray:latest
+          ports:
+            - containerPort: 3000
+          env:
+            - name: NODE_ENV
+              value: "production"
 ```
 
 ### Cloud-Native Deployment
 
 #### AWS CloudFormation
+
 ```yaml
 Resources:
   StrRayLoadBalancer:
@@ -379,9 +402,9 @@ Resources:
   StrRayAutoScalingGroup:
     Type: AWS::AutoScaling::AutoScalingGroup
     Properties:
-      MinSize: '2'
-      MaxSize: '10'
-      DesiredCapacity: '3'
+      MinSize: "2"
+      MaxSize: "10"
+      DesiredCapacity: "3"
 ```
 
 ---
@@ -391,11 +414,13 @@ Resources:
 ### Horizontal Scaling
 
 #### Load Balancing
+
 - **Application Load Balancer**: Request distribution across instances
 - **Session Affinity**: Sticky sessions for stateful operations
 - **Health Checks**: Automatic instance health monitoring
 
 #### Auto Scaling
+
 - **CPU Utilization**: Scale based on compute resource usage
 - **Request Rate**: Scale based on incoming request volume
 - **Custom Metrics**: Application-specific scaling triggers
@@ -403,6 +428,7 @@ Resources:
 ### Vertical Scaling
 
 #### Resource Optimization
+
 - **Memory Management**: Efficient memory allocation and garbage collection
 - **CPU Optimization**: Multi-threading and parallel processing
 - **Storage Optimization**: Database indexing and query optimization
@@ -410,11 +436,13 @@ Resources:
 ### Database Scaling
 
 #### Read Replicas
+
 - **Read/Write Separation**: Dedicated read replicas for query optimization
 - **Connection Pooling**: Efficient database connection management
 - **Query Caching**: Result caching for frequently accessed data
 
 #### Sharding Strategy
+
 - **Horizontal Partitioning**: Data distribution across multiple nodes
 - **Shard Key Selection**: Optimal key selection for even distribution
 - **Cross-Shard Queries**: Efficient multi-shard query execution
@@ -452,16 +480,19 @@ The framework exposes 9 MCP servers for AI integration:
 ### External System Integration
 
 #### Monitoring Systems
+
 - **Prometheus**: Metrics collection and alerting
 - **Grafana**: Dashboard visualization
 - **DataDog**: Enterprise monitoring and analytics
 
 #### CI/CD Systems
+
 - **GitHub Actions**: Automated testing and deployment
 - **Jenkins**: Pipeline orchestration
 - **GitLab CI**: Integrated DevOps workflows
 
 #### Cloud Platforms
+
 - **AWS**: EC2, ECS, Lambda integration
 - **Azure**: App Service, AKS, Functions
 - **GCP**: App Engine, Cloud Run, Cloud Functions
@@ -469,6 +500,7 @@ The framework exposes 9 MCP servers for AI integration:
 ### API Integration
 
 #### RESTful APIs
+
 ```typescript
 // Framework API endpoints
 GET  /api/status       // System status
@@ -478,9 +510,10 @@ GET  /api/tasks/:id    // Task status
 ```
 
 #### WebSocket APIs
+
 ```typescript
 // Real-time updates
-const ws = new WebSocket('ws://localhost:3000/ws');
+const ws = new WebSocket("ws://localhost:3000/ws");
 ws.onmessage = (event) => {
   const update = JSON.parse(event.data);
   // Handle real-time updates
@@ -488,6 +521,7 @@ ws.onmessage = (event) => {
 ```
 
 #### GraphQL APIs
+
 ```graphql
 query GetSystemStatus {
   status {
@@ -508,16 +542,19 @@ query GetSystemStatus {
 ### Quality Gates
 
 #### Code Quality
+
 - **Test Coverage**: >85% behavioral test coverage
 - **Type Safety**: Zero TypeScript errors
 - **Linting**: ESLint compliance across all files
 
 #### Performance Validation
+
 - **Bundle Size**: <2MB uncompressed, <700KB gzipped
 - **Boot Time**: <500ms cold start, <100ms warm start
 - **Response Time**: <1ms average task processing
 
 #### Security Validation
+
 - **Vulnerability Scanning**: Automated security audits
 - **Dependency Auditing**: No vulnerable dependencies
 - **Compliance Checks**: OWASP Top 10 compliance
@@ -525,6 +562,7 @@ query GetSystemStatus {
 ### Continuous Validation
 
 #### CI/CD Integration
+
 ```yaml
 - name: Architecture Validation
   run: |
@@ -534,6 +572,7 @@ query GetSystemStatus {
 ```
 
 #### Automated Compliance
+
 - **Codex Enforcement**: Runtime validation of 45 codex terms
 - **Architecture Reviews**: Automated architectural compliance checks
 - **Dependency Scanning**: Continuous vulnerability assessment

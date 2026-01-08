@@ -32,7 +32,7 @@ export interface ProcessorHook {
 
 export interface ProcessorRegistration {
   name: string;
-  type: 'pre' | 'post';
+  type: "pre" | "post";
   hook: ProcessorHook;
 }
 
@@ -46,7 +46,7 @@ export interface ProcessorExecutionResult {
 
 export interface ProcessorHealthCheck {
   name: string;
-  status: 'healthy' | 'degraded' | 'failed';
+  status: "healthy" | "degraded" | "failed";
   lastRun: number;
   successRate: number;
   averageExecutionTime: number;

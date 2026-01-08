@@ -8,16 +8,23 @@
  * @since 2026-01-08
  */
 
-import { execSync } from 'child_process';
-import * as fs from 'fs';
-import * as path from 'path';
-import { PerformanceBudgetEnforcer, PerformanceReport, PERFORMANCE_BUDGET } from './performance-budget-enforcer.js';
-import { PerformanceRegressionTester, RegressionTestSuite } from './performance-regression-tester.js';
+import { execSync } from "child_process";
+import * as fs from "fs";
+import * as path from "path";
+import {
+  PerformanceBudgetEnforcer,
+  PerformanceReport,
+  PERFORMANCE_BUDGET,
+} from "./performance-budget-enforcer.js";
+import {
+  PerformanceRegressionTester,
+  RegressionTestSuite,
+} from "./performance-regression-tester.js";
 
 export interface CIGateConfig {
   failOnBudgetViolation: boolean;
   failOnRegression: boolean;
-  budgetThreshold: 'warning' | 'error' | 'critical';
+  budgetThreshold: "warning" | "error" | "critical";
   regressionThreshold: number; // percentage
   baselineComparison: boolean;
   generateReports: boolean;
@@ -59,31 +66,34 @@ export class PerformanceCIGates {
   constructor(
     config: Partial<CIGateConfig> = {},
     budgetEnforcer?: PerformanceBudgetEnforcer,
-    regressionTester?: PerformanceRegressionTester
+    regressionTester?: PerformanceRegressionTester,
   ) {
     this.config = {
       failOnBudgetViolation: true,
       failOnRegression: true,
-      budgetThreshold: 'error',
+      budgetThreshold: "error",
       regressionThreshold: 20, // 20%
       baselineComparison: true,
       generateReports: true,
-      reportPath: './performance-reports',
-      artifactPath: './artifacts',
-      ...config
+      reportPath: "./performance-reports",
+      artifactPath: "./artifacts",
+      ...config,
     };
 
     this.budgetEnforcer = budgetEnforcer || new PerformanceBudgetEnforcer();
-    this.regressionTester = regressionTester || new PerformanceRegressionTester();
+    this.regressionTester =
+      regressionTester || new PerformanceRegressionTester();
   }
 
   /**
    * Run all performance gates for CI/CD pipeline
    */
-  async runPerformanceGates(testSuite?: RegressionTestSuite): Promise<CIGateResult> {
+  async runPerformanceGates(
+    testSuite?: RegressionTestSuite,
+  ): Promise<CIGateResult> {
     const startTime = Date.now();
-    console.log('🚀 Running StrRay Performance Gates');
-    console.log('=====================================');
+    console.log("🚀 Running StrRay Performance Gates");
+    console.log("=====================================");
 
     const result: CIGateResult = {
       success: true,
@@ -91,17 +101,17 @@ export class PerformanceCIGates {
         passed: true,
         violations: 0,
         criticalViolations: 0,
-        report: null
+        report: null,
       },
       regressionCheck: {
         passed: true,
         failedTests: 0,
         averageDeviation: 0,
-        baselineUpdated: false
+        baselineUpdated: false,
       },
       duration: 0,
       timestamp: startTime,
-      reports: {}
+      reports: {},
     };
 
     try {
@@ -109,61 +119,75 @@ export class PerformanceCIGates {
       this.ensureDirectories();
 
       // 1. Run performance budget check
-      console.log('\n📊 Running Performance Budget Check...');
+      console.log("\n📊 Running Performance Budget Check...");
       const budgetResult = await this.runBudgetCheck();
       result.budgetCheck = budgetResult;
 
       if (!budgetResult.passed && this.config.failOnBudgetViolation) {
         result.success = false;
-        console.log('❌ Budget check failed - pipeline will fail');
+        console.log("❌ Budget check failed - pipeline will fail");
       }
 
       // 2. Run regression tests
-      console.log('\n🧪 Running Performance Regression Tests...');
+      console.log("\n🧪 Running Performance Regression Tests...");
       const regressionResult = await this.runRegressionCheck(testSuite);
       result.regressionCheck = regressionResult;
 
       if (!regressionResult.passed && this.config.failOnRegression) {
         result.success = false;
-        console.log('❌ Regression check failed - pipeline will fail');
+        console.log("❌ Regression check failed - pipeline will fail");
       }
 
       // 3. Generate reports
       if (this.config.generateReports) {
-        console.log('\n📝 Generating Performance Reports...');
-        result.reports = await this.generateReports(budgetResult.report, regressionResult);
+        console.log("\n📝 Generating Performance Reports...");
+        result.reports = await this.generateReports(
+          budgetResult.report,
+          regressionResult,
+        );
       }
 
       // 4. Update baselines if tests passed
       if (result.success && this.config.baselineComparison) {
-        console.log('\n💾 Updating Performance Baselines...');
+        console.log("\n💾 Updating Performance Baselines...");
         this.updateBaselines();
         result.regressionCheck.baselineUpdated = true;
       }
-
     } catch (error) {
-      console.error('❌ Performance gates failed with error:', error);
+      console.error("❌ Performance gates failed with error:", error);
       result.success = false;
     }
 
     result.duration = Date.now() - startTime;
 
     // Final summary
-    console.log('\n🎯 Performance Gates Summary');
-    console.log('=============================');
+    console.log("\n🎯 Performance Gates Summary");
+    console.log("=============================");
     console.log(`   Duration: ${result.duration}ms`);
-    console.log(`   Budget Check: ${result.budgetCheck.passed ? '✅ PASSED' : '❌ FAILED'}`);
-    console.log(`   Regression Check: ${result.regressionCheck.passed ? '✅ PASSED' : '❌ FAILED'}`);
-    console.log(`   Overall Result: ${result.success ? '✅ SUCCESS' : '❌ FAILURE'}`);
+    console.log(
+      `   Budget Check: ${result.budgetCheck.passed ? "✅ PASSED" : "❌ FAILED"}`,
+    );
+    console.log(
+      `   Regression Check: ${result.regressionCheck.passed ? "✅ PASSED" : "❌ FAILED"}`,
+    );
+    console.log(
+      `   Overall Result: ${result.success ? "✅ SUCCESS" : "❌ FAILURE"}`,
+    );
 
     if (!result.success) {
-      console.log('\n🔍 Failure Details:');
+      console.log("\n🔍 Failure Details:");
       if (!result.budgetCheck.passed) {
-        console.log(`   - Budget violations: ${result.budgetCheck.violations} (${result.budgetCheck.criticalViolations} critical)`);
+        console.log(
+          `   - Budget violations: ${result.budgetCheck.violations} (${result.budgetCheck.criticalViolations} critical)`,
+        );
       }
       if (!result.regressionCheck.passed) {
-        console.log(`   - Failed regression tests: ${result.regressionCheck.failedTests}`);
-        console.log(`   - Average deviation: ${result.regressionCheck.averageDeviation.toFixed(2)}%`);
+        console.log(
+          `   - Failed regression tests: ${result.regressionCheck.failedTests}`,
+        );
+        console.log(
+          `   - Average deviation: ${result.regressionCheck.averageDeviation.toFixed(2)}%`,
+        );
       }
     }
 
@@ -173,60 +197,89 @@ export class PerformanceCIGates {
   /**
    * Run performance budget compliance check
    */
-  private async runBudgetCheck(): Promise<CIGateResult['budgetCheck']> {
+  private async runBudgetCheck(): Promise<CIGateResult["budgetCheck"]> {
     const report = await this.budgetEnforcer.generatePerformanceReport();
     const violations = report.violations;
 
-    const criticalViolations = violations.filter(v => v.severity === 'critical').length;
-    const errorViolations = violations.filter(v => v.severity === 'error').length;
-    const warningViolations = violations.filter(v => v.severity === 'warning').length;
+    const criticalViolations = violations.filter(
+      (v) => v.severity === "critical",
+    ).length;
+    const errorViolations = violations.filter(
+      (v) => v.severity === "error",
+    ).length;
+    const warningViolations = violations.filter(
+      (v) => v.severity === "warning",
+    ).length;
 
     let passed = true;
 
-    if (this.config.budgetThreshold === 'warning' && (criticalViolations > 0 || errorViolations > 0)) {
+    if (
+      this.config.budgetThreshold === "warning" &&
+      (criticalViolations > 0 || errorViolations > 0)
+    ) {
       passed = false;
-    } else if (this.config.budgetThreshold === 'error' && criticalViolations > 0) {
+    } else if (
+      this.config.budgetThreshold === "error" &&
+      criticalViolations > 0
+    ) {
       passed = false;
-    } else if (this.config.budgetThreshold === 'critical' && criticalViolations > 0) {
+    } else if (
+      this.config.budgetThreshold === "critical" &&
+      criticalViolations > 0
+    ) {
       passed = false;
     }
 
-    console.log(`   📦 Bundle Size: ${(report.bundleSize.totalSize / 1024).toFixed(2)} KB (${(report.bundleSize.gzippedSize / 1024).toFixed(2)} KB gzipped)`);
-    console.log(`   🧠 Memory Usage: ${(report.runtime.memoryUsage.heapUsed / 1024 / 1024).toFixed(2)} MB`);
-    console.log(`   ⚡ Startup Time: ${report.runtime.startupTime.toFixed(2)}ms`);
-    console.log(`   🚨 Violations: ${violations.length} (${criticalViolations} critical, ${errorViolations} error, ${warningViolations} warning)`);
-    console.log(`   📊 Status: ${passed ? 'PASSED' : 'FAILED'}`);
+    console.log(
+      `   📦 Bundle Size: ${(report.bundleSize.totalSize / 1024).toFixed(2)} KB (${(report.bundleSize.gzippedSize / 1024).toFixed(2)} KB gzipped)`,
+    );
+    console.log(
+      `   🧠 Memory Usage: ${(report.runtime.memoryUsage.heapUsed / 1024 / 1024).toFixed(2)} MB`,
+    );
+    console.log(
+      `   ⚡ Startup Time: ${report.runtime.startupTime.toFixed(2)}ms`,
+    );
+    console.log(
+      `   🚨 Violations: ${violations.length} (${criticalViolations} critical, ${errorViolations} error, ${warningViolations} warning)`,
+    );
+    console.log(`   📊 Status: ${passed ? "PASSED" : "FAILED"}`);
 
     return {
       passed,
       violations: violations.length,
       criticalViolations,
-      report
+      report,
     };
   }
 
   /**
    * Run performance regression tests
    */
-  private async runRegressionCheck(testSuite?: RegressionTestSuite): Promise<CIGateResult['regressionCheck']> {
+  private async runRegressionCheck(
+    testSuite?: RegressionTestSuite,
+  ): Promise<CIGateResult["regressionCheck"]> {
     const suite = testSuite || this.regressionTester.createDefaultTestSuite();
     const suiteResult = await this.regressionTester.runTestSuite(suite);
 
-    const failedTests = suiteResult.results.filter(r => r.status === 'fail').length;
+    const failedTests = suiteResult.results.filter(
+      (r) => r.status === "fail",
+    ).length;
     const passed = suiteResult.success;
 
     console.log(`   🧪 Tests Run: ${suiteResult.summary.totalTests}`);
     console.log(`   ✅ Passed: ${suiteResult.summary.passed}`);
     console.log(`   ⚠️ Warnings: ${suiteResult.summary.warnings}`);
     console.log(`   ❌ Failed: ${suiteResult.summary.failed}`);
-    console.log(`   📈 Average Deviation: ${suiteResult.summary.averageDeviation.toFixed(2)}%`);
-    console.log(`   📊 Status: ${passed ? 'PASSED' : 'FAILED'}`);
+    console.log(
+      `   📈 Average Deviation: ${suiteResult.summary.averageDeviation.toFixed(2)}%`,
+    );
+    console.log(`   📊 Status: ${passed ? "PASSED" : "FAILED"}`);
 
     return {
       passed,
       failedTests,
       averageDeviation: suiteResult.summary.averageDeviation,
-      baselineUpdated: false
+      baselineUpdated: false,
     };
   }
 
@@ -235,47 +288,65 @@ export class PerformanceCIGates {
    */
   private async generateReports(
     budgetReport: PerformanceReport | null,
-    regressionResult: any
-  ): Promise<CIGateResult['reports']> {
-    const reports: CIGateResult['reports'] = {};
-    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    regressionResult: any,
+  ): Promise<CIGateResult["reports"]> {
+    const reports: CIGateResult["reports"] = {};
+    const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
 
     // Budget report
     if (budgetReport) {
-      const budgetReportPath = path.join(this.config.reportPath, `budget-report-${timestamp}.json`);
+      const budgetReportPath = path.join(
+        this.config.reportPath,
+        `budget-report-${timestamp}.json`,
+      );
       fs.writeFileSync(budgetReportPath, JSON.stringify(budgetReport, null, 2));
       reports.budgetReport = budgetReportPath;
       console.log(`   💾 Budget report saved: ${budgetReportPath}`);
     }
 
     // Regression report
-    const regressionReportPath = path.join(this.config.reportPath, `regression-report-${timestamp}.json`);
-    fs.writeFileSync(regressionReportPath, JSON.stringify(regressionResult, null, 2));
+    const regressionReportPath = path.join(
+      this.config.reportPath,
+      `regression-report-${timestamp}.json`,
+    );
+    fs.writeFileSync(
+      regressionReportPath,
+      JSON.stringify(regressionResult, null, 2),
+    );
     reports.regressionReport = regressionReportPath;
     console.log(`   💾 Regression report saved: ${regressionReportPath}`);
 
     // Summary report
     const summaryReport = {
       timestamp: new Date().toISOString(),
-      budget: budgetReport ? {
-        status: budgetReport.overallStatus,
-        violations: budgetReport.violations.length,
-        criticalViolations: budgetReport.violations.filter(v => v.severity === 'critical').length,
-        recommendations: budgetReport.recommendations
-      } : null,
+      budget: budgetReport
+        ? {
+            status: budgetReport.overallStatus,
+            violations: budgetReport.violations.length,
+            criticalViolations: budgetReport.violations.filter(
+              (v) => v.severity === "critical",
+            ).length,
+            recommendations: budgetReport.recommendations,
+          }
+        : null,
       regression: {
         totalTests: 4, // Default test suite has 4 tests
         passRate: regressionResult.passed ? 100 : 0,
         averageDeviation: regressionResult.averageDeviation,
-        regressionDetected: !regressionResult.passed
+        regressionDetected: !regressionResult.passed,
       },
       recommendations: [
         ...(budgetReport?.recommendations || []),
-        ...(regressionResult.failedTests > 0 ? ['Performance regression detected - investigate recent changes'] : [])
-      ]
+        ...(regressionResult.failedTests > 0
+          ? ["Performance regression detected - investigate recent changes"]
+          : []),
+      ],
     };
 
-    const summaryReportPath = path.join(this.config.reportPath, `performance-summary-${timestamp}.json`);
+    const summaryReportPath = path.join(
+      this.config.reportPath,
+      `performance-summary-${timestamp}.json`,
+    );
     fs.writeFileSync(summaryReportPath, JSON.stringify(summaryReport, null, 2));
     reports.summaryReport = summaryReportPath;
     console.log(`   💾 Summary report saved: ${summaryReportPath}`);
@@ -290,9 +361,9 @@ export class PerformanceCIGates {
     try {
       // This would typically be done in the regression tester
       // For now, we'll just log that baselines would be updated
-      console.log('   📊 Baselines updated for future comparison');
+      console.log("   📊 Baselines updated for future comparison");
     } catch (error) {
-      console.warn('   ⚠️ Failed to update baselines:', error);
+      console.warn("   ⚠️ Failed to update baselines:", error);
     }
   }
 

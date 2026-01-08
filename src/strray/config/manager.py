@@ -28,7 +28,7 @@ class ConfigManager:
         for config_path in self.config_paths:
             if config_path.exists():
                 try:
-                    with open(config_path, 'r', encoding='utf-8') as f:
+                    with open(config_path, "r", encoding="utf-8") as f:
                         config_data = json.load(f)
                         self._config_cache.update(config_data)
                 except (json.JSONDecodeError, IOError) as e:
@@ -41,15 +41,15 @@ class ConfigManager:
     def _set_defaults(self) -> None:
         """Set default configuration values."""
         defaults = {
-            'ai_default_provider': 'openai',
-            'ai_default_model': 'gpt-4',
-            'ai_auto_log_responses': True,
-            'model_default': 'opencode/grok-code',
-            'agent_default_temperature': 0.3,
-            'logging_level': 'INFO',
-            'state_dir': '.strray/state',
-            'max_concurrent_tasks': 10,
-            'timeout_default': 300,
+            "ai_default_provider": "openai",
+            "ai_default_model": "gpt-4",
+            "ai_auto_log_responses": True,
+            "model_default": "opencode/grok-code",
+            "agent_default_temperature": 0.3,
+            "logging_level": "INFO",
+            "state_dir": ".strray/state",
+            "max_concurrent_tasks": 10,
+            "timeout_default": 300,
         }
 
         for key, value in defaults.items():
@@ -67,12 +67,7 @@ class ConfigManager:
     def get_agent_capabilities(self, agent_name: str) -> List[str]:
         """Get capabilities for specific agent."""
         # Default capabilities - could be extended
-        return [
-            "task-execution",
-            "ai-integration",
-            "state-management",
-            "communication"
-        ]
+        return ["task-execution", "ai-integration", "state-management", "communication"]
 
     def save_config(self, path: Optional[Path] = None) -> None:
         """Save current configuration."""
@@ -82,7 +77,7 @@ class ConfigManager:
         path.parent.mkdir(parents=True, exist_ok=True)
 
         try:
-            with open(path, 'w', encoding='utf-8') as f:
+            with open(path, "w", encoding="utf-8") as f:
                 json.dump(self._config_cache, f, indent=2, ensure_ascii=False)
         except IOError as e:
             print(f"Error saving config to {path}: {e}")

@@ -8,13 +8,13 @@
  * @since 2026-01-07
  */
 
-import { StrRayStateManager } from '../../state/state-manager';
-import { createSessionCoordinator } from '../../delegation/session-coordinator';
-import { createSessionCleanupManager } from '../../session/session-cleanup-manager';
-import { createSessionMonitor } from '../../session/session-monitor';
-import { createSessionStateManager } from '../../session/session-state-manager';
+import { StrRayStateManager } from "../../state/state-manager";
+import { createSessionCoordinator } from "../../delegation/session-coordinator";
+import { createSessionCleanupManager } from "../../session/session-cleanup-manager";
+import { createSessionMonitor } from "../../session/session-monitor";
+import { createSessionStateManager } from "../../session/session-state-manager";
 
-describe('Session Management Integration', () => {
+describe("Session Management Integration", () => {
   let stateManager: StrRayStateManager;
   let sessionCoordinator: any;
   let cleanupManager: any;
@@ -25,8 +25,15 @@ describe('Session Management Integration', () => {
     stateManager = new StrRayStateManager();
     sessionCoordinator = createSessionCoordinator(stateManager);
     cleanupManager = createSessionCleanupManager(stateManager);
-    sessionMonitor = createSessionMonitor(stateManager, sessionCoordinator, cleanupManager);
-    stateManagerInstance = createSessionStateManager(stateManager, sessionCoordinator);
+    sessionMonitor = createSessionMonitor(
+      stateManager,
+      sessionCoordinator,
+      cleanupManager,
+    );
+    stateManagerInstance = createSessionStateManager(
+      stateManager,
+      sessionCoordinator,
+    );
   });
 
   afterEach(() => {
@@ -35,14 +42,14 @@ describe('Session Management Integration', () => {
     stateManagerInstance?.shutdown();
   });
 
-  test('should initialize session management components', () => {
+  test("should initialize session management components", () => {
     expect(cleanupManager).toBeDefined();
     expect(sessionMonitor).toBeDefined();
     expect(stateManagerInstance).toBeDefined();
   });
 
-  test('should register and cleanup sessions', async () => {
-    const sessionId = 'test-session-1';
+  test("should register and cleanup sessions", async () => {
+    const sessionId = "test-session-1";
 
     // Register session
     cleanupManager.registerSession(sessionId);
@@ -60,8 +67,8 @@ describe('Session Management Integration', () => {
     expect(cleanupManager.getSessionMetadata(sessionId)).toBeUndefined();
   });
 
-  test('should perform health checks', async () => {
-    const sessionId = 'test-session-2';
+  test("should perform health checks", async () => {
+    const sessionId = "test-session-2";
     const session = sessionCoordinator.initializeSession(sessionId);
 
     cleanupManager.registerSession(sessionId);
@@ -70,23 +77,30 @@ describe('Session Management Integration', () => {
     const health = await sessionMonitor.performHealthCheck(sessionId);
     expect(health).toBeDefined();
     expect(health.sessionId).toBe(sessionId);
-    expect(['healthy', 'degraded', 'critical', 'unknown']).toContain(health.status);
+    expect(["healthy", "degraded", "critical", "unknown"]).toContain(
+      health.status,
+    );
   });
 
-  test('should share state between sessions', () => {
-    const sessionId1 = 'test-session-3';
-    const sessionId2 = 'test-session-4';
+  test("should share state between sessions", () => {
+    const sessionId1 = "test-session-3";
+    const sessionId2 = "test-session-4";
 
     sessionCoordinator.initializeSession(sessionId1);
     sessionCoordinator.initializeSession(sessionId2);
 
-    const success = stateManagerInstance.shareState(sessionId1, sessionId2, 'test-key', 'test-value');
+    const success = stateManagerInstance.shareState(
+      sessionId1,
+      sessionId2,
+      "test-key",
+      "test-value",
+    );
     expect(success).toBe(true);
   });
 
-  test('should manage session dependencies', () => {
-    const sessionId1 = 'test-session-5';
-    const sessionId2 = 'test-session-6';
+  test("should manage session dependencies", () => {
+    const sessionId1 = "test-session-5";
+    const sessionId2 = "test-session-6";
 
     sessionCoordinator.initializeSession(sessionId1);
     sessionCoordinator.initializeSession(sessionId2);
@@ -97,49 +111,58 @@ describe('Session Management Integration', () => {
     expect(chain.dependencies).toContain(sessionId1);
     expect(chain.canStart).toBe(false);
 
-    stateManagerInstance.updateDependencyState(sessionId1, 'completed');
+    stateManagerInstance.updateDependencyState(sessionId1, "completed");
 
     const updatedChain = stateManagerInstance.getDependencyChain(sessionId2);
     expect(updatedChain.canStart).toBe(true);
   });
 
-  test('should create and manage session groups', () => {
-    const groupId = 'test-group';
-    const sessionIds = ['test-session-7', 'test-session-8', 'test-session-9'];
+  test("should create and manage session groups", () => {
+    const groupId = "test-group";
+    const sessionIds = ["test-session-7", "test-session-8", "test-session-9"];
 
-    sessionIds.forEach(id => sessionCoordinator.initializeSession(id));
+    sessionIds.forEach((id) => sessionCoordinator.initializeSession(id));
 
-    const group = stateManagerInstance.createSessionGroup(groupId, sessionIds, sessionIds[0]);
+    const group = stateManagerInstance.createSessionGroup(
+      groupId,
+      sessionIds,
+      sessionIds[0],
+    );
     expect(group).toBeDefined();
     expect(group.groupId).toBe(groupId);
     expect(group.sessionIds).toEqual(sessionIds);
 
-    stateManagerInstance.shareGroupState(groupId, 'group-key', 'group-value', sessionIds[0]);
-    const value = stateManagerInstance.getGroupState(groupId, 'group-key');
-    expect(value).toBe('group-value');
+    stateManagerInstance.shareGroupState(
+      groupId,
+      "group-key",
+      "group-value",
+      sessionIds[0],
+    );
+    const value = stateManagerInstance.getGroupState(groupId, "group-key");
+    expect(value).toBe("group-value");
   });
 
-  test('should provide monitoring statistics', () => {
+  test("should provide monitoring statistics", () => {
     const stats = sessionMonitor.getMonitoringStats();
     expect(stats).toBeDefined();
-    expect(typeof stats.totalSessions).toBe('number');
-    expect(typeof stats.healthySessions).toBe('number');
-    expect(typeof stats.activeAlerts).toBe('number');
+    expect(typeof stats.totalSessions).toBe("number");
+    expect(typeof stats.healthySessions).toBe("number");
+    expect(typeof stats.activeAlerts).toBe("number");
   });
 
-  test('should provide cleanup statistics', () => {
+  test("should provide cleanup statistics", () => {
     const stats = cleanupManager.getCleanupStats();
     expect(stats).toBeDefined();
-    expect(typeof stats.totalSessions).toBe('number');
-    expect(typeof stats.activeSessions).toBe('number');
-    expect(typeof stats.expiredSessions).toBe('number');
+    expect(typeof stats.totalSessions).toBe("number");
+    expect(typeof stats.activeSessions).toBe("number");
+    expect(typeof stats.expiredSessions).toBe("number");
   });
 
-  test('should provide coordination statistics', () => {
+  test("should provide coordination statistics", () => {
     const stats = stateManagerInstance.getCoordinationStats();
     expect(stats).toBeDefined();
-    expect(typeof stats.totalDependencies).toBe('number');
-    expect(typeof stats.totalGroups).toBe('number');
-    expect(typeof stats.failoverConfigs).toBe('number');
+    expect(typeof stats.totalDependencies).toBe("number");
+    expect(typeof stats.totalGroups).toBe("number");
+    expect(typeof stats.failoverConfigs).toBe("number");
   });
 });

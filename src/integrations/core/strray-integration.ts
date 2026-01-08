@@ -8,19 +8,19 @@
  * @since 2026-01-08
  */
 
-import { EventEmitter } from 'events';
-import { StrRayOrchestrator, TaskDefinition } from '../../orchestrator';
-import { securityHardeningSystem } from '../../security/security-hardening-system';
-import { enterpriseMonitoringSystem } from '../../monitoring/enterprise-monitoring-system';
-import { performanceSystem } from '../../performance/performance-system-orchestrator';
+import { EventEmitter } from "events";
+import { StrRayOrchestrator, TaskDefinition } from "../../orchestrator";
+import { securityHardeningSystem } from "../../security/security-hardening-system";
+import { enterpriseMonitoringSystem } from "../../monitoring/enterprise-monitoring-system";
+import { performanceSystem } from "../../performance/performance-system-orchestrator";
 
 // Framework detection and capabilities
 export enum SupportedFramework {
-  REACT = 'react',
-  VUE = 'vue',
-  ANGULAR = 'angular',
-  SVELTE = 'svelte',
-  VANILLA = 'vanilla'
+  REACT = "react",
+  VUE = "vue",
+  ANGULAR = "angular",
+  SVELTE = "svelte",
+  VANILLA = "vanilla",
 }
 
 export interface FrameworkCapabilities {
@@ -81,7 +81,7 @@ export interface IntegrationConfig {
     minification: boolean;
   };
   build: {
-    target: 'development' | 'production' | 'test';
+    target: "development" | "production" | "test";
     sourcemaps: boolean;
     analyze: boolean;
   };
@@ -103,13 +103,13 @@ export interface FrameworkPerformanceMetrics {
 
 // Integration events
 export type IntegrationEventType =
-  | 'framework-initialized'
-  | 'framework-destroyed'
-  | 'component-created'
-  | 'hook-executed'
-  | 'error-caught'
-  | 'performance-measured'
-  | 'feature-used';
+  | "framework-initialized"
+  | "framework-destroyed"
+  | "component-created"
+  | "hook-executed"
+  | "error-caught"
+  | "performance-measured"
+  | "feature-used";
 
 export interface IntegrationEvent {
   type: IntegrationEventType;
@@ -181,10 +181,13 @@ export class StrRayIntegration extends EventEmitter {
    * Setup event handlers
    */
   private setupEventHandlers(): void {
-    this.on('framework-initialized', this.handleFrameworkInitialized.bind(this));
-    this.on('framework-destroyed', this.handleFrameworkDestroyed.bind(this));
-    this.on('error-caught', this.handleErrorCaught.bind(this));
-    this.on('performance-measured', this.handlePerformanceMeasured.bind(this));
+    this.on(
+      "framework-initialized",
+      this.handleFrameworkInitialized.bind(this),
+    );
+    this.on("framework-destroyed", this.handleFrameworkDestroyed.bind(this));
+    this.on("error-caught", this.handleErrorCaught.bind(this));
+    this.on("performance-measured", this.handlePerformanceMeasured.bind(this));
   }
 
   /**
@@ -196,7 +199,9 @@ export class StrRayIntegration extends EventEmitter {
     }
 
     try {
-      console.log(`🚀 Initializing StrRay Framework integration for ${this.config.framework}`);
+      console.log(
+        `🚀 Initializing StrRay Framework integration for ${this.config.framework}`,
+      );
 
       // Detect and create framework adapter
       this.adapter = this.createFrameworkAdapter();
@@ -212,16 +217,20 @@ export class StrRayIntegration extends EventEmitter {
 
       this.initialized = true;
 
-      this.emitIntegrationEvent('framework-initialized', {
+      this.emitIntegrationEvent("framework-initialized", {
         framework: this.config.framework,
         version: this.config.version,
-        features: this.config.features
+        features: this.config.features,
       });
 
-      console.log(`✅ StrRay Framework integration initialized for ${this.config.framework} v${this.config.version}`);
-
+      console.log(
+        `✅ StrRay Framework integration initialized for ${this.config.framework} v${this.config.version}`,
+      );
     } catch (error) {
-      console.error('❌ Failed to initialize StrRay Framework integration:', error);
+      console.error(
+        "❌ Failed to initialize StrRay Framework integration:",
+        error,
+      );
       throw error;
     }
   }
@@ -235,7 +244,9 @@ export class StrRayIntegration extends EventEmitter {
     }
 
     try {
-      console.log(`🛑 Destroying StrRay Framework integration for ${this.config.framework}`);
+      console.log(
+        `🛑 Destroying StrRay Framework integration for ${this.config.framework}`,
+      );
 
       // Destroy framework adapter
       if (this.adapter) {
@@ -248,14 +259,18 @@ export class StrRayIntegration extends EventEmitter {
 
       this.initialized = false;
 
-      this.emitIntegrationEvent('framework-destroyed', {
-        framework: this.config.framework
+      this.emitIntegrationEvent("framework-destroyed", {
+        framework: this.config.framework,
       });
 
-      console.log(`✅ StrRay Framework integration destroyed for ${this.config.framework}`);
-
+      console.log(
+        `✅ StrRay Framework integration destroyed for ${this.config.framework}`,
+      );
     } catch (error) {
-      console.error('❌ Failed to destroy StrRay Framework integration:', error);
+      console.error(
+        "❌ Failed to destroy StrRay Framework integration:",
+        error,
+      );
       throw error;
     }
   }
@@ -263,50 +278,55 @@ export class StrRayIntegration extends EventEmitter {
   /**
    * Execute agent with framework integration
    */
-  async executeAgent(agentId: string, input: any, options?: {
-    timeout?: number;
-    priority?: 'low' | 'medium' | 'high';
-    context?: Record<string, any>;
-  }): Promise<AgentIntegrationResult> {
+  async executeAgent(
+    agentId: string,
+    input: any,
+    options?: {
+      timeout?: number;
+      priority?: "low" | "medium" | "high";
+      context?: Record<string, any>;
+    },
+  ): Promise<AgentIntegrationResult> {
     this.ensureInitialized();
 
     const startTime = performance.now();
 
     try {
       // Validate input
-      const validation = securityHardeningSystem.validateInput(input, 'agent-execution');
+      const validation = securityHardeningSystem.validateInput(
+        input,
+        "agent-execution",
+      );
       if (!validation.isValid) {
         return {
           success: false,
           agentId,
           executionTime: performance.now() - startTime,
           result: null,
-          errors: validation.errors
+          errors: validation.errors,
         };
       }
 
-      
       const taskDefinition: TaskDefinition = {
         id: `integration-${agentId}-${Date.now()}`,
         description: `Framework integration execution for ${agentId}`,
         subagentType: agentId,
-        priority: options?.priority || 'medium',
+        priority: options?.priority || "medium",
       };
 
-      
       const executionTime = performance.now() - startTime;
 
       const performanceMetrics = {
         memoryUsage: process.memoryUsage().heapUsed,
         cpuTime: process.cpuUsage().user + process.cpuUsage().system,
-        networkRequests: 0
+        networkRequests: 0,
       };
 
-      this.emitIntegrationEvent('feature-used', {
-        feature: 'agent-execution',
+      this.emitIntegrationEvent("feature-used", {
+        feature: "agent-execution",
         agentId,
         executionTime,
-        success: true
+        success: true,
       });
 
       return {
@@ -314,9 +334,8 @@ export class StrRayIntegration extends EventEmitter {
         agentId,
         executionTime,
         result: `Agent ${agentId} executed with input: ${JSON.stringify(validation.sanitizedValue)}`,
-        performanceMetrics
+        performanceMetrics,
       };
-
     } catch (error) {
       const executionTime = performance.now() - startTime;
 
@@ -325,7 +344,7 @@ export class StrRayIntegration extends EventEmitter {
         agentId,
         executionTime,
         result: null,
-        errors: [error instanceof Error ? error.message : String(error)]
+        errors: [error instanceof Error ? error.message : String(error)],
       };
     }
   }
@@ -333,42 +352,47 @@ export class StrRayIntegration extends EventEmitter {
   /**
    * Query codex with framework integration
    */
-  async queryCodex(query: string, options?: {
-    validate?: boolean;
-    context?: Record<string, any>;
-    timeout?: number;
-  }): Promise<CodexIntegrationResult> {
+  async queryCodex(
+    query: string,
+    options?: {
+      validate?: boolean;
+      context?: Record<string, any>;
+      timeout?: number;
+    },
+  ): Promise<CodexIntegrationResult> {
     this.ensureInitialized();
 
     const startTime = performance.now();
 
     try {
       // Validate query
-      const validation = securityHardeningSystem.validateInput(query, 'codex-query');
+      const validation = securityHardeningSystem.validateInput(
+        query,
+        "codex-query",
+      );
       if (!validation.isValid) {
         return {
           success: false,
           query,
           response: null,
           validationErrors: validation.errors,
-          executionTime: performance.now() - startTime
+          executionTime: performance.now() - startTime,
         };
       }
 
-      
       const codexResult = {
         success: true,
         response: `Codex query processed: ${validation.sanitizedValue}`,
-        complianceScore: 95
+        complianceScore: 95,
       };
 
       const executionTime = performance.now() - startTime;
 
-      this.emitIntegrationEvent('feature-used', {
-        feature: 'codex-query',
+      this.emitIntegrationEvent("feature-used", {
+        feature: "codex-query",
         queryLength: query.length,
         executionTime,
-        success: codexResult.success
+        success: codexResult.success,
       });
 
       return {
@@ -376,9 +400,8 @@ export class StrRayIntegration extends EventEmitter {
         query,
         response: codexResult.response,
         executionTime,
-        complianceScore: codexResult.complianceScore
+        complianceScore: codexResult.complianceScore,
       };
-
     } catch (error) {
       const executionTime = performance.now() - startTime;
 
@@ -386,8 +409,10 @@ export class StrRayIntegration extends EventEmitter {
         success: false,
         query,
         response: null,
-        validationErrors: [error instanceof Error ? error.message : String(error)],
-        executionTime
+        validationErrors: [
+          error instanceof Error ? error.message : String(error),
+        ],
+        executionTime,
       };
     }
   }
@@ -416,7 +441,7 @@ export class StrRayIntegration extends EventEmitter {
       frameworkMetrics,
       agentMetrics,
       userInteractions,
-      errors
+      errors,
     };
   }
 
@@ -445,7 +470,7 @@ export class StrRayIntegration extends EventEmitter {
    */
   private createReactAdapter(): FrameworkAdapter {
     // Implementation would import from React integration
-    throw new Error('React adapter not implemented');
+    throw new Error("React adapter not implemented");
   }
 
   /**
@@ -453,7 +478,7 @@ export class StrRayIntegration extends EventEmitter {
    */
   private createVueAdapter(): FrameworkAdapter {
     // Implementation would import from Vue integration
-    throw new Error('Vue adapter not implemented');
+    throw new Error("Vue adapter not implemented");
   }
 
   /**
@@ -461,7 +486,7 @@ export class StrRayIntegration extends EventEmitter {
    */
   private createAngularAdapter(): FrameworkAdapter {
     // Implementation would import from Angular integration
-    throw new Error('Angular adapter not implemented');
+    throw new Error("Angular adapter not implemented");
   }
 
   /**
@@ -469,7 +494,7 @@ export class StrRayIntegration extends EventEmitter {
    */
   private createSvelteAdapter(): FrameworkAdapter {
     // Implementation would import from Svelte integration
-    throw new Error('Svelte adapter not implemented');
+    throw new Error("Svelte adapter not implemented");
   }
 
   /**
@@ -477,7 +502,7 @@ export class StrRayIntegration extends EventEmitter {
    */
   private createVanillaAdapter(): FrameworkAdapter {
     // Implementation would import from vanilla integration
-    throw new Error('Vanilla adapter not implemented');
+    throw new Error("Vanilla adapter not implemented");
   }
 
   /**
@@ -488,10 +513,8 @@ export class StrRayIntegration extends EventEmitter {
     this.orchestrator = new StrRayOrchestrator({
       maxConcurrentTasks: 5,
       taskTimeout: 300000,
-      conflictResolutionStrategy: 'majority_vote'
+      conflictResolutionStrategy: "majority_vote",
     });
-
-    
 
     // Initialize monitoring if enabled
     if (this.config.features.monitoring) {
@@ -538,13 +561,17 @@ export class StrRayIntegration extends EventEmitter {
   /**
    * Emit integration event
    */
-  private emitIntegrationEvent(type: IntegrationEventType, data: Record<string, any>, metadata?: Record<string, any>): void {
+  private emitIntegrationEvent(
+    type: IntegrationEventType,
+    data: Record<string, any>,
+    metadata?: Record<string, any>,
+  ): void {
     const event: IntegrationEvent = {
       type,
       framework: this.config.framework,
       timestamp: Date.now(),
       data,
-      ...(metadata && { metadata })
+      ...(metadata && { metadata }),
     };
 
     this.emit(type, event);
@@ -555,7 +582,9 @@ export class StrRayIntegration extends EventEmitter {
    */
   private ensureInitialized(): void {
     if (!this.initialized) {
-      throw new Error('StrRay Framework integration not initialized. Call initialize() first.');
+      throw new Error(
+        "StrRay Framework integration not initialized. Call initialize() first.",
+      );
     }
   }
 
@@ -563,7 +592,9 @@ export class StrRayIntegration extends EventEmitter {
    * Event handlers
    */
   private handleFrameworkInitialized(event: IntegrationEvent): void {
-    console.log(`🎯 Framework integration initialized: ${event.framework} v${event.data.version}`);
+    console.log(
+      `🎯 Framework integration initialized: ${event.framework} v${event.data.version}`,
+    );
   }
 
   private handleFrameworkDestroyed(event: IntegrationEvent): void {
@@ -619,32 +650,35 @@ export class StrRayIntegration extends EventEmitter {
 }
 
 // Export singleton factory function
-export const createStrRayIntegration = (config: IntegrationConfig): StrRayIntegration => {
+export const createStrRayIntegration = (
+  config: IntegrationConfig,
+): StrRayIntegration => {
   return new StrRayIntegration(config);
 };
 
 // Export default integration for auto-detection
 export const strRayIntegration = new StrRayIntegration({
   framework: StrRayIntegration.detectFramework(),
-  version: '1.0.0',
+  version: "1.0.0",
   features: {
     agents: true,
     codex: true,
     monitoring: true,
     analytics: true,
     validation: true,
-    security: true
+    security: true,
   },
   performance: {
     lazyLoading: true,
     bundleSplitting: true,
     treeShaking: true,
-    minification: true
+    minification: true,
   },
   build: {
-    target: process.env.NODE_ENV === 'production' ? 'production' : 'development',
-    sourcemaps: process.env.NODE_ENV !== 'production',
-    analyze: false
+    target:
+      process.env.NODE_ENV === "production" ? "production" : "development",
+    sourcemaps: process.env.NODE_ENV !== "production",
+    analyze: false,
   },
-  plugins: []
+  plugins: [],
 });

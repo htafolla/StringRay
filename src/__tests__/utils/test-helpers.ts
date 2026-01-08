@@ -1,9 +1,9 @@
 // Test utilities and mocks for StrRay Framework testing
 
-import * as fs from 'fs';
-import * as path from 'path';
-import { vi } from 'vitest';
-import { CodexContext, CodexTerm } from '../../context-loader';
+import * as fs from "fs";
+import * as path from "path";
+import { vi } from "vitest";
+import { CodexContext, CodexTerm } from "../../context-loader";
 
 /**
  * Mock file system utilities for testing
@@ -36,9 +36,9 @@ export class MockFileSystem {
   reset(): void {
     this.files.clear();
     this.directories.clear();
-    
+
     // Add default test directory
-    this.addDirectory('/test/project');
+    this.addDirectory("/test/project");
   }
 
   /**
@@ -69,16 +69,16 @@ export class MockFileSystem {
    */
   getMockPath(): typeof path {
     return {
-      join: (...args: string[]) => args.join('/'),
+      join: (...args: string[]) => args.join("/"),
       resolve: (...args: string[]) => path.join(...args),
       basename: (filePath: string) => {
-        const parts = filePath.split('/');
+        const parts = filePath.split("/");
         return parts[parts.length - 1];
       },
       dirname: (filePath: string) => {
-        const parts = filePath.split('/');
+        const parts = filePath.split("/");
         parts.pop();
-        return parts.join('/');
+        return parts.join("/");
       },
       extname: path.extname,
       relative: path.relative,
@@ -95,7 +95,7 @@ export class MockCodexGenerator {
   /**
    * Generate a complete mock codex content
    */
-  static createCompleteCodex(version = '1.2.20'): string {
+  static createCompleteCodex(version = "1.2.20"): string {
     return JSON.stringify({
       version: version,
       lastUpdated: "2026-01-06",
@@ -104,18 +104,20 @@ export class MockCodexGenerator {
         "1": {
           number: 1,
           title: "Progressive Prod-Ready Code",
-          description: "All code must be production-ready from the first commit. No placeholder, stub, or incomplete implementations.",
+          description:
+            "All code must be production-ready from the first commit. No placeholder, stub, or incomplete implementations.",
           category: "core",
           zeroTolerance: false,
-          enforcementLevel: "high"
+          enforcementLevel: "high",
         },
         "2": {
           number: 2,
           title: "No Patches/Boiler/Stubs/Bridge Code",
-          description: "Prohibit temporary patches that are \"meant to be fixed later\"",
+          description:
+            'Prohibit temporary patches that are "meant to be fixed later"',
           category: "core",
           zeroTolerance: false,
-          enforcementLevel: "high"
+          enforcementLevel: "high",
         },
         "3": {
           number: 3,
@@ -123,55 +125,61 @@ export class MockCodexGenerator {
           description: "Solutions should be simple and direct.",
           category: "core",
           zeroTolerance: false,
-          enforcementLevel: "medium"
+          enforcementLevel: "medium",
         },
         "7": {
           number: 7,
           title: "Resolve All Errors (90% Runtime Prevention)",
-          description: "Zero-tolerance for unresolved errors: TODO, FIXME, XXX comments are blocking violations.",
+          description:
+            "Zero-tolerance for unresolved errors: TODO, FIXME, XXX comments are blocking violations.",
           category: "core",
           zeroTolerance: true,
-          enforcementLevel: "blocking"
+          enforcementLevel: "blocking",
         },
         "8": {
           number: 8,
           title: "Prevent Infinite Loops",
-          description: "Guarantee termination in all iterative processes: while(true), for(;;) are blocking violations.",
+          description:
+            "Guarantee termination in all iterative processes: while(true), for(;;) are blocking violations.",
           category: "core",
           zeroTolerance: true,
-          enforcementLevel: "blocking"
+          enforcementLevel: "blocking",
         },
         "11": {
           number: 11,
           title: "Type Safety First",
-          description: "Never use \`any\`, \`@ts-ignore\`, or \`@ts-expect-error\` - these are high-priority violations.",
+          description:
+            "Never use \`any\`, \`@ts-ignore\`, or \`@ts-expect-error\` - these are high-priority violations.",
           category: "extended",
           zeroTolerance: true,
-          enforcementLevel: "blocking"
+          enforcementLevel: "blocking",
         },
         "12": {
           number: 12,
           title: "Early Returns and Guard Clauses",
-          description: "Validate inputs at function boundaries with early returns.",
+          description:
+            "Validate inputs at function boundaries with early returns.",
           category: "extended",
           zeroTolerance: false,
-          enforcementLevel: "medium"
+          enforcementLevel: "medium",
         },
         "15": {
           number: 15,
           title: "Separation of Concerns",
-          description: "Keep UI separate from business logic, isolate side effects.",
+          description:
+            "Keep UI separate from business logic, isolate side effects.",
           category: "extended",
           zeroTolerance: false,
-          enforcementLevel: "high"
+          enforcementLevel: "high",
         },
         "21": {
           number: 21,
           title: "Dependency Injection",
-          description: "Pass dependencies as parameters, avoid hardcoded dependencies.",
+          description:
+            "Pass dependencies as parameters, avoid hardcoded dependencies.",
           category: "architecture",
           zeroTolerance: false,
-          enforcementLevel: "medium"
+          enforcementLevel: "medium",
         },
         "24": {
           number: 24,
@@ -179,7 +187,7 @@ export class MockCodexGenerator {
           description: "Each class/module should have one reason to change.",
           category: "architecture",
           zeroTolerance: false,
-          enforcementLevel: "high"
+          enforcementLevel: "high",
         },
         "26": {
           number: 26,
@@ -187,32 +195,35 @@ export class MockCodexGenerator {
           description: "Maintain 85%+ behavioral test coverage.",
           category: "architecture",
           zeroTolerance: false,
-          enforcementLevel: "high"
+          enforcementLevel: "high",
         },
         "31": {
           number: 31,
           title: "Async/Await Over Callbacks",
-          description: "Use async/await for asynchronous code, avoid callback hell.",
+          description:
+            "Use async/await for asynchronous code, avoid callback hell.",
           category: "advanced",
           zeroTolerance: false,
-          enforcementLevel: "medium"
+          enforcementLevel: "medium",
         },
         "32": {
           number: 32,
           title: "Proper Error Handling",
-          description: "Never ignore errors, provide context in error messages.",
+          description:
+            "Never ignore errors, provide context in error messages.",
           category: "advanced",
           zeroTolerance: true,
-          enforcementLevel: "blocking"
+          enforcementLevel: "blocking",
         },
         "35": {
           number: 35,
           title: "Version Control Best Practices",
-          description: "Atomic commits, descriptive commit messages, use feature branches.",
+          description:
+            "Atomic commits, descriptive commit messages, use feature branches.",
           category: "advanced",
           zeroTolerance: false,
-          enforcementLevel: "medium"
-        }
+          enforcementLevel: "medium",
+        },
       },
       interweaves: ["Error Prevention Interweave", "Performance Interweave"],
       lenses: ["Code Quality Lens", "Maintainability Lens"],
@@ -221,12 +232,12 @@ export class MockCodexGenerator {
       validationCriteria: {
         "All functions have implementations": false,
         "No TODO comments in production code": false,
-        "TypeScript compilation succeeds": true
+        "TypeScript compilation succeeds": true,
       },
       frameworkAlignment: {
         "oh-my-opencode": "v2.12.0",
-        "strray-framework": "v1.0.0"
-      }
+        "strray-framework": "v1.0.0",
+      },
     });
   }
 
@@ -245,7 +256,7 @@ export class MockCodexGenerator {
           description: "All code must be production-ready.",
           category: "core",
           zeroTolerance: false,
-          enforcementLevel: "high"
+          enforcementLevel: "high",
         },
         "7": {
           number: 7,
@@ -253,7 +264,7 @@ export class MockCodexGenerator {
           description: "Zero-tolerance for unresolved errors.",
           category: "core",
           zeroTolerance: true,
-          enforcementLevel: "blocking"
+          enforcementLevel: "blocking",
         },
         "8": {
           number: 8,
@@ -261,15 +272,15 @@ export class MockCodexGenerator {
           description: "Guarantee termination in all iterative processes.",
           category: "core",
           zeroTolerance: true,
-          enforcementLevel: "blocking"
-        }
+          enforcementLevel: "blocking",
+        },
       },
       interweaves: [],
       lenses: [],
       principles: [],
       antiPatterns: [],
       validationCriteria: {},
-      frameworkAlignment: {}
+      frameworkAlignment: {},
     });
   }
 
@@ -288,15 +299,16 @@ export class MockCodexGenerator {
           description: "All code must be production-ready.",
           category: "core",
           zeroTolerance: false,
-          enforcementLevel: "high"
+          enforcementLevel: "high",
         },
         "7": {
           number: 7,
           title: "Resolve All Errors",
-          description: "Zero-tolerance for unresolved errors - TODO and FIXME are violations.",
+          description:
+            "Zero-tolerance for unresolved errors - TODO and FIXME are violations.",
           category: "core",
           zeroTolerance: true,
-          enforcementLevel: "blocking"
+          enforcementLevel: "blocking",
         },
         "8": {
           number: 8,
@@ -304,7 +316,7 @@ export class MockCodexGenerator {
           description: "Guarantee termination - while(true) is a violation.",
           category: "core",
           zeroTolerance: true,
-          enforcementLevel: "blocking"
+          enforcementLevel: "blocking",
         },
         "11": {
           number: 11,
@@ -312,15 +324,15 @@ export class MockCodexGenerator {
           description: "Never use \`any\` or type suppressions.",
           category: "extended",
           zeroTolerance: true,
-          enforcementLevel: "blocking"
-        }
+          enforcementLevel: "blocking",
+        },
       },
       interweaves: [],
       lenses: [],
       principles: [],
       antiPatterns: [],
       validationCriteria: {},
-      frameworkAlignment: {}
+      frameworkAlignment: {},
     });
   }
 
@@ -331,7 +343,7 @@ export class MockCodexGenerator {
     return JSON.stringify({
       invalid: "codex",
       noVersion: true,
-      noTerms: true
+      noTerms: true,
     });
   }
 }
@@ -343,52 +355,69 @@ export class MockContextFactory {
   /**
    * Create a mock codex context
    */
-  static createMockContext(overrides: Partial<CodexContext> = {}): CodexContext {
+  static createMockContext(
+    overrides: Partial<CodexContext> = {},
+  ): CodexContext {
     const defaultContext: CodexContext = {
-      version: '1.2.20',
+      version: "1.2.20",
       lastUpdated: new Date().toISOString(),
       terms: new Map([
-        [1, {
-          number: 1,
-          description: 'Progressive Prod-Ready Code - All code must be production-ready.',
-          category: 'core',
-          enforcementLevel: 'high'
-        }],
-        [7, {
-          number: 7,
-          description: 'Resolve All Errors - Zero-tolerance for unresolved errors.',
-          category: 'core',
-          zeroTolerance: true,
-          enforcementLevel: 'blocking'
-        }],
-        [8, {
-          number: 8,
-          description: 'Prevent Infinite Loops - Guarantee termination.',
-          category: 'core',
-          zeroTolerance: true,
-          enforcementLevel: 'blocking'
-        }],
-        [11, {
-          number: 11,
-          description: 'Type Safety First - Never use any or type suppressions.',
-          category: 'extended',
-          enforcementLevel: 'high'
-        }]
+        [
+          1,
+          {
+            number: 1,
+            description:
+              "Progressive Prod-Ready Code - All code must be production-ready.",
+            category: "core",
+            enforcementLevel: "high",
+          },
+        ],
+        [
+          7,
+          {
+            number: 7,
+            description:
+              "Resolve All Errors - Zero-tolerance for unresolved errors.",
+            category: "core",
+            zeroTolerance: true,
+            enforcementLevel: "blocking",
+          },
+        ],
+        [
+          8,
+          {
+            number: 8,
+            description: "Prevent Infinite Loops - Guarantee termination.",
+            category: "core",
+            zeroTolerance: true,
+            enforcementLevel: "blocking",
+          },
+        ],
+        [
+          11,
+          {
+            number: 11,
+            description:
+              "Type Safety First - Never use any or type suppressions.",
+            category: "extended",
+            enforcementLevel: "high",
+          },
+        ],
       ]),
-      interweaves: ['Error Prevention Interweave', 'Performance Interweave'],
-      lenses: ['Code Quality Lens', 'Maintainability Lens'],
-      principles: ['SOLID Principles', 'DRY Principles'],
-      antiPatterns: ['Spaghetti code', 'God classes'],
+      interweaves: ["Error Prevention Interweave", "Performance Interweave"],
+      lenses: ["Code Quality Lens", "Maintainability Lens"],
+      principles: ["SOLID Principles", "DRY Principles"],
+      antiPatterns: ["Spaghetti code", "God classes"],
       validationCriteria: {
-        'All functions have implementations': false,
-        'No TODO comments': false,
-        'TypeScript compilation succeeds': true
+        "All functions have implementations": false,
+        "No TODO comments": false,
+        "TypeScript compilation succeeds": true,
       },
       frameworkAlignment: {
-        'oh-my-opencode': 'v2.12.0',
-        'StrRay Framework': 'v1.0.0'
+        "oh-my-opencode": "v2.12.0",
+        "StrRay Framework": "v1.0.0",
       },
-      errorPreventionTarget: 0.996
+      errorPreventionTarget: 0.996,
     };
 
     return { ...defaultContext, ...overrides };
@@ -400,10 +429,10 @@ export class MockContextFactory {
   static createMockTerm(overrides: Partial<CodexTerm> = {}): CodexTerm {
     return {
       number: 1,
-      description: 'Mock codex term for testing',
-      category: 'core',
-      enforcementLevel: 'medium',
-      ...overrides
+      description: "Mock codex term for testing",
+      category: "core",
+      enforcementLevel: "medium",
+      ...overrides,
     };
   }
 }
@@ -419,41 +448,45 @@ export class TestDataFactory {
     const violations = Array.from({ length: violationCount }, (_, i) => ({
       term: MockContextFactory.createMockTerm({ number: i + 1 }),
       reason: `Mock violation ${i + 1}`,
-      severity: ['low', 'medium', 'high', 'blocking'][i % 4] as 'low' | 'medium' | 'high' | 'blocking'
+      severity: ["low", "medium", "high", "blocking"][i % 4] as
+        | "low"
+        | "medium"
+        | "high"
+        | "blocking",
     }));
 
     return {
       compliant,
       violations,
-      recommendations: compliant ? [] : ['Fix the violations']
+      recommendations: compliant ? [] : ["Fix the violations"],
     };
   }
 
   /**
    * Create mock tool execution data
    */
-  static createToolExecution(tool = 'read', hasOutput = true) {
+  static createToolExecution(tool = "read", hasOutput = true) {
     return {
       input: {
         tool,
-        args: { filePath: 'test.ts' }
+        args: { filePath: "test.ts" },
       },
-      output: hasOutput ? { output: 'Mock tool output' } : {}
+      output: hasOutput ? { output: "Mock tool output" } : {},
     };
   }
 
   /**
    * Create mock session data
    */
-  static createSessionData(sessionId = 'test-session-123') {
+  static createSessionData(sessionId = "test-session-123") {
     return {
       sessionId,
       startTime: Date.now(),
       componentStates: {
-        contextLoader: 'loaded',
-        stateManager: 'active',
-        codexInjector: 'ready'
-      }
+        contextLoader: "loaded",
+        stateManager: "active",
+        codexInjector: "ready",
+      },
     };
   }
 }
@@ -469,10 +502,10 @@ export class PerformanceTestUtils {
     const startTime = performance.now();
     const result = fn();
     const endTime = performance.now();
-    
+
     return {
       result,
-      duration: endTime - startTime
+      duration: endTime - startTime,
     };
   }
 
@@ -480,8 +513,8 @@ export class PerformanceTestUtils {
    * Run performance test with multiple iterations
    */
   static runPerformanceTest<T>(
-    fn: () => T, 
-    iterations = 100
+    fn: () => T,
+    iterations = 100,
   ): { results: T[]; totalDuration: number; averageDuration: number } {
     const results: T[] = [];
     const startTime = performance.now();
@@ -496,16 +529,22 @@ export class PerformanceTestUtils {
     return {
       results,
       totalDuration,
-      averageDuration: totalDuration / iterations
+      averageDuration: totalDuration / iterations,
     };
   }
 
   /**
    * Assert performance requirements
    */
-  static assertPerformance(duration: number, maxDuration: number, operation: string): void {
+  static assertPerformance(
+    duration: number,
+    maxDuration: number,
+    operation: string,
+  ): void {
     if (duration > maxDuration) {
-      throw new Error(`${operation} took ${duration}ms, exceeding maximum of ${maxDuration}ms`);
+      throw new Error(
+        `${operation} took ${duration}ms, exceeding maximum of ${maxDuration}ms`,
+      );
     }
   }
 }
@@ -524,14 +563,17 @@ export class MemoryTestUtils {
   /**
    * Monitor memory usage during operation
    */
-  static monitorMemoryUsage<T>(fn: () => T): { result: T; memoryDelta: number } {
+  static monitorMemoryUsage<T>(fn: () => T): {
+    result: T;
+    memoryDelta: number;
+  } {
     const beforeMemory = this.getMemoryUsage().heapUsed;
     const result = fn();
     const afterMemory = this.getMemoryUsage().heapUsed;
-    
+
     return {
       result,
-      memoryDelta: afterMemory - beforeMemory
+      memoryDelta: afterMemory - beforeMemory,
     };
   }
 
@@ -553,31 +595,31 @@ export class AsyncTestUtils {
    * Wait for a specified amount of time
    */
   static delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   /**
    * Retry an async operation with backoff
    */
   static async retry<T>(
-    fn: () => Promise<T>, 
-    maxAttempts = 3, 
-    delayMs = 100
+    fn: () => Promise<T>,
+    maxAttempts = 3,
+    delayMs = 100,
   ): Promise<T> {
     let lastError: Error;
-    
+
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
       try {
         return await fn();
       } catch (error) {
         lastError = error as Error;
-        
+
         if (attempt < maxAttempts) {
           await this.delay(delayMs * attempt); // Exponential backoff
         }
       }
     }
-    
+
     throw lastError!;
   }
 
@@ -587,9 +629,12 @@ export class AsyncTestUtils {
   static withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
     return Promise.race([
       promise,
-      new Promise<never>((_, reject) => 
-        setTimeout(() => reject(new Error(`Operation timed out after ${timeoutMs}ms`)), timeoutMs)
-      )
+      new Promise<never>((_, reject) =>
+        setTimeout(
+          () => reject(new Error(`Operation timed out after ${timeoutMs}ms`)),
+          timeoutMs,
+        ),
+      ),
     ]);
   }
 }

@@ -1,86 +1,86 @@
 {
-	"name": "stringray-framework",
-	"version": "1.0.0",
-	"description": "StringRay (StrRay) - Ship Production-Ready Code & Eliminate Common Dead Ends for AI Devs. Eradicates Spaghetti Code, Hallucinations & Code Rot with Agentic AI Coordination & Automation.",
-	"type": "module",
-	"main": "./dist/index.js",
-	"types": "./dist/index.d.ts",
-	"scripts": {
-		"build": "tsc",
-		"dev": "tsc && node dist/server.js",
-		"start": "node dist/server.js",
-		"stop": "pkill -f 'node dist/server.js'",
-		"init": "bash scripts/init.sh",
-		"validate": "node scripts/validate-codex.js",
-		"clean": "rm -rf dist",
-		"prepublishOnly": "npm run build",
-		"test": "node scripts/test-utils/smart-test-runner.mjs",
-		"test:direct": "vitest run",
-		"test:watch": "vitest",
-		"test:coverage": "vitest run --coverage --reporter=verbose",
-		"test:unit": "vitest run --config vitest.unit.config.ts",
-		"test:smart": "node scripts/test-utils/smart-test-runner.mjs",
-		"test:quarantine": "node scripts/test-utils/test-quarantine.mjs",
-		"test:quarantine:list": "node scripts/test-utils/test-quarantine.mjs list",
-		"test:quarantine:stats": "node scripts/test-utils/test-quarantine.mjs stats",
-		"test:performance": "node scripts/performance-test.cjs",
-		"test:performance:comprehensive": "node -e \"import('./dist/performance/index.js').then(m => m.performanceSystem.initialize().then(() => m.performanceSystem.runGates()))\"",
-		"performance:monitor": "node -e \"import('./dist/performance/index.js').then(m => m.performanceSystem.initialize().then(() => m.performanceSystem.start()))\"",
-		"performance:report": "node -e \"import('./dist/performance/index.js').then(m => m.performanceSystem.initialize().then(() => m.performanceSystem.generateReport().then(r => console.log(JSON.stringify(r, null, 2))))\"",
-		"performance:gates": "node -e \"import('./dist/performance/index.js').then(m => m.performanceSystem.initialize().then(() => m.performanceSystem.runGates()))\"",
-		"audit": "npm audit",
-		"security-audit": "node scripts/basic-security-audit.cjs",
-		"security-check": "npm run security-audit && npm audit --audit-level=moderate",
-		"security-monitor": "node scripts/basic-security-audit.cjs --monitor",
-		"deps:check": "npm audit && npm outdated",
-		"deps:update": "npm update && npm audit fix",
-		"deps:scan": "node scripts/dependency-scan.cjs"
-	},
-	"keywords": [
-		"ai",
-		"development",
-		"framework",
-		"typescript",
-		"codex",
-		"error-prevention",
-		"oh-my-opencode"
-	],
-	"author": "StrRay Framework Team",
-	"license": "MIT",
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/strray-framework/stringray.git"
-	},
-	"homepage": "https://github.com/strray-framework/stringray#readme",
-	"bugs": {
-		"url": "https://github.com/strray-framework/stringray/issues"
-	},
-	"dependencies": {
-		"@opencode-ai/plugin": "~1.1.4",
-		"@types/express": "~5.0.6",
-		"@types/jsonwebtoken": "^9.0.10",
-		"express": "~5.2.1",
-		"jsonwebtoken": "^9.0.3",
-		"open": "~11.0.0",
-		"zod": "~4.1.8"
-	},
-	"devDependencies": {
-		"@faker-js/faker": "^9.9.0",
-		"@types/node": "~22.19.3",
-		"@vitest/coverage-v8": "~4.0.16",
-		"fishery": "^2.4.0",
-		"typescript": "~5.9.3",
-		"vitest": "~4.0.16"
-	},
-	"engines": {
-		"node": ">=18.0.0"
-	},
-	"files": [
-		"dist",
-		"src",
-		"scripts",
-		"config",
-		"docs",
-		"README.md"
-	]
+  "name": "stringray-framework",
+  "version": "1.0.0",
+  "description": "StringRay (StrRay) - Ship Production-Ready Code & Eliminate Common Dead Ends for AI Devs. Eradicates Spaghetti Code, Hallucinations & Code Rot with Agentic AI Coordination & Automation.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc && node dist/server.js",
+    "start": "node dist/server.js",
+    "stop": "pkill -f 'node dist/server.js'",
+    "init": "bash scripts/init.sh",
+    "validate": "node scripts/validate-codex.js",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "npm run build",
+    "test": "node scripts/test-utils/smart-test-runner.mjs",
+    "test:direct": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage --reporter=verbose",
+    "test:unit": "vitest run --config vitest.unit.config.ts",
+    "test:smart": "node scripts/test-utils/smart-test-runner.mjs",
+    "test:quarantine": "node scripts/test-utils/test-quarantine.mjs",
+    "test:quarantine:list": "node scripts/test-utils/test-quarantine.mjs list",
+    "test:quarantine:stats": "node scripts/test-utils/test-quarantine.mjs stats",
+    "test:performance": "node scripts/performance-test.cjs",
+    "test:performance:comprehensive": "node -e \"import('./dist/performance/index.js').then(m => m.performanceSystem.initialize().then(() => m.performanceSystem.runGates()))\"",
+    "performance:monitor": "node -e \"import('./dist/performance/index.js').then(m => m.performanceSystem.initialize().then(() => m.performanceSystem.start()))\"",
+    "performance:report": "node -e \"import('./dist/performance/index.js').then(m => m.performanceSystem.initialize().then(() => m.performanceSystem.generateReport().then(r => console.log(JSON.stringify(r, null, 2))))\"",
+    "performance:gates": "node -e \"import('./dist/performance/index.js').then(m => m.performanceSystem.initialize().then(() => m.performanceSystem.runGates()))\"",
+    "audit": "npm audit",
+    "security-audit": "node scripts/basic-security-audit.cjs",
+    "security-check": "npm run security-audit && npm audit --audit-level=moderate",
+    "security-monitor": "node scripts/basic-security-audit.cjs --monitor",
+    "deps:check": "npm audit && npm outdated",
+    "deps:update": "npm update && npm audit fix",
+    "deps:scan": "node scripts/dependency-scan.cjs"
+  },
+  "keywords": [
+    "ai",
+    "development",
+    "framework",
+    "typescript",
+    "codex",
+    "error-prevention",
+    "oh-my-opencode"
+  ],
+  "author": "StrRay Framework Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/strray-framework/stringray.git"
+  },
+  "homepage": "https://github.com/strray-framework/stringray#readme",
+  "bugs": {
+    "url": "https://github.com/strray-framework/stringray/issues"
+  },
+  "dependencies": {
+    "@opencode-ai/plugin": "~1.1.4",
+    "@types/express": "~5.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "express": "~5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "open": "~11.0.0",
+    "zod": "~4.1.8"
+  },
+  "devDependencies": {
+    "@faker-js/faker": "^9.9.0",
+    "@types/node": "~22.19.3",
+    "@vitest/coverage-v8": "~4.0.16",
+    "fishery": "^2.4.0",
+    "typescript": "~5.9.3",
+    "vitest": "~4.0.16"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "files": [
+    "dist",
+    "src",
+    "scripts",
+    "config",
+    "docs",
+    "README.md"
+  ]
 }

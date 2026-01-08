@@ -8,8 +8,8 @@
  * @since 2026-01-07
  */
 
-import { SecurityIssue } from './security-auditor';
-import { promises as fs } from 'fs';
+import { SecurityIssue } from "./security-auditor";
+import { promises as fs } from "fs";
 
 export interface SecurityHardeningConfig {
   enableInputValidation: boolean;
@@ -33,7 +33,7 @@ export class SecurityHardener {
       maxRequestSizeBytes: 1024 * 1024, // 1MB
       rateLimitWindowMs: 60000, // 1 minute
       rateLimitMaxRequests: 100,
-      ...config
+      ...config,
     };
   }
 
@@ -47,7 +47,7 @@ export class SecurityHardener {
     const appliedFixes: string[] = [];
     const remainingIssues: SecurityIssue[] = [];
 
-    console.log('🔒 Security Hardener: Applying security fixes...');
+    console.log("🔒 Security Hardener: Applying security fixes...");
 
     for (const issue of auditResult.issues) {
       const fix = await this.applyFixForIssue(issue);
@@ -68,18 +68,18 @@ export class SecurityHardener {
     description: string;
   }> {
     switch (issue.category) {
-      case 'hardcoded-secrets':
+      case "hardcoded-secrets":
         return await this.fixHardcodedSecrets(issue);
-      case 'file-permissions':
+      case "file-permissions":
         return await this.fixFilePermissions(issue);
-      case 'dependency-management':
+      case "dependency-management":
         return await this.fixDependencyManagement(issue);
-      case 'input-validation':
+      case "input-validation":
         return await this.addInputValidation(issue);
       default:
         return {
           applied: false,
-          description: `No automated fix available for ${issue.category}`
+          description: `No automated fix available for ${issue.category}`,
         };
     }
   }
@@ -94,7 +94,7 @@ export class SecurityHardener {
 
     return {
       applied: false,
-      description: `Manual intervention required for hardcoded secrets in ${issue.file}`
+      description: `Manual intervention required for hardcoded secrets in ${issue.file}`,
     };
   }
 
@@ -107,12 +107,12 @@ export class SecurityHardener {
       await fs.chmod(issue.file, 0o644);
       return {
         applied: true,
-        description: `Fixed file permissions for ${issue.file}`
+        description: `Fixed file permissions for ${issue.file}`,
       };
     } catch (error) {
       return {
         applied: false,
-        description: `Failed to fix permissions for ${issue.file}: ${error}`
+        description: `Failed to fix permissions for ${issue.file}: ${error}`,
       };
     }
   }
@@ -122,12 +122,16 @@ export class SecurityHardener {
     description: string;
   }> {
     // This requires manual intervention for dependency updates
-    console.log(`🔧 Manual fix needed for dependency management in ${issue.file}`);
-    console.log(`💡 Recommendation: Update dependencies to specific versions and use lockfiles`);
+    console.log(
+      `🔧 Manual fix needed for dependency management in ${issue.file}`,
+    );
+    console.log(
+      `💡 Recommendation: Update dependencies to specific versions and use lockfiles`,
+    );
 
     return {
       applied: false,
-      description: `Manual intervention required for dependency management in ${issue.file}`
+      description: `Manual intervention required for dependency management in ${issue.file}`,
     };
   }
 
@@ -136,12 +140,16 @@ export class SecurityHardener {
     description: string;
   }> {
     // This would require code analysis and modification
-    console.log(`🔧 Code modification needed for input validation in ${issue.file}:${issue.line}`);
-    console.log(`💡 Recommendation: Add comprehensive input validation and sanitization`);
+    console.log(
+      `🔧 Code modification needed for input validation in ${issue.file}:${issue.line}`,
+    );
+    console.log(
+      `💡 Recommendation: Add comprehensive input validation and sanitization`,
+    );
 
     return {
       applied: false,
-      description: `Code modification required for input validation in ${issue.file}`
+      description: `Code modification required for input validation in ${issue.file}`,
     };
   }
 
@@ -153,12 +161,12 @@ export class SecurityHardener {
 
     return {
       ...headers,
-      'X-Content-Type-Options': 'nosniff',
-      'X-Frame-Options': 'DENY',
-      'X-XSS-Protection': '1; mode=block',
-      'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
-      'Content-Security-Policy': "default-src 'self'",
-      'Referrer-Policy': 'strict-origin-when-cross-origin'
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY",
+      "X-XSS-Protection": "1; mode=block",
+      "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
+      "Content-Security-Policy": "default-src 'self'",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
     };
   }
 
@@ -173,21 +181,29 @@ export class SecurityHardener {
     const errors: string[] = [];
 
     // Basic validation - in production, use a proper validation library
-    if (schema.type === 'string' && typeof input !== 'string') {
-      errors.push('Expected string');
+    if (schema.type === "string" && typeof input !== "string") {
+      errors.push("Expected string");
     }
 
-    if (schema.maxLength && typeof input === 'string' && input.length > schema.maxLength) {
+    if (
+      schema.maxLength &&
+      typeof input === "string" &&
+      input.length > schema.maxLength
+    ) {
       errors.push(`String too long (max ${schema.maxLength})`);
     }
 
-    if (schema.pattern && typeof input === 'string' && !new RegExp(schema.pattern).test(input)) {
-      errors.push('String does not match required pattern');
+    if (
+      schema.pattern &&
+      typeof input === "string" &&
+      !new RegExp(schema.pattern).test(input)
+    ) {
+      errors.push("String does not match required pattern");
     }
 
     return {
       valid: errors.length === 0,
-      errors
+      errors,
     };
   }
 
@@ -201,7 +217,7 @@ export class SecurityHardener {
     const windowStart = now - this.config.rateLimitWindowMs;
 
     const userRequests = requests.get(identifier) || [];
-    const recentRequests = userRequests.filter(time => time > windowStart);
+    const recentRequests = userRequests.filter((time) => time > windowStart);
 
     if (recentRequests.length >= this.config.rateLimitMaxRequests) {
       return false;
@@ -218,7 +234,7 @@ export class SecurityHardener {
    */
   logSecurityEvent(event: {
     type: string;
-    severity: 'low' | 'medium' | 'high' | 'critical';
+    severity: "low" | "medium" | "high" | "critical";
     message: string;
     metadata?: Record<string, any>;
   }): void {
@@ -226,10 +242,13 @@ export class SecurityHardener {
 
     const logEntry = {
       timestamp: new Date().toISOString(),
-      ...event
+      ...event,
     };
 
-    console.log(`🔒 SECURITY EVENT [${event.severity.toUpperCase()}]:`, JSON.stringify(logEntry));
+    console.log(
+      `🔒 SECURITY EVENT [${event.severity.toUpperCase()}]:`,
+      JSON.stringify(logEntry),
+    );
 
     // In production, this would write to secure audit logs
   }

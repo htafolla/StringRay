@@ -1,6 +1,7 @@
 # Security Training Documentation Tasks
 
 ## 완료된 작업
+
 [ ] Analyze StrRay Framework security implementations
 [x] Create Security Training Guide - Core security principles, secure coding practices
 [x] Code Review Checklist - Security-focused code review guidelines

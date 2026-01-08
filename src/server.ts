@@ -1,7 +1,7 @@
-import express from 'express';
-import { exec } from 'child_process';
-import { join, dirname } from 'path';
-import { fileURLToPath } from 'url';
+import express from "express";
+import { exec } from "child_process";
+import { join, dirname } from "path";
+import { fileURLToPath } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -14,10 +14,13 @@ let securityMiddleware: any = null;
 const getSecurityMiddleware = async () => {
   if (!securityMiddleware) {
     try {
-      const { securityHeadersMiddleware } = await import('./security/security-headers');
+      const { securityHeadersMiddleware } =
+        await import("./security/security-headers");
       securityMiddleware = securityHeadersMiddleware.getExpressMiddleware();
     } catch (error) {
-      console.warn('Security middleware not available, continuing without security headers');
+      console.warn(
+        "Security middleware not available, continuing without security headers",
+      );
       securityMiddleware = (req: any, res: any, next: any) => next(); // No-op middleware
     }
   }
@@ -30,46 +33,49 @@ app.use(async (req, res, next) => {
     const middleware = await getSecurityMiddleware();
     return middleware(req, res, next);
   } catch (error) {
-    console.warn('Security middleware failed to load, continuing without it:', error);
+    console.warn(
+      "Security middleware failed to load, continuing without it:",
+      error,
+    );
     next();
   }
 });
 
 // Serve static files
-app.use(express.static(join(__dirname, 'public')));
+app.use(express.static(join(__dirname, "public")));
 
 // API endpoints
-app.get('/api/status', (req: any, res: any) => {
+app.get("/api/status", (req: any, res: any) => {
   // Return framework status
   res.json({
-    framework: 'StringRay',
-    version: '1.0.0',
-    status: 'active',
+    framework: "StringRay",
+    version: "1.0.0",
+    status: "active",
     agents: 8,
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   });
 });
 
-app.get('/api/agents', (req: any, res: any) => {
+app.get("/api/agents", (req: any, res: any) => {
   // Return agent configurations
   res.json({
     agents: [
-      'enforcer',
-      'architect',
-      'orchestrator',
-      'bug-triage-specialist',
-      'code-reviewer',
-      'security-auditor',
-      'refactorer',
-      'test-architect'
-    ]
+      "enforcer",
+      "architect",
+      "orchestrator",
+      "bug-triage-specialist",
+      "code-reviewer",
+      "security-auditor",
+      "refactorer",
+      "test-architect",
+    ],
   });
 });
 
 // Performance monitoring middleware
 app.use((req: any, res: any, next: any) => {
   const start = process.hrtime.bigint();
-  res.on('finish', () => {
+  res.on("finish", () => {
     const end = process.hrtime.bigint();
     const duration = Number(end - start) / 1e6; // Convert to milliseconds
     console.log(`${req.method} ${req.url} - ${duration.toFixed(2)}ms`);
@@ -78,37 +84,44 @@ app.use((req: any, res: any, next: any) => {
 });
 
 // Add route for root path
-app.get('/', (req: any, res: any) => {
-  res.sendFile(join(__dirname, '..', 'public', 'index.html'));
+app.get("/", (req: any, res: any) => {
+  res.sendFile(join(__dirname, "..", "public", "index.html"));
 });
 
 // Add route for refactoring logs
-app.get('/logs', async (req: any, res: any) => {
-  const logPath = join(__dirname, '..', '.opencode', 'REFACTORING_LOG.md');
-  console.log('Server __dirname:', __dirname);
-  console.log('Resolved log path:', logPath);
+app.get("/logs", async (req: any, res: any) => {
+  const logPath = join(__dirname, "..", ".opencode", "REFACTORING_LOG.md");
+  console.log("Server __dirname:", __dirname);
+  console.log("Resolved log path:", logPath);
 
   try {
-    const fs = await import('fs');
-    console.log('File exists:', fs.existsSync(logPath));
+    const fs = await import("fs");
+    console.log("File exists:", fs.existsSync(logPath));
 
     if (fs.existsSync(logPath)) {
-      const content = fs.readFileSync(logPath, 'utf-8');
-      res.setHeader('Content-Type', 'text/markdown');
+      const content = fs.readFileSync(logPath, "utf-8");
+      res.setHeader("Content-Type", "text/markdown");
       res.send(content);
     } else {
-      res.status(404).send('Refactoring log not found. The framework may not have generated any logs yet.');
+      res
+        .status(404)
+        .send(
+          "Refactoring log not found. The framework may not have generated any logs yet.",
+        );
     }
   } catch (error) {
-    console.log('File read error:', error);
-    res.status(500).send('Server error reading log file.');
+    console.log("File read error:", error);
+    res.status(500).send("Server error reading log file.");
   }
 });
 
 app.listen(PORT, () => {
-
   // Auto-open browser
-  const start = process.platform === 'darwin' ? 'open' :
-                process.platform === 'win32' ? 'start' : 'xdg-open';
+  const start =
+    process.platform === "darwin"
+      ? "open"
+      : process.platform === "win32"
+        ? "start"
+        : "xdg-open";
   exec(`${start} http://localhost:${PORT}`);
 });

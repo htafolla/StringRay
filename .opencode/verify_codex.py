@@ -116,8 +116,14 @@ def test_zero_tolerance_blocking():
             print("✗ FAIL: Should have found violations")
             return False
 
-        has_todo = any('TODO' in v.get('matched_text', '') or 'TODO' in v.get('message', '') for v in violations)
-        has_any = any('any' in v.get('matched_text', '') or 'any' in v.get('message', '') for v in violations)
+        has_todo = any(
+            "TODO" in v.get("matched_text", "") or "TODO" in v.get("message", "")
+            for v in violations
+        )
+        has_any = any(
+            "any" in v.get("matched_text", "") or "any" in v.get("message", "")
+            for v in violations
+        )
 
         print(f"  - Detected TODO: {has_todo}")
         print(f"  - Detected 'any' type: {has_any}")
@@ -176,11 +182,11 @@ def test_manifest():
     print(f"  - Categories: {list(manifest.get('categories', {}).keys())}")
     print(f"  - Is loaded: {manifest.get('is_loaded')}")
 
-    if not manifest.get('is_loaded'):
+    if not manifest.get("is_loaded"):
         print("✗ FAIL: Manifest shows not loaded")
         return False
 
-    if manifest.get('term_count', 0) < 10:
+    if manifest.get("term_count", 0) < 10:
         print(f"✗ FAIL: Expected at least 10 terms in manifest")
         return False
 
@@ -213,6 +219,7 @@ def main():
         except Exception as e:
             print(f"✗ FAIL: {test_name} raised exception: {e}")
             import traceback
+
             traceback.print_exc()
             results.append((test_name, False))
 

@@ -8,13 +8,13 @@
  * @since 2026-01-07
  */
 
-import { StrRayStateManager } from '../state/state-manager';
-import { SessionCoordinator } from '../delegation/session-coordinator';
-import { SessionCleanupManager } from './session-cleanup-manager';
+import { StrRayStateManager } from "../state/state-manager";
+import { SessionCoordinator } from "../delegation/session-coordinator";
+import { SessionCleanupManager } from "./session-cleanup-manager";
 
 export interface SessionHealth {
   sessionId: string;
-  status: 'healthy' | 'degraded' | 'critical' | 'unknown';
+  status: "healthy" | "degraded" | "critical" | "unknown";
   lastCheck: number;
   responseTime: number;
   errorCount: number;
@@ -52,8 +52,8 @@ export interface MonitorConfig {
 export interface Alert {
   id: string;
   sessionId: string;
-  type: 'health' | 'performance' | 'resource' | 'coordination';
-  severity: 'low' | 'medium' | 'high' | 'critical';
+  type: "health" | "performance" | "resource" | "coordination";
+  severity: "low" | "medium" | "high" | "critical";
   message: string;
   timestamp: number;
   resolved: boolean;
@@ -75,7 +75,7 @@ export class SessionMonitor {
     stateManager: StrRayStateManager,
     sessionCoordinator: SessionCoordinator,
     cleanupManager: SessionCleanupManager,
-    config: Partial<MonitorConfig> = {}
+    config: Partial<MonitorConfig> = {},
   ) {
     this.stateManager = stateManager;
     this.sessionCoordinator = sessionCoordinator;
@@ -87,18 +87,18 @@ export class SessionMonitor {
         maxResponseTime: 5000,
         maxErrorRate: 0.1,
         maxMemoryUsage: 100 * 1024 * 1024,
-        minCoordinationEfficiency: 0.8
+        minCoordinationEfficiency: 0.8,
       },
       enableAlerts: true,
       enableMetrics: true,
-      ...config
+      ...config,
     };
 
     this.initialize();
   }
 
   private initialize(): void {
-    console.log('📊 Session Monitor: Initializing...');
+    console.log("📊 Session Monitor: Initializing...");
 
     this.loadPersistedData();
 
@@ -110,19 +110,19 @@ export class SessionMonitor {
       this.startMetricsCollection();
     }
 
-    console.log('✅ Session Monitor: Initialized');
+    console.log("✅ Session Monitor: Initialized");
   }
 
   registerSession(sessionId: string): void {
     const health: SessionHealth = {
       sessionId,
-      status: 'unknown',
+      status: "unknown",
       lastCheck: 0,
       responseTime: 0,
       errorCount: 0,
       activeAgents: 0,
       memoryUsage: 0,
-      issues: []
+      issues: [],
     };
 
     this.healthChecks.set(sessionId, health);
@@ -156,13 +156,13 @@ export class SessionMonitor {
     }
 
     const issues: string[] = [];
-    let status: SessionHealth['status'] = 'healthy';
+    let status: SessionHealth["status"] = "healthy";
 
     try {
       const sessionStatus = this.sessionCoordinator.getSessionStatus(sessionId);
       if (!sessionStatus) {
-        issues.push('Session not found in coordinator');
-        status = 'critical';
+        issues.push("Session not found in coordinator");
+        status = "critical";
       } else {
         health.activeAgents = sessionStatus.agentCount;
 
@@ -176,16 +176,17 @@ export class SessionMonitor {
         health.activeAgents = metadata.agentCount;
 
         if (metadata.memoryUsage > this.config.alertThresholds.maxMemoryUsage) {
-          issues.push(`High memory usage: ${Math.round(metadata.memoryUsage / 1024 / 1024)}MB`);
-          status = 'degraded';
+          issues.push(
+            `High memory usage: ${Math.round(metadata.memoryUsage / 1024 / 1024)}MB`,
+          );
+          status = "degraded";
         }
       } else {
         health.memoryUsage = Math.random() * 50 * 1024 * 1024;
       }
-
     } catch (error) {
       issues.push(`Health check failed: ${error}`);
-      status = 'critical';
+      status = "critical";
       health.errorCount++;
     }
 
@@ -193,7 +194,7 @@ export class SessionMonitor {
 
     if (responseTime > this.config.alertThresholds.maxResponseTime) {
       issues.push(`Slow response time: ${responseTime}ms`);
-      status = 'degraded';
+      status = "degraded";
     }
 
     health.status = status;
@@ -226,7 +227,7 @@ export class SessionMonitor {
       conflictResolutionRate: 1.0, // Simplified
       coordinationEfficiency: 1.0,
       memoryUsage: metadata?.memoryUsage || 0,
-      agentCount: sessionStatus.agentCount
+      agentCount: sessionStatus.agentCount,
     };
 
     const history = this.metricsHistory.get(sessionId) || [];
@@ -254,7 +255,7 @@ export class SessionMonitor {
   getActiveAlerts(sessionId?: string): Alert[] {
     const alerts = Array.from(this.activeAlerts.values());
     if (sessionId) {
-      return alerts.filter(alert => alert.sessionId === sessionId);
+      return alerts.filter((alert) => alert.sessionId === sessionId);
     }
     return alerts;
   }
@@ -286,9 +287,15 @@ export class SessionMonitor {
 
     for (const health of this.healthChecks.values()) {
       switch (health.status) {
-        case 'healthy': healthy++; break;
-        case 'degraded': degraded++; break;
-        case 'critical': critical++; break;
+        case "healthy":
+          healthy++;
+          break;
+        case "degraded":
+          degraded++;
+          break;
+        case "critical":
+          critical++;
+          break;
       }
     }
 
@@ -303,7 +310,7 @@ export class SessionMonitor {
       degradedSessions: degraded,
       criticalSessions: critical,
       activeAlerts: this.activeAlerts.size,
-      totalMetricsPoints: totalMetrics
+      totalMetricsPoints: totalMetrics,
     };
   }
 
@@ -313,12 +320,17 @@ export class SessionMonitor {
         try {
           await this.performHealthCheck(sessionId);
         } catch (error) {
-          console.error(`❌ Session Monitor: Health check failed for ${sessionId}:`, error);
+          console.error(
+            `❌ Session Monitor: Health check failed for ${sessionId}:`,
+            error,
+          );
         }
       }
     }, this.config.healthCheckIntervalMs);
 
-    console.log(`⏰ Session Monitor: Health checks started (interval: ${this.config.healthCheckIntervalMs}ms)`);
+    console.log(
+      `⏰ Session Monitor: Health checks started (interval: ${this.config.healthCheckIntervalMs}ms)`,
+    );
   }
 
   private startMetricsCollection(): void {
@@ -327,51 +339,68 @@ export class SessionMonitor {
         try {
           this.collectMetrics(sessionId);
         } catch (error) {
-          console.error(`❌ Session Monitor: Metrics collection failed for ${sessionId}:`, error);
+          console.error(
+            `❌ Session Monitor: Metrics collection failed for ${sessionId}:`,
+            error,
+          );
         }
       }
     }, this.config.metricsCollectionIntervalMs);
 
-    console.log(`⏰ Session Monitor: Metrics collection started (interval: ${this.config.metricsCollectionIntervalMs}ms)`);
+    console.log(
+      `⏰ Session Monitor: Metrics collection started (interval: ${this.config.metricsCollectionIntervalMs}ms)`,
+    );
   }
 
-  private generateAlerts(sessionId: string, issues: string[], status: SessionHealth['status']): void {
-    const severity = status === 'critical' ? 'high' : status === 'degraded' ? 'medium' : 'low';
+  private generateAlerts(
+    sessionId: string,
+    issues: string[],
+    status: SessionHealth["status"],
+  ): void {
+    const severity =
+      status === "critical" ? "high" : status === "degraded" ? "medium" : "low";
 
     for (const issue of issues) {
       const alert: Alert = {
         id: `alert_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         sessionId,
-        type: 'health',
+        type: "health",
         severity,
         message: issue,
         timestamp: Date.now(),
-        resolved: false
+        resolved: false,
       };
 
       this.activeAlerts.set(alert.id, alert);
-      console.log(`🚨 Session Monitor: Alert generated for ${sessionId}: ${issue}`);
+      console.log(
+        `🚨 Session Monitor: Alert generated for ${sessionId}: ${issue}`,
+      );
     }
 
     this.persistAlertData();
   }
 
   private loadPersistedData(): void {
-    const healthData = this.stateManager.get<Record<string, SessionHealth>>('monitor:health');
+    const healthData =
+      this.stateManager.get<Record<string, SessionHealth>>("monitor:health");
     if (healthData) {
       for (const [sessionId, health] of Object.entries(healthData)) {
         this.healthChecks.set(sessionId, health);
       }
     }
 
-    const metricsData = this.stateManager.get<Record<string, SessionMetrics[]>>('monitor:metrics');
+    const metricsData =
+      this.stateManager.get<Record<string, SessionMetrics[]>>(
+        "monitor:metrics",
+      );
     if (metricsData) {
       for (const [sessionId, history] of Object.entries(metricsData)) {
         this.metricsHistory.set(sessionId, history);
       }
     }
 
-    const alertData = this.stateManager.get<Record<string, Alert>>('monitor:alerts');
+    const alertData =
+      this.stateManager.get<Record<string, Alert>>("monitor:alerts");
     if (alertData) {
       for (const [alertId, alert] of Object.entries(alertData)) {
         this.activeAlerts.set(alertId, alert);
@@ -381,17 +410,17 @@ export class SessionMonitor {
 
   private persistHealthData(): void {
     const healthData = Object.fromEntries(this.healthChecks);
-    this.stateManager.set('monitor:health', healthData);
+    this.stateManager.set("monitor:health", healthData);
   }
 
   private persistMetricsData(): void {
     const metricsData = Object.fromEntries(this.metricsHistory);
-    this.stateManager.set('monitor:metrics', metricsData);
+    this.stateManager.set("monitor:metrics", metricsData);
   }
 
   private persistAlertData(): void {
     const alertData = Object.fromEntries(this.activeAlerts);
-    this.stateManager.set('monitor:alerts', alertData);
+    this.stateManager.set("monitor:alerts", alertData);
   }
 
   shutdown(): void {
@@ -405,7 +434,7 @@ export class SessionMonitor {
       this.metricsInterval = undefined;
     }
 
-    console.log('🛑 Session Monitor: Shutdown complete');
+    console.log("🛑 Session Monitor: Shutdown complete");
   }
 }
 
@@ -413,7 +442,12 @@ export const createSessionMonitor = (
   stateManager: StrRayStateManager,
   sessionCoordinator: SessionCoordinator,
   cleanupManager: SessionCleanupManager,
-  config?: Partial<MonitorConfig>
+  config?: Partial<MonitorConfig>,
 ): SessionMonitor => {
-  return new SessionMonitor(stateManager, sessionCoordinator, cleanupManager, config);
+  return new SessionMonitor(
+    stateManager,
+    sessionCoordinator,
+    cleanupManager,
+    config,
+  );
 };

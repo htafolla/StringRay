@@ -99,8 +99,8 @@ echo "🚨 Estimating runtime error risk..."
 
 # Check for common error patterns
 
-ERROR*PATTERNS=$(find src -name "*.ts" -o -name "*.tsx" -o -name "*.js" -o -name "*.jsx" | xargs grep -l "console.error\|throw new\|catch.*error" 2>/dev/null | wc -l)
-TOTAL_FILES=$(find src -name "*.ts" -o -name "_.tsx" -o -name "_.js" -o -name "\_.jsx" | wc -l)
+ERROR*PATTERNS=$(find src -name "*.ts" -o -name "_.tsx" -o -name "_.js" -o -name "*.jsx" | xargs grep -l "console.error\|throw new\|catch.*error" 2>/dev/null | wc -l)
+TOTAL*FILES=$(find src -name "\*.ts" -o -name "*.tsx" -o -name "\_.js" -o -name "\_.jsx" | wc -l)
 
 if [ "$TOTAL_FILES" -gt 0 ]; then
 ERROR_RATIO=$((ERROR_PATTERNS * 100 / TOTAL_FILES))

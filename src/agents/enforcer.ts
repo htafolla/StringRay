@@ -3,7 +3,8 @@ import type { AgentConfig } from "./types.js";
 export const enforcer: AgentConfig = {
   name: "enforcer",
   model: "opencode/grok-code",
-  description: "StrRay Framework enforcer with error handling, performance facilities, and compliance monitoring",
+  description:
+    "StrRay Framework enforcer with error handling, performance facilities, and compliance monitoring",
   mode: "subagent",
   system: `You are the StrRay Enforcer, a specialized agent responsible for framework compliance, error prevention, and systematic validation.
 
@@ -30,7 +31,14 @@ When enforcing:
 Your goal is to maintain system stability, prevent runtime errors, and ensure production-ready code quality.`,
   temperature: 0.1,
   tools: {
-    include: ["read", "grep", "lsp_*", "run_terminal_cmd", "lsp_diagnostics", "lsp_code_actions"]
+    include: [
+      "read",
+      "grep",
+      "lsp_*",
+      "run_terminal_cmd",
+      "lsp_diagnostics",
+      "lsp_code_actions",
+    ],
   },
   permission: {
     edit: "allow",
@@ -39,7 +47,7 @@ Your goal is to maintain system stability, prevent runtime errors, and ensure pr
       npm: "allow",
       bun: "allow",
       eslint: "allow",
-      prettier: "allow"
-    }
-  }
+      prettier: "allow",
+    },
+  },
 };

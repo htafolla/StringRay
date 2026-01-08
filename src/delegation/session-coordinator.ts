@@ -8,8 +8,8 @@
  * @since 2026-01-07
  */
 
-import { StrRayStateManager } from '../state/state-manager';
-import { DelegationResult } from './agent-delegator';
+import { StrRayStateManager } from "../state/state-manager";
+import { DelegationResult } from "./agent-delegator";
 
 export interface SessionContext {
   sessionId: string;
@@ -34,7 +34,7 @@ export interface ConflictRecord {
   conflictId: string;
   timestamp: number;
   agents: string[];
-  resolution: 'consensus' | 'majority_vote' | 'expert_priority' | 'manual';
+  resolution: "consensus" | "majority_vote" | "expert_priority" | "manual";
   outcome: any;
 }
 
@@ -51,7 +51,7 @@ export interface Communication {
   toAgent: string;
   message: any;
   timestamp: number;
-  priority: 'low' | 'medium' | 'high';
+  priority: "low" | "medium" | "high";
 }
 
 export interface SessionMetrics {
@@ -74,9 +74,18 @@ export class SessionCoordinator {
   /**
    * Initialize session coordination for a new session
    */
-  initializeSession(sessionId: string): { sessionId: string; createdAt: Date; active: boolean; agentCount: number } {
-    if (!sessionId || typeof sessionId !== 'string' || sessionId.trim() === '') {
-      throw new Error('Invalid session ID: must be a non-empty string');
+  initializeSession(sessionId: string): {
+    sessionId: string;
+    createdAt: Date;
+    active: boolean;
+    agentCount: number;
+  } {
+    if (
+      !sessionId ||
+      typeof sessionId !== "string" ||
+      sessionId.trim() === ""
+    ) {
+      throw new Error("Invalid session ID: must be a non-empty string");
     }
 
     const context: SessionContext = {
@@ -95,38 +104,50 @@ export class SessionCoordinator {
           failedInteractions: 0,
           averageResponseTime: 0,
           conflictResolutionRate: 0,
-          coordinationEfficiency: 0
-        }
+          coordinationEfficiency: 0,
+        },
       },
-      isActive: true
+      isActive: true,
     };
 
     // Initialize with default agents
     const defaultAgents = [
-      'enforcer', 'architect', 'orchestrator', 'bug-triage-specialist',
-      'code-reviewer', 'security-auditor', 'refactorer', 'test-architect'
+      "enforcer",
+      "architect",
+      "orchestrator",
+      "bug-triage-specialist",
+      "code-reviewer",
+      "security-auditor",
+      "refactorer",
+      "test-architect",
     ];
 
-    defaultAgents.forEach(agentName => {
+    defaultAgents.forEach((agentName) => {
       context.coordinationState.activeAgents.add(agentName);
     });
 
     this.sessions.set(sessionId, context);
     this.stateManager.set(`session:${sessionId}:coordinator`, context);
 
-    console.log(`📋 Session Coordinator: Initialized session ${sessionId} with ${defaultAgents.length} agents`);
+    console.log(
+      `📋 Session Coordinator: Initialized session ${sessionId} with ${defaultAgents.length} agents`,
+    );
     return {
       sessionId,
       createdAt: new Date(context.startTime),
       active: context.isActive,
-      agentCount: context.coordinationState.activeAgents.size
+      agentCount: context.coordinationState.activeAgents.size,
     };
   }
 
   /**
    * Register delegation execution in session
    */
-  registerDelegation(sessionId: string, delegationId: string, delegation: DelegationResult): void {
+  registerDelegation(
+    sessionId: string,
+    delegationId: string,
+    delegation: DelegationResult,
+  ): void {
     const session = this.sessions.get(sessionId);
     if (!session) {
       throw new Error(`Session ${sessionId} not found`);
@@ -134,18 +155,27 @@ export class SessionCoordinator {
 
     session.activeDelegations.set(delegationId, delegation);
 
-    delegation.agents.forEach(agentName => {
+    delegation.agents.forEach((agentName) => {
       session.coordinationState.activeAgents.add(agentName);
     });
 
-    this.stateManager.set(`session:${sessionId}:delegations:${delegationId}`, delegation);
-    console.log(`📋 Session Coordinator: Registered delegation ${delegationId} in session ${sessionId}`);
+    this.stateManager.set(
+      `session:${sessionId}:delegations:${delegationId}`,
+      delegation,
+    );
+    console.log(
+      `📋 Session Coordinator: Registered delegation ${delegationId} in session ${sessionId}`,
+    );
   }
 
   /**
    * Record agent interaction within session
    */
-  recordInteraction(sessionId: string, agentName: string, interaction: Omit<AgentInteraction, 'timestamp'>): void {
+  recordInteraction(
+    sessionId: string,
+    agentName: string,
+    interaction: Omit<AgentInteraction, "timestamp">,
+  ): void {
     const session = this.sessions.get(sessionId);
     if (!session) {
       return;
@@ -153,7 +183,7 @@ export class SessionCoordinator {
 
     const fullInteraction: AgentInteraction = {
       ...interaction,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
 
     if (!session.agentInteractions.has(agentName)) {
@@ -164,40 +194,50 @@ export class SessionCoordinator {
 
     this.updateSessionMetrics(session, fullInteraction);
 
-    this.stateManager.set(`session:${sessionId}:interactions:${agentName}`,
-      session.agentInteractions.get(agentName));
+    this.stateManager.set(
+      `session:${sessionId}:interactions:${agentName}`,
+      session.agentInteractions.get(agentName),
+    );
   }
 
   /**
    * Send message between agents within session
    */
-  async sendMessage(sessionId: string, fromAgent: string, toAgent: string, message: any, priority: 'low' | 'medium' | 'high' = 'medium'): Promise<void> {
+  async sendMessage(
+    sessionId: string,
+    fromAgent: string,
+    toAgent: string,
+    message: any,
+    priority: "low" | "medium" | "high" = "medium",
+  ): Promise<void> {
     const session = this.sessions.get(sessionId);
     if (!session) {
       throw new Error(`Session ${sessionId} not found`);
     }
 
-    const crypto = require('crypto');
+    const crypto = require("crypto");
     const communication: Communication = {
-      id: `comm_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`,
+      id: `comm_${Date.now()}_${crypto.randomBytes(4).toString("hex")}`,
       fromAgent,
       toAgent,
       message,
       timestamp: Date.now(),
-      priority
+      priority,
     };
 
     session.coordinationState.pendingCommunications.push(communication);
 
     this.recordInteraction(sessionId, fromAgent, {
       agentName: fromAgent,
-      action: 'send_message',
+      action: "send_message",
       result: { to: toAgent, message },
       duration: 0,
-      success: true
+      success: true,
     });
 
-    console.log(`💬 Session Coordinator: Message from ${fromAgent} to ${toAgent} in session ${sessionId}`);
+    console.log(
+      `💬 Session Coordinator: Message from ${fromAgent} to ${toAgent} in session ${sessionId}`,
+    );
   }
 
   /**
@@ -210,21 +250,21 @@ export class SessionCoordinator {
     }
 
     const messages = session.coordinationState.pendingCommunications.filter(
-      comm => comm.toAgent === agentName
+      (comm) => comm.toAgent === agentName,
     );
 
     session.coordinationState.pendingCommunications =
       session.coordinationState.pendingCommunications.filter(
-        comm => comm.toAgent !== agentName
+        (comm) => comm.toAgent !== agentName,
       );
 
     if (messages.length > 0) {
       this.recordInteraction(sessionId, agentName, {
         agentName,
-        action: 'receive_messages',
+        action: "receive_messages",
         result: { count: messages.length },
         duration: 0,
-        success: true
+        success: true,
       });
     }
 
@@ -234,7 +274,12 @@ export class SessionCoordinator {
   /**
    * Share context data between agents
    */
-  shareContext(sessionId: string, key: string, value: any, fromAgent: string): void {
+  shareContext(
+    sessionId: string,
+    key: string,
+    value: any,
+    fromAgent: string,
+  ): void {
     const session = this.sessions.get(sessionId);
     if (!session) {
       throw new Error(`Session ${sessionId} not found`);
@@ -244,7 +289,7 @@ export class SessionCoordinator {
     const newEntry = {
       value,
       fromAgent,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
 
     if (Array.isArray(existing)) {
@@ -258,17 +303,19 @@ export class SessionCoordinator {
     try {
       this.recordInteraction(sessionId, fromAgent, {
         agentName: fromAgent,
-        action: 'share_context',
+        action: "share_context",
         result: { key, value },
         duration: 0,
-        success: true
+        success: true,
       });
     } catch (error) {
       console.warn(`⚠️ Failed to record context sharing interaction:`, error);
       // Continue operation despite recording failure
     }
 
-    console.log(`🔗 Session Coordinator: ${fromAgent} shared context '${key}' in session ${sessionId}`);
+    console.log(
+      `🔗 Session Coordinator: ${fromAgent} shared context '${key}' in session ${sessionId}`,
+    );
   }
 
   /**
@@ -291,36 +338,53 @@ export class SessionCoordinator {
   /**
    * Record conflict and resolution
    */
-  recordConflict(sessionId: string, agents: string[], resolution: ConflictRecord['resolution'], outcome: any): void {
+  recordConflict(
+    sessionId: string,
+    agents: string[],
+    resolution: ConflictRecord["resolution"],
+    outcome: any,
+  ): void {
     const session = this.sessions.get(sessionId);
     if (!session) {
       return;
     }
 
-    const crypto = require('crypto');
+    const crypto = require("crypto");
     const conflict: ConflictRecord = {
-      conflictId: `conflict_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`,
+      conflictId: `conflict_${Date.now()}_${crypto.randomBytes(4).toString("hex")}`,
       timestamp: Date.now(),
       agents,
       resolution,
-      outcome
+      outcome,
     };
 
     session.conflictHistory.push(conflict);
 
     const totalConflicts = session.conflictHistory.length;
-    const successfulResolutions = session.conflictHistory.filter(c => c.outcome !== undefined).length;
-    session.coordinationState.sessionMetrics.conflictResolutionRate = successfulResolutions / totalConflicts;
+    const successfulResolutions = session.conflictHistory.filter(
+      (c) => c.outcome !== undefined,
+    ).length;
+    session.coordinationState.sessionMetrics.conflictResolutionRate =
+      successfulResolutions / totalConflicts;
 
-    this.stateManager.set(`session:${sessionId}:conflicts`, session.conflictHistory);
+    this.stateManager.set(
+      `session:${sessionId}:conflicts`,
+      session.conflictHistory,
+    );
 
-    console.log(`⚖️ Session Coordinator: Conflict resolved via ${resolution} in session ${sessionId}`);
+    console.log(
+      `⚖️ Session Coordinator: Conflict resolved via ${resolution} in session ${sessionId}`,
+    );
   }
 
   /**
    * Complete delegation and cleanup
    */
-  completeDelegation(sessionId: string, delegationId: string, result: any): void {
+  completeDelegation(
+    sessionId: string,
+    delegationId: string,
+    result: any,
+  ): void {
     const session = this.sessions.get(sessionId);
     if (!session) {
       return;
@@ -333,17 +397,21 @@ export class SessionCoordinator {
       this.stateManager.set(`session:${sessionId}:completed:${delegationId}`, {
         delegation,
         result,
-        completedAt: Date.now()
+        completedAt: Date.now(),
       });
 
-      console.log(`✅ Session Coordinator: Completed delegation ${delegationId} in session ${sessionId}`);
+      console.log(
+        `✅ Session Coordinator: Completed delegation ${delegationId} in session ${sessionId}`,
+      );
     }
   }
 
   /**
    * Get session coordination status
    */
-  getSessionStatus(sessionId: string): { active: boolean; agentCount: number } | null {
+  getSessionStatus(
+    sessionId: string,
+  ): { active: boolean; agentCount: number } | null {
     const session = this.sessions.get(sessionId);
     if (!session) {
       return null;
@@ -351,14 +419,18 @@ export class SessionCoordinator {
 
     return {
       active: session.isActive,
-      agentCount: session.coordinationState.activeAgents.size
+      agentCount: session.coordinationState.activeAgents.size,
     };
   }
 
   /**
    * Resolve conflicts using specified strategy
    */
-  resolveConflict(sessionId: string, conflictKey: string, strategy: 'majority_vote' | 'expert_priority' | 'consensus'): any {
+  resolveConflict(
+    sessionId: string,
+    conflictKey: string,
+    strategy: "majority_vote" | "expert_priority" | "consensus",
+  ): any {
     const session = this.sessions.get(sessionId);
     if (!session) {
       throw new Error(`Session ${sessionId} not found`);
@@ -372,7 +444,7 @@ export class SessionCoordinator {
     let resolved: any;
 
     switch (strategy) {
-      case 'majority_vote':
+      case "majority_vote":
         // Find most common value
         const counts: Record<string, number> = {};
         sharedData.forEach((item: any) => {
@@ -380,8 +452,11 @@ export class SessionCoordinator {
           counts[value] = (counts[value] || 0) + 1;
         });
 
-        const majorityEntry = Object.entries(counts).reduce(([keyA, countA]: [string, number], [keyB, countB]: [string, number]) =>
-          countA > countB ? [keyA, countA] : [keyB, countB]
+        const majorityEntry = Object.entries(counts).reduce(
+          (
+            [keyA, countA]: [string, number],
+            [keyB, countB]: [string, number],
+          ) => (countA > countB ? [keyA, countA] : [keyB, countB]),
         );
 
         if (majorityEntry) {
@@ -389,16 +464,21 @@ export class SessionCoordinator {
         }
         break;
 
-      case 'expert_priority':
+      case "expert_priority":
         // Use security-auditor if available, otherwise first value
-        const expertItem = sharedData.find((item: any) => item.fromAgent === 'security-auditor');
+        const expertItem = sharedData.find(
+          (item: any) => item.fromAgent === "security-auditor",
+        );
         resolved = expertItem ? expertItem.value : sharedData[0]?.value;
         break;
 
-      case 'consensus':
+      case "consensus":
         // All values must be the same
         const firstValue = sharedData[0]?.value;
-        const allSame = sharedData.every((item: any) => JSON.stringify(item.value) === JSON.stringify(firstValue));
+        const allSame = sharedData.every(
+          (item: any) =>
+            JSON.stringify(item.value) === JSON.stringify(firstValue),
+        );
         resolved = allSame ? firstValue : undefined;
         break;
     }
@@ -433,12 +513,17 @@ export class SessionCoordinator {
     // Clear from state manager
     this.stateManager.clear(`session:${sessionId}:coordinator`);
 
-    console.log(`🧹 Session Coordinator: Cleaned up session ${sessionId} (removed)`);
+    console.log(
+      `🧹 Session Coordinator: Cleaned up session ${sessionId} (removed)`,
+    );
   }
 
   // Private methods
 
-  private updateSessionMetrics(session: SessionContext, interaction: AgentInteraction): void {
+  private updateSessionMetrics(
+    session: SessionContext,
+    interaction: AgentInteraction,
+  ): void {
     const metrics = session.coordinationState.sessionMetrics;
 
     metrics.totalInteractions++;
@@ -449,16 +534,22 @@ export class SessionCoordinator {
       metrics.failedInteractions++;
     }
 
-    const totalResponseTime = metrics.averageResponseTime * (metrics.totalInteractions - 1) + interaction.duration;
+    const totalResponseTime =
+      metrics.averageResponseTime * (metrics.totalInteractions - 1) +
+      interaction.duration;
     metrics.averageResponseTime = totalResponseTime / metrics.totalInteractions;
 
-    const successRate = metrics.successfulInteractions / metrics.totalInteractions;
-    const conflictRate = session.conflictHistory.length / Math.max(metrics.totalInteractions, 1);
+    const successRate =
+      metrics.successfulInteractions / metrics.totalInteractions;
+    const conflictRate =
+      session.conflictHistory.length / Math.max(metrics.totalInteractions, 1);
     metrics.coordinationEfficiency = successRate * (1 - conflictRate);
   }
 }
 
 // Export singleton instance factory
-export const createSessionCoordinator = (stateManager: StrRayStateManager): SessionCoordinator => {
+export const createSessionCoordinator = (
+  stateManager: StrRayStateManager,
+): SessionCoordinator => {
   return new SessionCoordinator(stateManager);
 };

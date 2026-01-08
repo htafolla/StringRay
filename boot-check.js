@@ -10,25 +10,25 @@
  * @since 2026-01-07
  */
 
-import fs from 'fs';
-import path from 'path';
+import fs from "fs";
+import path from "path";
 
 function log(message) {
   console.log(`[${new Date().toISOString()}] ${message}`);
 }
 
 function checkOrchestratorFirstLoading() {
-  log('🔍 Checking orchestrator-first loading...');
+  log("🔍 Checking orchestrator-first loading...");
 
   try {
-    const initScript = fs.readFileSync('.opencode/init.sh', 'utf8');
+    const initScript = fs.readFileSync(".opencode/init.sh", "utf8");
     const orchestratorFirst = initScript.includes('AGENTS=("orchestrator"');
 
     if (orchestratorFirst) {
-      log('✅ Orchestrator is loaded first in agent initialization');
+      log("✅ Orchestrator is loaded first in agent initialization");
       return true;
     } else {
-      log('❌ Orchestrator is not prioritized in agent loading');
+      log("❌ Orchestrator is not prioritized in agent loading");
       return false;
     }
   } catch (error) {
@@ -38,35 +38,35 @@ function checkOrchestratorFirstLoading() {
 }
 
 function checkBootOrchestratorIntegration() {
-  log('🔍 Checking BootOrchestrator integration...');
+  log("🔍 Checking BootOrchestrator integration...");
 
   try {
-    const bootOrchestratorExists = fs.existsSync('src/boot-orchestrator.ts');
+    const bootOrchestratorExists = fs.existsSync("src/boot-orchestrator.ts");
 
     if (bootOrchestratorExists) {
-      log('✅ BootOrchestrator class exists');
+      log("✅ BootOrchestrator class exists");
     } else {
-      log('❌ BootOrchestrator class missing');
+      log("❌ BootOrchestrator class missing");
       return false;
     }
 
-    const orchestratorExists = fs.existsSync('src/orchestrator.ts');
+    const orchestratorExists = fs.existsSync("src/orchestrator.ts");
 
     if (orchestratorExists) {
-      log('✅ StrRayOrchestrator class exists');
+      log("✅ StrRayOrchestrator class exists");
     } else {
-      log('❌ StrRayOrchestrator class missing');
+      log("❌ StrRayOrchestrator class missing");
       return false;
     }
 
-    const initScript = fs.readFileSync('.opencode/init.sh', 'utf8');
-    const hasBootOrchestratorCall = initScript.includes('BootOrchestrator');
+    const initScript = fs.readFileSync(".opencode/init.sh", "utf8");
+    const hasBootOrchestratorCall = initScript.includes("BootOrchestrator");
 
     if (hasBootOrchestratorCall) {
-      log('✅ BootOrchestrator integration in init.sh');
+      log("✅ BootOrchestrator integration in init.sh");
       return true;
     } else {
-      log('❌ BootOrchestrator not integrated in init.sh');
+      log("❌ BootOrchestrator not integrated in init.sh");
       return false;
     }
   } catch (error) {
@@ -76,17 +76,21 @@ function checkBootOrchestratorIntegration() {
 }
 
 function checkEnforcementActivation() {
-  log('🔍 Checking automatic enforcement activation...');
+  log("🔍 Checking automatic enforcement activation...");
 
   try {
-    const bootOrchestratorContent = fs.readFileSync('src/boot-orchestrator.ts', 'utf8');
-    const hasEnforcementLogic = bootOrchestratorContent.includes('enableEnforcement');
+    const bootOrchestratorContent = fs.readFileSync(
+      "src/boot-orchestrator.ts",
+      "utf8",
+    );
+    const hasEnforcementLogic =
+      bootOrchestratorContent.includes("enableEnforcement");
 
     if (hasEnforcementLogic) {
-      log('✅ Automatic enforcement activation implemented');
+      log("✅ Automatic enforcement activation implemented");
       return true;
     } else {
-      log('❌ Automatic enforcement activation missing');
+      log("❌ Automatic enforcement activation missing");
       return false;
     }
   } catch (error) {
@@ -96,17 +100,22 @@ function checkEnforcementActivation() {
 }
 
 function checkCodexComplianceBootTime() {
-  log('🔍 Checking codex compliance at boot time...');
+  log("🔍 Checking codex compliance at boot time...");
 
   try {
-    const bootOrchestratorContent = fs.readFileSync('src/boot-orchestrator.ts', 'utf8');
-    const hasCodexCompliance = bootOrchestratorContent.includes('activateCodexCompliance');
+    const bootOrchestratorContent = fs.readFileSync(
+      "src/boot-orchestrator.ts",
+      "utf8",
+    );
+    const hasCodexCompliance = bootOrchestratorContent.includes(
+      "activateCodexCompliance",
+    );
 
     if (hasCodexCompliance) {
-      log('✅ Codex compliance checking at boot time implemented');
+      log("✅ Codex compliance checking at boot time implemented");
       return true;
     } else {
-      log('❌ Codex compliance checking at boot time missing');
+      log("❌ Codex compliance checking at boot time missing");
       return false;
     }
   } catch (error) {
@@ -116,11 +125,20 @@ function checkCodexComplianceBootTime() {
 }
 
 function checkBackwardCompatibility() {
-  log('🔍 Checking backward compatibility...');
+  log("🔍 Checking backward compatibility...");
 
   try {
-    const initScript = fs.readFileSync('.opencode/init.sh', 'utf8');
-    const requiredAgents = ['enforcer', 'architect', 'orchestrator', 'bug-triage-specialist', 'code-reviewer', 'security-auditor', 'refactorer', 'test-architect'];
+    const initScript = fs.readFileSync(".opencode/init.sh", "utf8");
+    const requiredAgents = [
+      "enforcer",
+      "architect",
+      "orchestrator",
+      "bug-triage-specialist",
+      "code-reviewer",
+      "security-auditor",
+      "refactorer",
+      "test-architect",
+    ];
 
     let missingAgents = [];
     for (const agent of requiredAgents) {
@@ -130,10 +148,10 @@ function checkBackwardCompatibility() {
     }
 
     if (missingAgents.length === 0) {
-      log('✅ All required agents present (backward compatibility maintained)');
+      log("✅ All required agents present (backward compatibility maintained)");
       return true;
     } else {
-      log(`❌ Missing agents: ${missingAgents.join(', ')}`);
+      log(`❌ Missing agents: ${missingAgents.join(", ")}`);
       return false;
     }
   } catch (error) {
@@ -143,15 +161,24 @@ function checkBackwardCompatibility() {
 }
 
 function main() {
-  log('🚀 StrRay Boot Check: Validating orchestrator-first boot sequence');
-  log('========================================================');
+  log("🚀 StrRay Boot Check: Validating orchestrator-first boot sequence");
+  log("========================================================");
 
   const checks = [
-    { name: 'Orchestrator-first loading', func: checkOrchestratorFirstLoading },
-    { name: 'BootOrchestrator integration', func: checkBootOrchestratorIntegration },
-    { name: 'Automatic enforcement activation', func: checkEnforcementActivation },
-    { name: 'Codex compliance at boot time', func: checkCodexComplianceBootTime },
-    { name: 'Backward compatibility', func: checkBackwardCompatibility }
+    { name: "Orchestrator-first loading", func: checkOrchestratorFirstLoading },
+    {
+      name: "BootOrchestrator integration",
+      func: checkBootOrchestratorIntegration,
+    },
+    {
+      name: "Automatic enforcement activation",
+      func: checkEnforcementActivation,
+    },
+    {
+      name: "Codex compliance at boot time",
+      func: checkCodexComplianceBootTime,
+    },
+    { name: "Backward compatibility", func: checkBackwardCompatibility },
   ];
 
   let passed = 0;
@@ -171,14 +198,14 @@ function main() {
     }
   }
 
-  log('\\n========================================================');
+  log("\\n========================================================");
   log(`Boot Check Results: ${passed} passed, ${failed} failed`);
 
   if (failed === 0) {
-    log('✅ All boot sequence validations passed!');
+    log("✅ All boot sequence validations passed!");
     process.exit(0);
   } else {
-    log('❌ Boot sequence validation failed!');
+    log("❌ Boot sequence validation failed!");
     process.exit(1);
   }
 }
@@ -192,5 +219,5 @@ export {
   checkBootOrchestratorIntegration,
   checkEnforcementActivation,
   checkCodexComplianceBootTime,
-  checkBackwardCompatibility
+  checkBackwardCompatibility,
 };

@@ -1,11 +1,11 @@
-import { describe, test, expect, beforeEach, afterEach } from 'vitest';
-import { StrRayStateManager } from '../../state/state-manager';
-import { createSessionCoordinator } from '../../delegation/session-coordinator';
-import { createSessionCleanupManager } from '../../session/session-cleanup-manager';
-import { createSessionMonitor } from '../../session/session-monitor';
-import { createSessionStateManager } from '../../session/session-state-manager';
+import { describe, test, expect, beforeEach, afterEach } from "vitest";
+import { StrRayStateManager } from "../../state/state-manager";
+import { createSessionCoordinator } from "../../delegation/session-coordinator";
+import { createSessionCleanupManager } from "../../session/session-cleanup-manager";
+import { createSessionMonitor } from "../../session/session-monitor";
+import { createSessionStateManager } from "../../session/session-state-manager";
 
-describe('Session Lifecycle Management', () => {
+describe("Session Lifecycle Management", () => {
   let stateManager: StrRayStateManager;
   let sessionCoordinator: any;
   let cleanupManager: any;
@@ -16,8 +16,15 @@ describe('Session Lifecycle Management', () => {
     stateManager = new StrRayStateManager();
     sessionCoordinator = createSessionCoordinator(stateManager);
     cleanupManager = createSessionCleanupManager(stateManager);
-    sessionMonitor = createSessionMonitor(stateManager, sessionCoordinator, cleanupManager);
-    stateManagerInstance = createSessionStateManager(stateManager, sessionCoordinator);
+    sessionMonitor = createSessionMonitor(
+      stateManager,
+      sessionCoordinator,
+      cleanupManager,
+    );
+    stateManagerInstance = createSessionStateManager(
+      stateManager,
+      sessionCoordinator,
+    );
   });
 
   afterEach(() => {
@@ -26,9 +33,9 @@ describe('Session Lifecycle Management', () => {
     stateManagerInstance?.shutdown();
   });
 
-  describe('Session Creation and Initialization', () => {
-    test('should create session with proper initialization', () => {
-      const sessionId = 'lifecycle-test-1';
+  describe("Session Creation and Initialization", () => {
+    test("should create session with proper initialization", () => {
+      const sessionId = "lifecycle-test-1";
 
       const session = sessionCoordinator.initializeSession(sessionId);
       expect(session).toBeDefined();
@@ -37,8 +44,8 @@ describe('Session Lifecycle Management', () => {
       expect(session.agentCount).toBe(8); // Default agents: enforcer, architect, orchestrator, bug-triage-specialist, code-reviewer, security-auditor, refactorer, test-architect
     });
 
-    test('should register session with cleanup manager', () => {
-      const sessionId = 'lifecycle-test-2';
+    test("should register session with cleanup manager", () => {
+      const sessionId = "lifecycle-test-2";
 
       sessionCoordinator.initializeSession(sessionId);
       cleanupManager.registerSession(sessionId);
@@ -50,8 +57,8 @@ describe('Session Lifecycle Management', () => {
       expect(metadata?.createdAt).toBeGreaterThan(0);
     });
 
-    test('should register session with monitor', () => {
-      const sessionId = 'lifecycle-test-3';
+    test("should register session with monitor", () => {
+      const sessionId = "lifecycle-test-3";
 
       sessionCoordinator.initializeSession(sessionId);
       cleanupManager.registerSession(sessionId);
@@ -63,8 +70,8 @@ describe('Session Lifecycle Management', () => {
       expect(health?.status).toBeDefined();
     });
 
-    test('should initialize session with custom TTL', () => {
-      const sessionId = 'lifecycle-test-4';
+    test("should initialize session with custom TTL", () => {
+      const sessionId = "lifecycle-test-4";
       const customTtl = 60 * 60 * 1000;
 
       sessionCoordinator.initializeSession(sessionId);
@@ -74,8 +81,8 @@ describe('Session Lifecycle Management', () => {
       expect(metadata?.ttlMs).toBe(customTtl);
     });
 
-    test('should handle duplicate session initialization', () => {
-      const sessionId = 'lifecycle-test-5';
+    test("should handle duplicate session initialization", () => {
+      const sessionId = "lifecycle-test-5";
 
       const session1 = sessionCoordinator.initializeSession(sessionId);
       const session2 = sessionCoordinator.initializeSession(sessionId);
@@ -86,24 +93,24 @@ describe('Session Lifecycle Management', () => {
     });
   });
 
-  describe('Session State Transitions', () => {
-    test('should update session activity timestamp', async () => {
-      const sessionId = 'transition-test-1';
+  describe("Session State Transitions", () => {
+    test("should update session activity timestamp", async () => {
+      const sessionId = "transition-test-1";
 
       sessionCoordinator.initializeSession(sessionId);
       cleanupManager.registerSession(sessionId);
       sessionMonitor.registerSession(sessionId);
 
       // Small delay to ensure timestamps are different
-      await new Promise(resolve => setTimeout(resolve, 1));
+      await new Promise((resolve) => setTimeout(resolve, 1));
       cleanupManager.updateActivity(sessionId);
 
       const metadata = cleanupManager.getSessionMetadata(sessionId);
       expect(metadata?.lastActivity).toBeGreaterThan(metadata?.createdAt);
     });
 
-    test('should handle session completion', () => {
-      const sessionId = 'transition-test-2';
+    test("should handle session completion", () => {
+      const sessionId = "transition-test-2";
 
       sessionCoordinator.initializeSession(sessionId);
       cleanupManager.registerSession(sessionId);
@@ -115,8 +122,8 @@ describe('Session Lifecycle Management', () => {
       expect(metadata?.isActive).toBe(false);
     });
 
-    test('should handle session failure and recovery', () => {
-      const sessionId = 'transition-test-3';
+    test("should handle session failure and recovery", () => {
+      const sessionId = "transition-test-3";
 
       sessionCoordinator.initializeSession(sessionId);
       cleanupManager.registerSession(sessionId);
@@ -124,16 +131,16 @@ describe('Session Lifecycle Management', () => {
 
       cleanupManager.updateMetadata(sessionId, {
         isActive: false,
-        cleanupReason: 'test failure'
+        cleanupReason: "test failure",
       });
 
       const metadata = cleanupManager.getSessionMetadata(sessionId);
       expect(metadata?.isActive).toBe(false);
-      expect(metadata?.cleanupReason).toBe('test failure');
+      expect(metadata?.cleanupReason).toBe("test failure");
     });
 
-    test('should update session metadata correctly', () => {
-      const sessionId = 'transition-test-4';
+    test("should update session metadata correctly", () => {
+      const sessionId = "transition-test-4";
 
       sessionCoordinator.initializeSession(sessionId);
       cleanupManager.registerSession(sessionId);
@@ -141,7 +148,7 @@ describe('Session Lifecycle Management', () => {
       const updates = {
         agentCount: 3,
         memoryUsage: 1024 * 1024,
-        lastActivity: Date.now()
+        lastActivity: Date.now(),
       };
 
       cleanupManager.updateMetadata(sessionId, updates);
@@ -153,9 +160,9 @@ describe('Session Lifecycle Management', () => {
     });
   });
 
-  describe('Session Termination and Cleanup', () => {
-    test('should perform manual session cleanup', async () => {
-      const sessionId = 'cleanup-test-1';
+  describe("Session Termination and Cleanup", () => {
+    test("should perform manual session cleanup", async () => {
+      const sessionId = "cleanup-test-1";
 
       sessionCoordinator.initializeSession(sessionId);
       cleanupManager.registerSession(sessionId);
@@ -168,29 +175,34 @@ describe('Session Lifecycle Management', () => {
       expect(metadata).toBeUndefined();
     });
 
-    test('should cleanup session with custom reason', async () => {
-      const sessionId = 'cleanup-test-2';
-      const reason = 'user requested termination';
+    test("should cleanup session with custom reason", async () => {
+      const sessionId = "cleanup-test-2";
+      const reason = "user requested termination";
 
       sessionCoordinator.initializeSession(sessionId);
       cleanupManager.registerSession(sessionId);
 
-      const cleanupResult = await cleanupManager.manualCleanup(sessionId, reason);
+      const cleanupResult = await cleanupManager.manualCleanup(
+        sessionId,
+        reason,
+      );
       expect(cleanupResult).toBe(true);
 
       const metadata = cleanupManager.getSessionMetadata(sessionId);
       expect(metadata).toBeUndefined();
     });
 
-    test('should handle cleanup of non-existent session', async () => {
-      const cleanupResult = await cleanupManager.manualCleanup('non-existent-session');
+    test("should handle cleanup of non-existent session", async () => {
+      const cleanupResult = await cleanupManager.manualCleanup(
+        "non-existent-session",
+      );
       expect(cleanupResult).toBe(true); // Cleanup succeeds for non-existent sessions
     });
 
-    test('should perform emergency cleanup of all sessions', async () => {
-      const sessionIds = ['emergency-1', 'emergency-2', 'emergency-3'];
+    test("should perform emergency cleanup of all sessions", async () => {
+      const sessionIds = ["emergency-1", "emergency-2", "emergency-3"];
 
-      sessionIds.forEach(id => {
+      sessionIds.forEach((id) => {
         sessionCoordinator.initializeSession(id);
         cleanupManager.registerSession(id);
       });
@@ -200,23 +212,23 @@ describe('Session Lifecycle Management', () => {
       expect(cleanupResult.errors).toHaveLength(0);
     });
 
-    test('should cleanup expired sessions automatically', async () => {
-      const sessionId = 'expired-test';
+    test("should cleanup expired sessions automatically", async () => {
+      const sessionId = "expired-test";
 
       sessionCoordinator.initializeSession(sessionId);
       cleanupManager.registerSession(sessionId, 100);
 
-      await new Promise(resolve => setTimeout(resolve, 150));
+      await new Promise((resolve) => setTimeout(resolve, 150));
 
       const cleanupResult = await cleanupManager.performCleanup();
       expect(cleanupResult.sessionsExpired).toBe(1);
     });
   });
 
-  describe('Session Error Handling', () => {
-    test('should handle session initialization errors gracefully', () => {
+  describe("Session Error Handling", () => {
+    test("should handle session initialization errors gracefully", () => {
       expect(() => {
-        sessionCoordinator.initializeSession('');
+        sessionCoordinator.initializeSession("");
       }).toThrow();
 
       expect(() => {
@@ -224,42 +236,46 @@ describe('Session Lifecycle Management', () => {
       }).toThrow();
     });
 
-    test('should handle cleanup errors gracefully', async () => {
-      const sessionId = 'error-test-1';
+    test("should handle cleanup errors gracefully", async () => {
+      const sessionId = "error-test-1";
 
       const result = await cleanupManager.manualCleanup(sessionId);
       expect(result).toBe(true); // Cleanup of non-existent session succeeds
     });
 
-    test('should handle monitor registration errors', () => {
-      const sessionId = 'error-test-2';
+    test("should handle monitor registration errors", () => {
+      const sessionId = "error-test-2";
 
       expect(() => {
         sessionMonitor.registerSession(sessionId);
       }).not.toThrow();
     });
 
-    test('should handle health check errors', async () => {
-      const sessionId = 'error-test-3';
+    test("should handle health check errors", async () => {
+      const sessionId = "error-test-3";
 
       sessionMonitor.registerSession(sessionId);
 
       const health = await sessionMonitor.performHealthCheck(sessionId);
       expect(health).toBeDefined();
-      expect(health.status).toBe('critical'); // Session registered with monitor but not coordinator
+      expect(health.status).toBe("critical"); // Session registered with monitor but not coordinator
     });
   });
 
-  describe('Session Recovery Mechanisms', () => {
-    test('should recover session state from persistence', () => {
-      const sessionId = 'recovery-test-1';
+  describe("Session Recovery Mechanisms", () => {
+    test("should recover session state from persistence", () => {
+      const sessionId = "recovery-test-1";
 
       sessionCoordinator.initializeSession(sessionId);
       cleanupManager.registerSession(sessionId);
       sessionMonitor.registerSession(sessionId);
 
       const newCleanupManager = createSessionCleanupManager(stateManager);
-      const newSessionMonitor = createSessionMonitor(stateManager, sessionCoordinator, newCleanupManager);
+      const newSessionMonitor = createSessionMonitor(
+        stateManager,
+        sessionCoordinator,
+        newCleanupManager,
+      );
 
       const recoveredMetadata = newCleanupManager.getSessionMetadata(sessionId);
       expect(recoveredMetadata).toBeDefined();
@@ -271,8 +287,8 @@ describe('Session Lifecycle Management', () => {
       newSessionMonitor.shutdown();
     });
 
-    test('should handle partial recovery failures', () => {
-      const sessionId = 'recovery-test-2';
+    test("should handle partial recovery failures", () => {
+      const sessionId = "recovery-test-2";
 
       sessionCoordinator.initializeSession(sessionId);
       cleanupManager.registerSession(sessionId);
@@ -285,9 +301,9 @@ describe('Session Lifecycle Management', () => {
       newCleanupManager.shutdown();
     });
 
-    test('should maintain session isolation during recovery', () => {
-      const sessionId1 = 'recovery-test-3';
-      const sessionId2 = 'recovery-test-4';
+    test("should maintain session isolation during recovery", () => {
+      const sessionId1 = "recovery-test-3";
+      const sessionId2 = "recovery-test-4";
 
       sessionCoordinator.initializeSession(sessionId1);
       sessionCoordinator.initializeSession(sessionId2);
@@ -307,9 +323,9 @@ describe('Session Lifecycle Management', () => {
     });
   });
 
-  describe('Session Performance and Monitoring', () => {
-    test('should track session activity correctly', () => {
-      const sessionId = 'performance-test-1';
+  describe("Session Performance and Monitoring", () => {
+    test("should track session activity correctly", () => {
+      const sessionId = "performance-test-1";
 
       sessionCoordinator.initializeSession(sessionId);
       cleanupManager.registerSession(sessionId);
@@ -320,28 +336,30 @@ describe('Session Lifecycle Management', () => {
       cleanupManager.updateActivity(sessionId);
 
       const updatedMetadata = cleanupManager.getSessionMetadata(sessionId);
-      expect(updatedMetadata?.lastActivity).toBeGreaterThanOrEqual(initialActivity!);
+      expect(updatedMetadata?.lastActivity).toBeGreaterThanOrEqual(
+        initialActivity!,
+      );
     });
 
-    test('should provide accurate cleanup statistics', () => {
+    test("should provide accurate cleanup statistics", () => {
       const stats = cleanupManager.getCleanupStats();
       expect(stats).toBeDefined();
-      expect(typeof stats.totalSessions).toBe('number');
-      expect(typeof stats.activeSessions).toBe('number');
-      expect(typeof stats.expiredSessions).toBe('number');
-      expect(typeof stats.idleSessions).toBe('number');
+      expect(typeof stats.totalSessions).toBe("number");
+      expect(typeof stats.activeSessions).toBe("number");
+      expect(typeof stats.expiredSessions).toBe("number");
+      expect(typeof stats.idleSessions).toBe("number");
     });
 
-    test('should provide accurate monitoring statistics', () => {
+    test("should provide accurate monitoring statistics", () => {
       const stats = sessionMonitor.getMonitoringStats();
       expect(stats).toBeDefined();
-      expect(typeof stats.totalSessions).toBe('number');
-      expect(typeof stats.healthySessions).toBe('number');
-      expect(typeof stats.activeAlerts).toBe('number');
+      expect(typeof stats.totalSessions).toBe("number");
+      expect(typeof stats.healthySessions).toBe("number");
+      expect(typeof stats.activeAlerts).toBe("number");
     });
 
-    test('should collect metrics for active sessions', () => {
-      const sessionId = 'metrics-test-1';
+    test("should collect metrics for active sessions", () => {
+      const sessionId = "metrics-test-1";
 
       sessionCoordinator.initializeSession(sessionId);
       cleanupManager.registerSession(sessionId);
@@ -354,9 +372,9 @@ describe('Session Lifecycle Management', () => {
     });
   });
 
-  describe('Session Lifecycle Integration', () => {
-    test('should handle complete session lifecycle', async () => {
-      const sessionId = 'integration-test-1';
+  describe("Session Lifecycle Integration", () => {
+    test("should handle complete session lifecycle", async () => {
+      const sessionId = "integration-test-1";
 
       const session = sessionCoordinator.initializeSession(sessionId);
       expect(session.active).toBe(true);
@@ -380,10 +398,10 @@ describe('Session Lifecycle Management', () => {
       expect(finalMetadata).toBeUndefined();
     });
 
-    test('should handle concurrent session operations', async () => {
-      const sessionIds = ['concurrent-1', 'concurrent-2', 'concurrent-3'];
+    test("should handle concurrent session operations", async () => {
+      const sessionIds = ["concurrent-1", "concurrent-2", "concurrent-3"];
 
-      sessionIds.forEach(id => {
+      sessionIds.forEach((id) => {
         sessionCoordinator.initializeSession(id);
         cleanupManager.registerSession(id);
         sessionMonitor.registerSession(id);
@@ -400,8 +418,8 @@ describe('Session Lifecycle Management', () => {
       expect(results.sort()).toEqual(sessionIds.sort());
     });
 
-    test('should maintain data consistency across lifecycle', () => {
-      const sessionId = 'consistency-test-1';
+    test("should maintain data consistency across lifecycle", () => {
+      const sessionId = "consistency-test-1";
 
       sessionCoordinator.initializeSession(sessionId);
       cleanupManager.registerSession(sessionId);

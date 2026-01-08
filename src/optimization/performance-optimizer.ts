@@ -31,7 +31,7 @@ export interface CacheConfig {
   maxSize: number; // max entries
   maxMemory: number; // max memory in bytes
   ttl: number; // time to live in ms
-  evictionPolicy: 'lru' | 'lfu' | 'size' | 'ttl';
+  evictionPolicy: "lru" | "lfu" | "size" | "ttl";
 }
 
 export class HighPerformanceCache<T> {
@@ -44,8 +44,8 @@ export class HighPerformanceCache<T> {
       maxSize: 1000,
       maxMemory: 50 * 1024 * 1024, // 50MB
       ttl: 300000, // 5 minutes
-      evictionPolicy: 'lru',
-      ...config
+      evictionPolicy: "lru",
+      ...config,
     };
   }
 
@@ -79,11 +79,13 @@ export class HighPerformanceCache<T> {
       timestamp: Date.now(),
       accessCount: 0,
       lastAccessed: Date.now(),
-      size
+      size,
     };
 
-    if (this.cache.size >= this.config.maxSize ||
-        this.totalMemory + size > this.config.maxMemory) {
+    if (
+      this.cache.size >= this.config.maxSize ||
+      this.totalMemory + size > this.config.maxMemory
+    ) {
       this.evictEntries(size);
     }
 
@@ -125,8 +127,10 @@ export class HighPerformanceCache<T> {
     hitRate: number;
     averageAccessTime: number;
   } {
-    const totalRequests = Array.from(this.cache.values())
-      .reduce((sum, entry) => sum + entry.accessCount, 0);
+    const totalRequests = Array.from(this.cache.values()).reduce(
+      (sum, entry) => sum + entry.accessCount,
+      0,
+    );
 
     // Simplified hit rate calculation (would need total requests in real implementation)
     const hitRate = totalRequests > 0 ? 0.85 : 0; // Assume 85% hit rate for demo
@@ -135,7 +139,7 @@ export class HighPerformanceCache<T> {
       size: this.cache.size,
       memoryUsage: this.totalMemory,
       hitRate,
-      averageAccessTime: 0.1 // ~100 microseconds
+      averageAccessTime: 0.1, // ~100 microseconds
     };
   }
 
@@ -143,24 +147,26 @@ export class HighPerformanceCache<T> {
     const entries = Array.from(this.cache.entries());
 
     switch (this.config.evictionPolicy) {
-      case 'lru':
-        entries.sort(([,a], [,b]) => a.lastAccessed - b.lastAccessed);
+      case "lru":
+        entries.sort(([, a], [, b]) => a.lastAccessed - b.lastAccessed);
         break;
-      case 'lfu':
-        entries.sort(([,a], [,b]) => a.accessCount - b.accessCount);
+      case "lfu":
+        entries.sort(([, a], [, b]) => a.accessCount - b.accessCount);
         break;
-      case 'size':
-        entries.sort(([,a], [,b]) => b.size - a.size);
+      case "size":
+        entries.sort(([, a], [, b]) => b.size - a.size);
         break;
-      case 'ttl':
-        entries.sort(([,a], [,b]) => a.timestamp - b.timestamp);
+      case "ttl":
+        entries.sort(([, a], [, b]) => a.timestamp - b.timestamp);
         break;
     }
 
     let freedMemory = 0;
     for (const [key, entry] of entries) {
-      if (this.cache.size <= this.config.maxSize * 0.8 &&
-          this.totalMemory - freedMemory <= this.config.maxMemory - requiredSize) {
+      if (
+        this.cache.size <= this.config.maxSize * 0.8 &&
+        this.totalMemory - freedMemory <= this.config.maxMemory - requiredSize
+      ) {
         break;
       }
 
@@ -173,11 +179,11 @@ export class HighPerformanceCache<T> {
 
   private estimateSize(value: T): number {
     // Rough estimation - in production, use a more sophisticated approach
-    if (typeof value === 'string') return value.length * 2;
-    if (typeof value === 'number') return 8;
-    if (typeof value === 'boolean') return 1;
+    if (typeof value === "string") return value.length * 2;
+    if (typeof value === "number") return 8;
+    if (typeof value === "boolean") return 1;
     if (Array.isArray(value)) return value.length * 8; // Assume 8 bytes per element
-    if (typeof value === 'object' && value !== null) {
+    if (typeof value === "object" && value !== null) {
       return JSON.stringify(value).length * 2;
     }
     return 16; // Default object size
@@ -190,7 +196,11 @@ export class MemoryPool<T> {
   private resetFn: (obj: T) => void;
   private maxSize: number;
 
-  constructor(createFn: () => T, resetFn: (obj: T) => void, maxSize: number = 1000) {
+  constructor(
+    createFn: () => T,
+    resetFn: (obj: T) => void,
+    maxSize: number = 1000,
+  ) {
     this.createFn = createFn;
     this.resetFn = resetFn;
     this.maxSize = maxSize;
@@ -224,7 +234,7 @@ export class MemoryPool<T> {
     return {
       size: this.maxSize,
       available: this.pool.length,
-      utilization: (this.maxSize - this.pool.length) / this.maxSize
+      utilization: (this.maxSize - this.pool.length) / this.maxSize,
     };
   }
 }
@@ -233,8 +243,10 @@ export class OptimizedTaskProcessor {
   private cache = new HighPerformanceCache<any>();
   private resultPool = new MemoryPool(
     () => ({}),
-    (obj: any) => { Object.keys(obj).forEach(key => delete obj[key]); },
-    500
+    (obj: any) => {
+      Object.keys(obj).forEach((key) => delete obj[key]);
+    },
+    500,
   );
 
   /**
@@ -273,7 +285,7 @@ export class OptimizedTaskProcessor {
     const taskGroups = new Map<string, any[]>();
 
     for (const task of tasks) {
-      const type = task.type || 'default';
+      const type = task.type || "default";
       if (!taskGroups.has(type)) {
         taskGroups.set(type, []);
       }
@@ -292,11 +304,11 @@ export class OptimizedTaskProcessor {
   private async executeOptimizedTask(task: any, result: any): Promise<any> {
     // Apply various optimizations based on task type
     switch (task.type) {
-      case 'validation':
+      case "validation":
         return this.optimizeValidation(task, result);
-      case 'computation':
+      case "computation":
         return this.optimizeComputation(task, result);
-      case 'data_processing':
+      case "data_processing":
         return this.optimizeDataProcessing(task, result);
       default:
         return this.executeStandardTask(task, result);
@@ -316,7 +328,7 @@ export class OptimizedTaskProcessor {
       results.splice(i, chunk.length, ...chunkResults);
     }
 
-    result.valid = results.every(r => r);
+    result.valid = results.every((r) => r);
     result.results = results;
     return result;
   }
@@ -326,16 +338,17 @@ export class OptimizedTaskProcessor {
     const { operation, operands } = task;
 
     switch (operation) {
-      case 'sum':
+      case "sum":
         result.value = operands.reduce((a: number, b: number) => a + b, 0);
         break;
-      case 'average':
-        result.value = operands.reduce((a: number, b: number) => a + b, 0) / operands.length;
+      case "average":
+        result.value =
+          operands.reduce((a: number, b: number) => a + b, 0) / operands.length;
         break;
-      case 'max':
+      case "max":
         result.value = Math.max(...operands);
         break;
-      case 'min':
+      case "min":
         result.value = Math.min(...operands);
         break;
       default:
@@ -369,7 +382,7 @@ export class OptimizedTaskProcessor {
 
   private generateCacheKey(task: any): string {
     // Generate efficient cache key
-    const relevantProps = ['type', 'operation', 'id', 'params'];
+    const relevantProps = ["type", "operation", "id", "params"];
     const keyParts: string[] = [];
 
     for (const prop of relevantProps) {
@@ -378,17 +391,17 @@ export class OptimizedTaskProcessor {
       }
     }
 
-    return keyParts.join('|');
+    return keyParts.join("|");
   }
 
   private isCacheable(task: any): boolean {
     // Determine if task result should be cached
-    return !task.noCache && !task.dynamic && task.type !== 'mutation';
+    return !task.noCache && !task.dynamic && task.type !== "mutation";
   }
 
   private async validateChunk(items: any[]): Promise<boolean[]> {
     // Optimized validation for chunks
-    return items.map(item => {
+    return items.map((item) => {
       // Simple validation - in practice, this would be more complex
       return item !== null && item !== undefined;
     });
@@ -399,15 +412,23 @@ export class OptimizedTaskProcessor {
     return operands[0] || 0;
   }
 
-  private async applyDataOperation(data: any[], operation: any): Promise<any[]> {
+  private async applyDataOperation(
+    data: any[],
+    operation: any,
+  ): Promise<any[]> {
     // Placeholder for data operations
     switch (operation.type) {
-      case 'filter':
-        return data.filter(item => item[operation.field] === operation.value);
-      case 'map':
-        return data.map(item => ({ ...item, [operation.field]: operation.value }));
-      case 'sort':
-        return [...data].sort((a, b) => a[operation.field] - b[operation.field]);
+      case "filter":
+        return data.filter((item) => item[operation.field] === operation.value);
+      case "map":
+        return data.map((item) => ({
+          ...item,
+          [operation.field]: operation.value,
+        }));
+      case "sort":
+        return [...data].sort(
+          (a, b) => a[operation.field] - b[operation.field],
+        );
       default:
         return data;
     }
@@ -418,9 +439,12 @@ export class OptimizedTaskProcessor {
     const results: any[] = [];
 
     // Use batch processing for similar tasks
-    if (type === 'validation' && tasks.length > 10) {
-      const allItems = tasks.flatMap(t => t.items || []);
-      const batchResult = await this.processTask({ type: 'validation', items: allItems });
+    if (type === "validation" && tasks.length > 10) {
+      const allItems = tasks.flatMap((t) => t.items || []);
+      const batchResult = await this.processTask({
+        type: "validation",
+        items: allItems,
+      });
 
       // Split results back to individual tasks
       let offset = 0;
@@ -429,7 +453,7 @@ export class OptimizedTaskProcessor {
         const taskResults = batchResult.results.slice(offset, offset + count);
         results.push({
           valid: taskResults.every((r: boolean) => r),
-          results: taskResults
+          results: taskResults,
         });
         offset += count;
       }
@@ -455,7 +479,7 @@ export class PerformanceOptimizer {
   async optimizeOperation<T>(
     operation: string,
     originalFn: () => Promise<T> | T,
-    optimizedFn: () => Promise<T> | T
+    optimizedFn: () => Promise<T> | T,
   ): Promise<T> {
     const startMemory = process.memoryUsage().heapUsed;
 
@@ -476,11 +500,14 @@ export class PerformanceOptimizer {
       operation,
       originalTime,
       optimizedTime,
-      improvement: originalTime > 0 ? ((originalTime - optimizedTime) / originalTime) * 100 : 0,
+      improvement:
+        originalTime > 0
+          ? ((originalTime - optimizedTime) / originalTime) * 100
+          : 0,
       memoryBefore: startMemory,
       memoryAfter: endMemory,
       memorySaved,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
 
     this.optimizations.push(metrics);
@@ -503,21 +530,25 @@ export class PerformanceOptimizer {
         totalOptimizations: 0,
         averageImprovement: 0,
         totalMemorySaved: 0,
-        bestOptimization: '',
-        worstOptimization: ''
+        bestOptimization: "",
+        worstOptimization: "",
       };
     }
 
-    const improvements = this.optimizations.map(o => o.improvement);
-    const avgImprovement = improvements.reduce((a, b) => a + b, 0) / improvements.length;
-    const totalMemorySaved = this.optimizations.reduce((sum, o) => sum + o.memorySaved, 0);
+    const improvements = this.optimizations.map((o) => o.improvement);
+    const avgImprovement =
+      improvements.reduce((a, b) => a + b, 0) / improvements.length;
+    const totalMemorySaved = this.optimizations.reduce(
+      (sum, o) => sum + o.memorySaved,
+      0,
+    );
 
     const bestOpt = this.optimizations.reduce((best, current) =>
-      current.improvement > best.improvement ? current : best
+      current.improvement > best.improvement ? current : best,
     );
 
     const worstOpt = this.optimizations.reduce((worst, current) =>
-      current.improvement < worst.improvement ? current : worst
+      current.improvement < worst.improvement ? current : worst,
     );
 
     return {
@@ -525,7 +556,7 @@ export class PerformanceOptimizer {
       averageImprovement: avgImprovement,
       totalMemorySaved,
       bestOptimization: bestOpt.operation,
-      worstOptimization: worstOpt.operation
+      worstOptimization: worstOpt.operation,
     };
   }
 
@@ -536,7 +567,7 @@ export class PerformanceOptimizer {
     name: string,
     createFn: () => T,
     resetFn: (obj: T) => void,
-    maxSize: number = 100
+    maxSize: number = 100,
   ): MemoryPool<T> {
     const pool = new MemoryPool(createFn, resetFn, maxSize);
     this.memoryPools.set(name, pool);
@@ -546,8 +577,14 @@ export class PerformanceOptimizer {
   /**
    * Get memory pool statistics
    */
-  getMemoryPoolStats(): Record<string, { size: number; available: number; utilization: number }> {
-    const stats: Record<string, { size: number; available: number; utilization: number }> = {};
+  getMemoryPoolStats(): Record<
+    string,
+    { size: number; available: number; utilization: number }
+  > {
+    const stats: Record<
+      string,
+      { size: number; available: number; utilization: number }
+    > = {};
 
     for (const [name, pool] of this.memoryPools) {
       stats[name] = pool.getStats();

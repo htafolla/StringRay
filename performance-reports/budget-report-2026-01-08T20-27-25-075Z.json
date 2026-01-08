@@ -1,0 +1,85 @@
+{
+  "timestamp": 1767904044981,
+  "bundleSize": {
+    "totalSize": 124004,
+    "gzippedSize": 28147,
+    "fileCount": 8,
+    "largestFile": {
+      "name": "enterprise-monitoring.js",
+      "size": 45349,
+      "gzippedSize": 8423
+    },
+    "breakdown": [
+      {
+        "name": "enterprise-monitoring.js",
+        "size": 45349,
+        "gzippedSize": 8423,
+        "percentage": 36.57059449695171
+      },
+      {
+        "name": "enterprise-monitoring-config.js",
+        "size": 29559,
+        "gzippedSize": 6452,
+        "percentage": 23.837134285990775
+      },
+      {
+        "name": "boot-orchestrator.js",
+        "size": 15745,
+        "gzippedSize": 3191,
+        "percentage": 12.697171058998096
+      },
+      {
+        "name": "codex-injector.js",
+        "size": 12699,
+        "gzippedSize": 3471,
+        "percentage": 10.240798683913424
+      },
+      {
+        "name": "context-loader.js",
+        "size": 9440,
+        "gzippedSize": 2708,
+        "percentage": 7.612657656204639
+      },
+      {
+        "name": "orchestrator.js",
+        "size": 6289,
+        "gzippedSize": 2001,
+        "percentage": 5.07161059320667
+      },
+      {
+        "name": "server.js",
+        "size": 3499,
+        "gzippedSize": 1332,
+        "percentage": 2.8216831715105966
+      },
+      {
+        "name": "index.js",
+        "size": 1424,
+        "gzippedSize": 569,
+        "percentage": 1.1483500532240896
+      }
+    ]
+  },
+  "webVitals": {
+    "firstContentfulPaint": 748.673144654287,
+    "timeToInteractive": 2193.754942399482,
+    "largestContentfulPaint": 1842.5844241109112,
+    "cumulativeLayoutShift": 0.06949633353330067,
+    "firstInputDelay": 72.10613543757282,
+    "timestamp": 1767904044981
+  },
+  "runtime": {
+    "memoryUsage": {
+      "rss": 130809856,
+      "heapUsed": 14005040,
+      "heapTotal": 20316160,
+      "external": 3491123
+    },
+    "startupTime": 480.588792,
+    "cpuUsage": 438.93,
+    "timestamp": 1767904044981
+  },
+  "violations": [],
+  "recommendations": [],
+  "overallStatus": "pass"
+}

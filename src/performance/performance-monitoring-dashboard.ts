@@ -8,18 +8,22 @@
  * @since 2026-01-08
  */
 
-import { EventEmitter } from 'events';
-import * as fs from 'fs';
-import * as path from 'path';
-import { PerformanceBudgetEnforcer, PerformanceReport, PERFORMANCE_BUDGET } from './performance-budget-enforcer.js';
-import { PerformanceRegressionTester } from './performance-regression-tester.js';
+import { EventEmitter } from "events";
+import * as fs from "fs";
+import * as path from "path";
+import {
+  PerformanceBudgetEnforcer,
+  PerformanceReport,
+  PERFORMANCE_BUDGET,
+} from "./performance-budget-enforcer.js";
+import { PerformanceRegressionTester } from "./performance-regression-tester.js";
 
 export interface DashboardMetrics {
   timestamp: number;
   bundleSize: {
     current: number;
     budget: number;
-    trend: 'improving' | 'stable' | 'degrading';
+    trend: "improving" | "stable" | "degrading";
     history: Array<{ timestamp: number; value: number }>;
   };
   runtime: {
@@ -34,7 +38,14 @@ export interface DashboardMetrics {
     lcp: number;
     cls: number;
     fid: number;
-    history: Array<{ timestamp: number; fcp: number; tti: number; lcp: number; cls: number; fid: number }>;
+    history: Array<{
+      timestamp: number;
+      fcp: number;
+      tti: number;
+      lcp: number;
+      cls: number;
+      fid: number;
+    }>;
   };
   regressions: {
     totalTests: number;
@@ -44,13 +55,13 @@ export interface DashboardMetrics {
       testName: string;
       duration: number;
       deviation: number;
-      status: 'pass' | 'warning' | 'fail';
+      status: "pass" | "warning" | "fail";
     }>;
   };
   alerts: Array<{
     id: string;
-    type: 'budget' | 'regression' | 'anomaly';
-    severity: 'info' | 'warning' | 'error' | 'critical';
+    type: "budget" | "regression" | "anomaly";
+    severity: "info" | "warning" | "error" | "critical";
     message: string;
     timestamp: number;
     resolved: boolean;
@@ -61,9 +72,9 @@ export interface DashboardConfig {
   updateInterval: number;
   historyRetention: number; // hours
   alertThresholds: {
-    budgetViolation: 'warning' | 'error';
+    budgetViolation: "warning" | "error";
     regressionThreshold: number; // percentage
-    anomalySensitivity: 'low' | 'medium' | 'high';
+    anomalySensitivity: "low" | "medium" | "high";
   };
   notifications: {
     email: boolean;
@@ -86,7 +97,7 @@ export class PerformanceMonitoringDashboard extends EventEmitter {
   constructor(
     config: Partial<DashboardConfig> = {},
     budgetEnforcer?: PerformanceBudgetEnforcer,
-    regressionTester?: PerformanceRegressionTester
+    regressionTester?: PerformanceRegressionTester,
   ) {
     super();
 
@@ -94,20 +105,21 @@ export class PerformanceMonitoringDashboard extends EventEmitter {
       updateInterval: 30000, // 30 seconds
       historyRetention: 24, // 24 hours
       alertThresholds: {
-        budgetViolation: 'error',
+        budgetViolation: "error",
         regressionThreshold: 15, // 15%
-        anomalySensitivity: 'medium'
+        anomalySensitivity: "medium",
       },
       notifications: {
         email: false,
         slack: false,
-        webhook: null
+        webhook: null,
       },
-      ...config
+      ...config,
     };
 
     this.budgetEnforcer = budgetEnforcer || new PerformanceBudgetEnforcer();
-    this.regressionTester = regressionTester || new PerformanceRegressionTester();
+    this.regressionTester =
+      regressionTester || new PerformanceRegressionTester();
 
     this.metrics = this.initializeMetrics();
     this.setupEventHandlers();
@@ -122,14 +134,14 @@ export class PerformanceMonitoringDashboard extends EventEmitter {
       bundleSize: {
         current: 0,
         budget: PERFORMANCE_BUDGET.bundleSize.uncompressed,
-        trend: 'stable',
-        history: []
+        trend: "stable",
+        history: [],
       },
       runtime: {
         memoryUsage: 0,
         cpuUsage: 0,
         startupTime: 0,
-        history: []
+        history: [],
       },
       webVitals: {
         fcp: 0,
@@ -137,15 +149,15 @@ export class PerformanceMonitoringDashboard extends EventEmitter {
         lcp: 0,
         cls: 0,
         fid: 0,
-        history: []
+        history: [],
       },
       regressions: {
         totalTests: 0,
         failedTests: 0,
         averageDeviation: 0,
-        recentResults: []
+        recentResults: [],
       },
-      alerts: []
+      alerts: [],
     };
   }
 
@@ -153,19 +165,19 @@ export class PerformanceMonitoringDashboard extends EventEmitter {
    * Setup event handlers for real-time updates
    */
   private setupEventHandlers(): void {
-    this.budgetEnforcer.on('violation', (violation) => {
+    this.budgetEnforcer.on("violation", (violation) => {
       this.addAlert({
         id: `budget-${violation.metric}-${Date.now()}`,
-        type: 'budget',
-        severity: violation.severity as 'warning' | 'error' | 'critical',
+        type: "budget",
+        severity: violation.severity as "warning" | "error" | "critical",
         message: `${violation.metric}: ${violation.percentage.toFixed(1)}% of budget (${violation.actual.toLocaleString()} / ${violation.budget.toLocaleString()})`,
         timestamp: Date.now(),
-        resolved: false
+        resolved: false,
       });
     });
 
-    this.budgetEnforcer.on('budget-exceeded', (violation) => {
-      this.emit('budget-exceeded', violation);
+    this.budgetEnforcer.on("budget-exceeded", (violation) => {
+      this.emit("budget-exceeded", violation);
     });
   }
 
@@ -177,10 +189,12 @@ export class PerformanceMonitoringDashboard extends EventEmitter {
       return;
     }
 
-    console.log('📊 Starting Performance Monitoring Dashboard');
+    console.log("📊 Starting Performance Monitoring Dashboard");
     console.log(`   Update Interval: ${this.config.updateInterval / 1000}s`);
     console.log(`   History Retention: ${this.config.historyRetention}h`);
-    console.log(`   Alert Thresholds: Budget=${this.config.alertThresholds.budgetViolation}, Regression=${this.config.alertThresholds.regressionThreshold}%`);
+    console.log(
+      `   Alert Thresholds: Budget=${this.config.alertThresholds.budgetViolation}, Regression=${this.config.alertThresholds.regressionThreshold}%`,
+    );
 
     this.isRunning = true;
     this.updateMetrics();
@@ -204,7 +218,7 @@ export class PerformanceMonitoringDashboard extends EventEmitter {
       this.updateTimer = undefined;
     }
 
-    console.log('🛑 Stopped Performance Monitoring Dashboard');
+    console.log("🛑 Stopped Performance Monitoring Dashboard");
   }
 
   /**
@@ -233,11 +247,10 @@ export class PerformanceMonitoringDashboard extends EventEmitter {
       this.detectAnomalies();
 
       this.metrics.timestamp = timestamp;
-      this.emit('metrics-updated', this.metrics);
-
+      this.emit("metrics-updated", this.metrics);
     } catch (error) {
-      console.error('Failed to update dashboard metrics:', error);
-      this.emit('error', error);
+      console.error("Failed to update dashboard metrics:", error);
+      this.emit("error", error);
     }
   }
 
@@ -252,21 +265,20 @@ export class PerformanceMonitoringDashboard extends EventEmitter {
       // Add to history
       this.metrics.bundleSize.history.push({
         timestamp,
-        value: currentSize
+        value: currentSize,
       });
 
       // Calculate trend
       this.metrics.bundleSize.current = currentSize;
-      this.calculateTrend('bundleSize');
+      this.calculateTrend("bundleSize");
 
       // Keep history within retention period
       const retentionMs = this.config.historyRetention * 60 * 60 * 1000;
       this.metrics.bundleSize.history = this.metrics.bundleSize.history.filter(
-        h => timestamp - h.timestamp < retentionMs
+        (h) => timestamp - h.timestamp < retentionMs,
       );
-
     } catch (error) {
-      console.warn('Failed to update bundle size metrics:', error);
+      console.warn("Failed to update bundle size metrics:", error);
     }
   }
 
@@ -284,13 +296,13 @@ export class PerformanceMonitoringDashboard extends EventEmitter {
     this.metrics.runtime.history.push({
       timestamp,
       memory: runtimeMetrics.memoryUsage.heapUsed,
-      cpu: runtimeMetrics.cpuUsage
+      cpu: runtimeMetrics.cpuUsage,
     });
 
     // Keep history within retention period
     const retentionMs = this.config.historyRetention * 60 * 60 * 1000;
     this.metrics.runtime.history = this.metrics.runtime.history.filter(
-      h => timestamp - h.timestamp < retentionMs
+      (h) => timestamp - h.timestamp < retentionMs,
     );
   }
 
@@ -314,17 +326,16 @@ export class PerformanceMonitoringDashboard extends EventEmitter {
         tti: vitalsMetrics.timeToInteractive,
         lcp: vitalsMetrics.largestContentfulPaint,
         cls: vitalsMetrics.cumulativeLayoutShift,
-        fid: vitalsMetrics.firstInputDelay
+        fid: vitalsMetrics.firstInputDelay,
       });
 
       // Keep history within retention period
       const retentionMs = this.config.historyRetention * 60 * 60 * 1000;
       this.metrics.webVitals.history = this.metrics.webVitals.history.filter(
-        h => timestamp - h.timestamp < retentionMs
+        (h) => timestamp - h.timestamp < retentionMs,
       );
-
     } catch (error) {
-      console.warn('Failed to update web vitals metrics:', error);
+      console.warn("Failed to update web vitals metrics:", error);
     }
   }
 
@@ -335,42 +346,50 @@ export class PerformanceMonitoringDashboard extends EventEmitter {
     const regressionData = this.regressionTester.exportResults();
 
     this.metrics.regressions.totalTests = regressionData.summary.totalTests;
-    this.metrics.regressions.failedTests = regressionData.results.filter(r => r.status === 'fail').length;
-    this.metrics.regressions.averageDeviation = regressionData.summary.averageDeviation;
+    this.metrics.regressions.failedTests = regressionData.results.filter(
+      (r) => r.status === "fail",
+    ).length;
+    this.metrics.regressions.averageDeviation =
+      regressionData.summary.averageDeviation;
 
     // Keep only recent results (last 10)
     this.metrics.regressions.recentResults = regressionData.results
       .slice(-10)
-      .map(r => ({
+      .map((r) => ({
         testName: r.testName,
         duration: r.duration,
         deviation: r.deviation,
-        status: r.status
+        status: r.status,
       }));
   }
 
   /**
    * Calculate trend for a metric
    */
-  private calculateTrend(metricType: 'bundleSize'): void {
+  private calculateTrend(metricType: "bundleSize"): void {
     const history = this.metrics.bundleSize.history;
     if (history.length < 3) {
-      this.metrics.bundleSize.trend = 'stable';
+      this.metrics.bundleSize.trend = "stable";
       return;
     }
 
     const recent = history.slice(-3);
-    const values = recent.map(h => h.value);
-    if (values.length >= 3 && values[0] !== undefined && values[1] !== undefined && values[2] !== undefined) {
+    const values = recent.map((h) => h.value);
+    if (
+      values.length >= 3 &&
+      values[0] !== undefined &&
+      values[1] !== undefined &&
+      values[2] !== undefined
+    ) {
       const avgFirst = (values[0] + values[1]) / 2;
       const avgLast = (values[1] + values[2]) / 2;
 
       if (avgLast < avgFirst * 0.95) {
-        this.metrics.bundleSize.trend = 'improving';
+        this.metrics.bundleSize.trend = "improving";
       } else if (avgLast > avgFirst * 1.05) {
-        this.metrics.bundleSize.trend = 'degrading';
+        this.metrics.bundleSize.trend = "degrading";
       } else {
-        this.metrics.bundleSize.trend = 'stable';
+        this.metrics.bundleSize.trend = "stable";
       }
     }
   }
@@ -383,15 +402,15 @@ export class PerformanceMonitoringDashboard extends EventEmitter {
     const now = Date.now();
 
     this.metrics.bundleSize.history = this.metrics.bundleSize.history.filter(
-      h => now - h.timestamp < retentionMs
+      (h) => now - h.timestamp < retentionMs,
     );
 
     this.metrics.runtime.history = this.metrics.runtime.history.filter(
-      h => now - h.timestamp < retentionMs
+      (h) => now - h.timestamp < retentionMs,
     );
 
     this.metrics.webVitals.history = this.metrics.webVitals.history.filter(
-      h => now - h.timestamp < retentionMs
+      (h) => now - h.timestamp < retentionMs,
     );
   }
 
@@ -412,23 +431,25 @@ export class PerformanceMonitoringDashboard extends EventEmitter {
     const history = this.metrics.bundleSize.history;
     if (history.length < 5) return;
 
-    const values = history.map(h => h.value);
+    const values = history.map((h) => h.value);
     const mean = values.reduce((a, b) => a + b, 0) / values.length;
-    const variance = values.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / values.length;
+    const variance =
+      values.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / values.length;
     const stdDev = Math.sqrt(variance);
 
     const latest = values[values.length - 1];
     if (latest !== undefined) {
       const zScore = Math.abs(latest - mean) / stdDev;
 
-      if (zScore > 2) { // 2 standard deviations
+      if (zScore > 2) {
+        // 2 standard deviations
         this.addAlert({
           id: `anomaly-bundle-${Date.now()}`,
-          type: 'anomaly',
-          severity: zScore > 3 ? 'critical' : 'warning',
+          type: "anomaly",
+          severity: zScore > 3 ? "critical" : "warning",
           message: `Bundle size anomaly detected: ${latest.toLocaleString()} bytes (${zScore.toFixed(2)}σ from mean)`,
           timestamp: Date.now(),
-          resolved: false
+          resolved: false,
         });
       }
     }
@@ -441,18 +462,20 @@ export class PerformanceMonitoringDashboard extends EventEmitter {
     const history = this.metrics.runtime.history;
     if (history.length < 5) return;
 
-    const memoryValues = history.map(h => h.memory);
-    const memoryMean = memoryValues.reduce((a, b) => a + b, 0) / memoryValues.length;
+    const memoryValues = history.map((h) => h.memory);
+    const memoryMean =
+      memoryValues.reduce((a, b) => a + b, 0) / memoryValues.length;
     const latestMemory = memoryValues[memoryValues.length - 1];
 
-    if (latestMemory !== undefined && latestMemory > memoryMean * 1.5) { // 50% above average
+    if (latestMemory !== undefined && latestMemory > memoryMean * 1.5) {
+      // 50% above average
       this.addAlert({
         id: `anomaly-memory-${Date.now()}`,
-        type: 'anomaly',
-        severity: latestMemory > memoryMean * 2 ? 'critical' : 'warning',
+        type: "anomaly",
+        severity: latestMemory > memoryMean * 2 ? "critical" : "warning",
         message: `Memory usage spike: ${(latestMemory / 1024 / 1024).toFixed(2)}MB (${((latestMemory / memoryMean - 1) * 100).toFixed(1)}% above average)`,
         timestamp: Date.now(),
-        resolved: false
+        resolved: false,
       });
     }
   }
@@ -464,18 +487,21 @@ export class PerformanceMonitoringDashboard extends EventEmitter {
     const history = this.metrics.webVitals.history;
     if (history.length < 5) return;
 
-    const fcpValues = history.map(h => h.fcp);
+    const fcpValues = history.map((h) => h.fcp);
     const fcpMean = fcpValues.reduce((a, b) => a + b, 0) / fcpValues.length;
     const latestFCP = fcpValues[fcpValues.length - 1];
 
-    if (latestFCP !== undefined && latestFCP > PERFORMANCE_BUDGET.webVitals.firstContentfulPaint) {
+    if (
+      latestFCP !== undefined &&
+      latestFCP > PERFORMANCE_BUDGET.webVitals.firstContentfulPaint
+    ) {
       this.addAlert({
         id: `anomaly-fcp-${Date.now()}`,
-        type: 'anomaly',
-        severity: 'warning',
+        type: "anomaly",
+        severity: "warning",
         message: `FCP budget violation: ${latestFCP.toFixed(2)}ms (budget: ${PERFORMANCE_BUDGET.webVitals.firstContentfulPaint}ms)`,
         timestamp: Date.now(),
-        resolved: false
+        resolved: false,
       });
     }
   }
@@ -483,7 +509,7 @@ export class PerformanceMonitoringDashboard extends EventEmitter {
   /**
    * Add an alert to the dashboard
    */
-  private addAlert(alert: DashboardMetrics['alerts'][0]): void {
+  private addAlert(alert: DashboardMetrics["alerts"][0]): void {
     this.metrics.alerts.push(alert);
 
     // Keep only recent alerts (last 100)
@@ -491,7 +517,7 @@ export class PerformanceMonitoringDashboard extends EventEmitter {
       this.metrics.alerts = this.metrics.alerts.slice(-100);
     }
 
-    this.emit('alert', alert);
+    this.emit("alert", alert);
 
     // Send notifications if configured
     this.sendNotification(alert);
@@ -500,7 +526,7 @@ export class PerformanceMonitoringDashboard extends EventEmitter {
   /**
    * Send notification for alert
    */
-  private sendNotification(alert: DashboardMetrics['alerts'][0]): void {
+  private sendNotification(alert: DashboardMetrics["alerts"][0]): void {
     if (this.config.notifications.webhook) {
       // Send webhook notification
       this.sendWebhookNotification(alert);
@@ -512,12 +538,12 @@ export class PerformanceMonitoringDashboard extends EventEmitter {
   /**
    * Send webhook notification
    */
-  private sendWebhookNotification(alert: DashboardMetrics['alerts'][0]): void {
+  private sendWebhookNotification(alert: DashboardMetrics["alerts"][0]): void {
     try {
       // In a real implementation, this would make an HTTP request
       console.log(`📤 Webhook notification: ${alert.message}`);
     } catch (error) {
-      console.error('Failed to send webhook notification:', error);
+      console.error("Failed to send webhook notification:", error);
     }
   }
 
@@ -531,8 +557,8 @@ export class PerformanceMonitoringDashboard extends EventEmitter {
   /**
    * Get active alerts
    */
-  getActiveAlerts(): DashboardMetrics['alerts'] {
-    return this.metrics.alerts.filter(alert => !alert.resolved);
+  getActiveAlerts(): DashboardMetrics["alerts"] {
+    return this.metrics.alerts.filter((alert) => !alert.resolved);
   }
 
   /**
@@ -546,10 +572,10 @@ export class PerformanceMonitoringDashboard extends EventEmitter {
    * Resolve an alert
    */
   resolveAlert(alertId: string): boolean {
-    const alert = this.metrics.alerts.find(a => a.id === alertId);
+    const alert = this.metrics.alerts.find((a) => a.id === alertId);
     if (alert) {
       alert.resolved = true;
-      this.emit('alert-resolved', alert);
+      this.emit("alert-resolved", alert);
       return true;
     }
     return false;
@@ -574,8 +600,10 @@ export class PerformanceMonitoringDashboard extends EventEmitter {
     return {
       config: this.config,
       metrics: this.metrics,
-      performanceReport: this.budgetEnforcer.getReports(1)[0] || (await this.budgetEnforcer.generatePerformanceReport()),
-      regressionData: this.regressionTester.exportResults()
+      performanceReport:
+        this.budgetEnforcer.getReports(1)[0] ||
+        (await this.budgetEnforcer.generatePerformanceReport()),
+      regressionData: this.regressionTester.exportResults(),
     };
   }
 }

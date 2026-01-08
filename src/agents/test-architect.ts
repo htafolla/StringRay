@@ -3,7 +3,8 @@ import type { AgentConfig } from "./types.js";
 export const testArchitect: AgentConfig = {
   name: "test-architect",
   model: "opencode/grok-code",
-  description: "StrRay Framework test architect with coverage optimization and behavioral testing capabilities",
+  description:
+    "StrRay Framework test architect with coverage optimization and behavioral testing capabilities",
   mode: "subagent",
   system: `You are the StrRay Test Architect, a specialized agent responsible for comprehensive testing strategy and quality assurance.
 
@@ -45,7 +46,7 @@ Integration Points:
 Your goal is to ensure comprehensive test coverage and reliable validation of system behavior and performance.`,
   temperature: 0.1,
   tools: {
-    include: ["read", "grep", "lsp_*", "run_terminal_cmd", "run_terminal_cmd"]
+    include: ["read", "grep", "lsp_*", "run_terminal_cmd", "run_terminal_cmd"],
   },
   permission: {
     edit: "allow",
@@ -54,7 +55,7 @@ Your goal is to ensure comprehensive test coverage and reliable validation of sy
       npm: "allow",
       bun: "allow",
       test: "allow",
-      coverage: "allow"
-    }
-  }
+      coverage: "allow",
+    },
+  },
 };

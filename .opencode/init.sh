@@ -1,48 +1,47 @@
 #!/bin/bash
 
-LOG_FILE=".opencode/logs/strray-init-$(date +%Y%m%d-%H%M%S).log"
-mkdir -p ".opencode/logs"
+# StrRay Framework Initialization Script
+# This script verifies all framework components are properly installed and configured
 
-# Simple log function
 log() {
-    echo "$@" | tee -a "$LOG_FILE"
+    echo "$1"
+    echo "$(date): $1" >> "$LOG_FILE"
 }
 
-# Display boot header with STRRAY ASCII art
-# Display boot header with STRRAY ASCII art (Monochrome - ANSI colors not supported)
+LOG_FILE="logs/strray-init-$(date +%Y%m%d-%H%M%S).log"
+mkdir -p "logs"
+
+# ASCII Art Header
 log "//═══════════════════════════════════════════════════════//"
-sleep 0.1
 log "//                                                       //"
-sleep 0.1
 log "//   ███████╗████████╗██████╗ ██████╗  █████╗ ██╗   ██╗  //"
-sleep 0.1
 log "//   ██╔════╝╚══██╔══╝██╔══██╗██╔══██╗██╔══██╗╚██╗ ██╔╝  //"
-sleep 0.1
 log "//   ███████╗   ██║   ██████╔╝██████╔╝███████║ ╚████╔╝   //"
-sleep 0.1
 log "//   ╚════██║   ██║   ██╔══██╗██╔══██╗██╔══██║  ╚██╔╝    //"
-sleep 0.1
 log "//   ███████║   ██║   ██║  ██║██║  ██║██║  ██║   ██║     //"
-sleep 0.1
 log "//   ╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝     //"
-sleep 0.1
 log "//                                                       //"
-sleep 0.1
 log "//        ⚡ Precision-Guided AI Development ⚡          //"
-sleep 0.1
 log "//          Platform • 99.6% Error Prevention            //"
-sleep 0.1
 log "//                                                       //"
-sleep 0.1
 log "//═══════════════════════════════════════════════════════//"
 sleep 0.5
-log "//   🚀 Initializing orchestrator-first boot sequence..." //
-sleep 0.3
+log "//   🚀 Initializing orchestrator-first boot sequence... //"
 log "//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━//"
 sleep 1
 
-if [ ! -f ".opencode/enforcer-config.json" ]; then
+# Ensure we're running from the .opencode directory
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+OPENCODE_DIR="$SCRIPT_DIR"
+
+cd "$OPENCODE_DIR" || exit 1
+
+if [ ! -f "enforcer-config.json" ]; then
     log "❌ ERROR: Framework configuration not found"
+    log "   Expected: enforcer-config.json"
+    log "   Current directory: $(pwd)"
+    log "   Files in directory: $(ls -la | head -10)"
+    echo "INIT_SCRIPT_ERROR: enforcer-config.json not found in $(pwd)" >&2
     exit 1
 fi
 
@@ -50,14 +49,21 @@ HOOKS=("pre-commit-introspection" "auto-format" "security-scan" "enforcer-daily-
 MCPS=("project-analysis" "testing-strategy" "architecture-patterns" "performance-optimization" "git-workflow" "api-design")
 AGENTS=("orchestrator" "enforcer" "architect" "bug-triage-specialist" "code-reviewer" "security-auditor" "refactorer" "test-architect")
 
+# Count specific framework components
 HOOKS_LOADED=0; HOOKS_MISSING=0
-for hook in "${HOOKS[@]}"; do [ -f ".opencode/commands/${hook}.md" ] && HOOKS_LOADED=$((HOOKS_LOADED + 1)) || HOOKS_MISSING=$((HOOKS_MISSING + 1)); done
+for hook in "${HOOKS[@]}"; do [ -f "commands/${hook}.md" ] && HOOKS_LOADED=$((HOOKS_LOADED + 1)) || HOOKS_MISSING=$((HOOKS_MISSING + 1)); done
 
 MCPS_LOADED=0; MCPS_MISSING=0
-for mcp in "${MCPS[@]}"; do [ -f ".opencode/mcps/${mcp}.mcp.json" ] && MCPS_LOADED=$((MCPS_LOADED + 1)) || MCPS_MISSING=$((MCPS_MISSING + 1)); done
+for mcp in "${MCPS[@]}"; do [ -f "mcps/${mcp}.mcp.json" ] && MCPS_LOADED=$((MCPS_LOADED + 1)) || MCPS_MISSING=$((MCPS_MISSING + 1)); done
 
 AGENTS_LOADED=0; AGENTS_MISSING=0
-for agent in "${AGENTS[@]}"; do [ -f ".opencode/agents/${agent}.md" ] && AGENTS_LOADED=$((AGENTS_LOADED + 1)) || AGENTS_MISSING=$((AGENTS_MISSING + 1)); done
+for agent in "${AGENTS[@]}"; do [ -f "agents/${agent}.md" ] && AGENTS_LOADED=$((AGENTS_LOADED + 1)) || AGENTS_MISSING=$((AGENTS_MISSING + 1)); done
+
+# Count additional framework components
+PYTHON_BACKEND=$([ -d "src/strray" ] && echo "✅" || echo "❌")
+CODEX_FILE=$([ -f "../.strray/agents_template.md" ] && echo "✅" || echo "❌")
+PLUGIN_SYSTEM=$([ -f "plugin/strray-codex-injection.ts" ] && echo "✅" || echo "❌")
+MCP_SERVERS=$(ls mcps/*.server.js 2>/dev/null | wc -l)
 
 # Status display with emojis
 log "✅ Framework configuration loaded"
@@ -67,28 +73,45 @@ sleep 0.5
 log "🧠 MCP skills: $MCPS_LOADED loaded, $MCPS_MISSING missing"
 sleep 0.5
 log "🤖 Agent configs: $AGENTS_LOADED loaded, $AGENTS_MISSING missing"
+sleep 0.5
+log "🐍 Python backend: $PYTHON_BACKEND Present"
+sleep 0.5
+log "📚 Codex system: $CODEX_FILE Universal Development Codex v1.2.20"
+sleep 0.5
+log "🔌 Plugin system: $PLUGIN_SYSTEM TypeScript integration"
+sleep 0.5
+log "⚙️ MCP servers: $MCP_SERVERS active server implementations"
 sleep 1
 
 # Quick boot-time compliance check (much faster than full daily scan)
-if command -v node &> /dev/null && [ -f "src/context-loader.ts" ]; then
+if command -v python3 &> /dev/null && [ -f "src/strray/core/codex_loader.py" ]; then
     log "🔍 SCAN Running compliance scan..."
     sleep 1
     # Quick check: just verify codex can be loaded (much faster than full file scan)
-    node -e "
-    (async () => {
-      try {
-        const { StrRayContextLoader } = await import('./dist/context-loader.js');
-        const loader = StrRayContextLoader.getInstance();
-        process.exit(0);
-      } catch (e) {
-        console.error('Codex load failed:', e.message);
-        process.exit(1);
-      }
-    })();
-    " > /dev/null 2>&1
+    python3 -c "
+import sys
+sys.path.insert(0, 'src')
+try:
+    from strray.core.codex_loader import CodexLoader
+    loader = CodexLoader()
+    if len(loader._codex_terms) > 0:
+        print('SUCCESS')
+        sys.exit(0)
+    else:
+        print('NO_TERMS')
+        sys.exit(1)
+except Exception as e:
+    print(f'ERROR: {e}')
+    sys.exit(1)
+    " > /tmp/compliance_check.txt 2>&1
     COMPLIANCE_EXIT_CODE=$?
-    [ $COMPLIANCE_EXIT_CODE -eq 0 ] && log "✅ Compliance scan passed" || log "⚠️ WARN Compliance scan completed with issues"
-elif command -v bash &> /dev/null && [ -f ".opencode/commands/enforcer-daily-scan.md" ]; then
+    if [ $COMPLIANCE_EXIT_CODE -eq 0 ] && grep -q "SUCCESS" /tmp/compliance_check.txt; then
+        log "✅ Compliance scan passed"
+    else
+        log "⚠️ WARN Compliance scan completed with issues"
+    fi
+    rm -f /tmp/compliance_check.txt
+elif command -v bash &> /dev/null && [ -f "commands/enforcer-daily-scan.md" ]; then
     # Fallback to basic file existence check if Node.js not available
     log "🔍 SCAN Running basic compliance check..."
     sleep 1
@@ -101,7 +124,7 @@ sleep 1
 log "🚀 INIT Initializing boot sequence..."
 sleep 1
 
-if command -v node &> /dev/null && [ -f "src/boot-orchestrator.ts" ]; then
+if command -v node &> /dev/null && [ -f "../src/boot-orchestrator.ts" ]; then
     log "⚙️ BootOrchestrator: orchestrator-first initiated"
     sleep 0.5
     log "🔄 BootOrchestrator: session management activated"
@@ -132,6 +155,7 @@ sleep 1
 if [ $HOOKS_LOADED -eq 0 ] || [ $AGENTS_LOADED -eq 0 ]; then
     log ""
     log "❌ CRITICAL: Required components missing. Framework may not function correctly."
+    log "   Hooks loaded: $HOOKS_LOADED, Agents loaded: $AGENTS_LOADED"
     exit 1
 fi
 

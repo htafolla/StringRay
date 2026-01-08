@@ -14,12 +14,12 @@ export interface ComponentProps {
   style?: Record<string, any>;
   children?: any;
   id?: string;
-  'data-testid'?: string;
+  "data-testid"?: string;
 }
 
 export interface StrRayComponent {
   name: string;
-  framework: 'react' | 'vue' | 'angular' | 'svelte';
+  framework: "react" | "vue" | "angular" | "svelte";
   render: (props: ComponentProps) => any;
   theme?: ComponentTheme;
 }
@@ -97,75 +97,77 @@ export interface ComponentTheme {
 // Default StrRay theme
 export const defaultStrRayTheme: ComponentTheme = {
   colors: {
-    primary: '#2563eb',
-    secondary: '#64748b',
-    accent: '#f59e0b',
-    background: '#ffffff',
-    surface: '#f8fafc',
-    text: '#1e293b',
-    error: '#ef4444',
-    warning: '#f59e0b',
-    success: '#10b981',
-    info: '#3b82f6'
+    primary: "#2563eb",
+    secondary: "#64748b",
+    accent: "#f59e0b",
+    background: "#ffffff",
+    surface: "#f8fafc",
+    text: "#1e293b",
+    error: "#ef4444",
+    warning: "#f59e0b",
+    success: "#10b981",
+    info: "#3b82f6",
   },
   spacing: {
-    xs: '0.25rem',
-    sm: '0.5rem',
-    md: '1rem',
-    lg: '1.5rem',
-    xl: '2rem'
+    xs: "0.25rem",
+    sm: "0.5rem",
+    md: "1rem",
+    lg: "1.5rem",
+    xl: "2rem",
   },
   typography: {
-    fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
+    fontFamily: "Inter, system-ui, -apple-system, sans-serif",
     fontSize: {
-      xs: '0.75rem',
-      sm: '0.875rem',
-      md: '1rem',
-      lg: '1.125rem',
-      xl: '1.25rem'
+      xs: "0.75rem",
+      sm: "0.875rem",
+      md: "1rem",
+      lg: "1.125rem",
+      xl: "1.25rem",
     },
     fontWeight: {
       light: 300,
       regular: 400,
       medium: 500,
-      bold: 700
+      bold: 700,
     },
     lineHeight: {
       tight: 1.25,
       normal: 1.5,
-      loose: 1.75
-    }
+      loose: 1.75,
+    },
   },
   borderRadius: {
-    none: '0',
-    sm: '0.125rem',
-    md: '0.375rem',
-    lg: '0.5rem',
-    full: '9999px'
+    none: "0",
+    sm: "0.125rem",
+    md: "0.375rem",
+    lg: "0.5rem",
+    full: "9999px",
   },
   shadows: {
-    none: 'none',
-    sm: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
-    md: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
-    lg: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
-    xl: '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)'
+    none: "none",
+    sm: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
+    md: "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
+    lg: "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
+    xl: "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)",
   },
   animations: {
     duration: {
-      fast: '150ms',
-      normal: '300ms',
-      slow: '500ms'
+      fast: "150ms",
+      normal: "300ms",
+      slow: "500ms",
     },
     easing: {
-      easeIn: 'cubic-bezier(0.4, 0, 1, 1)',
-      easeOut: 'cubic-bezier(0, 0, 0.2, 1)',
-      easeInOut: 'cubic-bezier(0.4, 0, 0.2, 1)'
-    }
-  }
+      easeIn: "cubic-bezier(0.4, 0, 1, 1)",
+      easeOut: "cubic-bezier(0, 0, 0.2, 1)",
+      easeInOut: "cubic-bezier(0.4, 0, 0.2, 1)",
+    },
+  },
 };
 
 // Base component styles (CSS-in-JS approach)
-export const createComponentStyles = (theme: ComponentTheme = defaultStrRayTheme) => ({
+export const createComponentStyles = (
+  theme: ComponentTheme = defaultStrRayTheme,
+) => ({
   // Button styles
   button: {
     base: `
@@ -224,7 +226,7 @@ export const createComponentStyles = (theme: ComponentTheme = defaultStrRayTheme
         &:hover {
           background-color: ${theme.colors.surface};
         }
-      `
+      `,
     },
     sizes: {
       sm: `
@@ -238,8 +240,8 @@ export const createComponentStyles = (theme: ComponentTheme = defaultStrRayTheme
       lg: `
         padding: ${theme.spacing.md} ${theme.spacing.lg};
         font-size: ${theme.typography.fontSize.lg};
-      `
-    }
+      `,
+    },
   },
 
   // Card styles
@@ -261,8 +263,8 @@ export const createComponentStyles = (theme: ComponentTheme = defaultStrRayTheme
       `,
       filled: `
         background-color: ${theme.colors.surface};
-      `
-    }
+      `,
+    },
   },
 
   // Input styles
@@ -299,8 +301,8 @@ export const createComponentStyles = (theme: ComponentTheme = defaultStrRayTheme
         background-color: #f9fafb;
         color: #9ca3af;
         cursor: not-allowed;
-      `
-    }
+      `,
+    },
   },
 
   // Loading spinner
@@ -313,11 +315,11 @@ export const createComponentStyles = (theme: ComponentTheme = defaultStrRayTheme
       border-radius: 50%;
       animation: spin 1s linear infinite;
     `,
-    '@keyframes spin': `
+    "@keyframes spin": `
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
-    `
-  }
+    `,
+  },
 });
 
 // Framework-agnostic component registry
@@ -353,14 +355,17 @@ export class ComponentRegistry {
 export const componentRegistry = new ComponentRegistry();
 
 // Initialize default theme
-componentRegistry.registerTheme('default', defaultStrRayTheme);
+componentRegistry.registerTheme("default", defaultStrRayTheme);
 
 // Utility functions for cross-framework development
-export const createComponentId = (prefix: string = 'strray') => {
+export const createComponentId = (prefix: string = "strray") => {
   return `${prefix}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 };
 
-export const mergeThemes = (baseTheme: ComponentTheme, overrides: Partial<ComponentTheme>): ComponentTheme => {
+export const mergeThemes = (
+  baseTheme: ComponentTheme,
+  overrides: Partial<ComponentTheme>,
+): ComponentTheme => {
   return {
     ...baseTheme,
     ...overrides,
@@ -369,18 +374,33 @@ export const mergeThemes = (baseTheme: ComponentTheme, overrides: Partial<Compon
     typography: {
       ...baseTheme.typography,
       ...overrides.typography,
-      fontSize: { ...baseTheme.typography.fontSize, ...overrides.typography?.fontSize },
-      fontWeight: { ...baseTheme.typography.fontWeight, ...overrides.typography?.fontWeight },
-      lineHeight: { ...baseTheme.typography.lineHeight, ...overrides.typography?.lineHeight }
+      fontSize: {
+        ...baseTheme.typography.fontSize,
+        ...overrides.typography?.fontSize,
+      },
+      fontWeight: {
+        ...baseTheme.typography.fontWeight,
+        ...overrides.typography?.fontWeight,
+      },
+      lineHeight: {
+        ...baseTheme.typography.lineHeight,
+        ...overrides.typography?.lineHeight,
+      },
     },
     borderRadius: { ...baseTheme.borderRadius, ...overrides.borderRadius },
     shadows: { ...baseTheme.shadows, ...overrides.shadows },
     animations: {
       ...baseTheme.animations,
       ...overrides.animations,
-      duration: { ...baseTheme.animations.duration, ...overrides.animations?.duration },
-      easing: { ...baseTheme.animations.easing, ...overrides.animations?.easing }
-    }
+      duration: {
+        ...baseTheme.animations.duration,
+        ...overrides.animations?.duration,
+      },
+      easing: {
+        ...baseTheme.animations.easing,
+        ...overrides.animations?.easing,
+      },
+    },
   };
 };
 
@@ -393,12 +413,12 @@ export const createResponsiveStyles = (breakpoints: Record<string, any>) => {
 export const createAriaProps = (props: Record<string, any>) => {
   const ariaProps: Record<string, any> = {};
 
-  if (props.label) ariaProps['aria-label'] = props.label;
-  if (props.describedBy) ariaProps['aria-describedby'] = props.describedBy;
-  if (props.expanded !== undefined) ariaProps['aria-expanded'] = props.expanded;
-  if (props.disabled) ariaProps['aria-disabled'] = true;
-  if (props.required) ariaProps['aria-required'] = true;
-  if (props.invalid) ariaProps['aria-invalid'] = true;
+  if (props.label) ariaProps["aria-label"] = props.label;
+  if (props.describedBy) ariaProps["aria-describedby"] = props.describedBy;
+  if (props.expanded !== undefined) ariaProps["aria-expanded"] = props.expanded;
+  if (props.disabled) ariaProps["aria-disabled"] = true;
+  if (props.required) ariaProps["aria-required"] = true;
+  if (props.invalid) ariaProps["aria-invalid"] = true;
 
   return ariaProps;
 };
@@ -408,6 +428,6 @@ export const createOptimizedComponent = (component: StrRayComponent) => {
   // Add performance optimizations like memoization, lazy loading, etc.
   return {
     ...component,
-    optimized: true
+    optimized: true,
   };
 };

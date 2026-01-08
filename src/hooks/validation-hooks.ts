@@ -1,4 +1,8 @@
-import { PreValidateContext, PostValidateContext, ProcessorHook } from '../processors/processor-types';
+import {
+  PreValidateContext,
+  PostValidateContext,
+  ProcessorHook,
+} from "../processors/processor-types";
 
 export interface ValidationHooks {
   preValidate: (data: unknown) => boolean;
@@ -14,7 +18,7 @@ export interface ProcessorValidationHooks {
 
 export const useCodexValidation = (): ValidationHooks => {
   return {
-    preValidate: (data: unknown) => typeof data === 'object' && data !== null,
+    preValidate: (data: unknown) => typeof data === "object" && data !== null,
     postValidate: (result: boolean) => {
       // Post-validation logic
     },

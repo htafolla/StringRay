@@ -1,5 +1,5 @@
 // Global test setup for StrRay Framework tests
-import { beforeAll, afterAll, beforeEach, afterEach, expect } from 'vitest';
+import { beforeAll, afterAll, beforeEach, afterEach, expect } from "vitest";
 
 // Global type declarations
 declare global {
@@ -21,8 +21,8 @@ declare global {
 
 beforeAll(() => {
   // Set up test environment
-  process.env.NODE_ENV = 'test';
-  process.env.STRRAY_TEST_MODE = 'true';
+  process.env.NODE_ENV = "test";
+  process.env.STRRAY_TEST_MODE = "true";
 });
 
 afterAll(() => {
@@ -31,31 +31,33 @@ afterAll(() => {
 });
 
 // Reset console methods after each test
-afterEach(() => {
-});
+afterEach(() => {});
 
 // Global test utilities
 global.testUtils = {
   // Create a temporary directory for file operations
   createTempDir: () => {
-    const crypto = require('crypto');
-    const os = require('os');
-    const path = require('path');
-    return path.join(os.tmpdir(), `strray-test-${crypto.randomBytes(8).toString('hex')}`);
+    const crypto = require("crypto");
+    const os = require("os");
+    const path = require("path");
+    return path.join(
+      os.tmpdir(),
+      `strray-test-${crypto.randomBytes(8).toString("hex")}`,
+    );
   },
 
   // Clean up temporary directory
   cleanupTempDir: (dirPath: string) => {
-    const fs = require('fs');
-    const path = require('path');
-    
+    const fs = require("fs");
+    const path = require("path");
+
     if (fs.existsSync(dirPath)) {
       fs.rmSync(dirPath, { recursive: true, force: true });
     }
   },
 
   // Create mock codex content
-  createMockCodexContent: (version = '1.2.20') => {
+  createMockCodexContent: (version = "1.2.20") => {
     return JSON.stringify({
       version: version,
       lastUpdated: "2026-01-06",
@@ -64,10 +66,11 @@ global.testUtils = {
         "1": {
           number: 1,
           title: "Progressive Prod-Ready Code",
-          description: "All code must be production-ready from the first commit.",
+          description:
+            "All code must be production-ready from the first commit.",
           category: "core",
           zeroTolerance: false,
-          enforcementLevel: "high"
+          enforcementLevel: "high",
         },
         "2": {
           number: 2,
@@ -75,7 +78,7 @@ global.testUtils = {
           description: "Prohibit temporary patches and boilerplate code.",
           category: "core",
           zeroTolerance: false,
-          enforcementLevel: "high"
+          enforcementLevel: "high",
         },
         "7": {
           number: 7,
@@ -83,7 +86,7 @@ global.testUtils = {
           description: "Zero-tolerance for unresolved errors.",
           category: "core",
           zeroTolerance: true,
-          enforcementLevel: "blocking"
+          enforcementLevel: "blocking",
         },
         "8": {
           number: 8,
@@ -91,16 +94,17 @@ global.testUtils = {
           description: "Guarantee termination in all iterative processes.",
           category: "core",
           zeroTolerance: true,
-          enforcementLevel: "blocking"
+          enforcementLevel: "blocking",
         },
         "11": {
           number: 11,
           title: "Type Safety First",
-          description: "Never use \`any\`, \`@ts-ignore\`, or \`@ts-expect-error\`.",
+          description:
+            "Never use \`any\`, \`@ts-ignore\`, or \`@ts-expect-error\`.",
           category: "extended",
           zeroTolerance: true,
-          enforcementLevel: "blocking"
-        }
+          enforcementLevel: "blocking",
+        },
       },
       interweaves: ["Error Prevention Interweave"],
       lenses: ["Code Quality Lens"],
@@ -108,18 +112,19 @@ global.testUtils = {
       antiPatterns: ["Spaghetti code"],
       validationCriteria: {
         "All functions have implementations": false,
-        "No TODO comments in production code": false
+        "No TODO comments in production code": false,
       },
       frameworkAlignment: {
-        "oh-my-opencode": "v2.12.0"
-      }
+        "oh-my-opencode": "v2.12.0",
+      },
     });
   },
 
   // Mock file system operations
   mockFs: {
     existsSync: (path: string) => true,
-    readFileSync: (path: string, encoding: string) => global.testUtils.createMockCodexContent(),
+    readFileSync: (path: string, encoding: string) =>
+      global.testUtils.createMockCodexContent(),
     writeFileSync: () => {},
     mkdirSync: () => {},
     rmSync: () => {},
@@ -127,7 +132,7 @@ global.testUtils = {
 };
 
 // Extend expect with custom matchers
-declare module 'vitest' {
+declare module "vitest" {
   interface Assertion<T = any> {
     toBeValidCodexTerm(): T;
     toHaveCodexViolations(): T;
@@ -138,11 +143,14 @@ declare module 'vitest' {
 // Custom matchers
 expect.extend({
   toBeValidCodexTerm(received: any) {
-    const pass = received &&
-                 typeof received === 'object' &&
-                 typeof received.number === 'number' &&
-                 typeof received.description === 'string' &&
-                 ['core', 'extended', 'architecture', 'advanced'].includes(received.category);
+    const pass =
+      received &&
+      typeof received === "object" &&
+      typeof received.number === "number" &&
+      typeof received.description === "string" &&
+      ["core", "extended", "architecture", "advanced"].includes(
+        received.category,
+      );
 
     return {
       message: () => `expected ${received} to be a valid codex term`,
@@ -151,9 +159,10 @@ expect.extend({
   },
 
   toHaveCodexViolations(received: any) {
-    const pass = received &&
-                 Array.isArray(received.violations) &&
-                 received.violations.length > 0;
+    const pass =
+      received &&
+      Array.isArray(received.violations) &&
+      received.violations.length > 0;
 
     return {
       message: () => `expected ${received} to have codex violations`,
@@ -162,9 +171,10 @@ expect.extend({
   },
 
   toBeCompliantWithCodex(received: any) {
-    const pass = received &&
-                 typeof received.compliant === 'boolean' &&
-                 received.compliant === true;
+    const pass =
+      received &&
+      typeof received.compliant === "boolean" &&
+      received.compliant === true;
 
     return {
       message: () => `expected ${received} to be compliant with codex`,

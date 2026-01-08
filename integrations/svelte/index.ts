@@ -8,15 +8,23 @@
  * @since 2026-01-08
  */
 
-import { writable, readable, derived, get } from 'svelte/store';
-import { StrRayIntegration, StrRayIntegrationConfig, FrameworkAdapter } from '../core';
+import { writable, readable, derived, get } from "svelte/store";
+import {
+  StrRayIntegration,
+  StrRayIntegrationConfig,
+  FrameworkAdapter,
+} from "../core";
 
 // Svelte Framework Adapter
 class SvelteFrameworkAdapter implements FrameworkAdapter {
-  name = 'svelte';
-  version = '4.x';
+  name = "svelte";
+  version = "4.x";
 
-  mount(container: HTMLElement, component: any, props?: Record<string, any>): void {
+  mount(
+    container: HTMLElement,
+    component: any,
+    props?: Record<string, any>,
+  ): void {
     // Svelte components are mounted by Svelte's runtime
     // This would typically be handled by Svelte's mount function
   }
@@ -25,7 +33,11 @@ class SvelteFrameworkAdapter implements FrameworkAdapter {
     // Svelte handles component destruction automatically
   }
 
-  createElement(type: string, props?: Record<string, any>, ...children: any[]): any {
+  createElement(
+    type: string,
+    props?: Record<string, any>,
+    ...children: any[]
+  ): any {
     return { type, props, children };
   }
 
@@ -44,8 +56,11 @@ class StrRayStore {
   public loadingStore = writable(false);
 
   // Derived stores
-  public isInitialized = derived(this.integrationStore, $integration => $integration !== null);
-  public agents = derived(this.integrationStore, $integration => {
+  public isInitialized = derived(
+    this.integrationStore,
+    ($integration) => $integration !== null,
+  );
+  public agents = derived(this.integrationStore, ($integration) => {
     if (!$integration) return new Map();
     return $integration.getContext().agents;
   });
@@ -59,11 +74,12 @@ class StrRayStore {
     try {
       this.integration = new StrRayIntegration({
         ...config,
-        framework: 'svelte'
+        framework: "svelte",
       });
 
       // Override framework adapter with Svelte-specific implementation
-      (this.integration as any).context.framework = new SvelteFrameworkAdapter();
+      (this.integration as any).context.framework =
+        new SvelteFrameworkAdapter();
 
       await this.integration.initialize();
       this.integrationStore.set(this.integration);
@@ -82,7 +98,7 @@ class StrRayStore {
   async executeAgent(agentName: string, task: any): Promise<any> {
     const integration = this.getIntegration();
     if (!integration) {
-      throw new Error('StrRay integration not initialized');
+      throw new Error("StrRay integration not initialized");
     }
     return await integration.executeAgent(agentName, task);
   }
@@ -90,9 +106,9 @@ class StrRayStore {
   async validateCode(code: string): Promise<any> {
     const integration = this.getIntegration();
     if (!integration) {
-      throw new Error('StrRay integration not initialized');
+      throw new Error("StrRay integration not initialized");
     }
-    return await integration.validateCode(code, 'svelte');
+    return await integration.validateCode(code, "svelte");
   }
 }
 
@@ -104,31 +120,31 @@ export function createStrRayAction(actionType: string) {
   return async (params: any = {}) => {
     const integration = strRayStore.getIntegration();
     if (!integration) {
-      throw new Error('StrRay integration not initialized');
+      throw new Error("StrRay integration not initialized");
     }
 
     switch (actionType) {
-      case 'executeAgent':
+      case "executeAgent":
         return await integration.executeAgent(params.agentName, params.task);
-      case 'validateCode':
-        return await integration.validateCode(params.code, 'svelte');
-      case 'injectCodex':
-        const injectHook = integration.getHook('codex:inject');
+      case "validateCode":
+        return await integration.validateCode(params.code, "svelte");
+      case "injectCodex":
+        const injectHook = integration.getHook("codex:inject");
         return injectHook ? await injectHook(params.code) : null;
-      case 'getCodexStats':
-        const statsHook = integration.getHook('codex:stats');
+      case "getCodexStats":
+        const statsHook = integration.getHook("codex:stats");
         return statsHook ? await statsHook() : null;
-      case 'startMonitoring':
-        const monitorHook = integration.getHook('monitor:performance');
+      case "startMonitoring":
+        const monitorHook = integration.getHook("monitor:performance");
         return monitorHook ? monitorHook() : null;
-      case 'trackError':
-        const errorHook = integration.getHook('monitor:errors');
+      case "trackError":
+        const errorHook = integration.getHook("monitor:errors");
         return errorHook ? errorHook(params.error) : null;
-      case 'generatePrediction':
-        const predictHook = integration.getHook('analytics:predict');
+      case "generatePrediction":
+        const predictHook = integration.getHook("analytics:predict");
         return predictHook ? await predictHook(params.data) : null;
-      case 'optimizeAssignment':
-        const optimizeHook = integration.getHook('analytics:optimize');
+      case "optimizeAssignment":
+        const optimizeHook = integration.getHook("analytics:optimize");
         return optimizeHook ? await optimizeHook(params.task) : null;
       default:
         throw new Error(`Unknown action type: ${actionType}`);
@@ -137,27 +153,30 @@ export function createStrRayAction(actionType: string) {
 }
 
 // Svelte stores for specific functionality
-export const codexStats = derived(strRayStore.integrationStore, async ($integration, set) => {
-  if (!$integration) {
-    set(null);
-    return;
-  }
+export const codexStats = derived(
+  strRayStore.integrationStore,
+  async ($integration, set) => {
+    if (!$integration) {
+      set(null);
+      return;
+    }
 
-  try {
-    const statsHook = $integration.getHook('codex:stats');
-    const stats = statsHook ? await statsHook() : null;
-    set(stats);
-  } catch (error) {
-    console.error('Failed to load codex stats:', error);
-    set(null);
-  }
-});
+    try {
+      const statsHook = $integration.getHook("codex:stats");
+      const stats = statsHook ? await statsHook() : null;
+      set(stats);
+    } catch (error) {
+      console.error("Failed to load codex stats:", error);
+      set(null);
+    }
+  },
+);
 
-export const agentList = derived(strRayStore.agents, $agents => {
-  return Array.from($agents.keys()).map(name => ({
+export const agentList = derived(strRayStore.agents, ($agents) => {
+  return Array.from($agents.keys()).map((name) => ({
     name,
     active: true,
-    instance: $agents.get(name)
+    instance: $agents.get(name),
   }));
 });
 
@@ -168,9 +187,9 @@ export function strrayValidate(node: HTMLElement, code: string) {
   const validate = async () => {
     try {
       const result = await strRayStore.validateCode(currentCode);
-      node.dispatchEvent(new CustomEvent('validation', { detail: result }));
+      node.dispatchEvent(new CustomEvent("validation", { detail: result }));
     } catch (error) {
-      node.dispatchEvent(new CustomEvent('validation', { detail: { error } }));
+      node.dispatchEvent(new CustomEvent("validation", { detail: { error } }));
     }
   };
 
@@ -185,7 +204,7 @@ export function strrayValidate(node: HTMLElement, code: string) {
     update,
     destroy() {
       // Cleanup if needed
-    }
+    },
   };
 }
 
@@ -214,7 +233,7 @@ export function createAgentStore(agentName: string) {
     result: { subscribe: result.subscribe },
     loading: { subscribe: loading.subscribe },
     error: { subscribe: error.subscribe },
-    execute
+    execute,
   };
 }
 

@@ -8,13 +8,13 @@
  * @since 2026-01-07
  */
 
-import { CodexContext, CodexTerm } from '../context-loader';
+import { CodexContext, CodexTerm } from "../context-loader";
 
 /**
  * Content format detection result
  */
 export interface FormatDetectionResult {
-  format: 'json' | 'markdown' | 'unknown';
+  format: "json" | "markdown" | "unknown";
   confidence: number;
 }
 
@@ -32,8 +32,8 @@ export interface ParsingResult {
  * Detect content format
  */
 export function detectContentFormat(content: string): FormatDetectionResult {
-  if (!content || content.trim() === '') {
-    return { format: 'unknown', confidence: 0 };
+  if (!content || content.trim() === "") {
+    return { format: "unknown", confidence: 0 };
   }
 
   // Check for JSON format
@@ -46,28 +46,30 @@ export function detectContentFormat(content: string): FormatDetectionResult {
     }
   })();
 
-   // Check for Markdown format
-   const markdownConfidence = (() => {
-     const markdownIndicators = [
-       content.includes('**Version**:'),
-       content.includes('**Last Updated**:'),
-       content.includes('#### '), // Term headers
-       content.includes('## Overview'),
-       content.includes('## Critical Codex Terms'),
-       content.includes('#### 1.'), // Common first term
-       content.includes('#### 2.'), // Common second term
-     ];
-     return markdownIndicators.filter(Boolean).length / markdownIndicators.length;
-   })();
+  // Check for Markdown format
+  const markdownConfidence = (() => {
+    const markdownIndicators = [
+      content.includes("**Version**:"),
+      content.includes("**Last Updated**:"),
+      content.includes("#### "), // Term headers
+      content.includes("## Overview"),
+      content.includes("## Critical Codex Terms"),
+      content.includes("#### 1."), // Common first term
+      content.includes("#### 2."), // Common second term
+    ];
+    return (
+      markdownIndicators.filter(Boolean).length / markdownIndicators.length
+    );
+  })();
 
   // Prefer JSON as primary format, Markdown as fallback
   if (jsonConfidence >= 0.5) {
-    return { format: 'json', confidence: jsonConfidence };
-   } else if (markdownConfidence > 0.1) {
-    return { format: 'markdown', confidence: markdownConfidence };
-   }
+    return { format: "json", confidence: jsonConfidence };
+  } else if (markdownConfidence > 0.1) {
+    return { format: "markdown", confidence: markdownConfidence };
+  }
 
-   return { format: 'unknown', confidence: 0 };
+  return { format: "unknown", confidence: 0 };
 }
 
 /**
@@ -120,23 +122,26 @@ function parseMarkdownContent(content: string): ParsingResult {
   try {
     // Extract version
     const versionMatch = content.match(/\*\*Version\*\*:\s*([^\n]+)/);
-    const version = versionMatch && versionMatch[1] ? versionMatch[1].trim() : "1.2.20";
+    const version =
+      versionMatch && versionMatch[1] ? versionMatch[1].trim() : "1.2.20";
 
     // Extract last updated
     const lastUpdatedMatch = content.match(/\*\*Last Updated\*\*:\s*([^\n]+)/);
-    const lastUpdated = lastUpdatedMatch && lastUpdatedMatch[1]
-      ? lastUpdatedMatch[1].trim()
-      : new Date().toISOString();
+    const lastUpdated =
+      lastUpdatedMatch && lastUpdatedMatch[1]
+        ? lastUpdatedMatch[1].trim()
+        : new Date().toISOString();
 
     // Extract terms
     const termsMap = new Map<number, CodexTerm>();
-    const termRegex = /^\s*#### (\d+)\.\s*([^\n]+)(?:\s*\n([\s\S]*?))?(?=^\s*#### \d+\.|^\s*## |$)/gm;
+    const termRegex =
+      /^\s*#### (\d+)\.\s*([^\n]+)(?:\s*\n([\s\S]*?))?(?=^\s*#### \d+\.|^\s*## |$)/gm;
     let match;
 
     while ((match = termRegex.exec(content)) !== null) {
       const termNumber = parseInt(match[1]!, 10);
       const termTitle = match[2]!.trim();
-      const termDescription = (match[3] || '').trim();
+      const termDescription = (match[3] || "").trim();
 
       // Infer category from term number
       let category: CodexTerm["category"];
@@ -151,18 +156,19 @@ function parseMarkdownContent(content: string): ParsingResult {
       }
 
       // Check for zero tolerance indicators
-      const zeroTolerance = termDescription.toLowerCase().includes('zero-tolerance') ||
-                           termDescription.toLowerCase().includes('blocking');
+      const zeroTolerance =
+        termDescription.toLowerCase().includes("zero-tolerance") ||
+        termDescription.toLowerCase().includes("blocking");
 
       // Infer enforcement level
       let enforcementLevel: "low" | "medium" | "high" | "blocking" = "low";
       if (zeroTolerance) {
         enforcementLevel = "blocking";
-      } else if (termDescription.toLowerCase().includes('blocking')) {
+      } else if (termDescription.toLowerCase().includes("blocking")) {
         enforcementLevel = "blocking";
-      } else if (termDescription.toLowerCase().includes('high')) {
+      } else if (termDescription.toLowerCase().includes("high")) {
         enforcementLevel = "high";
-      } else if (termDescription.toLowerCase().includes('medium')) {
+      } else if (termDescription.toLowerCase().includes("medium")) {
         enforcementLevel = "medium";
       }
 
@@ -178,35 +184,45 @@ function parseMarkdownContent(content: string): ParsingResult {
     }
 
     // Extract interweaves, lenses, principles, anti-patterns
-    const interweaves = extractSectionList(content, 'Interweaves');
-    const lenses = extractSectionList(content, 'Lenses');
-    const principles = extractSectionList(content, 'Principles');
-    const antiPatterns = extractSectionList(content, 'Anti-Patterns');
+    const interweaves = extractSectionList(content, "Interweaves");
+    const lenses = extractSectionList(content, "Lenses");
+    const principles = extractSectionList(content, "Principles");
+    const antiPatterns = extractSectionList(content, "Anti-Patterns");
 
     // Extract validation criteria (simple presence check for now)
     const validationCriteria: Record<string, boolean> = {};
-    const validationSections = ['Code Completeness', 'Code Quality', 'Code Safety'];
-    validationSections.forEach(section => {
+    const validationSections = [
+      "Code Completeness",
+      "Code Quality",
+      "Code Safety",
+    ];
+    validationSections.forEach((section) => {
       validationCriteria[section] = content.includes(`### ${section}`);
     });
 
     // Extract framework alignment
     const frameworkAlignment: Record<string, string> = {};
-    const frameworkMatch = content.match(/### Framework Alignment([\s\S]*?)(?=### |$)/);
+    const frameworkMatch = content.match(
+      /### Framework Alignment([\s\S]*?)(?=### |$)/,
+    );
     if (frameworkMatch && frameworkMatch[1]) {
       const alignmentText = frameworkMatch[1];
       const alignmentRegex = /- \*\*([^:]+)\*\*:\s*([^\n]+)/g;
       let alignmentMatch;
       while ((alignmentMatch = alignmentRegex.exec(alignmentText)) !== null) {
         if (alignmentMatch[1] && alignmentMatch[2]) {
-          frameworkAlignment[alignmentMatch[1].trim()] = alignmentMatch[2].trim();
+          frameworkAlignment[alignmentMatch[1].trim()] =
+            alignmentMatch[2].trim();
         }
       }
     }
 
     // Extract error prevention target
-    const targetMatch = content.match(/Error Prevention Target[^:]*:\s*([\d.]+)%?/);
-    const errorPreventionTarget = targetMatch && targetMatch[1] ? parseFloat(targetMatch[1]) / 100 : 0.996;
+    const targetMatch = content.match(
+      /Error Prevention Target[^:]*:\s*([\d.]+)%?/,
+    );
+    const errorPreventionTarget =
+      targetMatch && targetMatch[1] ? parseFloat(targetMatch[1]) / 100 : 0.996;
 
     const context: CodexContext = {
       version,
@@ -235,7 +251,10 @@ function parseMarkdownContent(content: string): ParsingResult {
  * Extract section list from markdown content
  */
 function extractSectionList(content: string, sectionName: string): string[] {
-  const sectionRegex = new RegExp(`### ${sectionName}([\\s\\S]*?)(?=### |$)`, 'i');
+  const sectionRegex = new RegExp(
+    `### ${sectionName}([\\s\\S]*?)(?=### |$)`,
+    "i",
+  );
   const match = content.match(sectionRegex);
 
   if (!match || !match[1]) return [];
@@ -257,20 +276,23 @@ function extractSectionList(content: string, sectionName: string): string[] {
 /**
  * Unified codex content parser
  */
-export function parseCodexContent(content: string, sourcePath?: string): ParsingResult {
+export function parseCodexContent(
+  content: string,
+  sourcePath?: string,
+): ParsingResult {
   // Validate inputs
-  if (!content || content.trim() === '') {
+  if (!content || content.trim() === "") {
     return {
       success: false,
-      error: 'Invalid content provided: content cannot be empty',
+      error: "Invalid content provided: content cannot be empty",
       warnings: [],
     };
   }
 
-  if (!sourcePath || sourcePath.trim() === '') {
+  if (!sourcePath || sourcePath.trim() === "") {
     return {
       success: false,
-      error: 'Invalid source path provided',
+      error: "Invalid source path provided",
       warnings: [],
     };
   }
@@ -279,9 +301,9 @@ export function parseCodexContent(content: string, sourcePath?: string): Parsing
   const formatResult = detectContentFormat(content);
 
   // For .json files, try JSON parsing regardless of detection result
-  const isJsonFile = sourcePath && sourcePath.endsWith('.json');
+  const isJsonFile = sourcePath && sourcePath.endsWith(".json");
 
-  if (formatResult.format === 'unknown' && !isJsonFile) {
+  if (formatResult.format === "unknown" && !isJsonFile) {
     return {
       success: false,
       error: `Unable to detect content format. Content appears to be neither valid JSON nor Markdown.`,
@@ -290,9 +312,10 @@ export function parseCodexContent(content: string, sourcePath?: string): Parsing
   }
 
   // Parse based on detected format or file extension
-  const result = (formatResult.format === 'json' || isJsonFile)
-    ? parseJsonContent(content)
-    : parseMarkdownContent(content);
+  const result =
+    formatResult.format === "json" || isJsonFile
+      ? parseJsonContent(content)
+      : parseMarkdownContent(content);
 
   // Add source path to error if available
   if (!result.success && sourcePath && result.error) {
@@ -309,7 +332,7 @@ export function extractCodexMetadata(content: string): {
   version: string;
   termCount: number;
 } {
-  const result = parseCodexContent(content, 'extract-metadata');
+  const result = parseCodexContent(content, "extract-metadata");
 
   if (result.success && result.context) {
     return {
@@ -342,14 +365,17 @@ export interface ValidationResult {
 /**
  * Validate TypeScript code syntax
  */
-export async function validateTypeScriptSyntax(code: string, filePath?: string): Promise<ValidationResult> {
+export async function validateTypeScriptSyntax(
+  code: string,
+  filePath?: string,
+): Promise<ValidationResult> {
   const errors: string[] = [];
   const warnings: string[] = [];
 
   try {
     // Use a simpler syntax check for now - basic bracket matching and common syntax issues
     const bracketStack: string[] = [];
-    const brackets = { '{': '}', '[': ']', '(': ')' };
+    const brackets = { "{": "}", "[": "]", "(": ")" };
 
     for (let i = 0; i < code.length; i++) {
       const char = code.charAt(i);
@@ -359,18 +385,20 @@ export async function validateTypeScriptSyntax(code: string, filePath?: string):
       } else if (Object.values(brackets).includes(char)) {
         const lastOpen = bracketStack.pop();
         if (!lastOpen || brackets[lastOpen as keyof typeof brackets] !== char) {
-          errors.push(`Bracket mismatch at position ${i}: expected closing bracket for '${lastOpen || 'none'}', found '${char}'`);
+          errors.push(
+            `Bracket mismatch at position ${i}: expected closing bracket for '${lastOpen || "none"}', found '${char}'`,
+          );
         }
       }
 
       // Check for common syntax issues
-      if (char === ';' && i > 0 && code.charAt(i - 1) === ';') {
+      if (char === ";" && i > 0 && code.charAt(i - 1) === ";") {
         warnings.push(`Double semicolon at position ${i}`);
       }
     }
 
     if (bracketStack.length > 0) {
-      errors.push(`Unclosed brackets: ${bracketStack.join(', ')}`);
+      errors.push(`Unclosed brackets: ${bracketStack.join(", ")}`);
     }
 
     // Check for basic import/export syntax
@@ -379,8 +407,10 @@ export async function validateTypeScriptSyntax(code: string, filePath?: string):
 
     let match;
     while ((match = importRegex.exec(code)) !== null) {
-      if (!match[0].includes('from')) {
-        errors.push(`Invalid import statement at line ${code.substring(0, match.index).split('\n').length}`);
+      if (!match[0].includes("from")) {
+        errors.push(
+          `Invalid import statement at line ${code.substring(0, match.index).split("\n").length}`,
+        );
       }
     }
 
@@ -394,7 +424,9 @@ export async function validateTypeScriptSyntax(code: string, filePath?: string):
       warnings,
     };
   } catch (error) {
-    errors.push(`Failed to validate TypeScript syntax: ${error instanceof Error ? error.message : String(error)}`);
+    errors.push(
+      `Failed to validate TypeScript syntax: ${error instanceof Error ? error.message : String(error)}`,
+    );
     return {
       valid: false,
       errors,
@@ -418,7 +450,9 @@ export function validateJsonSyntax(jsonString: string): ValidationResult {
       warnings: [],
     };
   } catch (error) {
-    errors.push(`Invalid JSON syntax: ${error instanceof Error ? error.message : String(error)}`);
+    errors.push(
+      `Invalid JSON syntax: ${error instanceof Error ? error.message : String(error)}`,
+    );
     return {
       valid: false,
       errors,
@@ -432,14 +466,14 @@ export function validateJsonSyntax(jsonString: string): ValidationResult {
  */
 export async function validateBeforeModification(
   content: string,
-  filePath: string
+  filePath: string,
 ): Promise<ValidationResult> {
   const errors: string[] = [];
   const warnings: string[] = [];
 
   // Check file extension to determine validation type
-  const isTypeScript = filePath.endsWith('.ts') || filePath.endsWith('.tsx');
-  const isJson = filePath.endsWith('.json');
+  const isTypeScript = filePath.endsWith(".ts") || filePath.endsWith(".tsx");
+  const isJson = filePath.endsWith(".json");
 
   if (isTypeScript) {
     const tsResult = await validateTypeScriptSyntax(content, filePath);
@@ -452,13 +486,15 @@ export async function validateBeforeModification(
   }
 
   // Additional content validation
-  if (!content || content.trim() === '') {
-    errors.push('File content is empty or contains only whitespace');
+  if (!content || content.trim() === "") {
+    errors.push("File content is empty or contains only whitespace");
   }
 
   // Check for potential security issues
-  if (content.includes('eval(') || content.includes('Function(')) {
-    warnings.push('Content contains potentially unsafe code execution patterns');
+  if (content.includes("eval(") || content.includes("Function(")) {
+    warnings.push(
+      "Content contains potentially unsafe code execution patterns",
+    );
   }
 
   return {

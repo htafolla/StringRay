@@ -62,13 +62,15 @@ class CodexViolationError(Exception):
         self.term_id = term_id
         self.term_title = term_title
         self.message = message
-        super().__init__(f"Codex violation for term {term_id} ({term_title}): {message}")
+        super().__init__(
+            f"Codex violation for term {term_id} ({term_title}): {message}"
+        )
 
 
 @dataclass
 class CodexRule:
     """Represents a codex validation rule."""
-    
+
     term_id: int
     title: str
     description: str
@@ -89,10 +91,11 @@ class CodexRule:
             "dependencies": self.dependencies,
         }
 
+
 @dataclass
 class CodexComplianceResult:
     """Result of a codex compliance check."""
-    
+
     term_id: Optional[int] = None
     is_compliant: bool = True
     violations: List[str] = field(default_factory=list)
@@ -215,7 +218,9 @@ class CodexLoader:
             )
 
         except Exception as e:
-            logger.error("Failed to load codex", error=str(e), path=str(self.codex_path))
+            logger.error(
+                "Failed to load codex", error=str(e), path=str(self.codex_path)
+            )
             # Keep existing cached data if load fails
 
     def _extract_version(self, content: str) -> Optional[str]:
@@ -288,7 +293,7 @@ class CodexLoader:
                 current_term_id = int(term_match.group(1))
                 current_title = term_match.group(2).strip()
                 current_content = []
-                
+
                 # Update category
                 if current_term_id <= 10:
                     current_category = CodexCategory.CORE.value
@@ -385,10 +390,7 @@ class CodexLoader:
 
         for term in self._codex_terms.values():
             # Search in title and content
-            if (
-                query_lower in term.title.lower()
-                or query_lower in term.content.lower()
-            ):
+            if query_lower in term.title.lower() or query_lower in term.content.lower():
                 matches.append(term)
 
         return matches
@@ -406,15 +408,10 @@ class CodexLoader:
         return [self._codex_terms[tid] for tid in term_ids if tid in self._codex_terms]
 
     def validate_compliance(
-
         self,
-
         code_or_action: Union[str, Dict[str, Any]],
-
         relevant_terms: Optional[List[int]] = None,
-
     ) -> List[CodexComplianceResult]:
-
         """Validate code or action against codex terms.
 
 
@@ -444,7 +441,9 @@ class CodexLoader:
 
             if relevant_terms:
 
-                filtered_results = [r for r in cached_results if r.term_id in relevant_terms]
+                filtered_results = [
+                    r for r in cached_results if r.term_id in relevant_terms
+                ]
 
                 if len(filtered_results) == len(relevant_terms):
 
@@ -454,9 +453,6 @@ class CodexLoader:
 
                 return cached_results
 
-
-
-
         # Determine which terms to check
 
         if relevant_terms:
@@ -465,9 +461,9 @@ class CodexLoader:
 
         else:
 
-            terms_to_check = list(self._loaded_terms) if self._loaded_terms else [1, 2, 3, 5, 15]  # Default terms
-
-
+            terms_to_check = (
+                list(self._loaded_terms) if self._loaded_terms else [1, 2, 3, 5, 15]
+            )  # Default terms
 
         results = []
 
@@ -485,32 +481,22 @@ class CodexLoader:
 
                 # Return non-compliant result for failed validation
 
-                results.append(CodexComplianceResult(
-
-                    term_id=term_id,
-
-                    is_compliant=False,
-
-                    violations=[f"Validation error: {str(e)}"],
-
-                    recommendations=["Fix validation error"],
-
-                ))
-
-
+                results.append(
+                    CodexComplianceResult(
+                        term_id=term_id,
+                        is_compliant=False,
+                        violations=[f"Validation error: {str(e)}"],
+                        recommendations=["Fix validation error"],
+                    )
+                )
 
         # Cache the results
 
         self._compliance_cache[cache_key] = results
 
-
-
         return results
 
-
-
     def load_codex_terms(self, term_ids: List[int]) -> Dict[int, CodexRule]:
-
         """Load codex terms by IDs.
 
 
@@ -545,22 +531,15 @@ class CodexLoader:
 
                 continue
 
-
-
         # Update cache and hash
 
         self._codex_cache.update(rules)
 
         self._codex_hash = self._calculate_codex_hash(list(self._loaded_terms))
 
-
-
         return rules
 
-
-
     def _load_codex_rule(self, term_id: int) -> CodexRule:
-
         """Load a single codex rule by ID.
 
 
@@ -589,8 +568,6 @@ class CodexLoader:
 
             return self._codex_cache[term_id]
 
-
-
         # Load from legacy codex terms if available
 
         if term_id in self._codex_terms:
@@ -598,125 +575,126 @@ class CodexLoader:
             term = self._codex_terms[term_id]
 
             rule = CodexRule(
-
                 term_id=term.term_id,
-
                 title=term.title,
-
                 description=term.content,
-
                 category=term.category,
-
                 severity="critical" if term_id in [1, 2, 5, 8] else "medium",
-
                 automated_check=True,
-
-                dependencies=self._get_term_dependencies_from_legacy(term_id)
-
+                dependencies=self._get_term_dependencies_from_legacy(term_id),
             )
 
             self._codex_cache[term_id] = rule
 
             return rule
 
-
-
         # Hardcoded rules for testing (based on test expectations)
 
         rules_data = {
-
-            1: {"title": "Framework Foundation", "category": "architecture", "severity": "critical", "deps": []},
-
-            2: {"title": "Agent Orchestration", "category": "architecture", "severity": "critical", "deps": [1]},
-
-            3: {"title": "State Management", "category": "architecture", "severity": "medium", "deps": [1]},
-
-            5: {"title": "Error Prevention", "category": "quality", "severity": "critical", "deps": [1, 2]},
-
-            7: {"title": "Resolve All Errors", "category": "quality", "severity": "high", "deps": [5]},
-
-            8: {"title": "Prevent Infinite Loops", "category": "quality", "severity": "critical", "deps": [5]},
-
-            15: {"title": "Deep Review", "category": "quality", "severity": "medium", "deps": [5]},
-
-            24: {"title": "Single Responsibility", "category": "architecture", "severity": "medium", "deps": [1]},
-
-            38: {"title": "Functionality Retention", "category": "quality", "severity": "medium", "deps": [5]},
-
-            39: {"title": "Syntax Validation", "category": "quality", "severity": "medium", "deps": [5]},
-
+            1: {
+                "title": "Framework Foundation",
+                "category": "architecture",
+                "severity": "critical",
+                "deps": [],
+            },
+            2: {
+                "title": "Agent Orchestration",
+                "category": "architecture",
+                "severity": "critical",
+                "deps": [1],
+            },
+            3: {
+                "title": "State Management",
+                "category": "architecture",
+                "severity": "medium",
+                "deps": [1],
+            },
+            5: {
+                "title": "Error Prevention",
+                "category": "quality",
+                "severity": "critical",
+                "deps": [1, 2],
+            },
+            7: {
+                "title": "Resolve All Errors",
+                "category": "quality",
+                "severity": "high",
+                "deps": [5],
+            },
+            8: {
+                "title": "Prevent Infinite Loops",
+                "category": "quality",
+                "severity": "critical",
+                "deps": [5],
+            },
+            15: {
+                "title": "Deep Review",
+                "category": "quality",
+                "severity": "medium",
+                "deps": [5],
+            },
+            24: {
+                "title": "Single Responsibility",
+                "category": "architecture",
+                "severity": "medium",
+                "deps": [1],
+            },
+            38: {
+                "title": "Functionality Retention",
+                "category": "quality",
+                "severity": "medium",
+                "deps": [5],
+            },
+            39: {
+                "title": "Syntax Validation",
+                "category": "quality",
+                "severity": "medium",
+                "deps": [5],
+            },
         }
-
-
 
         if term_id not in rules_data:
 
-            raise CodexError(term_id, f"Term {term_id}", f"Unknown codex term: {term_id}")
-
-
+            raise CodexError(
+                term_id, f"Term {term_id}", f"Unknown codex term: {term_id}"
+            )
 
         data = rules_data[term_id]
 
         rule = CodexRule(
-
             term_id=term_id,
-
             title=data["title"],
-
             description=f"Description for {data["title"]}",
-
             category=data["category"],
-
             severity=data["severity"],
-
             automated_check=True,
-
-            dependencies=data["deps"]
-
+            dependencies=data["deps"],
         )
-
-
 
         self._codex_cache[term_id] = rule
 
         return rule
 
-
-
     def _get_term_dependencies_from_legacy(self, term_id: int) -> List[int]:
-
         """Get term dependencies from legacy system (placeholder)."""
 
         # Simple dependency mapping for testing
 
         deps_map = {
-
             2: [1],
-
             3: [1],
-
             5: [1, 2],
-
             7: [5],
-
             8: [5],
-
             15: [5],
-
             24: [1],
-
             38: [5],
-
             39: [5],
-
         }
 
         return deps_map.get(term_id, [])
 
-
-
     def get_term_dependencies(self, term_id: int) -> List[int]:
-
         """Get dependencies for a specific term.
 
 
@@ -737,8 +715,6 @@ class CodexLoader:
 
             return self._codex_cache[term_id].dependencies.copy()
 
-        
-
         # Try to load the rule to get dependencies
 
         try:
@@ -751,10 +727,7 @@ class CodexLoader:
 
             return []
 
-
-
     def get_loaded_terms(self) -> Set[int]:
-
         """Get set of currently loaded term IDs.
 
 
@@ -767,10 +740,7 @@ class CodexLoader:
 
         return self._loaded_terms.copy()
 
-
-
     def get_rule(self, term_id: int) -> Optional[CodexRule]:
-
         """Get a specific codex rule by ID.
 
 
@@ -791,8 +761,6 @@ class CodexLoader:
 
             return self._codex_cache[term_id]
 
-        
-
         try:
 
             return self._load_codex_rule(term_id)
@@ -801,10 +769,7 @@ class CodexLoader:
 
             return None
 
-
-
     def get_rules_by_category(self, category: str) -> List[CodexRule]:
-
         """Get all rules in a specific category.
 
 
@@ -829,8 +794,6 @@ class CodexLoader:
 
                 rules.append(rule)
 
-        
-
         # Also check loaded terms that might not be in cache
 
         for term_id in self._loaded_terms:
@@ -849,14 +812,9 @@ class CodexLoader:
 
                     continue
 
-        
-
         return rules
 
-
-
     def _calculate_codex_hash(self, term_ids: List[int]) -> str:
-
         """Calculate hash for a set of codex terms.
 
 
@@ -883,10 +841,7 @@ class CodexLoader:
 
         return hashlib.sha256(content.encode()).hexdigest()
 
-
-
     def _get_context_hash(self, context: Dict[str, Any]) -> str:
-
         """Calculate hash for validation context.
 
 
@@ -923,10 +878,7 @@ class CodexLoader:
 
             return hashlib.sha256(content.encode()).hexdigest()
 
-
-
     def is_cache_valid(self, term_ids: List[int], context: Dict[str, Any]) -> bool:
-
         """Check if cached results are still valid.
 
 
@@ -949,16 +901,11 @@ class CodexLoader:
 
             return False
 
-        
-
         expected_hash = self._calculate_codex_hash(term_ids)
 
         return self._codex_hash == expected_hash
 
-
-
     def get_critical_rules(self) -> List[CodexRule]:
-
         """Get all rules with critical severity.
 
 
@@ -976,8 +923,6 @@ class CodexLoader:
             if rule.severity == "critical":
 
                 critical_rules.append(rule)
-
-        
 
         # Also check loaded terms that might not be in cache
 
@@ -997,18 +942,11 @@ class CodexLoader:
 
                     continue
 
-        
-
         return critical_rules
 
-
-
     def _validate_term_compliance(
-
         self, code_or_action: Union[str, Dict[str, Any]], term_id: int
-
     ) -> CodexComplianceResult:
-
         """Validate code/action against a specific term.
 
 
@@ -1039,13 +977,9 @@ class CodexLoader:
 
         content_lower = content_str.lower()
 
-
-
         violations = []
 
         recommendations = []
-
-
 
         # Term-specific validation logic
 
@@ -1059,13 +993,17 @@ class CodexLoader:
 
                     violations.append("Communication bus not configured")
 
-                    recommendations.append("Configure communication bus for agent orchestration")
+                    recommendations.append(
+                        "Configure communication bus for agent orchestration"
+                    )
 
                 if code_or_action.get("max_concurrent_agents") == 0:
 
                     violations.append("Invalid concurrent agents configuration")
 
-                    recommendations.append("Set max_concurrent_agents to positive value")
+                    recommendations.append(
+                        "Set max_concurrent_agents to positive value"
+                    )
 
             elif term_id == 3:  # State Management
 
@@ -1077,7 +1015,9 @@ class CodexLoader:
 
             elif term_id == 5:  # Error Prevention
 
-                if not code_or_action.get("error_handling_enabled", True) or not code_or_action.get("has_error_handling", True):
+                if not code_or_action.get(
+                    "error_handling_enabled", True
+                ) or not code_or_action.get("has_error_handling", True):
 
                     violations.append("Error handling disabled")
 
@@ -1097,7 +1037,10 @@ class CodexLoader:
 
             if term_id == 1:  # Framework Foundation
 
-                if "communication_bus" not in content_lower and "state_manager" not in content_lower:
+                if (
+                    "communication_bus" not in content_lower
+                    and "state_manager" not in content_lower
+                ):
 
                     violations.append("Missing framework foundation components")
 
@@ -1109,11 +1052,16 @@ class CodexLoader:
 
                     violations.append("Invalid concurrent agents configuration")
 
-                    recommendations.append("Set max_concurrent_agents to positive value")
+                    recommendations.append(
+                        "Set max_concurrent_agents to positive value"
+                    )
 
             elif term_id == 3:  # State Management
 
-                if "state_manager_enabled" in content_lower and "false" in content_lower:
+                if (
+                    "state_manager_enabled" in content_lower
+                    and "false" in content_lower
+                ):
 
                     violations.append("State management disabled")
 
@@ -1153,26 +1101,15 @@ class CodexLoader:
 
         compliant = len(violations) == 0
 
-
-
         return CodexComplianceResult(
-
             term_id=term_id,
-
             is_compliant=compliant,
-
             violations=violations,
-
             recommendations=recommendations,
-
-            metadata={"validated_at": time.time(), "content_length": len(content_str)}
-
+            metadata={"validated_at": time.time(), "content_length": len(content_str)},
         )
 
-
-
     def clear_cache(self) -> None:
-
         """Clear all caches and reset loaded terms.
 
 
@@ -1194,9 +1131,9 @@ class CodexLoader:
         logger.info("Codex cache cleared")
 
 
-
 # Global default loader instance
 _default_loader: Optional[CodexLoader] = None
+
 
 def get_default_codex_loader() -> CodexLoader:
     """Get or create the default CodexLoader instance."""

@@ -62,12 +62,12 @@ export interface AgentStatus {
   active: boolean;
   lastActivity: number;
   currentTasks: number;
-  health: 'healthy' | 'degraded' | 'unhealthy';
+  health: "healthy" | "degraded" | "unhealthy";
   metrics: Record<string, any>;
 }
 
 export interface PluginHealthStatus {
-  status: 'healthy' | 'degraded' | 'unhealthy' | 'unknown';
+  status: "healthy" | "degraded" | "unhealthy" | "unknown";
   lastCheck: number;
   uptime: number;
   errorCount: number;
@@ -94,15 +94,21 @@ export interface PluginSandboxConfig {
 
 export class PluginValidator {
   private readonly requiredFields = [
-    'id', 'name', 'version', 'description', 'author', 'license', 'engines'
+    "id",
+    "name",
+    "version",
+    "description",
+    "author",
+    "license",
+    "engines",
   ];
 
   private readonly securityChecks = [
-    'validatePackageName',
-    'validateDependencies',
-    'validatePermissions',
-    'validateCodeSecurity',
-    'validateResourceLimits'
+    "validatePackageName",
+    "validateDependencies",
+    "validatePermissions",
+    "validateCodeSecurity",
+    "validateResourceLimits",
   ];
 
   /**
@@ -114,7 +120,7 @@ export class PluginValidator {
       errors: [],
       warnings: [],
       securityIssues: [],
-      compatibilityScore: 0
+      compatibilityScore: 0,
     };
 
     try {
@@ -128,14 +134,17 @@ export class PluginValidator {
       result.errors.push(...capabilitiesValidation.errors);
       result.warnings.push(...capabilitiesValidation.warnings);
 
-      const securityValidation = await this.validateSecurity(pluginPath, packageJson);
+      const securityValidation = await this.validateSecurity(
+        pluginPath,
+        packageJson,
+      );
       result.securityIssues.push(...securityValidation.issues);
       result.errors.push(...securityValidation.errors);
 
       result.compatibilityScore = this.calculateCompatibilityScore(packageJson);
 
-      result.valid = result.errors.length === 0 && result.securityIssues.length === 0;
-
+      result.valid =
+        result.errors.length === 0 && result.securityIssues.length === 0;
     } catch (error) {
       result.errors.push(`Validation failed: ${error}`);
     }
@@ -144,15 +153,18 @@ export class PluginValidator {
   }
 
   private async loadPackageJson(pluginPath: string): Promise<any> {
-    const fs = require('fs').promises;
-    const path = require('path');
+    const fs = require("fs").promises;
+    const path = require("path");
 
-    const packagePath = path.join(pluginPath, 'package.json');
-    const content = await fs.readFile(packagePath, 'utf-8');
+    const packagePath = path.join(pluginPath, "package.json");
+    const content = await fs.readFile(packagePath, "utf-8");
     return JSON.parse(content);
   }
 
-  private validateMetadata(packageJson: any): { errors: string[]; warnings: string[] } {
+  private validateMetadata(packageJson: any): {
+    errors: string[];
+    warnings: string[];
+  } {
     const errors: string[] = [];
     const warnings: string[] = [];
 
@@ -163,17 +175,23 @@ export class PluginValidator {
     }
 
     if (packageJson.version && !/^\d+\.\d+\.\d+/.test(packageJson.version)) {
-      errors.push('Invalid version format (expected semver)');
+      errors.push("Invalid version format (expected semver)");
     }
 
     if (!packageJson.engines?.strray) {
-      errors.push('Missing StrRay engine requirement');
+      errors.push("Missing StrRay engine requirement");
     }
 
-    const suspiciousKeywords = ['hack', 'exploit', 'malware', 'virus', 'trojan'];
+    const suspiciousKeywords = [
+      "hack",
+      "exploit",
+      "malware",
+      "virus",
+      "trojan",
+    ];
     const keywords = packageJson.keywords || [];
     for (const keyword of keywords) {
-      if (suspiciousKeywords.some(s => keyword.toLowerCase().includes(s))) {
+      if (suspiciousKeywords.some((s) => keyword.toLowerCase().includes(s))) {
         warnings.push(`Suspicious keyword detected: ${keyword}`);
       }
     }
@@ -181,41 +199,66 @@ export class PluginValidator {
     return { errors, warnings };
   }
 
-  private validateCapabilities(packageJson: any): { errors: string[]; warnings: string[] } {
+  private validateCapabilities(packageJson: any): {
+    errors: string[];
+    warnings: string[];
+  } {
     const errors: string[] = [];
     const warnings: string[] = [];
 
     const capabilities = packageJson.strrayCapabilities;
     if (!capabilities) {
-      errors.push('Missing strrayCapabilities in package.json');
+      errors.push("Missing strrayCapabilities in package.json");
       return { errors, warnings };
     }
 
     if (!capabilities.agentTypes || !Array.isArray(capabilities.agentTypes)) {
-      errors.push('Missing or invalid agentTypes in capabilities');
+      errors.push("Missing or invalid agentTypes in capabilities");
     }
 
-    if (!capabilities.supportedTasks || !Array.isArray(capabilities.supportedTasks)) {
-      errors.push('Missing or invalid supportedTasks in capabilities');
+    if (
+      !capabilities.supportedTasks ||
+      !Array.isArray(capabilities.supportedTasks)
+    ) {
+      errors.push("Missing or invalid supportedTasks in capabilities");
     }
 
-    if (!capabilities.requiredPermissions || !Array.isArray(capabilities.requiredPermissions)) {
-      warnings.push('Missing requiredPermissions - assuming minimal permissions');
+    if (
+      !capabilities.requiredPermissions ||
+      !Array.isArray(capabilities.requiredPermissions)
+    ) {
+      warnings.push(
+        "Missing requiredPermissions - assuming minimal permissions",
+      );
     }
 
     return { errors, warnings };
   }
 
-  private async validateSecurity(pluginPath: string, packageJson: any): Promise<{ issues: string[]; errors: string[] }> {
+  private async validateSecurity(
+    pluginPath: string,
+    packageJson: any,
+  ): Promise<{ issues: string[]; errors: string[] }> {
     const issues: string[] = [];
     const errors: string[] = [];
 
     const dangerousDeps = [
-      'eval', 'child_process', 'fs', 'net', 'http', 'https',
-      'crypto', 'tls', 'cluster', 'worker_threads'
+      "eval",
+      "child_process",
+      "fs",
+      "net",
+      "http",
+      "https",
+      "crypto",
+      "tls",
+      "cluster",
+      "worker_threads",
     ];
 
-    const allDeps = { ...packageJson.dependencies, ...packageJson.devDependencies };
+    const allDeps = {
+      ...packageJson.dependencies,
+      ...packageJson.devDependencies,
+    };
     for (const dep of Object.keys(allDeps)) {
       if (dangerousDeps.includes(dep)) {
         issues.push(`Potentially dangerous dependency: ${dep}`);
@@ -224,27 +267,31 @@ export class PluginValidator {
 
     const scripts = packageJson.scripts || {};
     for (const [name, script] of Object.entries(scripts)) {
-      if (typeof script === 'string') {
-        if (script.includes('rm -rf') || script.includes('sudo') || script.includes('chmod +x')) {
+      if (typeof script === "string") {
+        if (
+          script.includes("rm -rf") ||
+          script.includes("sudo") ||
+          script.includes("chmod +x")
+        ) {
           issues.push(`Potentially dangerous script: ${name}`);
         }
       }
     }
 
-    const fs = require('fs').promises;
-    const path = require('path');
+    const fs = require("fs").promises;
+    const path = require("path");
 
     try {
       const files = await fs.readdir(pluginPath);
-      const hasIndex = files.includes('index.js') || files.includes('index.ts');
+      const hasIndex = files.includes("index.js") || files.includes("index.ts");
 
       if (!hasIndex) {
-        errors.push('Plugin must have an index.js or index.ts file');
+        errors.push("Plugin must have an index.js or index.ts file");
       }
 
       for (const file of files) {
         const stat = await fs.stat(path.join(pluginPath, file));
-        if (stat.isFile() && (stat.mode & parseInt('111', 8))) {
+        if (stat.isFile() && stat.mode & parseInt("111", 8)) {
           issues.push(`Executable file detected: ${file}`);
         }
       }
@@ -260,23 +307,23 @@ export class PluginValidator {
 
     const strrayEngine = packageJson.engines?.strray;
     if (strrayEngine) {
-      if (strrayEngine === '^1.0.0') score += 30;
-      else if (strrayEngine.startsWith('^1.')) score += 20;
-      else if (strrayEngine.startsWith('~1.')) score += 15;
+      if (strrayEngine === "^1.0.0") score += 30;
+      else if (strrayEngine.startsWith("^1.")) score += 20;
+      else if (strrayEngine.startsWith("~1.")) score += 15;
       else score += 5;
     }
 
     const nodeEngine = packageJson.engines?.node;
     if (nodeEngine) {
-      if (nodeEngine === '^18.0.0' || nodeEngine === '>=18.0.0') score += 20;
-      else if (nodeEngine.startsWith('^18.')) score += 15;
+      if (nodeEngine === "^18.0.0" || nodeEngine === ">=18.0.0") score += 20;
+      else if (nodeEngine.startsWith("^18.")) score += 15;
       else score += 5;
     }
 
     const keywords = packageJson.keywords || [];
-    const relevantKeywords = ['strray', 'plugin', 'agent', 'ai', 'framework'];
+    const relevantKeywords = ["strray", "plugin", "agent", "ai", "framework"];
     const relevantCount = keywords.filter((k: string) =>
-      relevantKeywords.some(r => k.toLowerCase().includes(r))
+      relevantKeywords.some((r) => k.toLowerCase().includes(r)),
     ).length;
     score += Math.min(relevantCount * 5, 25);
 
@@ -296,41 +343,48 @@ export class PluginSandbox {
     this.config = {
       memoryLimit: 50, // 50MB
       timeout: 30000, // 30 seconds
-      allowedModules: ['util', 'events', 'stream', 'buffer', 'string_decoder'],
+      allowedModules: ["util", "events", "stream", "buffer", "string_decoder"],
       networkAccess: false,
       fileSystemAccess: false,
       environmentVariables: [],
-      ...config
+      ...config,
     };
   }
 
   /**
    * Execute plugin code in sandbox
    */
-  async executePlugin(pluginPath: string, method: string, ...args: any[]): Promise<any> {
-    const vm = require('vm');
-    const fs = require('fs').promises;
-    const path = require('path');
+  async executePlugin(
+    pluginPath: string,
+    method: string,
+    ...args: any[]
+  ): Promise<any> {
+    const vm = require("vm");
+    const fs = require("fs").promises;
+    const path = require("path");
 
-    const pluginCode = await fs.readFile(path.join(pluginPath, 'index.js'), 'utf-8');
+    const pluginCode = await fs.readFile(
+      path.join(pluginPath, "index.js"),
+      "utf-8",
+    );
 
     const context = vm.createContext({
       console: {
-        log: (...args: any[]) => console.log('[PLUGIN]', ...args),
-        error: (...args: any[]) => console.error('[PLUGIN]', ...args),
-        warn: (...args: any[]) => console.warn('[PLUGIN]', ...args)
+        log: (...args: any[]) => console.log("[PLUGIN]", ...args),
+        error: (...args: any[]) => console.error("[PLUGIN]", ...args),
+        warn: (...args: any[]) => console.warn("[PLUGIN]", ...args),
       },
       require: this.createRestrictedRequire(),
       process: {
         env: this.filterEnvironmentVariables(),
         version: process.version,
-        platform: process.platform
+        platform: process.platform,
       },
       Buffer: Buffer,
       setTimeout: setTimeout,
       clearTimeout: clearTimeout,
       setInterval: setInterval,
-      clearInterval: clearInterval
+      clearInterval: clearInterval,
     });
 
     const script = new vm.Script(pluginCode);
@@ -339,13 +393,16 @@ export class PluginSandbox {
     return Promise.race([
       pluginInstance[method](...args),
       new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('Plugin execution timeout')), this.config.timeout)
-      )
+        setTimeout(
+          () => reject(new Error("Plugin execution timeout")),
+          this.config.timeout,
+        ),
+      ),
     ]);
   }
 
   private createRestrictedRequire() {
-    const Module = require('module');
+    const Module = require("module");
     const originalRequire = Module.prototype.require;
 
     return (id: string) => {
@@ -383,28 +440,34 @@ export class PluginRegistry {
   /**
    * Register a plugin
    */
-  async registerPlugin(pluginPath: string): Promise<{ success: boolean; errors: string[] }> {
+  async registerPlugin(
+    pluginPath: string,
+  ): Promise<{ success: boolean; errors: string[] }> {
     try {
       const validation = await this.validator.validatePlugin(pluginPath);
       if (!validation.valid) {
         return {
           success: false,
-          errors: [...validation.errors, ...validation.securityIssues]
+          errors: [...validation.errors, ...validation.securityIssues],
         };
       }
 
-      const pluginInstance = await this.sandbox.executePlugin(pluginPath, 'createPlugin');
+      const pluginInstance = await this.sandbox.executePlugin(
+        pluginPath,
+        "createPlugin",
+      );
 
       this.plugins.set(pluginInstance.metadata.id, pluginInstance);
 
-      console.log(`✅ Plugin registered: ${pluginInstance.metadata.name} v${pluginInstance.metadata.version}`);
+      console.log(
+        `✅ Plugin registered: ${pluginInstance.metadata.name} v${pluginInstance.metadata.version}`,
+      );
 
       return { success: true, errors: [] };
-
     } catch (error) {
       return {
         success: false,
-        errors: [`Plugin registration failed: ${error}`]
+        errors: [`Plugin registration failed: ${error}`],
       };
     }
   }
@@ -426,7 +489,6 @@ export class PluginRegistry {
 
       console.log(`✅ Plugin activated: ${plugin.metadata.name}`);
       return true;
-
     } catch (error) {
       console.error(`❌ Plugin activation failed: ${error}`);
       return false;
@@ -446,7 +508,6 @@ export class PluginRegistry {
 
       console.log(`✅ Plugin deactivated: ${plugin.metadata.name}`);
       return true;
-
     } catch (error) {
       console.error(`❌ Plugin deactivation failed: ${error}`);
       return false;
@@ -463,12 +524,17 @@ export class PluginRegistry {
   /**
    * List all registered plugins
    */
-  listPlugins(): Array<{ id: string; name: string; version: string; active: boolean }> {
+  listPlugins(): Array<{
+    id: string;
+    name: string;
+    version: string;
+    active: boolean;
+  }> {
     return Array.from(this.plugins.entries()).map(([id, plugin]) => ({
       id,
       name: plugin.metadata.name,
       version: plugin.metadata.version,
-      active: this.activePlugins.has(id)
+      active: this.activePlugins.has(id),
     }));
   }
 
@@ -483,12 +549,12 @@ export class PluginRegistry {
       return await plugin.getHealthStatus();
     } catch (error) {
       return {
-        status: 'unhealthy',
+        status: "unhealthy",
         lastCheck: Date.now(),
         uptime: 0,
         errorCount: 1,
         warningCount: 0,
-        details: { error: String(error) }
+        details: { error: String(error) },
       };
     }
   }

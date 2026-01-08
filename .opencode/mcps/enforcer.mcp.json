@@ -1,8 +1,8 @@
 {
-	"mcpServers": {
-		"enforcer": {
-			"command": "node",
-			"args": ["mcps/enforcer.server.js"]
-		}
-	}
+  "mcpServers": {
+    "enforcer": {
+      "command": "node",
+      "args": ["mcps/enforcer.server.js"]
+    }
+  }
 }

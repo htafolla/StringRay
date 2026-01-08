@@ -8,15 +8,30 @@
  * @since 2026-01-08
  */
 
-import React, { createContext, useContext, useEffect, useState, useCallback, ReactNode } from 'react';
-import { StrRayIntegration, StrRayIntegrationConfig, FrameworkAdapter } from '../core';
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useCallback,
+  ReactNode,
+} from "react";
+import {
+  StrRayIntegration,
+  StrRayIntegrationConfig,
+  FrameworkAdapter,
+} from "../core";
 
 // React Framework Adapter
 class ReactFrameworkAdapter implements FrameworkAdapter {
-  name = 'react';
+  name = "react";
   version = React.version;
 
-  mount(container: HTMLElement, component: React.ComponentType<any>, props?: Record<string, any>): void {
+  mount(
+    container: HTMLElement,
+    component: React.ComponentType<any>,
+    props?: Record<string, any>,
+  ): void {
     const element = React.createElement(component, props);
     ReactDOM.render(element, container);
   }
@@ -25,7 +40,11 @@ class ReactFrameworkAdapter implements FrameworkAdapter {
     ReactDOM.unmountComponentAtNode(container);
   }
 
-  createElement(type: string, props?: Record<string, any>, ...children: any[]): React.ReactElement {
+  createElement(
+    type: string,
+    props?: Record<string, any>,
+    ...children: any[]
+  ): React.ReactElement {
     return React.createElement(type, props, ...children);
   }
 
@@ -38,7 +57,7 @@ class ReactFrameworkAdapter implements FrameworkAdapter {
 let ReactDOM: any = null;
 const loadReactDOM = async () => {
   if (!ReactDOM) {
-    ReactDOM = (await import('react-dom')).default;
+    ReactDOM = (await import("react-dom")).default;
   }
   return ReactDOM;
 };
@@ -53,7 +72,7 @@ interface StrRayContextValue {
 const StrRayContext = createContext<StrRayContextValue>({
   integration: null,
   isInitialized: false,
-  error: null
+  error: null,
 });
 
 // Main StrRay Provider Component
@@ -68,9 +87,11 @@ export const StrRayProvider: React.FC<StrRayProviderProps> = ({
   config,
   children,
   fallback,
-  onError
+  onError,
 }) => {
-  const [integration, setIntegration] = useState<StrRayIntegration | null>(null);
+  const [integration, setIntegration] = useState<StrRayIntegration | null>(
+    null,
+  );
   const [isInitialized, setIsInitialized] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
@@ -80,11 +101,12 @@ export const StrRayProvider: React.FC<StrRayProviderProps> = ({
         await loadReactDOM();
         const strRayIntegration = new StrRayIntegration({
           ...config,
-          framework: 'react'
+          framework: "react",
         });
 
         // Override framework adapter with React-specific implementation
-        (strRayIntegration as any).context.framework = new ReactFrameworkAdapter();
+        (strRayIntegration as any).context.framework =
+          new ReactFrameworkAdapter();
 
         await strRayIntegration.initialize();
         setIntegration(strRayIntegration);
@@ -115,7 +137,7 @@ export const StrRayProvider: React.FC<StrRayProviderProps> = ({
 export const useStrRay = () => {
   const context = useContext(StrRayContext);
   if (!context.integration) {
-    throw new Error('useStrRay must be used within a StrRayProvider');
+    throw new Error("useStrRay must be used within a StrRayProvider");
   }
   return context.integration;
 };
@@ -125,20 +147,23 @@ export const useStrRayAgent = (agentName: string) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
-  const execute = useCallback(async (task: any) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const result = await integration.executeAgent(agentName, task);
-      return result;
-    } catch (err) {
-      const error = err as Error;
-      setError(error);
-      throw error;
-    } finally {
-      setLoading(false);
-    }
-  }, [integration, agentName]);
+  const execute = useCallback(
+    async (task: any) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const result = await integration.executeAgent(agentName, task);
+        return result;
+      } catch (err) {
+        const error = err as Error;
+        setError(error);
+        throw error;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [integration, agentName],
+  );
 
   return { execute, loading, error };
 };
@@ -149,18 +174,21 @@ export const useStrRayCodex = () => {
 
   useEffect(() => {
     const loadStats = async () => {
-      const stats = await integration.getHook('codex:stats')?.();
+      const stats = await integration.getHook("codex:stats")?.();
       setCodexStats(stats);
     };
     loadStats();
   }, [integration]);
 
-  const injectCodex = useCallback(async (code: string) => {
-    const injectHook = integration.getHook('codex:inject');
-    if (injectHook) {
-      return await injectHook(code);
-    }
-  }, [integration]);
+  const injectCodex = useCallback(
+    async (code: string) => {
+      const injectHook = integration.getHook("codex:inject");
+      if (injectHook) {
+        return await injectHook(code);
+      }
+    },
+    [integration],
+  );
 
   return { codexStats, injectCodex };
 };
@@ -168,9 +196,12 @@ export const useStrRayCodex = () => {
 export const useStrRayValidation = () => {
   const integration = useStrRay();
 
-  const validateCode = useCallback(async (code: string) => {
-    return await integration.validateCode(code, 'react');
-  }, [integration]);
+  const validateCode = useCallback(
+    async (code: string) => {
+      return await integration.validateCode(code, "react");
+    },
+    [integration],
+  );
 
   return { validateCode };
 };
@@ -179,18 +210,21 @@ export const useStrRayMonitoring = () => {
   const integration = useStrRay();
 
   const startMonitoring = useCallback(() => {
-    const monitorHook = integration.getHook('monitor:performance');
+    const monitorHook = integration.getHook("monitor:performance");
     if (monitorHook) {
       return monitorHook();
     }
   }, [integration]);
 
-  const trackError = useCallback((error: Error) => {
-    const errorHook = integration.getHook('monitor:errors');
-    if (errorHook) {
-      return errorHook(error);
-    }
-  }, [integration]);
+  const trackError = useCallback(
+    (error: Error) => {
+      const errorHook = integration.getHook("monitor:errors");
+      if (errorHook) {
+        return errorHook(error);
+      }
+    },
+    [integration],
+  );
 
   return { startMonitoring, trackError };
 };
@@ -198,19 +232,25 @@ export const useStrRayMonitoring = () => {
 export const useStrRayAnalytics = () => {
   const integration = useStrRay();
 
-  const predict = useCallback(async (data: any) => {
-    const predictHook = integration.getHook('analytics:predict');
-    if (predictHook) {
-      return await predictHook(data);
-    }
-  }, [integration]);
+  const predict = useCallback(
+    async (data: any) => {
+      const predictHook = integration.getHook("analytics:predict");
+      if (predictHook) {
+        return await predictHook(data);
+      }
+    },
+    [integration],
+  );
 
-  const optimize = useCallback(async (task: any) => {
-    const optimizeHook = integration.getHook('analytics:optimize');
-    if (optimizeHook) {
-      return await optimizeHook(task);
-    }
-  }, [integration]);
+  const optimize = useCallback(
+    async (task: any) => {
+      const optimizeHook = integration.getHook("analytics:optimize");
+      if (optimizeHook) {
+        return await optimizeHook(task);
+      }
+    },
+    [integration],
+  );
 
   return { predict, optimize };
 };
@@ -218,19 +258,14 @@ export const useStrRayAnalytics = () => {
 // Higher-order component for StrRay integration
 export const withStrRay = <P extends object>(
   Component: React.ComponentType<P>,
-  agentName?: string
+  agentName?: string,
 ) => {
   return React.forwardRef<any, P>((props, ref) => {
     const integration = useStrRay();
     const agent = agentName ? integration.getAgent(agentName) : null;
 
     return (
-      <Component
-        {...props}
-        ref={ref}
-        strRay={integration}
-        agent={agent}
-      />
+      <Component {...props} ref={ref} strRay={integration} agent={agent} />
     );
   });
 };
@@ -260,7 +295,7 @@ export class StrRayErrorBoundary extends React.Component<
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     // Report to StrRay monitoring if available
-    console.error('StrRay Error Boundary caught an error:', error, errorInfo);
+    console.error("StrRay Error Boundary caught an error:", error, errorInfo);
   }
 
   retry = () => {
@@ -287,14 +322,16 @@ interface StrRayAgentResponseProps {
 export const StrRayAgentResponse: React.FC<StrRayAgentResponseProps> = ({
   agentName,
   task,
-  render
+  render,
 }) => {
   const { execute, loading, error } = useStrRayAgent(agentName);
   const [result, setResult] = useState<any>(null);
 
   useEffect(() => {
     if (task) {
-      execute(task).then(setResult).catch(() => {});
+      execute(task)
+        .then(setResult)
+        .catch(() => {});
     }
   }, [task, execute]);
 
@@ -313,19 +350,25 @@ export const StrRayAgentResponse: React.FC<StrRayAgentResponseProps> = ({
 export const useImperativeStrRay = () => {
   const integration = useStrRay();
 
-  return useCallback((action: string, params: any = {}) => {
-    switch (action) {
-      case 'validate':
-        return integration.validateCode(params.code, params.framework || 'react');
-      case 'execute':
-        return integration.executeAgent(params.agent, params.task);
-      case 'codex':
-        const codexHook = integration.getHook('codex:inject');
-        return codexHook?.(params.code);
-      default:
-        throw new Error(`Unknown StrRay action: ${action}`);
-    }
-  }, [integration]);
+  return useCallback(
+    (action: string, params: any = {}) => {
+      switch (action) {
+        case "validate":
+          return integration.validateCode(
+            params.code,
+            params.framework || "react",
+          );
+        case "execute":
+          return integration.executeAgent(params.agent, params.task);
+        case "codex":
+          const codexHook = integration.getHook("codex:inject");
+          return codexHook?.(params.code);
+        default:
+          throw new Error(`Unknown StrRay action: ${action}`);
+      }
+    },
+    [integration],
+  );
 };
 
 // Export types

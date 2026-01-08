@@ -131,6 +131,7 @@ StrRay uses **static model assignment** - each agent is assigned a specific mode
 If you have an existing StrRay installation with older Anthropic models, you **must update** your `.opencode/oh-my-opencode.json` file to use `opencode/grok-code` for all agents. The framework will not function properly with deprecated models.
 
 Run this command to update your configuration:
+
 ```bash
 # Backup your current config
 cp .opencode/oh-my-opencode.json .opencode/oh-my-opencode.json.backup

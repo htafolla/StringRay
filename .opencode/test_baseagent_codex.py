@@ -55,7 +55,9 @@ def test_baseagent_codex():
         validation = agent.validate_codex_compliance("any test = true")
 
         if not validation["compliant"]:
-            print(f"✓ validate_codex_compliance: detected {validation['violations_count']} violations")
+            print(
+                f"✓ validate_codex_compliance: detected {validation['violations_count']} violations"
+            )
 
         if validation["compliant"]:
             print("✗ FAIL: validate_codex_compliance should detect violations")
@@ -70,7 +72,9 @@ def test_baseagent_codex():
             print("✗ FAIL: codex_manifest is None")
             return False
 
-        print(f"✓ codex_manifest: version={manifest['version']}, terms={manifest['term_count']}")
+        print(
+            f"✓ codex_manifest: version={manifest['version']}, terms={manifest['term_count']}"
+        )
 
         print(f"\n✓ All BaseAgent codex integration tests passed!")
         return True
@@ -78,6 +82,7 @@ def test_baseagent_codex():
     except Exception as e:
         print(f"✗ FAIL: Exception during test: {e}")
         import traceback
+
         traceback.print_exc()
         return False
 

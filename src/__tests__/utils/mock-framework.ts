@@ -1,8 +1,8 @@
 // Mock implementations for StrRay Framework components
 
-import { vi } from 'vitest';
-import { StateManager } from '../../state/state-manager';
-import { CodexContext, ContextLoadResult } from '../../context-loader';
+import { vi } from "vitest";
+import { StateManager } from "../../state/state-manager";
+import { CodexContext, ContextLoadResult } from "../../context-loader";
 
 /**
  * Mock State Manager implementation
@@ -60,23 +60,23 @@ export class MockContextLoader {
     if (this.shouldFail) {
       return {
         success: false,
-        error: 'Mock context loader failure',
-        warnings: ['Mock warning']
+        error: "Mock context loader failure",
+        warnings: ["Mock warning"],
       };
     }
 
     if (!this.mockContext) {
       return {
         success: false,
-        error: 'No mock context set',
-        warnings: []
+        error: "No mock context set",
+        warnings: [],
       };
     }
 
     return {
       success: true,
       context: this.mockContext,
-      warnings: []
+      warnings: [],
     };
   }
 
@@ -100,25 +100,34 @@ export class MockCodexInjectorHook {
 
   getHook() {
     return {
-      name: 'mock-strray-codex-injector',
+      name: "mock-strray-codex-injector",
       hooks: {
-        'agent.start': (sessionId: string) => {
-          this.hookCalls.push({ type: 'agent.start', sessionId });
+        "agent.start": (sessionId: string) => {
+          this.hookCalls.push({ type: "agent.start", sessionId });
         },
-        'tool.execute.after': (input: any, output: any, sessionId: string) => {
-          this.hookCalls.push({ type: 'tool.execute.after', input, output, sessionId });
-          
+        "tool.execute.after": (input: any, output: any, sessionId: string) => {
+          this.hookCalls.push({
+            type: "tool.execute.after",
+            input,
+            output,
+            sessionId,
+          });
+
           // Mock injection
           const injectedOutput = {
             ...output,
-            output: `Mock injected content\n${output.output || ''}`
+            output: `Mock injected content\n${output.output || ""}`,
           };
-          
-          this.injectedContexts.push({ input, output: injectedOutput, sessionId });
-          
+
+          this.injectedContexts.push({
+            input,
+            output: injectedOutput,
+            sessionId,
+          });
+
           return injectedOutput;
-        }
-      }
+        },
+      },
     };
   }
 
@@ -170,7 +179,7 @@ export class MockFrameworkFactory {
       stateManager: this.stateManager,
       contextLoader: this.contextLoader,
       codexInjector: this.codexInjector,
-      injectorHook: this.codexInjector.getHook()
+      injectorHook: this.codexInjector.getHook(),
     };
   }
 
@@ -195,14 +204,14 @@ export class FrameworkSpies {
     const spies = {
       get: vi.fn(),
       set: vi.fn(),
-      clear: vi.fn()
+      clear: vi.fn(),
     };
 
     const stateManager = {
       get: spies.get,
       set: spies.set,
       clear: spies.clear,
-      spies
+      spies,
     };
 
     return stateManager;
@@ -219,7 +228,7 @@ export class FrameworkSpies {
       validateAgainstCodex: vi.fn(),
       clearCache: vi.fn(),
       isContextLoaded: vi.fn(),
-      getContextStats: vi.fn()
+      getContextStats: vi.fn(),
     };
   }
 
@@ -232,16 +241,16 @@ export class FrameworkSpies {
 
     return {
       hook: {
-        name: 'spy-strray-codex-injector',
+        name: "spy-strray-codex-injector",
         hooks: {
-          'agent.start': agentStartSpy,
-          'tool.execute.after': toolExecuteSpy
-        }
+          "agent.start": agentStartSpy,
+          "tool.execute.after": toolExecuteSpy,
+        },
       },
       spies: {
         agentStart: agentStartSpy,
-        toolExecute: toolExecuteSpy
-      }
+        toolExecute: toolExecuteSpy,
+      },
     };
   }
 }
@@ -262,7 +271,7 @@ export class FrameworkInteractionRecorder {
   }): void {
     this.interactions.push({
       ...interaction,
-      timestamp: interaction.timestamp || Date.now()
+      timestamp: interaction.timestamp || Date.now(),
     });
   }
 
@@ -271,11 +280,11 @@ export class FrameworkInteractionRecorder {
   }
 
   getInteractionsByType(type: string): any[] {
-    return this.interactions.filter(i => i.type === type);
+    return this.interactions.filter((i) => i.type === type);
   }
 
   getInteractionsByComponent(component: string): any[] {
-    return this.interactions.filter(i => i.component === component);
+    return this.interactions.filter((i) => i.component === component);
   }
 
   clear(): void {
@@ -290,15 +299,17 @@ export class FrameworkInteractionRecorder {
     const componentBreakdown: Record<string, number> = {};
     const typeBreakdown: Record<string, number> = {};
 
-    this.interactions.forEach(interaction => {
-      componentBreakdown[interaction.component] = (componentBreakdown[interaction.component] || 0) + 1;
-      typeBreakdown[interaction.type] = (typeBreakdown[interaction.type] || 0) + 1;
+    this.interactions.forEach((interaction) => {
+      componentBreakdown[interaction.component] =
+        (componentBreakdown[interaction.component] || 0) + 1;
+      typeBreakdown[interaction.type] =
+        (typeBreakdown[interaction.type] || 0) + 1;
     });
 
     return {
       totalInteractions: this.interactions.length,
       componentBreakdown,
-      typeBreakdown
+      typeBreakdown,
     };
   }
 }
@@ -337,8 +348,11 @@ export class FrameworkProfiler {
   getAverage(name: string): number {
     const measurements = this.getMeasurements(name);
     if (measurements.length === 0) return 0;
-    
-    return measurements.reduce((sum, duration) => sum + duration, 0) / measurements.length;
+
+    return (
+      measurements.reduce((sum, duration) => sum + duration, 0) /
+      measurements.length
+    );
   }
 
   getStats(name: string): {
@@ -358,7 +372,7 @@ export class FrameworkProfiler {
       average: this.getAverage(name),
       min: Math.min(...measurements),
       max: Math.max(...measurements),
-      total: measurements.reduce((sum, duration) => sum + duration, 0)
+      total: measurements.reduce((sum, duration) => sum + duration, 0),
     };
   }
 
@@ -366,13 +380,13 @@ export class FrameworkProfiler {
     this.measurements.clear();
   }
 
-  getAllStats(): Record<string, ReturnType<FrameworkProfiler['getStats']>> {
-    const stats: Record<string, ReturnType<FrameworkProfiler['getStats']>> = {};
-    
+  getAllStats(): Record<string, ReturnType<FrameworkProfiler["getStats"]>> {
+    const stats: Record<string, ReturnType<FrameworkProfiler["getStats"]>> = {};
+
     for (const name of this.measurements.keys()) {
       stats[name] = this.getStats(name);
     }
-    
+
     return stats;
   }
 }

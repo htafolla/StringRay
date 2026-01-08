@@ -8,8 +8,8 @@
  * @since 2026-01-07
  */
 
-import { StrRayStateManager } from '../state/state-manager';
-import { SessionCoordinator } from '../delegation/session-coordinator';
+import { StrRayStateManager } from "../state/state-manager";
+import { SessionCoordinator } from "../delegation/session-coordinator";
 
 export interface SessionMetadata {
   sessionId: string;
@@ -43,7 +43,10 @@ export class SessionCleanupManager {
   private cleanupInterval?: NodeJS.Timeout | undefined;
   private sessionMetadata = new Map<string, SessionMetadata>();
 
-  constructor(stateManager: StrRayStateManager, config: Partial<CleanupConfig> = {}) {
+  constructor(
+    stateManager: StrRayStateManager,
+    config: Partial<CleanupConfig> = {},
+  ) {
     this.stateManager = stateManager;
     this.config = {
       ttlMs: 24 * 60 * 60 * 1000,
@@ -51,7 +54,7 @@ export class SessionCleanupManager {
       maxSessions: 100,
       cleanupIntervalMs: 5 * 60 * 1000,
       enableAutoCleanup: true,
-      ...config
+      ...config,
     };
 
     this.initialize();
@@ -61,7 +64,7 @@ export class SessionCleanupManager {
    * Initialize cleanup manager and start auto-cleanup if enabled
    */
   private initialize(): void {
-    console.log('🧹 Session Cleanup Manager: Initializing...');
+    console.log("🧹 Session Cleanup Manager: Initializing...");
 
     this.loadSessionMetadata();
 
@@ -69,7 +72,7 @@ export class SessionCleanupManager {
       this.startAutoCleanup();
     }
 
-    console.log('✅ Session Cleanup Manager: Initialized');
+    console.log("✅ Session Cleanup Manager: Initialized");
   }
 
   /**
@@ -83,13 +86,15 @@ export class SessionCleanupManager {
       ttlMs: ttlMs || this.config.ttlMs,
       isActive: true,
       agentCount: 0,
-      memoryUsage: 0
+      memoryUsage: 0,
     };
 
     this.sessionMetadata.set(sessionId, metadata);
     this.persistSessionMetadata(sessionId, metadata);
 
-    console.log(`📋 Session Cleanup Manager: Registered session ${sessionId} with TTL ${ttlMs || this.config.ttlMs}ms`);
+    console.log(
+      `📋 Session Cleanup Manager: Registered session ${sessionId} with TTL ${ttlMs || this.config.ttlMs}ms`,
+    );
   }
 
   updateActivity(sessionId: string): void {
@@ -136,7 +141,7 @@ export class SessionCleanupManager {
       sessionsCleaned: 0,
       sessionsExpired: 0,
       sessionsIdle: 0,
-      errors: []
+      errors: [],
     };
 
     const sessionsToCleanup: string[] = [];
@@ -179,7 +184,9 @@ export class SessionCleanupManager {
     }
 
     if (result.sessionsCleaned > 0) {
-      console.log(`🧹 Session Cleanup Manager: Cleaned up ${result.sessionsCleaned} sessions (${result.sessionsExpired} expired, ${result.sessionsIdle} idle)`);
+      console.log(
+        `🧹 Session Cleanup Manager: Cleaned up ${result.sessionsCleaned} sessions (${result.sessionsExpired} expired, ${result.sessionsIdle} idle)`,
+      );
     }
 
     return result;
@@ -192,15 +199,20 @@ export class SessionCleanupManager {
     try {
       const metadata = this.sessionMetadata.get(sessionId);
       if (metadata) {
-        metadata.cleanupReason = reason || 'manual';
+        metadata.cleanupReason = reason || "manual";
         this.persistSessionMetadata(sessionId, metadata);
       }
 
       await this.cleanupSession(sessionId);
-      console.log(`🧹 Session Cleanup Manager: Manual cleanup completed for session ${sessionId}`);
+      console.log(
+        `🧹 Session Cleanup Manager: Manual cleanup completed for session ${sessionId}`,
+      );
       return true;
     } catch (error) {
-      console.error(`❌ Session Cleanup Manager: Manual cleanup failed for session ${sessionId}:`, error);
+      console.error(
+        `❌ Session Cleanup Manager: Manual cleanup failed for session ${sessionId}:`,
+        error,
+      );
       return false;
     }
   }
@@ -213,7 +225,7 @@ export class SessionCleanupManager {
       sessionsCleaned: 0,
       sessionsExpired: 0,
       sessionsIdle: 0,
-      errors: []
+      errors: [],
     };
 
     for (const sessionId of this.sessionMetadata.keys()) {
@@ -225,7 +237,9 @@ export class SessionCleanupManager {
       }
     }
 
-    console.log(`🚨 Session Cleanup Manager: Emergency cleanup completed - ${result.sessionsCleaned} sessions cleaned`);
+    console.log(
+      `🚨 Session Cleanup Manager: Emergency cleanup completed - ${result.sessionsCleaned} sessions cleaned`,
+    );
     return result;
   }
 
@@ -255,10 +269,14 @@ export class SessionCleanupManager {
 
     return {
       totalSessions: this.sessionMetadata.size,
-      activeSessions: Array.from(this.sessionMetadata.values()).filter(m => m.isActive).length,
+      activeSessions: Array.from(this.sessionMetadata.values()).filter(
+        (m) => m.isActive,
+      ).length,
       expiredSessions: expiredCount,
       idleSessions: idleCount,
-      nextCleanup: this.cleanupInterval ? Date.now() + this.config.cleanupIntervalMs : 0
+      nextCleanup: this.cleanupInterval
+        ? Date.now() + this.config.cleanupIntervalMs
+        : 0,
     };
   }
 
@@ -284,11 +302,16 @@ export class SessionCleanupManager {
       try {
         await this.performCleanup();
       } catch (error) {
-        console.error('❌ Session Cleanup Manager: Auto-cleanup failed:', error);
+        console.error(
+          "❌ Session Cleanup Manager: Auto-cleanup failed:",
+          error,
+        );
       }
     }, this.config.cleanupIntervalMs);
 
-    console.log(`⏰ Session Cleanup Manager: Auto-cleanup started (interval: ${this.config.cleanupIntervalMs}ms)`);
+    console.log(
+      `⏰ Session Cleanup Manager: Auto-cleanup started (interval: ${this.config.cleanupIntervalMs}ms)`,
+    );
   }
 
   /**
@@ -298,7 +321,7 @@ export class SessionCleanupManager {
     if (this.cleanupInterval) {
       clearInterval(this.cleanupInterval);
       this.cleanupInterval = undefined;
-      console.log('⏹️ Session Cleanup Manager: Auto-cleanup stopped');
+      console.log("⏹️ Session Cleanup Manager: Auto-cleanup stopped");
     }
   }
 
@@ -307,28 +330,44 @@ export class SessionCleanupManager {
    */
   private loadSessionMetadata(): void {
     try {
-      const storedMetadata = this.stateManager.get<Record<string, SessionMetadata>>('cleanup:session_metadata');
-      if (storedMetadata && typeof storedMetadata === 'object' && !Array.isArray(storedMetadata)) {
+      const storedMetadata = this.stateManager.get<
+        Record<string, SessionMetadata>
+      >("cleanup:session_metadata");
+      if (
+        storedMetadata &&
+        typeof storedMetadata === "object" &&
+        !Array.isArray(storedMetadata)
+      ) {
         for (const [sessionId, metadata] of Object.entries(storedMetadata)) {
-          if (metadata && typeof metadata === 'object' && metadata.sessionId) {
+          if (metadata && typeof metadata === "object" && metadata.sessionId) {
             this.sessionMetadata.set(sessionId, metadata as SessionMetadata);
           }
         }
-        console.log(`📋 Session Cleanup Manager: Loaded metadata for ${this.sessionMetadata.size} sessions`);
+        console.log(
+          `📋 Session Cleanup Manager: Loaded metadata for ${this.sessionMetadata.size} sessions`,
+        );
       } else if (storedMetadata) {
-        console.warn('⚠️ Session Cleanup Manager: Corrupted session metadata detected, skipping load');
+        console.warn(
+          "⚠️ Session Cleanup Manager: Corrupted session metadata detected, skipping load",
+        );
       }
     } catch (error) {
-      console.error('❌ Session Cleanup Manager: Failed to load session metadata:', error);
+      console.error(
+        "❌ Session Cleanup Manager: Failed to load session metadata:",
+        error,
+      );
     }
   }
 
   /**
    * Persist session metadata to state manager
    */
-  private persistSessionMetadata(sessionId: string, metadata: SessionMetadata): void {
+  private persistSessionMetadata(
+    sessionId: string,
+    metadata: SessionMetadata,
+  ): void {
     const allMetadata = Object.fromEntries(this.sessionMetadata);
-    this.stateManager.set('cleanup:session_metadata', allMetadata);
+    this.stateManager.set("cleanup:session_metadata", allMetadata);
   }
 
   /**
@@ -341,7 +380,9 @@ export class SessionCleanupManager {
     metadata.isActive = false;
     this.persistSessionMetadata(sessionId, metadata);
 
-    const sessionCoordinator = this.stateManager.get('delegation:session_coordinator') as SessionCoordinator;
+    const sessionCoordinator = this.stateManager.get(
+      "delegation:session_coordinator",
+    ) as SessionCoordinator;
     if (sessionCoordinator) {
       sessionCoordinator.cleanupSession(sessionId);
     }
@@ -359,13 +400,13 @@ export class SessionCleanupManager {
    */
   shutdown(): void {
     this.stopAutoCleanup();
-    console.log('🛑 Session Cleanup Manager: Shutdown complete');
+    console.log("🛑 Session Cleanup Manager: Shutdown complete");
   }
 }
 
 export const createSessionCleanupManager = (
   stateManager: StrRayStateManager,
-  config?: Partial<CleanupConfig>
+  config?: Partial<CleanupConfig>,
 ): SessionCleanupManager => {
   return new SessionCleanupManager(stateManager, config);
 };

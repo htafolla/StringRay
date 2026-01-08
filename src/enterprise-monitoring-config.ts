@@ -7,7 +7,7 @@
  * @since 2026-01-08
  */
 
-import { EnterpriseMonitoringConfig } from './enterprise-monitoring';
+import { EnterpriseMonitoringConfig } from "./enterprise-monitoring";
 
 // =============================================================================
 // CONFIGURATION TEMPLATES
@@ -20,24 +20,24 @@ import { EnterpriseMonitoringConfig } from './enterprise-monitoring';
 export const basicEnterpriseConfig: Partial<EnterpriseMonitoringConfig> = {
   distributed: {
     enabled: false,
-    instanceId: 'strray-instance-1',
+    instanceId: "strray-instance-1",
     clusterSize: 1,
     leaderElectionInterval: 30000,
     consensusTimeout: 10000,
-    dataReplicationFactor: 1
+    dataReplicationFactor: 1,
   },
 
   loadBalancing: {
     enabled: false,
-    provider: 'nginx',
+    provider: "nginx",
     endpoints: [],
     healthCheckInterval: 30000,
-    trafficAnalysisInterval: 60000
+    trafficAnalysisInterval: 60000,
   },
 
   autoScaling: {
     enabled: false,
-    provider: 'aws',
+    provider: "aws",
     minInstances: 1,
     maxInstances: 3,
     scaleUpThresholds: {
@@ -45,61 +45,61 @@ export const basicEnterpriseConfig: Partial<EnterpriseMonitoringConfig> = {
       memoryUtilization: 85,
       errorRate: 0.05,
       responseTime: 5000,
-      queueDepth: 100
+      queueDepth: 100,
     },
     scaleDownThresholds: {
       cpuUtilization: 30,
       memoryUtilization: 40,
       errorRate: 0.01,
       responseTime: 1000,
-      queueDepth: 10
+      queueDepth: 10,
     },
     cooldownPeriod: 300,
-    predictiveScaling: false
+    predictiveScaling: false,
   },
 
   highAvailability: {
     enabled: false,
     redundancyLevel: 1,
-    failoverStrategy: 'active-passive',
+    failoverStrategy: "active-passive",
     failoverTimeout: 30000,
-    backupFrequency: 3600000
+    backupFrequency: 3600000,
   },
 
   integrations: {
     prometheus: {
       enabled: false,
-      endpoint: 'http://localhost:9090',
+      endpoint: "http://localhost:9090",
       scrapeInterval: 15000,
-      metricsPath: '/metrics',
-      labels: { service: 'strray' }
+      metricsPath: "/metrics",
+      labels: { service: "strray" },
     },
     datadog: {
       enabled: false,
-      apiKey: '',
-      appKey: '',
-      site: 'datadoghq.com',
-      serviceName: 'strray',
-      env: 'production'
+      apiKey: "",
+      appKey: "",
+      site: "datadoghq.com",
+      serviceName: "strray",
+      env: "production",
     },
     newrelic: {
       enabled: false,
-      licenseKey: '',
-      appName: 'StrRay Framework',
+      licenseKey: "",
+      appName: "StrRay Framework",
       distributedTracing: true,
-      aiMonitoring: true
+      aiMonitoring: true,
     },
     slack: {
       enabled: false,
-      webhookUrl: '',
-      channel: '#alerts',
-      username: 'StrRay Monitor'
+      webhookUrl: "",
+      channel: "#alerts",
+      username: "StrRay Monitor",
     },
     pagerduty: {
       enabled: false,
-      integrationKey: '',
-      serviceId: '',
-    }
+      integrationKey: "",
+      serviceId: "",
+    },
   },
 
   healthChecks: {
@@ -107,56 +107,80 @@ export const basicEnterpriseConfig: Partial<EnterpriseMonitoringConfig> = {
     applicationHealthInterval: 60000,
     dependencyHealthInterval: 120000,
     securityHealthInterval: 300000,
-    performanceHealthInterval: 15000
+    performanceHealthInterval: 15000,
   },
 
   alerting: {
     enabled: true,
     escalationPolicies: [
       {
-        id: 'critical-policy',
-        name: 'Critical Alert Escalation',
+        id: "critical-policy",
+        name: "Critical Alert Escalation",
         conditions: [
-          { metric: 'severity', operator: 'eq', threshold: 4, duration: 0 }
+          { metric: "severity", operator: "eq", threshold: 4, duration: 0 },
         ],
         escalationSteps: [
-          { delay: 0, channels: ['pagerduty'], message: '🚨 CRITICAL: {alert.title}' },
-          { delay: 300000, channels: ['slack'], message: '🚨 CRITICAL ALERT: {alert.title} - {alert.description}' }
+          {
+            delay: 0,
+            channels: ["pagerduty"],
+            message: "🚨 CRITICAL: {alert.title}",
+          },
+          {
+            delay: 300000,
+            channels: ["slack"],
+            message: "🚨 CRITICAL ALERT: {alert.title} - {alert.description}",
+          },
         ],
-        cooldownPeriod: 1800000
+        cooldownPeriod: 1800000,
       },
       {
-        id: 'high-policy',
-        name: 'High Priority Alert Escalation',
+        id: "high-policy",
+        name: "High Priority Alert Escalation",
         conditions: [
-          { metric: 'severity', operator: 'eq', threshold: 3, duration: 300000 }
+          {
+            metric: "severity",
+            operator: "eq",
+            threshold: 3,
+            duration: 300000,
+          },
         ],
         escalationSteps: [
-          { delay: 0, channels: ['slack'], message: '⚠️ HIGH ALERT: {alert.title}' },
-          { delay: 900000, channels: ['email'], message: 'HIGH PRIORITY ALERT: {alert.title}' }
+          {
+            delay: 0,
+            channels: ["slack"],
+            message: "⚠️ HIGH ALERT: {alert.title}",
+          },
+          {
+            delay: 900000,
+            channels: ["email"],
+            message: "HIGH PRIORITY ALERT: {alert.title}",
+          },
         ],
-        cooldownPeriod: 3600000
-      }
+        cooldownPeriod: 3600000,
+      },
     ],
     notificationChannels: [
       {
-        id: 'slack',
-        type: 'slack',
-        config: { webhookUrl: process.env.SLACK_WEBHOOK_URL }
+        id: "slack",
+        type: "slack",
+        config: { webhookUrl: process.env.SLACK_WEBHOOK_URL },
       },
       {
-        id: 'pagerduty',
-        type: 'pagerduty',
-        config: { integrationKey: process.env.PAGERDUTY_INTEGRATION_KEY }
+        id: "pagerduty",
+        type: "pagerduty",
+        config: { integrationKey: process.env.PAGERDUTY_INTEGRATION_KEY },
       },
       {
-        id: 'email',
-        type: 'email',
-        config: { smtpHost: process.env.SMTP_HOST, recipients: process.env.ALERT_EMAIL_RECIPIENTS?.split(',') }
-      }
+        id: "email",
+        type: "email",
+        config: {
+          smtpHost: process.env.SMTP_HOST,
+          recipients: process.env.ALERT_EMAIL_RECIPIENTS?.split(","),
+        },
+      },
     ],
     alertCooldown: 300000,
-    alertRetention: 2592000000
+    alertRetention: 2592000000,
   },
 
   dashboards: {
@@ -165,47 +189,47 @@ export const basicEnterpriseConfig: Partial<EnterpriseMonitoringConfig> = {
     historicalRetentionDays: 30,
     customDashboards: [
       {
-        id: 'system-overview',
-        name: 'System Overview',
-        description: 'Real-time system health and performance metrics',
+        id: "system-overview",
+        name: "System Overview",
+        description: "Real-time system health and performance metrics",
         panels: [
           {
-            id: 'cpu-usage',
-            title: 'CPU Usage',
-            type: 'gauge',
-            metrics: ['system.cpu'],
-            timeRange: '1h',
-            aggregation: 'avg'
+            id: "cpu-usage",
+            title: "CPU Usage",
+            type: "gauge",
+            metrics: ["system.cpu"],
+            timeRange: "1h",
+            aggregation: "avg",
           },
           {
-            id: 'memory-usage',
-            title: 'Memory Usage',
-            type: 'gauge',
-            metrics: ['system.memory'],
-            timeRange: '1h',
-            aggregation: 'avg'
+            id: "memory-usage",
+            title: "Memory Usage",
+            type: "gauge",
+            metrics: ["system.memory"],
+            timeRange: "1h",
+            aggregation: "avg",
           },
           {
-            id: 'active-sessions',
-            title: 'Active Sessions',
-            type: 'line',
-            metrics: ['application.activeSessions'],
-            timeRange: '1h',
-            aggregation: 'max'
+            id: "active-sessions",
+            title: "Active Sessions",
+            type: "line",
+            metrics: ["application.activeSessions"],
+            timeRange: "1h",
+            aggregation: "max",
           },
           {
-            id: 'error-rate',
-            title: 'Error Rate',
-            type: 'line',
-            metrics: ['performance.errorRate'],
-            timeRange: '1h',
-            aggregation: 'avg'
-          }
+            id: "error-rate",
+            title: "Error Rate",
+            type: "line",
+            metrics: ["performance.errorRate"],
+            timeRange: "1h",
+            aggregation: "avg",
+          },
         ],
-        refreshInterval: 30000
-      }
-    ]
-  }
+        refreshInterval: 30000,
+      },
+    ],
+  },
 };
 
 /**
@@ -215,86 +239,95 @@ export const basicEnterpriseConfig: Partial<EnterpriseMonitoringConfig> = {
 export const advancedEnterpriseConfig: EnterpriseMonitoringConfig = {
   distributed: {
     enabled: true,
-    instanceId: process.env.STRRAY_INSTANCE_ID || 'strray-instance-1',
-    clusterSize: parseInt(process.env.STRRAY_CLUSTER_SIZE || '3'),
+    instanceId: process.env.STRRAY_INSTANCE_ID || "strray-instance-1",
+    clusterSize: parseInt(process.env.STRRAY_CLUSTER_SIZE || "3"),
     leaderElectionInterval: 15000,
     consensusTimeout: 5000,
-    dataReplicationFactor: parseInt(process.env.DATA_REPLICATION_FACTOR || '2')
+    dataReplicationFactor: parseInt(process.env.DATA_REPLICATION_FACTOR || "2"),
   },
 
   loadBalancing: {
     enabled: true,
-    provider: (process.env.LOAD_BALANCER_PROVIDER as any) || 'aws',
-    endpoints: JSON.parse(process.env.LOAD_BALANCER_ENDPOINTS || '[]'),
+    provider: (process.env.LOAD_BALANCER_PROVIDER as any) || "aws",
+    endpoints: JSON.parse(process.env.LOAD_BALANCER_ENDPOINTS || "[]"),
     healthCheckInterval: 10000,
-    trafficAnalysisInterval: 30000
+    trafficAnalysisInterval: 30000,
   },
 
   autoScaling: {
     enabled: true,
-    provider: (process.env.AUTO_SCALING_PROVIDER as any) || 'aws',
-    minInstances: parseInt(process.env.MIN_INSTANCES || '2'),
-    maxInstances: parseInt(process.env.MAX_INSTANCES || '10'),
+    provider: (process.env.AUTO_SCALING_PROVIDER as any) || "aws",
+    minInstances: parseInt(process.env.MIN_INSTANCES || "2"),
+    maxInstances: parseInt(process.env.MAX_INSTANCES || "10"),
     scaleUpThresholds: {
-      cpuUtilization: parseFloat(process.env.SCALE_UP_CPU_THRESHOLD || '75'),
-      memoryUtilization: parseFloat(process.env.SCALE_UP_MEMORY_THRESHOLD || '80'),
-      errorRate: parseFloat(process.env.SCALE_UP_ERROR_RATE || '0.03'),
-      responseTime: parseInt(process.env.SCALE_UP_RESPONSE_TIME || '3000'),
-      queueDepth: parseInt(process.env.SCALE_UP_QUEUE_DEPTH || '50')
+      cpuUtilization: parseFloat(process.env.SCALE_UP_CPU_THRESHOLD || "75"),
+      memoryUtilization: parseFloat(
+        process.env.SCALE_UP_MEMORY_THRESHOLD || "80",
+      ),
+      errorRate: parseFloat(process.env.SCALE_UP_ERROR_RATE || "0.03"),
+      responseTime: parseInt(process.env.SCALE_UP_RESPONSE_TIME || "3000"),
+      queueDepth: parseInt(process.env.SCALE_UP_QUEUE_DEPTH || "50"),
     },
     scaleDownThresholds: {
-      cpuUtilization: parseFloat(process.env.SCALE_DOWN_CPU_THRESHOLD || '25'),
-      memoryUtilization: parseFloat(process.env.SCALE_DOWN_MEMORY_THRESHOLD || '30'),
-      errorRate: parseFloat(process.env.SCALE_DOWN_ERROR_RATE || '0.005'),
-      responseTime: parseInt(process.env.SCALE_DOWN_RESPONSE_TIME || '500'),
-      queueDepth: parseInt(process.env.SCALE_DOWN_QUEUE_DEPTH || '5')
+      cpuUtilization: parseFloat(process.env.SCALE_DOWN_CPU_THRESHOLD || "25"),
+      memoryUtilization: parseFloat(
+        process.env.SCALE_DOWN_MEMORY_THRESHOLD || "30",
+      ),
+      errorRate: parseFloat(process.env.SCALE_DOWN_ERROR_RATE || "0.005"),
+      responseTime: parseInt(process.env.SCALE_DOWN_RESPONSE_TIME || "500"),
+      queueDepth: parseInt(process.env.SCALE_DOWN_QUEUE_DEPTH || "5"),
     },
-    cooldownPeriod: parseInt(process.env.AUTO_SCALING_COOLDOWN || '600'),
-    predictiveScaling: true
+    cooldownPeriod: parseInt(process.env.AUTO_SCALING_COOLDOWN || "600"),
+    predictiveScaling: true,
   },
 
   highAvailability: {
     enabled: true,
-    redundancyLevel: parseInt(process.env.REDUNDANCY_LEVEL || '2'),
-    failoverStrategy: (process.env.FAILOVER_STRATEGY as any) || 'active-active',
-    failoverTimeout: parseInt(process.env.FAILOVER_TIMEOUT || '15000'),
-    backupFrequency: parseInt(process.env.BACKUP_FREQUENCY || '1800000')
+    redundancyLevel: parseInt(process.env.REDUNDANCY_LEVEL || "2"),
+    failoverStrategy: (process.env.FAILOVER_STRATEGY as any) || "active-active",
+    failoverTimeout: parseInt(process.env.FAILOVER_TIMEOUT || "15000"),
+    backupFrequency: parseInt(process.env.BACKUP_FREQUENCY || "1800000"),
   },
 
   integrations: {
     prometheus: {
       enabled: true,
-      endpoint: process.env.PROMETHEUS_ENDPOINT || 'http://prometheus:9090',
-      scrapeInterval: parseInt(process.env.PROMETHEUS_SCRAPE_INTERVAL || '10000'),
-      metricsPath: '/metrics',
-      labels: { service: 'strray', cluster: process.env.STRRAY_CLUSTER_NAME || 'production' }
+      endpoint: process.env.PROMETHEUS_ENDPOINT || "http://prometheus:9090",
+      scrapeInterval: parseInt(
+        process.env.PROMETHEUS_SCRAPE_INTERVAL || "10000",
+      ),
+      metricsPath: "/metrics",
+      labels: {
+        service: "strray",
+        cluster: process.env.STRRAY_CLUSTER_NAME || "production",
+      },
     },
     datadog: {
       enabled: true,
-      apiKey: process.env.DATADOG_API_KEY || '',
-      appKey: process.env.DATADOG_APP_KEY || '',
-      site: process.env.DATADOG_SITE || 'datadoghq.com',
-      serviceName: 'strray',
-      env: process.env.NODE_ENV || 'production'
+      apiKey: process.env.DATADOG_API_KEY || "",
+      appKey: process.env.DATADOG_APP_KEY || "",
+      site: process.env.DATADOG_SITE || "datadoghq.com",
+      serviceName: "strray",
+      env: process.env.NODE_ENV || "production",
     },
     newrelic: {
       enabled: true,
-      licenseKey: process.env.NEW_RELIC_LICENSE_KEY || '',
-      appName: 'StrRay Framework',
+      licenseKey: process.env.NEW_RELIC_LICENSE_KEY || "",
+      appName: "StrRay Framework",
       distributedTracing: true,
-      aiMonitoring: true
+      aiMonitoring: true,
     },
     slack: {
       enabled: true,
-      webhookUrl: process.env.SLACK_WEBHOOK_URL || '',
-      channel: process.env.SLACK_ALERT_CHANNEL || '#strray-alerts',
-      username: 'StrRay Enterprise Monitor'
+      webhookUrl: process.env.SLACK_WEBHOOK_URL || "",
+      channel: process.env.SLACK_ALERT_CHANNEL || "#strray-alerts",
+      username: "StrRay Enterprise Monitor",
     },
     pagerduty: {
       enabled: true,
-      integrationKey: process.env.PAGERDUTY_INTEGRATION_KEY || '',
-      serviceId: process.env.PAGERDUTY_SERVICE_ID || ''
-    }
+      integrationKey: process.env.PAGERDUTY_INTEGRATION_KEY || "",
+      serviceId: process.env.PAGERDUTY_SERVICE_ID || "",
+    },
   },
 
   healthChecks: {
@@ -302,79 +335,118 @@ export const advancedEnterpriseConfig: EnterpriseMonitoringConfig = {
     applicationHealthInterval: 30000,
     dependencyHealthInterval: 60000,
     securityHealthInterval: 180000,
-    performanceHealthInterval: 10000
+    performanceHealthInterval: 10000,
   },
 
   alerting: {
     enabled: true,
     escalationPolicies: [
       {
-        id: 'enterprise-critical',
-        name: 'Enterprise Critical Escalation',
+        id: "enterprise-critical",
+        name: "Enterprise Critical Escalation",
         conditions: [
-          { metric: 'severity', operator: 'eq', threshold: 4, duration: 0 },
-          { metric: 'cluster_instances_healthy', operator: 'lt', threshold: 2, duration: 0 }
+          { metric: "severity", operator: "eq", threshold: 4, duration: 0 },
+          {
+            metric: "cluster_instances_healthy",
+            operator: "lt",
+            threshold: 2,
+            duration: 0,
+          },
         ],
         escalationSteps: [
-          { delay: 0, channels: ['pagerduty'], message: '🚨 ENTERPRISE CRITICAL: {alert.title} - Cluster Impact Detected' },
-          { delay: 60000, channels: ['slack'], message: '🚨 CLUSTER CRITICAL: {alert.title} - Immediate Action Required' },
-          { delay: 300000, channels: ['email'], message: 'CRITICAL SYSTEM ALERT: {alert.title}' }
+          {
+            delay: 0,
+            channels: ["pagerduty"],
+            message:
+              "🚨 ENTERPRISE CRITICAL: {alert.title} - Cluster Impact Detected",
+          },
+          {
+            delay: 60000,
+            channels: ["slack"],
+            message:
+              "🚨 CLUSTER CRITICAL: {alert.title} - Immediate Action Required",
+          },
+          {
+            delay: 300000,
+            channels: ["email"],
+            message: "CRITICAL SYSTEM ALERT: {alert.title}",
+          },
         ],
-        cooldownPeriod: 900000
+        cooldownPeriod: 900000,
       },
       {
-        id: 'performance-degradation',
-        name: 'Performance Degradation Policy',
+        id: "performance-degradation",
+        name: "Performance Degradation Policy",
         conditions: [
-          { metric: 'performance.p95_latency', operator: 'gt', threshold: 5000, duration: 300000 },
-          { metric: 'system.cpu', operator: 'gt', threshold: 85, duration: 180000 }
+          {
+            metric: "performance.p95_latency",
+            operator: "gt",
+            threshold: 5000,
+            duration: 300000,
+          },
+          {
+            metric: "system.cpu",
+            operator: "gt",
+            threshold: 85,
+            duration: 180000,
+          },
         ],
         escalationSteps: [
-          { delay: 0, channels: ['slack'], message: '⚡ PERFORMANCE DEGRADATION: {alert.title}' },
-          { delay: 600000, channels: ['pagerduty'], message: 'Performance Alert: {alert.title}' }
+          {
+            delay: 0,
+            channels: ["slack"],
+            message: "⚡ PERFORMANCE DEGRADATION: {alert.title}",
+          },
+          {
+            delay: 600000,
+            channels: ["pagerduty"],
+            message: "Performance Alert: {alert.title}",
+          },
         ],
-        cooldownPeriod: 1800000
-      }
+        cooldownPeriod: 1800000,
+      },
     ],
     notificationChannels: [
       {
-        id: 'slack-critical',
-        type: 'slack',
+        id: "slack-critical",
+        type: "slack",
         config: {
           webhookUrl: process.env.SLACK_CRITICAL_WEBHOOK_URL,
-          channel: '#strray-critical'
-        }
+          channel: "#strray-critical",
+        },
       },
       {
-        id: 'slack',
-        type: 'slack',
-        config: { webhookUrl: process.env.SLACK_WEBHOOK_URL }
+        id: "slack",
+        type: "slack",
+        config: { webhookUrl: process.env.SLACK_WEBHOOK_URL },
       },
       {
-        id: 'pagerduty',
-        type: 'pagerduty',
-        config: { integrationKey: process.env.PAGERDUTY_INTEGRATION_KEY }
+        id: "pagerduty",
+        type: "pagerduty",
+        config: { integrationKey: process.env.PAGERDUTY_INTEGRATION_KEY },
       },
       {
-        id: 'email',
-        type: 'email',
+        id: "email",
+        type: "email",
         config: {
           smtpHost: process.env.SMTP_HOST,
-          recipients: process.env.ALERT_EMAIL_RECIPIENTS?.split(','),
-          subjectPrefix: '[StrRay Enterprise Alert]'
-        }
+          recipients: process.env.ALERT_EMAIL_RECIPIENTS?.split(","),
+          subjectPrefix: "[StrRay Enterprise Alert]",
+        },
       },
       {
-        id: 'webhook',
-        type: 'webhook',
+        id: "webhook",
+        type: "webhook",
         config: {
           url: process.env.ALERT_WEBHOOK_URL,
-          headers: { 'Authorization': `Bearer ${process.env.ALERT_WEBHOOK_TOKEN}` }
-        }
-      }
+          headers: {
+            Authorization: `Bearer ${process.env.ALERT_WEBHOOK_TOKEN}`,
+          },
+        },
+      },
     ],
     alertCooldown: 180000,
-    alertRetention: 7776000000
+    alertRetention: 7776000000,
   },
 
   dashboards: {
@@ -383,79 +455,83 @@ export const advancedEnterpriseConfig: EnterpriseMonitoringConfig = {
     historicalRetentionDays: 90,
     customDashboards: [
       {
-        id: 'enterprise-overview',
-        name: 'Enterprise Overview',
-        description: 'Comprehensive enterprise monitoring dashboard',
+        id: "enterprise-overview",
+        name: "Enterprise Overview",
+        description: "Comprehensive enterprise monitoring dashboard",
         panels: [
           {
-            id: 'cluster-health',
-            title: 'Cluster Health',
-            type: 'gauge',
-            metrics: ['cluster.healthy_instances', 'cluster.total_instances'],
-            timeRange: '5m',
-            aggregation: 'current'
+            id: "cluster-health",
+            title: "Cluster Health",
+            type: "gauge",
+            metrics: ["cluster.healthy_instances", "cluster.total_instances"],
+            timeRange: "5m",
+            aggregation: "current",
           },
           {
-            id: 'system-performance',
-            title: 'System Performance',
-            type: 'line',
-            metrics: ['system.cpu', 'system.memory', 'performance.throughput'],
-            timeRange: '1h',
-            aggregation: 'avg'
+            id: "system-performance",
+            title: "System Performance",
+            type: "line",
+            metrics: ["system.cpu", "system.memory", "performance.throughput"],
+            timeRange: "1h",
+            aggregation: "avg",
           },
           {
-            id: 'scaling-events',
-            title: 'Auto-Scaling Events',
-            type: 'table',
-            metrics: ['scaling.action', 'scaling.instances', 'scaling.reason'],
-            timeRange: '24h',
-            aggregation: 'count'
+            id: "scaling-events",
+            title: "Auto-Scaling Events",
+            type: "table",
+            metrics: ["scaling.action", "scaling.instances", "scaling.reason"],
+            timeRange: "24h",
+            aggregation: "count",
           },
           {
-            id: 'alert-summary',
-            title: 'Alert Summary',
-            type: 'bar',
-            metrics: ['alerts.critical', 'alerts.error', 'alerts.warning'],
-            timeRange: '24h',
-            aggregation: 'count'
-          }
+            id: "alert-summary",
+            title: "Alert Summary",
+            type: "bar",
+            metrics: ["alerts.critical", "alerts.error", "alerts.warning"],
+            timeRange: "24h",
+            aggregation: "count",
+          },
         ],
-        refreshInterval: 10000
+        refreshInterval: 10000,
       },
       {
-        id: 'ai-performance',
-        name: 'AI Performance Monitoring',
-        description: 'Specialized dashboard for AI agent performance',
+        id: "ai-performance",
+        name: "AI Performance Monitoring",
+        description: "Specialized dashboard for AI agent performance",
         panels: [
           {
-            id: 'agent-response-times',
-            title: 'Agent Response Times',
-            type: 'line',
-            metrics: ['agent.*.response_time'],
-            timeRange: '1h',
-            aggregation: 'p95'
+            id: "agent-response-times",
+            title: "Agent Response Times",
+            type: "line",
+            metrics: ["agent.*.response_time"],
+            timeRange: "1h",
+            aggregation: "p95",
           },
           {
-            id: 'task-success-rates',
-            title: 'Task Success Rates',
-            type: 'gauge',
-            metrics: ['agent.*.success_rate'],
-            timeRange: '1h',
-            aggregation: 'avg'
+            id: "task-success-rates",
+            title: "Task Success Rates",
+            type: "gauge",
+            metrics: ["agent.*.success_rate"],
+            timeRange: "1h",
+            aggregation: "avg",
           },
           {
-            id: 'ai-errors',
-            title: 'AI-Specific Errors',
-            type: 'table',
-            metrics: ['ai.hallucination_errors', 'ai.timeout_errors', 'ai.validation_errors'],
-            timeRange: '24h',
-            aggregation: 'count'
-          }
+            id: "ai-errors",
+            title: "AI-Specific Errors",
+            type: "table",
+            metrics: [
+              "ai.hallucination_errors",
+              "ai.timeout_errors",
+              "ai.validation_errors",
+            ],
+            timeRange: "24h",
+            aggregation: "count",
+          },
         ],
-        refreshInterval: 15000
-      }
-    ]
-  }
+        refreshInterval: 15000,
+      },
+    ],
+  },
 };
 
 // =============================================================================

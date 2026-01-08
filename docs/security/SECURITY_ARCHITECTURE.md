@@ -30,12 +30,14 @@ The StrRay Framework implements a comprehensive, multi-layered security architec
 **Purpose**: Isolate third-party plugins to prevent system compromise
 
 **Implementation**:
+
 - **Sandboxed Execution**: Plugins run in isolated VM contexts
 - **Resource Limits**: Memory (50MB), timeout (30s), restricted modules
 - **Permission-Based Access**: Granular permissions per plugin capability
 - **Validation Pipeline**: Multi-stage plugin validation before activation
 
 **Key Components**:
+
 - `PluginSandbox` class for execution isolation
 - `PluginValidator` for comprehensive validation
 - `PluginRegistry` for lifecycle management
@@ -45,6 +47,7 @@ The StrRay Framework implements a comprehensive, multi-layered security architec
 **Purpose**: Control access to sensitive operations and data
 
 **Implementation**:
+
 - **Granular Permissions**: Read, write, execute, network access
 - **Agent-Level Controls**: Per-agent permission configuration
 - **Tool-Level Restrictions**: Function call limitations
@@ -55,6 +58,7 @@ The StrRay Framework implements a comprehensive, multi-layered security architec
 **Purpose**: Prevent malicious input and insecure configurations
 
 **Multi-Level Validation**:
+
 - **Input Validation**: Client and server-side input sanitization
 - **Type Safety**: Strict TypeScript enforcement
 - **Configuration Validation**: Schema-based config verification
@@ -65,6 +69,7 @@ The StrRay Framework implements a comprehensive, multi-layered security architec
 **Purpose**: Protect cross-agent communication and state
 
 **Features**:
+
 - **Session Isolation**: Independent execution contexts
 - **Secure State Sharing**: Controlled cross-session communication
 - **Conflict Resolution**: Secure multi-agent coordination
@@ -87,22 +92,22 @@ The SecurityAuditor provides comprehensive vulnerability detection and security 
 
 #### Vulnerability Patterns Detected
 
-| Category | Examples | CWE |
-|----------|----------|-----|
-| Code Injection | `eval()`, `Function()`, `new Function()` | CWE-95 |
-| Command Injection | `child_process.exec()`, `execSync()` | CWE-78 |
-| SQL Injection | String concatenation in queries | CWE-89 |
-| Path Traversal | `../` in paths, `path.join()` misuse | CWE-22 |
-| Hardcoded Secrets | API keys, passwords in code | CWE-798 |
-| Weak Cryptography | `Math.random()` for security | CWE-338 |
-| Information Disclosure | Logging sensitive data | CWE-532 |
+| Category               | Examples                                 | CWE     |
+| ---------------------- | ---------------------------------------- | ------- |
+| Code Injection         | `eval()`, `Function()`, `new Function()` | CWE-95  |
+| Command Injection      | `child_process.exec()`, `execSync()`     | CWE-78  |
+| SQL Injection          | String concatenation in queries          | CWE-89  |
+| Path Traversal         | `../` in paths, `path.join()` misuse     | CWE-22  |
+| Hardcoded Secrets      | API keys, passwords in code              | CWE-798 |
+| Weak Cryptography      | `Math.random()` for security             | CWE-338 |
+| Information Disclosure | Logging sensitive data                   | CWE-532 |
 
 #### Usage Example
 
 ```typescript
-import { securityAuditor } from './security/security-auditor';
+import { securityAuditor } from "./security/security-auditor";
 
-const auditResult = await securityAuditor.auditProject('./my-project');
+const auditResult = await securityAuditor.auditProject("./my-project");
 console.log(`Security Score: ${auditResult.score}/100`);
 
 if (auditResult.issues.length > 0) {
@@ -124,17 +129,17 @@ The SecurityHardener applies automated security fixes and hardening measures.
 
 #### Automated Fixes
 
-| Issue Type | Automated Fix | Manual Intervention |
-|------------|---------------|-------------------|
-| Hardcoded Secrets | ✗ Manual | Move to environment variables |
-| File Permissions | ✓ Automatic | Review file access needs |
-| Dependency Issues | ✗ Manual | Update vulnerable packages |
-| Input Validation | ✗ Manual | Add validation logic |
+| Issue Type        | Automated Fix | Manual Intervention           |
+| ----------------- | ------------- | ----------------------------- |
+| Hardcoded Secrets | ✗ Manual      | Move to environment variables |
+| File Permissions  | ✓ Automatic   | Review file access needs      |
+| Dependency Issues | ✗ Manual      | Update vulnerable packages    |
+| Input Validation  | ✗ Manual      | Add validation logic          |
 
 #### Usage Example
 
 ```typescript
-import { securityHardener } from './security/security-hardener';
+import { securityHardener } from "./security/security-hardener";
 
 const hardeningResult = await securityHardener.hardenSecurity(auditResult);
 console.log(`Applied ${hardeningResult.appliedFixes.length} fixes`);
@@ -146,19 +151,19 @@ Comprehensive HTTP security headers implementation for web applications.
 
 #### Supported Headers
 
-| Header | Purpose | Default Value |
-|--------|---------|---------------|
-| Content-Security-Policy | Prevent XSS attacks | Restrictive defaults |
-| X-Frame-Options | Prevent clickjacking | DENY |
-| X-XSS-Protection | XSS protection | 1; mode=block |
-| X-Content-Type-Options | MIME sniffing prevention | nosniff |
-| Strict-Transport-Security | HTTPS enforcement | max-age=1year |
-| Referrer-Policy | Referrer control | strict-origin-when-cross-origin |
+| Header                    | Purpose                  | Default Value                   |
+| ------------------------- | ------------------------ | ------------------------------- |
+| Content-Security-Policy   | Prevent XSS attacks      | Restrictive defaults            |
+| X-Frame-Options           | Prevent clickjacking     | DENY                            |
+| X-XSS-Protection          | XSS protection           | 1; mode=block                   |
+| X-Content-Type-Options    | MIME sniffing prevention | nosniff                         |
+| Strict-Transport-Security | HTTPS enforcement        | max-age=1year                   |
+| Referrer-Policy           | Referrer control         | strict-origin-when-cross-origin |
 
 #### Usage Example
 
 ```typescript
-import { securityHeadersMiddleware } from './security/security-headers';
+import { securityHeadersMiddleware } from "./security/security-headers";
 
 // Express.js
 app.use(securityHeadersMiddleware.getExpressMiddleware());
@@ -198,16 +203,16 @@ Secure plugin architecture with comprehensive sandboxing and validation.
 ```typescript
 // ✅ Good: Comprehensive validation
 function processUserInput(input: any) {
-  if (!input || typeof input !== 'string') {
-    throw new Error('Invalid input: must be non-empty string');
+  if (!input || typeof input !== "string") {
+    throw new Error("Invalid input: must be non-empty string");
   }
 
   if (input.length > 1000) {
-    throw new Error('Input too long: max 1000 characters');
+    throw new Error("Input too long: max 1000 characters");
   }
 
   // Sanitize and validate
-  const sanitized = input.replace(/[<>\"'&]/g, '');
+  const sanitized = input.replace(/[<>\"'&]/g, "");
   return sanitized;
 }
 
@@ -230,11 +235,11 @@ class SecureService {
 
     // Check authorization
     if (!this.hasPermission(user, action)) {
-      throw new Error('Access denied');
+      throw new Error("Access denied");
     }
 
     // Log the action
-    this.logSecurityEvent('action_performed', { userId, action });
+    this.logSecurityEvent("action_performed", { userId, action });
 
     return await this.executeAction(action);
   }
@@ -247,16 +252,16 @@ class SecureService {
 
 ```typescript
 // ❌ Bad: Command injection vulnerability
-const { exec } = require('child_process');
+const { exec } = require("child_process");
 function runCommand(userInput) {
   exec(`ls ${userInput}`); // Vulnerable!
 }
 
 // ✅ Good: Safe command execution
 function runCommand(safePath) {
-  const allowedPaths = ['/safe/dir1', '/safe/dir2'];
+  const allowedPaths = ["/safe/dir1", "/safe/dir2"];
   if (!allowedPaths.includes(safePath)) {
-    throw new Error('Access denied');
+    throw new Error("Access denied");
   }
   exec(`ls "${safePath}"`);
 }
@@ -268,12 +273,12 @@ function runCommand(safePath) {
 
 ```typescript
 // ❌ Bad: Hardcoded secrets
-const API_KEY = 'sk-1234567890abcdef';
+const API_KEY = "sk-1234567890abcdef";
 
 // ✅ Good: Environment variables
 const API_KEY = process.env.API_KEY;
 if (!API_KEY) {
-  throw new Error('API_KEY environment variable required');
+  throw new Error("API_KEY environment variable required");
 }
 ```
 
@@ -293,8 +298,8 @@ try {
 try {
   await riskyOperation();
 } catch (error) {
-  console.error('Operation failed:', error); // Log details internally
-  throw new Error('Operation failed. Please try again.'); // Safe user message
+  console.error("Operation failed:", error); // Log details internally
+  throw new Error("Operation failed. Please try again."); // Safe user message
 }
 ```
 
@@ -310,7 +315,7 @@ try {
     "security-audit": "npm run audit && npm audit --audit-level=moderate"
   },
   "dependencies": {
-    "safe-package": "^1.2.3"  // Specific version
+    "safe-package": "^1.2.3" // Specific version
   }
 }
 ```
@@ -328,6 +333,7 @@ try {
 **Impact**: Complete system compromise
 
 **Mitigation**:
+
 - Input validation and sanitization
 - Avoid `eval()`, `Function()`, template literals for code
 - Use safe alternatives like `JSON.parse()` with validation
@@ -340,6 +346,7 @@ try {
 **Impact**: System-level access, data destruction
 
 **Mitigation**:
+
 - Validate and sanitize all command inputs
 - Use parameterized commands or safe APIs
 - Whitelist allowed commands and paths
@@ -352,6 +359,7 @@ try {
 **Impact**: Sensitive file access, information disclosure
 
 **Mitigation**:
+
 - Resolve paths to absolute paths
 - Validate paths against allowlists
 - Use `path.resolve()` to prevent traversal
@@ -364,6 +372,7 @@ try {
 **Impact**: Data breach, privilege escalation
 
 **Mitigation**:
+
 - Multi-factor authentication
 - Secure session management
 - Token rotation and expiration
@@ -376,6 +385,7 @@ try {
 **Impact**: Data exposure, privilege escalation
 
 **Mitigation**:
+
 - Role-based access control (RBAC)
 - Permission checking on all operations
 - Principle of least privilege
@@ -388,6 +398,7 @@ try {
 **Impact**: Privacy violation, compliance issues
 
 **Mitigation**:
+
 - Avoid logging sensitive data
 - Sanitize error messages
 - Encrypt sensitive data at rest
@@ -400,6 +411,7 @@ try {
 **Impact**: Service disruption, business impact
 
 **Mitigation**:
+
 - Rate limiting and throttling
 - Resource limits and quotas
 - Input size validation
@@ -412,6 +424,7 @@ try {
 **Impact**: System compromise through supply chain attacks
 
 **Mitigation**:
+
 - Regular dependency updates
 - Automated vulnerability scanning
 - Lockfiles for reproducible builds
@@ -473,14 +486,14 @@ node scripts/security-audit.js
 #### Plugin Validation Process
 
 ```typescript
-import { pluginValidator } from './plugins/plugin-system';
+import { pluginValidator } from "./plugins/plugin-system";
 
 // Validate plugin before installation
-const validation = await pluginValidator.validatePlugin('/path/to/plugin');
+const validation = await pluginValidator.validatePlugin("/path/to/plugin");
 if (!validation.valid) {
-  console.log('Plugin validation failed:');
-  validation.errors.forEach(error => console.log(`❌ ${error}`));
-  validation.securityIssues.forEach(issue => console.log(`🔒 ${issue}`));
+  console.log("Plugin validation failed:");
+  validation.errors.forEach((error) => console.log(`❌ ${error}`));
+  validation.securityIssues.forEach((issue) => console.log(`🔒 ${issue}`));
 }
 ```
 
@@ -499,20 +512,20 @@ if (!validation.valid) {
 
 ```typescript
 // Test authentication flows
-describe('Authentication Security', () => {
-  test('rejects invalid credentials', async () => {
-    const result = await authenticate('invalid', 'credentials');
+describe("Authentication Security", () => {
+  test("rejects invalid credentials", async () => {
+    const result = await authenticate("invalid", "credentials");
     expect(result.success).toBe(false);
   });
 
-  test('prevents brute force attacks', async () => {
+  test("prevents brute force attacks", async () => {
     // Simulate multiple failed attempts
     for (let i = 0; i < 10; i++) {
-      await authenticate('user', 'wrongpass');
+      await authenticate("user", "wrongpass");
     }
 
     // Should be rate limited
-    const result = await authenticate('user', 'wrongpass');
+    const result = await authenticate("user", "wrongpass");
     expect(result.blocked).toBe(true);
   });
 });
@@ -549,58 +562,68 @@ jobs:
 ### OWASP Top 10 Compliance
 
 #### 1. Injection
+
 - [x] Input validation implemented
 - [x] Parameterized queries used
 - [x] Safe command execution
 - [x] HTML encoding for output
 
 #### 2. Broken Authentication
+
 - [x] Secure session management
 - [x] Multi-factor authentication ready
 - [x] Password policies enforced
 - [x] Session timeout implemented
 
 #### 3. Sensitive Data Exposure
+
 - [x] Data encryption at rest
 - [x] Secure transport (HTTPS)
 - [x] No sensitive data in logs
 - [x] Proper data classification
 
 #### 4. XML External Entities (XXE)
+
 - [x] XML parsing disabled for external entities
 - [x] Safe XML libraries used
 - [x] Input validation for XML
 
 #### 5. Broken Access Control
+
 - [x] Role-based access control
 - [x] Permission checking on all operations
 - [x] Secure defaults (deny by default)
 - [x] Regular permission audits
 
 #### 6. Security Misconfiguration
+
 - [x] Secure default configurations
 - [x] Configuration validation
 - [x] Security headers enabled
 - [x] Error handling configured
 
 #### 7. Cross-Site Scripting (XSS)
+
 - [x] Input sanitization
 - [x] Content Security Policy
 - [x] Safe HTML rendering
 - [x] XSS protection headers
 
 #### 8. Insecure Deserialization
+
 - [x] Safe deserialization practices
 - [x] Input validation before deserialization
 - [x] Secure serialization libraries
 
 #### 9. Vulnerable Components
+
 - [x] Dependency vulnerability scanning
 - [x] Regular dependency updates
 - [x] Lockfiles for reproducible builds
 - [x] Automated security monitoring
 
 #### 10. Insufficient Logging & Monitoring
+
 - [x] Security event logging
 - [x] Audit trails for sensitive operations
 - [x] Real-time monitoring
@@ -609,6 +632,7 @@ jobs:
 ### CWE Coverage
 
 #### Critical CWEs Covered
+
 - [x] CWE-95: Code Injection
 - [x] CWE-78: Command Injection
 - [x] CWE-89: SQL Injection
@@ -616,6 +640,7 @@ jobs:
 - [x] CWE-798: Hardcoded Secrets
 
 #### High-Impact CWEs Covered
+
 - [x] CWE-338: Weak Cryptography
 - [x] CWE-532: Information Disclosure
 - [x] CWE-20: Input Validation
@@ -623,6 +648,7 @@ jobs:
 - [x] CWE-732: File Permissions
 
 #### Medium-Impact CWEs Covered
+
 - [x] CWE-362: Race Conditions
 - [x] CWE-209: Error Information Disclosure
 - [x] CWE-350: Dangerous Imports
@@ -632,13 +658,13 @@ jobs:
 
 #### Security Standards Compliance
 
-| Standard | Compliance Level | Notes |
-|----------|------------------|-------|
-| **OWASP Top 10** | 🟢 High | All major categories covered |
-| **CWE Top 25** | 🟢 High | Critical and high-impact CWEs addressed |
-| **ISO 27001** | 🟡 Medium | Core security controls implemented |
-| **NIST Cybersecurity** | 🟡 Medium | Framework alignment in progress |
-| **GDPR** | 🟢 High | Data protection and privacy controls |
+| Standard               | Compliance Level | Notes                                   |
+| ---------------------- | ---------------- | --------------------------------------- |
+| **OWASP Top 10**       | 🟢 High          | All major categories covered            |
+| **CWE Top 25**         | 🟢 High          | Critical and high-impact CWEs addressed |
+| **ISO 27001**          | 🟡 Medium        | Core security controls implemented      |
+| **NIST Cybersecurity** | 🟡 Medium        | Framework alignment in progress         |
+| **GDPR**               | 🟢 High          | Data protection and privacy controls    |
 
 ### Security Score Interpretation
 
@@ -647,6 +673,7 @@ jobs:
 This score reflects the framework's security posture as assessed during the comprehensive security audit. The moderate score is appropriate for a development framework that prioritizes both security and usability.
 
 **Score Components**:
+
 - **Plugin Security**: 95/100 (Excellent sandboxing)
 - **Code Security**: 85/100 (Good pattern detection)
 - **Configuration Security**: 90/100 (Strong defaults)
@@ -669,12 +696,14 @@ The StrRay Framework implements a comprehensive security architecture with multi
 - **Session Security**: Secure multi-agent coordination
 
 **Key Strengths**:
+
 - Defense in depth approach
 - Automated security scanning
 - Comprehensive threat coverage
 - Developer-friendly security tools
 
 **Production Recommendations**:
+
 - Implement regular security audits
 - Enable all security features by default
 - Monitor security events and alerts

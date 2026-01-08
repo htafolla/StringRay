@@ -56,8 +56,8 @@ const coordination = await orchestrator.coordinateAgents({
   agents: ["enforcer", "architect", "code-reviewer"],
   input: {
     files: ["src/**/*.ts"],
-    context: "new-feature-implementation"
-  }
+    context: "new-feature-implementation",
+  },
 });
 
 // Handle conflicts and merge results
@@ -94,7 +94,7 @@ const analytics = new PredictiveAnalytics(orchestrator);
 // Analyze agent performance patterns
 const patterns = await analytics.analyzePerformancePatterns({
   timeframe: "24h",
-  agents: ["all"]
+  agents: ["all"],
 });
 
 // Get optimization recommendations
@@ -104,7 +104,7 @@ const recommendations = await analytics.getOptimizationRecommendations();
 const prediction = await analytics.predictTaskSuccess({
   task: "refactor-component",
   agent: "refactorer",
-  complexity: "high"
+  complexity: "high",
 });
 ```
 
@@ -119,14 +119,14 @@ const pluginSystem = new PluginSystem(orchestrator);
 const plugin = await pluginSystem.loadPlugin({
   name: "custom-validator",
   source: "https://plugins.strray.dev/custom-validator",
-  permissions: ["read-files", "validate-code"]
+  permissions: ["read-files", "validate-code"],
 });
 
 // Execute plugin in sandbox
 const result = await pluginSystem.executePlugin({
   pluginId: "custom-validator",
   input: { files: ["src/**/*.ts"] },
-  timeout: 30000
+  timeout: 30000,
 });
 
 // Get plugin health status
@@ -145,8 +145,8 @@ await monitor.startMonitoring({
   anomalyDetection: true,
   alerting: {
     email: "devops@company.com",
-    slack: "#alerts"
-  }
+    slack: "#alerts",
+  },
 });
 
 // Get system health status
@@ -157,7 +157,7 @@ await monitor.configureAlert({
   name: "high-error-rate",
   condition: "error_rate > 5%",
   severity: "critical",
-  channels: ["email", "slack"]
+  channels: ["email", "slack"],
 });
 ```
 
@@ -173,8 +173,8 @@ const optimization = await optimizer.analyzeAndOptimize({
   targetMetrics: {
     responseTime: "< 1ms",
     memoryUsage: "< 50MB",
-    cacheHitRate: "> 85%"
-  }
+    cacheHitRate: "> 85%",
+  },
 });
 
 // Get optimization recommendations
@@ -199,15 +199,15 @@ const session = await sessionManager.createSession({
   agents: ["enforcer", "architect"],
   config: {
     autoCleanup: true,
-    monitoring: true
-  }
+    monitoring: true,
+  },
 });
 
 // Execute tasks within session
 const result = await session.executeTask({
   agent: "architect",
   task: "design-component",
-  input: { component: "UserDashboard" }
+  input: { component: "UserDashboard" },
 });
 
 // Get session status and metrics
@@ -227,14 +227,14 @@ const health = await sessionManager.monitorSession(session.id);
 // Get session analytics
 const analytics = await sessionManager.getSessionAnalytics({
   sessionId: session.id,
-  metrics: ["performance", "errors", "agent-utilization"]
+  metrics: ["performance", "errors", "agent-utilization"],
 });
 
 // Configure session limits
 await sessionManager.configureLimits({
   maxConcurrentSessions: 10,
   maxSessionDuration: "2h",
-  cleanupInterval: "30m"
+  cleanupInterval: "30m",
 });
 ```
 
@@ -254,7 +254,7 @@ const globalState = await stateManager.getGlobalState();
 await stateManager.updateState({
   path: "agents.enforcer.status",
   value: "active",
-  version: globalState.version
+  version: globalState.version,
 });
 
 // Subscribe to state changes
@@ -278,14 +278,14 @@ const configManager = new ConfigManager(orchestrator);
 // Load configuration with validation
 const config = await configManager.loadConfig({
   validate: true,
-  environment: "production"
+  environment: "production",
 });
 
 // Update configuration dynamically
 await configManager.updateConfig({
   path: "performance.optimization.enabled",
   value: true,
-  validate: true
+  validate: true,
 });
 
 // Get configuration schema
@@ -304,7 +304,7 @@ try {
   const result = await orchestrator.executeTask({
     agent: "enforcer",
     task: "validate-code",
-    input: { files: ["src/**/*.ts"] }
+    input: { files: ["src/**/*.ts"] },
   });
 } catch (error) {
   if (error instanceof StrRayAgentError) {
@@ -328,7 +328,7 @@ try {
 const recovery = await orchestrator.recoverFromError({
   error: error,
   strategy: "exponential-backoff",
-  maxRetries: 3
+  maxRetries: 3,
 });
 
 // Circuit breaker pattern
@@ -396,7 +396,7 @@ class CustomSecurityPlugin extends BasePlugin {
     return {
       success: vulnerabilities.length === 0,
       vulnerabilities,
-      recommendations: this.generateRecommendations(vulnerabilities)
+      recommendations: this.generateRecommendations(vulnerabilities),
     };
   }
 
@@ -442,8 +442,8 @@ class CustomAnalyticsAgent extends BaseAgent {
       data: analysis,
       metadata: {
         analysisType: "deep",
-        coverage: "100%"
-      }
+        coverage: "100%",
+      },
     };
   }
 }
@@ -463,21 +463,21 @@ const batchResult = await orchestrator.batchExecute({
     {
       agent: "enforcer",
       task: "validate-files",
-      input: { files: "src/**/*.ts" }
+      input: { files: "src/**/*.ts" },
     },
     {
       agent: "architect",
       task: "review-architecture",
-      input: { files: "src/**/*.ts" }
+      input: { files: "src/**/*.ts" },
     },
     {
       agent: "test-architect",
       task: "analyze-coverage",
-      input: { files: "tests/**/*.spec.ts" }
-    }
+      input: { files: "tests/**/*.spec.ts" },
+    },
   ],
   parallel: true, // Execute in parallel
-  timeout: 300000 // 5 minutes
+  timeout: 300000, // 5 minutes
 });
 
 // Process results
@@ -605,19 +605,19 @@ await orchestrator.configureSecurity({
     resourceLimits: {
       memory: "100MB",
       cpu: "50%",
-      timeout: "30s"
-    }
+      timeout: "30s",
+    },
   },
   auditLogging: {
     enabled: true,
     retention: "1y",
-    encryption: "AES-256"
+    encryption: "AES-256",
   },
   vulnerabilityScanning: {
     enabled: true,
     frequency: "daily",
-    autoRemediation: true
-  }
+    autoRemediation: true,
+  },
 });
 ```
 
@@ -637,7 +637,7 @@ await orchestrator.configureSecurity({
 const migration = await orchestrator.migrateFromLegacy({
   sourceSystem: "legacy-framework",
   dataPath: "/path/to/legacy/data",
-  preserveConfiguration: true
+  preserveConfiguration: true,
 });
 
 // Validate migration

@@ -18,11 +18,12 @@ def temp_config_file():
         "ai_auto_log_responses": True,
         "logging_level": "INFO",
         "max_concurrent_tasks": 5,
-        "timeout_default": 30
+        "timeout_default": 30,
     }
 
-    with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
         import json
+
         json.dump(config_data, f)
         temp_path = f.name
 
@@ -45,9 +46,9 @@ def mock_ai_service():
 def base_agent(mock_ai_service):
     """Create a BaseAgent instance with mocked AI service."""
     config = {
-        'model_default': 'opencode/grok-code',
-        'ai_auto_log_responses': True,
-        'logging_level': 'INFO'
+        "model_default": "opencode/grok-code",
+        "ai_auto_log_responses": True,
+        "logging_level": "INFO",
     }
 
     agent = BaseAgent(config=config)
@@ -65,11 +66,11 @@ def config_manager(temp_config_file):
 def sample_task():
     """Sample task dictionary for testing."""
     return {
-        'id': 'test_task_001',
-        'type': 'analysis',
-        'content': 'def hello(): return "world"',
-        'priority': 'medium',
-        'timeout': 30
+        "id": "test_task_001",
+        "type": "analysis",
+        "content": 'def hello(): return "world"',
+        "priority": "medium",
+        "timeout": 30,
     }
 
 
@@ -77,11 +78,11 @@ def sample_task():
 def sample_response():
     """Sample AI response for testing."""
     return {
-        'content': 'Analysis complete: Function returns greeting',
-        'confidence': 0.95,
-        'metadata': {
-            'model': 'opencode/grok-code',
-            'tokens': 150,
-            'processing_time': 0.234
-        }
+        "content": "Analysis complete: Function returns greeting",
+        "confidence": 0.95,
+        "metadata": {
+            "model": "opencode/grok-code",
+            "tokens": 150,
+            "processing_time": 0.234,
+        },
     }

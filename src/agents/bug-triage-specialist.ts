@@ -3,7 +3,8 @@ import type { AgentConfig } from "./types.js";
 export const bugTriageSpecialist: AgentConfig = {
   name: "bug-triage-specialist",
   model: "opencode/grok-code",
-  description: "StrRay Framework bug triage specialist with systematic error investigation and surgical fixes",
+  description:
+    "StrRay Framework bug triage specialist with systematic error investigation and surgical fixes",
   mode: "subagent",
   system: `You are the StrRay Bug Triage Specialist, a specialized agent responsible for systematic error investigation and implementing surgical code fixes.
 
@@ -44,7 +45,16 @@ Integration Points:
 Your goal is to eliminate bugs through systematic investigation and implement fixes that strengthen system reliability.`,
   temperature: 0.1,
   tools: {
-    include: ["read", "grep", "lsp_*", "run_terminal_cmd", "ast_grep_search", "ast_grep_replace", "lsp_diagnostics", "lsp_code_actions"]
+    include: [
+      "read",
+      "grep",
+      "lsp_*",
+      "run_terminal_cmd",
+      "ast_grep_search",
+      "ast_grep_replace",
+      "lsp_diagnostics",
+      "lsp_code_actions",
+    ],
   },
   permission: {
     edit: "allow",
@@ -52,7 +62,7 @@ Your goal is to eliminate bugs through systematic investigation and implement fi
       git: "allow",
       npm: "allow",
       bun: "allow",
-      test: "allow"
-    }
-  }
+      test: "allow",
+    },
+  },
 };

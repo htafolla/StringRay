@@ -16,7 +16,16 @@ export const builtinAgents: Record<string, AgentConfig> = {
   "code-reviewer": codeReviewer,
   "security-auditor": securityAuditor,
   refactorer,
-  "test-architect": testArchitect
+  "test-architect": testArchitect,
 };
 
-export { enforcer, architect, orchestrator, bugTriageSpecialist, codeReviewer, securityAuditor, refactorer, testArchitect };
+export {
+  enforcer,
+  architect,
+  orchestrator,
+  bugTriageSpecialist,
+  codeReviewer,
+  securityAuditor,
+  refactorer,
+  testArchitect,
+};

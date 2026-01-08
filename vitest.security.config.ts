@@ -8,19 +8,19 @@
  * @since 2026-01-08
  */
 
-import { defineConfig } from 'vitest/config';
-import { resolve } from 'path';
+import { defineConfig } from "vitest/config";
+import { resolve } from "path";
 
 export default defineConfig({
   test: {
     // Security test configuration
-    name: 'StrRay Security Tests',
-    environment: 'node',
+    name: "StrRay Security Tests",
+    environment: "node",
     globals: true,
-    setupFiles: ['./src/__tests__/setup/security-setup.ts'],
+    setupFiles: ["./src/__tests__/setup/security-setup.ts"],
 
     // Sequential execution for security tests (to avoid interference)
-    pool: 'threads',
+    pool: "threads",
     maxConcurrency: 1,
 
     // Extended timeouts for security tests
@@ -31,44 +31,39 @@ export default defineConfig({
     // Security-specific coverage
     coverage: {
       enabled: true,
-      provider: 'v8',
-      reporter: ['text', 'json', 'html', 'lcov'],
-      reportsDirectory: './coverage/security',
+      provider: "v8",
+      reporter: ["text", "json", "html", "lcov"],
+      reportsDirectory: "./coverage/security",
       include: [
-        'src/security/**/*.ts',
-        'src/**/*.ts', // Include all for security validation
-        '!src/**/*.d.ts',
-        '!src/**/__tests__/**',
-        '!src/**/__mocks__/**',
+        "src/security/**/*.ts",
+        "src/**/*.ts", // Include all for security validation
+        "!src/**/*.d.ts",
+        "!src/**/__tests__/**",
+        "!src/**/__mocks__/**",
       ],
       exclude: [
-        'node_modules/**',
-        'dist/**',
-        'coverage/**',
-        '**/*.config.ts',
-        '**/*.config.js',
+        "node_modules/**",
+        "dist/**",
+        "coverage/**",
+        "**/*.config.ts",
+        "**/*.config.js",
       ],
     },
 
     // Security-focused reporting
     reporters: [
-      'default',
-      ['html', { outputFile: 'reports/security/index.html' }],
-      ['junit', { outputFile: 'reports/security/results.xml' }],
+      "default",
+      ["html", { outputFile: "reports/security/index.html" }],
+      ["junit", { outputFile: "reports/security/results.xml" }],
     ],
 
     // File patterns for security tests
     include: [
-      'src/__tests__/security/**/*.test.ts',
-      'src/__tests__/security/**/*.spec.ts',
-      'src/__tests__/integration/security/**/*.test.ts',
+      "src/__tests__/security/**/*.test.ts",
+      "src/__tests__/security/**/*.spec.ts",
+      "src/__tests__/integration/security/**/*.test.ts",
     ],
-    exclude: [
-      'node_modules/**',
-      'dist/**',
-      'coverage/**',
-      '**/*.config.ts',
-    ],
+    exclude: ["node_modules/**", "dist/**", "coverage/**", "**/*.config.ts"],
 
     // Security test configuration
     slowTestThreshold: 10000, // 10 seconds
@@ -77,19 +72,19 @@ export default defineConfig({
 
     // Environment variables for security testing
     env: {
-      NODE_ENV: 'test',
-      SECURITY_TEST: 'true',
-      LOG_LEVEL: 'error', // Reduce noise in security tests
-      SECURITY_AUDIT: 'enabled',
+      NODE_ENV: "test",
+      SECURITY_TEST: "true",
+      LOG_LEVEL: "error", // Reduce noise in security tests
+      SECURITY_AUDIT: "enabled",
     },
   },
 
   resolve: {
     alias: {
-      '@': resolve(__dirname, './src'),
-      '@tests': resolve(__dirname, './src/__tests__'),
-      '@utils': resolve(__dirname, './src/__tests__/utils'),
-      '@security': resolve(__dirname, './src/security'),
+      "@": resolve(__dirname, "./src"),
+      "@tests": resolve(__dirname, "./src/__tests__"),
+      "@utils": resolve(__dirname, "./src/__tests__/utils"),
+      "@security": resolve(__dirname, "./src/security"),
     },
   },
 });

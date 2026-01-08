@@ -6,8 +6,8 @@
  * and production-ready development practices.
  */
 
-import { CodexInjector } from '../src/codex-injector';
-import { StrRayContextLoader } from '../src/context-loader';
+import { CodexInjector } from "../src/codex-injector";
+import { StrRayContextLoader } from "../src/context-loader";
 
 export interface PluginConfig {
   enabled: boolean;
@@ -29,24 +29,26 @@ export class StrRayCodexInjectionPlugin {
 
   async initialize(): Promise<void> {
     if (!this.config.enabled) {
-      console.log('🛡️ StringRay Codex Plugin: Disabled');
+      console.log("🛡️ StringRay Codex Plugin: Disabled");
       return;
     }
 
-    console.log('🛡️ StringRay Codex Plugin: Initializing...');
+    console.log("🛡️ StringRay Codex Plugin: Initializing...");
 
     try {
       // Load codex context
       const context = await this.contextLoader.loadCodexContext(process.cwd());
       if (context.success) {
-        console.log(`✅ StringRay Codex loaded: ${context.context?.terms.size || 0} terms (v${context.context?.version || 'unknown'})`);
+        console.log(
+          `✅ StringRay Codex loaded: ${context.context?.terms.size || 0} terms (v${context.context?.version || "unknown"})`,
+        );
       } else {
-        console.warn('⚠️ StringRay Codex loading failed:', context.error);
+        console.warn("⚠️ StringRay Codex loading failed:", context.error);
       }
 
-      console.log('🛡️ StringRay Codex Plugin: Ready');
+      console.log("🛡️ StringRay Codex Plugin: Ready");
     } catch (error) {
-      console.error('❌ StringRay Codex Plugin initialization failed:', error);
+      console.error("❌ StringRay Codex Plugin initialization failed:", error);
     }
   }
 
@@ -60,12 +62,12 @@ export class StrRayCodexInjectionPlugin {
       const enhancedContext = await this.injector.injectCodexRules(context, {
         action,
         sessionId: `strray-${Date.now()}`,
-        priority: 'high'
+        priority: "high",
       });
 
       return enhancedContext;
     } catch (error) {
-      console.warn('⚠️ StringRay Codex injection failed:', error);
+      console.warn("⚠️ StringRay Codex injection failed:", error);
       return context;
     }
   }
@@ -77,14 +79,15 @@ export class StrRayCodexInjectionPlugin {
 
 // Export for oh-my-opencode plugin system
 export default {
-  name: 'strray-codex-injection',
-  version: '1.0.0',
-  description: 'StringRay Codex Injection Plugin for systematic error prevention',
-  author: 'StringRay Framework Team',
+  name: "strray-codex-injection",
+  version: "1.0.0",
+  description:
+    "StringRay Codex Injection Plugin for systematic error prevention",
+  author: "StringRay Framework Team",
 
   initialize: async (config: PluginConfig) => {
     const plugin = new StrRayCodexInjectionPlugin(config);
     await plugin.initialize();
     return plugin;
-  }
+  },
 };

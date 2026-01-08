@@ -369,16 +369,8 @@
     "Performance Interweave",
     "Security Interweave"
   ],
-  "lenses": [
-    "Code Quality Lens",
-    "Maintainability Lens",
-    "Performance Lens"
-  ],
-  "principles": [
-    "SOLID Principles",
-    "DRY Principles",
-    "KISS Principles"
-  ],
+  "lenses": ["Code Quality Lens", "Maintainability Lens", "Performance Lens"],
+  "principles": ["SOLID Principles", "DRY Principles", "KISS Principles"],
   "antiPatterns": [
     "Spaghetti code",
     "Lasagna code",

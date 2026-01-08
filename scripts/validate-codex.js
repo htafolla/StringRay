@@ -1,12 +1,11 @@
 #!/usr/bin/env node
 
-
 // Check if we're in the right directory
 import fs from "fs";
 import path from "path";
 
 if (!fs.existsSync("src/codex-injector.ts")) {
-	process.exit(1);
+  process.exit(1);
 }
 
 // Check if codex files exist
@@ -14,26 +13,25 @@ const codexFiles = ["src/agents_template.md", "src/codex/agents_template.md"];
 
 let codexFound = false;
 for (const file of codexFiles) {
-	if (fs.existsSync(file)) {
-		codexFound = true;
+  if (fs.existsSync(file)) {
+    codexFound = true;
 
-		// Basic validation of codex content
-		try {
-			const content = fs.readFileSync(file, "utf-8");
-			const versionMatch = content.match(/\*\*Version\*\*:\s*(\d+\.\d+\.\d+)/);
-			if (versionMatch) {
-			}
+    // Basic validation of codex content
+    try {
+      const content = fs.readFileSync(file, "utf-8");
+      const versionMatch = content.match(/\*\*Version\*\*:\s*(\d+\.\d+\.\d+)/);
+      if (versionMatch) {
+      }
 
-			const termMatches = content.match(/####\s*\d+\.\s/g);
-			if (termMatches) {
-			}
-		} catch (error) {
-		}
-	}
+      const termMatches = content.match(/####\s*\d+\.\s/g);
+      if (termMatches) {
+      }
+    } catch (error) {}
+  }
 }
 
 if (!codexFound) {
-	process.exit(1);
+  process.exit(1);
 }
 
 // Check if built files exist
@@ -43,19 +41,17 @@ if (fs.existsSync("dist")) {
 
 // Check package.json
 if (fs.existsSync("package.json")) {
-	try {
-		const pkg = JSON.parse(fs.readFileSync("package.json", "utf-8"));
-	} catch (error) {
-	}
+  try {
+    const pkg = JSON.parse(fs.readFileSync("package.json", "utf-8"));
+  } catch (error) {}
 } else {
-	process.exit(1);
+  process.exit(1);
 }
 
 // Check .opencode directory
 if (fs.existsSync(".opencode")) {
-	if (fs.existsSync(".opencode/codex-injector.js")) {
-	} else {
-	}
+  if (fs.existsSync(".opencode/codex-injector.js")) {
+  } else {
+  }
 } else {
 }
-

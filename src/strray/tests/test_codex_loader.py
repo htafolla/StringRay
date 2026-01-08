@@ -18,8 +18,11 @@ import hashlib
 from concurrent.futures import ThreadPoolExecutor
 
 from strray.core.codex_loader import (
-    CodexLoader, CodexRule, CodexComplianceResult,
-    CodexViolationError as CodexError, CodexTerm
+    CodexLoader,
+    CodexRule,
+    CodexComplianceResult,
+    CodexViolationError as CodexError,
+    CodexTerm,
 )
 from strray.config.manager import ConfigManager
 
@@ -56,14 +59,17 @@ class TestCodexLoader:
 
         assert len(rules) == len(self.sample_terms)
         assert all(isinstance(rule, CodexRule) for rule in rules.values())
-        assert all(term_id in self.loader._loaded_terms for term_id in self.sample_terms)
+        assert all(
+            term_id in self.loader._loaded_terms for term_id in self.sample_terms
+        )
         assert self.loader._codex_hash is not None
 
     def test_load_codex_terms_partial_failure(self):
         """Test loading codex terms with some failures."""
         invalid_terms = [1, 2, 999, 3]  # 999 is invalid
 
-        with patch.object(self.loader, '_load_codex_rule') as mock_load:
+        with patch.object(self.loader, "_load_codex_rule") as mock_load:
+
             def side_effect(term_id):
                 if term_id == 999:
                     raise CodexError(f"Unknown codex term: {term_id}")
@@ -116,7 +122,7 @@ class TestCodexLoader:
         context = {
             "communication_bus": None,  # Will violate term 2
             "state_manager_enabled": False,  # Will violate term 3
-            "error_handling_enabled": True  # Will pass term 5
+            "error_handling_enabled": True,  # Will pass term 5
         }
 
         results = self.loader.validate_compliance(context, relevant_terms=[2, 3, 5])
@@ -177,7 +183,11 @@ class TestCodexLoader:
         self.loader.load_codex_terms([1])
 
         # Mock validation to raise exception
-        with patch.object(self.loader, '_validate_term_compliance', side_effect=Exception("Test error")):
+        with patch.object(
+            self.loader,
+            "_validate_term_compliance",
+            side_effect=Exception("Test error"),
+        ):
             results = self.loader.validate_compliance("agent", {})
 
             assert len(results) == 1
@@ -211,7 +221,9 @@ class TestCodexLoader:
         """Test getting nested term dependencies."""
         self.loader.load_codex_terms([1, 2, 5, 15])
 
-        deps = self.loader.get_term_dependencies(15)  # Depends on 5, which depends on 1,2
+        deps = self.loader.get_term_dependencies(
+            15
+        )  # Depends on 5, which depends on 1,2
         assert 5 in deps
         assert 1 in deps
         assert 2 in deps
@@ -347,23 +359,21 @@ class TestCodexLoader:
 
     def test_concurrent_codex_loading(self):
         """Test concurrent codex loading operations."""
+
         def load_terms(terms):
             loader = CodexLoader()
             return loader.load_codex_terms(terms)
 
-        test_cases = [
-            [1, 2, 3],
-            [5, 15, 24],
-            [38, 39, 42],
-            [1, 5, 15, 38]
-        ]
+        test_cases = [[1, 2, 3], [5, 15, 24], [38, 39, 42], [1, 5, 15, 38]]
 
         with ThreadPoolExecutor(max_workers=4) as executor:
             futures = [executor.submit(load_terms, terms) for terms in test_cases]
             results = [f.result() for f in futures]
 
         # All operations should succeed
-        assert all(len(result) == len(terms) for result, terms in zip(results, test_cases))
+        assert all(
+            len(result) == len(terms) for result, terms in zip(results, test_cases)
+        )
 
     def test_memory_usage_with_large_codex(self):
         """Test memory usage with large codex loading."""
@@ -400,7 +410,7 @@ class TestCodexLoader:
             category="test",
             severity="medium",
             automated_check=True,
-            dependencies=[2, 3]
+            dependencies=[2, 3],
         )
 
         # Should be immutable (dataclass with frozen=True equivalent behavior)
@@ -415,7 +425,7 @@ class TestCodexLoader:
             compliant=False,
             violations=["Violation 1", "Violation 2"],
             recommendations=["Fix 1", "Fix 2"],
-            metadata={"test": "data"}
+            metadata={"test": "data"},
         )
 
         assert result.term_id == 5
@@ -424,20 +434,26 @@ class TestCodexLoader:
         assert len(result.recommendations) == 2
         assert result.metadata == {"test": "data"}
 
-    @patch('strray.core.codex_loader.logger')
+    @patch("strray.core.codex_loader.logger")
     def test_logging_on_term_load_failure(self, mock_logger):
         """Test logging when term loading fails."""
-        with patch.object(self.loader, '_load_codex_rule', side_effect=Exception("Load failed")):
+        with patch.object(
+            self.loader, "_load_codex_rule", side_effect=Exception("Load failed")
+        ):
             self.loader.load_codex_terms([999])
 
         mock_logger.warning.assert_called()
 
-    @patch('strray.core.codex_loader.logger')
+    @patch("strray.core.codex_loader.logger")
     def test_logging_on_compliance_validation_failure(self, mock_logger):
         """Test logging when compliance validation fails."""
         self.loader.load_codex_terms([1])
 
-        with patch.object(self.loader, '_validate_term_compliance', side_effect=Exception("Validation failed")):
+        with patch.object(
+            self.loader,
+            "_validate_term_compliance",
+            side_effect=Exception("Validation failed"),
+        ):
             self.loader.validate_compliance("agent", {})
 
         mock_logger.error.assert_called()

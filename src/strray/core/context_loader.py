@@ -50,7 +50,9 @@ class ContextLoader:
                 else:
                     logger.debug("Context file not found", file=file_path)
             except Exception as e:
-                logger.warning("Failed to load context file", file=file_path, error=str(e))
+                logger.warning(
+                    "Failed to load context file", file=file_path, error=str(e)
+                )
 
         # Also try to load agents_template.md if it exists
         template_path = self.project_root / ".opencode" / "agents_template.md"
@@ -64,7 +66,7 @@ class ContextLoader:
 
     def _read_file_content(self, file_path: Path) -> str:
         """Read content from a file."""
-        with open(file_path, 'r', encoding='utf-8') as f:
+        with open(file_path, "r", encoding="utf-8") as f:
             return f.read()
 
     def get_context(self, key: str) -> Optional[str]:
@@ -130,7 +132,9 @@ class ContextLoader:
 
         return "\n".join(combined)
 
-    def enforce_context(self, operation: str, context_keys: Optional[List[str]] = None) -> str:
+    def enforce_context(
+        self, operation: str, context_keys: Optional[List[str]] = None
+    ) -> str:
         """Enforce context loading for a specific operation.
 
         Args:
@@ -148,8 +152,14 @@ class ContextLoader:
 
         missing = [key for key in context_keys if not self.has_context(key)]
         if missing:
-            raise ValueError(f"Missing required context for operation '{operation}': {missing}")
+            raise ValueError(
+                f"Missing required context for operation '{operation}': {missing}"
+            )
 
         context = self.get_combined_context(context_keys)
-        logger.info("Context enforced for operation", operation=operation, context_keys=context_keys)
+        logger.info(
+            "Context enforced for operation",
+            operation=operation,
+            context_keys=context_keys,
+        )
         return context

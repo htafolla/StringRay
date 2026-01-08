@@ -7,6 +7,7 @@ from abc import ABC, abstractmethod
 
 class AIServiceError(Exception):
     """AI service related errors."""
+
     pass
 
 
@@ -46,7 +47,7 @@ class MockAIService(AIService):
             "analysis": f"Mock analysis of: {content[:50]}...",
             "task": task,
             "confidence": 0.95,
-            "mock": True
+            "mock": True,
         }
 
     async def generate(self, prompt: str, **kwargs) -> str:

@@ -1,9 +1,9 @@
 {
-	"mcpServers": {
-		"project-analysis": {
-			"command": "node",
-			"args": ["-e", "console.log('Project structure analysis tool')"],
-			"env": {}
-		}
-	}
+  "mcpServers": {
+    "project-analysis": {
+      "command": "node",
+      "args": ["-e", "console.log('Project structure analysis tool')"],
+      "env": {}
+    }
+  }
 }

@@ -15,6 +15,7 @@
 **Why StringRay?**
 
 Most AI coding tools fall into the same traps:
+
 - Tangled spaghetti code and monolithic blocks
 - Hallucinations and inconsistent output
 - Code rot that quietly erodes quality
@@ -23,6 +24,7 @@ Most AI coding tools fall into the same traps:
 StringRay orchestrates 8 specialized agents with 45 codex rules to eliminate them — before they take root.
 
 **Dead Ends Eliminated**
+
 - Spaghetti & Monoliths → Clean lines + single sources of truth
 - Hallucinations → Grounded, verifiable output
 - Code Rot → Modular, maintainable components
@@ -37,6 +39,7 @@ StringRay orchestrates 8 specialized agents with 45 codex rules to eliminate the
 Code rot (software entropy/technical debt creep) is how code quality degrades over time without active maintenance. It's not a single bug but gradual erosion that makes code harder to maintain, extend, or debug. StringRay prevents this by enforcing consistent patterns, automated testing, and modular structure.
 
 **Real-World Examples:**
+
 - **Outdated Dependencies**: Code relies on libraries with security vulnerabilities or deprecated APIs that break silently (e.g., an old React version causing render issues).
 - **Accumulated Quick Fixes**: Temporary patches (like `// TODO: fix this later`) pile up, creating fragile workarounds that cascade into bigger issues.
 - **Inconsistent Naming/Structure**: Variables/functions start with clear names but drift as features are added, leading to confusion (e.g., `userData` becomes `usrDt` in some files).
@@ -48,6 +51,7 @@ Code rot (software entropy/technical debt creep) is how code quality degrades ov
 GitHub Copilot is a great autocomplete tool—fast suggestions based on patterns in open-source code—but it's fundamentally reactive and surface-level. It suggests code snippets on the fly but doesn't prevent systemic issues like hallucinations, spaghetti code, or code rot.
 
 **Key Differences:**
+
 - **Copilot**: Autocompletes based on training data; can suggest hallucinated or insecure code if the context is off. No oversight or iteration.
 - **StringRay**: Orchestrates 8 agents with 45 codex rules for proactive prevention. Agents cross-validate output, enforce modular structure, and generate tests—eliminating the root causes Copilot leaves untouched.
 
@@ -60,6 +64,7 @@ In short, Copilot is a coding assistant for speed; StringRay is a quality guardi
 **Archetype**: The No-Nonsense Senior Engineer
 
 **Traits**:
+
 - Battle-scarred but unflappable
 - Speaks in specifics devs recognize instantly (spaghetti, rot, race conditions, hook chaos)
 - Doesn't sell — states facts and lets the relief speak for itself

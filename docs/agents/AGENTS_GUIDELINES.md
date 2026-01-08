@@ -315,12 +315,12 @@ Focus on testing, security, and code improvement.
 {
   "agent_models": {
     "enforcer_model": "opencode/grok-code",
-	"architect_model": "opencode/grok-code",
+    "architect_model": "opencode/grok-code",
     "orchestrator_model": "opencode/grok-code",
     "bug_triage_specialist_model": "opencode/grok-code",
-	"code_reviewer_model": "opencode/grok-code",
-	"security_auditor_model": "opencode/grok-code",
-	"refactorer_model": "opencode/grok-code",
+    "code_reviewer_model": "opencode/grok-code",
+    "security_auditor_model": "opencode/grok-code",
+    "refactorer_model": "opencode/grok-code",
     "test_architect_model": "opencode/grok-code"
   }
 }

@@ -5,6 +5,7 @@ from typing import Any
 
 class SecurityError(Exception):
     """Security-related errors."""
+
     pass
 
 
@@ -37,7 +38,8 @@ class InputValidator:
 
         # Allow alphanumeric, underscore, dash
         import re
-        if not re.match(r'^[a-zA-Z0-9_-]+$', name):
+
+        if not re.match(r"^[a-zA-Z0-9_-]+$", name):
             raise SecurityError("Agent name contains invalid characters")
 
         return name.strip()
@@ -60,7 +62,7 @@ class InputValidator:
             return None
 
         # Basic sanitization - remove null bytes and excessive whitespace
-        sanitized = content.replace('\x00', '').strip()
+        sanitized = content.replace("\x00", "").strip()
 
         # Ensure it's still valid after sanitization
         if not sanitized:

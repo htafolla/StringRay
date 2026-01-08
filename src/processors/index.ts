@@ -7,5 +7,5 @@
  * @since 2026-01-07
  */
 
-export * from './processor-manager';
-export * from './processor-types';
+export * from "./processor-manager";
+export * from "./processor-types";

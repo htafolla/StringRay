@@ -8,11 +8,26 @@
  */
 
 // Core performance system orchestrator
-export { PerformanceSystemOrchestrator, performanceSystem } from './performance-system-orchestrator.js';
+export {
+  PerformanceSystemOrchestrator,
+  performanceSystem,
+} from "./performance-system-orchestrator.js";
 
 // Individual performance components
-export { PerformanceBudgetEnforcer, performanceBudgetEnforcer, PERFORMANCE_BUDGET } from './performance-budget-enforcer.js';
-export { PerformanceRegressionTester, performanceRegressionTester } from './performance-regression-tester.js';
-export { PerformanceMonitoringDashboard, performanceDashboard } from './performance-monitoring-dashboard.js';
-export { PerformanceCIGates, performanceCIGates } from './performance-ci-gates.js';
-
+export {
+  PerformanceBudgetEnforcer,
+  performanceBudgetEnforcer,
+  PERFORMANCE_BUDGET,
+} from "./performance-budget-enforcer.js";
+export {
+  PerformanceRegressionTester,
+  performanceRegressionTester,
+} from "./performance-regression-tester.js";
+export {
+  PerformanceMonitoringDashboard,
+  performanceDashboard,
+} from "./performance-monitoring-dashboard.js";
+export {
+  PerformanceCIGates,
+  performanceCIGates,
+} from "./performance-ci-gates.js";

@@ -3,7 +3,8 @@ import type { AgentConfig } from "./types.js";
 export const orchestrator: AgentConfig = {
   name: "orchestrator",
   model: "opencode/grok-code",
-  description: "StrRay Framework orchestrator with coordination, workflow management, and multi-agent orchestration",
+  description:
+    "StrRay Framework orchestrator with coordination, workflow management, and multi-agent orchestration",
   mode: "subagent",
   system: `You are the StrRay Orchestrator, a specialized agent responsible for coordinating complex multi-agent workflows and managing enterprise operations.
 
@@ -51,14 +52,24 @@ Integration Points:
 Your goal is to flawlessly coordinate the StrRay Framework operations through intelligent orchestration and delegation.`,
   temperature: 0.1,
   tools: {
-    include: ["read", "grep", "lsp_*", "run_terminal_cmd", "background_task", "call_omo_agent", "session_list", "session_read", "session_search"]
+    include: [
+      "read",
+      "grep",
+      "lsp_*",
+      "run_terminal_cmd",
+      "background_task",
+      "call_omo_agent",
+      "session_list",
+      "session_read",
+      "session_search",
+    ],
   },
   permission: {
     edit: "allow",
     bash: {
       git: "allow",
       npm: "allow",
-      bun: "allow"
-    }
-  }
+      bun: "allow",
+    },
+  },
 };

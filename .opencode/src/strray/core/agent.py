@@ -206,10 +206,12 @@ class BaseAgent(ABC):
 
     def _create_response_interceptor(self):
         """Create response interceptor for auto-logging."""
+
         def intercept_response(response):
             if isinstance(response, str) and response.strip():
                 self.log_response_sync(response)
             return response
+
         return intercept_response
 
     def process_response(self, response: Any) -> Any:
@@ -222,15 +224,18 @@ class BaseAgent(ABC):
         if self._ai_service is None:
             # Lazy import to avoid circular dependencies
             from ..ai.service import MockAIService as AIService
+
             self._ai_service = AIService(
-                provider=self.config_manager.get_value('ai_default_provider', 'openai'),
-                model=self.config_manager.get_value('ai_default_model', 'gpt-4'),
+                provider=self.config_manager.get_value("ai_default_provider", "openai"),
+                model=self.config_manager.get_value("ai_default_model", "gpt-4"),
                 config=self.config_manager,
-                auto_log=True  # ALWAYS ENABLED for comprehensive logging
+                auto_log=True,  # ALWAYS ENABLED for comprehensive logging
             )
         return self._ai_service
 
-    async def analyze_with_ai(self, content: str, task: str, **kwargs) -> Dict[str, Any]:
+    async def analyze_with_ai(
+        self, content: str, task: str, **kwargs
+    ) -> Dict[str, Any]:
         """Analyze content using AI service with automatic response logging.
 
         Args:
@@ -246,18 +251,22 @@ class BaseAgent(ABC):
             result = await self.ai_service.analyze(content, task, **kwargs)
 
             # Automatic async logging of AI response (success case) - ALWAYS ENABLED
-            asyncio.create_task(self._trigger_logging_hooks_async(result, "analysis", content, task))
+            asyncio.create_task(
+                self._trigger_logging_hooks_async(result, "analysis", content, task)
+            )
 
             return result
 
         except Exception as e:
             # Automatic async logging of AI failure (error case) - ALWAYS ENABLED
-            asyncio.create_task(self._trigger_logging_hooks_async(
-                {"error": str(e), "error_type": type(e).__name__},
-                "analysis_failed",
-                content,
-                task
-            ))
+            asyncio.create_task(
+                self._trigger_logging_hooks_async(
+                    {"error": str(e), "error_type": type(e).__name__},
+                    "analysis_failed",
+                    content,
+                    task,
+                )
+            )
 
             logger.error("AI analysis failed", agent=self.name, error=str(e))
             raise
@@ -277,23 +286,31 @@ class BaseAgent(ABC):
             result = await self.ai_service.generate(prompt, **kwargs)
 
             # Automatic async logging of AI response (success case) - ALWAYS ENABLED
-            asyncio.create_task(self._trigger_logging_hooks_async(result, "generation", prompt, "content_generation"))
+            asyncio.create_task(
+                self._trigger_logging_hooks_async(
+                    result, "generation", prompt, "content_generation"
+                )
+            )
 
             return result
 
         except Exception as e:
             # Automatic async logging of AI failure (error case) - ALWAYS ENABLED
-            asyncio.create_task(self._trigger_logging_hooks_async(
-                {"error": str(e), "error_type": type(e).__name__},
-                "generation_failed",
-                prompt,
-                "content_generation"
-            ))
+            asyncio.create_task(
+                self._trigger_logging_hooks_async(
+                    {"error": str(e), "error_type": type(e).__name__},
+                    "generation_failed",
+                    prompt,
+                    "content_generation",
+                )
+            )
 
             logger.error("AI generation failed", agent=self.name, error=str(e))
             raise
 
-    async def _log_ai_analysis_completion(self, task: str, content: str, result: Dict[str, Any]):
+    async def _log_ai_analysis_completion(
+        self, task: str, content: str, result: Dict[str, Any]
+    ):
         """Log successful AI analysis at agent level."""
         try:
             summary = f"""## 🤖 Agent AI Analysis: {self.name}
@@ -305,8 +322,11 @@ class BaseAgent(ABC):
 """
             self.log_response_sync(summary)
         except Exception as e:
-            logger.error("Error logging agent AI analysis completion",
-                        agent=self.name, error=str(e))
+            logger.error(
+                "Error logging agent AI analysis completion",
+                agent=self.name,
+                error=str(e),
+            )
 
     async def _log_ai_analysis_error(self, task: str, content: str, error: Exception):
         """Log AI analysis error at agent level."""
@@ -320,8 +340,9 @@ class BaseAgent(ABC):
 """
             self.log_response_sync(summary)
         except Exception as e:
-            logger.error("Error logging agent AI analysis error",
-                        agent=self.name, error=str(e))
+            logger.error(
+                "Error logging agent AI analysis error", agent=self.name, error=str(e)
+            )
 
     async def _log_ai_generation_completion(self, prompt: str, result: str):
         """Log successful AI generation at agent level."""
@@ -334,8 +355,11 @@ class BaseAgent(ABC):
 """
             self.log_response_sync(summary)
         except Exception as e:
-            logger.error("Error logging agent AI generation completion",
-                        agent=self.name, error=str(e))
+            logger.error(
+                "Error logging agent AI generation completion",
+                agent=self.name,
+                error=str(e),
+            )
 
     async def _log_ai_generation_error(self, prompt: str, error: Exception):
         """Log AI generation error at agent level."""
@@ -348,8 +372,9 @@ class BaseAgent(ABC):
 """
             self.log_response_sync(summary)
         except Exception as e:
-            logger.error("Error logging agent AI generation error",
-                        agent=self.name, error=str(e))
+            logger.error(
+                "Error logging agent AI generation error", agent=self.name, error=str(e)
+            )
         """Log task completion output verbatim to REFACTORING_LOG.md."""
         try:
             # Format the actual output verbatim
@@ -380,13 +405,22 @@ class BaseAgent(ABC):
             success = await self._append_to_refactoring_log(verbatim_output)
 
             if success:
-                logger.info("Task completion output logged verbatim", agent=self.name, task=task[:50])
+                logger.info(
+                    "Task completion output logged verbatim",
+                    agent=self.name,
+                    task=task[:50],
+                )
             else:
-                logger.warning("Failed to log task completion output", agent=self.name, task=task[:50])
+                logger.warning(
+                    "Failed to log task completion output",
+                    agent=self.name,
+                    task=task[:50],
+                )
 
         except Exception as e:
-            logger.error("Error logging task completion output",
-                         agent=self.name, error=str(e))
+            logger.error(
+                "Error logging task completion output", agent=self.name, error=str(e)
+            )
 
     def _format_result_verbatim(self, result_data: Any) -> str:
         """Format result data verbatim for logging."""
@@ -410,12 +444,24 @@ class BaseAgent(ABC):
             formatted = []
             for key, value in result_data.items():
                 if isinstance(value, (list, dict)):
-                    formatted.append(f"- **{key}**: {type(value).__name__} with {len(value)} items")
+                    formatted.append(
+                        f"- **{key}**: {type(value).__name__} with {len(value)} items"
+                    )
                 else:
-                    formatted.append(f"- **{key}**: {str(value)[:100]}{'...' if len(str(value)) > 100 else ''}")
+                    formatted.append(
+                        f"- **{key}**: {str(value)[:100]}{'...' if len(str(value)) > 100 else ''}"
+                    )
             return "\n".join(formatted)
         elif isinstance(result_data, list):
-            return f"List with {len(result_data)} items:\n" + "\n".join(f"- {item}" for item in result_data[:5]) + (f"\n... and {len(result_data) - 5} more items" if len(result_data) > 5 else "")
+            return (
+                f"List with {len(result_data)} items:\n"
+                + "\n".join(f"- {item}" for item in result_data[:5])
+                + (
+                    f"\n... and {len(result_data) - 5} more items"
+                    if len(result_data) > 5
+                    else ""
+                )
+            )
         else:
             result_str = str(result_data)
             if len(result_str) > 500:
@@ -426,34 +472,51 @@ class BaseAgent(ABC):
         """Append content directly to REFACTORING_LOG.md."""
         try:
             import os
+
             # Find the project root and REFACTORING_LOG.md
             current_file = os.path.abspath(__file__)
             # Navigate up: .opencode/src/strray/core/agent.py -> .opencode/src/strray/core -> .opencode/src/strray -> .opencode/src -> .opencode -> project_root
-            project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(current_file)))))
-            log_file = os.path.join(project_root, '.opencode', 'REFACTORING_LOG.md')
+            project_root = os.path.dirname(
+                os.path.dirname(
+                    os.path.dirname(os.path.dirname(os.path.dirname(current_file)))
+                )
+            )
+            log_file = os.path.join(project_root, ".opencode", "REFACTORING_LOG.md")
 
-            logger.debug("Attempting to log to file", log_file=log_file, exists=os.path.exists(log_file))
+            logger.debug(
+                "Attempting to log to file",
+                log_file=log_file,
+                exists=os.path.exists(log_file),
+            )
 
             # Format the entry with proper separators
             entry = f"\n\n---\n\n{content}\n\n---\n\n_This entry was automatically logged by the StrRay Framework agent system._"
 
             # Append to the log file
-            with open(log_file, 'a', encoding='utf-8') as f:
+            with open(log_file, "a", encoding="utf-8") as f:
                 f.write(entry)
 
-            logger.debug("Successfully appended to REFACTORING_LOG.md", content_length=len(content))
+            logger.debug(
+                "Successfully appended to REFACTORING_LOG.md",
+                content_length=len(content),
+            )
             return True
 
         except Exception as e:
-            logger.error("Failed to append to REFACTORING_LOG.md", error=str(e), file=__file__)
+            logger.error(
+                "Failed to append to REFACTORING_LOG.md", error=str(e), file=__file__
+            )
             return False
 
-    async def _trigger_logging_hooks_async(self, content: Any, operation_type: str, original_input: str, task: str):
+    async def _trigger_logging_hooks_async(
+        self, content: Any, operation_type: str, original_input: str, task: str
+    ):
         """Trigger manual piping logging asynchronously for AI responses."""
         try:
             # Pipe the raw AI response content directly (not formatted) to maintain readability
             if isinstance(content, dict):
                 import json
+
                 raw_content = json.dumps(content, indent=2, ensure_ascii=False)
             else:
                 raw_content = str(content)
@@ -462,18 +525,23 @@ class BaseAgent(ABC):
             await self._execute_manual_piping_logging_async(raw_content)
 
         except Exception as e:
-            logger.warning("Failed to trigger manual piping logging async", agent=self.name, error=str(e))
+            logger.warning(
+                "Failed to trigger manual piping logging async",
+                agent=self.name,
+                error=str(e),
+            )
 
-    def _format_response_for_logging(self, content: Any, operation_type: str, original_input: str, task: str) -> str:
+    def _format_response_for_logging(
+        self, content: Any, operation_type: str, original_input: str, task: str
+    ) -> str:
         """Format AI response content for logging hooks - only the core content."""
         # Return only the raw content without any JSON wrapper or boilerplate
         if isinstance(content, dict):
             import json
+
             return json.dumps(content, indent=2, ensure_ascii=False)
         else:
             return str(content)
-
-
 
     def log_response_sync(self, content: str) -> None:
         """Synchronously log a response to the REFACTORING_LOG.md."""
@@ -483,28 +551,40 @@ class BaseAgent(ABC):
 
             # Get project root for script path
             current_file = os.path.abspath(__file__)
-            project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(current_file)))))
-            script_path = os.path.join(project_root, "scripts", "ai-response-processor.sh")
+            project_root = os.path.dirname(
+                os.path.dirname(
+                    os.path.dirname(os.path.dirname(os.path.dirname(current_file)))
+                )
+            )
+            script_path = os.path.join(
+                project_root, "scripts", "ai-response-processor.sh"
+            )
 
             # Simple, direct logging via the working script
             result = subprocess.run(
-                ['bash', script_path],
+                ["bash", script_path],
                 input=content,
                 text=True,
                 capture_output=True,
                 timeout=3,
-                cwd=project_root
+                cwd=project_root,
             )
 
             if result.returncode == 0:
-                logger.debug("Response logged successfully", agent=self.name, content_length=len(content))
+                logger.debug(
+                    "Response logged successfully",
+                    agent=self.name,
+                    content_length=len(content),
+                )
             else:
-                logger.warning("Response logging failed", agent=self.name, returncode=result.returncode)
+                logger.warning(
+                    "Response logging failed",
+                    agent=self.name,
+                    returncode=result.returncode,
+                )
 
         except Exception as e:
             logger.error("Response logging failed", agent=self.name, error=str(e))
-
-
 
     async def _execute_manual_piping_logging_async(self, content: str):
         """Execute logging via manual piping to working scripts."""
@@ -519,45 +599,54 @@ class BaseAgent(ABC):
             logger.debug("Executing manual piping logging", agent=self.name)
 
             # Get the project root to locate scripts
-            project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))))
+            project_root = os.path.dirname(
+                os.path.dirname(
+                    os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+                )
+            )
 
             # Use the working ai-response-processor.sh for automatic logging
-            script_path = os.path.join(project_root, "scripts", "ai-response-processor.sh")
+            script_path = os.path.join(
+                project_root, "scripts", "ai-response-processor.sh"
+            )
 
             if not os.path.exists(script_path):
-                logger.warning("Logging script not found", agent=self.name, path=script_path)
+                logger.warning(
+                    "Logging script not found", agent=self.name, path=script_path
+                )
                 return
 
             # Execute the logging script with piped content
             process = await asyncio.create_subprocess_exec(
-                'bash', script_path,
+                "bash",
+                script_path,
                 stdin=subprocess.PIPE,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
-                cwd=project_root
+                cwd=project_root,
             )
 
             # Pipe the formatted content to the logging script
-            stdout, stderr = await process.communicate(input=content.encode('utf-8'))
+            stdout, stderr = await process.communicate(input=content.encode("utf-8"))
 
             if process.returncode == 0:
                 logger.debug("Manual piping logging successful", agent=self.name)
             else:
-                stderr_text = stderr.decode('utf-8', errors='ignore')
-                logger.warning("Manual piping logging failed",
-                             agent=self.name,
-                             returncode=process.returncode,
-                             stderr=stderr_text)
+                stderr_text = stderr.decode("utf-8", errors="ignore")
+                logger.warning(
+                    "Manual piping logging failed",
+                    agent=self.name,
+                    returncode=process.returncode,
+                    stderr=stderr_text,
+                )
 
         except Exception as e:
             logger.error("Manual piping logging failed", agent=self.name, error=str(e))
 
-
-
-
-
     @classmethod
-    def intercept_agent_response(cls, agent_name: str, response: str, metadata: dict = None) -> str:
+    def intercept_agent_response(
+        cls, agent_name: str, response: str, metadata: dict = None
+    ) -> str:
         """Framework API: Intercept any agent response for automatic processing.
 
         Usage in external framework:
@@ -570,17 +659,24 @@ class BaseAgent(ABC):
             if response and response.strip():
                 import subprocess
                 import os
+
                 current_file = os.path.abspath(__file__)
-                project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(current_file)))))
-                script_path = os.path.join(project_root, "scripts", "ai-response-processor.sh")
+                project_root = os.path.dirname(
+                    os.path.dirname(
+                        os.path.dirname(os.path.dirname(os.path.dirname(current_file)))
+                    )
+                )
+                script_path = os.path.join(
+                    project_root, "scripts", "ai-response-processor.sh"
+                )
 
                 subprocess.run(
-                    ['bash', script_path],
+                    ["bash", script_path],
                     input=response,
                     text=True,
                     capture_output=True,
                     timeout=2,  # Shorter timeout for reliability
-                    cwd=project_root
+                    cwd=project_root,
                 )
         except Exception as e:
             logger.debug("Direct logging attempt failed", error=str(e))
@@ -595,10 +691,13 @@ class BaseAgent(ABC):
         def intercept_response(response: str) -> str:
             """Auto-log all architect responses at framework level."""
             from strray.core.agent import BaseAgent
+
             return BaseAgent.intercept_agent_response("architect", response)
 
     @classmethod
-    def create_summary(cls, summary_type: str, rich_content: str = None, **kwargs) -> str:
+    def create_summary(
+        cls, summary_type: str, rich_content: str = None, **kwargs
+    ) -> str:
         """Centralized summary creation method that automatically logs.
 
         Usage:
@@ -629,15 +728,15 @@ class BaseAgent(ABC):
             summary = rich_content
         else:
             # Create the summary based on type using templates
-            if summary_type == 'ai_analysis':
+            if summary_type == "ai_analysis":
                 summary = cls._create_ai_analysis_summary(**kwargs)
-            elif summary_type == 'error':
+            elif summary_type == "error":
                 summary = cls._create_error_summary(**kwargs)
-            elif summary_type == 'plan':
+            elif summary_type == "plan":
                 summary = cls._create_plan_summary(**kwargs)
-            elif summary_type == 'success':
+            elif summary_type == "success":
                 summary = cls._create_success_summary(**kwargs)
-            elif summary_type == 'status':
+            elif summary_type == "status":
                 summary = cls._create_status_summary(**kwargs)
             else:
                 # Generic summary
@@ -649,7 +748,14 @@ class BaseAgent(ABC):
         return summary
 
     @classmethod
-    def _create_ai_analysis_summary(cls, agent_name: str, task: str, result: str, timestamp: str, rich_content: str = None) -> str:
+    def _create_ai_analysis_summary(
+        cls,
+        agent_name: str,
+        task: str,
+        result: str,
+        timestamp: str,
+        rich_content: str = None,
+    ) -> str:
         """Create AI analysis summary with standard format or rich content."""
         if rich_content:
             return rich_content
@@ -662,7 +768,14 @@ class BaseAgent(ABC):
 """
 
     @classmethod
-    def _create_error_summary(cls, agent_name: str, task: str, error: str, timestamp: str, rich_content: str = None) -> str:
+    def _create_error_summary(
+        cls,
+        agent_name: str,
+        task: str,
+        error: str,
+        timestamp: str,
+        rich_content: str = None,
+    ) -> str:
         """Create error summary with standard format or rich content."""
         if rich_content:
             return rich_content
@@ -675,11 +788,18 @@ class BaseAgent(ABC):
 """
 
     @classmethod
-    def _create_plan_summary(cls, plan_type: str, objective: str, steps: list, expected_result: str, rich_content: str = None) -> str:
+    def _create_plan_summary(
+        cls,
+        plan_type: str,
+        objective: str,
+        steps: list,
+        expected_result: str,
+        rich_content: str = None,
+    ) -> str:
         """Create plan summary with standard format or rich content."""
         if rich_content:
             return rich_content
-        steps_formatted = '\n'.join(f"{i+1}. {step}" for i, step in enumerate(steps))
+        steps_formatted = "\n".join(f"{i+1}. {step}" for i, step in enumerate(steps))
         return f"""## 📋 {plan_type} Plan
 
 **Objective**: {objective}
@@ -689,14 +809,21 @@ class BaseAgent(ABC):
 """
 
     @classmethod
-    def _create_success_summary(cls, achievement_type: str, sections: dict, key_metric: str = None, value: str = None, rich_content: str = None) -> str:
+    def _create_success_summary(
+        cls,
+        achievement_type: str,
+        sections: dict,
+        key_metric: str = None,
+        value: str = None,
+        rich_content: str = None,
+    ) -> str:
         """Create success summary with standard format or rich content."""
         if rich_content:
             # Use rich content directly if provided
             return rich_content
 
         # Fallback to standard format
-        sections_formatted = '\n'.join(f"### {k}\n{v}" for k, v in sections.items())
+        sections_formatted = "\n".join(f"### {k}\n{v}" for k, v in sections.items())
         metric_line = f"\n**{key_metric}**: {value}" if key_metric and value else ""
         return f"""## ✅ {achievement_type}
 
@@ -704,11 +831,19 @@ class BaseAgent(ABC):
 """
 
     @classmethod
-    def _create_status_summary(cls, status_type: str, subject: str, status_desc: str, mechanism: str, sections: dict, rich_content: str = None) -> str:
+    def _create_status_summary(
+        cls,
+        status_type: str,
+        subject: str,
+        status_desc: str,
+        mechanism: str,
+        sections: dict,
+        rich_content: str = None,
+    ) -> str:
         """Create status summary with standard format or rich content."""
         if rich_content:
             return rich_content
-        sections_formatted = '\n'.join(f"### {k}\n{v}" for k, v in sections.items())
+        sections_formatted = "\n".join(f"### {k}\n{v}" for k, v in sections.items())
         return f"""## 🎯 {status_type}: {subject}
 
 **Status**: ✅ {status_desc}
@@ -717,19 +852,21 @@ class BaseAgent(ABC):
 """
 
     @classmethod
-    def _create_generic_summary(cls, summary_type: str, rich_content: str = None, **kwargs) -> str:
+    def _create_generic_summary(
+        cls, summary_type: str, rich_content: str = None, **kwargs
+    ) -> str:
         """Create generic summary for unsupported types."""
         if rich_content:
             return rich_content
         emoji_map = {
-            'analysis': '🔍',
-            'implementation': '🚀',
-            'data': '📊',
-            'documentation': '📝',
-            'warning': '⚠️'
+            "analysis": "🔍",
+            "implementation": "🚀",
+            "data": "📊",
+            "documentation": "📝",
+            "warning": "⚠️",
         }
-        emoji = emoji_map.get(summary_type, '📋')
-        content = '\n'.join(f"**{k}**: {v}" for k, v in kwargs.items())
+        emoji = emoji_map.get(summary_type, "📋")
+        content = "\n".join(f"**{k}**: {v}" for k, v in kwargs.items())
         return f"""## {emoji} {summary_type.title()} Summary
 
 {content}
@@ -747,15 +884,17 @@ class BaseAgent(ABC):
         """
         # Mark as deprecated but still functional for backward compatibility
         import warnings
+
         warnings.warn(
             "BaseAgent.log_response() is deprecated. Use BaseAgent.create_summary() for automatic logging.",
             DeprecationWarning,
-            stacklevel=2
+            stacklevel=2,
         )
 
         # Create a minimal agent instance for logging
         try:
             from strray.config.manager import ConfigManager
+
             config = ConfigManager()
             agent = cls("logging_agent", config)
             agent.log_response_sync(response)
@@ -763,12 +902,26 @@ class BaseAgent(ABC):
             # Fallback: direct script call
             import subprocess
             import os
+
             current_file = os.path.abspath(__file__)
-            project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(current_file)))))
-            script_path = os.path.join(project_root, "scripts", "ai-response-processor.sh")
+            project_root = os.path.dirname(
+                os.path.dirname(
+                    os.path.dirname(os.path.dirname(os.path.dirname(current_file)))
+                )
+            )
+            script_path = os.path.join(
+                project_root, "scripts", "ai-response-processor.sh"
+            )
 
             try:
-                subprocess.run([['bash', script_path]], input=response, text=True, capture_output=True, timeout=3, cwd=project_root)
+                subprocess.run(
+                    [["bash", script_path]],
+                    input=response,
+                    text=True,
+                    capture_output=True,
+                    timeout=3,
+                    cwd=project_root,
+                )
             except Exception:
                 pass  # Silent failure for static method
 
@@ -836,7 +989,9 @@ class BaseAgent(ABC):
 
             # Execute task
             self.current_state = AgentState.RUNNING
-            logger.info("Agent execution started", agent=self.name, task=validated_task[:50])
+            logger.info(
+                "Agent execution started", agent=self.name, task=validated_task[:50]
+            )
 
             # Monitor performance
             start_exec = time.perf_counter()
@@ -847,7 +1002,7 @@ class BaseAgent(ABC):
                 f"agent.{self.name}.execution",
                 exec_duration,
                 "seconds",
-                {"task": validated_task[:50]}
+                {"task": validated_task[:50]},
             )
 
             # Save final state
@@ -862,7 +1017,10 @@ class BaseAgent(ABC):
                 success=True,
                 data=result_data,
                 duration=duration,
-                metadata={"task": validated_task, "capabilities_used": self.capabilities}
+                metadata={
+                    "task": validated_task,
+                    "capabilities_used": self.capabilities,
+                },
             )
 
             # Codex post-validation (error prevention metrics)
@@ -881,7 +1039,7 @@ class BaseAgent(ABC):
                         f"codex.{self.name}.post_execution_violations",
                         post_validation["violations_count"],
                         "count",
-                        {"critical_count": post_validation["critical_violations"]}
+                        {"critical_count": post_validation["critical_violations"]},
                     )
 
             # Task completed successfully - process through response interceptor for auto-logging
@@ -890,7 +1048,11 @@ class BaseAgent(ABC):
             # Trigger automatic logging for ALL responses - ALWAYS ENABLED
             # Always log all result data as strings to ensure comprehensive logging
             result_str = str(processed_result)
-            asyncio.create_task(self._trigger_logging_hooks_async(result_str, "task_completion", validated_task, "agent_response"))
+            asyncio.create_task(
+                self._trigger_logging_hooks_async(
+                    result_str, "task_completion", validated_task, "agent_response"
+                )
+            )
 
             logger.info("Agent execution completed", agent=self.name, duration=duration)
             return result
@@ -904,7 +1066,7 @@ class BaseAgent(ABC):
                 f"agent.{self.name}.error_duration",
                 duration,
                 "seconds",
-                {"error_type": type(e).__name__}
+                {"error_type": type(e).__name__},
             )
 
             logger.error("Agent execution failed", agent=self.name, error=str(e))
@@ -915,7 +1077,10 @@ class BaseAgent(ABC):
                 success=False,
                 error=str(e),
                 duration=duration,
-                metadata={"task": validated_task if 'validated_task' in locals() else task, "failure_point": "execution"}
+                metadata={
+                    "task": validated_task if "validated_task" in locals() else task,
+                    "failure_point": "execution",
+                },
             )
 
             return result
@@ -926,17 +1091,19 @@ class BaseAgent(ABC):
         """Execute the specific agent task - base implementation delegates to AI service."""
         try:
             # Default implementation: delegate to AI service
-            if hasattr(self.ai_service, 'execute_task'):
+            if hasattr(self.ai_service, "execute_task"):
                 return await self.ai_service.execute_task(task, **kwargs)
             else:
                 # Fallback: treat as analysis task
                 return await self.analyze_with_ai(
-                    kwargs.get('content', ''),
+                    kwargs.get("content", ""),
                     task,
-                    **{k: v for k, v in kwargs.items() if k != 'content'}
+                    **{k: v for k, v in kwargs.items() if k != "content"},
                 )
         except Exception as e:
-            logger.error("Task execution failed", agent=self.name, task=task, error=str(e))
+            logger.error(
+                "Task execution failed", agent=self.name, task=task, error=str(e)
+            )
             raise
 
     async def send_message(
@@ -945,7 +1112,7 @@ class BaseAgent(ABC):
         message_type: str,
         content: Any,
         correlation_id: Optional[str] = None,
-        metadata: Optional[Dict[str, Any]] = None
+        metadata: Optional[Dict[str, Any]] = None,
     ) -> None:
         """Send a message to another agent via the communication bus."""
         # Auto-log string content sent via communication bus
@@ -958,7 +1125,7 @@ class BaseAgent(ABC):
                 message_type=message_type,
                 content=processed_content,
                 correlation_id=correlation_id,
-                metadata=metadata
+                metadata=metadata,
             )
         else:
             logger.warning("No communication bus available", agent=self.name)
@@ -969,7 +1136,7 @@ class BaseAgent(ABC):
         content: Any,
         exclude_self: bool = True,
         correlation_id: Optional[str] = None,
-        metadata: Optional[Dict[str, Any]] = None
+        metadata: Optional[Dict[str, Any]] = None,
     ) -> None:
         """Broadcast a message to all agents."""
         if self.communication_bus:
@@ -979,7 +1146,7 @@ class BaseAgent(ABC):
                 content=content,
                 exclude_self=exclude_self,
                 correlation_id=correlation_id,
-                metadata=metadata
+                metadata=metadata,
             )
         else:
             logger.warning("No communication bus available", agent=self.name)
@@ -995,7 +1162,7 @@ class BaseAgent(ABC):
             recipient=target_agent,
             message_type="status_request",
             content={},
-            correlation_id=correlation_id
+            correlation_id=correlation_id,
         )
 
         # In a real implementation, we'd wait for the response
@@ -1003,10 +1170,7 @@ class BaseAgent(ABC):
         return None
 
     async def delegate_task(
-        self,
-        target_agent: str,
-        task: str,
-        **kwargs
+        self, target_agent: str, task: str, **kwargs
     ) -> Optional[Any]:
         """Delegate a task to another agent."""
         if not self.communication_bus:
@@ -1018,7 +1182,7 @@ class BaseAgent(ABC):
             recipient=target_agent,
             message_type="task_request",
             content={"task": task, "kwargs": kwargs},
-            correlation_id=correlation_id
+            correlation_id=correlation_id,
         )
 
         # In a real implementation, we'd wait for the response
@@ -1215,22 +1379,25 @@ class BaseAgent(ABC):
             }
         """
         if not self.codex_enabled or not self.codex_loader.is_loaded:
-            return {"compliant": True, "violations": [], "violations_count": 0, "critical_violations": 0}
+            return {
+                "compliant": True,
+                "violations": [],
+                "violations_count": 0,
+                "critical_violations": 0,
+            }
 
         is_compliant, violations = self.codex_loader.validate_compliance(
             code_or_action, relevant_terms
         )
 
-        critical_violations = sum(
-            1 for v in violations if v.get("severity") == "high"
-        )
+        critical_violations = sum(1 for v in violations if v.get("severity") == "high")
 
         if not is_compliant:
             self._performance_monitor.record_metric(
                 f"codex.{self.name}.validation_failures",
                 len(violations),
                 "count",
-                {"critical_violations": critical_violations}
+                {"critical_violations": critical_violations},
             )
 
         return {
@@ -1270,9 +1437,7 @@ class BaseAgent(ABC):
         logger.debug("Action passed zero-tolerance validation", action=action[:50])
 
         self._performance_monitor.record_metric(
-            f"codex.{self.name}.validations_passed",
-            1,
-            "count"
+            f"codex.{self.name}.validations_passed", 1, "count"
         )
 
     async def execute_with_codex_context(
@@ -1340,7 +1505,7 @@ class BaseAgent(ABC):
                 f"codex.{self.name}.blocked_violations",
                 1,
                 "count",
-                {"term_id": e.term_id, "term_title": e.term_title}
+                {"term_id": e.term_id, "term_title": e.term_title},
             )
 
             return AgentResult(
@@ -1365,7 +1530,12 @@ class BaseAgent(ABC):
     async def handle_message(self, message: Any) -> None:
         """Handle incoming messages from other agents."""
         # Default message handling - can be overridden by subclasses
-        logger.info("Received message", agent=self.name, sender=message.sender, type=message.message_type)
+        logger.info(
+            "Received message",
+            agent=self.name,
+            sender=message.sender,
+            type=message.message_type,
+        )
 
         # Basic coordination responses
         if message.message_type == "ping":
@@ -1373,7 +1543,7 @@ class BaseAgent(ABC):
                 recipient=message.sender,
                 message_type="pong",
                 content={"status": "ok", "timestamp": message.timestamp.isoformat()},
-                correlation_id=message.correlation_id
+                correlation_id=message.correlation_id,
             )
 
         elif message.message_type == "status_request":
@@ -1382,7 +1552,7 @@ class BaseAgent(ABC):
                 recipient=message.sender,
                 message_type="status_response",
                 content=status,
-                correlation_id=message.correlation_id
+                correlation_id=message.correlation_id,
             )
 
         elif message.message_type == "state_sync_request":
@@ -1392,14 +1562,18 @@ class BaseAgent(ABC):
                 recipient=message.sender,
                 message_type="state_sync_response",
                 content=state,
-                correlation_id=message.correlation_id
+                correlation_id=message.correlation_id,
             )
 
         elif message.message_type == "state_update":
             # Receive state update from another agent
             if message.content:
                 await self._restore_agent_state(message.content)
-                logger.info("State synchronized from agent", agent=self.name, from_agent=message.sender)
+                logger.info(
+                    "State synchronized from agent",
+                    agent=self.name,
+                    from_agent=message.sender,
+                )
 
     async def synchronize_state(self, target_agent: str) -> None:
         """Synchronize state with another agent."""
@@ -1411,18 +1585,24 @@ class BaseAgent(ABC):
             recipient=target_agent,
             message_type="state_sync_request",
             content={},
-            correlation_id=correlation_id
+            correlation_id=correlation_id,
         )
 
     def get_status(self) -> Dict[str, Any]:
         """Get agent status information."""
         return {
             "name": self.name,
-            "state": self.current_state.value if hasattr(self.current_state, 'value') else str(self.current_state),
+            "state": (
+                self.current_state.value
+                if hasattr(self.current_state, "value")
+                else str(self.current_state)
+            ),
             "capabilities": self.capabilities,
             "model": self.model,
             "temperature": self.temperature,
-            "active_session": getattr(self.context, 'session_id', None) if self.context else None,
+            "active_session": (
+                getattr(self.context, "session_id", None) if self.context else None
+            ),
             "running_tasks": len(self._running_tasks),
             "communication_enabled": self.communication_bus is not None,
         }

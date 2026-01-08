@@ -59,12 +59,14 @@ The StrRay Framework supports multiple deployment strategies for enterprise envi
 ### System Requirements
 
 #### Minimum Requirements
+
 - **Node.js**: 18.0.0 or higher
 - **Memory**: 2GB RAM
 - **Storage**: 5GB available disk space
 - **Network**: Stable internet connection
 
 #### Recommended for Production
+
 - **Node.js**: 18.17.0+ LTS
 - **Memory**: 4GB RAM per instance
 - **Storage**: 20GB SSD storage
@@ -74,6 +76,7 @@ The StrRay Framework supports multiple deployment strategies for enterprise envi
 ### Software Dependencies
 
 #### Required Packages
+
 ```bash
 # oh-my-opencode framework
 npm install -g oh-my-opencode
@@ -86,6 +89,7 @@ npm install -g oh-my-opencode
 ```
 
 #### Optional Dependencies
+
 ```bash
 # Prometheus monitoring
 # Install from https://prometheus.io/docs/prometheus/latest/installation/
@@ -100,12 +104,14 @@ kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/
 ### Network Requirements
 
 #### Inbound Ports
+
 - **80/443**: HTTP/HTTPS traffic
 - **3000**: Framework API (internal)
 - **9090**: Prometheus metrics (monitoring)
 - **9093**: Alertmanager (alerting)
 
 #### Outbound Connectivity
+
 - **oh-my-opencode API**: For model routing and agent coordination
 - **External APIs**: For plugin ecosystem and integrations
 - **Monitoring Services**: For metrics export and alerting
@@ -117,6 +123,7 @@ kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/
 ### Quick Start Setup
 
 1. **Clone and Install**
+
 ```bash
 git clone https://github.com/strray-framework/stringray.git
 cd stringray
@@ -124,6 +131,7 @@ npm install
 ```
 
 2. **Configure oh-my-opencode**
+
 ```json
 // .opencode/oh-my-opencode.json
 {
@@ -148,12 +156,14 @@ npm install
 ```
 
 3. **Build and Start**
+
 ```bash
 npm run build
 npm start
 ```
 
 4. **Verify Installation**
+
 ```bash
 curl http://localhost:3000/api/status
 ```
@@ -161,6 +171,7 @@ curl http://localhost:3000/api/status
 ### Development Environment Configuration
 
 #### Environment Variables
+
 ```bash
 # Application settings
 NODE_ENV=development
@@ -181,6 +192,7 @@ GRAFANA_ENABLED=true
 ```
 
 #### Development Tools
+
 ```bash
 # Install development dependencies
 npm install -D typescript @types/node vitest
@@ -202,6 +214,7 @@ DEBUG=strray:* npm start
 ### Single Container Deployment
 
 #### Dockerfile
+
 ```dockerfile
 FROM node:18-alpine AS base
 
@@ -245,8 +258,9 @@ CMD ["npm", "start"]
 ```
 
 #### Docker Compose Configuration
+
 ```yaml
-version: '3.8'
+version: "3.8"
 
 services:
   strray:
@@ -293,6 +307,7 @@ volumes:
 ```
 
 #### Build and Deploy
+
 ```bash
 # Build and start
 docker-compose up -d
@@ -307,6 +322,7 @@ docker-compose up -d --scale strray=3
 ### Multi-Stage Container Strategy
 
 #### Optimized Production Build
+
 ```dockerfile
 # Multi-stage build for optimized image
 FROM node:18-alpine AS deps
@@ -351,6 +367,7 @@ CMD ["node", "dist/server.js"]
 ### Basic Kubernetes Manifests
 
 #### Namespace
+
 ```yaml
 apiVersion: v1
 kind: Namespace
@@ -362,6 +379,7 @@ metadata:
 ```
 
 #### ConfigMap
+
 ```yaml
 apiVersion: v1
 kind: ConfigMap
@@ -385,6 +403,7 @@ data:
 ```
 
 #### Secret
+
 ```yaml
 apiVersion: v1
 kind: Secret
@@ -398,6 +417,7 @@ data:
 ```
 
 #### Deployment
+
 ```yaml
 apiVersion: apps/v1
 kind: Deployment
@@ -417,54 +437,55 @@ spec:
         app: strray
     spec:
       containers:
-      - name: strray
-        image: strray/strray:latest
-        ports:
-        - containerPort: 3000
-          name: http
-        env:
-        - name: NODE_ENV
-          value: "production"
-        - name: OPENAI_API_KEY
-          valueFrom:
-            secretKeyRef:
-              name: strray-secrets
-              key: openai-api-key
-        - name: DATABASE_URL
-          valueFrom:
-            secretKeyRef:
-              name: strray-secrets
-              key: database-url
-        volumeMounts:
-        - name: config
-          mountPath: /app/config
-          readOnly: true
-        livenessProbe:
-          httpGet:
-            path: /api/status
-            port: http
-          initialDelaySeconds: 30
-          periodSeconds: 10
-        readinessProbe:
-          httpGet:
-            path: /api/status
-            port: http
-          initialDelaySeconds: 5
-          periodSeconds: 5
-        resources:
-          requests:
-            memory: "512Mi"
-            cpu: "250m"
-          limits:
-            memory: "1Gi"
-            cpu: "500m"
+        - name: strray
+          image: strray/strray:latest
+          ports:
+            - containerPort: 3000
+              name: http
+          env:
+            - name: NODE_ENV
+              value: "production"
+            - name: OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: strray-secrets
+                  key: openai-api-key
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: strray-secrets
+                  key: database-url
+          volumeMounts:
+            - name: config
+              mountPath: /app/config
+              readOnly: true
+          livenessProbe:
+            httpGet:
+              path: /api/status
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /api/status
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "1Gi"
+              cpu: "500m"
       volumes:
-      - name: config
-        configMap:
-          name: strray-config
+        - name: config
+          configMap:
+            name: strray-config
 ```
 
 #### Service
+
 ```yaml
 apiVersion: v1
 kind: Service
@@ -477,13 +498,14 @@ spec:
   selector:
     app: strray
   ports:
-  - name: http
-    port: 80
-    targetPort: 3000
+    - name: http
+      port: 80
+      targetPort: 3000
   type: ClusterIP
 ```
 
 #### Ingress
+
 ```yaml
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -495,25 +517,26 @@ metadata:
     cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
   tls:
-  - hosts:
-    - api.strray.example.com
-    secretName: strray-tls
+    - hosts:
+        - api.strray.example.com
+      secretName: strray-tls
   rules:
-  - host: api.strray.example.com
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: strray-service
-            port:
-              number: 80
+    - host: api.strray.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: strray-service
+                port:
+                  number: 80
 ```
 
 ### Advanced Kubernetes Configuration
 
 #### Horizontal Pod Autoscaler
+
 ```yaml
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
@@ -528,21 +551,22 @@ spec:
   minReplicas: 3
   maxReplicas: 10
   metrics:
-  - type: Resource
-    resource:
-      name: cpu
-      target:
-        type: Utilization
-        averageUtilization: 70
-  - type: Resource
-    resource:
-      name: memory
-      target:
-        type: Utilization
-        averageUtilization: 80
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
 ```
 
 #### Pod Disruption Budget
+
 ```yaml
 apiVersion: policy/v1
 kind: PodDisruptionBudget
@@ -557,6 +581,7 @@ spec:
 ```
 
 #### Network Policies
+
 ```yaml
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
@@ -600,9 +625,10 @@ spec:
 ### AWS Deployment
 
 #### CloudFormation Template
+
 ```yaml
-AWSTemplateFormatVersion: '2010-09-09'
-Description: 'StrRay Framework AWS Deployment'
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "StrRay Framework AWS Deployment"
 
 Parameters:
   InstanceType:
@@ -670,13 +696,13 @@ Resources:
     Properties:
       LaunchTemplate:
         LaunchTemplateId: !Ref StrRayLaunchTemplate
-        Version: '1'
-      MinSize: '2'
-      MaxSize: '10'
-      DesiredCapacity: '3'
+        Version: "1"
+      MinSize: "2"
+      MaxSize: "10"
+      DesiredCapacity: "3"
       AvailabilityZones:
-        - !Select [0, !GetAZs '']
-        - !Select [1, !GetAZs '']
+        - !Select [0, !GetAZs ""]
+        - !Select [1, !GetAZs ""]
       HealthCheckType: EC2
       HealthCheckGracePeriod: 300
 
@@ -715,6 +741,7 @@ Outputs:
 ```
 
 #### AWS Fargate Deployment
+
 ```yaml
 # ECS Fargate task definition
 {
@@ -725,38 +752,38 @@ Outputs:
   "requiresCompatibilities": ["FARGATE"],
   "cpu": "256",
   "memory": "512",
-  "containerDefinitions": [
-    {
-      "name": "strray",
-      "image": "strray/strray:latest",
-      "essential": true,
-      "portMappings": [
-        {
-          "containerPort": 3000,
-          "hostPort": 3000,
-          "protocol": "tcp"
-        }
-      ],
-      "environment": [
-        {"name": "NODE_ENV", "value": "production"},
-        {"name": "OPENAI_API_KEY", "value": "${OPENAI_API_KEY}"}
-      ],
-      "logConfiguration": {
-        "logDriver": "awslogs",
-        "options": {
-          "awslogs-group": "/ecs/strray-framework",
-          "awslogs-region": "us-east-1",
-          "awslogs-stream-prefix": "ecs"
-        }
-      }
-    }
-  ]
+  "containerDefinitions":
+    [
+      {
+        "name": "strray",
+        "image": "strray/strray:latest",
+        "essential": true,
+        "portMappings":
+          [{ "containerPort": 3000, "hostPort": 3000, "protocol": "tcp" }],
+        "environment":
+          [
+            { "name": "NODE_ENV", "value": "production" },
+            { "name": "OPENAI_API_KEY", "value": "${OPENAI_API_KEY}" },
+          ],
+        "logConfiguration":
+          {
+            "logDriver": "awslogs",
+            "options":
+              {
+                "awslogs-group": "/ecs/strray-framework",
+                "awslogs-region": "us-east-1",
+                "awslogs-stream-prefix": "ecs",
+              },
+          },
+      },
+    ],
 }
 ```
 
 ### Azure Deployment
 
 #### Azure Resource Manager Template
+
 ```json
 {
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
@@ -823,6 +850,7 @@ Outputs:
 ### Google Cloud Deployment
 
 #### Cloud Run Service
+
 ```yaml
 apiVersion: serving.knative.dev/v1
 kind: Service
@@ -837,37 +865,37 @@ spec:
         autoscaling.knative.dev/minScale: "1"
     spec:
       containers:
-      - image: gcr.io/project-id/strray:latest
-        ports:
-        - name: http1
-          containerPort: 3000
-        env:
-        - name: NODE_ENV
-          value: "production"
-        - name: OPENAI_API_KEY
-          valueFrom:
-            secretKeyRef:
-              name: strray-secrets
-              key: openai-api-key
-        resources:
-          limits:
-            cpu: 1000m
-            memory: 512Mi
-          requests:
-            cpu: 100m
-            memory: 128Mi
-        livenessProbe:
-          httpGet:
-            path: /api/status
-            port: 3000
-          initialDelaySeconds: 30
-          periodSeconds: 10
-        readinessProbe:
-          httpGet:
-            path: /api/status
-            port: 3000
-          initialDelaySeconds: 5
-          periodSeconds: 5
+        - image: gcr.io/project-id/strray:latest
+          ports:
+            - name: http1
+              containerPort: 3000
+          env:
+            - name: NODE_ENV
+              value: "production"
+            - name: OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: strray-secrets
+                  key: openai-api-key
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          livenessProbe:
+            httpGet:
+              path: /api/status
+              port: 3000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /api/status
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 5
 ```
 
 ---
@@ -877,34 +905,33 @@ spec:
 ### Multi-Region Deployment
 
 #### Global Load Balancing
+
 ```yaml
 # AWS Global Accelerator configuration
 {
-  "Accelerator": {
-    "Name": "strray-global-accelerator",
-    "IpAddressType": "IPV4",
-    "Enabled": true
-  },
-  "Listeners": [
+  "Accelerator":
     {
-      "ClientAffinity": "NONE",
-      "Protocol": "TCP",
-      "PortRanges": [
-        {
-          "FromPort": 80,
-          "ToPort": 80
-        },
-        {
-          "FromPort": 443,
-          "ToPort": 443
-        }
-      ]
-    }
-  ]
+      "Name": "strray-global-accelerator",
+      "IpAddressType": "IPV4",
+      "Enabled": true,
+    },
+  "Listeners":
+    [
+      {
+        "ClientAffinity": "NONE",
+        "Protocol": "TCP",
+        "PortRanges":
+          [
+            { "FromPort": 80, "ToPort": 80 },
+            { "FromPort": 443, "ToPort": 443 },
+          ],
+      },
+    ],
 }
 ```
 
 #### Database Replication
+
 ```yaml
 # PostgreSQL replication configuration
 postgresql:
@@ -922,6 +949,7 @@ postgresql:
 ### Disaster Recovery
 
 #### Backup Strategy
+
 ```bash
 #!/bin/bash
 # Automated backup script
@@ -947,6 +975,7 @@ find "$BACKUP_DIR" -name "*.tar.gz" -mtime +30 -delete
 ```
 
 #### Recovery Procedures
+
 ```bash
 #!/bin/bash
 # Disaster recovery script
@@ -979,6 +1008,7 @@ curl -f http://localhost:3000/api/status
 ### Prometheus Configuration
 
 #### prometheus.yml
+
 ```yaml
 global:
   scrape_interval: 15s
@@ -991,25 +1021,26 @@ alerting:
   alertmanagers:
     - static_configs:
         - targets:
-          - alertmanager:9093
+            - alertmanager:9093
 
 scrape_configs:
-  - job_name: 'strray-framework'
+  - job_name: "strray-framework"
     static_configs:
-      - targets: ['strray:3000']
-    metrics_path: '/metrics'
+      - targets: ["strray:3000"]
+    metrics_path: "/metrics"
     scrape_interval: 5s
 
-  - job_name: 'node-exporter'
+  - job_name: "node-exporter"
     static_configs:
-      - targets: ['node-exporter:9100']
+      - targets: ["node-exporter:9100"]
 
-  - job_name: 'postgres-exporter'
+  - job_name: "postgres-exporter"
     static_configs:
-      - targets: ['postgres-exporter:9187']
+      - targets: ["postgres-exporter:9187"]
 ```
 
 #### Alert Rules
+
 ```yaml
 groups:
   - name: strray
@@ -1045,6 +1076,7 @@ groups:
 ### Grafana Dashboards
 
 #### Installation
+
 ```bash
 # Add StrRay dashboard to Grafana
 curl -X POST -H "Content-Type: application/json" \
@@ -1053,6 +1085,7 @@ curl -X POST -H "Content-Type: application/json" \
 ```
 
 #### Sample Dashboard Panels
+
 ```json
 {
   "dashboard": {
@@ -1100,6 +1133,7 @@ curl -X POST -H "Content-Type: application/json" \
 ### Container Security
 
 #### Security Context
+
 ```yaml
 apiVersion: v1
 kind: Pod
@@ -1112,27 +1146,28 @@ spec:
     runAsGroup: 1001
     fsGroup: 1001
   containers:
-  - name: strray
-    image: strray/strray:latest
-    securityContext:
-      allowPrivilegeEscalation: false
-      readOnlyRootFilesystem: true
-      runAsNonRoot: true
-      runAsUser: 1001
-      capabilities:
-        drop:
-        - ALL
-    volumeMounts:
-    - name: tmp
-      mountPath: /tmp
+    - name: strray
+      image: strray/strray:latest
+      securityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        runAsNonRoot: true
+        runAsUser: 1001
+        capabilities:
+          drop:
+            - ALL
+      volumeMounts:
+        - name: tmp
+          mountPath: /tmp
   volumes:
-  - name: tmp
-    emptyDir: {}
+    - name: tmp
+      emptyDir: {}
 ```
 
 ### Network Security
 
 #### Network Policies
+
 ```yaml
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
@@ -1143,45 +1178,46 @@ spec:
     matchLabels:
       app: strray
   policyTypes:
-  - Ingress
-  - Egress
+    - Ingress
+    - Egress
   ingress:
-  - from:
-    - namespaceSelector:
-        matchLabels:
-          name: ingress-nginx
-    - podSelector:
-        matchLabels:
-          app: monitoring
-    ports:
-    - protocol: TCP
-      port: 3000
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: ingress-nginx
+        - podSelector:
+            matchLabels:
+              app: monitoring
+      ports:
+        - protocol: TCP
+          port: 3000
   egress:
-  - to:
-    - podSelector:
-        matchLabels:
-          app: database
-    ports:
-    - protocol: TCP
-      port: 5432
-  - to:
-    - podSelector:
-        matchLabels:
-          app: redis
-    ports:
-    - protocol: TCP
-      port: 6379
-  - to: []
-    ports:
-    - protocol: TCP
-      port: 443  # HTTPS for external APIs
-    - protocol: TCP
-      port: 80   # HTTP for package registries
+    - to:
+        - podSelector:
+            matchLabels:
+              app: database
+      ports:
+        - protocol: TCP
+          port: 5432
+    - to:
+        - podSelector:
+            matchLabels:
+              app: redis
+      ports:
+        - protocol: TCP
+          port: 6379
+    - to: []
+      ports:
+        - protocol: TCP
+          port: 443 # HTTPS for external APIs
+        - protocol: TCP
+          port: 80 # HTTP for package registries
 ```
 
 ### Secret Management
 
 #### Kubernetes Secrets
+
 ```yaml
 apiVersion: v1
 kind: Secret
@@ -1204,13 +1240,16 @@ data:
 ```
 
 #### AWS Secrets Manager
+
 ```typescript
-import { SecretsManager } from 'aws-sdk';
+import { SecretsManager } from "aws-sdk";
 
 const secretsManager = new SecretsManager();
 
 export async function getSecret(secretName: string): Promise<string> {
-  const response = await secretsManager.getSecretValue({ SecretId: secretName }).promise();
+  const response = await secretsManager
+    .getSecretValue({ SecretId: secretName })
+    .promise();
   return response.SecretString!;
 }
 ```
@@ -1222,9 +1261,10 @@ export async function getSecret(secretName: string): Promise<string> {
 ### Application Optimization
 
 #### Node.js Configuration
+
 ```javascript
 // Optimize for production
-process.env.NODE_ENV = 'production';
+process.env.NODE_ENV = "production";
 
 // Enable garbage collection optimization
 if (global.gc) {
@@ -1234,26 +1274,28 @@ if (global.gc) {
 }
 
 // Optimize thread pool size
-process.env.UV_THREADPOOL_SIZE = process.env.UV_THREADPOOL_SIZE || '8';
+process.env.UV_THREADPOOL_SIZE = process.env.UV_THREADPOOL_SIZE || "8";
 ```
 
 #### Memory Optimization
+
 ```typescript
 // Implement memory-efficient caching
-import NodeCache from 'node-cache';
+import NodeCache from "node-cache";
 
 // LRU cache with TTL
 const cache = new NodeCache({
-  stdTTL: 3600,    // 1 hour
+  stdTTL: 3600, // 1 hour
   checkperiod: 600, // Check every 10 minutes
-  maxKeys: 1000    // Maximum 1000 keys
+  maxKeys: 1000, // Maximum 1000 keys
 });
 
 // Memory monitoring
 setInterval(() => {
   const memUsage = process.memoryUsage();
-  if (memUsage.heapUsed > 500 * 1024 * 1024) { // 500MB
-    console.warn('High memory usage detected:', memUsage.heapUsed);
+  if (memUsage.heapUsed > 500 * 1024 * 1024) {
+    // 500MB
+    console.warn("High memory usage detected:", memUsage.heapUsed);
     if (global.gc) {
       global.gc();
     }
@@ -1264,16 +1306,17 @@ setInterval(() => {
 ### Database Optimization
 
 #### Connection Pooling
+
 ```typescript
-import { Pool } from 'pg';
+import { Pool } from "pg";
 
 const pool = new Pool({
   host: process.env.DB_HOST,
-  port: parseInt(process.env.DB_PORT || '5432'),
+  port: parseInt(process.env.DB_PORT || "5432"),
   database: process.env.DB_NAME,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
-  max: 20,        // Maximum connections
+  max: 20, // Maximum connections
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 2000,
 });
@@ -1282,10 +1325,9 @@ const pool = new Pool({
 export async function getUserById(id: number) {
   const client = await pool.connect();
   try {
-    const result = await client.query(
-      'SELECT * FROM users WHERE id = $1',
-      [id]
-    );
+    const result = await client.query("SELECT * FROM users WHERE id = $1", [
+      id,
+    ]);
     return result.rows[0];
   } finally {
     client.release();
@@ -1296,6 +1338,7 @@ export async function getUserById(id: number) {
 ### CDN Integration
 
 #### CloudFront Configuration
+
 ```yaml
 # AWS CloudFront distribution for static assets
 Resources:
@@ -1304,12 +1347,12 @@ Resources:
     Properties:
       DistributionConfig:
         Origins:
-        - DomainName: strray-api.example.com
-          Id: StrRayAPI
-          CustomOriginConfig:
-            HTTPPort: 80
-            HTTPSPort: 443
-            OriginProtocolPolicy: https-only
+          - DomainName: strray-api.example.com
+            Id: StrRayAPI
+            CustomOriginConfig:
+              HTTPPort: 80
+              HTTPSPort: 443
+              OriginProtocolPolicy: https-only
         Enabled: true
         DefaultCacheBehavior:
           TargetOriginId: StrRayAPI
@@ -1320,14 +1363,14 @@ Resources:
             Cookies:
               Forward: none
         CacheBehaviors:
-        - PathPattern: '/api/*'
-          TargetOriginId: StrRayAPI
-          ViewerProtocolPolicy: https-only
-          Compress: true
-          ForwardedValues:
-            QueryString: true
-            Cookies:
-              Forward: all
+          - PathPattern: "/api/*"
+            TargetOriginId: StrRayAPI
+            ViewerProtocolPolicy: https-only
+            Compress: true
+            ForwardedValues:
+              QueryString: true
+              Cookies:
+                Forward: all
 ```
 
 ---
@@ -1337,6 +1380,7 @@ Resources:
 ### Automated Backup Strategy
 
 #### Daily Backups
+
 ```bash
 #!/bin/bash
 # Daily backup script
@@ -1366,6 +1410,7 @@ echo "Daily backup completed: $DATE"
 ```
 
 #### Weekly Full Backups
+
 ```bash
 #!/bin/bash
 # Weekly full backup script
@@ -1394,6 +1439,7 @@ echo "Weekly backup completed: $WEEK"
 ### Recovery Procedures
 
 #### Application Recovery
+
 ```bash
 #!/bin/bash
 # Application recovery script
@@ -1423,6 +1469,7 @@ echo "Application recovery completed"
 ```
 
 #### Database Recovery
+
 ```bash
 #!/bin/bash
 # Database recovery script
@@ -1444,6 +1491,7 @@ echo "Database recovery completed"
 ### Point-in-Time Recovery
 
 #### WAL Archiving Setup
+
 ```postgresql
 -- PostgreSQL configuration for PITR
 wal_level = replica
@@ -1454,6 +1502,7 @@ recovery_target_time = '2023-12-01 12:00:00'
 ```
 
 #### Recovery Script
+
 ```bash
 #!/bin/bash
 # Point-in-time recovery script
@@ -1487,10 +1536,12 @@ echo "Point-in-time recovery initiated for: $RECOVERY_TIME"
 #### Container Won't Start
 
 **Symptoms:**
+
 - Container exits immediately
 - Logs show startup errors
 
 **Solutions:**
+
 ```bash
 # Check container logs
 docker logs <container-id>
@@ -1508,10 +1559,12 @@ docker exec <container> node -e "console.log(JSON.stringify(require('./config'),
 #### Database Connection Issues
 
 **Symptoms:**
+
 - Application logs show connection errors
 - Health checks fail
 
 **Solutions:**
+
 ```bash
 # Test database connectivity
 docker exec strray-app nc -zv database 5432
@@ -1529,10 +1582,12 @@ docker exec strray-postgres psql -U strray -d strray -c "SELECT 1;"
 #### High Memory Usage
 
 **Symptoms:**
+
 - Container restarts due to OOM
 - Performance degradation
 
 **Solutions:**
+
 ```bash
 # Monitor memory usage
 docker stats <container-id>
@@ -1550,10 +1605,12 @@ NODE_OPTIONS="--max-old-space-size=1024 --optimize-for-size" npm start
 #### Network Connectivity Issues
 
 **Symptoms:**
+
 - External API calls fail
 - Service discovery issues
 
 **Solutions:**
+
 ```bash
 # Test network connectivity
 docker exec strray-app curl -I https://api.openai.com
@@ -1571,11 +1628,13 @@ kubectl exec -it strray-pod -- curl -f http://other-service:port/api/status
 #### Performance Issues
 
 **Symptoms:**
+
 - Slow response times
 - High CPU usage
 - Database query timeouts
 
 **Solutions:**
+
 ```bash
 # Profile application performance
 docker exec strray-app node --prof dist/server.js
@@ -1594,10 +1653,12 @@ top -p $(pgrep node)
 #### SSL/TLS Issues
 
 **Symptoms:**
+
 - HTTPS connections fail
 - Certificate errors
 
 **Solutions:**
+
 ```bash
 # Check certificate validity
 openssl s_client -connect localhost:443 -servername localhost
@@ -1616,6 +1677,7 @@ kubectl describe certificate strray-tls
 ### Logging and Debugging
 
 #### Enable Debug Logging
+
 ```bash
 # Application debug logging
 DEBUG=strray:* npm start
@@ -1629,6 +1691,7 @@ kubectl describe pod <pod-name>
 ```
 
 #### Log Analysis
+
 ```bash
 # Search for error patterns
 grep -r "ERROR\|FATAL" /opt/strray/logs/
@@ -1643,6 +1706,7 @@ docker stats --format "table {{.Container}}\t{{.CPUPerc}}\t{{.MemUsage}}" --no-s
 ### Emergency Procedures
 
 #### Service Restart
+
 ```bash
 # Restart application
 docker-compose restart strray-app
@@ -1655,6 +1719,7 @@ kubectl rollout restart deployment/strray-framework
 ```
 
 #### Data Recovery
+
 ```bash
 # Restore from latest backup
 ./scripts/restore-backup.sh latest
@@ -1667,6 +1732,7 @@ kubectl rollout restart deployment/strray-framework
 ```
 
 #### Incident Response
+
 ```bash
 # Isolate affected components
 kubectl cordon <node-name>

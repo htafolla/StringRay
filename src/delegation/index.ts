@@ -8,23 +8,26 @@
  * @since 2026-01-07
  */
 
-export { ComplexityAnalyzer, complexityAnalyzer } from './complexity-analyzer';
-export { AgentDelegator, createAgentDelegator } from './agent-delegator';
-export { SessionCoordinator, createSessionCoordinator } from './session-coordinator';
+export { ComplexityAnalyzer, complexityAnalyzer } from "./complexity-analyzer";
+export { AgentDelegator, createAgentDelegator } from "./agent-delegator";
+export {
+  SessionCoordinator,
+  createSessionCoordinator,
+} from "./session-coordinator";
 
 // Re-export types
 export type {
   ComplexityMetrics,
   ComplexityScore,
-  ComplexityThresholds
-} from './complexity-analyzer';
+  ComplexityThresholds,
+} from "./complexity-analyzer";
 
 export type {
   DelegationRequest,
   DelegationResult,
   AgentCapability,
-  DelegationMetrics
-} from './agent-delegator';
+  DelegationMetrics,
+} from "./agent-delegator";
 
 export type {
   SessionContext,
@@ -32,5 +35,5 @@ export type {
   ConflictRecord,
   CoordinationState,
   Communication,
-  SessionMetrics
-} from './session-coordinator';
+  SessionMetrics,
+} from "./session-coordinator";

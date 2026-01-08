@@ -8,11 +8,11 @@
  * @since 2026-01-07
  */
 
-import { StrRayStateManager } from '../state/state-manager';
+import { StrRayStateManager } from "../state/state-manager";
 
 export interface ProcessorConfig {
   name: string;
-  type: 'pre' | 'post';
+  type: "pre" | "post";
   priority: number;
   enabled: boolean;
   timeout?: number;
@@ -29,7 +29,7 @@ export interface ProcessorResult {
 
 export interface ProcessorHealth {
   name: string;
-  status: 'healthy' | 'degraded' | 'failed';
+  status: "healthy" | "degraded" | "failed";
   lastExecution: number;
   successRate: number;
   averageDuration: number;
@@ -42,7 +42,7 @@ export interface ProcessorMetrics {
   failedExecutions: number;
   averageDuration: number;
   lastExecutionTime: number;
-  healthStatus: ProcessorHealth['status'];
+  healthStatus: ProcessorHealth["status"];
 }
 
 export class ProcessorManager {
@@ -61,21 +61,27 @@ export class ProcessorManager {
   registerProcessor(config: ProcessorConfig): void {
     // Validate processor name
     if (!config.name || config.name.trim().length === 0) {
-      throw new Error('Processor name cannot be empty');
+      throw new Error("Processor name cannot be empty");
     }
 
-    if (config.name.includes(' ') || config.name.includes('-') || config.name.includes('.')) {
-      throw new Error('Processor name must be a valid identifier (no spaces, hyphens, or dots)');
+    if (
+      config.name.includes(" ") ||
+      config.name.includes("-") ||
+      config.name.includes(".")
+    ) {
+      throw new Error(
+        "Processor name must be a valid identifier (no spaces, hyphens, or dots)",
+      );
     }
 
     // Validate processor type
-    if (config.type !== 'pre' && config.type !== 'post') {
+    if (config.type !== "pre" && config.type !== "post") {
       throw new Error('Processor type must be either "pre" or "post"');
     }
 
     // Validate priority
     if (config.priority < 0) {
-      throw new Error('Processor priority must be non-negative');
+      throw new Error("Processor priority must be non-negative");
     }
 
     if (this.processors.has(config.name)) {
@@ -89,7 +95,7 @@ export class ProcessorManager {
       failedExecutions: 0,
       averageDuration: 0,
       lastExecutionTime: 0,
-      healthStatus: 'healthy'
+      healthStatus: "healthy",
     });
 
     console.log(`✅ Processor registered: ${config.name} (${config.type})`);
@@ -114,25 +120,35 @@ export class ProcessorManager {
    * Initialize all registered processors
    */
   async initializeProcessors(): Promise<boolean> {
-    console.log('🔄 Initializing processors...');
+    console.log("🔄 Initializing processors...");
 
     const initPromises = Array.from(this.processors.values())
-      .filter(p => p.enabled)
+      .filter((p) => p.enabled)
       .map(async (config) => {
         try {
           await this.initializeProcessor(config.name);
           return { name: config.name, success: true };
         } catch (error) {
-          console.error(`❌ Failed to initialize processor ${config.name}:`, error);
-          return { name: config.name, success: false, error: error instanceof Error ? error.message : String(error) };
+          console.error(
+            `❌ Failed to initialize processor ${config.name}:`,
+            error,
+          );
+          return {
+            name: config.name,
+            success: false,
+            error: error instanceof Error ? error.message : String(error),
+          };
         }
       });
 
     const results = await Promise.all(initPromises);
-    const failures = results.filter(r => !r.success);
+    const failures = results.filter((r) => !r.success);
 
     if (failures.length > 0) {
-      console.error(`❌ Failed to initialize ${failures.length} processors:`, failures);
+      console.error(
+        `❌ Failed to initialize ${failures.length} processors:`,
+        failures,
+      );
       return false;
     }
 
@@ -151,22 +167,22 @@ export class ProcessorManager {
 
     // Initialize processor-specific setup
     switch (name) {
-      case 'preValidate':
+      case "preValidate":
         await this.initializePreValidateProcessor();
         break;
-      case 'codexCompliance':
+      case "codexCompliance":
         await this.initializeCodexComplianceProcessor();
         break;
-      case 'errorBoundary':
+      case "errorBoundary":
         await this.initializeErrorBoundaryProcessor();
         break;
-      case 'testExecution':
+      case "testExecution":
         await this.initializeTestExecutionProcessor();
         break;
-      case 'regressionTesting':
+      case "regressionTesting":
         await this.initializeRegressionTestingProcessor();
         break;
-      case 'stateValidation':
+      case "stateValidation":
         await this.initializeStateValidationProcessor();
         break;
       default:
@@ -180,20 +196,28 @@ export class ProcessorManager {
   /**
    * Execute pre-processors for a given operation
    */
-  async executePreProcessors(operation: string, data: any): Promise<ProcessorResult[]> {
+  async executePreProcessors(
+    operation: string,
+    data: any,
+  ): Promise<ProcessorResult[]> {
     const preProcessors = Array.from(this.processors.values())
-      .filter(p => p.type === 'pre' && p.enabled)
+      .filter((p) => p.type === "pre" && p.enabled)
       .sort((a, b) => a.priority - b.priority);
 
     const results: ProcessorResult[] = [];
 
     for (const config of preProcessors) {
-      const result = await this.executeProcessor(config.name, { operation, data });
+      const result = await this.executeProcessor(config.name, {
+        operation,
+        data,
+      });
       results.push(result);
 
       // Log failures but continue execution for graceful error handling
       if (!result.success) {
-        console.warn(`⚠️ Pre-processor ${config.name} failed, continuing with other processors`);
+        console.warn(
+          `⚠️ Pre-processor ${config.name} failed, continuing with other processors`,
+        );
       }
     }
 
@@ -203,15 +227,23 @@ export class ProcessorManager {
   /**
    * Execute post-processors for a given operation
    */
-  async executePostProcessors(operation: string, data: any, preResults: ProcessorResult[]): Promise<ProcessorResult[]> {
+  async executePostProcessors(
+    operation: string,
+    data: any,
+    preResults: ProcessorResult[],
+  ): Promise<ProcessorResult[]> {
     const postProcessors = Array.from(this.processors.values())
-      .filter(p => p.type === 'post' && p.enabled)
+      .filter((p) => p.type === "post" && p.enabled)
       .sort((a, b) => a.priority - b.priority);
 
     const results: ProcessorResult[] = [];
 
     for (const config of postProcessors) {
-      const result = await this.executeProcessor(config.name, { operation, data, preResults });
+      const result = await this.executeProcessor(config.name, {
+        operation,
+        data,
+        preResults,
+      });
       results.push(result);
 
       // Continue execution even if post-processors fail
@@ -226,7 +258,10 @@ export class ProcessorManager {
   /**
    * Execute a specific processor
    */
-  private async executeProcessor(name: string, context: any): Promise<ProcessorResult> {
+  private async executeProcessor(
+    name: string,
+    context: any,
+  ): Promise<ProcessorResult> {
     const config = this.processors.get(name);
     if (!config) {
       throw new Error(`Processor ${name} not found`);
@@ -239,22 +274,22 @@ export class ProcessorManager {
       let result: any;
 
       switch (name) {
-        case 'preValidate':
+        case "preValidate":
           result = await this.executePreValidate(context);
           break;
-        case 'codexCompliance':
+        case "codexCompliance":
           result = await this.executeCodexCompliance(context);
           break;
-        case 'errorBoundary':
+        case "errorBoundary":
           result = await this.executeErrorBoundary(context);
           break;
-        case 'testExecution':
+        case "testExecution":
           result = await this.executeTestExecution(context);
           break;
-        case 'regressionTesting':
+        case "regressionTesting":
           result = await this.executeRegressionTesting(context);
           break;
-        case 'stateValidation':
+        case "stateValidation":
           result = await this.executeStateValidation(context);
           break;
         default:
@@ -268,9 +303,8 @@ export class ProcessorManager {
         success: true,
         data: result,
         duration,
-        processorName: name
+        processorName: name,
       };
-
     } catch (error) {
       const duration = Date.now() - startTime;
       this.updateMetrics(name, false, duration);
@@ -279,7 +313,7 @@ export class ProcessorManager {
         success: false,
         error: error instanceof Error ? error.message : String(error),
         duration,
-        processorName: name
+        processorName: name,
       };
     }
   }
@@ -287,7 +321,11 @@ export class ProcessorManager {
   /**
    * Update processor metrics
    */
-  private updateMetrics(name: string, success: boolean, duration: number): void {
+  private updateMetrics(
+    name: string,
+    success: boolean,
+    duration: number,
+  ): void {
     const metrics = this.metrics.get(name)!;
     metrics.totalExecutions++;
     metrics.lastExecutionTime = Date.now();
@@ -299,20 +337,25 @@ export class ProcessorManager {
     }
 
     // Update rolling average duration
-    const totalDuration = metrics.averageDuration * (metrics.totalExecutions - 1) + duration;
+    const totalDuration =
+      metrics.averageDuration * (metrics.totalExecutions - 1) + duration;
     metrics.averageDuration = totalDuration / metrics.totalExecutions;
 
     // Update health status
     const successRate = metrics.successfulExecutions / metrics.totalExecutions;
-    metrics.healthStatus = successRate > 0.95 ? 'healthy' :
-                          successRate > 0.80 ? 'degraded' : 'failed';
+    metrics.healthStatus =
+      successRate > 0.95
+        ? "healthy"
+        : successRate > 0.8
+          ? "degraded"
+          : "failed";
   }
 
   /**
    * Get processor health status
    */
   getProcessorHealth(): ProcessorHealth[] {
-    return Array.from(this.activeProcessors).map(name => {
+    return Array.from(this.activeProcessors).map((name) => {
       const config = this.processors.get(name)!;
       const metrics = this.metrics.get(name)!;
 
@@ -323,7 +366,7 @@ export class ProcessorManager {
         lastExecution: metrics.lastExecutionTime,
         successRate: metrics.successfulExecutions / totalExecutions,
         averageDuration: metrics.averageDuration,
-        errorCount: metrics.failedExecutions
+        errorCount: metrics.failedExecutions,
       };
     });
   }
@@ -333,10 +376,10 @@ export class ProcessorManager {
    */
   resolveProcessorConflicts(conflicts: ProcessorResult[]): ProcessorResult {
     if (conflicts.length === 0) {
-      throw new Error('No conflicts to resolve');
+      throw new Error("No conflicts to resolve");
     }
 
-    const successful = conflicts.find(c => c.success);
+    const successful = conflicts.find((c) => c.success);
     if (successful) {
       return successful;
     }
@@ -348,7 +391,7 @@ export class ProcessorManager {
    * Cleanup all processors
    */
   async cleanupProcessors(): Promise<void> {
-    console.log('🧹 Cleaning up processors...');
+    console.log("🧹 Cleaning up processors...");
 
     for (const name of this.activeProcessors) {
       try {
@@ -359,7 +402,7 @@ export class ProcessorManager {
     }
 
     this.activeProcessors.clear();
-    console.log('✅ Processor cleanup completed');
+    console.log("✅ Processor cleanup completed");
   }
 
   /**
@@ -368,22 +411,22 @@ export class ProcessorManager {
   private async cleanupProcessor(name: string): Promise<void> {
     // Processor-specific cleanup logic
     switch (name) {
-      case 'preValidate':
+      case "preValidate":
         // Cleanup pre-validate resources
         break;
-      case 'codexCompliance':
+      case "codexCompliance":
         // Cleanup codex compliance resources
         break;
-      case 'errorBoundary':
+      case "errorBoundary":
         // Cleanup error boundary resources
         break;
-      case 'testExecution':
+      case "testExecution":
         // Cleanup test execution resources
         break;
-      case 'regressionTesting':
+      case "regressionTesting":
         // Cleanup regression testing resources
         break;
-      case 'stateValidation':
+      case "stateValidation":
         // Cleanup state validation resources
         break;
     }
@@ -393,32 +436,34 @@ export class ProcessorManager {
 
   private async initializePreValidateProcessor(): Promise<void> {
     // Setup syntax checking and validation hooks
-    console.log('🔍 Initializing pre-validate processor with syntax checking...');
+    console.log(
+      "🔍 Initializing pre-validate processor with syntax checking...",
+    );
   }
 
   private async initializeCodexComplianceProcessor(): Promise<void> {
     // Setup codex compliance validation
-    console.log('📋 Initializing codex compliance processor...');
+    console.log("📋 Initializing codex compliance processor...");
   }
 
   private async initializeErrorBoundaryProcessor(): Promise<void> {
     // Setup error boundary mechanisms
-    console.log('🛡️ Initializing error boundary processor...');
+    console.log("🛡️ Initializing error boundary processor...");
   }
 
   private async initializeTestExecutionProcessor(): Promise<void> {
     // Setup automatic test execution
-    console.log('🧪 Initializing test execution processor...');
+    console.log("🧪 Initializing test execution processor...");
   }
 
   private async initializeRegressionTestingProcessor(): Promise<void> {
     // Setup regression testing mechanisms
-    console.log('🔄 Initializing regression testing processor...');
+    console.log("🔄 Initializing regression testing processor...");
   }
 
   private async initializeStateValidationProcessor(): Promise<void> {
     // Setup state validation post-operation
-    console.log('📊 Initializing state validation processor...');
+    console.log("📊 Initializing state validation processor...");
   }
 
   private async executePreValidate(context: any): Promise<any> {
@@ -427,52 +472,52 @@ export class ProcessorManager {
 
     // Basic validation
     if (!data) {
-      throw new Error('No data provided for validation');
+      throw new Error("No data provided for validation");
     }
 
     // Syntax checking (placeholder - would integrate with TypeScript compiler API)
-    if (typeof data === 'string' && data.includes('undefined')) {
-      throw new Error('Potential undefined usage detected');
+    if (typeof data === "string" && data.includes("undefined")) {
+      throw new Error("Potential undefined usage detected");
     }
 
-    return { validated: true, syntaxCheck: 'passed' };
+    return { validated: true, syntaxCheck: "passed" };
   }
 
   private async executeCodexCompliance(context: any): Promise<any> {
     const { operation } = context;
 
-    const codexTerms = this.stateManager.get('enforcement:codex_terms') || [];
+    const codexTerms = this.stateManager.get("enforcement:codex_terms") || [];
     const termsArray = Array.isArray(codexTerms) ? codexTerms : [];
 
     return {
       compliant: true,
       termsChecked: termsArray.length,
-      operation
+      operation,
     };
   }
 
   private async executeErrorBoundary(context: any): Promise<any> {
     // Setup error boundaries
-    return { boundaries: 'established' };
+    return { boundaries: "established" };
   }
 
   private async executeTestExecution(context: any): Promise<any> {
     // Execute tests automatically
-    console.log('🧪 Executing automatic tests...');
+    console.log("🧪 Executing automatic tests...");
     // Placeholder - would integrate with test runner
     return { testsExecuted: 0, passed: 0, failed: 0 };
   }
 
   private async executeRegressionTesting(context: any): Promise<any> {
     // Run regression tests
-    console.log('🔄 Running regression tests...');
+    console.log("🔄 Running regression tests...");
     // Placeholder - would integrate with regression test suite
-    return { regressions: 'checked', issues: [] };
+    return { regressions: "checked", issues: [] };
   }
 
   private async executeStateValidation(context: any): Promise<any> {
     // Validate state post-operation
-    const currentState = this.stateManager.get('session:active');
+    const currentState = this.stateManager.get("session:active");
     return { stateValid: !!currentState };
   }
 }

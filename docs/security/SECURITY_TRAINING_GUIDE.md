@@ -32,8 +32,8 @@ class AdminService {
 class SecureService {
   async performAction(user: User) {
     // Check specific permissions
-    if (!this.hasPermission(user, 'read_sensitive_data')) {
-      throw new Error('Access denied: insufficient permissions');
+    if (!this.hasPermission(user, "read_sensitive_data")) {
+      throw new Error("Access denied: insufficient permissions");
     }
     return await this.executeOperation(user);
   }
@@ -47,22 +47,22 @@ class SecureService {
 ```typescript
 // ❌ Bad: Trust-based access
 function processRequest(req: Request) {
-  const userId = req.headers['user-id']; // Trusted without validation
+  const userId = req.headers["user-id"]; // Trusted without validation
   return await processUserData(userId);
 }
 
 // ✅ Good: Validate everything
 function processRequest(req: Request) {
   // Validate input
-  const userId = req.headers['user-id'];
-  if (!userId || typeof userId !== 'string' || userId.length > 50) {
-    throw new Error('Invalid user ID');
+  const userId = req.headers["user-id"];
+  if (!userId || typeof userId !== "string" || userId.length > 50) {
+    throw new Error("Invalid user ID");
   }
 
   // Verify permissions
   const user = await authenticateUser(req);
   if (!user) {
-    throw new Error('Authentication required');
+    throw new Error("Authentication required");
   }
 
   return await processUserData(user.id);
@@ -94,30 +94,30 @@ class SecurityConfig {
 // From StrRay SecurityAuditor - comprehensive validation
 function validateInput(input: any): string {
   // Type checking
-  if (!input || typeof input !== 'string') {
-    throw new Error('Input must be a non-empty string');
+  if (!input || typeof input !== "string") {
+    throw new Error("Input must be a non-empty string");
   }
 
   // Length limits
   if (input.length > 10000) {
-    throw new Error('Input exceeds maximum length');
+    throw new Error("Input exceeds maximum length");
   }
 
   // Content validation
   const dangerousPatterns = [
-    /<script/i,  // XSS attempts
-    /\.\.\//,    // Path traversal
+    /<script/i, // XSS attempts
+    /\.\.\//, // Path traversal
     /eval\s*\(/, // Code injection
   ];
 
   for (const pattern of dangerousPatterns) {
     if (pattern.test(input)) {
-      throw new Error('Invalid input: dangerous content detected');
+      throw new Error("Invalid input: dangerous content detected");
     }
   }
 
   // Sanitize output
-  return input.replace(/[<>]/g, ''); // Basic HTML escaping
+  return input.replace(/[<>]/g, ""); // Basic HTML escaping
 }
 ```
 
@@ -135,7 +135,7 @@ class SessionManager {
     const session: SessionData = {
       userId,
       createdAt: Date.now(),
-      expiresAt: Date.now() + (24 * 60 * 60 * 1000), // 24 hours
+      expiresAt: Date.now() + 24 * 60 * 60 * 1000, // 24 hours
       ipAddress: getClientIP(),
     };
 
@@ -171,17 +171,22 @@ class SessionManager {
 ```typescript
 // Role-Based Access Control (RBAC) implementation
 enum Permission {
-  READ = 'read',
-  WRITE = 'write',
-  DELETE = 'delete',
-  ADMIN = 'admin'
+  READ = "read",
+  WRITE = "write",
+  DELETE = "delete",
+  ADMIN = "admin",
 }
 
 class AccessControl {
   private rolePermissions: Record<string, Permission[]> = {
-    'user': [Permission.READ],
-    'editor': [Permission.READ, Permission.WRITE],
-    'admin': [Permission.READ, Permission.WRITE, Permission.DELETE, Permission.ADMIN]
+    user: [Permission.READ],
+    editor: [Permission.READ, Permission.WRITE],
+    admin: [
+      Permission.READ,
+      Permission.WRITE,
+      Permission.DELETE,
+      Permission.ADMIN,
+    ],
   };
 
   hasPermission(userRole: string, requiredPermission: Permission): boolean {
@@ -192,7 +197,7 @@ class AccessControl {
   // Usage in business logic
   async deleteResource(user: User, resourceId: string) {
     if (!this.hasPermission(user.role, Permission.DELETE)) {
-      throw new Error('Access denied: delete permission required');
+      throw new Error("Access denied: delete permission required");
     }
     return await this.repository.delete(resourceId);
   }
@@ -212,21 +217,21 @@ class DataProtection {
     // Never hardcode keys - use environment variables
     this.encryptionKey = process.env.ENCRYPTION_KEY!;
     if (!this.encryptionKey) {
-      throw new Error('ENCRYPTION_KEY environment variable required');
+      throw new Error("ENCRYPTION_KEY environment variable required");
     }
   }
 
   // Encrypt sensitive data
   encryptData(data: string): string {
-    const cipher = crypto.createCipher('aes-256-cbc', this.encryptionKey);
-    let encrypted = cipher.update(data, 'utf8', 'hex');
-    encrypted += cipher.final('hex');
+    const cipher = crypto.createCipher("aes-256-cbc", this.encryptionKey);
+    let encrypted = cipher.update(data, "utf8", "hex");
+    encrypted += cipher.final("hex");
     return encrypted;
   }
 
   // Sanitize data before logging
   sanitizeForLogging(data: any): any {
-    if (typeof data === 'object' && data !== null) {
+    if (typeof data === "object" && data !== null) {
       const sanitized = { ...data };
       // Remove sensitive fields
       delete sanitized.password;
@@ -249,18 +254,18 @@ class ErrorHandler {
   // Log errors securely without exposing sensitive information
   handleError(error: Error, context: any) {
     // Log full error details internally
-    console.error('Error occurred:', {
+    console.error("Error occurred:", {
       message: error.message,
       stack: error.stack,
       context: this.sanitizeContext(context),
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
 
     // Return safe error to user
     return {
       success: false,
-      error: 'An error occurred. Please try again.',
-      code: 'INTERNAL_ERROR'
+      error: "An error occurred. Please try again.",
+      code: "INTERNAL_ERROR",
     };
   }
 
@@ -274,7 +279,7 @@ class ErrorHandler {
 }
 
 // Usage in API endpoints
-app.post('/api/user', async (req, res) => {
+app.post("/api/user", async (req, res) => {
   try {
     const result = await userService.createUser(req.body);
     res.json({ success: true, data: result });
@@ -301,7 +306,7 @@ app.post('/api/user', async (req, res) => {
   "dependencies": {
     // Use specific versions, avoid wildcards
     "express": "^4.18.2",
-    "helmet": "^7.0.0"  // Security middleware
+    "helmet": "^7.0.0" // Security middleware
   },
   "devDependencies": {
     "typescript": "^5.0.0"
@@ -322,20 +327,20 @@ class Config {
   public readonly environment: string;
 
   constructor() {
-    this.port = parseInt(process.env.PORT || '3000');
+    this.port = parseInt(process.env.PORT || "3000");
     this.databaseUrl = process.env.DATABASE_URL!;
     this.jwtSecret = process.env.JWT_SECRET!;
-    this.environment = process.env.NODE_ENV || 'development';
+    this.environment = process.env.NODE_ENV || "development";
 
     // Validate required environment variables
     if (!this.databaseUrl) {
-      throw new Error('DATABASE_URL environment variable is required');
+      throw new Error("DATABASE_URL environment variable is required");
     }
     if (!this.jwtSecret) {
-      throw new Error('JWT_SECRET environment variable is required');
+      throw new Error("JWT_SECRET environment variable is required");
     }
     if (this.jwtSecret.length < 32) {
-      throw new Error('JWT_SECRET must be at least 32 characters long');
+      throw new Error("JWT_SECRET must be at least 32 characters long");
     }
   }
 }
@@ -354,20 +359,20 @@ const config = new Config();
 ```typescript
 // Secure plugin structure
 export class SecurePlugin {
-  name = 'secure-plugin';
-  version = '1.0.0';
+  name = "secure-plugin";
+  version = "1.0.0";
 
   // Declare required permissions explicitly
   permissions = [
-    'read:files',
-    'write:temp',
+    "read:files",
+    "write:temp",
     // Avoid requesting excessive permissions
   ];
 
   async execute(context: PluginContext) {
     // Validate inputs
-    if (!context.input || typeof context.input !== 'object') {
-      throw new Error('Invalid input: expected object');
+    if (!context.input || typeof context.input !== "object") {
+      throw new Error("Invalid input: expected object");
     }
 
     // Use framework's security utilities
@@ -375,19 +380,19 @@ export class SecurePlugin {
 
     // Implement timeout protection
     const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('Operation timed out')), 30000)
+      setTimeout(() => reject(new Error("Operation timed out")), 30000),
     );
 
     try {
       const result = await Promise.race([
         this.performOperation(sanitizedInput),
-        timeoutPromise
+        timeoutPromise,
       ]);
 
       return result;
     } catch (error) {
       // Log securely
-      context.logger.error('Plugin execution failed', {
+      context.logger.error("Plugin execution failed", {
         plugin: this.name,
         error: error.message,
         // Don't log sensitive context
@@ -405,7 +410,10 @@ export class SecurePlugin {
 ```typescript
 // From StrRay Framework - session isolation
 class SessionSecurity {
-  async createSecureSession(agentId: string, permissions: string[]): Promise<string> {
+  async createSecureSession(
+    agentId: string,
+    permissions: string[],
+  ): Promise<string> {
     const sessionId = crypto.randomUUID();
 
     // Create isolated session with specific permissions
@@ -414,7 +422,7 @@ class SessionSecurity {
       agentId,
       permissions,
       createdAt: Date.now(),
-      isolationLevel: 'sandboxed', // Framework-specific security
+      isolationLevel: "sandboxed", // Framework-specific security
     };
 
     // Store in secure session store
@@ -423,12 +431,16 @@ class SessionSecurity {
     return sessionId;
   }
 
-  async validateSessionAccess(sessionId: string, requiredPermission: string): Promise<boolean> {
+  async validateSessionAccess(
+    sessionId: string,
+    requiredPermission: string,
+  ): Promise<boolean> {
     const session = await this.sessionStore.get(sessionId);
     if (!session) return false;
 
     // Check session validity
-    if (Date.now() - session.createdAt > 3600000) { // 1 hour
+    if (Date.now() - session.createdAt > 3600000) {
+      // 1 hour
       await this.sessionStore.delete(sessionId);
       return false;
     }
@@ -446,13 +458,14 @@ class SessionSecurity {
 ```typescript
 // From StrRay SecurityHeadersMiddleware
 const securityHeaders = {
-  'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self'",
-  'X-Frame-Options': 'DENY',
-  'X-XSS-Protection': '1; mode=block',
-  'X-Content-Type-Options': 'nosniff',
-  'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload',
-  'Referrer-Policy': 'strict-origin-when-cross-origin',
-  'Permissions-Policy': 'geolocation=(), microphone=(), camera=()'
+  "Content-Security-Policy":
+    "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self'",
+  "X-Frame-Options": "DENY",
+  "X-XSS-Protection": "1; mode=block",
+  "X-Content-Type-Options": "nosniff",
+  "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
+  "Referrer-Policy": "strict-origin-when-cross-origin",
+  "Permissions-Policy": "geolocation=(), microphone=(), camera=()",
 };
 
 // Apply to all responses
@@ -469,6 +482,7 @@ app.use((req, res, next) => {
 ### 1. Injection Attacks
 
 **Prevention:**
+
 - Use parameterized queries or ORMs
 - Validate and sanitize all inputs
 - Implement content security policies
@@ -476,6 +490,7 @@ app.use((req, res, next) => {
 ### 2. Broken Authentication
 
 **Prevention:**
+
 - Use secure session management
 - Implement proper password policies
 - Enable multi-factor authentication
@@ -483,6 +498,7 @@ app.use((req, res, next) => {
 ### 3. Sensitive Data Exposure
 
 **Prevention:**
+
 - Encrypt data at rest and in transit
 - Use HTTPS everywhere
 - Avoid logging sensitive information
@@ -490,6 +506,7 @@ app.use((req, res, next) => {
 ### 4. XML External Entities (XXE)
 
 **Prevention:**
+
 - Disable XML external entity processing
 - Use safe XML parsing libraries
 - Validate XML input against schemas
@@ -497,6 +514,7 @@ app.use((req, res, next) => {
 ### 5. Broken Access Control
 
 **Prevention:**
+
 - Implement role-based access control
 - Check permissions on every request
 - Use the principle of least privilege
@@ -504,6 +522,7 @@ app.use((req, res, next) => {
 ### 6. Security Misconfiguration
 
 **Prevention:**
+
 - Use secure defaults
 - Regularly audit configurations
 - Automate security checks
@@ -511,6 +530,7 @@ app.use((req, res, next) => {
 ### 7. Cross-Site Scripting (XSS)
 
 **Prevention:**
+
 - Sanitize user input
 - Use Content Security Policy
 - Escape output appropriately
@@ -518,6 +538,7 @@ app.use((req, res, next) => {
 ### 8. Insecure Deserialization
 
 **Prevention:**
+
 - Avoid deserializing untrusted data
 - Use safe deserialization libraries
 - Validate data before deserialization
@@ -525,6 +546,7 @@ app.use((req, res, next) => {
 ### 9. Vulnerable Components
 
 **Prevention:**
+
 - Keep dependencies updated
 - Use automated vulnerability scanning
 - Monitor for security advisories
@@ -532,6 +554,7 @@ app.use((req, res, next) => {
 ### 10. Insufficient Logging & Monitoring
 
 **Prevention:**
+
 - Log security-relevant events
 - Implement comprehensive monitoring
 - Set up alerting for suspicious activities
@@ -542,22 +565,24 @@ app.use((req, res, next) => {
 
 ```typescript
 // From StrRay SecurityAuditor - automated scanning
-import { securityAuditor } from './security/security-auditor';
+import { securityAuditor } from "./security/security-auditor";
 
 async function runSecurityAudit() {
-  const auditResult = await securityAuditor.auditProject('./');
+  const auditResult = await securityAuditor.auditProject("./");
 
   console.log(`Security Score: ${auditResult.score}/100`);
 
   if (auditResult.issues.length > 0) {
-    console.log('Security Issues Found:');
-    auditResult.issues.forEach(issue => {
-      console.log(`[${issue.severity.toUpperCase()}] ${issue.category}: ${issue.description}`);
+    console.log("Security Issues Found:");
+    auditResult.issues.forEach((issue) => {
+      console.log(
+        `[${issue.severity.toUpperCase()}] ${issue.category}: ${issue.description}`,
+      );
       console.log(`Recommendation: ${issue.recommendation}`);
       if (issue.cwe) {
         console.log(`CWE: ${issue.cwe}`);
       }
-      console.log('---');
+      console.log("---");
     });
   }
 

@@ -8,8 +8,6 @@
  * @since 2026-01-07
  */
 
-
-
 export interface SecurityHeadersConfig {
   enableCSP: boolean;
   enableHSTS: boolean;
@@ -39,7 +37,7 @@ export class SecurityHeadersMiddleware {
       hstsMaxAge: 31536000, // 1 year
       hstsIncludeSubdomains: true,
       hstsPreload: false,
-      ...config
+      ...config,
     };
   }
 
@@ -47,8 +45,8 @@ export class SecurityHeadersMiddleware {
    * Apply security headers to HTTP response
    */
   applySecurityHeaders(response: any): void {
-    if (!response || typeof response.setHeader !== 'function') {
-      console.warn('SecurityHeadersMiddleware: Invalid response object');
+    if (!response || typeof response.setHeader !== "function") {
+      console.warn("SecurityHeadersMiddleware: Invalid response object");
       return;
     }
 
@@ -56,7 +54,8 @@ export class SecurityHeadersMiddleware {
 
     // Content Security Policy
     if (this.config.enableCSP) {
-      headers['Content-Security-Policy'] = this.config.customCSP ||
+      headers["Content-Security-Policy"] =
+        this.config.customCSP ||
         "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'";
     }
 
@@ -64,37 +63,38 @@ export class SecurityHeadersMiddleware {
     if (this.config.enableHSTS) {
       let hstsValue = `max-age=${this.config.hstsMaxAge}`;
       if (this.config.hstsIncludeSubdomains) {
-        hstsValue += '; includeSubDomains';
+        hstsValue += "; includeSubDomains";
       }
       if (this.config.hstsPreload) {
-        hstsValue += '; preload';
+        hstsValue += "; preload";
       }
-      headers['Strict-Transport-Security'] = hstsValue;
+      headers["Strict-Transport-Security"] = hstsValue;
     }
 
     // X-Frame-Options
     if (this.config.enableFrameOptions) {
-      headers['X-Frame-Options'] = 'DENY';
+      headers["X-Frame-Options"] = "DENY";
     }
 
     // X-XSS-Protection
     if (this.config.enableXSSProtection) {
-      headers['X-XSS-Protection'] = '1; mode=block';
+      headers["X-XSS-Protection"] = "1; mode=block";
     }
 
     // X-Content-Type-Options
     if (this.config.enableContentTypeOptions) {
-      headers['X-Content-Type-Options'] = 'nosniff';
+      headers["X-Content-Type-Options"] = "nosniff";
     }
 
     // Referrer-Policy
     if (this.config.enableReferrerPolicy) {
-      headers['Referrer-Policy'] = 'strict-origin-when-cross-origin';
+      headers["Referrer-Policy"] = "strict-origin-when-cross-origin";
     }
 
     // Permissions-Policy
     if (this.config.enablePermissionsPolicy) {
-      headers['Permissions-Policy'] = 'geolocation=(), microphone=(), camera=()';
+      headers["Permissions-Policy"] =
+        "geolocation=(), microphone=(), camera=()";
     }
 
     // Set headers on response

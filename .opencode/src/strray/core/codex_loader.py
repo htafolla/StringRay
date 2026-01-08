@@ -28,7 +28,7 @@ class CodexTerm:
         title: str,
         content: str,
         category: str,
-        subsection: Optional[str] = None
+        subsection: Optional[str] = None,
     ):
         self.term_id = term_id
         self.title = title
@@ -56,6 +56,30 @@ class CodexCategory(Enum):
     ADVANCED = "Advanced Terms (31-43)"
 
 
+@dataclass
+class CodexRule:
+    """A codex rule with validation logic."""
+
+    term_id: int
+    title: str
+    description: str
+    category: str
+    severity: str = "medium"
+    automated_check: bool = True
+    dependencies: List[int] = field(default_factory=list)
+
+
+@dataclass
+class CodexComplianceResult:
+    """Result of a codex compliance check."""
+
+    term_id: Optional[int] = None
+    is_compliant: bool = True
+    violations: List[str] = field(default_factory=list)
+    recommendations: List[str] = field(default_factory=list)
+    metadata: Dict[str, Any] = field(default_factory=dict)
+
+
 class CodexViolationError(Exception):
     """Raised when a codex violation is detected."""
 
@@ -63,7 +87,9 @@ class CodexViolationError(Exception):
         self.term_id = term_id
         self.term_title = term_title
         self.message = message
-        super().__init__(f"Codex violation for term {term_id} ({term_title}): {message}")
+        super().__init__(
+            f"Codex violation for term {term_id} ({term_title}): {message}"
+        )
 
 
 class CodexLoader:
@@ -115,9 +141,13 @@ class CodexLoader:
     def _find_codex_path(self) -> Optional[Path]:
         """Find codex file in standard locations."""
         candidates = [
-            Path.cwd().parent / ".strray" / "agents_template.md",  # Project root .strray
+            Path.cwd().parent
+            / ".strray"
+            / "agents_template.md",  # Project root .strray
             Path.cwd() / ".strray" / "agents_template.md",  # Current dir .strray
-            Path(__file__).parent.parent.parent.parent / ".strray" / "agents_template.md",  # From strray/core up to project root
+            Path(__file__).parent.parent.parent.parent
+            / ".strray"
+            / "agents_template.md",  # From strray/core up to project root
             Path.home() / ".strray" / "agents_template.md",
         ]
 
@@ -164,7 +194,9 @@ class CodexLoader:
             )
 
         except Exception as e:
-            logger.error("Failed to load codex", error=str(e), path=str(self.codex_path))
+            logger.error(
+                "Failed to load codex", error=str(e), path=str(self.codex_path)
+            )
             # Keep existing cached data if load fails
 
     def _extract_version(self, content: str) -> Optional[str]:
@@ -237,7 +269,7 @@ class CodexLoader:
                 current_term_id = int(term_match.group(1))
                 current_title = term_match.group(2).strip()
                 current_content = []
-                
+
                 # Update category
                 if current_term_id <= 10:
                     current_category = CodexCategory.CORE.value
@@ -334,10 +366,7 @@ class CodexLoader:
 
         for term in self._codex_terms.values():
             # Search in title and content
-            if (
-                query_lower in term.title.lower()
-                or query_lower in term.content.lower()
-            ):
+            if query_lower in term.title.lower() or query_lower in term.content.lower():
                 matches.append(term)
 
         return matches
@@ -375,7 +404,11 @@ class CodexLoader:
         # Determine which terms to check
         terms_to_check = []
         if relevant_terms:
-            terms_to_check = [self._codex_terms[tid] for tid in relevant_terms if tid in self._codex_terms]
+            terms_to_check = [
+                self._codex_terms[tid]
+                for tid in relevant_terms
+                if tid in self._codex_terms
+            ]
         else:
             terms_to_check = list(self._codex_terms.values())
 
@@ -460,13 +493,22 @@ class CodexLoader:
 
         return keywords[:10]  # Limit to top 10 keywords
 
-    def _check_progressive_prod_ready(self, content: str, term: CodexTerm) -> Optional[Dict]:
+    def _check_progressive_prod_ready(
+        self, content: str, term: CodexTerm
+    ) -> Optional[Dict]:
         """Check for placeholder or incomplete code."""
         violations = [
-            "TODO", "FIXME", "XXX", "HACK",
-            "// placeholder", "// stub", "// fix later",
-            "# placeholder", "# stub",
-            "NotImplementedError", "pass  # TODO",
+            "TODO",
+            "FIXME",
+            "XXX",
+            "HACK",
+            "// placeholder",
+            "// stub",
+            "// fix later",
+            "# placeholder",
+            "# stub",
+            "NotImplementedError",
+            "pass  # TODO",
         ]
 
         for violation in violations:
@@ -480,12 +522,18 @@ class CodexLoader:
                 }
         return None
 
-    def _check_no_patches_boiler_stubs(self, content: str, term: CodexTerm) -> Optional[Dict]:
+    def _check_no_patches_boiler_stubs(
+        self, content: str, term: CodexTerm
+    ) -> Optional[Dict]:
         """Check for temporary patches, boilerplate, or stubs."""
         violations = [
-            "temporary patch", "temporary fix", "quick fix",
-            "boilerplate", "stub implementation",
-            "// bridge", "# bridge",
+            "temporary patch",
+            "temporary fix",
+            "quick fix",
+            "boilerplate",
+            "stub implementation",
+            "// bridge",
+            "# bridge",
         ]
 
         for violation in violations:
@@ -499,7 +547,9 @@ class CodexLoader:
                 }
         return None
 
-    def _check_no_over_engineering(self, content: str, term: CodexTerm) -> Optional[Dict]:
+    def _check_no_over_engineering(
+        self, content: str, term: CodexTerm
+    ) -> Optional[Dict]:
         """Check for over-engineering patterns."""
         # This is harder to detect automatically
         # Look for excessive abstraction layers
@@ -512,10 +562,13 @@ class CodexLoader:
             }
         return None
 
-    def _check_resolve_all_errors(self, content: str, term: CodexTerm) -> Optional[Dict]:
+    def _check_resolve_all_errors(
+        self, content: str, term: CodexTerm
+    ) -> Optional[Dict]:
         """Check for unresolved errors or improper error handling."""
         violations = [
-            "console.log", "print(",  # Debugging statements
+            "console.log",
+            "print(",  # Debugging statements
             "pass  # error",  # Ignored errors
             "except:",  # Bare except
             "except Exception:",  # Generic exception handling
@@ -532,7 +585,9 @@ class CodexLoader:
                 }
         return None
 
-    def _check_prevent_infinite_loops(self, content: str, term: CodexTerm) -> Optional[Dict]:
+    def _check_prevent_infinite_loops(
+        self, content: str, term: CodexTerm
+    ) -> Optional[Dict]:
         """Check for potential infinite loops."""
         # Look for while True or similar patterns without breaks
         if "while True" in content and "break" not in content:
@@ -556,8 +611,11 @@ class CodexLoader:
     def _check_type_safety(self, content: str, term: CodexTerm) -> Optional[Dict]:
         """Check for type safety violations."""
         violations = [
-            "any", "any(", "any[",  # Using 'any' type
-            "@ts-ignore", "@ts-expect-error",  # TypeScript ignores
+            "any",
+            "any(",
+            "any[",  # Using 'any' type
+            "@ts-ignore",
+            "@ts-expect-error",  # TypeScript ignores
         ]
 
         for violation in violations:
@@ -571,7 +629,9 @@ class CodexLoader:
                 }
         return None
 
-    def _check_separation_of_concerns(self, content: str, term: CodexTerm) -> Optional[Dict]:
+    def _check_separation_of_concerns(
+        self, content: str, term: CodexTerm
+    ) -> Optional[Dict]:
         """Check for separation of concerns violations."""
         # Hard to detect automatically, look for mixed concerns
         if "fetch" in content and ("render" in content or "display" in content):
@@ -613,11 +673,20 @@ class CodexLoader:
                 category: len(term_ids)
                 for category, term_ids in self._categories.items()
             },
-            "last_loaded": datetime.fromtimestamp(self._last_load_time, tz=timezone.utc).isoformat() if self._last_load_time > 0 else None,
+            "last_loaded": (
+                datetime.fromtimestamp(
+                    self._last_load_time, tz=timezone.utc
+                ).isoformat()
+                if self._last_load_time > 0
+                else None
+            ),
             "codex_path": str(self.codex_path) if self.codex_path else None,
             "is_loaded": self.is_loaded,
         }
 
+
+# Alias for backward compatibility
+CodexError = CodexViolationError
 
 # Singleton instance for global access
 _default_loader: Optional[CodexLoader] = None

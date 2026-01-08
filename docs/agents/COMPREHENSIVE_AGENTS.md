@@ -45,12 +45,20 @@ Include direct code modification capabilities with surgical precision.
 export const enforcer: AgentConfig = {
   name: "enforcer",
   model: "opencode/grok-code",
-  description: "StrRay Framework enforcer with error handling, performance facilities, and compliance monitoring",
+  description:
+    "StrRay Framework enforcer with error handling, performance facilities, and compliance monitoring",
   mode: "subagent",
   system: `You are the StrRay Enforcer, a specialized agent responsible for framework compliance...`,
   temperature: 0.1,
   tools: {
-    include: ["read", "grep", "lsp_*", "run_terminal_cmd", "lsp_diagnostics", "lsp_code_actions"]
+    include: [
+      "read",
+      "grep",
+      "lsp_*",
+      "run_terminal_cmd",
+      "lsp_diagnostics",
+      "lsp_code_actions",
+    ],
   },
   permission: {
     edit: "allow",
@@ -59,15 +67,16 @@ export const enforcer: AgentConfig = {
       npm: "allow",
       bun: "allow",
       eslint: "allow",
-      prettier: "allow"
-    }
-  }
+      prettier: "allow",
+    },
+  },
 };
 ```
 
 **Note**: oh-my-opencode loads agents from TypeScript files in `src/agents/`, not YAML configurations. The YAML examples shown are for documentation purposes only.
-  Search: true
-```
+Search: true
+
+````
 
 #### Conceptual Framework Capabilities
 
@@ -137,7 +146,7 @@ export const architect: AgentConfig = {
     }
   }
 };
-```
+````
 
 **Note**: oh-my-opencode loads agents from TypeScript files in `src/agents/`, not YAML configurations.
 
@@ -197,21 +206,32 @@ export const architect: AgentConfig = {
 export const orchestrator: AgentConfig = {
   name: "orchestrator",
   model: "opencode/grok-code",
-  description: "StrRay Framework orchestrator with coordination, workflow management, and multi-agent orchestration",
+  description:
+    "StrRay Framework orchestrator with coordination, workflow management, and multi-agent orchestration",
   mode: "subagent",
   system: `You are the StrRay Orchestrator, a specialized agent responsible for coordinating complex multi-agent workflows...`,
   temperature: 0.1,
   tools: {
-    include: ["read", "grep", "lsp_*", "run_terminal_cmd", "background_task", "call_omo_agent", "session_list", "session_read", "session_search"]
+    include: [
+      "read",
+      "grep",
+      "lsp_*",
+      "run_terminal_cmd",
+      "background_task",
+      "call_omo_agent",
+      "session_list",
+      "session_read",
+      "session_search",
+    ],
   },
   permission: {
     edit: "allow",
     bash: {
       git: "allow",
       npm: "allow",
-      bun: "allow"
-    }
-  }
+      bun: "allow",
+    },
+  },
 };
 ```
 
@@ -272,12 +292,21 @@ export const orchestrator: AgentConfig = {
 export const codeReviewer: AgentConfig = {
   name: "code-reviewer",
   model: "opencode/grok-code",
-  description: "StrRay Framework code reviewer with monitoring, analytics, and quality assurance capabilities",
+  description:
+    "StrRay Framework code reviewer with monitoring, analytics, and quality assurance capabilities",
   mode: "subagent",
   system: `You are the StrRay Code Reviewer, a specialized agent responsible for code quality assurance...`,
   temperature: 0.1,
   tools: {
-    include: ["read", "grep", "lsp_*", "run_terminal_cmd", "lsp_diagnostics", "lsp_code_actions", "lsp_code_action_resolve"]
+    include: [
+      "read",
+      "grep",
+      "lsp_*",
+      "run_terminal_cmd",
+      "lsp_diagnostics",
+      "lsp_code_actions",
+      "lsp_code_action_resolve",
+    ],
   },
   permission: {
     edit: "allow",
@@ -286,9 +315,9 @@ export const codeReviewer: AgentConfig = {
       npm: "allow",
       bun: "allow",
       eslint: "allow",
-      prettier: "allow"
-    }
-  }
+      prettier: "allow",
+    },
+  },
 };
 ```
 
@@ -348,12 +377,22 @@ export const codeReviewer: AgentConfig = {
 export const bugTriageSpecialist: AgentConfig = {
   name: "bug-triage-specialist",
   model: "opencode/grok-code",
-  description: "StrRay Framework bug triage specialist with systematic error investigation and surgical fixes",
+  description:
+    "StrRay Framework bug triage specialist with systematic error investigation and surgical fixes",
   mode: "subagent",
   system: `You are the StrRay Bug Triage Specialist, a specialized agent responsible for systematic error investigation...`,
   temperature: 0.1,
   tools: {
-    include: ["read", "grep", "lsp_*", "run_terminal_cmd", "ast_grep_search", "ast_grep_replace", "lsp_diagnostics", "lsp_code_actions"]
+    include: [
+      "read",
+      "grep",
+      "lsp_*",
+      "run_terminal_cmd",
+      "ast_grep_search",
+      "ast_grep_replace",
+      "lsp_diagnostics",
+      "lsp_code_actions",
+    ],
   },
   permission: {
     edit: "allow",
@@ -361,9 +400,9 @@ export const bugTriageSpecialist: AgentConfig = {
       git: "allow",
       npm: "allow",
       bun: "allow",
-      test: "allow"
-    }
-  }
+      test: "allow",
+    },
+  },
 };
 ```
 
@@ -423,12 +462,20 @@ export const bugTriageSpecialist: AgentConfig = {
 export const securityAuditor: AgentConfig = {
   name: "security-auditor",
   model: "opencode/grok-code",
-  description: "StrRay Framework security auditor with compliance monitoring and vulnerability detection",
+  description:
+    "StrRay Framework security auditor with compliance monitoring and vulnerability detection",
   mode: "subagent",
   system: `You are the StrRay Security Auditor, a specialized agent responsible for comprehensive security validation...`,
   temperature: 0.1,
   tools: {
-    include: ["read", "grep", "lsp_*", "run_terminal_cmd", "grep_app_searchGitHub", "webfetch"]
+    include: [
+      "read",
+      "grep",
+      "lsp_*",
+      "run_terminal_cmd",
+      "grep_app_searchGitHub",
+      "webfetch",
+    ],
   },
   permission: {
     edit: "allow",
@@ -437,9 +484,9 @@ export const securityAuditor: AgentConfig = {
       npm: "allow",
       bun: "allow",
       security: "allow",
-      audit: "allow"
-    }
-  }
+      audit: "allow",
+    },
+  },
 };
 ```
 
@@ -499,12 +546,22 @@ export const securityAuditor: AgentConfig = {
 export const refactorer: AgentConfig = {
   name: "refactorer",
   model: "opencode/grok-code",
-  description: "StrRay Framework refactorer with technical debt elimination and code consolidation capabilities",
+  description:
+    "StrRay Framework refactorer with technical debt elimination and code consolidation capabilities",
   mode: "subagent",
   system: `You are the StrRay Refactorer, a specialized agent responsible for technical debt elimination...`,
   temperature: 0.1,
   tools: {
-    include: ["read", "grep", "lsp_*", "run_terminal_cmd", "ast_grep_search", "ast_grep_replace", "lsp_rename", "lsp_prepare_rename"]
+    include: [
+      "read",
+      "grep",
+      "lsp_*",
+      "run_terminal_cmd",
+      "ast_grep_search",
+      "ast_grep_replace",
+      "lsp_rename",
+      "lsp_prepare_rename",
+    ],
   },
   permission: {
     edit: "allow",
@@ -512,9 +569,9 @@ export const refactorer: AgentConfig = {
       git: "allow",
       npm: "allow",
       bun: "allow",
-      test: "allow"
-    }
-  }
+      test: "allow",
+    },
+  },
 };
 ```
 
@@ -574,12 +631,13 @@ export const refactorer: AgentConfig = {
 export const testArchitect: AgentConfig = {
   name: "test-architect",
   model: "opencode/grok-code",
-  description: "StrRay Framework test architect with coverage optimization and behavioral testing capabilities",
+  description:
+    "StrRay Framework test architect with coverage optimization and behavioral testing capabilities",
   mode: "subagent",
   system: `You are the StrRay Test Architect, a specialized agent responsible for comprehensive testing strategy...`,
   temperature: 0.1,
   tools: {
-    include: ["read", "grep", "lsp_*", "run_terminal_cmd", "run_terminal_cmd"]
+    include: ["read", "grep", "lsp_*", "run_terminal_cmd", "run_terminal_cmd"],
   },
   permission: {
     edit: "allow",
@@ -588,9 +646,9 @@ export const testArchitect: AgentConfig = {
       npm: "allow",
       bun: "allow",
       test: "allow",
-      coverage: "allow"
-    }
-  }
+      coverage: "allow",
+    },
+  },
 };
 ```
 

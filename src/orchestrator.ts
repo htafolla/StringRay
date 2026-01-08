@@ -11,14 +11,14 @@
 export interface OrchestratorConfig {
   maxConcurrentTasks: number;
   taskTimeout: number;
-  conflictResolutionStrategy: 'majority_vote' | 'expert_priority' | 'consensus';
+  conflictResolutionStrategy: "majority_vote" | "expert_priority" | "consensus";
 }
 
 export interface TaskDefinition {
   id: string;
   description: string;
   subagentType: string;
-  priority?: 'high' | 'medium' | 'low';
+  priority?: "high" | "medium" | "low";
   dependencies?: string[];
 }
 
@@ -37,8 +37,8 @@ export class StrRayOrchestrator {
     this.config = {
       maxConcurrentTasks: 5,
       taskTimeout: 300000, // 5 minutes
-      conflictResolutionStrategy: 'majority_vote',
-      ...config
+      conflictResolutionStrategy: "majority_vote",
+      ...config,
     };
   }
 
@@ -48,7 +48,7 @@ export class StrRayOrchestrator {
   async executeComplexTask(
     description: string,
     tasks: TaskDefinition[],
-    sessionId?: string
+    sessionId?: string,
   ): Promise<TaskResult[]> {
     console.log(`🎯 Orchestrator: Executing complex task - ${description}`);
 
@@ -56,40 +56,49 @@ export class StrRayOrchestrator {
     const taskMap = new Map<string, TaskDefinition>();
 
     // Build task dependency graph
-    tasks.forEach(task => taskMap.set(task.id, task));
+    tasks.forEach((task) => taskMap.set(task.id, task));
 
     // Execute tasks in dependency order
     const completedTasks = new Set<string>();
 
     while (completedTasks.size < tasks.length) {
-      const executableTasks = tasks.filter(task =>
-        !completedTasks.has(task.id) &&
-        (!task.dependencies || task.dependencies.every(dep => completedTasks.has(dep)))
+      const executableTasks = tasks.filter(
+        (task) =>
+          !completedTasks.has(task.id) &&
+          (!task.dependencies ||
+            task.dependencies.every((dep) => completedTasks.has(dep))),
       );
 
       if (executableTasks.length === 0) {
-        throw new Error('Circular dependency detected or no executable tasks');
+        throw new Error("Circular dependency detected or no executable tasks");
       }
 
       // Execute tasks concurrently up to maxConcurrentTasks
-      const batchSize = Math.min(executableTasks.length, this.config.maxConcurrentTasks);
+      const batchSize = Math.min(
+        executableTasks.length,
+        this.config.maxConcurrentTasks,
+      );
       const batchTasks = executableTasks.slice(0, batchSize);
 
-      const batchPromises = batchTasks.map(task => this.executeSingleTask(task));
+      const batchPromises = batchTasks.map((task) =>
+        this.executeSingleTask(task),
+      );
 
       try {
         const batchResults = await Promise.all(batchPromises);
         results.push(...batchResults);
 
         // Mark tasks as completed
-        batchTasks.forEach(task => completedTasks.add(task.id));
+        batchTasks.forEach((task) => completedTasks.add(task.id));
       } catch (error) {
-        console.error('❌ Orchestrator: Batch execution failed:', error);
+        console.error("❌ Orchestrator: Batch execution failed:", error);
         throw error;
       }
     }
 
-    console.log(`✅ Orchestrator: Complex task completed - ${results.length} tasks executed`);
+    console.log(
+      `✅ Orchestrator: Complex task completed - ${results.length} tasks executed`,
+    );
     return results;
   }
 
@@ -100,27 +109,34 @@ export class StrRayOrchestrator {
     const startTime = Date.now();
 
     try {
-      console.log(`🔄 Orchestrator: Executing task ${task.id} with ${task.subagentType}`);
+      console.log(
+        `🔄 Orchestrator: Executing task ${task.id} with ${task.subagentType}`,
+      );
 
       // Delegate to subagent (this would integrate with the actual agent system)
       const result = await this.delegateToSubagent(task);
 
       const duration = Date.now() - startTime;
-      console.log(`✅ Orchestrator: Task ${task.id} completed in ${duration}ms`);
+      console.log(
+        `✅ Orchestrator: Task ${task.id} completed in ${duration}ms`,
+      );
 
       return {
         success: true,
         result: { ...result, id: task.id },
-        duration
+        duration,
       };
     } catch (error) {
       const duration = Date.now() - startTime;
-      console.error(`❌ Orchestrator: Task ${task.id} failed after ${duration}ms:`, error);
+      console.error(
+        `❌ Orchestrator: Task ${task.id} failed after ${duration}ms:`,
+        error,
+      );
 
       return {
         success: false,
         error: error instanceof Error ? error.message : String(error),
-        duration
+        duration,
       };
     }
   }
@@ -131,19 +147,24 @@ export class StrRayOrchestrator {
   private async delegateToSubagent(task: TaskDefinition): Promise<any> {
     // This is a placeholder - would integrate with actual agent delegation system
     // For now, simulate subagent execution
-    await new Promise(resolve => setTimeout(resolve, Math.random() * 1000 + 500));
+    await new Promise((resolve) =>
+      setTimeout(resolve, Math.random() * 1000 + 500),
+    );
 
     switch (task.subagentType) {
-      case 'explore':
-        return { type: 'exploration', data: `Explored ${task.description}` };
-      case 'librarian':
-        return { type: 'documentation', data: `Researched ${task.description}` };
-      case 'architect':
-        return { type: 'design', data: `Designed ${task.description}` };
-      case 'enforcer':
-        return { type: 'validation', data: `Enforced ${task.description}` };
+      case "explore":
+        return { type: "exploration", data: `Explored ${task.description}` };
+      case "librarian":
+        return {
+          type: "documentation",
+          data: `Researched ${task.description}`,
+        };
+      case "architect":
+        return { type: "design", data: `Designed ${task.description}` };
+      case "enforcer":
+        return { type: "validation", data: `Enforced ${task.description}` };
       default:
-        return { type: 'generic', data: `Executed ${task.description}` };
+        return { type: "generic", data: `Executed ${task.description}` };
     }
   }
 
@@ -152,11 +173,11 @@ export class StrRayOrchestrator {
    */
   resolveConflicts(conflicts: any[]): any {
     switch (this.config.conflictResolutionStrategy) {
-      case 'majority_vote':
+      case "majority_vote":
         return this.resolveByMajorityVote(conflicts);
-      case 'expert_priority':
+      case "expert_priority":
         return this.resolveByExpertPriority(conflicts);
-      case 'consensus':
+      case "consensus":
         return this.resolveByConsensus(conflicts);
       default:
         return conflicts[0];
@@ -166,31 +187,38 @@ export class StrRayOrchestrator {
   private resolveByMajorityVote(conflicts: any[]): any {
     // Find the response that appears most frequently
     const counts: Record<string, number> = {};
-    conflicts.forEach(conflict => {
+    conflicts.forEach((conflict) => {
       const response = JSON.stringify(conflict.response);
       counts[response] = (counts[response] || 0) + 1;
     });
 
-    const majorityEntry = Object.entries(counts).reduce(([keyA, countA], [keyB, countB]) =>
-      countA > countB ? [keyA, countA] : [keyB, countB]
+    const majorityEntry = Object.entries(counts).reduce(
+      ([keyA, countA], [keyB, countB]) =>
+        countA > countB ? [keyA, countA] : [keyB, countB],
     );
 
     if (majorityEntry) {
       const majorityResponse = JSON.parse(majorityEntry[0]);
-      return conflicts.find(c => JSON.stringify(c.response) === majorityEntry[0]);
+      return conflicts.find(
+        (c) => JSON.stringify(c.response) === majorityEntry[0],
+      );
     }
     return conflicts[0];
   }
 
   private resolveByExpertPriority(conflicts: any[]): any {
     // Sort by expertise score
-    return conflicts.sort((a, b) => (b.expertiseScore || 0) - (a.expertiseScore || 0))[0];
+    return conflicts.sort(
+      (a, b) => (b.expertiseScore || 0) - (a.expertiseScore || 0),
+    )[0];
   }
 
   private resolveByConsensus(conflicts: any[]): any {
     // Return the response if all are identical, otherwise undefined
     const firstResponse = conflicts[0]?.response;
-    const allSame = conflicts.every(c => JSON.stringify(c.response) === JSON.stringify(firstResponse));
+    const allSame = conflicts.every(
+      (c) => JSON.stringify(c.response) === JSON.stringify(firstResponse),
+    );
     return allSame ? conflicts[0] : undefined;
   }
 
@@ -203,7 +231,7 @@ export class StrRayOrchestrator {
   } {
     return {
       activeTasks: this.activeTasks.size,
-      config: this.config
+      config: this.config,
     };
   }
 }

@@ -35,8 +35,7 @@ class TestBaseAgentCodexIntegration:
         self.config_manager.set_value("ai_auto_log_responses", True)
 
         self.agent = BaseAgent(
-            name="test_codex_agent",
-            config_manager=self.config_manager
+            name="test_codex_agent", config_manager=self.config_manager
         )
 
         # Mock AI service for testing
@@ -77,7 +76,7 @@ class TestBaseAgentCodexIntegration:
         agent_context = {
             "communication_bus": self.agent.communication_bus,
             "state_manager_enabled": True,
-            "error_handling_enabled": True
+            "error_handling_enabled": True,
         }
 
         results = codex_loader.validate_compliance("agent", agent_context)
@@ -159,19 +158,17 @@ class TestBaseAgentCodexIntegration:
             results = loader.validate_compliance("agent", context)
             return len(rules), len(results)
 
-        test_cases = [
-            [1, 2],
-            [3, 5],
-            [15, 24],
-            [38, 39]
-        ]
+        test_cases = [[1, 2], [3, 5], [15, 24], [38, 39]]
 
         with ThreadPoolExecutor(max_workers=4) as executor:
             futures = [executor.submit(codex_operation, terms) for terms in test_cases]
             results = [f.result() for f in futures]
 
         # All operations should complete successfully
-        assert all(rules_count > 0 and results_count > 0 for rules_count, results_count in results)
+        assert all(
+            rules_count > 0 and results_count > 0
+            for rules_count, results_count in results
+        )
 
     def test_agent_codex_term_dependencies_integration(self):
         """Test codex term dependencies work with agent context."""
@@ -192,9 +189,9 @@ class TestBaseAgentCodexIntegration:
 
         # Create context based on actual agent state
         agent_context = {
-            "state_manager_enabled": hasattr(self.agent, 'state_manager'),
+            "state_manager_enabled": hasattr(self.agent, "state_manager"),
             "error_handling_enabled": True,  # Assume error handling is enabled
-            "communication_bus": self.agent.communication_bus is not None
+            "communication_bus": self.agent.communication_bus is not None,
         }
 
         results = codex_loader.validate_compliance("agent", agent_context)
@@ -292,7 +289,7 @@ class TestBaseAgentCodexIntegration:
         # Mock task execution
         task = {"id": "codex_test", "content": "test task"}
 
-        with patch.object(self.agent, '_execute_task', return_value="task_result"):
+        with patch.object(self.agent, "_execute_task", return_value="task_result"):
             context = AgentContext(session_id="test_session")
             result = asyncio.run(self.agent.execute("test task", context))
 
@@ -310,11 +307,11 @@ class TestBaseAgentCodexIntegration:
         result = results[0]
 
         # Verify result structure
-        assert hasattr(result, 'term_id')
-        assert hasattr(result, 'compliant')
-        assert hasattr(result, 'violations')
-        assert hasattr(result, 'recommendations')
-        assert hasattr(result, 'metadata')
+        assert hasattr(result, "term_id")
+        assert hasattr(result, "compliant")
+        assert hasattr(result, "violations")
+        assert hasattr(result, "recommendations")
+        assert hasattr(result, "metadata")
 
         assert isinstance(result.violations, list)
         assert isinstance(result.recommendations, list)
@@ -335,7 +332,7 @@ class TestBaseAgentCodexIntegration:
             "error_handling_enabled": True,
             "max_concurrent_agents": 5,
             "validation_enabled": True,
-            "has_error_handling": True
+            "has_error_handling": True,
         }
 
         total_results = 0
@@ -355,7 +352,7 @@ class TestBaseAgentCodexIntegration:
         problematic_context = {
             "communication_bus": None,
             "state_manager_enabled": False,
-            "invalid_field": lambda x: x  # Non-serializable
+            "invalid_field": lambda x: x,  # Non-serializable
         }
 
         # Should handle errors gracefully and continue
@@ -364,7 +361,7 @@ class TestBaseAgentCodexIntegration:
         assert len(results) == 2  # Should still return results for both terms
         # Some may fail but shouldn't crash the entire validation
 
-    @patch('strray.core.codex_loader.logger')
+    @patch("strray.core.codex_loader.logger")
     def test_agent_codex_logging_integration(self, mock_logger):
         """Test codex operations integrate with agent logging."""
         codex_loader = CodexLoader(config_manager=self.config_manager)
@@ -376,7 +373,11 @@ class TestBaseAgentCodexIntegration:
         codex_loader.validate_compliance("agent", {})
 
         # Verify logging calls were made
-        assert mock_logger.info.called or mock_logger.warning.called or mock_logger.error.called
+        assert (
+            mock_logger.info.called
+            or mock_logger.warning.called
+            or mock_logger.error.called
+        )
 
     def test_agent_codex_term_extraction_from_config(self):
         """Test extracting codex terms from configuration."""
@@ -406,7 +407,7 @@ class TestBaseAgentCodexIntegration:
             "state_manager_enabled": True,
             "error_handling_enabled": True,
             "max_concurrent_agents": 3,
-            "validation_enabled": True
+            "validation_enabled": True,
         }
 
         results = codex_loader.validate_compliance("agent", context)

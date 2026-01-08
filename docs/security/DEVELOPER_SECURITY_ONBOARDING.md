@@ -11,6 +11,7 @@
 ## 🎯 Quick Start Overview
 
 By the end of this guide, you'll be able to:
+
 - ✅ Understand StrRay's security architecture
 - ✅ Write secure code following framework patterns
 - ✅ Use security tools and run security checks
@@ -22,6 +23,7 @@ By the end of this guide, you'll be able to:
 ## 📋 Prerequisites
 
 Before starting, ensure you have:
+
 - [ ] StrRay Framework development environment set up
 - [ ] Access to the project repository
 - [ ] Node.js 18+ and npm installed
@@ -44,6 +46,7 @@ Before starting, ensure you have:
    - Study input validation and data sanitization examples
 
 **Key Takeaways:**
+
 - StrRay uses **defense in depth** with multiple security layers
 - **Secure by default** - security features are enabled automatically
 - **Zero-tolerance policy** for security issues
@@ -64,6 +67,7 @@ find src -name "*auth*" -type f
 ```
 
 **What to look for:**
+
 - Security utilities in `src/security/`
 - Authentication modules
 - Input validation helpers
@@ -89,24 +93,26 @@ npm install --save-dev strray-security-auditor
 ### 2.2 Configure Your IDE
 
 **VS Code Security Extensions:**
+
 - Install "ESLint" extension
 - Install "TypeScript Importer" extension
 - Install "Security Scanner" extension
 
 **ESLint Configuration (.eslintrc.js):**
+
 ```javascript
 module.exports = {
   extends: [
-    'eslint:recommended',
-    '@typescript-eslint/recommended',
-    'plugin:security/recommended'
+    "eslint:recommended",
+    "@typescript-eslint/recommended",
+    "plugin:security/recommended",
   ],
-  plugins: ['@typescript-eslint', 'security'],
+  plugins: ["@typescript-eslint", "security"],
   rules: {
-    'security/detect-eval-with-expression': 'error',
-    'security/detect-non-literal-regexp': 'error',
-    'security/detect-unsafe-regex': 'error'
-  }
+    "security/detect-eval-with-expression": "error",
+    "security/detect-non-literal-regexp": "error",
+    "security/detect-unsafe-regex": "error",
+  },
 };
 ```
 
@@ -126,6 +132,7 @@ npm run lint:security
 ```
 
 **Expected Output:**
+
 ```
 🔍 Security Auditor: Scanning 150 files...
 ✅ No critical security issues found
@@ -144,6 +151,7 @@ npm run lint:security
 **Task:** Implement user registration with proper validation
 
 **Starting Code:**
+
 ```typescript
 // TODO: Implement secure user registration
 function registerUser(userData: any) {
@@ -152,18 +160,22 @@ function registerUser(userData: any) {
 ```
 
 **Solution Pattern:**
+
 ```typescript
-import { InputValidator } from './security/input-validator';
+import { InputValidator } from "./security/input-validator";
 
 class UserService {
   private validator = new InputValidator();
 
   async registerUser(userData: any) {
     // Step 1: Validate input structure
-    const validation = await this.validator.validate(userData, 'userRegistration');
+    const validation = await this.validator.validate(
+      userData,
+      "userRegistration",
+    );
 
     if (!validation.isValid) {
-      throw new Error(`Validation failed: ${validation.errors.join(', ')}`);
+      throw new Error(`Validation failed: ${validation.errors.join(", ")}`);
     }
 
     // Step 2: Sanitize input
@@ -172,7 +184,7 @@ class UserService {
     // Step 3: Check for duplicates
     const existingUser = await this.checkExistingUser(sanitizedData.email);
     if (existingUser) {
-      throw new Error('User already exists');
+      throw new Error("User already exists");
     }
 
     // Step 4: Hash password securely
@@ -181,13 +193,13 @@ class UserService {
     // Step 5: Create user with audit logging
     const user = await this.createUser({
       ...sanitizedData,
-      password: hashedPassword
+      password: hashedPassword,
     });
 
     // Step 6: Log security event
-    await this.logSecurityEvent('user_registered', {
+    await this.logSecurityEvent("user_registered", {
       userId: user.id,
-      ipAddress: this.getClientIP()
+      ipAddress: this.getClientIP(),
     });
 
     return { success: true, userId: user.id };
@@ -196,6 +208,7 @@ class UserService {
 ```
 
 **Test Your Implementation:**
+
 ```bash
 # Run tests
 npm test -- --grep "registerUser"
@@ -211,9 +224,10 @@ npm run security-audit
 **Task:** Create a secure login function with proper session management
 
 **Solution Pattern:**
+
 ```typescript
-import { SessionManager } from './security/session-manager';
-import { SecurityLogger } from './security/security-logger';
+import { SessionManager } from "./security/session-manager";
+import { SecurityLogger } from "./security/security-logger";
 
 class AuthService {
   private sessionManager = new SessionManager();
@@ -223,54 +237,56 @@ class AuthService {
     try {
       // Validate input
       if (!credentials.email || !credentials.password) {
-        throw new Error('Email and password required');
+        throw new Error("Email and password required");
       }
 
       // Find user
       const user = await this.findUserByEmail(credentials.email);
       if (!user) {
         // Log failed attempt (don't reveal if user exists)
-        await this.securityLogger.logSecurityEvent('auth_failure', {
+        await this.securityLogger.logSecurityEvent("auth_failure", {
           attemptedEmail: credentials.email,
           ipAddress: this.getClientIP(),
-          reason: 'user_not_found'
+          reason: "user_not_found",
         });
-        throw new Error('Invalid credentials');
+        throw new Error("Invalid credentials");
       }
 
       // Verify password
-      const isValidPassword = await this.verifyPassword(credentials.password, user.passwordHash);
+      const isValidPassword = await this.verifyPassword(
+        credentials.password,
+        user.passwordHash,
+      );
       if (!isValidPassword) {
-        await this.securityLogger.logSecurityEvent('auth_failure', {
+        await this.securityLogger.logSecurityEvent("auth_failure", {
           userId: user.id,
           ipAddress: this.getClientIP(),
-          reason: 'invalid_password'
+          reason: "invalid_password",
         });
-        throw new Error('Invalid credentials');
+        throw new Error("Invalid credentials");
       }
 
       // Create session
       const sessionId = await this.sessionManager.createSession(user.id, {
         ipAddress: this.getClientIP(),
-        userAgent: this.getUserAgent()
+        userAgent: this.getUserAgent(),
       });
 
       // Log successful authentication
-      await this.securityLogger.logSecurityEvent('auth_success', {
+      await this.securityLogger.logSecurityEvent("auth_success", {
         userId: user.id,
         sessionId,
-        ipAddress: this.getClientIP()
+        ipAddress: this.getClientIP(),
       });
 
       return {
         success: true,
         sessionId,
-        user: this.sanitizeUserForResponse(user)
+        user: this.sanitizeUserForResponse(user),
       };
-
     } catch (error) {
       // Don't log sensitive information
-      console.error('Login failed:', error.message);
+      console.error("Login failed:", error.message);
       throw error;
     }
   }
@@ -284,41 +300,42 @@ class AuthService {
 **Task:** Implement secure error handling that doesn't leak sensitive information
 
 **Solution Pattern:**
+
 ```typescript
 class SecureErrorHandler {
   handleError(error: Error, context: any): ApiResponse {
     // Log full error details internally
-    console.error('Error occurred:', {
+    console.error("Error occurred:", {
       message: error.message,
       stack: error.stack,
       context: this.sanitizeContext(context),
       timestamp: new Date().toISOString(),
       userId: context?.userId,
-      sessionId: context?.sessionId
+      sessionId: context?.sessionId,
     });
 
     // Determine error type and appropriate response
-    if (error.message.includes('database')) {
+    if (error.message.includes("database")) {
       return {
         success: false,
-        error: 'Database temporarily unavailable',
-        code: 'DATABASE_ERROR'
+        error: "Database temporarily unavailable",
+        code: "DATABASE_ERROR",
       };
     }
 
-    if (error.message.includes('permission')) {
+    if (error.message.includes("permission")) {
       return {
         success: false,
-        error: 'Access denied',
-        code: 'ACCESS_DENIED'
+        error: "Access denied",
+        code: "ACCESS_DENIED",
       };
     }
 
     // Generic error for unknown issues
     return {
       success: false,
-      error: 'An unexpected error occurred',
-      code: 'INTERNAL_ERROR'
+      error: "An unexpected error occurred",
+      code: "INTERNAL_ERROR",
     };
   }
 
@@ -337,7 +354,7 @@ class SecureErrorHandler {
 }
 
 // Usage in API routes
-app.post('/api/user', async (req, res) => {
+app.post("/api/user", async (req, res) => {
   try {
     const result = await userService.createUser(req.body);
     res.json({ success: true, data: result });
@@ -345,11 +362,12 @@ app.post('/api/user', async (req, res) => {
     const errorResponse = errorHandler.handleError(error, {
       userId: req.user?.id,
       sessionId: req.session?.id,
-      endpoint: '/api/user',
-      method: 'POST'
+      endpoint: "/api/user",
+      method: "POST",
     });
-    res.status(errorResponse.code === 'ACCESS_DENIED' ? 403 : 500)
-       .json(errorResponse);
+    res
+      .status(errorResponse.code === "ACCESS_DENIED" ? 403 : 500)
+      .json(errorResponse);
   }
 });
 ```
@@ -374,6 +392,7 @@ npm run security-audit -- --report security-report.json
 ```
 
 **Interpret Results:**
+
 ```
 🔍 Security Auditor: Scanning 150 files...
 
@@ -392,6 +411,7 @@ npm run security-audit -- --report security-report.json
 ### 4.2 Manual Security Review
 
 **Security Checklist:**
+
 - [ ] Input validation on all user inputs
 - [ ] Authentication required for sensitive operations
 - [ ] Passwords hashed with strong algorithms
@@ -408,6 +428,7 @@ npm run security-audit -- --report security-report.json
 ### 5.1 Code Injection Vulnerabilities
 
 **Problem:**
+
 ```typescript
 // ❌ Vulnerable code
 function executeUserCode(code: string) {
@@ -416,6 +437,7 @@ function executeUserCode(code: string) {
 ```
 
 **Solution:**
+
 ```typescript
 // ✅ Secure alternative
 function executeUserCode(code: string) {
@@ -423,12 +445,12 @@ function executeUserCode(code: string) {
   const allowedPatterns = [
     /^console\.log\(.*\)$/,
     /^const \w+ = \d+$/,
-    /^const \w+ = "\w+"$/
+    /^const \w+ = "\w+"$/,
   ];
 
-  const isAllowed = allowedPatterns.some(pattern => pattern.test(code));
+  const isAllowed = allowedPatterns.some((pattern) => pattern.test(code));
   if (!isAllowed) {
-    throw new Error('Invalid code pattern');
+    throw new Error("Invalid code pattern");
   }
 
   // Use safe evaluation if necessary
@@ -439,12 +461,14 @@ function executeUserCode(code: string) {
 ### 5.2 Hardcoded Secrets
 
 **Problem:**
+
 ```typescript
 // ❌ Hardcoded secret
 const API_KEY = "sk-1234567890abcdef";
 ```
 
 **Solution:**
+
 ```typescript
 // ✅ Environment variables
 const API_KEY = process.env.API_KEY;
@@ -460,24 +484,26 @@ API_KEY=sk-1234567890abcdef
 ### 5.3 Insecure Direct Object References
 
 **Problem:**
+
 ```typescript
 // ❌ Insecure direct reference
-app.get('/user/:id', (req, res) => {
+app.get("/user/:id", (req, res) => {
   const user = getUserById(req.params.id); // Any user can access any ID
   res.json(user);
 });
 ```
 
 **Solution:**
+
 ```typescript
 // ✅ Secure access control
-app.get('/user/:id', async (req, res) => {
+app.get("/user/:id", async (req, res) => {
   const requestedUserId = req.params.id;
   const currentUserId = req.user.id;
 
   // Check if user can access this resource
   if (requestedUserId !== currentUserId && !req.user.isAdmin) {
-    return res.status(403).json({ error: 'Access denied' });
+    return res.status(403).json({ error: "Access denied" });
   }
 
   const user = await getUserById(requestedUserId);
@@ -488,21 +514,23 @@ app.get('/user/:id', async (req, res) => {
 ### 5.4 Cross-Site Scripting (XSS)
 
 **Problem:**
+
 ```typescript
 // ❌ XSS vulnerability
-app.get('/search', (req, res) => {
+app.get("/search", (req, res) => {
   const query = req.query.q;
   res.send(`<h1>Search results for: ${query}</h1>`); // Dangerous!
 });
 ```
 
 **Solution:**
+
 ```typescript
 // ✅ XSS prevention
-import { escape } from 'html-escaper';
+import { escape } from "html-escaper";
 
-app.get('/search', (req, res) => {
-  const query = req.query.q || '';
+app.get("/search", (req, res) => {
+  const query = req.query.q || "";
   const safeQuery = escape(query);
   res.send(`<h1>Search results for: ${safeQuery}</h1>`);
 });
@@ -517,6 +545,7 @@ app.get('/search', (req, res) => {
 **Task:** Implement a secure "Update User Profile" feature
 
 **Requirements:**
+
 - User can only update their own profile
 - Input validation for all fields
 - Secure password change functionality
@@ -526,30 +555,34 @@ app.get('/search', (req, res) => {
 ### 6.2 Implementation
 
 ```typescript
-import { InputValidator } from './security/input-validator';
-import { AccessControl } from './security/access-control';
-import { SecurityLogger } from './security/security-logger';
+import { InputValidator } from "./security/input-validator";
+import { AccessControl } from "./security/access-control";
+import { SecurityLogger } from "./security/security-logger";
 
 class UserProfileService {
   private validator = new InputValidator();
   private accessControl = new AccessControl();
   private securityLogger = new SecurityLogger();
 
-  async updateProfile(userId: string, updates: any, currentUser: User): Promise<User> {
+  async updateProfile(
+    userId: string,
+    updates: any,
+    currentUser: User,
+  ): Promise<User> {
     // Step 1: Authorization check
-    if (!await this.accessControl.canUpdateProfile(currentUser, userId)) {
-      await this.securityLogger.logSecurityEvent('access_denied', {
-        action: 'update_profile',
+    if (!(await this.accessControl.canUpdateProfile(currentUser, userId))) {
+      await this.securityLogger.logSecurityEvent("access_denied", {
+        action: "update_profile",
         requestedUserId: userId,
-        currentUserId: currentUser.id
+        currentUserId: currentUser.id,
       });
-      throw new Error('Access denied');
+      throw new Error("Access denied");
     }
 
     // Step 2: Validate input
-    const validation = await this.validator.validate(updates, 'profileUpdate');
+    const validation = await this.validator.validate(updates, "profileUpdate");
     if (!validation.isValid) {
-      throw new Error(`Validation failed: ${validation.errors.join(', ')}`);
+      throw new Error(`Validation failed: ${validation.errors.join(", ")}`);
     }
 
     // Step 3: Handle password updates securely
@@ -558,14 +591,16 @@ class UserProfileService {
       // Verify current password first
       const isCurrentPasswordValid = await this.verifyCurrentPassword(
         currentUser.id,
-        sanitizedUpdates.currentPassword
+        sanitizedUpdates.currentPassword,
       );
       if (!isCurrentPasswordValid) {
-        throw new Error('Current password is incorrect');
+        throw new Error("Current password is incorrect");
       }
 
       // Hash new password
-      sanitizedUpdates.passwordHash = await this.hashPassword(sanitizedUpdates.password);
+      sanitizedUpdates.passwordHash = await this.hashPassword(
+        sanitizedUpdates.password,
+      );
       delete sanitizedUpdates.password;
       delete sanitizedUpdates.currentPassword;
     }
@@ -574,40 +609,43 @@ class UserProfileService {
     const updatedUser = await this.updateUserProfile(userId, sanitizedUpdates);
 
     // Step 5: Log the change
-    await this.securityLogger.logSecurityEvent('profile_updated', {
+    await this.securityLogger.logSecurityEvent("profile_updated", {
       userId,
       updatedFields: Object.keys(sanitizedUpdates),
-      updatedBy: currentUser.id
+      updatedBy: currentUser.id,
     });
 
     return updatedUser;
   }
 
-  private async canUpdateProfile(currentUser: User, targetUserId: string): Promise<boolean> {
+  private async canUpdateProfile(
+    currentUser: User,
+    targetUserId: string,
+  ): Promise<boolean> {
     // Users can update their own profile
     if (currentUser.id === targetUserId) {
       return true;
     }
 
     // Admins can update any profile
-    return currentUser.role === 'admin';
+    return currentUser.role === "admin";
   }
 }
 
 // API endpoint
-app.put('/api/user/:id/profile', async (req, res) => {
+app.put("/api/user/:id/profile", async (req, res) => {
   try {
     const result = await userProfileService.updateProfile(
       req.params.id,
       req.body,
-      req.user
+      req.user,
     );
     res.json({ success: true, data: result });
   } catch (error) {
     const errorResponse = errorHandler.handleError(error, {
       userId: req.user?.id,
-      action: 'update_profile',
-      targetUserId: req.params.id
+      action: "update_profile",
+      targetUserId: req.params.id,
     });
     res.status(403).json(errorResponse);
   }
@@ -617,6 +655,7 @@ app.put('/api/user/:id/profile', async (req, res) => {
 ### 6.3 Test Your Implementation
 
 **Run Security Tests:**
+
 ```bash
 # Test the new feature
 npm test -- --grep "updateProfile"
@@ -649,6 +688,7 @@ curl -X PUT http://localhost:3000/api/user/123/profile \
 ### 7.2 Common Review Feedback
 
 **Typical Security Issues Found:**
+
 1. **Missing Input Validation:** "Add validation for email format"
 2. **Insecure Direct References:** "Check ownership before allowing access"
 3. **Information Disclosure:** "Remove stack traces from error responses"
@@ -657,36 +697,37 @@ curl -X PUT http://localhost:3000/api/user/123/profile \
 ### 7.3 Address Review Comments
 
 **Example Fixes:**
+
 ```typescript
 // Before review
-app.get('/user/:id', (req, res) => {
+app.get("/user/:id", (req, res) => {
   const user = getUserById(req.params.id);
   res.json(user);
 });
 
 // After review
-app.get('/user/:id', async (req, res) => {
+app.get("/user/:id", async (req, res) => {
   // Validate input
   const userId = req.params.id;
   if (!/^\d+$/.test(userId)) {
-    return res.status(400).json({ error: 'Invalid user ID' });
+    return res.status(400).json({ error: "Invalid user ID" });
   }
 
   // Check authorization
   if (req.user.id !== userId && !req.user.isAdmin) {
-    return res.status(403).json({ error: 'Access denied' });
+    return res.status(403).json({ error: "Access denied" });
   }
 
   const user = await getUserById(userId);
   if (!user) {
-    return res.status(404).json({ error: 'User not found' });
+    return res.status(404).json({ error: "User not found" });
   }
 
   // Sanitize output
   const safeUser = {
     id: user.id,
     name: user.name,
-    email: user.email
+    email: user.email,
   };
 
   res.json(safeUser);
@@ -756,6 +797,7 @@ After completing this guide, you should be able to:
 ## 🚨 Security Contacts
 
 **For Security Issues:**
+
 - **Immediate Threats:** Call security hotline: +1-XXX-XXX-XXXX
 - **Non-Urgent:** Email security@company.com
 - **Code Reviews:** Tag @security-team in pull requests

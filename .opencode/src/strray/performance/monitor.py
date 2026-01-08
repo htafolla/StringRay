@@ -6,6 +6,7 @@ from collections import defaultdict
 
 try:
     import psutil
+
     HAS_PSUTIL = True
 except ImportError:
     HAS_PSUTIL = False
@@ -31,13 +32,19 @@ class PerformanceMonitor:
             return duration
         return 0.0
 
-    def record_metric(self, name: str, value: float, unit: str = "", metadata: Optional[Dict[str, Any]] = None) -> None:
+    def record_metric(
+        self,
+        name: str,
+        value: float,
+        unit: str = "",
+        metadata: Optional[Dict[str, Any]] = None,
+    ) -> None:
         """Record a performance metric."""
         metric_data = {
             "timestamp": time.time(),
             "value": value,
             "unit": unit,
-            "metadata": metadata or {}
+            "metadata": metadata or {},
         }
         self.metrics[name].append(metric_data)
 
@@ -52,16 +59,13 @@ class PerformanceMonitor:
     def get_system_stats(self) -> Dict[str, Any]:
         """Get current system statistics."""
         if not HAS_PSUTIL:
-            return {
-                "error": "psutil not available",
-                "timestamp": time.time()
-            }
+            return {"error": "psutil not available", "timestamp": time.time()}
 
         return {
             "cpu_percent": psutil.cpu_percent(interval=1),
             "memory_percent": psutil.virtual_memory().percent,
-            "disk_usage": psutil.disk_usage('/').percent,
-            "timestamp": time.time()
+            "disk_usage": psutil.disk_usage("/").percent,
+            "timestamp": time.time(),
         }
 
     def clear_metrics(self, name: Optional[str] = None) -> None:

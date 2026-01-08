@@ -6,9 +6,13 @@ export interface ToolConfig {
 
 export interface PermissionConfig {
   edit?: "ask" | "allow" | "deny";
-  bash?: "ask" | "allow" | "deny" | {
-    [command: string]: "ask" | "allow" | "deny";
-  };
+  bash?:
+    | "ask"
+    | "allow"
+    | "deny"
+    | {
+        [command: string]: "ask" | "allow" | "deny";
+      };
   webfetch?: "ask" | "allow" | "deny";
   [key: string]: any;
 }

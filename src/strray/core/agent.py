@@ -12,9 +12,9 @@ from typing import Any, Dict, List, Optional, Set, Union
 from enum import Enum
 import structlog
 
-from ..config.manager import ConfigManager
-from ..security import InputValidator, SecurityError
-from ..performance.monitor import PerformanceMonitor
+from strray.config.manager import ConfigManager
+from strray.security import InputValidator, SecurityError
+from strray.performance.monitor import PerformanceMonitor
 from .codex_loader import CodexLoader, CodexViolationError, get_default_codex_loader
 
 logger = structlog.get_logger(__name__)
@@ -221,7 +221,7 @@ class BaseAgent(ABC):
         """Get AI service instance with auto-logging enabled."""
         if self._ai_service is None:
             # Lazy import to avoid circular dependencies
-            from ..ai.service import MockAIService as AIService
+            from strray.ai.service import MockAIService as AIService
             self._ai_service = AIService(
                 provider=self.config_manager.get_value('ai_default_provider', 'openai'),
                 model=self.config_manager.get_value('ai_default_model', 'gpt-4'),

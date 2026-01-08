@@ -8,8 +8,8 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { StrRayStateManager } from '../../state/state-manager';
-import { createAgentDelegator, createSessionCoordinator } from '../../delegation';
+import { StrRayStateManager } from '../../state/state-manager.js';
+import { createAgentDelegator, createSessionCoordinator } from '../../delegation/index.js';
 
 describe('StrRay Delegation System Integration', () => {
   let stateManager: StrRayStateManager;

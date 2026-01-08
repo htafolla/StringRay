@@ -112,44 +112,58 @@ class SmartTestRunner {
    */
   async runIndividualTests(testFiles) {
     console.log('🔄 Executing tests individually...');
-    
+
     const results = [];
-    let passed = 0;
-    let failed = 0;
-    
+    let passedFiles = 0;
+    let failedFiles = 0;
+    let passedTests = 0;
+    let failedTests = 0;
+
     for (const testFile of testFiles) {
       console.log(`\n📄 Running: ${path.basename(testFile)}`);
-      
+
       try {
         const result = await this.runSingleTest(testFile);
         results.push(result);
-        
+
         if (result.success) {
-          passed++;
-          console.log(`✅ PASSED`);
+          passedFiles++;
+          passedTests += result.numPassedTests || 0;
+          console.log(`✅ PASSED (${result.numPassedTests || 0} tests)`);
         } else {
-          failed++;
-          console.log(`❌ FAILED`);
+          failedFiles++;
+          failedTests += result.numFailedTests || 0;
+          console.log(`❌ FAILED (${result.numFailedTests || 0} tests)`);
           if (result.error) {
             console.log(`   Error: ${result.error.substring(0, 100)}...`);
           }
         }
       } catch (error) {
-        failed++;
+        failedFiles++;
         console.log(`❌ ERROR: ${error.message}`);
         results.push({ file: testFile, success: false, error: error.message });
       }
     }
-    
+
     console.log(`\n📊 Individual Execution Results:`);
-    console.log(`   Files: ${passed + failed}`);
-    console.log(`   Passed: ${passed}`);
-    console.log(`   Failed: ${failed}`);
-    
+    console.log(`   Files: ${passedFiles + failedFiles}`);
+    console.log(`   Tests: ${passedTests + failedTests}`);
+    console.log(`   Tests Passed: ${passedTests}`);
+    console.log(`   Tests Failed: ${failedTests}`);
+    console.log(`   Files Passed: ${passedFiles}`);
+    console.log(`   Files Failed: ${failedFiles}`);
+
     return {
-      success: failed === 0,
+      success: failedTests === 0,
       results,
-      summary: { total: testFiles.length, passed, failed }
+      summary: {
+        totalFiles: testFiles.length,
+        totalTests: passedTests + failedTests,
+        passedTests,
+        failedTests,
+        passedFiles,
+        failedFiles
+      }
     };
   }
 
@@ -158,37 +172,64 @@ class SmartTestRunner {
    */
   async runInChunks(testFiles, chunkSize) {
     console.log(`🔄 Processing ${testFiles.length} tests in chunks of ${chunkSize}`);
-    
+
     const chunks = [];
     for (let i = 0; i < testFiles.length; i += chunkSize) {
       chunks.push(testFiles.slice(i, i + chunkSize));
     }
-    
+
     console.log(`📦 Created ${chunks.length} chunks`);
-    
+
     const results = [];
-    let totalPassed = 0;
-    let totalFailed = 0;
-    
+    let totalPassedTests = 0;
+    let totalFailedTests = 0;
+    let totalPassedFiles = 0;
+    let totalFailedFiles = 0;
+    const allFailedTests = [];
+
     for (let i = 0; i < chunks.length; i++) {
       const chunk = chunks[i];
 
       const chunkResult = await this.runChunk(chunk, i, chunks.length);
       results.push(chunkResult);
 
-      totalPassed += chunkResult.passed;
-      totalFailed += chunkResult.failed;
+      totalPassedFiles += chunkResult.passed;
+      totalFailedFiles += chunkResult.failed;
+      totalPassedTests += chunkResult.passedTests || 0;
+      totalFailedTests += chunkResult.failedTests || 0;
+
+      // Collect failed tests from this chunk
+      const failedTests = chunkResult.results.filter(r => !r.success);
+      allFailedTests.push(...failedTests);
     }
-    
+
     console.log(`\n📊 Chunked Execution Results:`);
     console.log(`   Total Files: ${testFiles.length}`);
-    console.log(`   Passed: ${totalPassed}`);
-    console.log(`   Failed: ${totalFailed}`);
-    
+    console.log(`   Total Tests: ${totalPassedTests + totalFailedTests}`);
+    console.log(`   Tests Passed: ${totalPassedTests}`);
+    console.log(`   Tests Failed: ${totalFailedTests}`);
+    console.log(`   Files Passed: ${totalPassedFiles}`);
+    console.log(`   Files Failed: ${totalFailedFiles}`);
+
+    // List all failed test files
+    if (allFailedTests.length > 0) {
+      console.log(`   ❌ Failed test files:`);
+      for (const failedTest of allFailedTests) {
+        console.log(`      - ${path.basename(failedTest.file)}`);
+      }
+    }
+
     return {
-      success: totalFailed === 0,
+      success: totalFailedTests === 0,
       results,
-      summary: { total: testFiles.length, passed: totalPassed, failed: totalFailed }
+      summary: {
+        totalFiles: testFiles.length,
+        totalTests: totalPassedTests + totalFailedTests,
+        passedTests: totalPassedTests,
+        failedTests: totalFailedTests,
+        passedFiles: totalPassedFiles,
+        failedFiles: totalFailedFiles
+      }
     };
   }
 
@@ -265,11 +306,23 @@ class SmartTestRunner {
     const promises = chunk.map(file => this.runSingleTest(file, useJson));
     const results = await Promise.all(promises);
 
-    const passed = results.filter(r => r.success).length;
-    const failed = results.filter(r => !r.success).length;
+    const passedFiles = results.filter(r => r.success).length;
+    const failedFiles = results.filter(r => !r.success).length;
+    const passedTests = results.reduce((sum, r) => sum + (r.numPassedTests || 0), 0);
+    const failedTests = results.reduce((sum, r) => sum + (r.numFailedTests || 0), 0);
 
-    console.log(`   Chunk ${chunkIndex + 1}: ${passed} passed, ${failed} failed`);
-    return { passed, failed, results };
+    console.log(`   Chunk ${chunkIndex + 1}: ${passedFiles} passed, ${failedFiles} failed (${passedTests + failedTests} tests)`);
+
+    // List failed tests
+    if (failedFiles > 0) {
+      const failedTests = results.filter(r => !r.success);
+      console.log(`   ❌ Failed tests:`);
+      for (const failedTest of failedTests) {
+        console.log(`      - ${path.basename(failedTest.file)}`);
+      }
+    }
+
+    return { passed: passedFiles, failed: failedFiles, passedTests, failedTests, results };
   }
 
   /**

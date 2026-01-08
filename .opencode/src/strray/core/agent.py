@@ -428,9 +428,9 @@ class BaseAgent(ABC):
             import os
             # Find the project root and REFACTORING_LOG.md
             current_file = os.path.abspath(__file__)
-            # Navigate up: src/strray/core/agent.py -> src/strray/core -> src/strray -> src -> project_root -> docs
+            # Navigate up: .opencode/src/strray/core/agent.py -> .opencode/src/strray/core -> .opencode/src/strray -> .opencode/src -> .opencode -> project_root
             project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(current_file)))))
-            log_file = os.path.join(project_root, 'docs', 'REFACTORING_LOG.md')
+            log_file = os.path.join(project_root, '.opencode', 'REFACTORING_LOG.md')
 
             logger.debug("Attempting to log to file", log_file=log_file, exists=os.path.exists(log_file))
 

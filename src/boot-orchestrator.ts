@@ -19,26 +19,7 @@ import { createSessionStateManager } from './session/session-state-manager.js';
 import { securityHardener } from './security/security-hardener.js';
 import { securityHeadersMiddleware } from './security/security-headers.js';
 
-// ANSI color codes for enhanced output
-const colors = {
-  reset: '\x1b[0m',
-  bright: '\x1b[1m',
-  red: '\x1b[31m',
-  green: '\x1b[32m',
-  yellow: '\x1b[33m',
-  blue: '\x1b[34m',
-  magenta: '\x1b[35m',
-  cyan: '\x1b[36m',
-  white: '\x1b[37m'
-};
 
-// Boot status indicators with colors and emojis
-const bootStatus = {
-  pending: `${colors.yellow}[⏳⏳]${colors.reset}`,
-  success: `${colors.green}[✅ OK]${colors.reset}`,
-  failure: `${colors.red}[❌FAIL]${colors.reset}`,
-  header: `${colors.cyan}[🚀INFO]${colors.reset}`
-};
 
 export interface BootSequenceConfig {
   enableEnforcement: boolean;
@@ -80,132 +61,7 @@ export class BootOrchestrator {
     this.processorManager = new ProcessorManager(this.stateManager);
   }
 
-  /**
-   * Execute orchestrator-first boot sequence
-   */
-  async executeBootSequence(): Promise<BootResult> {
-    const startTime = Date.now();
 
-    // Initialize security components early
-    await this.initializeSecurityComponents();
-
-    const result: BootResult = {
-      success: false,
-      orchestratorLoaded: false,
-      sessionManagementActive: false,
-      processorsActivated: false,
-      enforcementEnabled: false,
-      codexComplianceActive: false,
-      agentsLoaded: [],
-      errors: []
-    };
-
-    // OS-like boot sequence display with enhanced colors and emojis
-    console.log(`\n${colors.bright}${colors.cyan}🚀 StrRay Framework v1.0.0 - Boot Sequence${colors.reset}`);
-    console.log(`${colors.blue}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${colors.reset}`);
-
-    try {
-      // Phase 1: Initialize core systems
-      console.log(`${bootStatus.pending} ${colors.white}Initializing core systems...${colors.reset}`);
-      result.orchestratorLoaded = await this.loadOrchestrator();
-      if (!result.orchestratorLoaded) {
-        console.log(`${bootStatus.failure} ${colors.red}Core systems initialization failed${colors.reset}`);
-        result.errors.push('Failed to load orchestrator');
-        return result;
-      }
-
-      const delegationInitialized = await this.initializeDelegationSystem();
-      if (!delegationInitialized) {
-        console.log(`${bootStatus.failure} ${colors.red}Core systems initialization failed${colors.reset}`);
-        result.errors.push('Failed to initialize delegation system');
-        return result;
-      }
-
-      console.log(`${bootStatus.success} ${colors.green}Core systems initialized${colors.reset}`);
-
-      // Phase 2: Session management
-      if (this.config.sessionManagement) {
-        console.log(`${bootStatus.pending} ${colors.white}Initializing session management...${colors.reset}`);
-        result.sessionManagementActive = await this.initializeSessionManagement();
-        if (!result.sessionManagementActive) {
-          console.log(`${bootStatus.failure} ${colors.red}Session management initialization failed${colors.reset}`);
-          result.errors.push('Failed to initialize session management');
-          return result;
-        }
-        console.log(`${bootStatus.success} ${colors.green}Session management active${colors.reset}`);
-      }
-
-      // Phase 3: Processors
-      if (this.config.processorActivation) {
-        console.log(`${bootStatus.pending} ${colors.white}Activating processors...${colors.reset}`);
-        result.processorsActivated = await this.activateProcessors();
-        if (!result.processorsActivated) {
-          console.log(`${bootStatus.failure} ${colors.red}Processor activation failed${colors.reset}`);
-          result.errors.push('Failed to activate processors');
-          return result;
-        }
-
-        // Validate processor health
-        const healthValid = await this.validateProcessorHealth();
-        if (!healthValid) {
-          console.log(`${bootStatus.failure} ${colors.red}Processor health validation failed${colors.reset}`);
-          result.errors.push('Processor health validation failed');
-          return result;
-        }
-        console.log(`${bootStatus.success} ${colors.green}Processors activated and healthy${colors.reset}`);
-      }
-
-      // Phase 4: Load agents
-      if (this.config.agentLoading) {
-        console.log(`${bootStatus.pending} ${colors.white}Loading orchestration layer...${colors.reset}`);
-        result.agentsLoaded = await this.loadRemainingAgents();
-        console.log(`${bootStatus.success} ${colors.green}Orchestration layer loaded (${result.agentsLoaded.length} agents)${colors.reset}`);
-      }
-
-      // Phase 5: Security & compliance
-      console.log(`${bootStatus.pending} ${colors.white}Activating security & compliance...${colors.reset}`);
-      if (this.config.enableEnforcement) {
-        result.enforcementEnabled = await this.enableEnforcement();
-        if (!result.enforcementEnabled) {
-          console.log(`${bootStatus.failure} ${colors.red}Enforcement activation failed${colors.reset}`);
-          result.errors.push('Failed to enable enforcement');
-          return result;
-        }
-      }
-
-      if (this.config.codexValidation) {
-        result.codexComplianceActive = await this.activateCodexCompliance();
-        if (!result.codexComplianceActive) {
-          console.log(`${bootStatus.failure} ${colors.red}Compliance activation failed${colors.reset}`);
-          result.errors.push('Failed to activate codex compliance');
-          return result;
-        }
-      }
-
-      // Finalize security integration
-      await this.finalizeSecurityIntegration();
-
-      console.log(`${bootStatus.success} ${colors.green}Security & compliance active${colors.reset}`);
-
-      result.success = true;
-      const bootTime = Date.now() - startTime;
-
-      console.log(`${bootStatus.success} ${colors.green}Boot sequence complete${colors.reset}`);
-      console.log(`${colors.blue}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${colors.reset}`);
-      console.log(`${colors.bright}${colors.green}⏱️  Boot time: ${(bootTime / 1000).toFixed(1)}s | Status: OPERATIONAL${colors.reset}`);
-      console.log(`${colors.blue}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${colors.reset}`);
-
-    } catch (error) {
-      const bootTime = Date.now() - startTime;
-      console.log(`${bootStatus.failure} ${colors.red}Boot sequence failed${colors.reset}`);
-      console.log(`${colors.blue}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${colors.reset}`);
-      console.log(`${colors.bright}${colors.red}⏱️  Boot time: ${(bootTime / 1000).toFixed(1)}s | Status: FAILED${colors.reset}`);
-      console.log(`${colors.blue}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${colors.reset}`);
-      result.errors.push(`Boot sequence error: ${error}`);
-    }
-
-    return result;
-  }
 
   /**
    * Initialize delegation system components
@@ -512,19 +368,91 @@ export class BootOrchestrator {
   }
 
   /**
-   * Get current boot status
+   * Execute the boot sequence (internal framework initialization)
    */
-  getBootStatus(): BootResult {
-    return {
-      success: this.stateManager.get('boot:success') || false,
-      orchestratorLoaded: this.stateManager.get('orchestrator') !== undefined,
-      sessionManagementActive: this.stateManager.get('session:active') || false,
-      processorsActivated: this.stateManager.get('processor:active') || false,
-      enforcementEnabled: this.stateManager.get('enforcement:active') || false,
-      codexComplianceActive: this.stateManager.get('compliance:active') || false,
-      agentsLoaded: this.stateManager.get('session:agents') || [],
-      errors: this.stateManager.get('boot:errors') || []
+  async executeBootSequence(): Promise<BootResult> {
+    const result: BootResult = {
+      success: false,
+      orchestratorLoaded: false,
+      sessionManagementActive: false,
+      processorsActivated: false,
+      agentsLoaded: [],
+      enforcementEnabled: false,
+      codexComplianceActive: false,
+      errors: []
     };
+
+    try {
+      // Phase 1: Initialize core systems
+      result.orchestratorLoaded = await this.loadOrchestrator();
+      if (!result.orchestratorLoaded) {
+        result.errors.push('Failed to load orchestrator');
+        return result;
+      }
+
+      const delegationInitialized = await this.initializeDelegationSystem();
+      if (!delegationInitialized) {
+        result.errors.push('Failed to initialize delegation system');
+        return result;
+      }
+
+      // Phase 2: Session management
+      if (this.config.sessionManagement) {
+        result.sessionManagementActive = await this.initializeSessionManagement();
+        if (!result.sessionManagementActive) {
+          result.errors.push('Failed to initialize session management');
+          return result;
+        }
+      }
+
+      // Phase 3: Processors
+      if (this.config.processorActivation) {
+        result.processorsActivated = await this.activateProcessors();
+        if (!result.processorsActivated) {
+          result.errors.push('Failed to activate processors');
+          return result;
+        }
+
+        // Validate processor health
+        const healthValid = await this.validateProcessorHealth();
+        if (!healthValid) {
+          result.errors.push('Processor health validation failed');
+          return result;
+        }
+      }
+
+      // Phase 4: Load agents
+      if (this.config.agentLoading) {
+        result.agentsLoaded = await this.loadRemainingAgents();
+      }
+
+      // Phase 5: Security & compliance
+      if (this.config.enableEnforcement) {
+        result.enforcementEnabled = await this.enableEnforcement();
+        if (!result.enforcementEnabled) {
+          result.errors.push('Failed to enable enforcement');
+          return result;
+        }
+      }
+
+      if (this.config.codexValidation) {
+        result.codexComplianceActive = await this.activateCodexCompliance();
+        if (!result.codexComplianceActive) {
+          result.errors.push('Failed to activate codex compliance');
+          return result;
+        }
+      }
+
+      // Finalize security integration
+      await this.finalizeSecurityIntegration();
+
+      result.success = true;
+
+    } catch (error) {
+      result.errors.push(`Boot sequence error: ${error}`);
+    }
+
+    return result;
   }
 }
 

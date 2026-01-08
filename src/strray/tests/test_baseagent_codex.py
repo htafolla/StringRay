@@ -19,7 +19,7 @@ import psutil
 import json
 
 from strray.core.agent import BaseAgent, AgentContext
-from strray.core.codex_loader import CodexLoader, CodexComplianceResult
+from strray.core.codex_loader import CodexLoader
 from strray.config.manager import ConfigManager
 
 
@@ -197,10 +197,11 @@ class TestBaseAgentCodexIntegration:
             "communication_bus": self.agent.communication_bus is not None
         }
 
-        results = codex_loader.validate_compliance("agent", agent_context)
+        is_compliant, violations = codex_loader.validate_compliance("agent", agent_context)
 
-        assert len(results) == 2
-        assert all(isinstance(r, CodexComplianceResult) for r in results)
+        assert isinstance(is_compliant, bool)
+        assert isinstance(violations, list)
+        assert all(isinstance(v, dict) for v in violations)
 
     def test_agent_codex_cache_invalidation(self):
         """Test codex cache invalidation when terms change."""

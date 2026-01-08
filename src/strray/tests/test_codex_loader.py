@@ -19,7 +19,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 from strray.core.codex_loader import (
     CodexLoader, CodexRule, CodexComplianceResult,
-    CodexError, CodexTerm
+    CodexViolationError as CodexError, CodexTerm
 )
 from strray.config.manager import ConfigManager
 
@@ -111,7 +111,7 @@ class TestCodexLoader:
 
     def test_validate_compliance_agent_component(self):
         """Test compliance validation for agent component."""
-        self.loader.load_codex_terms([2, 3, 5])  # Agent-related terms
+        # CodexLoader loads all terms automatically - no need to call load_codex_terms
 
         context = {
             "communication_bus": None,  # Will violate term 2
@@ -119,33 +119,33 @@ class TestCodexLoader:
             "error_handling_enabled": True  # Will pass term 5
         }
 
-        results = self.loader.validate_compliance("agent", context)
+        results = self.loader.validate_compliance(context, relevant_terms=[2, 3, 5])
 
         assert len(results) == 3
         assert all(isinstance(result, CodexComplianceResult) for result in results)
 
         # Check specific results
         term_2_result = next(r for r in results if r.term_id == 2)
-        assert not term_2_result.compliant
+        assert not term_2_result.is_compliant
         assert "communication bus" in " ".join(term_2_result.violations).lower()
 
         term_3_result = next(r for r in results if r.term_id == 3)
-        assert not term_3_result.compliant
+        assert not term_3_result.is_compliant
         assert "state management" in " ".join(term_3_result.violations).lower()
 
         term_5_result = next(r for r in results if r.term_id == 5)
-        assert term_5_result.compliant
+        assert term_5_result.is_compliant
 
     def test_validate_compliance_orchestrator_component(self):
         """Test compliance validation for orchestrator component."""
         self.loader.load_codex_terms([2])  # Agent Orchestration term
 
         context = {"max_concurrent_agents": 0}  # Will violate
-        results = self.loader.validate_compliance("orchestrator", context)
+        results = self.loader.validate_compliance(context, relevant_terms=[2])
 
         assert len(results) == 1
         result = results[0]
-        assert not result.compliant
+        assert not result.is_compliant
         assert "concurrent agents" in " ".join(result.violations).lower()
 
     def test_validate_compliance_configuration_component(self):
@@ -153,11 +153,11 @@ class TestCodexLoader:
         self.loader.load_codex_terms([9])  # Configuration Management term
 
         context = {"validation_enabled": False}  # Will violate
-        results = self.loader.validate_compliance("configuration", context)
+        results = self.loader.validate_compliance(context, relevant_terms=[9])
 
         assert len(results) == 1
         result = results[0]
-        assert not result.compliant
+        assert not result.is_compliant
         assert "validation" in " ".join(result.violations).lower()
 
     def test_validate_compliance_generic_component(self):
@@ -165,11 +165,11 @@ class TestCodexLoader:
         self.loader.load_codex_terms([5])  # Error Prevention term
 
         context = {"has_error_handling": False}  # Will violate
-        results = self.loader.validate_compliance("unknown_component", context)
+        results = self.loader.validate_compliance(context, relevant_terms=[5])
 
         assert len(results) == 1
         result = results[0]
-        assert not result.compliant
+        assert not result.is_compliant
         assert "error handling" in " ".join(result.violations).lower()
 
     def test_validate_compliance_validation_error(self):
@@ -182,7 +182,7 @@ class TestCodexLoader:
 
             assert len(results) == 1
             result = results[0]
-            assert not result.compliant
+            assert not result.is_compliant
             assert "Test error" in " ".join(result.violations)
 
     def test_validate_compliance_caching(self):
@@ -195,7 +195,7 @@ class TestCodexLoader:
 
         # Results should be identical (cached)
         assert len(results1) == len(results2) == 1
-        assert results1[0].compliant == results2[0].compliant
+        assert results1[0].is_compliant == results2[0].is_compliant
 
         # Cache should be populated
         assert len(self.loader._compliance_cache) > 0
@@ -419,7 +419,7 @@ class TestCodexLoader:
         )
 
         assert result.term_id == 5
-        assert not result.compliant
+        assert not result.is_compliant
         assert len(result.violations) == 2
         assert len(result.recommendations) == 2
         assert result.metadata == {"test": "data"}

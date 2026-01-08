@@ -330,7 +330,7 @@ export class BootOrchestrator {
     for (const agentName of agents) {
       try {
         // Dynamic import of agent modules
-        const agentModule = await import(`./agents/${agentName}`);
+        const agentModule = await import(`./agents/${agentName}.js`);
         const agentClass = agentModule[`StrRay${agentName.charAt(0).toUpperCase() + agentName.slice(1)}Agent`];
 
         if (agentClass) {

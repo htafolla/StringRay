@@ -110,7 +110,7 @@ export class StrRayOrchestrator {
 
       return {
         success: true,
-        result,
+        result: { ...result, id: task.id },
         duration
       };
     } catch (error) {

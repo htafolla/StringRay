@@ -56,19 +56,29 @@ class TestBaseAgent:
         assert agent.model == agent.config_manager.get_value("model_default")
         # Model is set from config_manager
 
-    @patch('strray.core.agent.AI_SERVICE_CLASS')
-    def test_ai_service_lazy_loading(self, mock_ai_service):
+    @patch('strray.ai.service.MockAIService')
+    def test_ai_service_lazy_loading(self, mock_ai_service_class):
         """Test AI service is loaded lazily on first use."""
         # AI service should not be initialized yet
-        assert not hasattr(self.agent, '_ai_service_instance')
+        assert self.agent._ai_service is None
 
-        # Trigger lazy loading
-        with patch.object(self.agent, '_initialize_ai_service') as mock_init:
-            mock_init.return_value = Mock()
-            service = self.agent.ai_service
+        # Configure mock
+        mock_instance = Mock()
+        mock_ai_service_class.return_value = mock_instance
 
-            # Should have called initialization
-            mock_init.assert_called_once()
+        # Trigger lazy loading by accessing ai_service property
+        service = self.agent.ai_service
+
+        # Should have created the service instance
+        mock_ai_service_class.assert_called_once()
+        assert service is mock_instance
+        assert self.agent._ai_service is mock_instance
+
+        # Second access should return cached instance
+        service2 = self.agent.ai_service
+        assert service2 is mock_instance
+        # Should not create a new instance
+        assert mock_ai_service_class.call_count == 1
             assert service is not None
 
     def test_analyze_method(self):

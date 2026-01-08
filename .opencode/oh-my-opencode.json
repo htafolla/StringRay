@@ -44,7 +44,9 @@
 			"post_commit": ["auto-format"],
 			"daily": ["enforcer-daily-scan"],
 			"security": ["security-scan"],
-			"deployment": ["post-deployment-audit"]
+			"deployment": ["post-deployment-audit"],
+			"summary": ["summary-logger"],
+			"job_completion": ["job-summary-logger"]
 		},
 		"agent_capabilities": {
 			"enforcer": [
@@ -156,6 +158,14 @@
 				"destinations": ["console", "logs", "notifications"]
 			}
 		}
+	},
+	"logging": {
+		"enabled": true,
+		"refactoring_log_path": ".opencode/REFACTORING_LOG.md",
+		"auto_capture": true,
+		"format": "markdown",
+		"include_timestamps": true,
+		"categories": ["refactoring", "analysis", "performance", "security"]
 	},
 	"agents": {
 		"librarian": {

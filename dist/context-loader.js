@@ -9,7 +9,7 @@
  */
 import * as fs from "fs";
 import * as path from "path";
-import { parseCodexContent, detectContentFormat } from "./utils/codex-parser";
+import { parseCodexContent, detectContentFormat } from "./utils/codex-parser.js";
 /**
  * Type guard for regex match results
  */

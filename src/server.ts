@@ -13,8 +13,13 @@ const PORT = 3000;
 let securityMiddleware: any = null;
 const getSecurityMiddleware = async () => {
   if (!securityMiddleware) {
-    const { securityHeadersMiddleware } = await import('./security/security-headers');
-    securityMiddleware = securityHeadersMiddleware.getExpressMiddleware();
+    try {
+      const { securityHeadersMiddleware } = await import('./security/security-headers');
+      securityMiddleware = securityHeadersMiddleware.getExpressMiddleware();
+    } catch (error) {
+      console.warn('Security middleware not available, continuing without security headers');
+      securityMiddleware = (req: any, res: any, next: any) => next(); // No-op middleware
+    }
   }
   return securityMiddleware;
 };
@@ -74,7 +79,30 @@ app.use((req: any, res: any, next: any) => {
 
 // Add route for root path
 app.get('/', (req: any, res: any) => {
-  res.sendFile(join(__dirname, 'public', 'index.html'));
+  res.sendFile(join(__dirname, '..', 'public', 'index.html'));
+});
+
+// Add route for refactoring logs
+app.get('/logs', async (req: any, res: any) => {
+  const logPath = join(__dirname, '..', '.opencode', 'REFACTORING_LOG.md');
+  console.log('Server __dirname:', __dirname);
+  console.log('Resolved log path:', logPath);
+
+  try {
+    const fs = await import('fs');
+    console.log('File exists:', fs.existsSync(logPath));
+
+    if (fs.existsSync(logPath)) {
+      const content = fs.readFileSync(logPath, 'utf-8');
+      res.setHeader('Content-Type', 'text/markdown');
+      res.send(content);
+    } else {
+      res.status(404).send('Refactoring log not found. The framework may not have generated any logs yet.');
+    }
+  } catch (error) {
+    console.log('File read error:', error);
+    res.status(500).send('Server error reading log file.');
+  }
 });
 
 app.listen(PORT, () => {

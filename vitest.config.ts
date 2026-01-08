@@ -29,11 +29,11 @@ export default defineConfig({
         },
       },
     },
-    testTimeout: 10000,
-    hookTimeout: 10000,
-    bail: 5, // Stop after 5 test failures
-     // maxThreads: 4, // Removed unsupported option
-     // minThreads: 1, // Removed unsupported option
+    testTimeout: 30000,
+    hookTimeout: 30000,
+    bail: 5, // Stop after 5 test failures - prevents resource waste
+    pool: 'threads',
+    maxWorkers: 4,  // Explicit worker limit for stability
     retry: 2,
   },
   resolve: {

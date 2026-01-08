@@ -1,5 +1,5 @@
-export * from "./state-manager";
-export * from "./context-providers";
-export * from "./state-types";
-export { StrRayStateManager } from "./state-manager";
+export * from "./state-manager.js";
+export * from "./context-providers.js";
+export * from "./state-types.js";
+export { StrRayStateManager } from "./state-manager.js";
 //# sourceMappingURL=index.d.ts.map

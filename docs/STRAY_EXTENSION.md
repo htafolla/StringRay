@@ -269,7 +269,7 @@ Modify the agents configuration in `.opencode/oh-my-opencode.json`:
 
 1. Check framework initialization: `bash .opencode/init.sh`
 2. Verify mode settings: `jq '.disabled_agents' .opencode/oh-my-opencode.json`
-3. Review logs: `docs/REFACTORING_LOG.md`
+3. Review logs: `.opencode/REFACTORING_LOG.md`
 4. Check compliance: `bash .opencode/commands/framework-compliance-audit.md`
 
 ---

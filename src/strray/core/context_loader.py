@@ -35,7 +35,7 @@ class ContextLoader:
         """Load context from all available documentation files."""
         context_files = [
             ("agents", "AGENTS.md"),
-            ("refactoring_log", "docs/REFACTORING_LOG.md"),
+            ("refactoring_log", ".opencode/REFACTORING_LOG.md"),
             ("readme", "strray/README.md"),
             ("config", ".strray/config.json"),  # If exists
         ]

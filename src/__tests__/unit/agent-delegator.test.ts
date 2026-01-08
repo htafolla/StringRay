@@ -36,28 +36,22 @@ describe("AgentDelegator", () => {
         .mockResolvedValue({ success: true, result: "architect completed" }),
     });
     stateManager.set("agent:code-reviewer", {
-      execute: vi
-        .fn()
-        .mockResolvedValue({
-          success: true,
-          result: "code-reviewer completed",
-        }),
+      execute: vi.fn().mockResolvedValue({
+        success: true,
+        result: "code-reviewer completed",
+      }),
     });
     stateManager.set("agent:security-auditor", {
-      execute: vi
-        .fn()
-        .mockResolvedValue({
-          success: true,
-          result: "security-auditor completed",
-        }),
+      execute: vi.fn().mockResolvedValue({
+        success: true,
+        result: "security-auditor completed",
+      }),
     });
     stateManager.set("agent:test-architect", {
-      execute: vi
-        .fn()
-        .mockResolvedValue({
-          success: true,
-          result: "test-architect completed",
-        }),
+      execute: vi.fn().mockResolvedValue({
+        success: true,
+        result: "test-architect completed",
+      }),
     });
     stateManager.set("agent:refactorer", {
       execute: vi
@@ -464,22 +458,18 @@ describe("AgentDelegator", () => {
 
       // Mock agents with conflicting results
       const mockAgent1 = {
-        execute: vi
-          .fn()
-          .mockResolvedValue({
-            result: "option1",
-            consensus: false,
-            confidence: 0.7,
-          }),
+        execute: vi.fn().mockResolvedValue({
+          result: "option1",
+          consensus: false,
+          confidence: 0.7,
+        }),
       };
       const mockAgent2 = {
-        execute: vi
-          .fn()
-          .mockResolvedValue({
-            result: "option2",
-            consensus: true,
-            confidence: 0.9,
-          }),
+        execute: vi.fn().mockResolvedValue({
+          result: "option2",
+          consensus: true,
+          confidence: 0.9,
+        }),
       };
 
       stateManager.set("agent:security-auditor", mockAgent1);

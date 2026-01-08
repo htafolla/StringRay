@@ -12,6 +12,8 @@
     "stop": "pkill -f 'node dist/server.js'",
     "init": "bash scripts/init.sh",
     "validate": "node scripts/validate-codex.js",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src --ext .ts,.tsx",
     "clean": "rm -rf dist",
     "prepublishOnly": "npm run build",
     "test": "node scripts/test-utils/smart-test-runner.mjs",
@@ -65,9 +67,13 @@
     "zod": "~4.1.8"
   },
   "devDependencies": {
+    "@eslint/js": "^9.9.0",
     "@faker-js/faker": "^9.9.0",
     "@types/node": "~22.19.3",
+    "@typescript-eslint/eslint-plugin": "^8.7.0",
+    "@typescript-eslint/parser": "^8.7.0",
     "@vitest/coverage-v8": "~4.0.16",
+    "eslint": "^9.9.0",
     "fishery": "^2.4.0",
     "typescript": "~5.9.3",
     "vitest": "~4.0.16"

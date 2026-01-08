@@ -426,7 +426,8 @@ export class BootOrchestrator {
       sessionManagementActive: this.stateManager.get("session:active") || false,
       processorsActivated: this.stateManager.get("processor:active") || false,
       enforcementEnabled: this.stateManager.get("enforcement:active") || false,
-      codexComplianceActive: this.stateManager.get("compliance:active") || false,
+      codexComplianceActive:
+        this.stateManager.get("compliance:active") || false,
       agentsLoaded: Array.isArray(agentsLoaded) ? agentsLoaded : [],
       errors,
     };

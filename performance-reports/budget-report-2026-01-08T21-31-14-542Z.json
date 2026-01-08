@@ -1,5 +1,5 @@
 {
-  "timestamp": 1767906150975,
+  "timestamp": 1767907874442,
   "bundleSize": {
     "totalSize": 124004,
     "gzippedSize": 28147,
@@ -61,23 +61,23 @@
     ]
   },
   "webVitals": {
-    "firstContentfulPaint": 1201.1801515981356,
-    "timeToInteractive": 3593.9903147392743,
-    "largestContentfulPaint": 2170.865634563053,
-    "cumulativeLayoutShift": 0.05652595716800044,
-    "firstInputDelay": 56.98483456780214,
-    "timestamp": 1767906150975
+    "firstContentfulPaint": 970.9834960047765,
+    "timeToInteractive": 3980.0112017004976,
+    "largestContentfulPaint": 2211.7039206516915,
+    "cumulativeLayoutShift": 0.06987293928922599,
+    "firstInputDelay": 40.76695042530054,
+    "timestamp": 1767907874442
   },
   "runtime": {
     "memoryUsage": {
-      "rss": 134070272,
-      "heapUsed": 12641328,
-      "heapTotal": 30277632,
-      "external": 3032878
+      "rss": 130826240,
+      "heapUsed": 14236648,
+      "heapTotal": 20316160,
+      "external": 3354078
     },
-    "startupTime": 716.152459,
-    "cpuUsage": 514.358,
-    "timestamp": 1767906150975
+    "startupTime": 533.883333,
+    "cpuUsage": 481.424,
+    "timestamp": 1767907874442
   },
   "violations": [],
   "recommendations": [

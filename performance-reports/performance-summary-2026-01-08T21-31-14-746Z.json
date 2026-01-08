@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-01-08T21:02:31.050Z",
+  "timestamp": "2026-01-08T21:31:14.746Z",
   "budget": {
     "status": "pass",
     "violations": 0,
@@ -11,7 +11,7 @@
   "regression": {
     "totalTests": 4,
     "passRate": 0,
-    "averageDeviation": 59.81381640103281,
+    "averageDeviation": 54.98402455198676,
     "regressionDetected": true
   },
   "recommendations": [

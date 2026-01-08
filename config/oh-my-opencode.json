@@ -88,17 +88,10 @@
 				"behavioral-testing"
 			]
 		},
-		"mcp_knowledge_skills": [
-			"project-analysis",
-			"testing-strategy",
-			"architecture-patterns",
-			"performance-optimization",
-			"git-workflow",
-			"api-design"
-		],
+		"default_agent": "orchestrator",
 		"sisyphus_orchestrator": {
 			"enabled": true,
-			"coordination_model": "async-multi-agent",
+			"coordination_model": "agent-delegation",
 			"max_concurrent_agents": 3,
 			"task_distribution": {
 				"enforcer": ["compliance", "thresholds", "automation"],
@@ -116,26 +109,16 @@
 					"validation"
 				],
 				"bug-triage-specialist": ["errors", "root-cause", "fixes"]
-			},
-			"workflow_patterns": {
-				"complex-refactor": [
-					"architect",
-					"refactorer",
-					"test-architect"
-				],
-				"security-audit": [
-					"security-auditor",
-					"enforcer",
-					"code-reviewer"
-				],
-				"new-feature": ["architect", "code-reviewer", "test-architect"],
-				"bug-fix": [
-					"bug-triage-specialist",
-					"code-reviewer",
-					"test-architect"
-				]
 			}
 		},
+		"mcp_knowledge_skills": [
+			"project-analysis",
+			"testing-strategy",
+			"architecture-patterns",
+			"performance-optimization",
+			"git-workflow",
+			"api-design"
+		],
 		"monitoring": {
 			"metrics": [
 				"bundle-size",
@@ -158,20 +141,68 @@
 		}
 	},
 	"agents": {
+		"orchestrator": {
+			"description": "Main coordination agent for multi-agent workflows",
+			"model": "opencode/grok-code",
+			"mode": "primary",
+			"tools": {
+				"task": true
+			}
+		},
 		"librarian": {
-			"model": "opencode/grok-code"
+			"description": "Codebase and documentation search specialist",
+			"model": "opencode/grok-code",
+			"mode": "subagent"
 		},
 		"explore": {
-			"model": "opencode/grok-code"
+			"description": "Codebase exploration and pattern analysis",
+			"model": "opencode/grok-code",
+			"mode": "subagent"
+		},
+		"oracle": {
+			"description": "Strategic guidance and complex problem solving",
+			"model": "opencode/grok-code",
+			"mode": "subagent"
+		},
+		"architect": {
+			"description": "System design and architecture planning",
+			"model": "opencode/grok-code",
+			"mode": "subagent"
+		},
+		"code-reviewer": {
+			"description": "Code quality assessment and improvement suggestions",
+			"model": "opencode/grok-code",
+			"mode": "subagent"
+		},
+		"security-auditor": {
+			"description": "Security vulnerability detection and hardening",
+			"model": "opencode/grok-code",
+			"mode": "subagent"
+		},
+		"refactorer": {
+			"description": "Code modernization and technical debt reduction",
+			"model": "opencode/grok-code",
+			"mode": "subagent"
+		},
+		"test-architect": {
+			"description": "Testing strategy and coverage optimization",
+			"model": "opencode/grok-code",
+			"mode": "subagent"
 		},
 		"frontend-ui-ux-engineer": {
-			"model": "opencode/grok-code"
+			"description": "Frontend development and UI/UX implementation",
+			"model": "opencode/grok-code",
+			"mode": "subagent"
 		},
 		"document-writer": {
-			"model": "opencode/grok-code"
+			"description": "Technical documentation and guides",
+			"model": "opencode/grok-code",
+			"mode": "subagent"
 		},
 		"multimodal-looker": {
-			"model": "opencode/grok-code"
+			"description": "Media file analysis and interpretation",
+			"model": "opencode/grok-code",
+			"mode": "subagent"
 		}
 	}
 }

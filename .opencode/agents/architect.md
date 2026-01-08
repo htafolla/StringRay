@@ -4,7 +4,7 @@ description: Enterprise architect specializing in StrRay framework design, compl
 model: opencode/grok-code
 temperature: 0.3
 maxSteps: 30
-mode: primary
+mode: subagent
 tools:
   Read: true
   Search: true

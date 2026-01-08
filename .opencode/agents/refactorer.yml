@@ -1,0 +1,109 @@
+name: refactorer
+description: "Refactorer agent for technical debt elimination and surgical code improvements"
+version: "2.0.0"
+model: opencode/grok-code
+
+# Error Handling Configuration
+error_handling:
+  enabled: true
+  investigation_depth: systematic
+  root_cause_timeout: 30000
+  error_boundary_layers: 3
+  graceful_degradation: true
+  recovery_strategies:
+    - technical_debt_elimination
+    - code_consolidation
+    - gradual_refactoring
+  error_classification:
+    enabled: true
+    severity_levels: [critical, high, medium, low]
+    impact_assessment: true
+
+# Performance Facilities Configuration
+performance_facilities:
+  enabled: true
+  refactoring_efficiency_tracking: true
+  code_consolidation_metrics: true
+  resource_usage_limits:
+    memory_mb: 256
+    cpu_percent: 80
+    timeout_ms: 45000
+  scalability_assessment: true
+  optimization_recommendations: true
+
+# Logging Configuration
+logging:
+  level: info
+  format: json
+  destinations:
+    - console
+    - file
+    - monitoring
+  retention_days: 30
+  sensitive_data_filtering: true
+  audit_trail: true
+  error_tracking: true
+
+# Processor Pipeline Configuration
+processor_pipeline:
+  - name: code-analysis
+    type: analysis
+    priority: critical
+    timeout_ms: 15000
+    retry_attempts: 3
+  - name: technical-debt-assessment
+    type: assessment
+    priority: high
+    timeout_ms: 30000
+    retry_attempts: 2
+  - name: refactoring-validation
+    type: validation
+    priority: high
+    timeout_ms: 10000
+    retry_attempts: 1
+  - name: consolidation-impact
+    type: analysis
+    priority: medium
+    timeout_ms: 8000
+    retry_attempts: 1
+
+# Agent Capabilities
+capabilities:
+  - code-analysis
+  - technical-debt-elimination
+  - refactoring-suggestions
+  - code-consolidation
+  - performance-optimization
+  - maintainability-improvements
+  - gradual-refactoring
+  - dependency-cleanup
+
+# Integration Hooks
+integration:
+  pre_refactoring_analysis: true
+  post_consolidation_validation: true
+  technical_debt_monitoring: true
+  performance_impact_tracking: true
+  webhook_endpoints:
+    - url: "https://refactorer-monitoring.example.com/webhook"
+      events: ["refactoring_started", "debt_eliminated", "consolidation_completed", "performance_improved"]
+
+# Security Configuration
+security:
+  sandboxed_execution: true
+  permission_level: elevated
+  data_classification: internal
+  encryption_required: false
+  refactoring_data_protection: true
+
+# Monitoring Configuration
+monitoring:
+  metrics_collection: true
+  health_checks: true
+  performance_tracking: true
+  technical_debt_tracking: true
+  alert_thresholds:
+    response_time_ms: 35000
+    error_rate_percent: 5
+    memory_usage_mb: 256
+    refactoring_timeout_ms: 30000

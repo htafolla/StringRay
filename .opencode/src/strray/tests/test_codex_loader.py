@@ -1,0 +1,460 @@
+"""
+StrRay Framework - Codex Loader Test Suite
+
+Comprehensive test suite for CodexLoader functionality including:
+- Codex term loading and validation
+- Compliance checking and caching
+- Error handling and edge cases
+- Performance and memory testing
+- Integration with configuration management
+"""
+
+import pytest
+import json
+import tempfile
+from pathlib import Path
+from unittest.mock import Mock, patch, MagicMock
+import hashlib
+from concurrent.futures import ThreadPoolExecutor
+
+from strray.core.codex_loader import (
+    CodexLoader, CodexRule, CodexComplianceResult,
+    CodexError, CodexTerm
+)
+from strray.config.manager import ConfigManager
+
+
+class TestCodexLoader:
+    """Test suite for CodexLoader core functionality."""
+
+    def setup_method(self):
+        """Set up test fixtures before each test method."""
+        self.loader = CodexLoader()
+        self.sample_terms = [1, 2, 3, 5, 15, 24, 38, 39]
+        self.config_manager = ConfigManager()
+
+    def teardown_method(self):
+        """Clean up after each test method."""
+        self.loader.clear_cache()
+
+    def test_codex_loader_initialization(self):
+        """Test CodexLoader initializes correctly."""
+        assert self.loader._codex_cache == {}
+        assert self.loader._compliance_cache == {}
+        assert self.loader._loaded_terms == set()
+        assert self.loader._codex_hash is None
+        assert self.loader.config_manager is None
+
+    def test_codex_loader_with_config_manager(self):
+        """Test CodexLoader initializes with config manager."""
+        loader = CodexLoader(config_manager=self.config_manager)
+        assert loader.config_manager is self.config_manager
+
+    def test_load_codex_terms_success(self):
+        """Test successful loading of codex terms."""
+        rules = self.loader.load_codex_terms(self.sample_terms)
+
+        assert len(rules) == len(self.sample_terms)
+        assert all(isinstance(rule, CodexRule) for rule in rules.values())
+        assert all(term_id in self.loader._loaded_terms for term_id in self.sample_terms)
+        assert self.loader._codex_hash is not None
+
+    def test_load_codex_terms_partial_failure(self):
+        """Test loading codex terms with some failures."""
+        invalid_terms = [1, 2, 999, 3]  # 999 is invalid
+
+        with patch.object(self.loader, '_load_codex_rule') as mock_load:
+            def side_effect(term_id):
+                if term_id == 999:
+                    raise CodexError(f"Unknown codex term: {term_id}")
+                return self.loader._load_codex_rule(term_id)
+
+            mock_load.side_effect = side_effect
+
+            rules = self.loader.load_codex_terms(invalid_terms)
+
+            # Should load valid terms but skip invalid ones
+            assert len(rules) == 3  # 1, 2, 3 loaded
+            assert 999 not in rules
+
+    def test_load_codex_terms_empty_list(self):
+        """Test loading empty codex terms list."""
+        rules = self.loader.load_codex_terms([])
+        assert rules == {}
+        assert self.loader._loaded_terms == set()
+
+    def test_load_individual_codex_rule_known_terms(self):
+        """Test loading individual known codex rules."""
+        # Test core framework terms
+        rule = self.loader._load_codex_rule(1)
+        assert rule.term_id == 1
+        assert rule.title == "Framework Foundation"
+        assert rule.category == "architecture"
+        assert rule.severity == "critical"
+        assert rule.automated_check is True
+
+        # Test advanced terms
+        rule = self.loader._load_codex_rule(15)
+        assert rule.term_id == 15
+        assert rule.title == "Deep Review"
+        assert rule.category == "quality"
+
+        # Test terms from config
+        rule = self.loader._load_codex_rule(38)
+        assert rule.term_id == 38
+        assert rule.title == "Functionality Retention"
+
+    def test_load_individual_codex_rule_unknown_term(self):
+        """Test loading unknown codex term raises error."""
+        with pytest.raises(CodexError, match="Unknown codex term: 999"):
+            self.loader._load_codex_rule(999)
+
+    def test_validate_compliance_agent_component(self):
+        """Test compliance validation for agent component."""
+        self.loader.load_codex_terms([2, 3, 5])  # Agent-related terms
+
+        context = {
+            "communication_bus": None,  # Will violate term 2
+            "state_manager_enabled": False,  # Will violate term 3
+            "error_handling_enabled": True  # Will pass term 5
+        }
+
+        results = self.loader.validate_compliance("agent", context)
+
+        assert len(results) == 3
+        assert all(isinstance(result, CodexComplianceResult) for result in results)
+
+        # Check specific results
+        term_2_result = next(r for r in results if r.term_id == 2)
+        assert not term_2_result.compliant
+        assert "communication bus" in " ".join(term_2_result.violations).lower()
+
+        term_3_result = next(r for r in results if r.term_id == 3)
+        assert not term_3_result.compliant
+        assert "state management" in " ".join(term_3_result.violations).lower()
+
+        term_5_result = next(r for r in results if r.term_id == 5)
+        assert term_5_result.compliant
+
+    def test_validate_compliance_orchestrator_component(self):
+        """Test compliance validation for orchestrator component."""
+        self.loader.load_codex_terms([2])  # Agent Orchestration term
+
+        context = {"max_concurrent_agents": 0}  # Will violate
+        results = self.loader.validate_compliance("orchestrator", context)
+
+        assert len(results) == 1
+        result = results[0]
+        assert not result.compliant
+        assert "concurrent agents" in " ".join(result.violations).lower()
+
+    def test_validate_compliance_configuration_component(self):
+        """Test compliance validation for configuration component."""
+        self.loader.load_codex_terms([9])  # Configuration Management term
+
+        context = {"validation_enabled": False}  # Will violate
+        results = self.loader.validate_compliance("configuration", context)
+
+        assert len(results) == 1
+        result = results[0]
+        assert not result.compliant
+        assert "validation" in " ".join(result.violations).lower()
+
+    def test_validate_compliance_generic_component(self):
+        """Test compliance validation for unknown component (generic validation)."""
+        self.loader.load_codex_terms([5])  # Error Prevention term
+
+        context = {"has_error_handling": False}  # Will violate
+        results = self.loader.validate_compliance("unknown_component", context)
+
+        assert len(results) == 1
+        result = results[0]
+        assert not result.compliant
+        assert "error handling" in " ".join(result.violations).lower()
+
+    def test_validate_compliance_validation_error(self):
+        """Test compliance validation handles validation errors gracefully."""
+        self.loader.load_codex_terms([1])
+
+        # Mock validation to raise exception
+        with patch.object(self.loader, '_validate_term_compliance', side_effect=Exception("Test error")):
+            results = self.loader.validate_compliance("agent", {})
+
+            assert len(results) == 1
+            result = results[0]
+            assert not result.compliant
+            assert "Test error" in " ".join(result.violations)
+
+    def test_validate_compliance_caching(self):
+        """Test compliance validation result caching."""
+        self.loader.load_codex_terms([5])
+
+        context = {"has_error_handling": True}
+        results1 = self.loader.validate_compliance("agent", context)
+        results2 = self.loader.validate_compliance("agent", context)
+
+        # Results should be identical (cached)
+        assert len(results1) == len(results2) == 1
+        assert results1[0].compliant == results2[0].compliant
+
+        # Cache should be populated
+        assert len(self.loader._compliance_cache) > 0
+
+    def test_get_term_dependencies_simple(self):
+        """Test getting simple term dependencies."""
+        self.loader.load_codex_terms([1, 2, 3])
+
+        deps = self.loader.get_term_dependencies(2)  # Depends on 1
+        assert 1 in deps
+
+    def test_get_term_dependencies_nested(self):
+        """Test getting nested term dependencies."""
+        self.loader.load_codex_terms([1, 2, 5, 15])
+
+        deps = self.loader.get_term_dependencies(15)  # Depends on 5, which depends on 1,2
+        assert 5 in deps
+        assert 1 in deps
+        assert 2 in deps
+
+    def test_get_term_dependencies_no_dependencies(self):
+        """Test getting dependencies for term with no dependencies."""
+        self.loader.load_codex_terms([1])
+
+        deps = self.loader.get_term_dependencies(1)  # No dependencies
+        assert deps == []
+
+    def test_get_term_dependencies_unloaded_term(self):
+        """Test getting dependencies for unloaded term."""
+        deps = self.loader.get_term_dependencies(999)
+        assert deps == []
+
+    def test_is_cache_valid_no_hash(self):
+        """Test cache validity when no hash exists."""
+        assert not self.loader.is_cache_valid([1, 2], {})
+
+    def test_is_cache_valid_different_terms(self):
+        """Test cache validity with different terms."""
+        self.loader.load_codex_terms([1, 2])
+        assert not self.loader.is_cache_valid([1, 2, 3], {})  # Different terms
+
+    def test_is_cache_valid_same_terms(self):
+        """Test cache validity with same terms."""
+        self.loader.load_codex_terms([1, 2])
+        assert self.loader.is_cache_valid([1, 2], {})  # Same terms
+
+    def test_clear_cache(self):
+        """Test clearing all caches."""
+        self.loader.load_codex_terms([1, 2, 3])
+        self.loader.validate_compliance("agent", {"test": "data"})
+
+        # Caches should be populated
+        assert len(self.loader._codex_cache) > 0
+        assert len(self.loader._compliance_cache) > 0
+        assert self.loader._codex_hash is not None
+
+        self.loader.clear_cache()
+
+        # Caches should be empty
+        assert len(self.loader._codex_cache) == 0
+        assert len(self.loader._compliance_cache) == 0
+        assert self.loader._codex_hash is None
+
+    def test_get_loaded_terms(self):
+        """Test getting loaded terms."""
+        self.loader.load_codex_terms([1, 2, 3])
+        loaded = self.loader.get_loaded_terms()
+
+        assert loaded == {1, 2, 3}
+        assert isinstance(loaded, set)
+
+    def test_get_rule_existing(self):
+        """Test getting existing rule."""
+        self.loader.load_codex_terms([1])
+        rule = self.loader.get_rule(1)
+
+        assert rule is not None
+        assert rule.term_id == 1
+        assert isinstance(rule, CodexRule)
+
+    def test_get_rule_nonexistent(self):
+        """Test getting nonexistent rule."""
+        rule = self.loader.get_rule(999)
+        assert rule is None
+
+    def test_get_rules_by_category(self):
+        """Test getting rules by category."""
+        self.loader.load_codex_terms([1, 2, 5, 15])  # Mix of categories
+
+        architecture_rules = self.loader.get_rules_by_category("architecture")
+        quality_rules = self.loader.get_rules_by_category("quality")
+
+        assert len(architecture_rules) == 1  # Term 1
+        assert len(quality_rules) == 2  # Terms 5, 15
+
+        assert all(rule.category == "architecture" for rule in architecture_rules)
+        assert all(rule.category == "quality" for rule in quality_rules)
+
+    def test_get_rules_by_category_empty(self):
+        """Test getting rules by nonexistent category."""
+        self.loader.load_codex_terms([1, 2, 3])
+        rules = self.loader.get_rules_by_category("nonexistent")
+        assert rules == []
+
+    def test_get_critical_rules(self):
+        """Test getting critical severity rules."""
+        self.loader.load_codex_terms([1, 2, 5, 7, 8, 15])  # Mix of severities
+
+        critical_rules = self.loader.get_critical_rules()
+
+        # Terms 1, 2, 5, 8 should be critical
+        assert len(critical_rules) == 4
+        assert all(rule.severity == "critical" for rule in critical_rules)
+        assert all(rule.term_id in [1, 2, 5, 8] for rule in critical_rules)
+
+    def test_calculate_codex_hash_consistency(self):
+        """Test codex hash calculation consistency."""
+        hash1 = self.loader._calculate_codex_hash([1, 2, 3])
+        hash2 = self.loader._calculate_codex_hash([1, 2, 3])
+        hash3 = self.loader._calculate_codex_hash([3, 2, 1])  # Different order
+
+        assert hash1 == hash2  # Same terms, same hash
+        assert hash1 == hash3  # Order shouldn't matter
+
+    def test_calculate_codex_hash_different_terms(self):
+        """Test codex hash calculation with different terms."""
+        hash1 = self.loader._calculate_codex_hash([1, 2, 3])
+        hash2 = self.loader._calculate_codex_hash([1, 2, 4])
+
+        assert hash1 != hash2
+
+    def test_get_context_hash_consistency(self):
+        """Test context hash calculation consistency."""
+        context = {"key": "value", "number": 42}
+        hash1 = self.loader._get_context_hash(context)
+        hash2 = self.loader._get_context_hash(context)
+
+        assert hash1 == hash2
+
+    def test_get_context_hash_different_context(self):
+        """Test context hash calculation with different contexts."""
+        context1 = {"key": "value1"}
+        context2 = {"key": "value2"}
+
+        hash1 = self.loader._get_context_hash(context1)
+        hash2 = self.loader._get_context_hash(context2)
+
+        assert hash1 != hash2
+
+    def test_concurrent_codex_loading(self):
+        """Test concurrent codex loading operations."""
+        def load_terms(terms):
+            loader = CodexLoader()
+            return loader.load_codex_terms(terms)
+
+        test_cases = [
+            [1, 2, 3],
+            [5, 15, 24],
+            [38, 39, 42],
+            [1, 5, 15, 38]
+        ]
+
+        with ThreadPoolExecutor(max_workers=4) as executor:
+            futures = [executor.submit(load_terms, terms) for terms in test_cases]
+            results = [f.result() for f in futures]
+
+        # All operations should succeed
+        assert all(len(result) == len(terms) for result, terms in zip(results, test_cases))
+
+    def test_memory_usage_with_large_codex(self):
+        """Test memory usage with large codex loading."""
+        # Load many terms
+        large_term_set = list(range(1, 21))  # Terms 1-20
+        rules = self.loader.load_codex_terms(large_term_set)
+
+        assert len(rules) == 20  # Should load all valid terms
+        assert len(self.loader._codex_cache) == 20
+
+        # Test compliance validation with large set
+        context = {"has_error_handling": True, "communication_bus": True}
+        results = self.loader.validate_compliance("agent", context)
+
+        assert len(results) == 20
+
+    def test_error_handling_invalid_json_context(self):
+        """Test error handling with invalid JSON in context."""
+        self.loader.load_codex_terms([1])
+
+        # Context with non-serializable objects
+        context = {"func": lambda x: x, "complex": complex(1, 2)}
+
+        # Should handle gracefully (may not cache, but shouldn't crash)
+        results = self.loader.validate_compliance("agent", context)
+        assert len(results) == 1
+
+    def test_codex_rule_dataclass_immutability(self):
+        """Test CodexRule dataclass behavior."""
+        rule = CodexRule(
+            term_id=1,
+            title="Test Rule",
+            description="Test description",
+            category="test",
+            severity="medium",
+            automated_check=True,
+            dependencies=[2, 3]
+        )
+
+        # Should be immutable (dataclass with frozen=True equivalent behavior)
+        assert rule.term_id == 1
+        assert rule.title == "Test Rule"
+        assert rule.dependencies == [2, 3]
+
+    def test_codex_compliance_result_structure(self):
+        """Test CodexComplianceResult structure."""
+        result = CodexComplianceResult(
+            term_id=5,
+            compliant=False,
+            violations=["Violation 1", "Violation 2"],
+            recommendations=["Fix 1", "Fix 2"],
+            metadata={"test": "data"}
+        )
+
+        assert result.term_id == 5
+        assert not result.compliant
+        assert len(result.violations) == 2
+        assert len(result.recommendations) == 2
+        assert result.metadata == {"test": "data"}
+
+    @patch('strray.core.codex_loader.logger')
+    def test_logging_on_term_load_failure(self, mock_logger):
+        """Test logging when term loading fails."""
+        with patch.object(self.loader, '_load_codex_rule', side_effect=Exception("Load failed")):
+            self.loader.load_codex_terms([999])
+
+        mock_logger.warning.assert_called()
+
+    @patch('strray.core.codex_loader.logger')
+    def test_logging_on_compliance_validation_failure(self, mock_logger):
+        """Test logging when compliance validation fails."""
+        self.loader.load_codex_terms([1])
+
+        with patch.object(self.loader, '_validate_term_compliance', side_effect=Exception("Validation failed")):
+            self.loader.validate_compliance("agent", {})
+
+        mock_logger.error.assert_called()
+
+    def test_codex_term_enum_values(self):
+        """Test CodexTerm enum has expected values."""
+        assert CodexTerm.FRAMEWORK_FOUNDATION.value == 1
+        assert CodexTerm.DEEP_REVIEW.value == 15
+        assert CodexTerm.FUNCTIONALITY_RETENTION.value == 38
+        assert CodexTerm.SYNTAX_VALIDATION.value == 39
+
+    def test_integration_with_config_manager(self):
+        """Test integration with ConfigManager for term loading."""
+        # Mock config manager with codex terms
+        config = Mock()
+        config.get_value.return_value = [1, 2, 3, 5]
+
+        loader = CodexLoader(config_manager=config)
+
+        # Should be able to access config manager

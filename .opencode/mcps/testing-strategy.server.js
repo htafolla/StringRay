@@ -592,14 +592,20 @@ export default defineConfig({
 
       // Analyze the source file
       const analysis = await this.analyzeSourceFile(filePath);
-      const testTemplate = this.createTestTemplate(filePath, testFilePath, analysis, testType, framework);
+      const testTemplate = this.createTestTemplate(
+        filePath,
+        testFilePath,
+        analysis,
+        testType,
+        framework,
+      );
 
       // Ensure the directory exists
       const testDir = path.dirname(testFilePath);
       await fs.mkdir(testDir, { recursive: true });
 
       // Write the test file
-      await fs.writeFile(testFilePath, testTemplate, 'utf-8');
+      await fs.writeFile(testFilePath, testTemplate, "utf-8");
 
       return {
         content: [
@@ -613,7 +619,7 @@ export default defineConfig({
 - **File:** ${filePath}
 - **Type:** ${analysis.fileType}
 - **Language:** ${analysis.language}
-- **Exports:** ${analysis.exports.length} (${analysis.exports.join(', ')})
+- **Exports:** ${analysis.exports.length} (${analysis.exports.join(", ")})
 
 ### Generated Tests:
 - **Framework:** ${framework}
@@ -621,7 +627,7 @@ export default defineConfig({
 - **Coverage:** ${analysis.exports.length} functions/classes tested
 
 ### Test Structure:
-${testTemplate.split('\n').slice(0, 10).join('\n')}
+${testTemplate.split("\n").slice(0, 10).join("\n")}
 
 ... (full test file written to disk)
 
@@ -639,14 +645,15 @@ ${testTemplate.split('\n').slice(0, 10).join('\n')}
   }
 
   async analyzeSourceFile(filePath) {
-    const content = await fs.readFile(filePath, 'utf-8');
+    const content = await fs.readFile(filePath, "utf-8");
     const ext = path.extname(filePath);
-    const isTypeScript = ['.ts', '.tsx'].includes(ext);
-    const isReact = ['.tsx', '.jsx'].includes(ext);
+    const isTypeScript = [".ts", ".tsx"].includes(ext);
+    const isReact = [".tsx", ".jsx"].includes(ext);
 
     // Extract exports
     const exports = [];
-    const exportRegex = /export\s+(?:const|function|class|let|var|default)\s+(\w+)/g;
+    const exportRegex =
+      /export\s+(?:const|function|class|let|var|default)\s+(\w+)/g;
     let match;
     while ((match = exportRegex.exec(content)) !== null) {
       if (match[1] && !exports.includes(match[1])) {
@@ -655,13 +662,16 @@ ${testTemplate.split('\n').slice(0, 10).join('\n')}
     }
 
     // Determine file type
-    let fileType = 'utility';
+    let fileType = "utility";
     if (isReact) {
-      fileType = 'component';
-    } else if (content.includes('class ')) {
-      fileType = 'class';
-    } else if (content.includes('export default function') || content.includes('export function')) {
-      fileType = 'function';
+      fileType = "component";
+    } else if (content.includes("class ")) {
+      fileType = "class";
+    } else if (
+      content.includes("export default function") ||
+      content.includes("export function")
+    ) {
+      fileType = "function";
     }
 
     return {
@@ -669,9 +679,9 @@ ${testTemplate.split('\n').slice(0, 10).join('\n')}
       content,
       exports,
       fileType,
-      language: isTypeScript ? 'TypeScript' : 'JavaScript',
+      language: isTypeScript ? "TypeScript" : "JavaScript",
       isReact,
-      isTypeScript
+      isTypeScript,
     };
   }
 
@@ -679,8 +689,20 @@ ${testTemplate.split('\n').slice(0, 10).join('\n')}
     const { exports, fileType, isTypeScript, isReact } = analysis;
     const fileName = path.basename(filePath, path.extname(filePath));
 
-    const testImports = this.getTestImports(filePath, testFilePath, analysis.exports, framework, isReact, isTypeScript);
-    const testStructure = this.getTestStructure(fileType, exports, testType, framework);
+    const testImports = this.getTestImports(
+      filePath,
+      testFilePath,
+      analysis.exports,
+      framework,
+      isReact,
+      isTypeScript,
+    );
+    const testStructure = this.getTestStructure(
+      fileType,
+      exports,
+      testType,
+      framework,
+    );
 
     return `${testImports}
 
@@ -690,11 +712,18 @@ ${testStructure}
 `;
   }
 
-  getTestImports(filePath, testFilePath, exports, framework, isReact, isTypeScript) {
-    const typeAnnotation = isTypeScript ? ': RenderResult' : '';
-    const typeImport = isTypeScript ? ', RenderResult' : '';
+  getTestImports(
+    filePath,
+    testFilePath,
+    exports,
+    framework,
+    isReact,
+    isTypeScript,
+  ) {
+    const typeAnnotation = isTypeScript ? ": RenderResult" : "";
+    const typeImport = isTypeScript ? ", RenderResult" : "";
 
-    let imports = `import { expect, describe, it } from '${framework === 'vitest' ? 'vitest' : 'jest'}';`;
+    let imports = `import { expect, describe, it } from '${framework === "vitest" ? "vitest" : "jest"}';`;
 
     if (isReact) {
       imports += `
@@ -713,14 +742,14 @@ import type { RenderResult } from '@testing-library/react';`;
       const relativePath = path.relative(testDir, sourceDir);
 
       let importPath;
-      if (relativePath === '') {
+      if (relativePath === "") {
         importPath = `./${fileName}`;
       } else {
         importPath = path.join(relativePath, fileName);
       }
 
       imports += `
-import { ${exports.join(', ')} } from '${importPath}';`;
+import { ${exports.join(", ")} } from '${importPath}';`;
     }
 
     return imports;
@@ -729,27 +758,27 @@ import { ${exports.join(', ')} } from '${importPath}';`;
   getTestStructure(fileType, exports, testType, framework) {
     const tests = [];
 
-    if (fileType === 'component' && testType === 'component') {
+    if (fileType === "component" && testType === "component") {
       tests.push(`  it('should render successfully', () => {
-    const { container } = render(<${exports[0] || 'Component'} />);
+    const { container } = render(<${exports[0] || "Component"} />);
     expect(container).toBeInTheDocument();
   });
 
   it('should handle props correctly', () => {
-    render(<${exports[0] || 'Component'} testProp="value" />);
+    render(<${exports[0] || "Component"} testProp="value" />);
     expect(screen.getByText('value')).toBeInTheDocument();
   });
 
   it('should be accessible', () => {
-    const { container } = render(<${exports[0] || 'Component'} />);
+    const { container } = render(<${exports[0] || "Component"} />);
     expect(container).toBeAccessible();
   });`);
     } else {
       // Unit tests for functions/classes
-      exports.forEach(exportName => {
+      exports.forEach((exportName) => {
         tests.push(`  describe('${exportName}', () => {
     it('should be defined', () => {
-      expect(typeof ${exportName}).toBe('${fileType === 'class' ? 'function' : 'function'}');
+      expect(typeof ${exportName}).toBe('${fileType === "class" ? "function" : "function"}');
     });
 
     it('should handle basic functionality', () => {
@@ -765,16 +794,16 @@ import { ${exports.join(', ')} } from '${importPath}';`;
       });
     }
 
-    return tests.join('\n\n');
+    return tests.join("\n\n");
   }
 
   getTestFilePath(sourcePath, framework) {
     const dir = path.dirname(sourcePath);
     const fileName = path.basename(sourcePath, path.extname(sourcePath));
-    const ext = framework === 'vitest' ? '.test.ts' : '.test.js';
+    const ext = framework === "vitest" ? ".test.ts" : ".test.js";
 
     // Place tests in __tests__ directory
-    const testDir = path.join(dir, '__tests__');
+    const testDir = path.join(dir, "__tests__");
     return path.join(testDir, fileName + ext);
   }
 

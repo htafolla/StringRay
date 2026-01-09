@@ -17,13 +17,27 @@ export interface TestTemplateOptions {
  * Generate a test template based on file type and structure
  */
 export function generateTestTemplate(options: TestTemplateOptions): string {
-  const { filePath, componentName, exports = [], isReact = false, isTypeScript = false } = options;
+  const {
+    filePath,
+    componentName,
+    exports = [],
+    isReact = false,
+    isTypeScript = false,
+  } = options;
 
-  const fileName = filePath.split('/').pop()?.replace(/\.(ts|tsx|js|jsx)$/, '') || 'Unknown';
-  const testFileName = `${fileName}.test.${isTypeScript ? 'ts' : 'js'}${isReact ? 'x' : ''}`;
+  const fileName =
+    filePath
+      .split("/")
+      .pop()
+      ?.replace(/\.(ts|tsx|js|jsx)$/, "") || "Unknown";
+  const testFileName = `${fileName}.test.${isTypeScript ? "ts" : "js"}${isReact ? "x" : ""}`;
 
   if (isReact) {
-    return generateReactTestTemplate(fileName, componentName || fileName, isTypeScript);
+    return generateReactTestTemplate(
+      fileName,
+      componentName || fileName,
+      isTypeScript,
+    );
   }
 
   return generateUnitTestTemplate(fileName, exports, isTypeScript);
@@ -32,12 +46,16 @@ export function generateTestTemplate(options: TestTemplateOptions): string {
 /**
  * Generate React component test template
  */
-function generateReactTestTemplate(fileName: string, componentName: string, isTypeScript: boolean): string {
-  const typeAnnotation = isTypeScript ? ': RenderResult' : '';
-  const typeImport = isTypeScript ? ', RenderResult' : '';
+function generateReactTestTemplate(
+  fileName: string,
+  componentName: string,
+  isTypeScript: boolean,
+): string {
+  const typeAnnotation = isTypeScript ? ": RenderResult" : "";
+  const typeImport = isTypeScript ? ", RenderResult" : "";
 
   return `import { render, screen } from '@testing-library/react';
-import { expect, describe, it${typeImport} } from '${isTypeScript ? 'vitest' : 'jest'}';
+import { expect, describe, it${typeImport} } from '${isTypeScript ? "vitest" : "jest"}';
 import { ${componentName} } from './${fileName}';
 
 describe('${componentName}', () => {
@@ -73,26 +91,32 @@ describe('${componentName}', () => {
 /**
  * Generate unit test template for utility functions/classes
  */
-function generateUnitTestTemplate(fileName: string, exports: string[], isTypeScript: boolean): string {
-  const describeBlocks = exports.map(exportName => {
-    if (exportName.match(/^[A-Z]/)) {
-      // Class export
-      return generateClassTestTemplate(exportName);
-    } else {
-      // Function export
-      return generateFunctionTestTemplate(exportName);
-    }
-  }).join('\n\n');
+function generateUnitTestTemplate(
+  fileName: string,
+  exports: string[],
+  isTypeScript: boolean,
+): string {
+  const describeBlocks = exports
+    .map((exportName) => {
+      if (exportName.match(/^[A-Z]/)) {
+        // Class export
+        return generateClassTestTemplate(exportName);
+      } else {
+        // Function export
+        return generateFunctionTestTemplate(exportName);
+      }
+    })
+    .join("\n\n");
 
-  return `import { expect, describe, it } from '${isTypeScript ? 'vitest' : 'jest'}';
-${exports.length > 0 ? `import { ${exports.join(', ')} } from './${fileName}';` : `// import functions from './${fileName}'`}
+  return `import { expect, describe, it } from '${isTypeScript ? "vitest" : "jest"}';
+${exports.length > 0 ? `import { ${exports.join(", ")} } from './${fileName}';` : `// import functions from './${fileName}'`}
 
 ${describeBlocks}
 
 describe('${fileName}', () => {
   // Add general module tests here
   it('should export expected functions', () => {
-    ${exports.length > 0 ? exports.map(exp => `expect(typeof ${exp}).toBe('function');`).join('\n    ') : '// Add export tests'}
+    ${exports.length > 0 ? exports.map((exp) => `expect(typeof ${exp}).toBe('function');`).join("\n    ") : "// Add export tests"}
   });
 });
 `;
@@ -154,20 +178,31 @@ function generateFunctionTestTemplate(functionName: string): string {
 /**
  * Analyze a source file to extract exports for test generation
  */
-export function analyzeSourceFile(filePath: string): { exports: string[], isReact: boolean, isTypeScript: boolean } {
+export function analyzeSourceFile(filePath: string): {
+  exports: string[];
+  isReact: boolean;
+  isTypeScript: boolean;
+} {
   try {
-    const fs = require('fs');
-    const content = fs.readFileSync(filePath, 'utf-8');
+    const fs = require("fs");
+    const content = fs.readFileSync(filePath, "utf-8");
 
     const exports: string[] = [];
-    const isReact = /\b(React|jsx?|tsx?)\b/.test(content) || filePath.endsWith('.tsx') || filePath.endsWith('.jsx');
-    const isTypeScript = filePath.endsWith('.ts') || filePath.endsWith('.tsx');
+    const isReact =
+      /\b(React|jsx?|tsx?)\b/.test(content) ||
+      filePath.endsWith(".tsx") ||
+      filePath.endsWith(".jsx");
+    const isTypeScript = filePath.endsWith(".ts") || filePath.endsWith(".tsx");
 
     // Extract named exports
-    const exportMatches = content.match(/export\s+(?:const|function|class|let|var)\s+(\w+)/g);
+    const exportMatches = content.match(
+      /export\s+(?:const|function|class|let|var)\s+(\w+)/g,
+    );
     if (exportMatches) {
       exportMatches.forEach((match: string) => {
-        const nameMatch = match.match(/(?:const|function|class|let|var)\s+(\w+)/);
+        const nameMatch = match.match(
+          /(?:const|function|class|let|var)\s+(\w+)/,
+        );
         if (nameMatch && nameMatch[1] && !exports.includes(nameMatch[1])) {
           exports.push(nameMatch[1]);
         }
@@ -176,7 +211,11 @@ export function analyzeSourceFile(filePath: string): { exports: string[], isReac
 
     // Extract default export if no named exports found
     if (exports.length === 0 && /export\s+default/.test(content)) {
-      const fileName = filePath.split('/').pop()?.replace(/\.(ts|tsx|js|jsx)$/, '') || 'Component';
+      const fileName =
+        filePath
+          .split("/")
+          .pop()
+          ?.replace(/\.(ts|tsx|js|jsx)$/, "") || "Component";
       exports.push(fileName.charAt(0).toUpperCase() + fileName.slice(1));
     }
 

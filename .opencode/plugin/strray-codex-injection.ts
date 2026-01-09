@@ -298,10 +298,16 @@ export default async function strrayCodexPlugin(input: {
         const filePath = args.filePath;
 
         // Check if this is a source file that should have tests
-        if (/\.(ts|tsx|js|jsx)$/.test(filePath) && !filePath.includes('.test.') && !filePath.includes('__tests__')) {
+        if (
+          /\.(ts|tsx|js|jsx)$/.test(filePath) &&
+          !filePath.includes(".test.") &&
+          !filePath.includes("__tests__")
+        ) {
           // Trigger test-architect agent to create tests
           const logger = await getOrCreateLogger(directory);
-          logger.log(`Detected new source file: ${filePath} - triggering test generation`);
+          logger.log(
+            `Detected new source file: ${filePath} - triggering test generation`,
+          );
 
           try {
             // Call test-architect agent to generate tests for the new file
@@ -309,11 +315,11 @@ export default async function strrayCodexPlugin(input: {
               directory,
               ".opencode",
               "mcps",
-              "testing-strategy.server.js"
+              "testing-strategy.server.js",
             );
 
             // Use the MCP server directly via stdio
-            const { spawn } = require('child_process');
+            const { spawn } = require("child_process");
 
             if (fs.existsSync(testArchitectScript)) {
               try {
@@ -333,9 +339,9 @@ export default async function strrayCodexPlugin(input: {
                     arguments: {
                       filePath: filePath,
                       testType: "unit",
-                      framework: "vitest"
-                    }
-                  }
+                      framework: "vitest",
+                    },
+                  },
                 };
 
                 // Send the tool call to the MCP server
@@ -358,7 +364,11 @@ export default async function strrayCodexPlugin(input: {
                     if (code === 0) {
                       resolve(undefined);
                     } else {
-                      reject(new Error(`MCP server exited with code ${code}: ${stderr}`));
+                      reject(
+                        new Error(
+                          `MCP server exited with code ${code}: ${stderr}`,
+                        ),
+                      );
                     }
                   });
                   mcpProcess.on("error", reject);
@@ -366,14 +376,21 @@ export default async function strrayCodexPlugin(input: {
 
                 logger.log(`Test generation completed for ${filePath}`);
               } catch (mcpError) {
-                logger.error(`MCP test generation failed for ${filePath}: ${mcpError.message}`);
+                logger.error(
+                  `MCP test generation failed for ${filePath}: ${mcpError.message}`,
+                );
               }
             } else {
-              logger.log(`Test architect MCP not found, skipping auto test generation for ${filePath}`);
+              logger.log(
+                `Test architect MCP not found, skipping auto test generation for ${filePath}`,
+              );
             }
           } catch (error: unknown) {
-            const errorMessage = error instanceof Error ? error.message : String(error);
-            logger.error(`Test generation failed for ${filePath}: ${errorMessage}`);
+            const errorMessage =
+              error instanceof Error ? error.message : String(error);
+            logger.error(
+              `Test generation failed for ${filePath}: ${errorMessage}`,
+            );
           }
         }
       }

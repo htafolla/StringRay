@@ -61,7 +61,14 @@ When creating tests automatically:
 Your goal is to ensure comprehensive test coverage and reliable validation of system behavior and performance.`,
   temperature: 0.1,
   tools: {
-    include: ["read", "grep", "lsp_*", "run_terminal_cmd", "run_terminal_cmd", "write"],
+    include: [
+      "read",
+      "grep",
+      "lsp_*",
+      "run_terminal_cmd",
+      "run_terminal_cmd",
+      "write",
+    ],
   },
   permission: {
     edit: "allow",

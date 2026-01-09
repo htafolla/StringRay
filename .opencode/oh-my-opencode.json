@@ -33,7 +33,9 @@
       "mode": "subagent",
       "temperature": 0.1,
       "tools": {
-        "include": ["read", "grep", "run_terminal_cmd"]
+          "read": true,
+          "grep": true,
+          "run_terminal_cmd": true
       },
       "permission": {
         "edit": "deny",
@@ -50,7 +52,9 @@
       "mode": "subagent",
       "temperature": 0.1,
       "tools": {
-        "include": ["read", "grep", "run_terminal_cmd"]
+          "read": true,
+          "grep": true,
+          "run_terminal_cmd": true
       },
       "permission": {
         "edit": "deny",
@@ -67,7 +71,9 @@
       "mode": "subagent",
       "temperature": 0.1,
       "tools": {
-        "include": ["read", "grep", "run_terminal_cmd"]
+          "read": true,
+          "grep": true,
+          "run_terminal_cmd": true
       },
       "permission": {
         "edit": "allow",
@@ -84,7 +90,9 @@
       "mode": "subagent",
       "temperature": 0.1,
       "tools": {
-        "include": ["read", "write", "run_terminal_cmd"]
+          "read": true,
+          "write": true,
+          "run_terminal_cmd": true
       },
       "permission": {
         "edit": "allow",
@@ -101,7 +109,9 @@
       "mode": "subagent",
       "temperature": 0.1,
       "tools": {
-        "include": ["read", "run_terminal_cmd", "look_at"]
+          "read": true,
+          "run_terminal_cmd": true,
+          "look_at": true
       },
       "permission": {
         "edit": "deny",
@@ -118,7 +128,9 @@
       "mode": "subagent",
       "temperature": 0.3,
       "tools": {
-        "include": ["read", "grep", "run_terminal_cmd"]
+          "read": true,
+          "grep": true,
+          "run_terminal_cmd": true
       },
       "permission": {
         "edit": "deny",
@@ -135,7 +147,10 @@
       "mode": "subagent",
       "temperature": 0.1,
       "tools": {
-        "include": ["read", "grep", "lsp_*", "run_terminal_cmd"]
+          "read": true,
+          "grep": true,
+          "lsp_*": true,
+          "run_terminal_cmd": true
       },
       "permission": {
         "edit": "allow",
@@ -151,15 +166,11 @@
       "description": "StrRay Framework architect with state management and delegation",
       "mode": "subagent",
       "temperature": 0.1,
-      "tools": {
-        "include": [
-          "read",
-          "grep",
-          "lsp_*",
-          "run_terminal_cmd",
-          "background_task"
-        ]
-      },
+        "tools": {
+          "read": true,
+          "grep": true,
+          "run_terminal_cmd": true
+        },
       "permission": {
         "edit": "allow",
         "bash": {
@@ -174,16 +185,18 @@
       "description": "StrRay Framework orchestrator with coordination and workflow management",
       "mode": "subagent",
       "temperature": 0.1,
-      "tools": {
-        "include": [
-          "read",
-          "grep",
-          "lsp_*",
-          "run_terminal_cmd",
-          "background_task",
-          "call_omo_agent"
-        ]
-      },
+        "tools": {
+          "read": true,
+          "grep": true,
+          "run_terminal_cmd": true,
+          "background_task": true,
+          "call_omo_agent": true,
+          "session_*": true,
+          "task": true,
+          "todowrite": true,
+          "todoread": true,
+          "skill": true
+        },
       "permission": {
         "edit": "allow",
         "bash": {
@@ -198,16 +211,14 @@
       "description": "StrRay Framework bug triage specialist with error investigation and surgical fixes",
       "mode": "subagent",
       "temperature": 0.1,
-      "tools": {
-        "include": [
-          "read",
-          "grep",
-          "lsp_*",
-          "run_terminal_cmd",
-          "ast_grep_search",
-          "ast_grep_replace"
-        ]
-      },
+        "tools": {
+          "read": true,
+          "grep": true,
+          "lsp_*": true,
+          "run_terminal_cmd": true,
+          "ast_grep_search": true,
+          "ast_grep_replace": true
+        },
       "permission": {
         "edit": "allow",
         "bash": {
@@ -222,16 +233,14 @@
       "description": "StrRay Framework code reviewer with monitoring and analytics capabilities",
       "mode": "subagent",
       "temperature": 0.1,
-      "tools": {
-        "include": [
-          "read",
-          "grep",
-          "lsp_*",
-          "run_terminal_cmd",
-          "lsp_diagnostics",
-          "lsp_code_actions"
-        ]
-      },
+        "tools": {
+          "read": true,
+          "grep": true,
+          "lsp_*": true,
+          "run_terminal_cmd": true,
+          "lsp_diagnostics": true,
+          "lsp_code_actions": true
+        },
       "permission": {
         "edit": "allow",
         "bash": {
@@ -246,15 +255,12 @@
       "description": "StrRay Framework security auditor with compliance and vulnerability detection",
       "mode": "subagent",
       "temperature": 0.1,
-      "tools": {
-        "include": [
-          "read",
-          "grep",
-          "lsp_*",
-          "run_terminal_cmd",
-          "grep_app_searchGitHub"
-        ]
-      },
+        "tools": {
+          "read": true,
+          "grep": true,
+          "run_terminal_cmd": true,
+          "look_at": true
+        },
       "permission": {
         "edit": "allow",
         "bash": {
@@ -269,17 +275,13 @@
       "description": "StrRay Framework refactorer with technical debt elimination and code consolidation",
       "mode": "subagent",
       "temperature": 0.1,
-      "tools": {
-        "include": [
-          "read",
-          "grep",
-          "lsp_*",
-          "run_terminal_cmd",
-          "ast_grep_search",
-          "ast_grep_replace",
-          "lsp_rename"
-        ]
-      },
+        "tools": {
+          "read": true,
+          "grep": true,
+          "lsp_*": true,
+          "run_terminal_cmd": true,
+          "grep_app_searchGitHub": true
+        },
       "permission": {
         "edit": "allow",
         "bash": {
@@ -294,16 +296,15 @@
       "description": "StrRay Framework test architect with automatic test generation, coverage optimization, and behavioral testing",
       "mode": "subagent",
       "temperature": 0.1,
-      "tools": {
-        "include": [
-          "read",
-          "grep",
-          "lsp_*",
-          "run_terminal_cmd",
-          "run_terminal_cmd",
-          "write"
-        ]
-      },
+        "tools": {
+          "read": true,
+          "grep": true,
+          "lsp_*": true,
+          "run_terminal_cmd": true,
+          "ast_grep_search": true,
+          "ast_grep_replace": true,
+          "lsp_rename": true
+        },
       "permission": {
         "edit": "allow",
         "bash": {
@@ -319,20 +320,13 @@
       "description": "Main orchestrator and command center for multi-agent coordination and workflow management",
       "mode": "primary",
       "temperature": 0.1,
-      "tools": {
-        "include": [
-          "read",
-          "grep",
-          "run_terminal_cmd",
-          "background_task",
-          "call_omo_agent",
-          "session_*",
-          "task",
-          "todowrite",
-          "todoread",
-          "skill"
-        ]
-      },
+        "tools": {
+          "read": true,
+          "grep": true,
+          "lsp_*": true,
+          "run_terminal_cmd": true,
+          "write": true
+        },
       "permission": {
         "edit": "deny",
         "bash": {

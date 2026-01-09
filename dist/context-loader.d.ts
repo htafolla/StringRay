@@ -44,7 +44,7 @@ export interface ContextLoadResult {
 /**
  * StrRay Context Loader
  *
-     * Loads and parses the Universal Development Codex v1.2.20 from codex.json
+ * Loads and parses the Universal Development Codex v1.2.20 from codex.json
  */
 export declare class StrRayContextLoader {
     private static instance;

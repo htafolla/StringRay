@@ -998,9 +998,9 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
   }
 
   /**
-   * Get monitoring status
-   */
-  getStatus(): {
+    * Get monitoring status
+    */
+  getMonitoringStatus(): {
     running: boolean;
     instanceId: string;
     metricsCollected: number;
@@ -1031,15 +1031,35 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
   }
 
   /**
-   * Export monitoring data
+   * Record a custom metric
    */
-  exportData(): {
+  recordMetric(name: string, value: any, tags?: Record<string, string>): void {
+    console.log(`📊 Metric recorded: ${name}`, { value, tags, timestamp: new Date().toISOString() });
+    // In a real implementation, this would store metrics for analysis
+  }
+
+  /**
+   * Record an error for monitoring
+   */
+  recordError(operation: string, error: any): void {
+    console.error(`❌ Error recorded: ${operation}`, {
+      error: error.message || error,
+      timestamp: new Date().toISOString(),
+      stack: error.stack
+    });
+    // In a real implementation, this would store errors for analysis and alerting
+  }
+
+  /**
+    * Get comprehensive system status
+    */
+  getStatus(): {
     config: MonitoringConfig;
     metrics: { system: SystemMetrics[]; application: ApplicationMetrics[] };
     alerts: Alert[];
     healthResults: HealthCheckResult[];
     clusterMetrics: ClusterMetrics;
-    status: any;
+    monitoringStatus: any;
   } {
     return {
       config: this.config,
@@ -1047,7 +1067,7 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
       alerts: this.alerts,
       healthResults: this.healthResults,
       clusterMetrics: this.getClusterMetrics(),
-      status: this.getStatus(),
+      monitoringStatus: this.getMonitoringStatus(),
     };
   }
 }

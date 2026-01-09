@@ -9,7 +9,7 @@
  */
 import * as fs from "fs";
 import * as path from "path";
-import { parseCodexContent, detectContentFormat } from "./utils/codex-parser.js";
+import { parseCodexContent, detectContentFormat, } from "./utils/codex-parser.js";
 /**
  * Type guard for regex match results
  */
@@ -19,7 +19,7 @@ function isValidMatch(match, index) {
 /**
  * StrRay Context Loader
  *
-     * Loads and parses the Universal Development Codex v1.2.20 from codex.json
+ * Loads and parses the Universal Development Codex v1.2.20 from codex.json
  */
 export class StrRayContextLoader {
     static instance;
@@ -46,10 +46,10 @@ export class StrRayContextLoader {
     async loadCodexContext(projectRoot) {
         const warnings = [];
         // Validate project root
-        if (!projectRoot || projectRoot.trim() === '') {
+        if (!projectRoot || projectRoot.trim() === "") {
             return {
                 success: false,
-                error: 'Invalid project root path: path cannot be empty',
+                error: "Invalid project root path: path cannot be empty",
                 warnings,
             };
         }
@@ -93,25 +93,25 @@ export class StrRayContextLoader {
      */
     parseCodexContent(content, sourcePath) {
         // Validate inputs before format detection
-        if (!content || content.trim() === '') {
-            throw new Error('Invalid content provided');
+        if (!content || content.trim() === "") {
+            throw new Error("Invalid content provided");
         }
-        if (!sourcePath || sourcePath.trim() === '') {
-            throw new Error('Invalid source path provided');
+        if (!sourcePath || sourcePath.trim() === "") {
+            throw new Error("Invalid source path provided");
         }
         // Detect format before parsing
         const formatResult = detectContentFormat(content);
-        if (formatResult.format === 'unknown') {
+        if (formatResult.format === "unknown") {
             throw new Error(`Unable to detect content format for ${sourcePath}. Content appears to be neither valid JSON nor Markdown.`);
         }
         // Log format detection for debugging
         console.log(`StrRay: Detected ${formatResult.format} format for ${sourcePath} (confidence: ${formatResult.confidence})`);
         const result = parseCodexContent(content, sourcePath);
         if (!result.success) {
-            throw new Error(result.error || 'Failed to parse codex content');
+            throw new Error(result.error || "Failed to parse codex content");
         }
         if (!result.context) {
-            throw new Error('Parsing succeeded but no context was returned');
+            throw new Error("Parsing succeeded but no context was returned");
         }
         return result.context;
     }
@@ -160,10 +160,10 @@ export class StrRayContextLoader {
     validateAgainstCodex(context, action, actionDetails) {
         // Input validation
         if (!context || !context.terms) {
-            throw new Error('Invalid codex context provided');
+            throw new Error("Invalid codex context provided");
         }
-        if (!action || action.trim() === '') {
-            throw new Error('Invalid action provided');
+        if (!action || action.trim() === "") {
+            throw new Error("Invalid action provided");
         }
         const violations = [];
         const recommendations = [];
@@ -181,9 +181,13 @@ export class StrRayContextLoader {
             }
         }
         // Check for unresolved tasks in code
-        const codeContent = typeof actionDetails.code === 'string' ? actionDetails.code : '';
-        if (codeContent.includes("TODO") || codeContent.includes("FIXME") || codeContent.includes("XXX") ||
-            action.includes("TODO") || action.includes("FIXME") || action.includes("XXX")) {
+        const codeContent = typeof actionDetails.code === "string" ? actionDetails.code : "";
+        if (codeContent.includes("TODO") ||
+            codeContent.includes("FIXME") ||
+            codeContent.includes("XXX") ||
+            action.includes("TODO") ||
+            action.includes("FIXME") ||
+            action.includes("XXX")) {
             const term7 = context.terms.get(7);
             if (term7) {
                 violations.push({
@@ -205,7 +209,8 @@ export class StrRayContextLoader {
             }
         }
         if (actionDetails.isInfiniteLoop ||
-            action.includes("while(true)") || action.includes("for(;;)")) {
+            action.includes("while(true)") ||
+            action.includes("for(;;)")) {
             const term8 = context.terms.get(8);
             if (term8) {
                 violations.push({
@@ -250,7 +255,8 @@ export class StrRayContextLoader {
         const terms = Array.from(context.terms.values());
         const categoryBreakdown = {};
         terms.forEach((term) => {
-            categoryBreakdown[term.category] = (categoryBreakdown[term.category] || 0) + 1;
+            categoryBreakdown[term.category] =
+                (categoryBreakdown[term.category] || 0) + 1;
         });
         return {
             loaded: true,

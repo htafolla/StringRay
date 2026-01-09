@@ -1,4 +1,4 @@
-import { PreValidateContext, PostValidateContext, ProcessorHook } from '../processors/processor-types';
+import { PreValidateContext, PostValidateContext, ProcessorHook } from "../processors/processor-types";
 export interface ValidationHooks {
     preValidate: (data: unknown) => boolean;
     postValidate: (result: boolean) => void;

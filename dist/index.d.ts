@@ -13,7 +13,7 @@ export declare const loadOrchestrator: () => Promise<typeof import("./orchestrat
 export declare const loadBootOrchestrator: () => Promise<typeof import("./boot-orchestrator.js")>;
 export declare const loadStateManagement: () => Promise<typeof import("./state/index.js")>;
 export declare const loadHooks: () => Promise<typeof import("./hooks/index.js")>;
-export { createStrRayCodexInjectorHook, getCodexStats, clearCodexCache } from "./codex-injector.js";
+export { createStrRayCodexInjectorHook, getCodexStats, clearCodexCache, } from "./codex-injector.js";
 export { StrRayContextLoader, strRayContextLoader } from "./context-loader.js";
 export declare const loadAdvancedFeatures: () => Promise<{
     StrRayOrchestrator: typeof import("./orchestrator.js").StrRayOrchestrator;

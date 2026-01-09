@@ -1,0 +1,21 @@
+{
+  "timestamp": "2026-01-08T23:53:21.126Z",
+  "budget": {
+    "status": "pass",
+    "violations": 0,
+    "criticalViolations": 0,
+    "recommendations": [
+      "Reduce Time to Interactive by minimizing main thread blocking JavaScript"
+    ]
+  },
+  "regression": {
+    "totalTests": 4,
+    "passRate": 0,
+    "averageDeviation": 184.58284326181527,
+    "regressionDetected": true
+  },
+  "recommendations": [
+    "Reduce Time to Interactive by minimizing main thread blocking JavaScript",
+    "Performance regression detected - investigate recent changes"
+  ]
+}

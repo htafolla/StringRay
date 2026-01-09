@@ -1,0 +1,85 @@
+{
+  "timestamp": 1767914124000,
+  "bundleSize": {
+    "totalSize": 128005,
+    "gzippedSize": 28479,
+    "fileCount": 8,
+    "largestFile": {
+      "name": "enterprise-monitoring.js",
+      "size": 46005,
+      "gzippedSize": 8431
+    },
+    "breakdown": [
+      {
+        "name": "enterprise-monitoring.js",
+        "size": 46005,
+        "gzippedSize": 8431,
+        "percentage": 35.94000234365845
+      },
+      {
+        "name": "enterprise-monitoring-config.js",
+        "size": 31197,
+        "gzippedSize": 6501,
+        "percentage": 24.371704230303504
+      },
+      {
+        "name": "boot-orchestrator.js",
+        "size": 17065,
+        "gzippedSize": 3429,
+        "percentage": 13.331510487871567
+      },
+      {
+        "name": "codex-injector.js",
+        "size": 12871,
+        "gzippedSize": 3478,
+        "percentage": 10.055075973594782
+      },
+      {
+        "name": "context-loader.js",
+        "size": 9484,
+        "gzippedSize": 2705,
+        "percentage": 7.40908558259443
+      },
+      {
+        "name": "orchestrator.js",
+        "size": 6388,
+        "gzippedSize": 2021,
+        "percentage": 4.99043006132573
+      },
+      {
+        "name": "server.js",
+        "size": 3568,
+        "gzippedSize": 1344,
+        "percentage": 2.7873911175344714
+      },
+      {
+        "name": "index.js",
+        "size": 1427,
+        "gzippedSize": 570,
+        "percentage": 1.1148002031170656
+      }
+    ]
+  },
+  "webVitals": {
+    "firstContentfulPaint": 678.3531472637983,
+    "timeToInteractive": 2673.6588107269995,
+    "largestContentfulPaint": 1674.8884130934093,
+    "cumulativeLayoutShift": 0.07540167253320014,
+    "firstInputDelay": 72.3755903383865,
+    "timestamp": 1767914124000
+  },
+  "runtime": {
+    "memoryUsage": {
+      "rss": 120340480,
+      "heapUsed": 13777064,
+      "heapTotal": 30277632,
+      "external": 3234008
+    },
+    "startupTime": 2142.9055,
+    "cpuUsage": 762.737,
+    "timestamp": 1767914124000
+  },
+  "violations": [],
+  "recommendations": [],
+  "overallStatus": "pass"
+}

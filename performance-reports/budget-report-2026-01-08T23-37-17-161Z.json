@@ -1,0 +1,87 @@
+{
+  "timestamp": 1767915437071,
+  "bundleSize": {
+    "totalSize": 128042,
+    "gzippedSize": 28479,
+    "fileCount": 8,
+    "largestFile": {
+      "name": "enterprise-monitoring.js",
+      "size": 46013,
+      "gzippedSize": 8429
+    },
+    "breakdown": [
+      {
+        "name": "enterprise-monitoring.js",
+        "size": 46013,
+        "gzippedSize": 8429,
+        "percentage": 35.93586479436435
+      },
+      {
+        "name": "enterprise-monitoring-config.js",
+        "size": 31197,
+        "gzippedSize": 6501,
+        "percentage": 24.364661595414006
+      },
+      {
+        "name": "boot-orchestrator.js",
+        "size": 17065,
+        "gzippedSize": 3429,
+        "percentage": 13.32765811218194
+      },
+      {
+        "name": "codex-injector.js",
+        "size": 12871,
+        "gzippedSize": 3478,
+        "percentage": 10.05217038159354
+      },
+      {
+        "name": "context-loader.js",
+        "size": 9513,
+        "gzippedSize": 2707,
+        "percentage": 7.429593414660815
+      },
+      {
+        "name": "orchestrator.js",
+        "size": 6388,
+        "gzippedSize": 2021,
+        "percentage": 4.9889879883163335
+      },
+      {
+        "name": "server.js",
+        "size": 3568,
+        "gzippedSize": 1344,
+        "percentage": 2.7865856515830743
+      },
+      {
+        "name": "index.js",
+        "size": 1427,
+        "gzippedSize": 570,
+        "percentage": 1.1144780618859436
+      }
+    ]
+  },
+  "webVitals": {
+    "firstContentfulPaint": 1286.9151338131835,
+    "timeToInteractive": 3175.09258642045,
+    "largestContentfulPaint": 2058.393933768245,
+    "cumulativeLayoutShift": 0.0939836967741279,
+    "firstInputDelay": 44.244397359214545,
+    "timestamp": 1767915437070
+  },
+  "runtime": {
+    "memoryUsage": {
+      "rss": 133054464,
+      "heapUsed": 13549872,
+      "heapTotal": 20316160,
+      "external": 3320772
+    },
+    "startupTime": 754.633833,
+    "cpuUsage": 599.085,
+    "timestamp": 1767915437071
+  },
+  "violations": [],
+  "recommendations": [
+    "Reduce Time to Interactive by minimizing main thread blocking JavaScript"
+  ],
+  "overallStatus": "pass"
+}

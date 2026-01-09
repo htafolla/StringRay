@@ -2,9 +2,7 @@
   "$schema": "https://raw.githubusercontent.com/code-yeongyu/oh-my-opencode/master/assets/oh-my-opencode.schema.json",
   "google_auth": false,
   "preemptive_compaction": true,
-  "plugins": [
-    "stringray-framework"
-  ],
+  "plugins": ["stringray-framework"],
   "model_routing": {
     "enforcer": "opencode/grok-code",
     "architect": "opencode/grok-code",
@@ -26,12 +24,7 @@
     "auto_capture": true,
     "format": "markdown",
     "include_timestamps": true,
-    "categories": [
-      "refactoring",
-      "analysis",
-      "performance",
-      "security"
-    ]
+    "categories": ["refactoring", "analysis", "performance", "security"]
   },
   "agents": {
     "librarian": {
@@ -40,11 +33,7 @@
       "mode": "subagent",
       "temperature": 0.1,
       "tools": {
-        "include": [
-          "read",
-          "grep",
-          "run_terminal_cmd"
-        ]
+        "include": ["read", "grep", "run_terminal_cmd"]
       },
       "permission": {
         "edit": "deny",
@@ -61,11 +50,7 @@
       "mode": "subagent",
       "temperature": 0.1,
       "tools": {
-        "include": [
-          "read",
-          "grep",
-          "run_terminal_cmd"
-        ]
+        "include": ["read", "grep", "run_terminal_cmd"]
       },
       "permission": {
         "edit": "deny",
@@ -82,11 +67,7 @@
       "mode": "subagent",
       "temperature": 0.1,
       "tools": {
-        "include": [
-          "read",
-          "grep",
-          "run_terminal_cmd"
-        ]
+        "include": ["read", "grep", "run_terminal_cmd"]
       },
       "permission": {
         "edit": "allow",
@@ -103,11 +84,7 @@
       "mode": "subagent",
       "temperature": 0.1,
       "tools": {
-        "include": [
-          "read",
-          "write",
-          "run_terminal_cmd"
-        ]
+        "include": ["read", "write", "run_terminal_cmd"]
       },
       "permission": {
         "edit": "allow",
@@ -124,11 +101,7 @@
       "mode": "subagent",
       "temperature": 0.1,
       "tools": {
-        "include": [
-          "read",
-          "run_terminal_cmd",
-          "look_at"
-        ]
+        "include": ["read", "run_terminal_cmd", "look_at"]
       },
       "permission": {
         "edit": "deny",
@@ -145,11 +118,7 @@
       "mode": "subagent",
       "temperature": 0.3,
       "tools": {
-        "include": [
-          "read",
-          "grep",
-          "run_terminal_cmd"
-        ]
+        "include": ["read", "grep", "run_terminal_cmd"]
       },
       "permission": {
         "edit": "deny",
@@ -166,12 +135,7 @@
       "mode": "subagent",
       "temperature": 0.1,
       "tools": {
-        "include": [
-          "read",
-          "grep",
-          "lsp_*",
-          "run_terminal_cmd"
-        ]
+        "include": ["read", "grep", "lsp_*", "run_terminal_cmd"]
       },
       "permission": {
         "edit": "allow",

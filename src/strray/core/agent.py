@@ -1607,6 +1607,64 @@ class BaseAgent(ABC):
             "communication_enabled": self.communication_bus is not None,
         }
 
+    def serialize(self) -> Dict[str, Any]:
+        """Serialize agent state for persistence."""
+        # Get key configuration values
+        config_data = {}
+        if self.config_manager:
+            # Get important config values
+            config_data = {
+                "model_default": self.config_manager.get_value("model_default"),
+                "temperature": self.config_manager.get_value("agent_default_temperature", 0.3),
+                "strray_version": self.config_manager.get_value("strray_version"),
+            }
+
+        return {
+            "name": self.name,
+            "capabilities": self.capabilities,
+            "model": self.model,
+            "temperature": self.temperature,
+            "config_data": config_data,
+            "current_state": (
+                self.current_state.value
+                if hasattr(self.current_state, "value")
+                else str(self.current_state)
+            ),
+            "state_data": getattr(self, "_state_data", {}),
+        }
+
+    @classmethod
+    def deserialize(cls, state: Dict[str, Any]) -> "BaseAgent":
+        """Deserialize agent from serialized state."""
+        config_manager = ConfigManager()
+        if "config_data" in state:
+            for key, value in state["config_data"].items():
+                config_manager.set_value(key, value)
+
+        agent = cls(
+            name=state["name"],
+            config_manager=config_manager,
+            capabilities=state.get("capabilities"),
+            model=state.get("model"),
+            temperature=state.get("temperature", 0.3),
+        )
+
+        # Restore additional state
+        if "state_data" in state:
+            agent._state_data = state["state_data"]
+
+        return agent
+
+    def get_performance_metrics(self) -> Dict[str, Any]:
+        """Get performance metrics for the agent."""
+        return {
+            "total_operations": getattr(self, "_completed_tasks", 0),
+            "active_tasks": len(self._running_tasks),
+            "memory_usage_mb": 0,  # Placeholder for actual implementation
+            "cpu_usage_percent": 0,  # Placeholder for actual implementation
+            "average_response_time": 0.0,  # Placeholder for actual implementation
+        }
+
 
 class AgentError(Exception):
     """Agent-related errors."""

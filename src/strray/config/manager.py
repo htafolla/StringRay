@@ -50,6 +50,112 @@ class ConfigManager:
             "state_dir": ".strray/state",
             "max_concurrent_tasks": 10,
             "timeout_default": 300,
+
+            # StrRay Framework Configuration
+            "strray_version": "1.0.0",
+            "codex_enabled": True,
+            "codex_version": "v1.2.20",
+            "codex_cache_ttl_seconds": 3600,
+            "codex_auto_reload_on_change": True,
+            "codex_terms": [
+                1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+                21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39,
+                40, 41, 42, 43
+            ],
+            "session_auto_format": True,
+            "session_security_scan": True,
+            "session_compliance_check": True,
+            "session_threshold_monitoring": True,
+            "automation_hooks": {
+                "pre_commit": ["pre-commit-introspection"],
+                "post_commit": ["auto-format"],
+                "daily": ["enforcer-daily-scan"],
+                "security": ["security-scan"],
+                "deployment": ["post-deployment-audit"],
+                "summary": ["summary-logger"],
+                "job_completion": ["job-summary-logger"]
+            },
+            "mcp_knowledge_skills": [
+                "project-analysis",
+                "testing-strategy",
+                "architecture-patterns",
+                "performance-optimization",
+                "git-workflow",
+                "api-design"
+            ],
+            "sisyphus_coordination_model": "async-multi-agent",
+            "sisyphus_max_concurrent_agents": 3,
+            "sisyphus_task_distribution": {
+                "enforcer": ["compliance", "thresholds", "automation"],
+                "architect": ["design", "architecture", "dependencies"],
+                "code-reviewer": ["quality", "best-practices", "security"],
+                "test-architect": ["testing", "coverage", "behavioral"],
+                "refactorer": ["modernization", "debt-reduction", "consolidation"],
+                "security-auditor": ["vulnerabilities", "threats", "validation"],
+                "bug-triage-specialist": ["errors", "root-cause", "fixes"]
+            },
+            "sisyphus_workflow_patterns": {
+                "complex-refactor": ["architect", "refactorer", "test-architect"],
+                "security-audit": ["security-auditor", "enforcer", "code-reviewer"],
+                "new-feature": ["architect", "code-reviewer", "test-architect"],
+                "bug-fix": ["bug-triage-specialist", "code-reviewer", "test-architect"]
+            },
+            "monitoring_metrics": [
+                "bundle-size",
+                "test-coverage",
+                "code-duplication",
+                "build-time",
+                "error-rate"
+            ],
+            "monitoring_alerts": [
+                "threshold-violations",
+                "security-issues",
+                "performance-degradation",
+                "test-failures"
+            ],
+            "monitoring_reporting": {
+                "frequency": "daily",
+                "format": "json",
+                "destinations": ["console", "logs", "notifications"]
+            },
+            "agent_capabilities": {
+                "enforcer": [
+                    "compliance-monitoring",
+                    "threshold-enforcement",
+                    "automation-orchestration"
+                ],
+                "architect": [
+                    "design-review",
+                    "architecture-validation",
+                    "dependency-analysis"
+                ],
+                "orchestrator": [
+                    "task-coordination",
+                    "multi-agent-orchestration",
+                    "workflow-management"
+                ],
+                "bug-triage-specialist": [
+                    "error-analysis",
+                    "root-cause-identification",
+                    "fix-suggestions"
+                ],
+                "code-reviewer": [
+                    "code-quality-assessment",
+                    "best-practice-validation",
+                    "security-review"
+                ],
+                "security-auditor": [
+                    "vulnerability-detection",
+                    "threat-analysis",
+                    "security-validation"
+                ],
+                "refactorer": ["code-modernization", "debt-reduction", "consolidation"],
+                "test-architect": [
+                    "test-strategy-design",
+                    "coverage-optimization",
+                    "behavioral-testing"
+                ]
+            }
         }
 
         for key, value in defaults.items():
@@ -66,8 +172,8 @@ class ConfigManager:
 
     def get_agent_capabilities(self, agent_name: str) -> List[str]:
         """Get capabilities for specific agent."""
-        # Default capabilities - could be extended
-        return ["task-execution", "ai-integration", "state-management", "communication"]
+        agent_capabilities = self.get_value("agent_capabilities", {})
+        return agent_capabilities.get(agent_name, ["task-execution", "ai-integration", "state-management", "communication"])
 
     def save_config(self, path: Optional[Path] = None) -> None:
         """Save current configuration."""

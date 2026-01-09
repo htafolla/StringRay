@@ -51,6 +51,11 @@ export class BootOrchestrator {
     config: Partial<BootSequenceConfig> = {},
     stateManager?: StrRayStateManager,
   ) {
+    // Initialize components first
+    this.contextLoader = StrRayContextLoader.getInstance();
+    this.stateManager = stateManager || new StrRayStateManager();
+    this.processorManager = new ProcessorManager(this.stateManager);
+
     this.config = {
       enableEnforcement: true,
       codexValidation: true,
@@ -59,10 +64,6 @@ export class BootOrchestrator {
       agentLoading: true,
       ...config,
     };
-
-    this.contextLoader = StrRayContextLoader.getInstance();
-    this.stateManager = stateManager || new StrRayStateManager();
-    this.processorManager = new ProcessorManager(this.stateManager);
   }
 
   /**
@@ -123,21 +124,29 @@ export class BootOrchestrator {
       this.stateManager.set("session:boot_time", Date.now());
       this.stateManager.set("session:agents", []);
 
-      // Initialize session cleanup manager
-      const cleanupManager = createSessionCleanupManager(this.stateManager);
-      this.stateManager.set("session:cleanup_manager", cleanupManager);
-
       const sessionCoordinator = this.stateManager.get(
         "delegation:session_coordinator",
       ) as any;
 
       if (sessionCoordinator) {
+        // Initialize session monitor first
         const sessionMonitor = createSessionMonitor(
           this.stateManager,
           sessionCoordinator,
-          cleanupManager,
+          undefined as any, // Will be set later
         );
         this.stateManager.set("session:monitor", sessionMonitor);
+
+        // Initialize session cleanup manager with session monitor reference
+        const cleanupManager = createSessionCleanupManager(
+          this.stateManager,
+          {},
+          sessionMonitor
+        );
+        this.stateManager.set("session:cleanup_manager", cleanupManager);
+
+        // Update session monitor with cleanup manager reference
+        (sessionMonitor as any).cleanupManager = cleanupManager;
 
         const stateManagerInstance = createSessionStateManager(
           this.stateManager,
@@ -307,7 +316,14 @@ export class BootOrchestrator {
       let codexInjector = this.stateManager.get("processor:codex_injector");
       if (!codexInjector) {
         // Import and initialize codex injector
-        const { CodexInjector } = await import("./codex-injector");
+        // Try import with .js extension first (for Node.js/test environment)
+        let CodexInjector;
+        try {
+          ({ CodexInjector } = await import("./codex-injector.js"));
+        } catch (error) {
+          // Fallback to import without .js extension (for oh-my-opencode plugin environment)
+          ({ CodexInjector } = await import("./codex-injector"));
+        }
         codexInjector = new CodexInjector();
         this.stateManager.set("processor:codex_injector", codexInjector);
       }
@@ -449,6 +465,8 @@ export class BootOrchestrator {
     };
 
     try {
+      // Phase 0: Load StrRay configuration from Python ConfigManager
+      await this.loadStrRayConfiguration();
       // Phase 1: Initialize core systems
       result.orchestratorLoaded = await this.loadOrchestrator();
       if (!result.orchestratorLoaded) {
@@ -523,6 +541,82 @@ export class BootOrchestrator {
     this.stateManager.set("boot:errors", result.errors);
 
     return result;
+  }
+
+  /**
+   * Load StrRay configuration from Python ConfigManager
+   */
+  private async loadStrRayConfiguration(): Promise<void> {
+    try {
+      // Import Python ConfigManager via dynamic import
+      const { spawn } = await import("child_process");
+      const { promisify } = await import("util");
+
+      // Execute Python script to get configuration
+      const pythonScript = `
+import sys
+import json
+sys.path.insert(0, 'src')
+from strray.config.manager import ConfigManager
+
+config_manager = ConfigManager()
+strray_config = {
+    'version': config_manager.get_value('strray_version'),
+    'codex_enabled': config_manager.get_value('codex_enabled'),
+    'codex_version': config_manager.get_value('codex_version'),
+    'codex_terms': config_manager.get_value('codex_terms'),
+    'monitoring_metrics': config_manager.get_value('monitoring_metrics'),
+    'monitoring_alerts': config_manager.get_value('monitoring_alerts'),
+    'agent_capabilities': config_manager.get_value('agent_capabilities')
+}
+print(json.dumps(strray_config))
+`;
+
+      const child = spawn("python3", ["-c", pythonScript], {
+        cwd: process.cwd(),
+        stdio: ["ignore", "pipe", "pipe"]
+      });
+
+      let stdout = "";
+      let stderr = "";
+
+      child.stdout?.on("data", (data) => {
+        stdout += data.toString();
+      });
+
+      child.stderr?.on("data", (data) => {
+        stderr += data.toString();
+      });
+
+      await new Promise((resolve, reject) => {
+        child.on("close", (code) => {
+          if (code === 0) {
+            resolve(undefined);
+          } else {
+            reject(new Error(`Python config loading failed: ${stderr}`));
+          }
+        });
+        child.on("error", reject);
+      });
+
+      if (stdout.trim()) {
+        const strrayConfig = JSON.parse(stdout.trim());
+
+        // Store configuration in state manager for use by other components
+        this.stateManager.set("strray:config", strrayConfig);
+        this.stateManager.set("strray:version", strrayConfig.version);
+        this.stateManager.set("strray:codex_enabled", strrayConfig.codex_enabled);
+        this.stateManager.set("strray:codex_terms", strrayConfig.codex_terms);
+        this.stateManager.set("strray:monitoring_metrics", strrayConfig.monitoring_metrics);
+        this.stateManager.set("strray:monitoring_alerts", strrayConfig.monitoring_alerts);
+        this.stateManager.set("strray:agent_capabilities", strrayConfig.agent_capabilities);
+
+        console.log("✅ StrRay configuration loaded from Python ConfigManager");
+      }
+    } catch (error) {
+      console.warn("⚠️ Failed to load StrRay configuration from Python ConfigManager:", error);
+      // Continue with defaults if Python loading fails
+    }
   }
 }
 

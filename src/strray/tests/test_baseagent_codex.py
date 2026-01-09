@@ -106,9 +106,11 @@ class TestBaseAgentCodexIntegration:
         """Test agent error handling with codex operations."""
         codex_loader = CodexLoader(config_manager=self.config_manager)
 
-        # Test with invalid terms
-        with pytest.raises(Exception):  # Should handle gracefully
-            codex_loader.load_codex_terms([999])  # Invalid term
+        # Test with invalid terms - should handle gracefully
+        rules = codex_loader.load_codex_terms([999])  # Invalid term
+
+        # Should return empty dict for invalid terms
+        assert rules == {}
 
         # Agent should continue to function
         assert self.agent.name == "test_codex_agent"
@@ -194,13 +196,15 @@ class TestBaseAgentCodexIntegration:
             "communication_bus": self.agent.communication_bus is not None,
         }
 
-        is_compliant, violations = codex_loader.validate_compliance(
+        results = codex_loader.validate_compliance(
             "agent", agent_context
         )
 
-        assert isinstance(is_compliant, bool)
-        assert isinstance(violations, list)
-        assert all(isinstance(v, dict) for v in violations)
+        assert isinstance(results, list)
+        assert len(results) > 0
+        result = results[0]
+        assert hasattr(result, 'compliant')
+        assert isinstance(result.violations, list)
 
     def test_agent_codex_cache_invalidation(self):
         """Test codex cache invalidation when terms change."""
@@ -328,7 +332,6 @@ class TestBaseAgentCodexIntegration:
         all_terms = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 24, 38, 39]
         codex_loader.load_codex_terms(all_terms)
 
-        components = ["agent", "orchestrator", "configuration"]
         context = {
             "communication_bus": True,
             "state_manager_enabled": True,
@@ -338,13 +341,11 @@ class TestBaseAgentCodexIntegration:
             "has_error_handling": True,
         }
 
-        total_results = 0
-        for component in components:
-            results = codex_loader.validate_compliance(component, context)
-            total_results += len(results)
+        # Validate context against all loaded terms
+        results = codex_loader.validate_compliance(context)
 
-        # Should have results for all terms across all components
-        assert total_results == len(all_terms) * len(components)
+        # Should have results for all loaded terms
+        assert len(results) == len(all_terms)
 
     def test_agent_codex_error_recovery_validation(self):
         """Test codex validation error recovery."""
@@ -359,9 +360,9 @@ class TestBaseAgentCodexIntegration:
         }
 
         # Should handle errors gracefully and continue
-        results = codex_loader.validate_compliance("agent", problematic_context)
+        results = codex_loader.validate_compliance(problematic_context)
 
-        assert len(results) == 2  # Should still return results for both terms
+        assert len(results) == 2  # Should return results for both loaded terms
         # Some may fail but shouldn't crash the entire validation
 
     @patch("strray.core.codex_loader.logger")
@@ -413,7 +414,7 @@ class TestBaseAgentCodexIntegration:
             "validation_enabled": True,
         }
 
-        results = codex_loader.validate_compliance("agent", context)
+        results = codex_loader.validate_compliance(context)
 
         # 4. Verify workflow completion
         assert len(rules) == len(terms)

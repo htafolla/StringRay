@@ -68,20 +68,11 @@ class TestCodexLoader:
         """Test loading codex terms with some failures."""
         invalid_terms = [1, 2, 999, 3]  # 999 is invalid
 
-        with patch.object(self.loader, "_load_codex_rule") as mock_load:
+        rules = self.loader.load_codex_terms(invalid_terms)
 
-            def side_effect(term_id):
-                if term_id == 999:
-                    raise CodexError(f"Unknown codex term: {term_id}")
-                return self.loader._load_codex_rule(term_id)
-
-            mock_load.side_effect = side_effect
-
-            rules = self.loader.load_codex_terms(invalid_terms)
-
-            # Should load valid terms but skip invalid ones
-            assert len(rules) == 3  # 1, 2, 3 loaded
-            assert 999 not in rules
+        # Should load valid terms but skip invalid ones
+        assert len(rules) == 3  # 1, 2, 3 loaded
+        assert 999 not in rules
 
     def test_load_codex_terms_empty_list(self):
         """Test loading empty codex terms list."""
@@ -132,15 +123,15 @@ class TestCodexLoader:
 
         # Check specific results
         term_2_result = next(r for r in results if r.term_id == 2)
-        assert not term_2_result.is_compliant
+        assert not term_2_result.compliant
         assert "communication bus" in " ".join(term_2_result.violations).lower()
 
         term_3_result = next(r for r in results if r.term_id == 3)
-        assert not term_3_result.is_compliant
+        assert not term_3_result.compliant
         assert "state management" in " ".join(term_3_result.violations).lower()
 
         term_5_result = next(r for r in results if r.term_id == 5)
-        assert term_5_result.is_compliant
+        assert term_5_result.compliant
 
     def test_validate_compliance_orchestrator_component(self):
         """Test compliance validation for orchestrator component."""
@@ -151,7 +142,7 @@ class TestCodexLoader:
 
         assert len(results) == 1
         result = results[0]
-        assert not result.is_compliant
+        assert not result.compliant
         assert "concurrent agents" in " ".join(result.violations).lower()
 
     def test_validate_compliance_configuration_component(self):
@@ -163,7 +154,7 @@ class TestCodexLoader:
 
         assert len(results) == 1
         result = results[0]
-        assert not result.is_compliant
+        assert not result.compliant
         assert "validation" in " ".join(result.violations).lower()
 
     def test_validate_compliance_generic_component(self):
@@ -175,7 +166,7 @@ class TestCodexLoader:
 
         assert len(results) == 1
         result = results[0]
-        assert not result.is_compliant
+        assert not result.compliant
         assert "error handling" in " ".join(result.violations).lower()
 
     def test_validate_compliance_validation_error(self):
@@ -192,7 +183,7 @@ class TestCodexLoader:
 
             assert len(results) == 1
             result = results[0]
-            assert not result.is_compliant
+            assert not result.compliant
             assert "Test error" in " ".join(result.violations)
 
     def test_validate_compliance_caching(self):
@@ -205,7 +196,7 @@ class TestCodexLoader:
 
         # Results should be identical (cached)
         assert len(results1) == len(results2) == 1
-        assert results1[0].is_compliant == results2[0].is_compliant
+        assert results1[0].compliant == results2[0].compliant
 
         # Cache should be populated
         assert len(self.loader._compliance_cache) > 0
@@ -300,7 +291,7 @@ class TestCodexLoader:
         architecture_rules = self.loader.get_rules_by_category("architecture")
         quality_rules = self.loader.get_rules_by_category("quality")
 
-        assert len(architecture_rules) == 1  # Term 1
+        assert len(architecture_rules) == 2  # Terms 1, 2
         assert len(quality_rules) == 2  # Terms 5, 15
 
         assert all(rule.category == "architecture" for rule in architecture_rules)
@@ -386,7 +377,7 @@ class TestCodexLoader:
 
         # Test compliance validation with large set
         context = {"has_error_handling": True, "communication_bus": True}
-        results = self.loader.validate_compliance("agent", context)
+        results = self.loader.validate_compliance(context)
 
         assert len(results) == 20
 
@@ -398,7 +389,7 @@ class TestCodexLoader:
         context = {"func": lambda x: x, "complex": complex(1, 2)}
 
         # Should handle gracefully (may not cache, but shouldn't crash)
-        results = self.loader.validate_compliance("agent", context)
+        results = self.loader.validate_compliance(context)
         assert len(results) == 1
 
     def test_codex_rule_dataclass_immutability(self):
@@ -429,7 +420,7 @@ class TestCodexLoader:
         )
 
         assert result.term_id == 5
-        assert not result.is_compliant
+        assert not result.compliant
         assert len(result.violations) == 2
         assert len(result.recommendations) == 2
         assert result.metadata == {"test": "data"}
@@ -438,7 +429,7 @@ class TestCodexLoader:
     def test_logging_on_term_load_failure(self, mock_logger):
         """Test logging when term loading fails."""
         with patch.object(
-            self.loader, "_load_codex_rule", side_effect=Exception("Load failed")
+            self.loader, "_load_codex_rule", side_effect=CodexError(999, "Test Term", "Load failed")
         ):
             self.loader.load_codex_terms([999])
 

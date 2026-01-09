@@ -36,7 +36,10 @@
     "security-monitor": "node scripts/basic-security-audit.cjs --monitor",
     "deps:check": "npm audit && npm outdated",
     "deps:update": "npm update && npm audit fix",
-    "deps:scan": "node scripts/dependency-scan.cjs"
+    "deps:scan": "node scripts/dependency-scan.cjs",
+    "eval:phase1": "node scripts/verify-phase1.js",
+    "eval:boot": "node scripts/boot-check.cjs",
+    "eval:processors": "node scripts/test-processor-activation.js"
   },
   "keywords": [
     "ai",

@@ -302,8 +302,8 @@ This checklist provides comprehensive security-focused guidelines for code revie
 - [ ] Code is ready for secure deployment
 - [ ] Security documentation updated
 
-**Security Review Completed By:** ****\*\*\*\*****\_\_****\*\*\*\*****
-**Date:** ****\*\*\*\*****\_\_****\*\*\*\*****
+**Security Review Completed By:** \***\*\*\*\*\*\*\***\_\_\***\*\*\*\*\*\*\***
+**Date:** \***\*\*\*\*\*\*\***\_\_\***\*\*\*\*\*\*\***
 **Approval Status:** ☐ Approved ☐ Requires Changes ☐ Rejected
 
 **Comments:**

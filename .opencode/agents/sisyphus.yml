@@ -1,6 +1,6 @@
-name: sisyphus
+name: Sisyphus
 description: "Main orchestrator and command center for multi-agent coordination and workflow management"
-version: "2.0.0"
+version: "1.0.0"
 model: opencode/grok-code
 
 # State Management Configuration

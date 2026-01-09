@@ -2,8 +2,9 @@
   "$schema": "https://raw.githubusercontent.com/code-yeongyu/oh-my-opencode/master/assets/oh-my-opencode.schema.json",
   "google_auth": false,
   "preemptive_compaction": true,
-
-  "plugins": ["stringray-framework"],
+  "plugins": [
+    "stringray-framework"
+  ],
   "model_routing": {
     "enforcer": "opencode/grok-code",
     "architect": "opencode/grok-code",
@@ -13,7 +14,11 @@
     "security-auditor": "opencode/grok-code",
     "refactorer": "opencode/grok-code",
     "test-architect": "opencode/grok-code",
-    "sisyphus": "opencode/grok-code"
+    "sisyphus": "opencode/grok-code",
+    "librarian": "opencode/grok-code",
+    "explore": "opencode/grok-code",
+    "oracle": "opencode/grok-code",
+    "multimodal-looker": "opencode/grok-code"
   },
   "logging": {
     "enabled": true,
@@ -21,23 +26,139 @@
     "auto_capture": true,
     "format": "markdown",
     "include_timestamps": true,
-    "categories": ["refactoring", "analysis", "performance", "security"]
+    "categories": [
+      "refactoring",
+      "analysis",
+      "performance",
+      "security"
+    ]
   },
   "agents": {
     "librarian": {
-      "model": "opencode/grok-code"
+      "model": "opencode/grok-code",
+      "description": "Codebase and documentation search specialist",
+      "mode": "subagent",
+      "temperature": 0.1,
+      "tools": {
+        "include": [
+          "read",
+          "grep",
+          "run_terminal_cmd"
+        ]
+      },
+      "permission": {
+        "edit": "deny",
+        "bash": {
+          "git": "allow",
+          "npm": "allow",
+          "bun": "allow"
+        }
+      }
     },
     "explore": {
-      "model": "opencode/grok-code"
+      "model": "opencode/grok-code",
+      "description": "Fast codebase exploration and pattern analysis specialist",
+      "mode": "subagent",
+      "temperature": 0.1,
+      "tools": {
+        "include": [
+          "read",
+          "grep",
+          "run_terminal_cmd"
+        ]
+      },
+      "permission": {
+        "edit": "deny",
+        "bash": {
+          "git": "allow",
+          "npm": "allow",
+          "bun": "allow"
+        }
+      }
     },
     "frontend-ui-ux-engineer": {
-      "model": "opencode/grok-code"
+      "model": "opencode/grok-code",
+      "description": "Frontend development and UI/UX implementation specialist",
+      "mode": "subagent",
+      "temperature": 0.1,
+      "tools": {
+        "include": [
+          "read",
+          "grep",
+          "run_terminal_cmd"
+        ]
+      },
+      "permission": {
+        "edit": "allow",
+        "bash": {
+          "git": "allow",
+          "npm": "allow",
+          "bun": "allow"
+        }
+      }
     },
     "document-writer": {
-      "model": "opencode/grok-code"
+      "model": "opencode/grok-code",
+      "description": "Technical documentation and content creation specialist",
+      "mode": "subagent",
+      "temperature": 0.1,
+      "tools": {
+        "include": [
+          "read",
+          "write",
+          "run_terminal_cmd"
+        ]
+      },
+      "permission": {
+        "edit": "allow",
+        "bash": {
+          "git": "allow",
+          "npm": "allow",
+          "bun": "allow"
+        }
+      }
     },
     "multimodal-looker": {
-      "model": "opencode/grok-code"
+      "model": "opencode/grok-code",
+      "description": "Multimodal file analysis and interpretation specialist for images, diagrams, PDFs, and media files",
+      "mode": "subagent",
+      "temperature": 0.1,
+      "tools": {
+        "include": [
+          "read",
+          "run_terminal_cmd",
+          "look_at"
+        ]
+      },
+      "permission": {
+        "edit": "deny",
+        "bash": {
+          "git": "allow",
+          "npm": "allow",
+          "bun": "allow"
+        }
+      }
+    },
+    "oracle": {
+      "model": "opencode/grok-code",
+      "description": "Strategic guidance and complex problem-solving specialist for architectural decisions",
+      "mode": "subagent",
+      "temperature": 0.3,
+      "tools": {
+        "include": [
+          "read",
+          "grep",
+          "run_terminal_cmd"
+        ]
+      },
+      "permission": {
+        "edit": "deny",
+        "bash": {
+          "git": "allow",
+          "npm": "allow",
+          "bun": "allow"
+        }
+      }
     },
     "enforcer": {
       "model": "opencode/grok-code",
@@ -45,7 +166,12 @@
       "mode": "subagent",
       "temperature": 0.1,
       "tools": {
-        "include": ["read", "grep", "lsp_*", "run_terminal_cmd"]
+        "include": [
+          "read",
+          "grep",
+          "lsp_*",
+          "run_terminal_cmd"
+        ]
       },
       "permission": {
         "edit": "allow",
@@ -224,7 +350,7 @@
         }
       }
     },
-    "sisyphus": {
+    "Sisyphus": {
       "model": "opencode/grok-code",
       "description": "Main orchestrator and command center for multi-agent coordination and workflow management",
       "mode": "primary",
@@ -233,74 +359,22 @@
         "include": [
           "read",
           "grep",
-          "lsp_*",
           "run_terminal_cmd",
-          "run_terminal_cmd",
-          "write",
           "background_task",
           "call_omo_agent",
           "session_*",
           "task",
           "todowrite",
           "todoread",
-          "webfetch",
-          "websearch",
-          "codesearch",
-          "skill",
-          "webfetch",
-          "bash",
-          "read",
-          "glob",
-          "grep",
-          "edit",
-          "write",
-          "task",
-          "todowrite",
-          "todoread",
-          "webfetch",
-          "websearch",
-          "codesearch",
-          "skill",
-          "lsp_hover",
-          "lsp_goto_definition",
-          "lsp_find_references",
-          "lsp_document_symbols",
-          "lsp_workspace_symbols",
-          "lsp_diagnostics",
-          "lsp_servers",
-          "lsp_prepare_rename",
-          "lsp_rename",
-          "lsp_code_actions",
-          "lsp_code_action_resolve",
-          "ast_grep_search",
-          "ast_grep_replace",
-          "session_list",
-          "session_read",
-          "session_search",
-          "session_info",
-          "background_task",
-          "background_output",
-          "background_cancel",
-          "call_omo_agent",
-          "background_output",
-          "look_at",
-          "skill_mcp",
-          "slashcommand",
-          "interactive_bash",
-          "skill_mcp",
-          "slashcommand",
-          "interactive_bash",
-          "look_at"
+          "skill"
         ]
       },
       "permission": {
-        "edit": "allow",
+        "edit": "deny",
         "bash": {
           "git": "allow",
           "npm": "allow",
-          "bun": "allow",
-          "test": "allow",
-          "coverage": "allow"
+          "bun": "allow"
         }
       }
     }

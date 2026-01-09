@@ -8,20 +8,20 @@
  * @since 2026-01-08
  */
 
-import { EventEmitter } from 'events';
-import { DistributedStateManager } from './state-manager';
+import { EventEmitter } from "events";
+import { DistributedStateManager } from "./state-manager";
 
 export enum RaftState {
-  FOLLOWER = 'follower',
-  CANDIDATE = 'candidate',
-  LEADER = 'leader'
+  FOLLOWER = "follower",
+  CANDIDATE = "candidate",
+  LEADER = "leader",
 }
 
 export enum RaftMessageType {
-  REQUEST_VOTE = 'request_vote',
-  REQUEST_VOTE_RESPONSE = 'request_vote_response',
-  APPEND_ENTRIES = 'append_entries',
-  APPEND_ENTRIES_RESPONSE = 'append_entries_response'
+  REQUEST_VOTE = "request_vote",
+  REQUEST_VOTE_RESPONSE = "request_vote_response",
+  APPEND_ENTRIES = "append_entries",
+  APPEND_ENTRIES_RESPONSE = "append_entries_response",
 }
 
 export interface RaftMessage {
@@ -74,7 +74,7 @@ export class RaftConsensus extends EventEmitter {
   constructor(
     private instanceId: string,
     private stateManager: DistributedStateManager,
-    config: Partial<RaftConfig> = {}
+    config: Partial<RaftConfig> = {},
   ) {
     super();
 
@@ -100,7 +100,9 @@ export class RaftConsensus extends EventEmitter {
     // Start election timer
     this.resetElectionTimer();
 
-    console.log(`🗳️ Raft: Initialized ${this.instanceId} as ${this.state} in term ${this.currentTerm}`);
+    console.log(
+      `🗳️ Raft: Initialized ${this.instanceId} as ${this.state} in term ${this.currentTerm}`,
+    );
   }
 
   /**
@@ -142,7 +144,7 @@ export class RaftConsensus extends EventEmitter {
     let votes = 1; // Vote for self
 
     for (const result of results) {
-      if (result.status === 'fulfilled' && result.value) {
+      if (result.status === "fulfilled" && result.value) {
         votes++;
       }
     }
@@ -152,7 +154,8 @@ export class RaftConsensus extends EventEmitter {
 
   private async requestVoteFromPeer(peerId: string): Promise<boolean> {
     const lastLogIndex = this.log.length;
-    const lastLogTerm = lastLogIndex > 0 ? this.log[lastLogIndex - 1]?.term ?? 0 : 0;
+    const lastLogTerm =
+      lastLogIndex > 0 ? (this.log[lastLogIndex - 1]?.term ?? 0) : 0;
 
     const message: RaftMessage = {
       type: RaftMessageType.REQUEST_VOTE,
@@ -187,8 +190,10 @@ export class RaftConsensus extends EventEmitter {
     // Start heartbeat timer
     this.startHeartbeatTimer();
 
-    console.log(`👑 Raft: ${this.instanceId} became leader for term ${this.currentTerm}`);
-    this.emit('leaderElected', this.instanceId);
+    console.log(
+      `👑 Raft: ${this.instanceId} became leader for term ${this.currentTerm}`,
+    );
+    this.emit("leaderElected", this.instanceId);
   }
 
   private becomeFollower(): void {
@@ -201,7 +206,9 @@ export class RaftConsensus extends EventEmitter {
     }
 
     this.resetElectionTimer();
-    console.log(`👥 Raft: ${this.instanceId} became follower in term ${this.currentTerm}`);
+    console.log(
+      `👥 Raft: ${this.instanceId} became follower in term ${this.currentTerm}`,
+    );
   }
 
   /**
@@ -236,14 +243,18 @@ export class RaftConsensus extends EventEmitter {
   private handleRequestVote(message: RaftMessage): RaftMessage {
     const { lastLogIndex, lastLogTerm } = message.data ?? {};
     const myLastLogIndex = this.log.length;
-    const myLastLogTerm = myLastLogIndex > 0 ? this.log[myLastLogIndex - 1]?.term ?? 0 : 0;
+    const myLastLogTerm =
+      myLastLogIndex > 0 ? (this.log[myLastLogIndex - 1]?.term ?? 0) : 0;
 
-    const logUpToDate = (lastLogTerm ?? 0) > myLastLogTerm ||
-                       ((lastLogTerm ?? 0) === myLastLogTerm && (lastLogIndex ?? 0) >= myLastLogIndex);
+    const logUpToDate =
+      (lastLogTerm ?? 0) > myLastLogTerm ||
+      ((lastLogTerm ?? 0) === myLastLogTerm &&
+        (lastLogIndex ?? 0) >= myLastLogIndex);
 
-    const grantVote = message.term >= this.currentTerm &&
-                     (this.votedFor === null || this.votedFor === message.from) &&
-                     logUpToDate;
+    const grantVote =
+      message.term >= this.currentTerm &&
+      (this.votedFor === null || this.votedFor === message.from) &&
+      logUpToDate;
 
     if (grantVote) {
       this.votedFor = message.from;
@@ -283,12 +294,15 @@ export class RaftConsensus extends EventEmitter {
     this.leaderId = message.from;
     this.state = RaftState.FOLLOWER;
 
-    const { prevLogIndex, prevLogTerm, entries, leaderCommit } = message.data ?? {};
+    const { prevLogIndex, prevLogTerm, entries, leaderCommit } =
+      message.data ?? {};
 
     // Check log consistency
     if ((prevLogIndex ?? 0) > 0) {
-      if ((prevLogIndex ?? 0) > this.log.length ||
-          this.log[(prevLogIndex ?? 0) - 1]?.term !== (prevLogTerm ?? 0)) {
+      if (
+        (prevLogIndex ?? 0) > this.log.length ||
+        this.log[(prevLogIndex ?? 0) - 1]?.term !== (prevLogTerm ?? 0)
+      ) {
         return {
           type: RaftMessageType.APPEND_ENTRIES_RESPONSE,
           term: this.currentTerm,
@@ -319,7 +333,9 @@ export class RaftConsensus extends EventEmitter {
     };
   }
 
-  private handleAppendEntriesResponse(message: RaftMessage): RaftMessage | null {
+  private handleAppendEntriesResponse(
+    message: RaftMessage,
+  ): RaftMessage | null {
     if (this.state !== RaftState.LEADER) return null;
 
     const peer = this.peers.get(message.from);
@@ -328,7 +344,10 @@ export class RaftConsensus extends EventEmitter {
     const { success } = message.data;
 
     if (success) {
-      peer.matchIndex = Math.max(peer.matchIndex, message.data?.lastLogIndex ?? 0);
+      peer.matchIndex = Math.max(
+        peer.matchIndex,
+        message.data?.lastLogIndex ?? 0,
+      );
       peer.nextIndex = peer.matchIndex + 1;
 
       this.updateCommitIndex();
@@ -374,9 +393,13 @@ export class RaftConsensus extends EventEmitter {
     if (!peer) return;
 
     const prevLogIndex = peer.nextIndex - 1;
-    const prevLogTerm = prevLogIndex > 0 ? this.log[prevLogIndex - 1]?.term ?? 0 : 0;
+    const prevLogTerm =
+      prevLogIndex > 0 ? (this.log[prevLogIndex - 1]?.term ?? 0) : 0;
 
-    const entries = this.log.slice(Math.max(0, prevLogIndex), prevLogIndex + this.config.maxLogEntriesPerAppend);
+    const entries = this.log.slice(
+      Math.max(0, prevLogIndex),
+      prevLogIndex + this.config.maxLogEntriesPerAppend,
+    );
 
     const message: RaftMessage = {
       type: RaftMessageType.APPEND_ENTRIES,
@@ -394,7 +417,10 @@ export class RaftConsensus extends EventEmitter {
     try {
       await this.sendMessage(peerId, message);
     } catch (error) {
-      console.warn(`⚠️ Raft: Failed to send append entries to ${peerId}:`, error);
+      console.warn(
+        `⚠️ Raft: Failed to send append entries to ${peerId}:`,
+        error,
+      );
     }
   }
 
@@ -415,8 +441,10 @@ export class RaftConsensus extends EventEmitter {
       clearTimeout(this.electionTimer);
     }
 
-    const timeout = Math.random() * (this.config.electionTimeoutMax - this.config.electionTimeoutMin) +
-                   this.config.electionTimeoutMin;
+    const timeout =
+      Math.random() *
+        (this.config.electionTimeoutMax - this.config.electionTimeoutMin) +
+      this.config.electionTimeoutMin;
 
     this.electionTimer = setTimeout(async () => {
       if (this.state !== RaftState.LEADER) {
@@ -461,7 +489,7 @@ export class RaftConsensus extends EventEmitter {
       const entry = this.log[this.lastApplied - 1];
 
       if (entry) {
-        this.emit('applyEntry', entry);
+        this.emit("applyEntry", entry);
       }
     }
   }
@@ -481,24 +509,33 @@ export class RaftConsensus extends EventEmitter {
         }
       }
     } catch (error) {
-      console.error('❌ Raft: Failed to discover peers:', error);
+      console.error("❌ Raft: Failed to discover peers:", error);
     }
   }
 
-  private async sendMessage(peerId: string, message: RaftMessage): Promise<RaftMessage> {
+  private async sendMessage(
+    peerId: string,
+    message: RaftMessage,
+  ): Promise<RaftMessage> {
     // Send message via distributed state manager
     const channel = `raft:${peerId}`;
-    await this.stateManager.set(`raft:message:${this.instanceId}:${peerId}`, message);
+    await this.stateManager.set(
+      `raft:message:${this.instanceId}:${peerId}`,
+      message,
+    );
 
     // Wait for response (simplified - in real implementation would use proper messaging)
     return new Promise((resolve, reject) => {
-      const timeout = setTimeout(() => reject(new Error('Timeout')), 5000);
+      const timeout = setTimeout(() => reject(new Error("Timeout")), 5000);
 
-      const unwatch = this.stateManager.watch(`raft:response:${peerId}:${this.instanceId}`, (response: RaftMessage) => {
-        clearTimeout(timeout);
-        unwatch();
-        resolve(response);
-      });
+      const unwatch = this.stateManager.watch(
+        `raft:response:${peerId}:${this.instanceId}`,
+        (response: RaftMessage) => {
+          clearTimeout(timeout);
+          unwatch();
+          resolve(response);
+        },
+      );
     });
   }
 
@@ -509,12 +546,12 @@ export class RaftConsensus extends EventEmitter {
       log: this.log,
     };
 
-    await this.stateManager.set('raft:state', state);
+    await this.stateManager.set("raft:state", state);
   }
 
   private async restoreState(): Promise<void> {
     try {
-      const state = await this.stateManager.get('raft:state') as any;
+      const state = (await this.stateManager.get("raft:state")) as any;
       if (state) {
         this.currentTerm = state.currentTerm ?? 0;
         this.votedFor = state.votedFor ?? null;
@@ -523,14 +560,19 @@ export class RaftConsensus extends EventEmitter {
         this.lastApplied = this.log.length;
       }
     } catch (error) {
-      console.warn('⚠️ Raft: Failed to restore state, starting fresh:', error);
+      console.warn("⚠️ Raft: Failed to restore state, starting fresh:", error);
     }
   }
 
   /**
    * Get current Raft state
    */
-  getState(): { state: RaftState; term: number; leaderId: string | null; isLeader: boolean } {
+  getState(): {
+    state: RaftState;
+    term: number;
+    leaderId: string | null;
+    isLeader: boolean;
+  } {
     return {
       state: this.state,
       term: this.currentTerm,
@@ -573,7 +615,7 @@ export class RaftConsensus extends EventEmitter {
 export const createRaftConsensus = (
   instanceId: string,
   stateManager: DistributedStateManager,
-  config: Partial<RaftConfig> = {}
+  config: Partial<RaftConfig> = {},
 ): RaftConsensus => {
   return new RaftConsensus(instanceId, stateManager, config);
 };

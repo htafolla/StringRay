@@ -8,7 +8,7 @@
  * @since 2026-01-08
  */
 
-import WebSocket from "ws";
+import { WebSocketServer, WebSocket } from "ws";
 import { EventEmitter } from "events";
 import { IncomingMessage } from "http";
 import * as zlib from "zlib";
@@ -63,9 +63,12 @@ export interface StreamingStats {
  * Real-time data streaming service
  */
 export class RealTimeStreamingService extends EventEmitter {
-  private wss?: WebSocket.Server;
+  private wss?: WebSocketServer;
   private config: StreamingConfig;
-  private connections = new Map<string, { ws: WebSocket; info: ConnectionInfo }>();
+  private connections = new Map<
+    string,
+    { ws: WebSocket; info: ConnectionInfo }
+  >();
   private messageBuffer: StreamMessage[] = [];
   private heartbeatTimer?: NodeJS.Timeout;
   private stats: StreamingStats;
@@ -163,7 +166,7 @@ export class RealTimeStreamingService extends EventEmitter {
   async start(): Promise<void> {
     return new Promise((resolve, reject) => {
       try {
-        this.wss = new WebSocket.Server({
+        this.wss = new WebSocketServer({
           port: this.config.port,
           path: this.config.path,
           maxPayload: 1024 * 1024, // 1MB max payload
@@ -171,7 +174,7 @@ export class RealTimeStreamingService extends EventEmitter {
         });
 
         this.wss.on("connection", this.handleConnection.bind(this));
-        this.wss.on("error", (error) => {
+        this.wss.on("error", (error: Error) => {
           console.error("WebSocket server error:", error);
           this.emit("error", error);
         });
@@ -182,10 +185,14 @@ export class RealTimeStreamingService extends EventEmitter {
         // Start buffer cleanup
         this.startBufferCleanup();
 
-        console.log(`🚀 Real-Time Streaming Service started on port ${this.config.port}`);
+        console.log(
+          `🚀 Real-Time Streaming Service started on port ${this.config.port}`,
+        );
         console.log(`   Path: ${this.config.path}`);
         console.log(`   Max Connections: ${this.config.maxConnections}`);
-        console.log(`   Compression: ${this.config.compression ? "enabled" : "disabled"}`);
+        console.log(
+          `   Compression: ${this.config.compression ? "enabled" : "disabled"}`,
+        );
 
         this.emit("started");
         resolve();
@@ -290,7 +297,9 @@ export class RealTimeStreamingService extends EventEmitter {
       }
 
       this.stats.messagesReceived++;
-      this.stats.bytesReceived += Buffer.isBuffer(data) ? data.length : data.toString().length;
+      this.stats.bytesReceived += Buffer.isBuffer(data)
+        ? data.length
+        : data.toString().length;
 
       // Handle different message types
       switch (message.type) {
@@ -325,7 +334,9 @@ export class RealTimeStreamingService extends EventEmitter {
   private handleDisconnection(connectionId: string): void {
     const connection = this.connections.get(connectionId);
     if (connection) {
-      console.log(`🔌 Disconnection: ${connectionId} from ${connection.info.ip}`);
+      console.log(
+        `🔌 Disconnection: ${connectionId} from ${connection.info.ip}`,
+      );
       this.connections.delete(connectionId);
       this.stats.activeConnections--;
       this.emit("disconnection", connection.info);
@@ -346,7 +357,9 @@ export class RealTimeStreamingService extends EventEmitter {
   private handleSubscription(connectionId: string, channels: string[]): void {
     const connection = this.connections.get(connectionId);
     if (connection) {
-      connection.info.subscriptions = [...new Set([...connection.info.subscriptions, ...channels])];
+      connection.info.subscriptions = [
+        ...new Set([...connection.info.subscriptions, ...channels]),
+      ];
       console.log(`📡 ${connectionId} subscribed to: ${channels.join(", ")}`);
     }
   }
@@ -358,9 +371,11 @@ export class RealTimeStreamingService extends EventEmitter {
     const connection = this.connections.get(connectionId);
     if (connection) {
       connection.info.subscriptions = connection.info.subscriptions.filter(
-        (sub) => !channels.includes(sub)
+        (sub) => !channels.includes(sub),
       );
-      console.log(`📡 ${connectionId} unsubscribed from: ${channels.join(", ")}`);
+      console.log(
+        `📡 ${connectionId} unsubscribed from: ${channels.join(", ")}`,
+      );
     }
   }
 
@@ -407,7 +422,9 @@ export class RealTimeStreamingService extends EventEmitter {
 
       connection.ws.send(dataToSend);
       this.stats.messagesSent++;
-      this.stats.bytesSent += Buffer.isBuffer(dataToSend) ? dataToSend.length : dataToSend.length;
+      this.stats.bytesSent += Buffer.isBuffer(dataToSend)
+        ? dataToSend.length
+        : dataToSend.length;
     } catch (error) {
       console.error(`Error sending message to ${connectionId}:`, error);
     }
@@ -422,7 +439,7 @@ export class RealTimeStreamingService extends EventEmitter {
 
     const cutoffTime = Date.now() - this.config.retentionPeriod;
     const recentMessages = this.messageBuffer.filter(
-      (msg) => msg.timestamp > cutoffTime
+      (msg) => msg.timestamp > cutoffTime,
     );
 
     // Send recent messages in batches
@@ -441,10 +458,15 @@ export class RealTimeStreamingService extends EventEmitter {
   /**
    * Check if message should be sent to connection based on subscriptions
    */
-  private shouldSendToConnection(info: ConnectionInfo, message: StreamMessage): boolean {
-    return info.subscriptions.includes("all") ||
-           info.subscriptions.includes(message.type) ||
-           info.subscriptions.includes(message.source);
+  private shouldSendToConnection(
+    info: ConnectionInfo,
+    message: StreamMessage,
+  ): boolean {
+    return (
+      info.subscriptions.includes("all") ||
+      info.subscriptions.includes(message.type) ||
+      info.subscriptions.includes(message.source)
+    );
   }
 
   /**
@@ -453,7 +475,7 @@ export class RealTimeStreamingService extends EventEmitter {
   private startHeartbeatMonitoring(): void {
     this.heartbeatTimer = setInterval(() => {
       const now = Date.now();
-      const timeoutThreshold = now - (this.config.heartbeatInterval * 2);
+      const timeoutThreshold = now - this.config.heartbeatInterval * 2;
 
       for (const [connectionId, connection] of this.connections) {
         if (connection.info.lastHeartbeat < timeoutThreshold) {
@@ -476,7 +498,7 @@ export class RealTimeStreamingService extends EventEmitter {
       const initialLength = this.messageBuffer.length;
 
       this.messageBuffer = this.messageBuffer.filter(
-        (msg) => msg.timestamp > cutoffTime
+        (msg) => msg.timestamp > cutoffTime,
       );
 
       const removed = initialLength - this.messageBuffer.length;
@@ -518,7 +540,8 @@ export class RealTimeStreamingService extends EventEmitter {
 
     // Calculate compression ratio
     if (this.stats.messagesSent > 0) {
-      this.stats.compressionRatio = this.stats.bytesSent / (this.stats.messagesSent * 100); // Rough estimate
+      this.stats.compressionRatio =
+        this.stats.bytesSent / (this.stats.messagesSent * 100); // Rough estimate
     }
 
     return { ...this.stats };
@@ -528,7 +551,9 @@ export class RealTimeStreamingService extends EventEmitter {
    * Get active connections
    */
   getConnections(): ConnectionInfo[] {
-    return Array.from(this.connections.values()).map(({ info }) => ({ ...info }));
+    return Array.from(this.connections.values()).map(({ info }) => ({
+      ...info,
+    }));
   }
 
   /**

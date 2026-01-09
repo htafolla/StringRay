@@ -14,7 +14,7 @@ import { execSync, spawn } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 
-const MAX_OUTPUT_SIZE = 25000; // Leave buffer below 30k limit
+const MAX_OUTPUT_SIZE = 100000; // Increased buffer for large test outputs
 const MAX_FILES_THRESHOLD = 50; // Run individually if more than 50 test files
 const CHUNK_SIZE = 10; // Process tests in chunks of 10
 
@@ -268,14 +268,25 @@ class SmartTestRunner {
             return;
           }
           
-          const result = JSON.parse(stdout);
-          resolve({
-            file: testFile,
-            success: result.success,
-            numPassedTests: result.numPassedTests,
-            numFailedTests: result.numFailedTests,
-            output: stdout.length > 1000 ? stdout.substring(0, 1000) + '...' : stdout
-          });
+           const result = JSON.parse(stdout);
+
+           // Check for actual test failures even if overall success is true
+           let actualFailedTests = result.numFailedTests;
+           if (result.testResults && result.testResults.length > 0) {
+             for (const testResult of result.testResults) {
+               if (testResult.assertionResults) {
+                 actualFailedTests += testResult.assertionResults.filter(r => r.status === 'failed').length;
+               }
+             }
+           }
+
+           resolve({
+             file: testFile,
+             success: result.success && actualFailedTests === 0,
+             numPassedTests: result.numPassedTests,
+             numFailedTests: actualFailedTests,
+             output: stdout.length > 1000 ? stdout.substring(0, 1000) + '...' : stdout
+           });
         } catch (error) {
           resolve({
             file: testFile,

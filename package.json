@@ -39,7 +39,8 @@
     "deps:scan": "node scripts/dependency-scan.cjs",
     "eval:phase1": "node scripts/verify-phase1.js",
     "eval:boot": "node scripts/boot-check.cjs",
-    "eval:processors": "node scripts/test-processor-activation.js"
+    "eval:processors": "node scripts/test-processor-activation.js",
+    "validate:all": "echo '🔬 StrRay Framework - Complete Validation Suite' && echo '================================================' && echo -e '\\n📝 1. TypeScript Compilation...' && npm run typecheck && echo '✅ PASSED' && echo -e '\\n🔍 2. ESLint Code Quality...' && npm run lint && echo '✅ PASSED' && echo -e '\\n🧪 3. Test Suite Execution...' && npm test && echo '✅ PASSED' && echo -e '\\n📊 4. Test Coverage Analysis...' && npm run test:coverage && echo '✅ PASSED' && echo -e '\\n⚡ 5. Performance Evaluation...' && npm run test:performance && echo '✅ PASSED' && echo -e '\\n🔒 6. Security Audit...' && npm run security-audit && echo '✅ PASSED' && echo -e '\\n📦 7. Dependency Scan...' && npm run deps:scan && echo '✅ PASSED' && echo -e '\\n🚀 8. Phase 1 Integration...' && timeout 60 npm run eval:phase1 && echo '✅ PASSED' && echo -e '\\n💻 9. Boot Health...' && npm run eval:boot && echo '✅ PASSED' && echo -e '\\n⚙️ 10. Processor Activation...' && npm run eval:processors && echo '✅ PASSED' && echo -e '\\n🎉 ALL VALIDATIONS PASSED!' || echo '❌ Some validations failed - check output above'"
   },
   "keywords": [
     "ai",

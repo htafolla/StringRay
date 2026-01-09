@@ -429,7 +429,9 @@ class TestCodexLoader:
     def test_logging_on_term_load_failure(self, mock_logger):
         """Test logging when term loading fails."""
         with patch.object(
-            self.loader, "_load_codex_rule", side_effect=CodexError(999, "Test Term", "Load failed")
+            self.loader,
+            "_load_codex_rule",
+            side_effect=CodexError(999, "Test Term", "Load failed"),
         ):
             self.loader.load_codex_terms([999])
 

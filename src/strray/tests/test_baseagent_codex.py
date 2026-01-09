@@ -196,14 +196,12 @@ class TestBaseAgentCodexIntegration:
             "communication_bus": self.agent.communication_bus is not None,
         }
 
-        results = codex_loader.validate_compliance(
-            "agent", agent_context
-        )
+        results = codex_loader.validate_compliance("agent", agent_context)
 
         assert isinstance(results, list)
         assert len(results) > 0
         result = results[0]
-        assert hasattr(result, 'compliant')
+        assert hasattr(result, "compliant")
         assert isinstance(result.violations, list)
 
     def test_agent_codex_cache_invalidation(self):

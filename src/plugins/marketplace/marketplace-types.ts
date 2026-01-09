@@ -227,7 +227,13 @@ export interface PluginDownloadResult {
 }
 
 export interface PluginReport {
-  type: "security" | "inappropriate" | "malicious" | "broken" | "spam" | "other";
+  type:
+    | "security"
+    | "inappropriate"
+    | "malicious"
+    | "broken"
+    | "spam"
+    | "other";
   description: string;
   evidence?: string[];
   contactInfo?: string;
@@ -235,10 +241,20 @@ export interface PluginReport {
 
 // Version management interfaces
 export interface VersionManager {
-  resolveVersion(pluginId: string, versionSpec: string): Promise<PluginVersion | null>;
-  checkCompatibility(pluginId: string, version: string, strRayVersion: string): Promise<CompatibilityResult>;
+  resolveVersion(
+    pluginId: string,
+    versionSpec: string,
+  ): Promise<PluginVersion | null>;
+  checkCompatibility(
+    pluginId: string,
+    version: string,
+    strRayVersion: string,
+  ): Promise<CompatibilityResult>;
   getVersionHistory(pluginId: string): Promise<PluginVersion[]>;
-  getLatestCompatibleVersion(pluginId: string, strRayVersion: string): Promise<PluginVersion | null>;
+  getLatestCompatibleVersion(
+    pluginId: string,
+    strRayVersion: string,
+  ): Promise<PluginVersion | null>;
   validateVersion(version: string): boolean;
   compareVersions(version1: string, version2: string): number;
 }
@@ -259,7 +275,11 @@ export interface CompatibilityIssue {
 
 // Plugin management interfaces
 export interface PluginManager {
-  install(pluginId: string, version?: string, options?: InstallOptions): Promise<InstallResult>;
+  install(
+    pluginId: string,
+    version?: string,
+    options?: InstallOptions,
+  ): Promise<InstallResult>;
   uninstall(pluginId: string): Promise<UninstallResult>;
   update(pluginId: string, version?: string): Promise<UpdateResult>;
   listInstalled(): Promise<InstalledPlugin[]>;
@@ -268,7 +288,10 @@ export interface PluginManager {
   disable(pluginId: string): Promise<boolean>;
   getHealth(pluginId: string): Promise<PluginHealth>;
   validateInstallation(pluginId: string): Promise<ValidationResult>;
-  resolveDependencies(pluginId: string, version: string): Promise<DependencyResolution>;
+  resolveDependencies(
+    pluginId: string,
+    version: string,
+  ): Promise<DependencyResolution>;
 }
 
 export interface InstallOptions {
@@ -401,16 +424,29 @@ export interface IntegrationManager {
   getProvider(id: string): IntegrationProvider | null;
   listProviders(): IntegrationProvider[];
   authenticate(providerId: string, credentials: any): Promise<AuthResult>;
-  executeIntegration(providerId: string, action: string, params: any): Promise<IntegrationResult>;
+  executeIntegration(
+    providerId: string,
+    action: string,
+    params: any,
+  ): Promise<IntegrationResult>;
   getWebhooks(providerId: string): Promise<Webhook[]>;
-  handleWebhook(providerId: string, webhook: WebhookPayload): Promise<WebhookResult>;
+  handleWebhook(
+    providerId: string,
+    webhook: WebhookPayload,
+  ): Promise<WebhookResult>;
 }
 
 export interface IntegrationProvider {
   id: string;
   name: string;
   description: string;
-  category: "authentication" | "storage" | "communication" | "analytics" | "deployment" | "monitoring";
+  category:
+    | "authentication"
+    | "storage"
+    | "communication"
+    | "analytics"
+    | "deployment"
+    | "monitoring";
   authType: "oauth" | "api-key" | "basic" | "certificate";
   capabilities: string[];
   configSchema: any;
@@ -497,7 +533,10 @@ export interface DiscoveryService {
   indexPlugin(plugin: MarketplacePlugin): Promise<boolean>;
   removePlugin(id: string): Promise<boolean>;
   search(query: DiscoveryQuery): Promise<DiscoveryResult>;
-  getRecommendations(userId?: string, context?: any): Promise<MarketplacePlugin[]>;
+  getRecommendations(
+    userId?: string,
+    context?: any,
+  ): Promise<MarketplacePlugin[]>;
   getTrending(): Promise<MarketplacePlugin[]>;
   getFeatured(): Promise<MarketplacePlugin[]>;
   getSimilar(pluginId: string): Promise<MarketplacePlugin[]>;

@@ -8,26 +8,29 @@
  * @since 2026-01-07
  */
 
-export { ComplexityAnalyzer, complexityAnalyzer } from "./complexity-analyzer";
-export { AgentDelegator, createAgentDelegator } from "./agent-delegator";
+export {
+  ComplexityAnalyzer,
+  complexityAnalyzer,
+} from "./complexity-analyzer.js";
+export { AgentDelegator, createAgentDelegator } from "./agent-delegator.js";
 export {
   SessionCoordinator,
   createSessionCoordinator,
-} from "./session-coordinator";
+} from "./session-coordinator.js";
 
 // Re-export types
 export type {
   ComplexityMetrics,
   ComplexityScore,
   ComplexityThresholds,
-} from "./complexity-analyzer";
+} from "./complexity-analyzer.js";
 
 export type {
   DelegationRequest,
   DelegationResult,
   AgentCapability,
   DelegationMetrics,
-} from "./agent-delegator";
+} from "./agent-delegator.js";
 
 export type {
   SessionContext,
@@ -36,4 +39,4 @@ export type {
   CoordinationState,
   Communication,
   SessionMetrics,
-} from "./session-coordinator";
+} from "./session-coordinator.js";

@@ -998,8 +998,8 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
   }
 
   /**
-    * Get monitoring status
-    */
+   * Get monitoring status
+   */
   getMonitoringStatus(): {
     running: boolean;
     instanceId: string;
@@ -1034,7 +1034,11 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
    * Record a custom metric
    */
   recordMetric(name: string, value: any, tags?: Record<string, string>): void {
-    console.log(`📊 Metric recorded: ${name}`, { value, tags, timestamp: new Date().toISOString() });
+    console.log(`📊 Metric recorded: ${name}`, {
+      value,
+      tags,
+      timestamp: new Date().toISOString(),
+    });
     // In a real implementation, this would store metrics for analysis
   }
 
@@ -1045,14 +1049,14 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
     console.error(`❌ Error recorded: ${operation}`, {
       error: error.message || error,
       timestamp: new Date().toISOString(),
-      stack: error.stack
+      stack: error.stack,
     });
     // In a real implementation, this would store errors for analysis and alerting
   }
 
   /**
-    * Get comprehensive system status
-    */
+   * Get comprehensive system status
+   */
   getStatus(): {
     config: MonitoringConfig;
     metrics: { system: SystemMetrics[]; application: ApplicationMetrics[] };

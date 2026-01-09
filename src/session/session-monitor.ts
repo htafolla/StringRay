@@ -63,7 +63,7 @@ export interface Alert {
 export class SessionMonitor {
   private stateManager: StrRayStateManager;
   private sessionCoordinator: SessionCoordinator;
-  private cleanupManager: SessionCleanupManager;
+  private cleanupManager: SessionCleanupManager | undefined;
   private config: MonitorConfig;
   private healthChecks = new Map<string, SessionHealth>();
   private metricsHistory = new Map<string, SessionMetrics[]>();
@@ -161,8 +161,22 @@ export class SessionMonitor {
     try {
       const sessionStatus = this.sessionCoordinator.getSessionStatus(sessionId);
       if (!sessionStatus) {
-        issues.push("Session not found in coordinator");
-        status = "critical";
+        // Session was cleaned up but monitor wasn't notified - auto-unregister silently
+        console.log(
+          `🧹 Session Monitor: Auto-unregistering cleaned up session ${sessionId}`,
+        );
+        this.unregisterSession(sessionId);
+        // Return a basic health status for the cleaned up session
+        return {
+          sessionId,
+          status: "unknown" as const,
+          lastCheck: Date.now(),
+          responseTime: 0,
+          errorCount: 0,
+          activeAgents: 0,
+          memoryUsage: 0,
+          issues: ["Session was cleaned up"],
+        };
       } else {
         health.activeAgents = sessionStatus.agentCount;
 
@@ -170,7 +184,7 @@ export class SessionMonitor {
         // TODO: Implement comprehensive session health monitoring
       }
 
-      const metadata = this.cleanupManager.getSessionMetadata(sessionId);
+      const metadata = this.cleanupManager?.getSessionMetadata(sessionId);
       if (metadata) {
         health.memoryUsage = metadata.memoryUsage;
         health.activeAgents = metadata.agentCount;
@@ -215,7 +229,7 @@ export class SessionMonitor {
     const sessionStatus = this.sessionCoordinator.getSessionStatus(sessionId);
     if (!sessionStatus) return null;
 
-    const metadata = this.cleanupManager.getSessionMetadata(sessionId);
+    const metadata = this.cleanupManager?.getSessionMetadata(sessionId);
 
     const metrics: SessionMetrics = {
       timestamp: Date.now(),

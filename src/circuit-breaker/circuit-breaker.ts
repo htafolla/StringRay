@@ -8,21 +8,21 @@
  * @since 2026-01-08
  */
 
-import { EventEmitter } from 'events';
+import { EventEmitter } from "events";
 
 export enum CircuitState {
-  CLOSED = 'closed',     // Normal operation
-  OPEN = 'open',         // Circuit is open, failing fast
-  HALF_OPEN = 'half_open' // Testing if service has recovered
+  CLOSED = "closed", // Normal operation
+  OPEN = "open", // Circuit is open, failing fast
+  HALF_OPEN = "half_open", // Testing if service has recovered
 }
 
 export interface CircuitBreakerConfig {
-  failureThreshold: number;      // Number of failures before opening circuit
-  recoveryTimeout: number;       // Time in ms before attempting recovery
-  monitoringPeriod: number;      // Time window in ms for failure counting
-  successThreshold: number;      // Number of successes needed in half-open state
-  timeout: number;              // Request timeout in ms
-  name: string;                 // Circuit breaker name for logging
+  failureThreshold: number; // Number of failures before opening circuit
+  recoveryTimeout: number; // Time in ms before attempting recovery
+  monitoringPeriod: number; // Time window in ms for failure counting
+  successThreshold: number; // Number of successes needed in half-open state
+  timeout: number; // Request timeout in ms
+  name: string; // Circuit breaker name for logging
 }
 
 export interface CircuitBreakerStats {
@@ -71,7 +71,7 @@ export class CircuitBreaker extends EventEmitter {
       monitoringPeriod: 60000, // 1 minute
       successThreshold: 3,
       timeout: 30000, // 30 seconds
-      name: 'default-circuit-breaker',
+      name: "default-circuit-breaker",
       ...config,
     };
   }
@@ -81,7 +81,7 @@ export class CircuitBreaker extends EventEmitter {
    */
   async execute<T>(
     operation: () => Promise<T>,
-    fallback?: () => Promise<T>
+    fallback?: () => Promise<T>,
   ): Promise<CircuitBreakerResult<T>> {
     const startTime = Date.now();
     this.totalRequests++;
@@ -97,12 +97,12 @@ export class CircuitBreaker extends EventEmitter {
           circuitState: this.state,
         };
 
-        this.emit('callRejected', result);
+        this.emit("callRejected", result);
         return result;
       } else {
         // Time to try half-open
         this.state = CircuitState.HALF_OPEN;
-        this.emit('stateChanged', CircuitState.HALF_OPEN);
+        this.emit("stateChanged", CircuitState.HALF_OPEN);
       }
     }
 
@@ -118,7 +118,6 @@ export class CircuitBreaker extends EventEmitter {
         executionTime: Date.now() - startTime,
         circuitState: this.state,
       };
-
     } catch (error) {
       // Failure
       const circuitResult = this.onFailure(error as Error);
@@ -136,7 +135,7 @@ export class CircuitBreaker extends EventEmitter {
           };
         } catch (fallbackError) {
           // Fallback also failed
-          this.emit('fallbackFailed', fallbackError);
+          this.emit("fallbackFailed", fallbackError);
         }
       }
 
@@ -148,7 +147,7 @@ export class CircuitBreaker extends EventEmitter {
    * Execute operation with timeout
    */
   private async executeWithTimeout<T>(operation: () => Promise<T>): Promise<T> {
-    return     new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       const timeoutId = setTimeout(() => {
         this.timeouts++;
         reject(new Error(`Operation timeout after ${this.config.timeout}ms`));
@@ -186,15 +185,17 @@ export class CircuitBreaker extends EventEmitter {
         this.state = CircuitState.CLOSED;
         this.failures = 0;
         this.consecutiveFailures = 0;
-        this.emit('stateChanged', CircuitState.CLOSED);
-        console.log(`🔄 Circuit Breaker ${this.config.name}: CLOSED (recovered)`);
+        this.emit("stateChanged", CircuitState.CLOSED);
+        console.log(
+          `🔄 Circuit Breaker ${this.config.name}: CLOSED (recovered)`,
+        );
       }
     } else if (this.state === CircuitState.CLOSED) {
       // Reset consecutive failures on success
       this.consecutiveFailures = 0;
     }
 
-    this.emit('success');
+    this.emit("success");
   }
 
   /**
@@ -224,18 +225,22 @@ export class CircuitBreaker extends EventEmitter {
       if (recentFailures >= this.config.failureThreshold) {
         this.state = CircuitState.OPEN;
         this.nextAttemptTime = Date.now() + this.config.recoveryTimeout;
-        this.emit('stateChanged', CircuitState.OPEN);
-        console.log(`🔴 Circuit Breaker ${this.config.name}: OPEN (failure threshold exceeded)`);
+        this.emit("stateChanged", CircuitState.OPEN);
+        console.log(
+          `🔴 Circuit Breaker ${this.config.name}: OPEN (failure threshold exceeded)`,
+        );
       }
     } else if (this.state === CircuitState.HALF_OPEN) {
       // Failed in half-open state, go back to open
       this.state = CircuitState.OPEN;
       this.nextAttemptTime = Date.now() + this.config.recoveryTimeout;
-      this.emit('stateChanged', CircuitState.OPEN);
-      console.log(`🔴 Circuit Breaker ${this.config.name}: OPEN (half-open failure)`);
+      this.emit("stateChanged", CircuitState.OPEN);
+      console.log(
+        `🔴 Circuit Breaker ${this.config.name}: OPEN (half-open failure)`,
+      );
     }
 
-    this.emit('failure', result);
+    this.emit("failure", result);
     return result;
   }
 
@@ -244,7 +249,7 @@ export class CircuitBreaker extends EventEmitter {
    */
   private cleanFailureWindow(): void {
     const cutoff = Date.now() - this.config.monitoringPeriod;
-    this.failureWindow = this.failureWindow.filter(time => time > cutoff);
+    this.failureWindow = this.failureWindow.filter((time) => time > cutoff);
   }
 
   /**
@@ -254,8 +259,10 @@ export class CircuitBreaker extends EventEmitter {
     if (this.state !== CircuitState.OPEN) {
       this.state = CircuitState.OPEN;
       this.nextAttemptTime = Date.now() + this.config.recoveryTimeout;
-      this.emit('stateChanged', CircuitState.OPEN);
-      console.log(`🔴 Circuit Breaker ${this.config.name}: OPEN (manually tripped)`);
+      this.emit("stateChanged", CircuitState.OPEN);
+      console.log(
+        `🔴 Circuit Breaker ${this.config.name}: OPEN (manually tripped)`,
+      );
     }
   }
 
@@ -269,8 +276,10 @@ export class CircuitBreaker extends EventEmitter {
       this.consecutiveFailures = 0;
       this.consecutiveSuccesses = 0;
       this.failureWindow = [];
-      this.emit('stateChanged', CircuitState.CLOSED);
-      console.log(`🟢 Circuit Breaker ${this.config.name}: CLOSED (manually reset)`);
+      this.emit("stateChanged", CircuitState.CLOSED);
+      console.log(
+        `🟢 Circuit Breaker ${this.config.name}: CLOSED (manually reset)`,
+      );
     }
   }
 
@@ -302,9 +311,11 @@ export class CircuitBreaker extends EventEmitter {
    * Check if circuit breaker is allowing calls
    */
   canExecute(): boolean {
-    return this.state === CircuitState.CLOSED ||
-           (this.state === CircuitState.HALF_OPEN) ||
-           (this.state === CircuitState.OPEN && Date.now() >= this.nextAttemptTime);
+    return (
+      this.state === CircuitState.CLOSED ||
+      this.state === CircuitState.HALF_OPEN ||
+      (this.state === CircuitState.OPEN && Date.now() >= this.nextAttemptTime)
+    );
   }
 
   /**
@@ -332,7 +343,10 @@ export class CircuitBreakerRegistry extends EventEmitter {
   /**
    * Get or create a circuit breaker for a service
    */
-  getBreaker(serviceName: string, config?: Partial<CircuitBreakerConfig>): CircuitBreaker {
+  getBreaker(
+    serviceName: string,
+    config?: Partial<CircuitBreakerConfig>,
+  ): CircuitBreaker {
     if (!this.breakers.has(serviceName)) {
       const breakerConfig = {
         ...this.globalConfig,
@@ -343,10 +357,16 @@ export class CircuitBreakerRegistry extends EventEmitter {
       const breaker = new CircuitBreaker(breakerConfig);
 
       // Forward events
-      breaker.on('stateChanged', (state) => this.emit('breakerStateChanged', serviceName, state));
-      breaker.on('success', () => this.emit('breakerSuccess', serviceName));
-      breaker.on('failure', (result) => this.emit('breakerFailure', serviceName, result));
-      breaker.on('callRejected', (result) => this.emit('breakerCallRejected', serviceName, result));
+      breaker.on("stateChanged", (state) =>
+        this.emit("breakerStateChanged", serviceName, state),
+      );
+      breaker.on("success", () => this.emit("breakerSuccess", serviceName));
+      breaker.on("failure", (result) =>
+        this.emit("breakerFailure", serviceName, result),
+      );
+      breaker.on("callRejected", (result) =>
+        this.emit("breakerCallRejected", serviceName, result),
+      );
 
       this.breakers.set(serviceName, breaker);
     }
@@ -361,7 +381,7 @@ export class CircuitBreakerRegistry extends EventEmitter {
     serviceName: string,
     operation: () => Promise<T>,
     fallback?: () => Promise<T>,
-    config?: Partial<CircuitBreakerConfig>
+    config?: Partial<CircuitBreakerConfig>,
   ): Promise<CircuitBreakerResult<T>> {
     const breaker = this.getBreaker(serviceName, config);
     return breaker.execute(operation, fallback);
@@ -420,10 +440,14 @@ export class CircuitBreakerRegistry extends EventEmitter {
 }
 
 // Factory functions
-export const createCircuitBreaker = (config: Partial<CircuitBreakerConfig> = {}): CircuitBreaker => {
+export const createCircuitBreaker = (
+  config: Partial<CircuitBreakerConfig> = {},
+): CircuitBreaker => {
   return new CircuitBreaker(config);
 };
 
-export const createCircuitBreakerRegistry = (config: Partial<CircuitBreakerConfig> = {}): CircuitBreakerRegistry => {
+export const createCircuitBreakerRegistry = (
+  config: Partial<CircuitBreakerConfig> = {},
+): CircuitBreakerRegistry => {
   return new CircuitBreakerRegistry(config);
 };

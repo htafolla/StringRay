@@ -283,6 +283,102 @@ export default async function strrayCodexPlugin(input: {
       }
     },
 
+    "tool.execute.after": async (
+      input: {
+        tool: string;
+        args?: { content?: string; filePath?: string };
+        result?: unknown;
+      },
+      _output: unknown,
+    ) => {
+      const { tool, args } = input;
+
+      // Auto-generate tests for newly created files
+      if (tool === "write" && args?.filePath) {
+        const filePath = args.filePath;
+
+        // Check if this is a source file that should have tests
+        if (/\.(ts|tsx|js|jsx)$/.test(filePath) && !filePath.includes('.test.') && !filePath.includes('__tests__')) {
+          // Trigger test-architect agent to create tests
+          const logger = await getOrCreateLogger(directory);
+          logger.log(`Detected new source file: ${filePath} - triggering test generation`);
+
+          try {
+            // Call test-architect agent to generate tests for the new file
+            const testArchitectScript = path.join(
+              directory,
+              ".opencode",
+              "mcps",
+              "testing-strategy.server.js"
+            );
+
+            // Use the MCP server directly via stdio
+            const { spawn } = require('child_process');
+
+            if (fs.existsSync(testArchitectScript)) {
+              try {
+                // Call the MCP server with the generate_tests tool
+                const mcpProcess = spawn("node", [testArchitectScript], {
+                  cwd: directory,
+                  stdio: ["pipe", "pipe", "pipe"],
+                });
+
+                // Prepare the MCP tool call message
+                const toolCall = {
+                  jsonrpc: "2.0",
+                  id: 1,
+                  method: "tools/call",
+                  params: {
+                    name: "generate_tests",
+                    arguments: {
+                      filePath: filePath,
+                      testType: "unit",
+                      framework: "vitest"
+                    }
+                  }
+                };
+
+                // Send the tool call to the MCP server
+                mcpProcess.stdin.write(JSON.stringify(toolCall) + "\n");
+                mcpProcess.stdin.end();
+
+                let stdout = "";
+                let stderr = "";
+
+                mcpProcess.stdout.on("data", (data) => {
+                  stdout += data.toString();
+                });
+
+                mcpProcess.stderr.on("data", (data) => {
+                  stderr += data.toString();
+                });
+
+                await new Promise((resolve, reject) => {
+                  mcpProcess.on("close", (code) => {
+                    if (code === 0) {
+                      resolve(undefined);
+                    } else {
+                      reject(new Error(`MCP server exited with code ${code}: ${stderr}`));
+                    }
+                  });
+                  mcpProcess.on("error", reject);
+                });
+
+                logger.log(`Test generation completed for ${filePath}`);
+              } catch (mcpError) {
+                logger.error(`MCP test generation failed for ${filePath}: ${mcpError.message}`);
+              }
+            } else {
+              logger.log(`Test architect MCP not found, skipping auto test generation for ${filePath}`);
+            }
+          } catch (error: unknown) {
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            logger.error(`Test generation failed for ${filePath}: ${errorMessage}`);
+          }
+        }
+      }
+    },
+
     "tool.execute.before": async (
       input: {
         tool: string;

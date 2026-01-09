@@ -72,7 +72,10 @@ export interface RegressionAlert {
   resolved: boolean;
 }
 
-export interface EnhancedRegressionTestResult extends Omit<RegressionTestResult, 'expectedDuration'> {
+export interface EnhancedRegressionTestResult extends Omit<
+  RegressionTestResult,
+  "expectedDuration"
+> {
   expectedDuration: number | undefined;
   statisticalAnalysis: StatisticalAnalysis;
   trendAnalysis: TrendAnalysis;
@@ -112,7 +115,9 @@ export class AdvancedRegressionTestingSystem extends EventEmitter {
   private statisticalWindow = 100; // number of recent results to analyze
   private anomalyThreshold = 0.95; // z-score threshold for anomalies
 
-  constructor(private baselineFile: string = "./performance-baselines-advanced.json") {
+  constructor(
+    private baselineFile: string = "./performance-baselines-advanced.json",
+  ) {
     super();
     this.loadBaselines();
   }
@@ -130,7 +135,10 @@ export class AdvancedRegressionTestingSystem extends EventEmitter {
       await Promise.race([
         test.testFunction(),
         new Promise<never>((_, reject) =>
-          setTimeout(() => reject(new Error(`Test timeout after ${test.timeout}ms`)), test.timeout)
+          setTimeout(
+            () => reject(new Error(`Test timeout after ${test.timeout}ms`)),
+            test.timeout,
+          ),
         ),
       ]);
 
@@ -148,7 +156,10 @@ export class AdvancedRegressionTestingSystem extends EventEmitter {
       const trendAnalysis = this.analyzeTrends(history);
 
       // Calculate anomaly score
-      const anomalyScore = this.calculateAnomalyScore(duration, statisticalAnalysis);
+      const anomalyScore = this.calculateAnomalyScore(
+        duration,
+        statisticalAnalysis,
+      );
 
       // Get baseline and calculate deviation
       const baseline = this.baselines.get(test.name);
@@ -156,7 +167,9 @@ export class AdvancedRegressionTestingSystem extends EventEmitter {
       let status: "pass" | "warning" | "fail" = "pass";
 
       if (baseline) {
-        deviation = ((duration - baseline.averageDuration) / baseline.averageDuration) * 100;
+        deviation =
+          ((duration - baseline.averageDuration) / baseline.averageDuration) *
+          100;
 
         // Use statistical significance for status determination
         const statisticalSignificance = this.calculateStatisticalSignificance(
@@ -165,20 +178,34 @@ export class AdvancedRegressionTestingSystem extends EventEmitter {
         );
 
         if (Math.abs(deviation) > test.tolerance) {
-          if (statisticalSignificance < 0.05) { // 95% confidence
-            status = Math.abs(deviation) > test.tolerance * 2 ? "fail" : "warning";
+          if (statisticalSignificance < 0.05) {
+            // 95% confidence
+            status =
+              Math.abs(deviation) > test.tolerance * 2 ? "fail" : "warning";
           }
         }
       }
 
       // Calculate confidence level
-      const confidenceLevel = this.calculateConfidenceLevel(statisticalAnalysis, history.length);
+      const confidenceLevel = this.calculateConfidenceLevel(
+        statisticalAnalysis,
+        history.length,
+      );
 
       // Generate historical context
-      const historicalContext = this.generateHistoricalContext(duration, history);
+      const historicalContext = this.generateHistoricalContext(
+        duration,
+        history,
+      );
 
       // Generate alerts
-      const alerts = this.generateAlerts(test.name, duration, baseline, statisticalAnalysis, trendAnalysis);
+      const alerts = this.generateAlerts(
+        test.name,
+        duration,
+        baseline,
+        statisticalAnalysis,
+        trendAnalysis,
+      );
 
       const result: EnhancedRegressionTestResult = {
         testName: test.name,
@@ -205,10 +232,9 @@ export class AdvancedRegressionTestingSystem extends EventEmitter {
 
       // Emit events
       this.emit("test-completed", result);
-      alerts.forEach(alert => this.emit("alert", alert));
+      alerts.forEach((alert) => this.emit("alert", alert));
 
       return result;
-
     } catch (error) {
       const errorResult: EnhancedRegressionTestResult = {
         testName: test.name,
@@ -227,23 +253,29 @@ export class AdvancedRegressionTestingSystem extends EventEmitter {
           comparedToLastWeek: 0,
           comparedToLastMonth: 0,
         },
-        alerts: [{
-          id: `error-${Date.now()}`,
-          timestamp: Date.now(),
-          testName: test.name,
-          type: "anomaly",
-          severity: "critical",
-          message: `Test execution failed: ${(error as Error).message}`,
-          metrics: {
-            current: 0,
-            baseline: 0,
-            deviation: 0,
-            statisticalSignificance: 1,
+        alerts: [
+          {
+            id: `error-${Date.now()}`,
+            timestamp: Date.now(),
+            testName: test.name,
+            type: "anomaly",
+            severity: "critical",
+            message: `Test execution failed: ${(error as Error).message}`,
+            metrics: {
+              current: 0,
+              baseline: 0,
+              deviation: 0,
+              statisticalSignificance: 1,
+            },
+            recommendations: [
+              "Investigate test failure",
+              "Check system resources",
+              "Review test implementation",
+            ],
+            automated: false,
+            resolved: false,
           },
-          recommendations: ["Investigate test failure", "Check system resources", "Review test implementation"],
-          automated: false,
-          resolved: false,
-        }],
+        ],
       };
 
       this.emit("test-failed", errorResult);
@@ -264,7 +296,8 @@ export class AdvancedRegressionTestingSystem extends EventEmitter {
 
     // Basic statistics
     const mean = data.reduce((sum, val) => sum + val, 0) / n;
-    const variance = data.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / n;
+    const variance =
+      data.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / n;
     const stdDev = Math.sqrt(variance);
 
     // Quartiles
@@ -274,17 +307,25 @@ export class AdvancedRegressionTestingSystem extends EventEmitter {
 
     // Confidence interval (95%)
     const marginOfError = 1.96 * (stdDev / Math.sqrt(n));
-    const confidenceInterval: [number, number] = [mean - marginOfError, mean + marginOfError];
+    const confidenceInterval: [number, number] = [
+      mean - marginOfError,
+      mean + marginOfError,
+    ];
 
     // Outliers (using IQR method)
     const iqr = q3 - q1;
     const lowerBound = q1 - 1.5 * iqr;
     const upperBound = q3 + 1.5 * iqr;
-    const outliers = data.filter(val => val < lowerBound || val > upperBound);
+    const outliers = data.filter((val) => val < lowerBound || val > upperBound);
 
     // Skewness and Kurtosis
-    const skewness = data.reduce((sum, val) => sum + Math.pow((val - mean) / stdDev, 3), 0) / n;
-    const kurtosis = data.reduce((sum, val) => sum + Math.pow((val - mean) / stdDev, 4), 0) / n - 3;
+    const skewness =
+      data.reduce((sum, val) => sum + Math.pow((val - mean) / stdDev, 3), 0) /
+      n;
+    const kurtosis =
+      data.reduce((sum, val) => sum + Math.pow((val - mean) / stdDev, 4), 0) /
+        n -
+      3;
 
     return {
       mean,
@@ -330,7 +371,7 @@ export class AdvancedRegressionTestingSystem extends EventEmitter {
       return sum + Math.pow(val - predicted, 2);
     }, 0);
     const ssTot = y.reduce((sum, val) => sum + Math.pow(val - yMean, 2), 0);
-    const rSquared = 1 - (ssRes / ssTot);
+    const rSquared = 1 - ssRes / ssTot;
 
     // Determine trend direction
     let direction: "improving" | "degrading" | "stable" = "stable";
@@ -343,10 +384,15 @@ export class AdvancedRegressionTestingSystem extends EventEmitter {
     for (let i = 10; i < data.length - 10; i++) {
       const before = data.slice(i - 10, i);
       const after = data.slice(i, i + 10);
-      const beforeMean = before.reduce((sum, val) => sum + val, 0) / before.length;
+      const beforeMean =
+        before.reduce((sum, val) => sum + val, 0) / before.length;
       const afterMean = after.reduce((sum, val) => sum + val, 0) / after.length;
 
-      if (beforeMean !== 0 && Math.abs(afterMean - beforeMean) / beforeMean > 0.1) { // 10% change
+      if (
+        beforeMean !== 0 &&
+        Math.abs(afterMean - beforeMean) / beforeMean > 0.1
+      ) {
+        // 10% change
         changePoints.push(i);
       }
     }
@@ -364,7 +410,10 @@ export class AdvancedRegressionTestingSystem extends EventEmitter {
   /**
    * Calculate anomaly score using z-score
    */
-  private calculateAnomalyScore(value: number, stats: StatisticalAnalysis): number {
+  private calculateAnomalyScore(
+    value: number,
+    stats: StatisticalAnalysis,
+  ): number {
     if (stats.standardDeviation === 0) return 0;
 
     const zScore = Math.abs((value - stats.mean) / stats.standardDeviation);
@@ -375,10 +424,15 @@ export class AdvancedRegressionTestingSystem extends EventEmitter {
   /**
    * Calculate statistical significance (p-value approximation)
    */
-  private calculateStatisticalSignificance(value: number, baselineStats: StatisticalAnalysis): number {
+  private calculateStatisticalSignificance(
+    value: number,
+    baselineStats: StatisticalAnalysis,
+  ): number {
     if (baselineStats.standardDeviation === 0) return 1;
 
-    const zScore = Math.abs((value - baselineStats.mean) / baselineStats.standardDeviation);
+    const zScore = Math.abs(
+      (value - baselineStats.mean) / baselineStats.standardDeviation,
+    );
 
     // Approximate p-value using normal distribution
     // For z > 3, p-value ≈ 0.001
@@ -393,10 +447,16 @@ export class AdvancedRegressionTestingSystem extends EventEmitter {
   /**
    * Calculate confidence level in the result
    */
-  private calculateConfidenceLevel(stats: StatisticalAnalysis, sampleSize: number): number {
+  private calculateConfidenceLevel(
+    stats: StatisticalAnalysis,
+    sampleSize: number,
+  ): number {
     // Higher confidence with more samples and lower variance
     const sampleConfidence = Math.min(sampleSize / 50, 1); // Max confidence at 50 samples
-    const varianceConfidence = Math.max(0, 1 - stats.standardDeviation / stats.mean);
+    const varianceConfidence = Math.max(
+      0,
+      1 - stats.standardDeviation / stats.mean,
+    );
 
     return (sampleConfidence + varianceConfidence) / 2;
   }
@@ -404,7 +464,10 @@ export class AdvancedRegressionTestingSystem extends EventEmitter {
   /**
    * Generate historical context
    */
-  private generateHistoricalContext(current: number, history: number[]): EnhancedRegressionTestResult["historicalContext"] {
+  private generateHistoricalContext(
+    current: number,
+    history: number[],
+  ): EnhancedRegressionTestResult["historicalContext"] {
     if (history.length < 2) {
       return {
         percentileRank: 50,
@@ -414,19 +477,24 @@ export class AdvancedRegressionTestingSystem extends EventEmitter {
     }
 
     const sorted = [...history].sort((a, b) => a - b);
-    const percentileRank = (sorted.findIndex(val => val >= current) / sorted.length) * 100;
+    const percentileRank =
+      (sorted.findIndex((val) => val >= current) / sorted.length) * 100;
 
     // Compare to recent periods (simplified)
     const recent = history.slice(-7); // Last 7 results
     const older = history.slice(-30, -7); // Previous 23 results
 
     const recentAvg = recent.reduce((sum, val) => sum + val, 0) / recent.length;
-    const olderAvg = older.length > 0 ? older.reduce((sum, val) => sum + val, 0) / older.length : recentAvg;
+    const olderAvg =
+      older.length > 0
+        ? older.reduce((sum, val) => sum + val, 0) / older.length
+        : recentAvg;
 
     return {
       percentileRank,
       comparedToLastWeek: ((current - recentAvg) / recentAvg) * 100,
-      comparedToLastMonth: older.length > 0 ? ((current - olderAvg) / olderAvg) * 100 : 0,
+      comparedToLastMonth:
+        older.length > 0 ? ((current - olderAvg) / olderAvg) * 100 : 0,
     };
   }
 
@@ -445,9 +513,13 @@ export class AdvancedRegressionTestingSystem extends EventEmitter {
     if (!baseline) return alerts;
 
     // Regression alert
-    const deviation = ((current - baseline.averageDuration) / baseline.averageDuration) * 100;
+    const deviation =
+      ((current - baseline.averageDuration) / baseline.averageDuration) * 100;
     if (Math.abs(deviation) > baseline.tolerance) {
-      const significance = this.calculateStatisticalSignificance(current, baseline.statisticalModel);
+      const significance = this.calculateStatisticalSignificance(
+        current,
+        baseline.statisticalModel,
+      );
 
       if (significance < 0.05) {
         alerts.push({
@@ -455,7 +527,8 @@ export class AdvancedRegressionTestingSystem extends EventEmitter {
           timestamp: Date.now(),
           testName,
           type: "regression",
-          severity: Math.abs(deviation) > baseline.tolerance * 2 ? "high" : "medium",
+          severity:
+            Math.abs(deviation) > baseline.tolerance * 2 ? "high" : "medium",
           message: `Performance ${deviation > 0 ? "regression" : "improvement"} detected: ${deviation.toFixed(2)}%`,
           metrics: {
             current,
@@ -503,7 +576,8 @@ export class AdvancedRegressionTestingSystem extends EventEmitter {
     // Trend change alert
     if (trends.changePoints.length > 0) {
       const recentChange = trends.changePoints[trends.changePoints.length - 1]!;
-      if (Date.now() - recentChange < 24 * 60 * 60 * 1000) { // Within last 24 hours
+      if (Date.now() - recentChange < 24 * 60 * 60 * 1000) {
+        // Within last 24 hours
         alerts.push({
           id: `trend-${Date.now()}`,
           timestamp: Date.now(),
@@ -534,7 +608,11 @@ export class AdvancedRegressionTestingSystem extends EventEmitter {
   /**
    * Update baseline if statistical conditions are met
    */
-  private updateBaselineIfNeeded(testName: string, newValue: number, result: EnhancedRegressionTestResult): void {
+  private updateBaselineIfNeeded(
+    testName: string,
+    newValue: number,
+    result: EnhancedRegressionTestResult,
+  ): void {
     const baseline = this.baselines.get(testName);
     if (!baseline) return;
 
@@ -549,9 +627,15 @@ export class AdvancedRegressionTestingSystem extends EventEmitter {
     const recentStats = this.performStatisticalAnalysis(recent);
 
     // Update if the recent performance is stable and different from baseline
-    const recentDeviation = Math.abs((recentStats.mean - baseline.averageDuration) / baseline.averageDuration);
+    const recentDeviation = Math.abs(
+      (recentStats.mean - baseline.averageDuration) / baseline.averageDuration,
+    );
 
-    if (recentDeviation > 0.05 && recentStats.standardDeviation / recentStats.mean < 0.1) { // 10% CV threshold
+    if (
+      recentDeviation > 0.05 &&
+      recentStats.standardDeviation / recentStats.mean < 0.1
+    ) {
+      // 10% CV threshold
       const oldValue = baseline.averageDuration;
       baseline.averageDuration = recentStats.mean;
       baseline.standardDeviation = recentStats.standardDeviation;
@@ -569,7 +653,11 @@ export class AdvancedRegressionTestingSystem extends EventEmitter {
       });
 
       this.saveBaselines();
-      this.emit("baseline-updated", { testName, oldValue, newValue: recentStats.mean });
+      this.emit("baseline-updated", {
+        testName,
+        oldValue,
+        newValue: recentStats.mean,
+      });
     }
   }
 
@@ -587,13 +675,15 @@ export class AdvancedRegressionTestingSystem extends EventEmitter {
       statisticalModel: this.getEmptyStatisticalAnalysis(),
       trendModel: this.getEmptyTrendAnalysis(),
       lastUpdateReason: "automatic",
-      updateHistory: [{
-        timestamp: Date.now(),
-        reason: "Initial baseline creation",
-        oldValue: 0,
-        newValue: initialValue,
-        confidence: 0.5,
-      }],
+      updateHistory: [
+        {
+          timestamp: Date.now(),
+          reason: "Initial baseline creation",
+          oldValue: 0,
+          newValue: initialValue,
+          confidence: 0.5,
+        },
+      ],
       outlierThreshold: 3, // 3 standard deviations
       adaptationRate: 0.1, // 10% adaptation rate
       minimumSamples: 10,
@@ -628,7 +718,9 @@ export class AdvancedRegressionTestingSystem extends EventEmitter {
         const data = JSON.parse(fs.readFileSync(this.baselineFile, "utf8"));
         this.baselines = new Map(Object.entries(data.baselines || {}));
         this.historicalData = new Map(Object.entries(data.historical || {}));
-        console.log(`📊 Loaded advanced baselines for ${this.baselines.size} tests`);
+        console.log(
+          `📊 Loaded advanced baselines for ${this.baselines.size} tests`,
+        );
       }
     } catch (error) {
       console.warn("⚠️ Could not load advanced baselines:", error);
@@ -689,14 +781,14 @@ export class AdvancedRegressionTestingSystem extends EventEmitter {
    * Get active alerts
    */
   getActiveAlerts(): RegressionAlert[] {
-    return this.alerts.filter(alert => !alert.resolved);
+    return this.alerts.filter((alert) => !alert.resolved);
   }
 
   /**
    * Resolve an alert
    */
   resolveAlert(alertId: string): boolean {
-    const alert = this.alerts.find(a => a.id === alertId);
+    const alert = this.alerts.find((a) => a.id === alertId);
     if (alert) {
       alert.resolved = true;
       this.emit("alert-resolved", alert);
@@ -723,10 +815,13 @@ export class AdvancedRegressionTestingSystem extends EventEmitter {
       statistics: {
         totalTests: this.baselines.size,
         activeAlerts: this.getActiveAlerts().length,
-        averageConfidence: Array.from(this.baselines.values()).reduce(
-          (sum, b) => sum + (b.updateHistory[b.updateHistory.length - 1]?.confidence || 0),
-          0
-        ) / this.baselines.size,
+        averageConfidence:
+          Array.from(this.baselines.values()).reduce(
+            (sum, b) =>
+              sum +
+              (b.updateHistory[b.updateHistory.length - 1]?.confidence || 0),
+            0,
+          ) / this.baselines.size,
       },
     };
   }

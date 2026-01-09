@@ -1,0 +1,155 @@
+name: sisyphus
+description: "Main orchestrator and command center for multi-agent coordination and workflow management"
+version: "2.0.0"
+model: opencode/grok-code
+
+# State Management Configuration
+state_management:
+  enabled: true
+  namespaces:
+    - agent_orchestration
+    - workflow_coordination
+    - task_delegation
+    - conflict_resolution
+    - progress_tracking
+  persistence: true
+  recovery: transactional
+  backup_interval: 15m
+  retention_days: 30
+
+# Delegation System Configuration
+delegation:
+  enabled: true
+  capabilities:
+    - agent_coordination
+    - task_delegation
+    - async_orchestration
+    - conflict_resolution
+    - load_balancing
+    - failure_recovery
+  complexity_analysis: enabled
+  monitoring_interval: 15s
+  max_concurrent_tasks: 15
+  max_chain_depth: 8
+  agent_routing:
+    enforcer:
+      - compliance-monitoring
+      - threshold-enforcement
+      - automation-orchestration
+    architect:
+      - design-review
+      - architecture-validation
+      - dependency-analysis
+    bug-triage-specialist:
+      - error-analysis
+      - root-cause-identification
+      - fix-suggestions
+    code-reviewer:
+      - code-quality-assessment
+      - best-practice-validation
+      - security-review
+    security-auditor:
+      - vulnerability-detection
+      - threat-analysis
+      - security-validation
+    refactorer:
+      - code-modernization
+      - debt-reduction
+      - consolidation
+    test-architect:
+      - test-strategy-design
+      - coverage-optimization
+      - behavioral-testing
+
+# Logging Configuration
+logging:
+  level: info
+  format: json
+  destinations:
+    - console
+    - file
+    - monitoring
+  retention_days: 30
+  sensitive_data_filtering: true
+  audit_trail: true
+
+# Processor Pipeline Configuration
+processor_pipeline:
+  - name: agent-validation
+    type: validation
+    priority: critical
+    timeout_ms: 8000
+    retry_attempts: 3
+  - name: task-routing
+    type: orchestration
+    priority: critical
+    timeout_ms: 10000
+    retry_attempts: 3
+  - name: coordination-monitoring
+    type: monitoring
+    priority: high
+    timeout_ms: 5000
+    retry_attempts: 2
+  - name: completion-verification
+    type: validation
+    priority: high
+    timeout_ms: 15000
+    retry_attempts: 2
+
+# Agent Capabilities
+capabilities:
+  - multi_agent_orchestration
+  - workflow_coordination
+  - task_delegation
+  - conflict_resolution
+  - async_processing
+  - error_recovery
+  - progress_tracking
+
+# Error Handling Configuration
+error_handling:
+  retry_attempts: 5
+  circuit_breaker:
+    enabled: true
+    failure_threshold: 5
+    recovery_timeout_ms: 60000
+  fallback_strategy: escalate
+  alert_on_failure: true
+
+# Performance Configuration
+performance:
+  timeout_ms: 120000
+  concurrency_limit: 20
+  memory_limit_mb: 1024
+  cpu_limit_percent: 75
+
+# Integration Hooks
+integration:
+  agent_startup: true
+  workflow_initialization: true
+  task_completion_handler: true
+  agent_health_monitor: true
+  progress_update_broadcast: true
+  webhook_endpoints:
+    - url: "https://sisyphus-monitoring.example.com/webhook"
+      events: ["workflow_completed", "agent_failed", "coordination_error", "conflict_detected"]
+
+# Security Configuration
+security:
+  sandboxed_execution: true
+  permission_level: elevated
+  data_classification: internal
+  encryption_required: true
+
+# Monitoring Configuration
+monitoring:
+  metrics_collection: true
+  health_checks: true
+  performance_tracking: true
+  coordination_tracking: true
+  conflict_detection: true
+  alert_thresholds:
+    response_time_ms: 30000
+    error_rate_percent: 1
+    memory_usage_mb: 800
+    coordination_delay_ms: 10000

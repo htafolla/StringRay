@@ -223,7 +223,6 @@
   "disabled_agents": [
     "security-auditor",
     "refactorer",
-    "test-architect",
     "bug-triage-specialist"
   ]
 }

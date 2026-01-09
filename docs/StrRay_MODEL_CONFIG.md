@@ -10,10 +10,14 @@ This guide explains how to configure and update AI models in the StrRay framewor
 
 **Location**: `.opencode/oh-my-opencode.json`
 
-**Purpose**: Defines which AI model each agent uses
+**Purpose**: Defines which AI model each agent uses and basic framework settings
 
 ```json
 {
+  "$schema": "https://raw.githubusercontent.com/code-yeongyu/oh-my-opencode/master/assets/oh-my-opencode.schema.json",
+  "google_auth": false,
+  "preemptive_compaction": true,
+  "plugins": ["stringray-framework"],
   "model_routing": {
     "enforcer": "opencode/grok-code",
     "architect": "opencode/grok-code",
@@ -23,27 +27,66 @@ This guide explains how to configure and update AI models in the StrRay framewor
     "security-auditor": "opencode/grok-code",
     "refactorer": "opencode/grok-code",
     "test-architect": "opencode/grok-code"
+  },
+  "logging": {
+    "enabled": true,
+    "refactoring_log_path": ".opencode/REFACTORING_LOG.md",
+    "auto_capture": true,
+    "format": "markdown",
+    "include_timestamps": true,
+    "categories": ["refactoring", "analysis", "performance", "security"]
   }
 }
 ```
 
-### 2. Framework Settings: `enforcer-config.json`
+### 2. Framework Settings: Python ConfigManager
 
-**Location**: `.opencode/enforcer-config.json`
+**Location**: `src/strray/config/manager.py`
 
-**Purpose**: Framework thresholds and automation settings
+**Purpose**: Comprehensive framework configuration loaded at runtime
+
+```python
+# StrRay Framework Configuration
+defaults = {
+    "strray_version": "1.0.0",
+    "codex_enabled": True,
+    "codex_version": "v1.2.20",
+    "codex_terms": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, ...],
+    "agent_capabilities": {
+        "enforcer": ["compliance-monitoring", "threshold-enforcement"],
+        "architect": ["design-review", "architecture-validation"],
+        # ... other agents
+    },
+    "monitoring_metrics": ["bundle-size", "test-coverage", ...],
+    "automation_hooks": {...},
+    # ... additional framework settings
+}
+```
+
+## Configuration Architecture
+
+The StrRay framework uses a **hybrid configuration system**:
+
+- **oh-my-opencode.json**: oh-my-opencode-compatible settings (model routing, plugins, basic config)
+- **Python ConfigManager**: Runtime framework configuration (codex terms, agent capabilities, monitoring)
+
+This separation ensures:
+
+- Schema compliance with oh-my-opencode
+- Runtime flexibility for framework settings
+- Clear separation of concerns
 
 ## Updating Models
 
 ### Step-by-Step Process
 
-1. **Edit the configuration file:**
+1. **Edit the oh-my-opencode.json file:**
 
    ```bash
    nano .opencode/oh-my-opencode.json
    ```
 
-2. **Update model assignments:**
+2. **Update model assignments in the `model_routing` section:**
 
    ```json
    {

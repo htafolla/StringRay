@@ -141,7 +141,7 @@ export class BootOrchestrator {
         const cleanupManager = createSessionCleanupManager(
           this.stateManager,
           {},
-          sessionMonitor
+          sessionMonitor,
         );
         this.stateManager.set("session:cleanup_manager", cleanupManager);
 
@@ -574,7 +574,7 @@ print(json.dumps(strray_config))
 
       const child = spawn("python3", ["-c", pythonScript], {
         cwd: process.cwd(),
-        stdio: ["ignore", "pipe", "pipe"]
+        stdio: ["ignore", "pipe", "pipe"],
       });
 
       let stdout = "";
@@ -605,16 +605,31 @@ print(json.dumps(strray_config))
         // Store configuration in state manager for use by other components
         this.stateManager.set("strray:config", strrayConfig);
         this.stateManager.set("strray:version", strrayConfig.version);
-        this.stateManager.set("strray:codex_enabled", strrayConfig.codex_enabled);
+        this.stateManager.set(
+          "strray:codex_enabled",
+          strrayConfig.codex_enabled,
+        );
         this.stateManager.set("strray:codex_terms", strrayConfig.codex_terms);
-        this.stateManager.set("strray:monitoring_metrics", strrayConfig.monitoring_metrics);
-        this.stateManager.set("strray:monitoring_alerts", strrayConfig.monitoring_alerts);
-        this.stateManager.set("strray:agent_capabilities", strrayConfig.agent_capabilities);
+        this.stateManager.set(
+          "strray:monitoring_metrics",
+          strrayConfig.monitoring_metrics,
+        );
+        this.stateManager.set(
+          "strray:monitoring_alerts",
+          strrayConfig.monitoring_alerts,
+        );
+        this.stateManager.set(
+          "strray:agent_capabilities",
+          strrayConfig.agent_capabilities,
+        );
 
         console.log("✅ StrRay configuration loaded from Python ConfigManager");
       }
     } catch (error) {
-      console.warn("⚠️ Failed to load StrRay configuration from Python ConfigManager:", error);
+      console.warn(
+        "⚠️ Failed to load StrRay configuration from Python ConfigManager:",
+        error,
+      );
       // Continue with defaults if Python loading fails
     }
   }

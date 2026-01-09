@@ -360,7 +360,7 @@ export class CodexInjector {
   getCodexStats() {
     // Return aggregated stats for plugin
     const allContexts: CodexContextEntry[] = [];
-    for (const contexts of codexCache.values()) {
+    for (const contexts of Array.from(codexCache.values())) {
       allContexts.push(...contexts);
     }
 

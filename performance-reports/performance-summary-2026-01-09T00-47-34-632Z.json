@@ -1,0 +1,18 @@
+{
+  "timestamp": "2026-01-09T00:47:34.633Z",
+  "budget": {
+    "status": "pass",
+    "violations": 0,
+    "criticalViolations": 0,
+    "recommendations": []
+  },
+  "regression": {
+    "totalTests": 4,
+    "passRate": 0,
+    "averageDeviation": 59.67602875753755,
+    "regressionDetected": true
+  },
+  "recommendations": [
+    "Performance regression detected - investigate recent changes"
+  ]
+}

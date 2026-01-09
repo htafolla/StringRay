@@ -1615,7 +1615,9 @@ class BaseAgent(ABC):
             # Get important config values
             config_data = {
                 "model_default": self.config_manager.get_value("model_default"),
-                "temperature": self.config_manager.get_value("agent_default_temperature", 0.3),
+                "temperature": self.config_manager.get_value(
+                    "agent_default_temperature", 0.3
+                ),
                 "strray_version": self.config_manager.get_value("strray_version"),
             }
 

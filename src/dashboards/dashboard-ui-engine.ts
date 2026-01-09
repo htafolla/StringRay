@@ -9,7 +9,10 @@
  */
 
 import { EventEmitter } from "events";
-import { liveMetricsCollector, CollectedMetric } from "./live-metrics-collector.js";
+import {
+  liveMetricsCollector,
+  CollectedMetric,
+} from "./live-metrics-collector.js";
 import { alertEngine, Alert } from "./alert-engine.js";
 import { webSocketGateway } from "./websocket-gateway.js";
 
@@ -76,7 +79,11 @@ export class DashboardUIEngine extends EventEmitter {
   private config: DashboardConfig;
   private state: DashboardState;
   private renderContexts = new Map<string, RenderContext>();
-  private updateQueue: Array<{ widgetId: string; data: any; priority: number }> = [];
+  private updateQueue: Array<{
+    widgetId: string;
+    data: any;
+    priority: number;
+  }> = [];
   private isRendering = false;
   private lastRenderTime = 0;
   private animationFrame?: number;
@@ -308,7 +315,6 @@ export class DashboardUIEngine extends EventEmitter {
       // Subscribe to relevant data
       this.subscribeToMetrics();
       this.subscribeToAlerts();
-
     } catch (error) {
       console.error("Failed to connect to WebSocket gateway:", error);
       this.state.connectionStatus = "error";
@@ -335,7 +341,9 @@ export class DashboardUIEngine extends EventEmitter {
     for (const widget of layout.widgets) {
       if (widget.config.metrics) {
         if (Array.isArray(widget.config.metrics)) {
-          widget.config.metrics.forEach((metric: string) => metricNames.add(metric));
+          widget.config.metrics.forEach((metric: string) =>
+            metricNames.add(metric),
+          );
         } else if (widget.config.metric) {
           metricNames.add(widget.config.metric);
         }
@@ -431,7 +439,7 @@ export class DashboardUIEngine extends EventEmitter {
    */
   private handleAlertUpdate(alert: Alert): void {
     // Update alerts in state
-    const existingIndex = this.state.alerts.findIndex(a => a.id === alert.id);
+    const existingIndex = this.state.alerts.findIndex((a) => a.id === alert.id);
     if (existingIndex >= 0) {
       this.state.alerts[existingIndex] = alert;
     } else {
@@ -439,7 +447,7 @@ export class DashboardUIEngine extends EventEmitter {
     }
 
     // Keep only active alerts
-    this.state.alerts = this.state.alerts.filter(a => a.status === "active");
+    this.state.alerts = this.state.alerts.filter((a) => a.status === "active");
 
     // Queue alert widget updates
     this.queueWidgetUpdate("alerts", alert, 2);
@@ -450,7 +458,11 @@ export class DashboardUIEngine extends EventEmitter {
   /**
    * Queue widget update
    */
-  private queueWidgetUpdate(metricName: string, data: any, priority: number): void {
+  private queueWidgetUpdate(
+    metricName: string,
+    data: any,
+    priority: number,
+  ): void {
     const layout = this.getActiveLayout();
     if (!layout) return;
 
@@ -460,7 +472,10 @@ export class DashboardUIEngine extends EventEmitter {
 
       if (widget.config.metric === metricName) {
         needsUpdate = true;
-      } else if (widget.config.metrics && Array.isArray(widget.config.metrics)) {
+      } else if (
+        widget.config.metrics &&
+        Array.isArray(widget.config.metrics)
+      ) {
         needsUpdate = widget.config.metrics.includes(metricName);
       } else if (widget.type === "alerts" && metricName === "alerts") {
         needsUpdate = true;
@@ -468,7 +483,9 @@ export class DashboardUIEngine extends EventEmitter {
 
       if (needsUpdate) {
         // Remove existing update for this widget
-        this.updateQueue = this.updateQueue.filter(u => u.widgetId !== widget.id);
+        this.updateQueue = this.updateQueue.filter(
+          (u) => u.widgetId !== widget.id,
+        );
 
         // Add new update
         this.updateQueue.push({
@@ -495,12 +512,12 @@ export class DashboardUIEngine extends EventEmitter {
     const updatesToProcess: typeof this.updateQueue = [];
 
     // Process high-priority updates immediately
-    const highPriority = this.updateQueue.filter(u => u.priority >= 2);
+    const highPriority = this.updateQueue.filter((u) => u.priority >= 2);
     updatesToProcess.push(...highPriority);
 
     // Process normal priority updates with throttling
     if (now - this.lastRenderTime > this.config.updateThrottle) {
-      const normalPriority = this.updateQueue.filter(u => u.priority < 2);
+      const normalPriority = this.updateQueue.filter((u) => u.priority < 2);
       updatesToProcess.push(...normalPriority);
     }
 
@@ -509,7 +526,7 @@ export class DashboardUIEngine extends EventEmitter {
 
       for (const update of updatesToProcess) {
         this.updateWidget(update.widgetId, update.data);
-        this.updateQueue = this.updateQueue.filter(u => u !== update);
+        this.updateQueue = this.updateQueue.filter((u) => u !== update);
       }
 
       this.isRendering = false;
@@ -524,7 +541,7 @@ export class DashboardUIEngine extends EventEmitter {
     const layout = this.getActiveLayout();
     if (!layout) return;
 
-    const widget = layout.widgets.find(w => w.id === widgetId);
+    const widget = layout.widgets.find((w) => w.id === widgetId);
     if (!widget) return;
 
     // Update widget data based on type
@@ -554,7 +571,10 @@ export class DashboardUIEngine extends EventEmitter {
   /**
    * Update gauge widget
    */
-  private updateGaugeWidget(widget: DashboardWidget, data: CollectedMetric): void {
+  private updateGaugeWidget(
+    widget: DashboardWidget,
+    data: CollectedMetric,
+  ): void {
     if (typeof data.value === "number") {
       widget.data = {
         value: data.value,
@@ -568,7 +588,10 @@ export class DashboardUIEngine extends EventEmitter {
   /**
    * Update chart widget
    */
-  private updateChartWidget(widget: DashboardWidget, data: CollectedMetric): void {
+  private updateChartWidget(
+    widget: DashboardWidget,
+    data: CollectedMetric,
+  ): void {
     if (!widget.data) {
       widget.data = {
         series: new Map(),
@@ -595,13 +618,16 @@ export class DashboardUIEngine extends EventEmitter {
     }
 
     // Update timestamps
-    widget.data.timestamps = seriesData.map(d => d.timestamp);
+    widget.data.timestamps = seriesData.map((d) => d.timestamp);
   }
 
   /**
    * Update table widget
    */
-  private updateTableWidget(widget: DashboardWidget, data: CollectedMetric): void {
+  private updateTableWidget(
+    widget: DashboardWidget,
+    data: CollectedMetric,
+  ): void {
     if (!widget.data) {
       widget.data = new Map();
     }
@@ -619,11 +645,14 @@ export class DashboardUIEngine extends EventEmitter {
    */
   private updateAlertsWidget(widget: DashboardWidget, data: Alert): void {
     widget.data = this.state.alerts
-      .filter(alert => !widget.config.showAcknowledged ? alert.status === "active" : true)
+      .filter((alert) =>
+        !widget.config.showAcknowledged ? alert.status === "active" : true,
+      )
       .sort((a, b) => {
         // Sort by severity first, then by timestamp
         const severityOrder = { critical: 4, high: 3, medium: 2, low: 1 };
-        const severityDiff = severityOrder[b.severity] - severityOrder[a.severity];
+        const severityDiff =
+          severityOrder[b.severity] - severityOrder[a.severity];
         return severityDiff !== 0 ? severityDiff : b.createdAt - a.createdAt;
       })
       .slice(0, widget.config.maxRows || 10);
@@ -644,17 +673,22 @@ export class DashboardUIEngine extends EventEmitter {
     const layout = this.getActiveLayout();
     if (!layout) return;
 
-    const widget = layout.widgets.find(w => w.id === widgetId);
+    const widget = layout.widgets.find((w) => w.id === widgetId);
     if (!widget) return;
 
     // Get relevant metrics for this widget
     let relevantMetrics: CollectedMetric[] = [];
 
     if (widget.config.metric) {
-      relevantMetrics = liveMetricsCollector.getMetricsByName(widget.config.metric, 100);
+      relevantMetrics = liveMetricsCollector.getMetricsByName(
+        widget.config.metric,
+        100,
+      );
     } else if (widget.config.metrics && Array.isArray(widget.config.metrics)) {
       for (const metricName of widget.config.metrics) {
-        relevantMetrics.push(...liveMetricsCollector.getMetricsByName(metricName, 100));
+        relevantMetrics.push(
+          ...liveMetricsCollector.getMetricsByName(metricName, 100),
+        );
       }
     }
 
@@ -671,7 +705,9 @@ export class DashboardUIEngine extends EventEmitter {
     const metrics = liveMetricsCollector.getMetricsByName(metricName, 10);
     if (metrics.length < 5) return "stable";
 
-    const values = metrics.map(m => typeof m.value === "number" ? m.value : 0);
+    const values = metrics.map((m) =>
+      typeof m.value === "number" ? m.value : 0,
+    );
     const first = values[0];
     const last = values[values.length - 1];
 
@@ -703,7 +739,7 @@ export class DashboardUIEngine extends EventEmitter {
 
     this.emit("dashboard-rendered", {
       renderTime,
-      widgetsRendered: layout.widgets.filter(w => w.visible).length,
+      widgetsRendered: layout.widgets.filter((w) => w.visible).length,
     });
   }
 
@@ -761,7 +797,7 @@ export class DashboardUIEngine extends EventEmitter {
     const series = widget.data.series as Map<string, any[]>;
     const chartData = Array.from(series.entries()).map(([name, data]) => ({
       name,
-      data: data.map(d => [d.timestamp, d.value]),
+      data: data.map((d) => [d.timestamp, d.value]),
     }));
 
     // Chart rendering (would use Chart.js or similar in real implementation)
@@ -872,7 +908,7 @@ export class DashboardUIEngine extends EventEmitter {
     }
 
     // Check for duplicate ID
-    if (layout.widgets.some(w => w.id === widget.id)) {
+    if (layout.widgets.some((w) => w.id === widget.id)) {
       return false;
     }
 
@@ -890,7 +926,7 @@ export class DashboardUIEngine extends EventEmitter {
     const layout = this.state.layouts.get(layoutId);
     if (!layout) return false;
 
-    const index = layout.widgets.findIndex(w => w.id === widgetId);
+    const index = layout.widgets.findIndex((w) => w.id === widgetId);
     if (index < 0) return false;
 
     layout.widgets.splice(index, 1);
@@ -903,11 +939,15 @@ export class DashboardUIEngine extends EventEmitter {
   /**
    * Update widget configuration
    */
-  updateWidgetConfig(layoutId: string, widgetId: string, config: Record<string, any>): boolean {
+  updateWidgetConfig(
+    layoutId: string,
+    widgetId: string,
+    config: Record<string, any>,
+  ): boolean {
     const layout = this.state.layouts.get(layoutId);
     if (!layout) return false;
 
-    const widget = layout.widgets.find(w => w.id === widgetId);
+    const widget = layout.widgets.find((w) => w.id === widgetId);
     if (!widget) return false;
 
     widget.config = { ...widget.config, ...config };

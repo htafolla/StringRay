@@ -255,7 +255,7 @@ export class CodexInjector {
     getCodexStats() {
         // Return aggregated stats for plugin
         const allContexts = [];
-        for (const contexts of codexCache.values()) {
+        for (const contexts of Array.from(codexCache.values())) {
             allContexts.push(...contexts);
         }
         const totalTerms = allContexts.reduce((sum, ctx) => sum + ctx.metadata.termCount, 0);

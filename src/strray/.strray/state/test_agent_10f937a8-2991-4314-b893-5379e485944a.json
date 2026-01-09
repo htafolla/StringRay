@@ -1,0 +1,17 @@
+{
+  "agent_name": "test_agent",
+  "session_id": "10f937a8-2991-4314-b893-5379e485944a",
+  "timestamp": "2026-01-09T04:42:20.618007+00:00",
+  "state": {
+    "current_state": "running",
+    "context": {
+      "session_id": "10f937a8-2991-4314-b893-5379e485944a",
+      "workflow_id": null,
+      "start_time": "2026-01-09T04:42:20.516424+00:00",
+      "priority": 1,
+      "tags": [],
+      "metadata": {}
+    },
+    "agent_specific": {}
+  }
+}

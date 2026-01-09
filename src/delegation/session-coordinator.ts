@@ -9,7 +9,7 @@
  */
 
 import { StrRayStateManager } from "../state/state-manager";
-import { DelegationResult } from "./agent-delegator";
+import { DelegationResult } from "./agent-delegator.js";
 
 export interface SessionContext {
   sessionId: string;

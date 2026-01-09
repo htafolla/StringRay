@@ -28,7 +28,7 @@ import {
   BundleSizeMetrics,
   WebVitalsMetrics,
   RuntimePerformanceMetrics,
-  PerformanceBudgetViolation
+  PerformanceBudgetViolation,
 } from "./performance-budget-enforcer.js";
 import { PerformanceRegressionTester } from "./performance-regression-tester.js";
 import { PerformanceMonitoringDashboard } from "./performance-monitoring-dashboard.js";
@@ -82,8 +82,6 @@ export interface BenchmarkingConfig {
     failureThreshold: number;
   };
 }
-
-
 
 export interface BenchmarkResult {
   id: string;
@@ -229,7 +227,9 @@ export class AutomatedBenchmarkingSuite extends EventEmitter {
       },
     };
     this.budgetEnforcer = new PerformanceBudgetEnforcer();
-    this.regressionTester = new PerformanceRegressionTester(this.budgetEnforcer);
+    this.regressionTester = new PerformanceRegressionTester(
+      this.budgetEnforcer,
+    );
     this.dashboard = new PerformanceMonitoringDashboard(
       {
         updateInterval: this.config.continuous.interval,
@@ -267,12 +267,12 @@ export class AutomatedBenchmarkingSuite extends EventEmitter {
     // Load existing benchmarks and baselines
     await this.loadExistingData();
 
-      // Setup event handlers
-      this.setupEventHandlers();
+    // Setup event handlers
+    this.setupEventHandlers();
 
-      this.emit("initialized");
-    } catch (error) {
+    this.emit("initialized");
   }
+  catch(error: unknown) {}
 
   /**
    * Start continuous benchmarking
@@ -314,7 +314,12 @@ export class AutomatedBenchmarkingSuite extends EventEmitter {
   /**
    * Create a new benchmark suite
    */
-  createSuite(id: string, name: string, description: string, benchmarks: Benchmark[]): BenchmarkSuite {
+  createSuite(
+    id: string,
+    name: string,
+    description: string,
+    benchmarks: Benchmark[],
+  ): BenchmarkSuite {
     const suite: BenchmarkSuite = {
       id,
       name,
@@ -345,7 +350,7 @@ export class AutomatedBenchmarkingSuite extends EventEmitter {
     const results: BenchmarkResult[] = [];
 
     for (const benchmark of suite.benchmarks) {
-    return [await this.runBenchmark(benchmark)];
+      return [await this.runBenchmark(benchmark)];
     }
 
     // Save results
@@ -370,7 +375,10 @@ export class AutomatedBenchmarkingSuite extends EventEmitter {
       await Promise.race([
         benchmark.function(),
         new Promise((_, reject) =>
-          setTimeout(() => reject(new Error("Benchmark timeout")), benchmark.timeout)
+          setTimeout(
+            () => reject(new Error("Benchmark timeout")),
+            benchmark.timeout,
+          ),
         ),
       ]);
 
@@ -381,10 +389,12 @@ export class AutomatedBenchmarkingSuite extends EventEmitter {
       // Calculate precise metrics
       const duration = Number(endTime - startTime); // nanoseconds
       const memoryDelta = endMemory.heapUsed - startMemory.heapUsed;
-      const cpuUsage = (endCpu.user + endCpu.system) - (startCpu.user + startCpu.system);
+      const cpuUsage =
+        endCpu.user + endCpu.system - (startCpu.user + startCpu.system);
 
       // Collect comprehensive metrics
-      const bundleMetrics = await this.budgetEnforcer.analyzeBundleSize("./dist");
+      const bundleMetrics =
+        await this.budgetEnforcer.analyzeBundleSize("./dist");
       const webVitals = await this.budgetEnforcer.measureWebVitals();
       const runtimeMetrics = this.budgetEnforcer.measureRuntimePerformance();
 
@@ -435,11 +445,11 @@ export class AutomatedBenchmarkingSuite extends EventEmitter {
             budget: 1,
             percentage: (durationMs / 1) * 100,
             severity: "warning",
-            recommendation: "Optimize benchmark to achieve sub-millisecond performance",
+            recommendation:
+              "Optimize benchmark to achieve sub-millisecond performance",
           });
         }
       }
-
     } catch (err) {
       error = err as Error;
       result = {
@@ -447,7 +457,13 @@ export class AutomatedBenchmarkingSuite extends EventEmitter {
         timestamp: Date.now(),
         type: "validation",
         metrics: {
-          bundleSize: { totalSize: 0, gzippedSize: 0, fileCount: 0, largestFile: { name: "", size: 0, gzippedSize: 0 }, breakdown: [] },
+          bundleSize: {
+            totalSize: 0,
+            gzippedSize: 0,
+            fileCount: 0,
+            largestFile: { name: "", size: 0, gzippedSize: 0 },
+            breakdown: [],
+          },
           webVitals: null,
           runtime: this.budgetEnforcer.measureRuntimePerformance(),
           custom: {},
@@ -460,14 +476,16 @@ export class AutomatedBenchmarkingSuite extends EventEmitter {
         validation: {
           codexCompliance: false,
           coverage: 0,
-          violations: [{
-            metric: "benchmark-execution",
-            actual: 0,
-            budget: 1,
-            percentage: 0,
-            severity: "error",
-            recommendation: `Benchmark failed: ${error.message}`,
-          }],
+          violations: [
+            {
+              metric: "benchmark-execution",
+              actual: 0,
+              budget: 1,
+              percentage: 0,
+              severity: "error",
+              recommendation: `Benchmark failed: ${error.message}`,
+            },
+          ],
         },
         optimization: {
           recommendations: [],
@@ -484,11 +502,16 @@ export class AutomatedBenchmarkingSuite extends EventEmitter {
   /**
    * Generate optimization recommendations based on benchmark results
    */
-  private async generateRecommendations(result: BenchmarkResult): Promise<OptimizationRecommendation[]> {
+  private async generateRecommendations(
+    result: BenchmarkResult,
+  ): Promise<OptimizationRecommendation[]> {
     const recommendations: OptimizationRecommendation[] = [];
 
     // Bundle size recommendations
-    if (result.metrics.bundleSize.totalSize > PERFORMANCE_BUDGET.bundleSize.uncompressed) {
+    if (
+      result.metrics.bundleSize.totalSize >
+      PERFORMANCE_BUDGET.bundleSize.uncompressed
+    ) {
       recommendations.push({
         id: `bundle-${Date.now()}`,
         timestamp: result.timestamp,
@@ -523,7 +546,8 @@ export class AutomatedBenchmarkingSuite extends EventEmitter {
     }
 
     // Memory recommendations
-    if (result.performance.memoryDelta > 10 * 1024 * 1024) { // 10MB increase
+    if (result.performance.memoryDelta > 10 * 1024 * 1024) {
+      // 10MB increase
       recommendations.push({
         id: `memory-${Date.now()}`,
         timestamp: result.timestamp,
@@ -572,7 +596,10 @@ export class AutomatedBenchmarkingSuite extends EventEmitter {
   /**
    * Update suite trends with new result
    */
-  private updateSuiteTrends(suite: BenchmarkSuite, result: BenchmarkResult): void {
+  private updateSuiteTrends(
+    suite: BenchmarkSuite,
+    result: BenchmarkResult,
+  ): void {
     // Calculate performance trend (simplified)
     const durationMs = result.performance.duration / 1_000_000;
     suite.trends.performance.push(durationMs);
@@ -612,7 +639,10 @@ export class AutomatedBenchmarkingSuite extends EventEmitter {
    * Load existing benchmark data
    */
   private async loadExistingData(): Promise<void> {
-    const dataPath = path.join(this.config.metrics.export.path, "benchmark-data.json");
+    const dataPath = path.join(
+      this.config.metrics.export.path,
+      "benchmark-data.json",
+    );
 
     try {
       if (fs.existsSync(dataPath)) {
@@ -629,7 +659,10 @@ export class AutomatedBenchmarkingSuite extends EventEmitter {
    * Save benchmark results
    */
   private async saveResults(results: BenchmarkResult[]): Promise<void> {
-    const dataPath = path.join(this.config.metrics.export.path, "benchmark-data.json");
+    const dataPath = path.join(
+      this.config.metrics.export.path,
+      "benchmark-data.json",
+    );
 
     const data = {
       timestamp: Date.now(),
@@ -647,7 +680,7 @@ export class AutomatedBenchmarkingSuite extends EventEmitter {
   private async exportMetrics(): Promise<void> {
     const exportPath = path.join(
       this.config.metrics.export.path,
-      `metrics-${Date.now()}.${this.config.metrics.export.format}`
+      `metrics-${Date.now()}.${this.config.metrics.export.format}`,
     );
 
     // Simplified export - in real implementation, this would format data appropriately
@@ -655,9 +688,16 @@ export class AutomatedBenchmarkingSuite extends EventEmitter {
       timestamp: Date.now(),
       summary: {
         totalBenchmarks: this.results.length,
-        averageDuration: this.results.reduce((sum, r) => sum + r.performance.duration, 0) / this.results.length,
-        codexCompliance: this.results.filter(r => r.validation.codexCompliance).length / this.results.length * 100,
-        activeRecommendations: this.recommendations.filter(r => r.status === "pending").length,
+        averageDuration:
+          this.results.reduce((sum, r) => sum + r.performance.duration, 0) /
+          this.results.length,
+        codexCompliance:
+          (this.results.filter((r) => r.validation.codexCompliance).length /
+            this.results.length) *
+          100,
+        activeRecommendations: this.recommendations.filter(
+          (r) => r.status === "pending",
+        ).length,
       },
       recentResults: this.results.slice(-10),
     };
@@ -669,10 +709,13 @@ export class AutomatedBenchmarkingSuite extends EventEmitter {
    * Clean up old benchmark data
    */
   private cleanupOldData(): void {
-    const cutoffTime = Date.now() - (this.config.continuous.retentionDays * 24 * 60 * 60 * 1000);
+    const cutoffTime =
+      Date.now() - this.config.continuous.retentionDays * 24 * 60 * 60 * 1000;
 
-    this.results = this.results.filter(r => r.timestamp > cutoffTime);
-    this.recommendations = this.recommendations.filter(r => r.timestamp > cutoffTime);
+    this.results = this.results.filter((r) => r.timestamp > cutoffTime);
+    this.recommendations = this.recommendations.filter(
+      (r) => r.timestamp > cutoffTime,
+    );
   }
 
   /**
@@ -681,8 +724,12 @@ export class AutomatedBenchmarkingSuite extends EventEmitter {
   private setupEventHandlers(): void {
     // Forward component events
     this.dashboard.on("alert", (alert) => this.emit("alert", alert));
-    this.dashboard.on("metrics-updated", (metrics) => this.emit("metrics-updated", metrics));
-    this.budgetEnforcer.on("violation", (violation) => this.emit("violation", violation));
+    this.dashboard.on("metrics-updated", (metrics) =>
+      this.emit("metrics-updated", metrics),
+    );
+    this.budgetEnforcer.on("violation", (violation) =>
+      this.emit("violation", violation),
+    );
   }
 
   /**
@@ -694,9 +741,17 @@ export class AutomatedBenchmarkingSuite extends EventEmitter {
     return {
       totalBenchmarks: this.results.length,
       recentBenchmarks: recent.length,
-      codexCompliance: recent.filter(r => r.validation.codexCompliance).length / recent.length * 100,
-      averageDuration: recent.reduce((sum, r) => sum + r.performance.duration, 0) / recent.length / 1_000_000, // ms
-      activeRecommendations: this.recommendations.filter(r => r.status === "pending").length,
+      codexCompliance:
+        (recent.filter((r) => r.validation.codexCompliance).length /
+          recent.length) *
+        100,
+      averageDuration:
+        recent.reduce((sum, r) => sum + r.performance.duration, 0) /
+        recent.length /
+        1_000_000, // ms
+      activeRecommendations: this.recommendations.filter(
+        (r) => r.status === "pending",
+      ).length,
       suites: this.suites.size,
     };
   }
@@ -704,9 +759,11 @@ export class AutomatedBenchmarkingSuite extends EventEmitter {
   /**
    * Get optimization recommendations
    */
-  getRecommendations(status?: "pending" | "applied" | "rejected"): OptimizationRecommendation[] {
+  getRecommendations(
+    status?: "pending" | "applied" | "rejected",
+  ): OptimizationRecommendation[] {
     if (status) {
-      return this.recommendations.filter(r => r.status === status);
+      return this.recommendations.filter((r) => r.status === status);
     }
     return [...this.recommendations];
   }
@@ -715,7 +772,9 @@ export class AutomatedBenchmarkingSuite extends EventEmitter {
    * Apply optimization recommendation
    */
   async applyRecommendation(recommendationId: string): Promise<boolean> {
-    const recommendation = this.recommendations.find(r => r.id === recommendationId);
+    const recommendation = this.recommendations.find(
+      (r) => r.id === recommendationId,
+    );
 
     if (!recommendation || recommendation.status !== "pending") {
       return false;

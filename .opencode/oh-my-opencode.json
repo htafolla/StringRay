@@ -1,9 +1,9 @@
 {
   "$schema": "https://raw.githubusercontent.com/code-yeongyu/oh-my-opencode/master/assets/oh-my-opencode.schema.json",
-    "google_auth": false,
-    "preemptive_compaction": true,
+  "google_auth": false,
+  "preemptive_compaction": true,
 
-    "plugins": ["stringray-framework"],
+  "plugins": ["stringray-framework"],
   "model_routing": {
     "enforcer": "opencode/grok-code",
     "architect": "opencode/grok-code",
@@ -12,7 +12,8 @@
     "code-reviewer": "opencode/grok-code",
     "security-auditor": "opencode/grok-code",
     "refactorer": "opencode/grok-code",
-    "test-architect": "opencode/grok-code"
+    "test-architect": "opencode/grok-code",
+    "sisyphus": "opencode/grok-code"
   },
   "logging": {
     "enabled": true,
@@ -200,7 +201,7 @@
     },
     "test-architect": {
       "model": "opencode/grok-code",
-      "description": "StrRay Framework test architect with coverage optimization and behavioral testing",
+      "description": "StrRay Framework test architect with automatic test generation, coverage optimization, and behavioral testing",
       "mode": "subagent",
       "temperature": 0.1,
       "tools": {
@@ -209,7 +210,8 @@
           "grep",
           "lsp_*",
           "run_terminal_cmd",
-          "run_terminal_cmd"
+          "run_terminal_cmd",
+          "write"
         ]
       },
       "permission": {
@@ -219,6 +221,86 @@
           "npm": "allow",
           "bun": "allow",
           "test": "allow"
+        }
+      }
+    },
+    "sisyphus": {
+      "model": "opencode/grok-code",
+      "description": "Main orchestrator and command center for multi-agent coordination and workflow management",
+      "mode": "primary",
+      "temperature": 0.1,
+      "tools": {
+        "include": [
+          "read",
+          "grep",
+          "lsp_*",
+          "run_terminal_cmd",
+          "run_terminal_cmd",
+          "write",
+          "background_task",
+          "call_omo_agent",
+          "session_*",
+          "task",
+          "todowrite",
+          "todoread",
+          "webfetch",
+          "websearch",
+          "codesearch",
+          "skill",
+          "webfetch",
+          "bash",
+          "read",
+          "glob",
+          "grep",
+          "edit",
+          "write",
+          "task",
+          "todowrite",
+          "todoread",
+          "webfetch",
+          "websearch",
+          "codesearch",
+          "skill",
+          "lsp_hover",
+          "lsp_goto_definition",
+          "lsp_find_references",
+          "lsp_document_symbols",
+          "lsp_workspace_symbols",
+          "lsp_diagnostics",
+          "lsp_servers",
+          "lsp_prepare_rename",
+          "lsp_rename",
+          "lsp_code_actions",
+          "lsp_code_action_resolve",
+          "ast_grep_search",
+          "ast_grep_replace",
+          "session_list",
+          "session_read",
+          "session_search",
+          "session_info",
+          "background_task",
+          "background_output",
+          "background_cancel",
+          "call_omo_agent",
+          "background_output",
+          "look_at",
+          "skill_mcp",
+          "slashcommand",
+          "interactive_bash",
+          "skill_mcp",
+          "slashcommand",
+          "interactive_bash",
+          "look_at"
+        ]
+      },
+      "permission": {
+        "edit": "allow",
+        "bash": {
+          "git": "allow",
+          "npm": "allow",
+          "bun": "allow",
+          "test": "allow",
+          "coverage": "allow"
         }
       }
     }

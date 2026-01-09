@@ -10,6 +10,7 @@
 
 import { StrRayStateManager } from "../state/state-manager";
 import { SessionCoordinator } from "../delegation/session-coordinator";
+import { SessionMonitor } from "./session-monitor";
 
 export interface SessionMetadata {
   sessionId: string;
@@ -42,12 +43,15 @@ export class SessionCleanupManager {
   private config: CleanupConfig;
   private cleanupInterval?: NodeJS.Timeout | undefined;
   private sessionMetadata = new Map<string, SessionMetadata>();
+  private sessionMonitor: SessionMonitor | undefined;
 
   constructor(
     stateManager: StrRayStateManager,
     config: Partial<CleanupConfig> = {},
+    sessionMonitor?: SessionMonitor,
   ) {
     this.stateManager = stateManager;
+    this.sessionMonitor = sessionMonitor;
     this.config = {
       ttlMs: 24 * 60 * 60 * 1000,
       idleTimeoutMs: 2 * 60 * 60 * 1000,
@@ -387,6 +391,11 @@ export class SessionCleanupManager {
       sessionCoordinator.cleanupSession(sessionId);
     }
 
+    // Notify session monitor to unregister the session
+    if (this.sessionMonitor) {
+      this.sessionMonitor.unregisterSession(sessionId);
+    }
+
     this.stateManager.clear(`session:${sessionId}`);
 
     this.sessionMetadata.delete(sessionId);
@@ -407,6 +416,7 @@ export class SessionCleanupManager {
 export const createSessionCleanupManager = (
   stateManager: StrRayStateManager,
   config?: Partial<CleanupConfig>,
+  sessionMonitor?: SessionMonitor,
 ): SessionCleanupManager => {
-  return new SessionCleanupManager(stateManager, config);
+  return new SessionCleanupManager(stateManager, config, sessionMonitor);
 };

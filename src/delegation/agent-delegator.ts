@@ -12,7 +12,7 @@ import {
   ComplexityAnalyzer,
   ComplexityScore,
   ComplexityMetrics,
-} from "./complexity-analyzer";
+} from "./complexity-analyzer.js";
 import { StrRayStateManager } from "../state/state-manager";
 
 export interface DelegationRequest {

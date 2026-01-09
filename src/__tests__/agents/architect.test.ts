@@ -1,108 +1,108 @@
-import { describe, it, expect } from 'vitest';
-import { architect } from '../../agents/architect.js';
-import type { AgentConfig } from '../../agents/types.js';
+import { describe, it, expect } from "vitest";
+import { architect } from "../../agents/architect.js";
+import type { AgentConfig } from "../../agents/types.js";
 
-describe('Architect Agent Configuration', () => {
-  it('should be a valid AgentConfig object', () => {
+describe("Architect Agent Configuration", () => {
+  it("should be a valid AgentConfig object", () => {
     const config: AgentConfig = architect;
     expect(config).toBeDefined();
   });
 
-  describe('Basic Configuration', () => {
-    it('should have correct name and model', () => {
-      expect(architect.name).toBe('architect');
-      expect(architect.model).toBe('opencode/grok-code');
+  describe("Basic Configuration", () => {
+    it("should have correct name and model", () => {
+      expect(architect.name).toBe("architect");
+      expect(architect.model).toBe("opencode/grok-code");
     });
 
-    it('should be configured as subagent mode', () => {
-      expect(architect.mode).toBe('subagent');
+    it("should be configured as subagent mode", () => {
+      expect(architect.mode).toBe("subagent");
     });
 
-    it('should have low temperature for consistent design decisions', () => {
+    it("should have low temperature for consistent design decisions", () => {
       expect(architect.temperature).toBe(0.1);
     });
   });
 
-  describe('Core Responsibilities', () => {
-    it('should define 4 core responsibilities', () => {
+  describe("Core Responsibilities", () => {
+    it("should define 4 core responsibilities", () => {
       const system = architect.system;
-      expect(system).toContain('State Management');
-      expect(system).toContain('Delegation System');
-      expect(system).toContain('System Design');
-      expect(system).toContain('Dependency Mapping');
+      expect(system).toContain("State Management");
+      expect(system).toContain("Delegation System");
+      expect(system).toContain("System Design");
+      expect(system).toContain("Dependency Mapping");
     });
 
-    it('should specify state management focus', () => {
+    it("should specify state management focus", () => {
       const system = architect.system;
-      expect(system).toContain('Maintain global state');
-      expect(system).toContain('prevent state duplication');
+      expect(system).toContain("Maintain global state");
+      expect(system).toContain("prevent state duplication");
     });
 
-    it('should include delegation intelligence', () => {
+    it("should include delegation intelligence", () => {
       const system = architect.system;
-      expect(system).toContain('Analyze task complexity');
-      expect(system).toContain('route to appropriate specialized agents');
-    });
-  });
-
-  describe('Key Facilities', () => {
-    it('should specify architectural facilities', () => {
-      const system = architect.system;
-      expect(system).toContain('Global state coordinator');
-      expect(system).toContain('Complexity analysis engine');
-      expect(system).toContain('Delegation system');
-      expect(system).toContain('State synchronization');
-    });
-
-    it('should define processor pipeline', () => {
-      const system = architect.system;
-      expect(system).toContain('Processor pipeline');
-      expect(system).toContain('stateValidation');
-      expect(system).toContain('dependencyMapping');
-      expect(system).toContain('architectureReview');
-      expect(system).toContain('delegationOptimization');
+      expect(system).toContain("Analyze task complexity");
+      expect(system).toContain("route to appropriate specialized agents");
     });
   });
 
-  describe('Architectural Principles', () => {
-    it('should follow shared global state principle', () => {
+  describe("Key Facilities", () => {
+    it("should specify architectural facilities", () => {
       const system = architect.system;
-      expect(system).toContain('shared global state where possible');
-      expect(system).toContain('single source of truth');
+      expect(system).toContain("Global state coordinator");
+      expect(system).toContain("Complexity analysis engine");
+      expect(system).toContain("Delegation system");
+      expect(system).toContain("State synchronization");
     });
 
-    it('should implement SOLID principles', () => {
+    it("should define processor pipeline", () => {
       const system = architect.system;
-      expect(system).toContain('SOLID principles');
-      expect(system).toContain('clean architecture');
-    });
-
-    it('should reference Universal Development Codex', () => {
-      const system = architect.system;
-      expect(system).toContain('Universal Development Codex v1.2.20');
-    });
-  });
-
-  describe('Tools Configuration', () => {
-    it('should have architecture-specific tools', () => {
-      expect(architect.tools?.include).toContain('read');
-      expect(architect.tools?.include).toContain('grep');
-      expect(architect.tools?.include).toContain('lsp_*');
-      expect(architect.tools?.include).toContain('run_terminal_cmd');
-      expect(architect.tools?.include).toContain('background_task');
-      expect(architect.tools?.include).toContain('lsp_goto_definition');
-      expect(architect.tools?.include).toContain('lsp_find_references');
+      expect(system).toContain("Processor pipeline");
+      expect(system).toContain("stateValidation");
+      expect(system).toContain("dependencyMapping");
+      expect(system).toContain("architectureReview");
+      expect(system).toContain("delegationOptimization");
     });
   });
 
-  describe('Integration Points', () => {
-    it('should define architectural integration points', () => {
+  describe("Architectural Principles", () => {
+    it("should follow shared global state principle", () => {
       const system = architect.system;
-      expect(system).toContain('Integration Points');
-      expect(system).toContain('State manager');
-      expect(system).toContain('Delegation system');
-      expect(system).toContain('Boot orchestrator');
-      expect(system).toContain('Monitoring system');
+      expect(system).toContain("shared global state where possible");
+      expect(system).toContain("single source of truth");
+    });
+
+    it("should implement SOLID principles", () => {
+      const system = architect.system;
+      expect(system).toContain("SOLID principles");
+      expect(system).toContain("clean architecture");
+    });
+
+    it("should reference Universal Development Codex", () => {
+      const system = architect.system;
+      expect(system).toContain("Universal Development Codex v1.2.20");
+    });
+  });
+
+  describe("Tools Configuration", () => {
+    it("should have architecture-specific tools", () => {
+      expect(architect.tools?.include).toContain("read");
+      expect(architect.tools?.include).toContain("grep");
+      expect(architect.tools?.include).toContain("lsp_*");
+      expect(architect.tools?.include).toContain("run_terminal_cmd");
+      expect(architect.tools?.include).toContain("background_task");
+      expect(architect.tools?.include).toContain("lsp_goto_definition");
+      expect(architect.tools?.include).toContain("lsp_find_references");
+    });
+  });
+
+  describe("Integration Points", () => {
+    it("should define architectural integration points", () => {
+      const system = architect.system;
+      expect(system).toContain("Integration Points");
+      expect(system).toContain("State manager");
+      expect(system).toContain("Delegation system");
+      expect(system).toContain("Boot orchestrator");
+      expect(system).toContain("Monitoring system");
     });
   });
 });

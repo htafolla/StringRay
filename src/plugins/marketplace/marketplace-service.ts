@@ -27,23 +27,68 @@ import { enterpriseMonitoringSystem } from "../../monitoring/enterprise-monitori
 export class PluginMarketplaceService implements MarketplaceService {
   private plugins = new Map<string, MarketplacePlugin>();
   private searchIndex = new Map<string, Set<string>>();
-  private downloadTokens = new Map<string, { token: string; expires: number }>();
+  private downloadTokens = new Map<
+    string,
+    { token: string; expires: number }
+  >();
 
   /**
    * Search plugins with advanced filtering and ranking
    */
-  async search(query: MarketplaceSearchQuery): Promise<MarketplaceSearchResult> {
+  async search(
+    query: MarketplaceSearchQuery,
+  ): Promise<MarketplaceSearchResult> {
+    // Basic validation for null/undefined
+    if (query == null) {
+      throw new Error("Search query cannot be null or undefined");
+    }
+
     // Input validation
-    const validation = securityHardeningSystem.validateInput(query, "marketplace-search");
+    const validation = securityHardeningSystem.validateInput(
+      query,
+      "marketplace-search",
+    );
     if (!validation.isValid) {
       throw new Error(`Invalid search query: ${validation.errors.join(", ")}`);
     }
 
     const sanitizedQuery = validation.sanitizedValue as MarketplaceSearchQuery;
 
+    // Additional validation for query structure
+    if (
+      sanitizedQuery.limit != null &&
+      (typeof sanitizedQuery.limit !== "number" ||
+        sanitizedQuery.limit < 0 ||
+        !Number.isFinite(sanitizedQuery.limit))
+    ) {
+      throw new Error("Invalid limit parameter");
+    }
+    if (
+      sanitizedQuery.offset != null &&
+      (typeof sanitizedQuery.offset !== "number" ||
+        sanitizedQuery.offset < 0 ||
+        !Number.isFinite(sanitizedQuery.offset))
+    ) {
+      throw new Error("Invalid offset parameter");
+    }
+    if (
+      sanitizedQuery.minRating != null &&
+      (typeof sanitizedQuery.minRating !== "number" ||
+        sanitizedQuery.minRating < 0 ||
+        sanitizedQuery.minRating > 5)
+    ) {
+      throw new Error("Invalid minRating parameter");
+    }
+    if (
+      sanitizedQuery.query != null &&
+      typeof sanitizedQuery.query !== "string"
+    ) {
+      throw new Error("Invalid query parameter");
+    }
+
     try {
       // Perform search with ranking and filtering
-      const results = await this.performSearch(sanitizedQuery);
+      const { results, total } = await this.performSearch(sanitizedQuery);
       const facets = await this.generateFacets(results);
 
       // Log search metrics
@@ -55,7 +100,7 @@ export class PluginMarketplaceService implements MarketplaceService {
 
       return {
         plugins: results,
-        total: results.length,
+        total,
         facets,
         query: sanitizedQuery,
       };
@@ -99,7 +144,15 @@ export class PluginMarketplaceService implements MarketplaceService {
    * Get plugins by author with reputation filtering
    */
   async getPluginsByAuthor(authorId: string): Promise<MarketplacePlugin[]> {
-    const validation = securityHardeningSystem.validateInput(authorId, "author-id");
+    // Basic validation for null/undefined
+    if (authorId == null) {
+      throw new Error("Author ID cannot be null or undefined");
+    }
+
+    const validation = securityHardeningSystem.validateInput(
+      authorId,
+      "author-id",
+    );
     if (!validation.isValid) {
       throw new Error(`Invalid author ID: ${validation.errors.join(", ")}`);
     }
@@ -108,12 +161,17 @@ export class PluginMarketplaceService implements MarketplaceService {
 
     try {
       const plugins = Array.from(this.plugins.values()).filter(
-        (plugin) => plugin.author.id === sanitizedAuthorId && plugin.status === "published"
+        (plugin) =>
+          plugin.author.id === sanitizedAuthorId &&
+          plugin.status === "published",
       );
 
       return plugins.sort((a, b) => b.updatedAt - a.updatedAt);
     } catch (error) {
-      enterpriseMonitoringSystem.recordError("marketplace.get_by_author", error);
+      enterpriseMonitoringSystem.recordError(
+        "marketplace.get_by_author",
+        error,
+      );
       throw error;
     }
   }
@@ -122,7 +180,10 @@ export class PluginMarketplaceService implements MarketplaceService {
    * Get plugins by category with curation
    */
   async getPluginsByCategory(category: string): Promise<MarketplacePlugin[]> {
-    const validation = securityHardeningSystem.validateInput(category, "plugin-category");
+    const validation = securityHardeningSystem.validateInput(
+      category,
+      "plugin-category",
+    );
     if (!validation.isValid) {
       throw new Error(`Invalid category: ${validation.errors.join(", ")}`);
     }
@@ -131,17 +192,24 @@ export class PluginMarketplaceService implements MarketplaceService {
 
     try {
       const plugins = Array.from(this.plugins.values()).filter(
-        (plugin) => plugin.category === sanitizedCategory && plugin.status === "published"
+        (plugin) =>
+          plugin.category === sanitizedCategory &&
+          plugin.status === "published",
       );
 
       // Sort by rating and downloads
       return plugins.sort((a, b) => {
-        const aScore = (a.stats.rating * 0.7) + (Math.log(a.stats.downloads + 1) * 0.3);
-        const bScore = (b.stats.rating * 0.7) + (Math.log(b.stats.downloads + 1) * 0.3);
+        const aScore =
+          a.stats.rating * 0.7 + Math.log(a.stats.downloads + 1) * 0.3;
+        const bScore =
+          b.stats.rating * 0.7 + Math.log(b.stats.downloads + 1) * 0.3;
         return bScore - aScore;
       });
     } catch (error) {
-      enterpriseMonitoringSystem.recordError("marketplace.get_by_category", error);
+      enterpriseMonitoringSystem.recordError(
+        "marketplace.get_by_category",
+        error,
+      );
       throw error;
     }
   }
@@ -152,7 +220,7 @@ export class PluginMarketplaceService implements MarketplaceService {
   async getFeaturedPlugins(): Promise<MarketplacePlugin[]> {
     try {
       const plugins = Array.from(this.plugins.values()).filter(
-        (plugin) => plugin.status === "published" && plugin.stats.rating >= 4.0
+        (plugin) => plugin.status === "published" && plugin.stats.rating >= 4.0,
       );
 
       // Curate featured plugins based on multiple criteria
@@ -177,7 +245,7 @@ export class PluginMarketplaceService implements MarketplaceService {
   async getTrendingPlugins(): Promise<MarketplacePlugin[]> {
     try {
       const now = Date.now();
-      const weekAgo = now - (7 * 24 * 60 * 60 * 1000);
+      const weekAgo = now - 7 * 24 * 60 * 60 * 1000;
 
       const plugins = Array.from(this.plugins.values())
         .filter((plugin) => plugin.status === "published")
@@ -205,7 +273,7 @@ export class PluginMarketplaceService implements MarketplaceService {
       // For now, return highly-rated plugins from different categories
       // In a full implementation, this would use user behavior analysis
       const plugins = Array.from(this.plugins.values()).filter(
-        (plugin) => plugin.status === "published" && plugin.stats.rating >= 3.5
+        (plugin) => plugin.status === "published" && plugin.stats.rating >= 3.5,
       );
 
       // Group by category and pick top from each
@@ -227,7 +295,10 @@ export class PluginMarketplaceService implements MarketplaceService {
 
       return recommendations.slice(0, 15);
     } catch (error) {
-      enterpriseMonitoringSystem.recordError("marketplace.get_recommended", error);
+      enterpriseMonitoringSystem.recordError(
+        "marketplace.get_recommended",
+        error,
+      );
       throw error;
     }
   }
@@ -235,8 +306,14 @@ export class PluginMarketplaceService implements MarketplaceService {
   /**
    * Download plugin with secure token generation
    */
-  async downloadPlugin(id: string, version: string): Promise<PluginDownloadResult> {
-    const validation = securityHardeningSystem.validateInput({ id, version }, "plugin-download");
+  async downloadPlugin(
+    id: string,
+    version: string,
+  ): Promise<PluginDownloadResult> {
+    const validation = securityHardeningSystem.validateInput(
+      { id, version },
+      "plugin-download",
+    );
     if (!validation.isValid) {
       return {
         success: false,
@@ -248,7 +325,8 @@ export class PluginMarketplaceService implements MarketplaceService {
       };
     }
 
-    const { id: sanitizedId, version: sanitizedVersion } = validation.sanitizedValue as any;
+    const { id: sanitizedId, version: sanitizedVersion } =
+      validation.sanitizedValue as any;
 
     try {
       const plugin = this.plugins.get(sanitizedId);
@@ -263,7 +341,9 @@ export class PluginMarketplaceService implements MarketplaceService {
         };
       }
 
-      const pluginVersion = plugin.versions.find((v) => v.version === sanitizedVersion);
+      const pluginVersion = plugin.versions.find(
+        (v) => v.version === sanitizedVersion,
+      );
       if (!pluginVersion) {
         return {
           success: false,
@@ -277,7 +357,7 @@ export class PluginMarketplaceService implements MarketplaceService {
 
       // Generate secure download token
       const token = this.generateDownloadToken(sanitizedId, sanitizedVersion);
-      const expiresAt = Date.now() + (15 * 60 * 1000); // 15 minutes
+      const expiresAt = Date.now() + 15 * 60 * 1000; // 15 minutes
 
       // Update download stats
       plugin.stats.downloads++;
@@ -313,12 +393,16 @@ export class PluginMarketplaceService implements MarketplaceService {
    * Report plugin for moderation
    */
   async reportPlugin(id: string, report: PluginReport): Promise<boolean> {
-    const validation = securityHardeningSystem.validateInput({ id, report }, "plugin-report");
+    const validation = securityHardeningSystem.validateInput(
+      { id, report },
+      "plugin-report",
+    );
     if (!validation.isValid) {
       throw new Error(`Invalid report: ${validation.errors.join(", ")}`);
     }
 
-    const { id: sanitizedId, report: sanitizedReport } = validation.sanitizedValue as any;
+    const { id: sanitizedId, report: sanitizedReport } =
+      validation.sanitizedValue as any;
 
     try {
       const plugin = this.plugins.get(sanitizedId);
@@ -334,7 +418,9 @@ export class PluginMarketplaceService implements MarketplaceService {
         pluginName: plugin.name,
       });
 
-      console.warn(`Plugin reported: ${plugin.name} (${sanitizedId}) - ${sanitizedReport.type}: ${sanitizedReport.description}`);
+      console.warn(
+        `Plugin reported: ${plugin.name} (${sanitizedId}) - ${sanitizedReport.type}: ${sanitizedReport.description}`,
+      );
 
       return true;
     } catch (error) {
@@ -346,9 +432,11 @@ export class PluginMarketplaceService implements MarketplaceService {
   /**
    * Perform advanced search with ranking
    */
-  private async performSearch(query: MarketplaceSearchQuery): Promise<MarketplacePlugin[]> {
+  private async performSearch(
+    query: MarketplaceSearchQuery,
+  ): Promise<{ results: MarketplacePlugin[]; total: number }> {
     let candidates = Array.from(this.plugins.values()).filter(
-      (plugin) => plugin.status === "published"
+      (plugin) => plugin.status === "published",
     );
 
     // Apply text search
@@ -358,24 +446,30 @@ export class PluginMarketplaceService implements MarketplaceService {
 
     // Apply category filter
     if (query.category) {
-      candidates = candidates.filter((plugin) => plugin.category === query.category);
+      candidates = candidates.filter(
+        (plugin) => plugin.category === query.category,
+      );
     }
 
     // Apply author filter
     if (query.author) {
-      candidates = candidates.filter((plugin) => plugin.author.id === query.author);
+      candidates = candidates.filter(
+        (plugin) => plugin.author.id === query.author,
+      );
     }
 
     // Apply tag filters
     if (query.tags && query.tags.length > 0) {
       candidates = candidates.filter((plugin) =>
-        query.tags!.some((tag) => plugin.tags.includes(tag))
+        query.tags!.some((tag) => plugin.tags.includes(tag)),
       );
     }
 
     // Apply rating filter
     if (query.minRating) {
-      candidates = candidates.filter((plugin) => plugin.stats.rating >= query.minRating!);
+      candidates = candidates.filter(
+        (plugin) => plugin.stats.rating >= query.minRating!,
+      );
     }
 
     // Apply advanced filters
@@ -386,17 +480,26 @@ export class PluginMarketplaceService implements MarketplaceService {
     // Sort results
     candidates = this.sortResults(candidates, query.sortBy, query.sortOrder);
 
+    // Get total before pagination
+    const total = candidates.length;
+
     // Apply pagination
     const limit = Math.min(query.limit || 50, 100); // Max 100 results
     const offset = query.offset || 0;
 
-    return candidates.slice(offset, offset + limit);
+    return {
+      results: candidates.slice(offset, offset + limit),
+      total,
+    };
   }
 
   /**
    * Filter plugins by text search
    */
-  private filterByText(plugins: MarketplacePlugin[], query: string): MarketplacePlugin[] {
+  private filterByText(
+    plugins: MarketplacePlugin[],
+    query: string,
+  ): MarketplacePlugin[] {
     const searchTerms = query.toLowerCase().split(/\s+/);
 
     return plugins.filter((plugin) => {
@@ -406,7 +509,9 @@ export class PluginMarketplaceService implements MarketplaceService {
         plugin.author.name,
         ...plugin.tags,
         plugin.category,
-      ].join(" ").toLowerCase();
+      ]
+        .join(" ")
+        .toLowerCase();
 
       return searchTerms.every((term) => searchableText.includes(term));
     });
@@ -415,10 +520,16 @@ export class PluginMarketplaceService implements MarketplaceService {
   /**
    * Apply advanced filters
    */
-  private applyAdvancedFilters(plugins: MarketplacePlugin[], filters: MarketplaceFilters): MarketplacePlugin[] {
+  private applyAdvancedFilters(
+    plugins: MarketplacePlugin[],
+    filters: MarketplaceFilters,
+  ): MarketplacePlugin[] {
     return plugins.filter((plugin) => {
       // Verified filter
-      if (filters.verified !== undefined && plugin.author.verified !== filters.verified) {
+      if (
+        filters.verified !== undefined &&
+        plugin.author.verified !== filters.verified
+      ) {
         return false;
       }
 
@@ -432,7 +543,7 @@ export class PluginMarketplaceService implements MarketplaceService {
       // Compatibility filters
       if (filters.compatibility && filters.compatibility.length > 0) {
         const compatible = filters.compatibility.some((version) =>
-          plugin.compatibility.strRayVersions.includes(version)
+          plugin.compatibility.strRayVersions.includes(version),
         );
         if (!compatible) return false;
       }
@@ -445,7 +556,7 @@ export class PluginMarketplaceService implements MarketplaceService {
       // Language filters
       if (filters.language && filters.language.length > 0) {
         const hasLanguage = filters.language.some((lang) =>
-          plugin.metadata.languages.includes(lang)
+          plugin.metadata.languages.includes(lang),
         );
         if (!hasLanguage) return false;
       }
@@ -453,7 +564,7 @@ export class PluginMarketplaceService implements MarketplaceService {
       // Platform filters
       if (filters.platform && filters.platform.length > 0) {
         const hasPlatform = filters.platform.some((platform) =>
-          plugin.metadata.supportedPlatforms.includes(platform)
+          plugin.metadata.supportedPlatforms.includes(platform),
         );
         if (!hasPlatform) return false;
       }
@@ -468,7 +579,7 @@ export class PluginMarketplaceService implements MarketplaceService {
   private sortResults(
     plugins: MarketplacePlugin[],
     sortBy?: string,
-    sortOrder?: string
+    sortOrder?: string,
   ): MarketplacePlugin[] {
     const order = sortOrder === "asc" ? 1 : -1;
 
@@ -504,20 +615,22 @@ export class PluginMarketplaceService implements MarketplaceService {
   /**
    * Generate search facets
    */
-   private async generateFacets(plugins: MarketplacePlugin[]): Promise<SearchFacets> {
-     const facets: SearchFacets = {
-       categories: {
-         agent: 0,
-         integration: 0,
-         ui: 0,
-         utility: 0,
-         security: 0,
-         monitoring: 0,
-         performance: 0,
-         testing: 0,
-         deployment: 0,
-         other: 0,
-       },
+  private async generateFacets(
+    plugins: MarketplacePlugin[],
+  ): Promise<SearchFacets> {
+    const facets: SearchFacets = {
+      categories: {
+        agent: 0,
+        integration: 0,
+        ui: 0,
+        utility: 0,
+        security: 0,
+        monitoring: 0,
+        performance: 0,
+        testing: 0,
+        deployment: 0,
+        other: 0,
+      },
       authors: {},
       tags: {},
       licenses: {},
@@ -527,10 +640,12 @@ export class PluginMarketplaceService implements MarketplaceService {
 
     for (const plugin of plugins) {
       // Categories
-      facets.categories[plugin.category] = (facets.categories[plugin.category] || 0) + 1;
+      facets.categories[plugin.category] =
+        (facets.categories[plugin.category] || 0) + 1;
 
       // Authors
-      facets.authors[plugin.author.name] = (facets.authors[plugin.author.name] || 0) + 1;
+      facets.authors[plugin.author.name] =
+        (facets.authors[plugin.author.name] || 0) + 1;
 
       // Tags
       for (const tag of plugin.tags) {
@@ -538,7 +653,8 @@ export class PluginMarketplaceService implements MarketplaceService {
       }
 
       // Licenses
-      facets.licenses[plugin.license] = (facets.licenses[plugin.license] || 0) + 1;
+      facets.licenses[plugin.license] =
+        (facets.licenses[plugin.license] || 0) + 1;
 
       // Languages
       for (const lang of plugin.metadata.languages) {
@@ -558,33 +674,49 @@ export class PluginMarketplaceService implements MarketplaceService {
    * Calculate featured score for curation
    */
   private calculateFeaturedScore(plugin: MarketplacePlugin): number {
-    const recencyWeight = Math.max(0, 1 - (Date.now() - plugin.updatedAt) / (30 * 24 * 60 * 60 * 1000)); // 30 days
+    const recencyWeight = Math.max(
+      0,
+      1 - (Date.now() - plugin.updatedAt) / (30 * 24 * 60 * 60 * 1000),
+    ); // 30 days
     const ratingWeight = plugin.stats.rating / 5.0;
-    const downloadWeight = Math.min(1, Math.log(plugin.stats.downloads + 1) / Math.log(1000));
+    const downloadWeight = Math.min(
+      1,
+      Math.log(plugin.stats.downloads + 1) / Math.log(1000),
+    );
     const authorWeight = plugin.author.verified ? 1.2 : 1.0;
 
-    return (recencyWeight * 0.2) + (ratingWeight * 0.4) + (downloadWeight * 0.3) + (authorWeight * 0.1);
+    return (
+      recencyWeight * 0.2 +
+      ratingWeight * 0.4 +
+      downloadWeight * 0.3 +
+      authorWeight * 0.1
+    );
   }
 
   /**
    * Calculate trend score for trending plugins
    */
-  private calculateTrendScore(plugin: MarketplacePlugin, since: number): number {
+  private calculateTrendScore(
+    plugin: MarketplacePlugin,
+    since: number,
+  ): number {
     // Simplified trend calculation - in reality would use time-series data
     const recentDownloads = plugin.stats.downloads; // Would be downloads since 'since'
     const recentRating = plugin.stats.rating;
 
-    return (recentDownloads * 0.7) + (recentRating * 10 * 0.3);
+    return recentDownloads * 0.7 + recentRating * 10 * 0.3;
   }
 
   /**
    * Calculate relevance score for search
    */
   private calculateRelevanceScore(plugin: MarketplacePlugin): number {
-    return (plugin.stats.rating * 0.4) +
-           (Math.log(plugin.stats.downloads + 1) * 0.3) +
-           (plugin.author.reputation / 100 * 0.2) +
-           (plugin.author.verified ? 0.1 : 0);
+    return (
+      plugin.stats.rating * 0.4 +
+      Math.log(plugin.stats.downloads + 1) * 0.3 +
+      (plugin.author.reputation / 100) * 0.2 +
+      (plugin.author.verified ? 0.1 : 0)
+    );
   }
 
   /**
@@ -602,9 +734,13 @@ export class PluginMarketplaceService implements MarketplaceService {
 
     if (plugin.security.vulnerabilities.length === 0) score += 10;
     else {
-      const criticalCount = plugin.security.vulnerabilities.filter(v => v.severity === "critical").length;
-      const highCount = plugin.security.vulnerabilities.filter(v => v.severity === "high").length;
-      score -= (criticalCount * 20) + (highCount * 10);
+      const criticalCount = plugin.security.vulnerabilities.filter(
+        (v) => v.severity === "critical",
+      ).length;
+      const highCount = plugin.security.vulnerabilities.filter(
+        (v) => v.severity === "high",
+      ).length;
+      score -= criticalCount * 20 + highCount * 10;
     }
 
     return Math.max(0, Math.min(100, score));
@@ -621,7 +757,7 @@ export class PluginMarketplaceService implements MarketplaceService {
     // Store token with expiration
     this.downloadTokens.set(token, {
       token,
-      expires: Date.now() + (15 * 60 * 1000), // 15 minutes
+      expires: Date.now() + 15 * 60 * 1000, // 15 minutes
     });
 
     // Cleanup expired tokens periodically
@@ -659,7 +795,7 @@ export class PluginMarketplaceService implements MarketplaceService {
       plugin.description.toLowerCase(),
       plugin.author.name.toLowerCase(),
       plugin.category.toLowerCase(),
-      ...plugin.tags.map(t => t.toLowerCase()),
+      ...plugin.tags.map((t) => t.toLowerCase()),
     ];
 
     for (const term of terms) {

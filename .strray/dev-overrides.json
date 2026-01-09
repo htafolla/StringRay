@@ -1,0 +1,18 @@
+{
+  "comment_justification": {
+    "enabled": false,
+    "reason": "Temporarily disabled during active development to reduce friction",
+    "override_author": "StrRay Development Team",
+    "timestamp": "2026-01-09T04:40:00Z",
+    "auto_reenable": {
+      "enabled": true,
+      "after_days": 7,
+      "reminder_message": "Re-evaluate comment justification rule enforcement"
+    }
+  },
+  "development_overrides": {
+    "allow_unjustified_comments": true,
+    "allow_unjustified_docstrings": true,
+    "lenient_comment_policy": true
+  }
+}

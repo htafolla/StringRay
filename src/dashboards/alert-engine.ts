@@ -9,7 +9,10 @@
  */
 
 import { EventEmitter } from "events";
-import { liveMetricsCollector, CollectedMetric } from "./live-metrics-collector.js";
+import {
+  liveMetricsCollector,
+  CollectedMetric,
+} from "./live-metrics-collector.js";
 import { realTimeStreamingService } from "../streaming/real-time-streaming-service.js";
 
 export interface AlertRule {
@@ -273,7 +276,9 @@ export class AlertEngine extends EventEmitter {
     console.log("🚨 Starting Alert Engine");
     console.log(`   Rules: ${this.rules.size}`);
     console.log(`   Max Active Alerts: ${this.config.maxActiveAlerts}`);
-    console.log(`   Anomaly Detection: ${this.config.anomalyDetection.enabled ? "enabled" : "disabled"}`);
+    console.log(
+      `   Anomaly Detection: ${this.config.anomalyDetection.enabled ? "enabled" : "disabled"}`,
+    );
 
     this.isRunning = true;
     this.startAlertCleanup();
@@ -322,7 +327,10 @@ export class AlertEngine extends EventEmitter {
   /**
    * Check if metric matches rule pattern
    */
-  private matchesMetricPattern(metric: CollectedMetric, rule: AlertRule): boolean {
+  private matchesMetricPattern(
+    metric: CollectedMetric,
+    rule: AlertRule,
+  ): boolean {
     const nameMatches = new RegExp(rule.metricPattern).test(metric.name);
     if (!nameMatches) return false;
 
@@ -340,7 +348,9 @@ export class AlertEngine extends EventEmitter {
     const lastTriggered = this.alertCooldowns.get(ruleId);
     if (!lastTriggered) return false;
 
-    const cooldownMs = this.rules.get(ruleId)?.cooldownMinutes || this.config.defaultCooldownMinutes;
+    const cooldownMs =
+      this.rules.get(ruleId)?.cooldownMinutes ||
+      this.config.defaultCooldownMinutes;
     return Date.now() - lastTriggered < cooldownMs * 60 * 1000;
   }
 
@@ -378,12 +388,19 @@ export class AlertEngine extends EventEmitter {
   private detectAnomaly(metric: CollectedMetric, rule: AlertRule): boolean {
     if (!this.config.anomalyDetection.enabled) return false;
 
-    const metrics = liveMetricsCollector.getMetricsByName(metric.name, this.config.anomalyDetection.minDataPoints);
-    if (metrics.length < this.config.anomalyDetection.minDataPoints) return false;
+    const metrics = liveMetricsCollector.getMetricsByName(
+      metric.name,
+      this.config.anomalyDetection.minDataPoints,
+    );
+    if (metrics.length < this.config.anomalyDetection.minDataPoints)
+      return false;
 
-    const values = metrics.map(m => typeof m.value === "number" ? m.value : 0);
+    const values = metrics.map((m) =>
+      typeof m.value === "number" ? m.value : 0,
+    );
     const mean = values.reduce((a, b) => a + b, 0) / values.length;
-    const variance = values.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / values.length;
+    const variance =
+      values.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / values.length;
     const stdDev = Math.sqrt(variance);
 
     if (stdDev === 0) return false;
@@ -443,8 +460,10 @@ export class AlertEngine extends EventEmitter {
 
     this.stats.totalAlerts++;
     this.stats.activeAlerts++;
-    this.stats.alertsBySeverity[alert.severity] = (this.stats.alertsBySeverity[alert.severity] || 0) + 1;
-    this.stats.alertsByRule[rule.id] = (this.stats.alertsByRule[rule.id] || 0) + 1;
+    this.stats.alertsBySeverity[alert.severity] =
+      (this.stats.alertsBySeverity[alert.severity] || 0) + 1;
+    this.stats.alertsByRule[rule.id] =
+      (this.stats.alertsByRule[rule.id] || 0) + 1;
 
     // Check if we've exceeded max active alerts
     if (this.activeAlerts.size > this.config.maxActiveAlerts) {
@@ -473,16 +492,20 @@ export class AlertEngine extends EventEmitter {
 
     // Find active alerts for this rule
     const activeAlerts = Array.from(this.activeAlerts)
-      .map(id => this.alerts.get(id))
-      .filter(alert => alert && alert.ruleId === rule.id && alert.status === "active");
+      .map((id) => this.alerts.get(id))
+      .filter(
+        (alert) =>
+          alert && alert.ruleId === rule.id && alert.status === "active",
+      );
 
     for (const alert of activeAlerts) {
       if (!alert) continue;
 
       const value = typeof metric.value === "number" ? metric.value : 0;
-      const shouldResolve = rule.condition === "gt"
-        ? value <= rule.resolveThreshold
-        : value >= rule.resolveThreshold;
+      const shouldResolve =
+        rule.condition === "gt"
+          ? value <= rule.resolveThreshold
+          : value >= rule.resolveThreshold;
 
       if (shouldResolve) {
         this.resolveAlert(alert.id, "auto-resolve");
@@ -498,7 +521,9 @@ export class AlertEngine extends EventEmitter {
     if (!rule || !this.config.notifications.enabled) return;
 
     for (const channelId of rule.notificationChannels) {
-      const channel = this.config.notifications.channels.find(c => c.id === channelId);
+      const channel = this.config.notifications.channels.find(
+        (c) => c.id === channelId,
+      );
       if (channel && channel.enabled) {
         this.sendNotification(channel, alert);
         alert.notificationsSent.push(channelId);
@@ -537,7 +562,10 @@ export class AlertEngine extends EventEmitter {
   /**
    * Send email notification
    */
-  private sendEmailNotification(channel: NotificationChannel, alert: Alert): void {
+  private sendEmailNotification(
+    channel: NotificationChannel,
+    alert: Alert,
+  ): void {
     console.log(`📧 Email notification: ${alert.title} - ${alert.description}`);
     // Implementation would integrate with email service
   }
@@ -545,7 +573,10 @@ export class AlertEngine extends EventEmitter {
   /**
    * Send Slack notification
    */
-  private sendSlackNotification(channel: NotificationChannel, alert: Alert): void {
+  private sendSlackNotification(
+    channel: NotificationChannel,
+    alert: Alert,
+  ): void {
     console.log(`💬 Slack notification: ${alert.title} - ${alert.description}`);
     // Implementation would integrate with Slack API
   }
@@ -553,15 +584,23 @@ export class AlertEngine extends EventEmitter {
   /**
    * Send webhook notification
    */
-  private sendWebhookNotification(channel: NotificationChannel, alert: Alert): void {
-    console.log(`🔗 Webhook notification: ${alert.title} - ${alert.description}`);
+  private sendWebhookNotification(
+    channel: NotificationChannel,
+    alert: Alert,
+  ): void {
+    console.log(
+      `🔗 Webhook notification: ${alert.title} - ${alert.description}`,
+    );
     // Implementation would make HTTP request to webhook URL
   }
 
   /**
    * Send SMS notification
    */
-  private sendSmsNotification(channel: NotificationChannel, alert: Alert): void {
+  private sendSmsNotification(
+    channel: NotificationChannel,
+    alert: Alert,
+  ): void {
     console.log(`📱 SMS notification: ${alert.title} - ${alert.description}`);
     // Implementation would integrate with SMS service
   }
@@ -569,8 +608,13 @@ export class AlertEngine extends EventEmitter {
   /**
    * Send PagerDuty notification
    */
-  private sendPagerDutyNotification(channel: NotificationChannel, alert: Alert): void {
-    console.log(`🚨 PagerDuty notification: ${alert.title} - ${alert.description}`);
+  private sendPagerDutyNotification(
+    channel: NotificationChannel,
+    alert: Alert,
+  ): void {
+    console.log(
+      `🚨 PagerDuty notification: ${alert.title} - ${alert.description}`,
+    );
     // Implementation would integrate with PagerDuty API
   }
 
@@ -585,7 +629,10 @@ export class AlertEngine extends EventEmitter {
     let currentLevel = 0;
 
     const escalate = () => {
-      if (currentLevel >= policy.maxEscalationLevel || alert.status !== "active") {
+      if (
+        currentLevel >= policy.maxEscalationLevel ||
+        alert.status !== "active"
+      ) {
         return;
       }
 
@@ -593,11 +640,13 @@ export class AlertEngine extends EventEmitter {
       alert.escalationLevel = currentLevel;
       alert.updatedAt = Date.now();
 
-      const level = policy.levels.find(l => l.level === currentLevel);
+      const level = policy.levels.find((l) => l.level === currentLevel);
       if (level) {
         // Send escalated notifications
         for (const channelId of level.channels) {
-          const channel = this.config.notifications.channels.find(c => c.id === channelId);
+          const channel = this.config.notifications.channels.find(
+            (c) => c.id === channelId,
+          );
           if (channel && channel.enabled) {
             this.sendNotification(channel, alert);
           }
@@ -608,16 +657,21 @@ export class AlertEngine extends EventEmitter {
 
       // Schedule next escalation
       if (currentLevel < policy.maxEscalationLevel) {
-        const nextLevel = policy.levels.find(l => l.level === currentLevel + 1);
+        const nextLevel = policy.levels.find(
+          (l) => l.level === currentLevel + 1,
+        );
         if (nextLevel) {
-          const timer = setTimeout(escalate, nextLevel.delayMinutes * 60 * 1000);
+          const timer = setTimeout(
+            escalate,
+            nextLevel.delayMinutes * 60 * 1000,
+          );
           this.escalationTimers.set(alert.id, timer);
         }
       }
     };
 
     // Start initial escalation after delay
-    const firstLevel = policy.levels.find(l => l.level === 1);
+    const firstLevel = policy.levels.find((l) => l.level === 1);
     if (firstLevel) {
       const timer = setTimeout(escalate, firstLevel.delayMinutes * 60 * 1000);
       this.escalationTimers.set(alert.id, timer);
@@ -686,7 +740,9 @@ export class AlertEngine extends EventEmitter {
       const resolutionTime = alert.resolvedAt - alert.createdAt;
       const totalResolved = this.stats.resolvedAlerts;
       this.stats.averageResolutionTime =
-        (this.stats.averageResolutionTime * (totalResolved - 1) + resolutionTime) / totalResolved;
+        (this.stats.averageResolutionTime * (totalResolved - 1) +
+          resolutionTime) /
+        totalResolved;
     }
 
     this.emit("alert-resolved", alert);
@@ -698,11 +754,14 @@ export class AlertEngine extends EventEmitter {
    */
   private pruneOldestAlerts(): void {
     const activeAlertList = Array.from(this.activeAlerts)
-      .map(id => ({ id, alert: this.alerts.get(id) }))
-      .filter(item => item.alert)
+      .map((id) => ({ id, alert: this.alerts.get(id) }))
+      .filter((item) => item.alert)
       .sort((a, b) => (a.alert?.createdAt || 0) - (b.alert?.createdAt || 0));
 
-    const toPrune = activeAlertList.slice(0, this.activeAlerts.size - this.config.maxActiveAlerts + 1);
+    const toPrune = activeAlertList.slice(
+      0,
+      this.activeAlerts.size - this.config.maxActiveAlerts + 1,
+    );
 
     for (const item of toPrune) {
       this.resolveAlert(item.id, "auto-prune");
@@ -713,25 +772,36 @@ export class AlertEngine extends EventEmitter {
    * Start alert cleanup (remove old resolved alerts)
    */
   private startAlertCleanup(): void {
-    setInterval(() => {
-      const cutoffTime = Date.now() - (this.config.alertRetentionHours * 60 * 60 * 1000);
+    setInterval(
+      () => {
+        const cutoffTime =
+          Date.now() - this.config.alertRetentionHours * 60 * 60 * 1000;
 
-      for (const [alertId, alert] of this.alerts) {
-        if (alert.status === "resolved" && alert.resolvedAt && alert.resolvedAt < cutoffTime) {
-          this.alerts.delete(alertId);
+        for (const [alertId, alert] of this.alerts) {
+          if (
+            alert.status === "resolved" &&
+            alert.resolvedAt &&
+            alert.resolvedAt < cutoffTime
+          ) {
+            this.alerts.delete(alertId);
+          }
         }
-      }
-    }, 60 * 60 * 1000); // Clean up every hour
+      },
+      60 * 60 * 1000,
+    ); // Clean up every hour
   }
 
   /**
    * Get all alerts
    */
-  getAlerts(status?: "active" | "acknowledged" | "resolved", limit?: number): Alert[] {
+  getAlerts(
+    status?: "active" | "acknowledged" | "resolved",
+    limit?: number,
+  ): Alert[] {
     let alerts = Array.from(this.alerts.values());
 
     if (status) {
-      alerts = alerts.filter(alert => alert.status === status);
+      alerts = alerts.filter((alert) => alert.status === status);
     }
 
     alerts.sort((a, b) => b.createdAt - a.createdAt);
@@ -755,7 +825,7 @@ export class AlertEngine extends EventEmitter {
    */
   getAlertsByRule(ruleId: string): Alert[] {
     return Array.from(this.alerts.values())
-      .filter(alert => alert.ruleId === ruleId)
+      .filter((alert) => alert.ruleId === ruleId)
       .sort((a, b) => b.createdAt - a.createdAt);
   }
 
@@ -791,7 +861,9 @@ export class AlertEngine extends EventEmitter {
     }
 
     // Resolve all active alerts for this rule
-    const activeAlerts = this.getAlertsByRule(ruleId).filter(a => a.status === "active");
+    const activeAlerts = this.getAlertsByRule(ruleId).filter(
+      (a) => a.status === "active",
+    );
     for (const alert of activeAlerts) {
       this.resolveAlert(alert.id, "rule-removed");
     }
@@ -826,7 +898,9 @@ export class AlertEngine extends EventEmitter {
    * Add notification channel
    */
   addNotificationChannel(channel: NotificationChannel): void {
-    const existingIndex = this.config.notifications.channels.findIndex(c => c.id === channel.id);
+    const existingIndex = this.config.notifications.channels.findIndex(
+      (c) => c.id === channel.id,
+    );
     if (existingIndex >= 0) {
       this.config.notifications.channels[existingIndex] = channel;
     } else {
@@ -839,7 +913,9 @@ export class AlertEngine extends EventEmitter {
    * Remove notification channel
    */
   removeNotificationChannel(channelId: string): boolean {
-    const index = this.config.notifications.channels.findIndex(c => c.id === channelId);
+    const index = this.config.notifications.channels.findIndex(
+      (c) => c.id === channelId,
+    );
     if (index < 0) {
       return false;
     }

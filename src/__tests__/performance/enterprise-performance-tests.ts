@@ -19,10 +19,17 @@ import { liveMetricsCollector } from "../../dashboards/live-metrics-collector";
 import { marketplaceService } from "../../plugins/marketplace/marketplace-service";
 
 // ML and inference components
-import { MLModel, InferenceRequest, InferenceResponse } from "../../ml/core/types";
+import {
+  MLModel,
+  InferenceRequest,
+  InferenceResponse,
+} from "../../ml/core/types";
 
 // Performance infrastructure
-import { automatedBenchmarkingSuite, Benchmark } from "../../performance/automated-benchmarking-suite";
+import {
+  automatedBenchmarkingSuite,
+  Benchmark,
+} from "../../performance/automated-benchmarking-suite";
 import { performanceRegressionTester } from "../../performance/performance-regression-tester";
 import { performanceBudgetEnforcer } from "../../performance/performance-budget-enforcer";
 
@@ -99,7 +106,9 @@ class PerformanceStatistics {
     const max = sorted[sorted.length - 1];
 
     // Calculate standard deviation
-    const variance = samples.reduce((acc, val) => acc + Math.pow(val - mean, 2), 0) / samples.length;
+    const variance =
+      samples.reduce((acc, val) => acc + Math.pow(val - mean, 2), 0) /
+      samples.length;
     const stdDev = Math.sqrt(variance);
 
     return {
@@ -115,14 +124,15 @@ class PerformanceStatistics {
   }
 
   static validateSubMillisecond(metrics: PerformanceMetrics): boolean {
-    return metrics.p95 < PERFORMANCE_CONFIG.subMillisecondThreshold &&
-           metrics.p99 < PERFORMANCE_CONFIG.maxLatencyP95;
+    return (
+      metrics.p95 < PERFORMANCE_CONFIG.subMillisecondThreshold &&
+      metrics.p99 < PERFORMANCE_CONFIG.maxLatencyP95
+    );
   }
 
   static validateStatisticalSignificance(metrics: PerformanceMetrics): boolean {
     // Ensure we have enough samples and reasonable variance
-    return metrics.sampleSize >= 100 &&
-           metrics.stdDev / metrics.mean < 0.5; // Coefficient of variation < 50%
+    return metrics.sampleSize >= 100 && metrics.stdDev / metrics.mean < 0.5; // Coefficient of variation < 50%
   }
 }
 
@@ -154,7 +164,12 @@ describe("ML Inference Performance Benchmarks", () => {
           learningRate: 0.001,
           optimizer: "adam",
           lossFunction: "cross_entropy",
-          earlyStopping: { enabled: true, patience: 10, minDelta: 0.001, monitor: "val_loss" },
+          earlyStopping: {
+            enabled: true,
+            patience: 10,
+            minDelta: 0.001,
+            monitor: "val_loss",
+          },
           validationSplit: 0.2,
         },
         performance: {
@@ -181,7 +196,10 @@ describe("ML Inference Performance Benchmarks", () => {
               precision: 0.93,
               recall: 0.92,
               f1Score: 0.925,
-              confusionMatrix: [[850, 50], [60, 840]],
+              confusionMatrix: [
+                [850, 50],
+                [60, 840],
+              ],
             },
             driftDetection: {
               hasDrift: false,
@@ -195,14 +213,20 @@ describe("ML Inference Performance Benchmarks", () => {
         lineage: {
           parentModels: [],
           childModels: [],
-          dataSources: [{
-            id: "training-data",
-            name: "Training Dataset",
-            type: "csv",
-            location: "/data/training.csv",
-            schema: { feature1: "number", feature2: "string", label: "number" },
-            lastModified: new Date(),
-          }],
+          dataSources: [
+            {
+              id: "training-data",
+              name: "Training Dataset",
+              type: "csv",
+              location: "/data/training.csv",
+              schema: {
+                feature1: "number",
+                feature2: "string",
+                label: "number",
+              },
+              lastModified: new Date(),
+            },
+          ],
           transformations: [],
           experiments: [],
           deployments: [],
@@ -232,7 +256,7 @@ describe("ML Inference Performance Benchmarks", () => {
 
       // Mock inference - in real implementation, this would call actual ML service
       const start = performance.now();
-      await new Promise(resolve => setImmediate(resolve)); // Simulate async inference
+      await new Promise((resolve) => setImmediate(resolve)); // Simulate async inference
       const latency = performance.now() - start;
       latencies.push(latency);
     }
@@ -251,7 +275,7 @@ describe("ML Inference Performance Benchmarks", () => {
       // Mock inference with realistic latency simulation
       // In real implementation: const response = await mlService.infer(request);
       const mockLatency = faker.number.float({ min: 0.1, max: 0.8 }); // Simulate 0.1-0.8ms latency
-      await new Promise(resolve => setTimeout(resolve, mockLatency));
+      await new Promise((resolve) => setTimeout(resolve, mockLatency));
 
       const latency = performance.now() - start;
       latencies.push(latency);
@@ -263,15 +287,23 @@ describe("ML Inference Performance Benchmarks", () => {
     inferenceMetrics = {
       ...PerformanceStatistics.calculateMetrics(latencies),
       accuracy: 0.95, // Mock accuracy from model metadata
-      throughput: PERFORMANCE_CONFIG.iterations / (latencies.reduce((a, b) => a + b, 0) / 1000), // inferences per second
+      throughput:
+        PERFORMANCE_CONFIG.iterations /
+        (latencies.reduce((a, b) => a + b, 0) / 1000), // inferences per second
       memoryUsage: endMemory.heapUsed - startMemory.heapUsed,
-      cpuUsage: (endCpu.user + endCpu.system) - (startCpu.user + startCpu.system),
+      cpuUsage: endCpu.user + endCpu.system - (startCpu.user + startCpu.system),
     };
 
     // Validate performance requirements
-    expect(PerformanceStatistics.validateSubMillisecond(inferenceMetrics)).toBe(true);
-    expect(PerformanceStatistics.validateStatisticalSignificance(inferenceMetrics)).toBe(true);
-    expect(inferenceMetrics.mean).toBeLessThan(PERFORMANCE_CONFIG.subMillisecondThreshold);
+    expect(PerformanceStatistics.validateSubMillisecond(inferenceMetrics)).toBe(
+      true,
+    );
+    expect(
+      PerformanceStatistics.validateStatisticalSignificance(inferenceMetrics),
+    ).toBe(true);
+    expect(inferenceMetrics.mean).toBeLessThan(
+      PERFORMANCE_CONFIG.subMillisecondThreshold,
+    );
     expect(inferenceMetrics.p95).toBeLessThan(PERFORMANCE_CONFIG.maxLatencyP95);
     expect(inferenceMetrics.p99).toBeLessThan(PERFORMANCE_CONFIG.maxLatencyP99);
     expect(inferenceMetrics.throughput).toBeGreaterThan(1000); // At least 1000 inferences/second
@@ -290,28 +322,40 @@ describe("ML Inference Performance Benchmarks", () => {
     const accuracySamples: number[] = [];
 
     for (let batch = 0; batch < 10; batch++) {
-      const promises = Array.from({ length: concurrentRequests }, async (_, i) => {
-        const request: InferenceRequest = {
-          modelId: mockModel.id,
-          data: [testData[(batch * concurrentRequests + i) % testData.length]],
-        };
+      const promises = Array.from(
+        { length: concurrentRequests },
+        async (_, i) => {
+          const request: InferenceRequest = {
+            modelId: mockModel.id,
+            data: [
+              testData[(batch * concurrentRequests + i) % testData.length],
+            ],
+          };
 
-        // Mock inference with occasional accuracy variation
-        const baseAccuracy = 0.95;
-        const accuracyVariation = faker.number.float({ min: -0.02, max: 0.02 });
-        const accuracy = Math.max(0.85, Math.min(0.98, baseAccuracy + accuracyVariation));
+          // Mock inference with occasional accuracy variation
+          const baseAccuracy = 0.95;
+          const accuracyVariation = faker.number.float({
+            min: -0.02,
+            max: 0.02,
+          });
+          const accuracy = Math.max(
+            0.85,
+            Math.min(0.98, baseAccuracy + accuracyVariation),
+          );
 
-        return accuracy;
-      });
+          return accuracy;
+        },
+      );
 
       const results = await Promise.all(promises);
       accuracySamples.push(...results);
     }
 
-    const accuracyMetrics = PerformanceStatistics.calculateMetrics(accuracySamples);
-    const accuracyStability = 1 - (accuracyMetrics.stdDev / accuracyMetrics.mean);
+    const accuracyMetrics =
+      PerformanceStatistics.calculateMetrics(accuracySamples);
+    const accuracyStability = 1 - accuracyMetrics.stdDev / accuracyMetrics.mean;
 
-    expect(accuracyMetrics.mean).toBeGreaterThan(0.90); // >90% accuracy
+    expect(accuracyMetrics.mean).toBeGreaterThan(0.9); // >90% accuracy
     expect(accuracyStability).toBeGreaterThan(0.95); // >95% stability
     expect(accuracyMetrics.min).toBeGreaterThan(0.85); // Minimum accuracy threshold
 
@@ -341,22 +385,25 @@ describe("Scaling Engine Prediction Accuracy Benchmarks", () => {
 
   beforeAll(async () => {
     // Generate realistic scaling scenarios
-    testScenarios = Array.from({ length: PERFORMANCE_CONFIG.iterations }, (_, i) => {
-      const baseLoad = 50 + Math.sin(i / 10) * 30; // Sinusoidal load pattern
-      const noise = faker.number.float({ min: -5, max: 5 });
-      const actualLoad = Math.max(0, baseLoad + noise);
+    testScenarios = Array.from(
+      { length: PERFORMANCE_CONFIG.iterations },
+      (_, i) => {
+        const baseLoad = 50 + Math.sin(i / 10) * 30; // Sinusoidal load pattern
+        const noise = faker.number.float({ min: -5, max: 5 });
+        const actualLoad = Math.max(0, baseLoad + noise);
 
-      // Predictive model prediction (with some error)
-      const predictionError = faker.number.float({ min: -3, max: 3 });
-      const predictedLoad = Math.max(0, actualLoad + predictionError);
+        // Predictive model prediction (with some error)
+        const predictionError = faker.number.float({ min: -3, max: 3 });
+        const predictedLoad = Math.max(0, actualLoad + predictionError);
 
-      return {
-        currentLoad: actualLoad,
-        predictedLoad,
-        actualLoad: actualLoad + faker.number.float({ min: -2, max: 2 }), // Future actual load
-        timestamp: Date.now() + i * 60000, // 1 minute intervals
-      };
-    });
+        return {
+          currentLoad: actualLoad,
+          predictedLoad,
+          actualLoad: actualLoad + faker.number.float({ min: -2, max: 2 }), // Future actual load
+          timestamp: Date.now() + i * 60000, // 1 minute intervals
+        };
+      },
+    );
   });
 
   it("should achieve accurate scaling predictions", async () => {
@@ -385,15 +432,18 @@ describe("Scaling Engine Prediction Accuracy Benchmarks", () => {
 
       // Binary classification: scale up/down decision
       const shouldScaleUp = scenario.predictedLoad > scenario.currentLoad * 1.2;
-      const actuallyNeededScaling = scenario.actualLoad > scenario.currentLoad * 1.15;
+      const actuallyNeededScaling =
+        scenario.actualLoad > scenario.currentLoad * 1.15;
 
       if (shouldScaleUp && actuallyNeededScaling) truePositives.push(1);
       else if (shouldScaleUp && !actuallyNeededScaling) falsePositives.push(1);
       else if (!shouldScaleUp && actuallyNeededScaling) falseNegatives.push(1);
     }
 
-    const latencyMetrics = PerformanceStatistics.calculateMetrics(predictionLatencies);
-    const errorMetrics = PerformanceStatistics.calculateMetrics(predictionErrors);
+    const latencyMetrics =
+      PerformanceStatistics.calculateMetrics(predictionLatencies);
+    const errorMetrics =
+      PerformanceStatistics.calculateMetrics(predictionErrors);
 
     const tp = truePositives.length;
     const fp = falsePositives.length;
@@ -401,7 +451,7 @@ describe("Scaling Engine Prediction Accuracy Benchmarks", () => {
 
     predictionMetrics = {
       ...latencyMetrics,
-      predictionAccuracy: 1 - (errorMetrics.mean / 100), // Normalized accuracy
+      predictionAccuracy: 1 - errorMetrics.mean / 100, // Normalized accuracy
       falsePositiveRate: fp / (fp + (testScenarios.length - tp - fp - fn)),
       falseNegativeRate: fn / (fn + tp),
       precision: tp / (tp + fp),
@@ -409,10 +459,12 @@ describe("Scaling Engine Prediction Accuracy Benchmarks", () => {
     };
 
     // Validate performance requirements
-    expect(PerformanceStatistics.validateSubMillisecond(predictionMetrics)).toBe(true);
+    expect(
+      PerformanceStatistics.validateSubMillisecond(predictionMetrics),
+    ).toBe(true);
     expect(predictionMetrics.predictionAccuracy).toBeGreaterThan(0.85); // >85% accuracy
-    expect(predictionMetrics.precision).toBeGreaterThan(0.80); // >80% precision
-    expect(predictionMetrics.recall).toBeGreaterThan(0.80); // >80% recall
+    expect(predictionMetrics.precision).toBeGreaterThan(0.8); // >80% precision
+    expect(predictionMetrics.recall).toBeGreaterThan(0.8); // >80% recall
     expect(predictionMetrics.falsePositiveRate).toBeLessThan(0.15); // <15% false positive rate
 
     console.log(`Scaling Prediction Performance:
@@ -433,16 +485,18 @@ describe("Scaling Engine Prediction Accuracy Benchmarks", () => {
 
     for (const range of loadRanges) {
       const rangeScenarios = testScenarios.filter(
-        s => s.currentLoad >= range.min && s.currentLoad < range.max
+        (s) => s.currentLoad >= range.min && s.currentLoad < range.max,
       );
 
       if (rangeScenarios.length < 10) continue; // Skip ranges with insufficient data
 
-      const rangeErrors = rangeScenarios.map(s => Math.abs(s.predictedLoad - s.actualLoad));
+      const rangeErrors = rangeScenarios.map((s) =>
+        Math.abs(s.predictedLoad - s.actualLoad),
+      );
       const rangeMetrics = PerformanceStatistics.calculateMetrics(rangeErrors);
-      const rangeAccuracy = 1 - (rangeMetrics.mean / 100);
+      const rangeAccuracy = 1 - rangeMetrics.mean / 100;
 
-      expect(rangeAccuracy).toBeGreaterThan(0.80); // >80% accuracy in each range
+      expect(rangeAccuracy).toBeGreaterThan(0.8); // >80% accuracy in each range
 
       console.log(`${range.name} Range (${rangeScenarios.length} samples):
         Accuracy: ${(rangeAccuracy * 100).toFixed(2)}%
@@ -514,7 +568,7 @@ describe("Dashboard Update Performance Benchmarks", () => {
       };
 
       // Simulate DOM updates (minimal delay)
-      await new Promise(resolve => setImmediate(resolve));
+      await new Promise((resolve) => setImmediate(resolve));
 
       const renderEnd = performance.now();
       const renderLatency = renderEnd - renderStart;
@@ -524,8 +578,10 @@ describe("Dashboard Update Performance Benchmarks", () => {
       memoryDeltas.push(endMemory - startMemory);
     }
 
-    const updateMetrics = PerformanceStatistics.calculateMetrics(updateLatencies);
-    const renderMetrics = PerformanceStatistics.calculateMetrics(renderLatencies);
+    const updateMetrics =
+      PerformanceStatistics.calculateMetrics(updateLatencies);
+    const renderMetrics =
+      PerformanceStatistics.calculateMetrics(renderLatencies);
     const memoryMetrics = PerformanceStatistics.calculateMetrics(memoryDeltas);
 
     dashboardMetrics = {
@@ -537,11 +593,15 @@ describe("Dashboard Update Performance Benchmarks", () => {
     };
 
     // Validate performance requirements
-    expect(PerformanceStatistics.validateSubMillisecond(dashboardMetrics)).toBe(true);
+    expect(PerformanceStatistics.validateSubMillisecond(dashboardMetrics)).toBe(
+      true,
+    );
     expect(dashboardMetrics.renderTime).toBeLessThan(2); // <2ms render time
     expect(dashboardMetrics.updateFrequency).toBeGreaterThan(500); // >500 updates/second
     expect(dashboardMetrics.memoryDelta).toBeLessThan(1024 * 1024); // <1MB per update
-    expect(dashboardMetrics.uiResponsiveness).toBeLessThan(PERFORMANCE_CONFIG.subMillisecondThreshold);
+    expect(dashboardMetrics.uiResponsiveness).toBeLessThan(
+      PERFORMANCE_CONFIG.subMillisecondThreshold,
+    );
 
     console.log(`Dashboard Update Performance:
       Update Latency: ${dashboardMetrics.mean.toFixed(3)}ms
@@ -615,10 +675,14 @@ describe("Plugin Marketplace Search Performance Benchmarks", () => {
         reputation: faker.number.float({ min: 0, max: 100 }),
       },
       category: faker.helpers.arrayElement([
-        "analytics", "security", "integration", "automation", "monitoring"
+        "analytics",
+        "security",
+        "integration",
+        "automation",
+        "monitoring",
       ]),
-      tags: Array.from({ length: faker.number.int({ min: 1, max: 5 }) },
-        () => faker.lorem.word()
+      tags: Array.from({ length: faker.number.int({ min: 1, max: 5 }) }, () =>
+        faker.lorem.word(),
       ),
       stats: {
         downloads: faker.number.int({ min: 0, max: 10000 }),
@@ -638,8 +702,16 @@ describe("Plugin Marketplace Search Performance Benchmarks", () => {
   it("should achieve sub-millisecond marketplace search", async () => {
     const searchLatencies: number[] = [];
     const searchQueries = [
-      "analytics", "security", "integration", "monitoring", "automation",
-      "data processing", "api", "dashboard", "reporting", "workflow"
+      "analytics",
+      "security",
+      "integration",
+      "monitoring",
+      "automation",
+      "data processing",
+      "api",
+      "dashboard",
+      "reporting",
+      "workflow",
     ];
 
     for (let i = 0; i < PERFORMANCE_CONFIG.iterations; i++) {
@@ -656,7 +728,8 @@ describe("Plugin Marketplace Search Performance Benchmarks", () => {
       searchLatencies.push(latency);
     }
 
-    const latencyMetrics = PerformanceStatistics.calculateMetrics(searchLatencies);
+    const latencyMetrics =
+      PerformanceStatistics.calculateMetrics(searchLatencies);
 
     // Calculate search quality metrics
     const relevanceScores: number[] = [];
@@ -664,18 +737,23 @@ describe("Plugin Marketplace Search Performance Benchmarks", () => {
       const results = await marketplaceService.search({ query, limit: 10 });
 
       // Calculate relevance score (simplified)
-      const relevanceScore = results.plugins.reduce((score, plugin, index) => {
-        const queryWords = query.toLowerCase().split(/\s+/);
-        const pluginText = `${plugin.name} ${plugin.description} ${plugin.tags.join(" ")}`.toLowerCase();
-        const matches = queryWords.filter(word => pluginText.includes(word)).length;
-        const positionBonus = Math.max(0, 10 - index) / 10; // Position-based relevance
-        return score + (matches / queryWords.length) * positionBonus;
-      }, 0) / Math.max(1, results.plugins.length);
+      const relevanceScore =
+        results.plugins.reduce((score, plugin, index) => {
+          const queryWords = query.toLowerCase().split(/\s+/);
+          const pluginText =
+            `${plugin.name} ${plugin.description} ${plugin.tags.join(" ")}`.toLowerCase();
+          const matches = queryWords.filter((word) =>
+            pluginText.includes(word),
+          ).length;
+          const positionBonus = Math.max(0, 10 - index) / 10; // Position-based relevance
+          return score + (matches / queryWords.length) * positionBonus;
+        }, 0) / Math.max(1, results.plugins.length);
 
       relevanceScores.push(relevanceScore);
     }
 
-    const relevanceMetrics = PerformanceStatistics.calculateMetrics(relevanceScores);
+    const relevanceMetrics =
+      PerformanceStatistics.calculateMetrics(relevanceScores);
 
     searchMetrics = {
       ...latencyMetrics,
@@ -686,10 +764,14 @@ describe("Plugin Marketplace Search Performance Benchmarks", () => {
     };
 
     // Validate performance requirements
-    expect(PerformanceStatistics.validateSubMillisecond(searchMetrics)).toBe(true);
-    expect(searchMetrics.searchLatency).toBeLessThan(PERFORMANCE_CONFIG.subMillisecondThreshold);
-    expect(searchMetrics.resultRelevance).toBeGreaterThan(0.70); // >70% relevance score
-    expect(searchMetrics.cacheHitRate).toBeGreaterThan(0.80); // >80% cache hit rate
+    expect(PerformanceStatistics.validateSubMillisecond(searchMetrics)).toBe(
+      true,
+    );
+    expect(searchMetrics.searchLatency).toBeLessThan(
+      PERFORMANCE_CONFIG.subMillisecondThreshold,
+    );
+    expect(searchMetrics.resultRelevance).toBeGreaterThan(0.7); // >70% relevance score
+    expect(searchMetrics.cacheHitRate).toBeGreaterThan(0.8); // >80% cache hit rate
 
     console.log(`Marketplace Search Performance:
       Search Latency: ${searchMetrics.searchLatency.toFixed(3)}ms
@@ -706,7 +788,7 @@ describe("Plugin Marketplace Search Performance Benchmarks", () => {
       "security monitoring integration",
       "workflow automation api",
       "data processing reporting",
-      "real-time monitoring alerts"
+      "real-time monitoring alerts",
     ];
 
     const complexLatencies: number[] = [];
@@ -720,14 +802,15 @@ describe("Plugin Marketplace Search Performance Benchmarks", () => {
         minRating: 3.0,
         filters: {
           verified: true,
-        }
+        },
       });
 
       const latency = performance.now() - start;
       complexLatencies.push(latency);
     });
 
-    const complexMetrics = PerformanceStatistics.calculateMetrics(complexLatencies);
+    const complexMetrics =
+      PerformanceStatistics.calculateMetrics(complexLatencies);
 
     expect(complexMetrics.p95).toBeLessThan(5); // <5ms for complex queries
     expect(complexMetrics.mean).toBeLessThan(2); // <2ms average for complex queries
@@ -767,7 +850,9 @@ describe("Plugin Marketplace Search Performance Benchmarks", () => {
     }
 
     // Verify sub-linear scaling (performance shouldn't degrade dramatically)
-    const scalingFactor = scalingResults[scalingResults.length - 1].latency / scalingResults[0].latency;
+    const scalingFactor =
+      scalingResults[scalingResults.length - 1].latency /
+      scalingResults[0].latency;
     const sizeRatio = indexSizes[indexSizes.length - 1] / indexSizes[0];
 
     expect(scalingFactor).toBeLessThan(Math.log(sizeRatio) * 2); // Allow some scaling degradation but not exponential
@@ -788,13 +873,19 @@ describe("Bundle Size Compliance Tests", () => {
     // This test would run in a build environment with actual bundle analysis
     // For now, we'll use the performance budget enforcer
 
-    const { performanceBudgetEnforcer } = await import("../../performance/performance-budget-enforcer");
+    const { performanceBudgetEnforcer } =
+      await import("../../performance/performance-budget-enforcer");
 
     // Analyze current bundle size (would use actual build output in CI)
-    const bundleMetrics = await performanceBudgetEnforcer.analyzeBundleSize("./dist");
+    const bundleMetrics =
+      await performanceBudgetEnforcer.analyzeBundleSize("./dist");
 
-    expect(bundleMetrics.totalSize).toBeLessThan(PERFORMANCE_CONFIG.bundleSizeLimit);
-    expect(bundleMetrics.gzippedSize).toBeLessThan(PERFORMANCE_CONFIG.bundleGzipLimit);
+    expect(bundleMetrics.totalSize).toBeLessThan(
+      PERFORMANCE_CONFIG.bundleSizeLimit,
+    );
+    expect(bundleMetrics.gzippedSize).toBeLessThan(
+      PERFORMANCE_CONFIG.bundleGzipLimit,
+    );
 
     console.log(`Bundle Size Compliance:
       Total Size: ${(bundleMetrics.totalSize / 1024 / 1024).toFixed(2)}MB
@@ -834,7 +925,7 @@ describe("Automated Benchmarking Suite Integration", () => {
           function: async () => {
             // ML inference benchmark implementation
             const start = performance.now();
-            await new Promise(resolve => setTimeout(resolve, 0.5)); // Simulate inference
+            await new Promise((resolve) => setTimeout(resolve, 0.5)); // Simulate inference
             const latency = performance.now() - start;
             if (latency >= PERFORMANCE_CONFIG.subMillisecondThreshold) {
               throw new Error(`ML inference too slow: ${latency}ms`);
@@ -855,7 +946,7 @@ describe("Automated Benchmarking Suite Integration", () => {
             const prediction = await predictiveAnalytics.predictOptimalAgent(
               "test-scaling-task",
               "scaling",
-              0.5
+              0.5,
             );
             if (prediction.riskLevel === "high") {
               throw new Error("Scaling prediction accuracy too low");
@@ -910,7 +1001,7 @@ describe("Automated Benchmarking Suite Integration", () => {
           tolerance: 30,
           tags: ["marketplace", "search", "performance"],
         },
-      ]
+      ],
     );
 
     // Run the benchmark suite
@@ -918,19 +1009,22 @@ describe("Automated Benchmarking Suite Integration", () => {
 
     // Validate results
     expect(results.length).toBe(4); // All benchmarks should run
-    expect(results.every(r => r.validation.codexCompliance)).toBe(true);
-    expect(results.every(r => r.performance.duration < PERFORMANCE_CONFIG.subMillisecondThreshold * 1e6)).toBe(true);
+    expect(results.every((r) => r.validation.codexCompliance)).toBe(true);
+    expect(
+      results.every(
+        (r) =>
+          r.performance.duration <
+          PERFORMANCE_CONFIG.subMillisecondThreshold * 1e6,
+      ),
+    ).toBe(true);
 
     console.log(`Automated Benchmarking Results:
       Total Benchmarks: ${results.length}
-      Passed: ${results.filter(r => r.validation.codexCompliance).length}
+      Passed: ${results.filter((r) => r.validation.codexCompliance).length}
       Average Duration: ${(results.reduce((sum, r) => sum + r.performance.duration, 0) / results.length / 1e6).toFixed(3)}ms
       Memory Usage: ${(results.reduce((sum, r) => sum + r.performance.memoryDelta, 0) / results.length / 1024 / 1024).toFixed(2)}MB avg`);
   });
 });
 
 // Export performance metrics for external monitoring
-export {
-  PERFORMANCE_CONFIG,
-  PerformanceStatistics,
-};
+export { PERFORMANCE_CONFIG, PerformanceStatistics };

@@ -18,7 +18,7 @@ export interface ScalingMetrics {
 }
 
 export interface ScalingPrediction {
-  scalingAction: 'scale_up' | 'scale_down' | 'maintain';
+  scalingAction: "scale_up" | "scale_down" | "maintain";
   recommendedInstances: number;
   confidence: number;
   reason: string;
@@ -67,20 +67,25 @@ export class PredictiveScalingEngine {
     this.metricsHistory.push(metrics);
 
     // Keep only recent history (last 24 hours)
-    const oneDayAgo = Date.now() - (24 * 60 * 60 * 1000);
-    this.metricsHistory = this.metricsHistory.filter(m => m.timestamp > oneDayAgo);
+    const oneDayAgo = Date.now() - 24 * 60 * 60 * 1000;
+    this.metricsHistory = this.metricsHistory.filter(
+      (m) => m.timestamp > oneDayAgo,
+    );
   }
 
   /**
    * Generate scaling prediction based on current metrics and history
    */
-  async generatePrediction(targetInstances: number): Promise<ScalingPrediction> {
+  async generatePrediction(
+    targetInstances: number,
+  ): Promise<ScalingPrediction> {
     const now = Date.now();
-    const cooldownEnd = this.lastScalingAction + (this.config.cooldownPeriod * 60 * 1000);
+    const cooldownEnd =
+      this.lastScalingAction + this.config.cooldownPeriod * 60 * 1000;
 
     if (now < cooldownEnd) {
       return {
-        scalingAction: 'maintain',
+        scalingAction: "maintain",
         recommendedInstances: targetInstances,
         confidence: 1.0,
         reason: `In cooldown period until ${new Date(cooldownEnd).toISOString()}`,
@@ -89,37 +94,59 @@ export class PredictiveScalingEngine {
 
     if (this.metricsHistory.length < 10) {
       return {
-        scalingAction: 'maintain',
+        scalingAction: "maintain",
         recommendedInstances: targetInstances,
         confidence: 0.5,
-        reason: 'Insufficient metrics history for prediction',
+        reason: "Insufficient metrics history for prediction",
       };
     }
 
     const recentMetrics = this.metricsHistory.slice(-10);
-    const avgCpu = recentMetrics.reduce((sum, m) => sum + m.cpuUtilization, 0) / recentMetrics.length;
-    const avgMemory = recentMetrics.reduce((sum, m) => sum + m.memoryUtilization, 0) / recentMetrics.length;
-    const avgRequestRate = recentMetrics.reduce((sum, m) => sum + m.requestRate, 0) / recentMetrics.length;
+    const avgCpu =
+      recentMetrics.reduce((sum, m) => sum + m.cpuUtilization, 0) /
+      recentMetrics.length;
+    const avgMemory =
+      recentMetrics.reduce((sum, m) => sum + m.memoryUtilization, 0) /
+      recentMetrics.length;
+    const avgRequestRate =
+      recentMetrics.reduce((sum, m) => sum + m.requestRate, 0) /
+      recentMetrics.length;
 
     // Simple threshold-based scaling (ML would be more sophisticated)
-    if (avgCpu > this.config.scaleUpThreshold || avgMemory > this.config.scaleUpThreshold) {
-      const scaleUpAmount = Math.min(this.config.maxScaleUp, Math.ceil(avgRequestRate / 100));
-      const newInstances = Math.min(targetInstances + scaleUpAmount, targetInstances * 2);
+    if (
+      avgCpu > this.config.scaleUpThreshold ||
+      avgMemory > this.config.scaleUpThreshold
+    ) {
+      const scaleUpAmount = Math.min(
+        this.config.maxScaleUp,
+        Math.ceil(avgRequestRate / 100),
+      );
+      const newInstances = Math.min(
+        targetInstances + scaleUpAmount,
+        targetInstances * 2,
+      );
 
       return {
-        scalingAction: 'scale_up',
+        scalingAction: "scale_up",
         recommendedInstances: newInstances,
         confidence: Math.min(0.9, avgCpu / 100),
         reason: `High CPU (${avgCpu.toFixed(1)}%) or memory usage detected`,
       };
     }
 
-    if (avgCpu < this.config.scaleDownThreshold && avgMemory < this.config.scaleDownThreshold && targetInstances > 1) {
-      const scaleDownAmount = Math.min(this.config.maxScaleDown, Math.max(1, Math.floor(targetInstances * 0.2)));
+    if (
+      avgCpu < this.config.scaleDownThreshold &&
+      avgMemory < this.config.scaleDownThreshold &&
+      targetInstances > 1
+    ) {
+      const scaleDownAmount = Math.min(
+        this.config.maxScaleDown,
+        Math.max(1, Math.floor(targetInstances * 0.2)),
+      );
       const newInstances = Math.max(1, targetInstances - scaleDownAmount);
 
       return {
-        scalingAction: 'scale_down',
+        scalingAction: "scale_down",
         recommendedInstances: newInstances,
         confidence: Math.min(0.8, (100 - avgCpu) / 100),
         reason: `Low resource utilization (CPU: ${avgCpu.toFixed(1)}%, Memory: ${avgMemory.toFixed(1)}%)`,
@@ -127,26 +154,33 @@ export class PredictiveScalingEngine {
     }
 
     return {
-      scalingAction: 'maintain',
+      scalingAction: "maintain",
       recommendedInstances: targetInstances,
       confidence: 0.7,
-      reason: 'Resource utilization within acceptable range',
+      reason: "Resource utilization within acceptable range",
     };
   }
 
   /**
    * Execute scaling action
    */
-  async executeScaling(prediction: ScalingPrediction, currentInstances: number): Promise<boolean> {
+  async executeScaling(
+    prediction: ScalingPrediction,
+    currentInstances: number,
+  ): Promise<boolean> {
     if (prediction.confidence < this.config.minConfidence) {
-      console.log(`⚠️ Predictive Scaling: Low confidence (${prediction.confidence.toFixed(2)}), skipping scaling`);
+      console.log(
+        `⚠️ Predictive Scaling: Low confidence (${prediction.confidence.toFixed(2)}), skipping scaling`,
+      );
       return false;
     }
 
     this.lastScalingAction = Date.now();
     this.currentInstances = prediction.recommendedInstances;
 
-    console.log(`📊 Predictive Scaling: ${prediction.scalingAction} from ${currentInstances} to ${prediction.recommendedInstances} instances`);
+    console.log(
+      `📊 Predictive Scaling: ${prediction.scalingAction} from ${currentInstances} to ${prediction.recommendedInstances} instances`,
+    );
     console.log(`   Reason: ${prediction.reason}`);
 
     // In a real implementation, this would integrate with container orchestration
@@ -159,13 +193,17 @@ export class PredictiveScalingEngine {
    */
   async shutdown(): Promise<void> {
     this.metricsHistory.length = 0;
-    console.log('🛑 Predictive Scaling Engine shutdown complete');
+    console.log("🛑 Predictive Scaling Engine shutdown complete");
   }
 
   /**
    * Get current scaling metrics
    */
-  getMetrics(): { currentInstances: number; lastScalingAction: number; metricsCount: number } {
+  getMetrics(): {
+    currentInstances: number;
+    lastScalingAction: number;
+    metricsCount: number;
+  } {
     return {
       currentInstances: this.currentInstances,
       lastScalingAction: this.lastScalingAction,

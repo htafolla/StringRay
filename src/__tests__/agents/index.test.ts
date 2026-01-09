@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect } from "vitest";
 import {
   builtinAgents,
   enforcer,
@@ -8,78 +8,78 @@ import {
   codeReviewer,
   securityAuditor,
   refactorer,
-  testArchitect
-} from '../../agents/index.js';
-import type { AgentConfig } from '../../agents/types.js';
+  testArchitect,
+} from "../../agents/index.js";
+import type { AgentConfig } from "../../agents/types.js";
 
-describe('Agent Index Registry', () => {
-  describe('Builtin Agents Registry', () => {
-    it('should export a valid builtinAgents registry', () => {
+describe("Agent Index Registry", () => {
+  describe("Builtin Agents Registry", () => {
+    it("should export a valid builtinAgents registry", () => {
       expect(builtinAgents).toBeDefined();
-      expect(typeof builtinAgents).toBe('object');
+      expect(typeof builtinAgents).toBe("object");
       expect(builtinAgents).not.toBeNull();
     });
 
-    it('should contain all 8 specialized agents', () => {
+    it("should contain all 8 specialized agents", () => {
       const expectedAgents = [
-        'enforcer',
-        'architect',
-        'orchestrator',
-        'bug-triage-specialist',
-        'code-reviewer',
-        'security-auditor',
-        'refactorer',
-        'test-architect'
+        "enforcer",
+        "architect",
+        "orchestrator",
+        "bug-triage-specialist",
+        "code-reviewer",
+        "security-auditor",
+        "refactorer",
+        "test-architect",
       ];
 
-      expectedAgents.forEach(agentName => {
+      expectedAgents.forEach((agentName) => {
         expect(builtinAgents).toHaveProperty(agentName);
       });
 
       expect(Object.keys(builtinAgents)).toHaveLength(8);
     });
 
-    it('should have all agents as valid AgentConfig objects', () => {
-      Object.values(builtinAgents).forEach(agent => {
+    it("should have all agents as valid AgentConfig objects", () => {
+      Object.values(builtinAgents).forEach((agent) => {
         expect(agent).toBeDefined();
-        expect(typeof agent).toBe('object');
-        expect(agent).toHaveProperty('name');
-        expect(agent).toHaveProperty('model');
-        expect(agent).toHaveProperty('description');
-        expect(agent).toHaveProperty('mode');
-        expect(agent).toHaveProperty('system');
-        expect(agent).toHaveProperty('temperature');
+        expect(typeof agent).toBe("object");
+        expect(agent).toHaveProperty("name");
+        expect(agent).toHaveProperty("model");
+        expect(agent).toHaveProperty("description");
+        expect(agent).toHaveProperty("mode");
+        expect(agent).toHaveProperty("system");
+        expect(agent).toHaveProperty("temperature");
       });
     });
 
-    it('should have agents with correct names matching their keys', () => {
+    it("should have agents with correct names matching their keys", () => {
       Object.entries(builtinAgents).forEach(([key, agent]) => {
         expect(agent.name).toBeDefined();
         expect(agent.name).toBe(key);
       });
     });
 
-    it('should have all agents configured as subagents', () => {
-      Object.values(builtinAgents).forEach(agent => {
-        expect(agent.mode).toBe('subagent');
+    it("should have all agents configured as subagents", () => {
+      Object.values(builtinAgents).forEach((agent) => {
+        expect(agent.mode).toBe("subagent");
       });
     });
 
-    it('should have agents with consistent model configuration', () => {
-      Object.values(builtinAgents).forEach(agent => {
-        expect(agent.model).toBe('opencode/grok-code');
+    it("should have agents with consistent model configuration", () => {
+      Object.values(builtinAgents).forEach((agent) => {
+        expect(agent.model).toBe("opencode/grok-code");
       });
     });
 
-    it('should have agents with appropriate temperature settings', () => {
-      Object.values(builtinAgents).forEach(agent => {
+    it("should have agents with appropriate temperature settings", () => {
+      Object.values(builtinAgents).forEach((agent) => {
         expect(agent.temperature).toBe(0.1);
       });
     });
   });
 
-  describe('Individual Agent Exports', () => {
-    it('should export all 8 individual agents', () => {
+  describe("Individual Agent Exports", () => {
+    it("should export all 8 individual agents", () => {
       expect(enforcer).toBeDefined();
       expect(architect).toBeDefined();
       expect(orchestrator).toBeDefined();
@@ -90,18 +90,18 @@ describe('Agent Index Registry', () => {
       expect(testArchitect).toBeDefined();
     });
 
-    it('should have individual exports match registry entries', () => {
+    it("should have individual exports match registry entries", () => {
       expect(builtinAgents.enforcer).toBe(enforcer);
       expect(builtinAgents.architect).toBe(architect);
       expect(builtinAgents.orchestrator).toBe(orchestrator);
-      expect(builtinAgents['bug-triage-specialist']).toBe(bugTriageSpecialist);
-      expect(builtinAgents['code-reviewer']).toBe(codeReviewer);
-      expect(builtinAgents['security-auditor']).toBe(securityAuditor);
+      expect(builtinAgents["bug-triage-specialist"]).toBe(bugTriageSpecialist);
+      expect(builtinAgents["code-reviewer"]).toBe(codeReviewer);
+      expect(builtinAgents["security-auditor"]).toBe(securityAuditor);
       expect(builtinAgents.refactorer).toBe(refactorer);
-      expect(builtinAgents['test-architect']).toBe(testArchitect);
+      expect(builtinAgents["test-architect"]).toBe(testArchitect);
     });
 
-    it('should have all individual exports as valid AgentConfig objects', () => {
+    it("should have all individual exports as valid AgentConfig objects", () => {
       const individualAgents = [
         enforcer,
         architect,
@@ -110,104 +110,104 @@ describe('Agent Index Registry', () => {
         codeReviewer,
         securityAuditor,
         refactorer,
-        testArchitect
+        testArchitect,
       ];
 
-      individualAgents.forEach(agent => {
+      individualAgents.forEach((agent) => {
         const config: AgentConfig = agent;
         expect(config).toBeDefined();
       });
     });
   });
 
-  describe('Registry Integrity', () => {
-    it('should have no duplicate agent names', () => {
-      const names = Object.values(builtinAgents).map(agent => agent.name);
+  describe("Registry Integrity", () => {
+    it("should have no duplicate agent names", () => {
+      const names = Object.values(builtinAgents).map((agent) => agent.name);
       const uniqueNames = new Set(names);
       expect(uniqueNames.size).toBe(names.length);
     });
 
-    it('should have no duplicate keys', () => {
+    it("should have no duplicate keys", () => {
       const keys = Object.keys(builtinAgents);
       const uniqueKeys = new Set(keys);
       expect(uniqueKeys.size).toBe(keys.length);
     });
 
-    it('should have consistent naming between keys and agent names', () => {
+    it("should have consistent naming between keys and agent names", () => {
       Object.entries(builtinAgents).forEach(([key, agent]) => {
         expect(agent.name).toBe(key);
       });
     });
 
-    it('should have all required AgentConfig properties', () => {
-      const requiredProps = ['name', 'model', 'description', 'mode', 'system'];
+    it("should have all required AgentConfig properties", () => {
+      const requiredProps = ["name", "model", "description", "mode", "system"];
 
-      Object.values(builtinAgents).forEach(agent => {
-        requiredProps.forEach(prop => {
+      Object.values(builtinAgents).forEach((agent) => {
+        requiredProps.forEach((prop) => {
           expect(agent).toHaveProperty(prop);
           expect(agent[prop as keyof AgentConfig]).toBeDefined();
-          expect(agent[prop as keyof AgentConfig]).not.toBe('');
+          expect(agent[prop as keyof AgentConfig]).not.toBe("");
         });
       });
     });
   });
 
-  describe('Agent Categories', () => {
-    it('should include all framework core agents', () => {
-      const coreAgents = ['enforcer', 'architect', 'orchestrator'];
-      coreAgents.forEach(agentName => {
+  describe("Agent Categories", () => {
+    it("should include all framework core agents", () => {
+      const coreAgents = ["enforcer", "architect", "orchestrator"];
+      coreAgents.forEach((agentName) => {
         expect(builtinAgents).toHaveProperty(agentName);
       });
     });
 
-    it('should include specialized agents', () => {
+    it("should include specialized agents", () => {
       const specializedAgents = [
-        'bug-triage-specialist',
-        'code-reviewer',
-        'security-auditor',
-        'refactorer',
-        'test-architect'
+        "bug-triage-specialist",
+        "code-reviewer",
+        "security-auditor",
+        "refactorer",
+        "test-architect",
       ];
 
-      specializedAgents.forEach(agentName => {
+      specializedAgents.forEach((agentName) => {
         expect(builtinAgents).toHaveProperty(agentName);
       });
     });
   });
 
-  describe('Type Safety', () => {
-    it('should maintain type safety across all exports', () => {
+  describe("Type Safety", () => {
+    it("should maintain type safety across all exports", () => {
       // This test ensures TypeScript compilation would catch type errors
       const agents: Record<string, AgentConfig> = builtinAgents;
 
-      Object.values(agents).forEach(agent => {
+      Object.values(agents).forEach((agent) => {
         // Type assertions that would fail at compile time if types are wrong
         const name: string = agent.name;
         const model: string = agent.model;
         const description: string = agent.description;
-        const mode: 'primary' | 'subagent' | 'all' = agent.mode;
+        const mode: "primary" | "subagent" | "all" = agent.mode;
         const system: string = agent.system;
 
-        expect(typeof name).toBe('string');
-        expect(typeof model).toBe('string');
-        expect(typeof description).toBe('string');
-        expect(['primary', 'subagent', 'all']).toContain(mode);
-        expect(typeof system).toBe('string');
+        expect(typeof name).toBe("string");
+        expect(typeof model).toBe("string");
+        expect(typeof description).toBe("string");
+        expect(["primary", "subagent", "all"]).toContain(mode);
+        expect(typeof system).toBe("string");
       });
     });
   });
 
-  describe('Registry Completeness', () => {
-    it('should export exactly the expected agents', () => {
+  describe("Registry Completeness", () => {
+    it("should export exactly the expected agents", () => {
       const expectedKeys = new Set([
-        'enforcer',
-        'architect',
-        'orchestrator',
-        'bug-triage-specialist',
-        'code-reviewer',
-        'security-auditor',
-        'refactorer',
-        'test-architect'
+        "enforcer",
+        "architect",
+        "orchestrator",
+        "bug-triage-specialist",
+        "code-reviewer",
+        "security-auditor",
+        "refactorer",
+        "test-architect",
       ]);
 
       const actualKeys = new Set(Object.keys(builtinAgents));
@@ -215,7 +215,7 @@ describe('Agent Index Registry', () => {
       expect(actualKeys).toEqual(expectedKeys);
     });
 
-    it('should have no extra or missing agents', () => {
+    it("should have no extra or missing agents", () => {
       expect(Object.keys(builtinAgents)).toHaveLength(8);
     });
   });

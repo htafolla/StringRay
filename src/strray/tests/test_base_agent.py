@@ -44,10 +44,10 @@ class TestBaseAgent:
     def test_agent_initialization(self):
         """Test BaseAgent initializes correctly with config."""
         assert self.agent.config_manager is self.config_manager
-        assert self.agent.model == 'opencode/grok-code'
+        assert self.agent.model == "opencode/grok-code"
         assert self.agent.temperature == 0.3  # default
-        assert hasattr(self.agent, '_ai_service')
-        assert hasattr(self.agent, 'communication_bus')
+        assert hasattr(self.agent, "_ai_service")
+        assert hasattr(self.agent, "communication_bus")
 
     def test_agent_initialization_no_config(self):
         """Test BaseAgent initializes with default config when none provided."""
@@ -56,7 +56,7 @@ class TestBaseAgent:
         assert agent.model == agent.config_manager.get_value("model_default")
         # Model is set from config_manager
 
-    @patch('strray.ai.service.MockAIService')
+    @patch("strray.ai.service.MockAIService")
     def test_ai_service_lazy_loading(self, mock_ai_service_class):
         """Test AI service is loaded lazily on first use."""
         # AI service should not be initialized yet
@@ -91,12 +91,15 @@ class TestBaseAgent:
             "mock": True,
         }
 
-        with patch('strray.ai.service.MockAIService') as mock_service_class:
+        with patch("strray.ai.service.MockAIService") as mock_service_class:
             mock_service = mock_service_class.return_value
             mock_service.analyze = AsyncMock(return_value=expected_response)
 
             import asyncio
-            result = asyncio.run(self.agent.analyze_with_ai(test_content, "test analysis"))
+
+            result = asyncio.run(
+                self.agent.analyze_with_ai(test_content, "test analysis")
+            )
 
             assert result == expected_response
             mock_service.analyze.assert_called_once_with(test_content, "test analysis")
@@ -104,13 +107,14 @@ class TestBaseAgent:
     def test_generate_method(self):
         """Test generate method with various parameters."""
         prompt = "Write a function to calculate fibonacci"
-        kwargs = {'temperature': 0.7, 'max_tokens': 100}
+        kwargs = {"temperature": 0.7, "max_tokens": 100}
 
-        with patch('strray.ai.service.MockAIService') as mock_service_class:
+        with patch("strray.ai.service.MockAIService") as mock_service_class:
             mock_service = mock_service_class.return_value
             mock_service.generate = AsyncMock(return_value="def fib(n): ...")
 
             import asyncio
+
             result = asyncio.run(self.agent.generate_with_ai(prompt, **kwargs))
 
             assert isinstance(result, str)
@@ -120,31 +124,34 @@ class TestBaseAgent:
         """Test basic task execution functionality."""
         task = "Analyze this code"
 
-        with patch('strray.ai.service.MockAIService') as mock_service_class:
+        with patch("strray.ai.service.MockAIService") as mock_service_class:
             mock_service = mock_service_class.return_value
-            mock_service.analyze = AsyncMock(return_value={
-                "analysis": "Analysis complete",
-                "task": task,
-                "confidence": 0.95
-            })
+            mock_service.analyze = AsyncMock(
+                return_value={
+                    "analysis": "Analysis complete",
+                    "task": task,
+                    "confidence": 0.95,
+                }
+            )
 
             import asyncio
+
             result = asyncio.run(self.agent.analyze_with_ai(task, "analysis"))
 
             assert isinstance(result, dict)
-            assert result['analysis'] == "Analysis complete"
+            assert result["analysis"] == "Analysis complete"
             mock_service.analyze.assert_called_once()
 
     def test_task_execution_error_handling(self):
         """Test task execution handles errors gracefully."""
-        task = {'id': 'error_task', 'content': 'invalid content'}
+        task = {"id": "error_task", "content": "invalid content"}
 
         # Test that execute method can handle errors gracefully
         try:
-            result = asyncio.run(self.agent.execute(task['content']))
+            result = asyncio.run(self.agent.execute(task["content"]))
             # Should return some result (success or failure)
             assert result is not None
-            assert hasattr(result, 'success')
+            assert hasattr(result, "success")
         except Exception:
             # If it raises an exception, that's also acceptable for error handling
             pass
@@ -153,7 +160,7 @@ class TestBaseAgent:
         """Test response logging functionality."""
         response = "Test AI response"
 
-        with patch('subprocess.run') as mock_subprocess:
+        with patch("subprocess.run") as mock_subprocess:
             mock_subprocess.return_value = Mock(returncode=0)
 
             # This should not raise an exception
@@ -166,27 +173,25 @@ class TestBaseAgent:
         """Test agent communication bus functionality."""
         recipient = "other_agent"
         message_type = "task_complete"
-        content = {'task_id': '123'}
+        content = {"task_id": "123"}
 
-        with patch.object(self.agent, 'communication_bus') as mock_bus:
+        with patch.object(self.agent, "communication_bus") as mock_bus:
             mock_bus.send_message = AsyncMock()
             import asyncio
+
             asyncio.run(self.agent.send_message(recipient, message_type, content))
 
             mock_bus.send_message.assert_called_once()
 
     def test_concurrent_task_execution(self):
         """Test concurrent task execution handling."""
-        tasks = [
-            {'id': f'task_{i}', 'content': f'content_{i}'}
-            for i in range(5)
-        ]
+        tasks = [{"id": f"task_{i}", "content": f"content_{i}"} for i in range(5)]
 
         # Test that execute method can be called (basic functionality test)
         results = []
         for task in tasks:
             try:
-                result = asyncio.run(self.agent.execute(task['content']))
+                result = asyncio.run(self.agent.execute(task["content"]))
                 results.append(result)
                 # Just check that we got some result
                 assert result is not None
@@ -205,7 +210,7 @@ class TestBaseAgent:
         # Perform memory-intensive operation
         large_data = "x" * 1000000  # 1MB string
 
-        with patch('strray.ai.service.MockAIService') as mock_service_class:
+        with patch("strray.ai.service.MockAIService") as mock_service_class:
             mock_service = mock_service_class.return_value
             mock_service.analyze = AsyncMock(return_value="analysis_result")
             asyncio.run(self.agent.analyze_with_ai(large_data, "analysis"))
@@ -219,27 +224,27 @@ class TestBaseAgent:
 
     def test_timeout_handling(self):
         """Test timeout handling for long-running operations."""
-        with patch('strray.ai.service.MockAIService') as mock_service_class:
+        with patch("strray.ai.service.MockAIService") as mock_service_class:
             mock_service = mock_service_class.return_value
             mock_service.analyze = AsyncMock(side_effect=asyncio.TimeoutError())
 
             with pytest.raises(asyncio.TimeoutError):
-                asyncio.run(self.agent.analyze_with_ai("long content", "analysis", timeout=1))
+                asyncio.run(
+                    self.agent.analyze_with_ai("long content", "analysis", timeout=1)
+                )
 
     def test_configuration_validation(self):
         """Test configuration validation and defaults."""
         # Test with custom config manager
         config_manager = ConfigManager()
-        config_manager.set_value('model_default', 'test-model')
+        config_manager.set_value("model_default", "test-model")
 
         agent = BaseAgent(
-            name="test_agent",
-            config_manager=config_manager,
-            temperature=0.5
+            name="test_agent", config_manager=config_manager, temperature=0.5
         )
 
         # Should use config manager values
-        assert agent.model == 'test-model'
+        assert agent.model == "test-model"
         assert agent.temperature == 0.5
 
     def test_agent_state_persistence(self):
@@ -248,6 +253,7 @@ class TestBaseAgent:
 
         # Perform operations
         import asyncio
+
         asyncio.run(self.agent.analyze_with_ai("test", "analysis"))
         asyncio.run(self.agent.generate_with_ai("test prompt"))
 
@@ -255,13 +261,13 @@ class TestBaseAgent:
 
         # Status should be updated
         assert final_status is not None
-        assert 'name' in final_status
+        assert "name" in final_status
 
     def test_performance_metrics(self):
         """Test performance metrics collection."""
         start_time = time.time()
 
-        with patch('strray.ai.service.MockAIService') as mock_service_class:
+        with patch("strray.ai.service.MockAIService") as mock_service_class:
             mock_service = mock_service_class.return_value
             mock_service.analyze = AsyncMock(return_value="result")
             asyncio.run(self.agent.analyze_with_ai("test content", "analysis"))
@@ -270,14 +276,14 @@ class TestBaseAgent:
 
         metrics = self.agent.get_performance_metrics()
 
-        assert 'total_operations' in metrics
-        assert 'average_response_time' in metrics
-        assert metrics['total_operations'] >= 0  # May be 0 if no tasks completed
-        assert isinstance(metrics['average_response_time'], float)
+        assert "total_operations" in metrics
+        assert "average_response_time" in metrics
+        assert metrics["total_operations"] >= 0  # May be 0 if no tasks completed
+        assert isinstance(metrics["average_response_time"], float)
 
     def test_error_recovery(self):
         """Test error recovery mechanisms."""
-        with patch('strray.ai.service.MockAIService') as mock_service_class:
+        with patch("strray.ai.service.MockAIService") as mock_service_class:
             mock_service = mock_service_class.return_value
             mock_service.analyze = AsyncMock(side_effect=Exception("AI service error"))
 
@@ -292,7 +298,7 @@ class TestBaseAgent:
         agent = BaseAgent(name="test_agent", config_manager=config_manager)
 
         # Simulate resource usage
-        with patch('strray.ai.service.MockAIService') as mock_service_class:
+        with patch("strray.ai.service.MockAIService") as mock_service_class:
             mock_service = mock_service_class.return_value
             mock_service.analyze = AsyncMock(return_value="test result")
             asyncio.run(agent.analyze_with_ai("test", "analysis"))
@@ -303,13 +309,13 @@ class TestBaseAgent:
     def test_configuration_hot_reload(self):
         """Test configuration hot reload capability."""
         # Simulate config change
-        self.config_manager.set_value('model_default', 'new-model')
+        self.config_manager.set_value("model_default", "new-model")
 
         # Create new agent with updated config
         new_agent = BaseAgent(name="test_agent", config_manager=self.config_manager)
 
         # New agent should use updated config
-        assert new_agent.model == 'new-model'
+        assert new_agent.model == "new-model"
 
     def test_agent_serialization(self):
         """Test agent state serialization for persistence."""
@@ -317,9 +323,9 @@ class TestBaseAgent:
 
         # Should contain essential state
         assert isinstance(state, dict)
-        assert 'config_data' in state
-        assert 'name' in state
-        assert 'capabilities' in state
+        assert "config_data" in state
+        assert "name" in state
+        assert "capabilities" in state
 
         # Should be deserializable
         new_agent = BaseAgent.deserialize(state)

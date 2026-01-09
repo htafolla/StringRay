@@ -8,15 +8,19 @@
  * @since 2026-01-08
  */
 
-import { IncomingMessage, ServerResponse } from 'http';
-import { DistributedStateManager, InstanceHealth } from './state-manager';
-import { EventEmitter } from 'events';
-import { CircuitBreakerRegistry } from '../circuit-breaker/circuit-breaker';
-import { PredictiveScalingEngine } from '../scaling/predictive-scaling-engine';
+import { IncomingMessage, ServerResponse } from "http";
+import { DistributedStateManager, InstanceHealth } from "./state-manager";
+import { EventEmitter } from "events";
+import { CircuitBreakerRegistry } from "../circuit-breaker/circuit-breaker";
+import { PredictiveScalingEngine } from "../scaling/predictive-scaling-engine";
 
 export interface LoadBalancerConfig {
   port: number;
-  algorithm: 'round-robin' | 'least-connections' | 'weighted-round-robin' | 'session-affinity';
+  algorithm:
+    | "round-robin"
+    | "least-connections"
+    | "weighted-round-robin"
+    | "session-affinity";
   healthCheckInterval: number;
   healthCheckTimeout: number;
   sessionAffinityCookie: string;
@@ -67,16 +71,16 @@ export class DistributedLoadBalancer extends EventEmitter {
 
   constructor(
     config: Partial<LoadBalancerConfig> = {},
-    stateManager: DistributedStateManager
+    stateManager: DistributedStateManager,
   ) {
     super();
 
     this.config = {
       port: 8080,
-      algorithm: 'session-affinity',
+      algorithm: "session-affinity",
       healthCheckInterval: 5000,
       healthCheckTimeout: 3000,
-      sessionAffinityCookie: 'strray-session',
+      sessionAffinityCookie: "strray-session",
       maxRetries: 3,
       failoverTimeout: 10000,
       enableAutoScaling: true,
@@ -93,7 +97,7 @@ export class DistributedLoadBalancer extends EventEmitter {
       recoveryTimeout: 30000,
       monitoringPeriod: 60000,
       timeout: this.config.healthCheckTimeout,
-      name: 'load-balancer',
+      name: "load-balancer",
     });
     this.predictiveScalingEngine = new PredictiveScalingEngine({
       predictionHorizon: 15,
@@ -101,7 +105,9 @@ export class DistributedLoadBalancer extends EventEmitter {
       scaleUpThreshold: this.config.scaleUpThreshold,
       scaleDownThreshold: this.config.scaleDownThreshold,
       cooldownPeriod: 5,
-      maxScaleUp: Math.floor((this.config.maxInstances - this.config.minInstances) / 2),
+      maxScaleUp: Math.floor(
+        (this.config.maxInstances - this.config.minInstances) / 2,
+      ),
       maxScaleDown: 1,
       enableML: true,
       modelUpdateInterval: 24,
@@ -128,13 +134,18 @@ export class DistributedLoadBalancer extends EventEmitter {
     // Watch for instance changes
     this.watchInstanceChanges();
 
-    console.log(`🔄 Load Balancer: Initialized with ${this.algorithm} algorithm on port ${this.config.port}`);
+    console.log(
+      `🔄 Load Balancer: Initialized with ${this.algorithm} algorithm on port ${this.config.port}`,
+    );
   }
 
   /**
    * Handle incoming HTTP requests
    */
-  async handleRequest(req: IncomingMessage, res: ServerResponse): Promise<void> {
+  async handleRequest(
+    req: IncomingMessage,
+    res: ServerResponse,
+  ): Promise<void> {
     const startTime = Date.now();
     this.stats.totalRequests++;
     this.stats.activeConnections++;
@@ -143,7 +154,7 @@ export class DistributedLoadBalancer extends EventEmitter {
       const instance = await this.selectInstance(req);
 
       if (!instance) {
-        this.sendError(res, 503, 'No healthy instances available');
+        this.sendError(res, 503, "No healthy instances available");
         return;
       }
 
@@ -155,10 +166,9 @@ export class DistributedLoadBalancer extends EventEmitter {
 
       const responseTime = Date.now() - startTime;
       this.updateInstanceStats(instance.id, responseTime);
-
     } catch (error) {
-      console.error('❌ Load Balancer: Request handling failed:', error);
-      this.sendError(res, 500, 'Internal server error');
+      console.error("❌ Load Balancer: Request handling failed:", error);
+      this.sendError(res, 500, "Internal server error");
     } finally {
       this.stats.activeConnections--;
       this.updateStats();
@@ -168,25 +178,28 @@ export class DistributedLoadBalancer extends EventEmitter {
   /**
    * Select backend instance based on algorithm
    */
-  private async selectInstance(req: IncomingMessage): Promise<BackendInstance | null> {
-    const healthyInstances = Array.from(this.instances.values())
-      .filter(instance => instance.healthy);
+  private async selectInstance(
+    req: IncomingMessage,
+  ): Promise<BackendInstance | null> {
+    const healthyInstances = Array.from(this.instances.values()).filter(
+      (instance) => instance.healthy,
+    );
 
     if (healthyInstances.length === 0) {
       return null;
     }
 
     switch (this.config.algorithm) {
-      case 'round-robin':
+      case "round-robin":
         return this.selectRoundRobin(healthyInstances);
 
-      case 'least-connections':
+      case "least-connections":
         return this.selectLeastConnections(healthyInstances);
 
-      case 'weighted-round-robin':
+      case "weighted-round-robin":
         return this.selectWeightedRoundRobin(healthyInstances);
 
-      case 'session-affinity':
+      case "session-affinity":
         return this.selectSessionAffinity(req, healthyInstances);
 
       default:
@@ -194,7 +207,9 @@ export class DistributedLoadBalancer extends EventEmitter {
     }
   }
 
-  private selectRoundRobin(instances: BackendInstance[]): BackendInstance | null {
+  private selectRoundRobin(
+    instances: BackendInstance[],
+  ): BackendInstance | null {
     if (instances.length === 0) return null;
     const index = this.currentIndex % instances.length;
     const instance = instances[index];
@@ -202,16 +217,23 @@ export class DistributedLoadBalancer extends EventEmitter {
     return instance || null;
   }
 
-  private selectLeastConnections(instances: BackendInstance[]): BackendInstance | null {
+  private selectLeastConnections(
+    instances: BackendInstance[],
+  ): BackendInstance | null {
     if (instances.length === 0) return null;
     return instances.reduce((min, current) =>
-      current.connections < min.connections ? current : min
+      current.connections < min.connections ? current : min,
     );
   }
 
-  private selectWeightedRoundRobin(instances: BackendInstance[]): BackendInstance | null {
+  private selectWeightedRoundRobin(
+    instances: BackendInstance[],
+  ): BackendInstance | null {
     if (instances.length === 0) return null;
-    let totalWeight = instances.reduce((sum, instance) => sum + instance.weight, 0);
+    let totalWeight = instances.reduce(
+      (sum, instance) => sum + instance.weight,
+      0,
+    );
     let random = Math.random() * totalWeight;
 
     for (const instance of instances) {
@@ -224,13 +246,16 @@ export class DistributedLoadBalancer extends EventEmitter {
     return instances[0] || null;
   }
 
-  private selectSessionAffinity(req: IncomingMessage, instances: BackendInstance[]): BackendInstance | null {
+  private selectSessionAffinity(
+    req: IncomingMessage,
+    instances: BackendInstance[],
+  ): BackendInstance | null {
     // Check for session affinity cookie
     const cookies = this.parseCookies(req);
     const sessionInstanceId = cookies[this.config.sessionAffinityCookie];
 
     if (sessionInstanceId) {
-      const instance = instances.find(inst => inst.id === sessionInstanceId);
+      const instance = instances.find((inst) => inst.id === sessionInstanceId);
       if (instance) {
         return instance;
       }
@@ -246,57 +271,62 @@ export class DistributedLoadBalancer extends EventEmitter {
   private async proxyRequest(
     req: IncomingMessage,
     res: ServerResponse,
-    instance: BackendInstance
+    instance: BackendInstance,
   ): Promise<void> {
     instance.connections++;
 
     try {
-      const result = await this.circuitBreakerRegistry.execute(`proxy-${instance.id}`, async () => {
-        // Create proxy request
-        const http = await import('http');
-        const url = require('url');
+      const result = await this.circuitBreakerRegistry.execute(
+        `proxy-${instance.id}`,
+        async () => {
+          // Create proxy request
+          const http = await import("http");
+          const url = require("url");
 
-        const options = {
-          hostname: instance.host,
-          port: instance.port,
-          path: req.url,
-          method: req.method,
-          headers: {
-            ...req.headers,
-            'X-Forwarded-For': req.socket.remoteAddress,
-            'X-Forwarded-Proto': 'http',
-            'X-Real-IP': req.socket.remoteAddress,
-          },
-        };
+          const options = {
+            hostname: instance.host,
+            port: instance.port,
+            path: req.url,
+            method: req.method,
+            headers: {
+              ...req.headers,
+              "X-Forwarded-For": req.socket.remoteAddress,
+              "X-Forwarded-Proto": "http",
+              "X-Real-IP": req.socket.remoteAddress,
+            },
+          };
 
-        return new Promise<void>((resolve, reject) => {
-          const proxyReq = http.request(options, (proxyRes) => {
-            // Copy response headers
-            Object.keys(proxyRes.headers).forEach(key => {
-              const value = proxyRes.headers[key];
-              if (value) {
-                res.setHeader(key, value);
-              }
+          return new Promise<void>((resolve, reject) => {
+            const proxyReq = http.request(options, (proxyRes) => {
+              // Copy response headers
+              Object.keys(proxyRes.headers).forEach((key) => {
+                const value = proxyRes.headers[key];
+                if (value) {
+                  res.setHeader(key, value);
+                }
+              });
+
+              res.statusCode = proxyRes.statusCode || 200;
+              proxyRes.pipe(res);
+              resolve();
             });
 
-            res.statusCode = proxyRes.statusCode || 200;
-            proxyRes.pipe(res);
-            resolve();
+            proxyReq.on("error", reject);
+
+            // Pipe request body
+            req.pipe(proxyReq);
           });
-
-          proxyReq.on('error', reject);
-
-          // Pipe request body
-          req.pipe(proxyReq);
-        });
-      });
+        },
+      );
 
       if (!result.success) {
-        console.error(`❌ Load Balancer: Proxy error for ${instance.id}:`, result.error);
+        console.error(
+          `❌ Load Balancer: Proxy error for ${instance.id}:`,
+          result.error,
+        );
         instance.failureCount++;
-        this.sendError(res, 502, 'Bad Gateway');
+        this.sendError(res, 502, "Bad Gateway");
       }
-
     } finally {
       instance.connections--;
     }
@@ -306,8 +336,8 @@ export class DistributedLoadBalancer extends EventEmitter {
    * Health check all instances
    */
   private async performHealthChecks(): Promise<void> {
-    const promises = Array.from(this.instances.values()).map(instance =>
-      this.checkInstanceHealth(instance)
+    const promises = Array.from(this.instances.values()).map((instance) =>
+      this.checkInstanceHealth(instance),
     );
 
     await Promise.allSettled(promises);
@@ -317,36 +347,39 @@ export class DistributedLoadBalancer extends EventEmitter {
   private async checkInstanceHealth(instance: BackendInstance): Promise<void> {
     const startTime = Date.now();
 
-    const result = await this.circuitBreakerRegistry.execute(`health-check-${instance.id}`, async () => {
-      const http = await import('http');
+    const result = await this.circuitBreakerRegistry.execute(
+      `health-check-${instance.id}`,
+      async () => {
+        const http = await import("http");
 
-      const options = {
-        hostname: instance.host,
-        port: instance.port,
-        path: '/api/status',
-        method: 'GET',
-        timeout: this.config.healthCheckTimeout,
-      };
+        const options = {
+          hostname: instance.host,
+          port: instance.port,
+          path: "/api/status",
+          method: "GET",
+          timeout: this.config.healthCheckTimeout,
+        };
 
-      return new Promise<void>((resolve, reject) => {
-        const req = http.request(options, (res) => {
-          if (res.statusCode === 200) {
-            resolve();
-          } else {
-            reject(new Error(`Status code: ${res.statusCode}`));
-          }
+        return new Promise<void>((resolve, reject) => {
+          const req = http.request(options, (res) => {
+            if (res.statusCode === 200) {
+              resolve();
+            } else {
+              reject(new Error(`Status code: ${res.statusCode}`));
+            }
+          });
+
+          req.on("error", reject);
+          req.on("timeout", () => reject(new Error("Timeout")));
+          req.setTimeout(this.config.healthCheckTimeout, () => {
+            req.destroy();
+            reject(new Error("Timeout"));
+          });
+
+          req.end();
         });
-
-        req.on('error', reject);
-        req.on('timeout', () => reject(new Error('Timeout')));
-        req.setTimeout(this.config.healthCheckTimeout, () => {
-          req.destroy();
-          reject(new Error('Timeout'));
-        });
-
-        req.end();
-      });
-    });
+      },
+    );
 
     if (result.success) {
       // Health check successful
@@ -355,14 +388,17 @@ export class DistributedLoadBalancer extends EventEmitter {
       instance.responseTime = Date.now() - startTime;
       instance.lastHealthCheck = Date.now();
     } else {
-      console.warn(`⚠️ Load Balancer: Health check failed for ${instance.id}:`, result.error);
+      console.warn(
+        `⚠️ Load Balancer: Health check failed for ${instance.id}:`,
+        result.error,
+      );
       instance.failureCount++;
       instance.lastHealthCheck = Date.now();
 
       // Mark as unhealthy after consecutive failures
       if (instance.failureCount >= 3) {
         instance.healthy = false;
-        this.emit('instanceUnhealthy', instance);
+        this.emit("instanceUnhealthy", instance);
       }
     }
   }
@@ -381,7 +417,7 @@ export class DistributedLoadBalancer extends EventEmitter {
             host: this.extractHostFromInstanceId(health.instanceId),
             port: 3000, // Default StrRay port
             weight: 1,
-            healthy: health.status === 'healthy',
+            healthy: health.status === "healthy",
             connections: 0,
             lastHealthCheck: health.lastHeartbeat,
             responseTime: 0,
@@ -389,11 +425,13 @@ export class DistributedLoadBalancer extends EventEmitter {
           };
 
           this.instances.set(health.instanceId, instance);
-          console.log(`🔍 Load Balancer: Discovered instance ${health.instanceId}`);
+          console.log(
+            `🔍 Load Balancer: Discovered instance ${health.instanceId}`,
+          );
         }
       }
     } catch (error) {
-      console.error('❌ Load Balancer: Failed to discover instances:', error);
+      console.error("❌ Load Balancer: Failed to discover instances:", error);
     }
   }
 
@@ -402,7 +440,7 @@ export class DistributedLoadBalancer extends EventEmitter {
    */
   private watchInstanceChanges(): void {
     // Watch for new instances joining
-    this.stateManager.watch('instances:join', (instanceData: any) => {
+    this.stateManager.watch("instances:join", (instanceData: any) => {
       if (instanceData && !this.instances.has(instanceData.id)) {
         const instance: BackendInstance = {
           id: instanceData.id,
@@ -422,7 +460,7 @@ export class DistributedLoadBalancer extends EventEmitter {
     });
 
     // Watch for instances leaving
-    this.stateManager.watch('instances:leave', (instanceId: string) => {
+    this.stateManager.watch("instances:leave", (instanceId: string) => {
       if (this.instances.has(instanceId)) {
         this.instances.delete(instanceId);
         console.log(`➖ Load Balancer: Instance left: ${instanceId}`);
@@ -440,7 +478,9 @@ export class DistributedLoadBalancer extends EventEmitter {
     const currentInstanceCount = instances.length;
 
     // Record current metrics for ML training
-    const avgLoad = instances.reduce((sum, inst) => sum + inst.loadFactor, 0) / instances.length;
+    const avgLoad =
+      instances.reduce((sum, inst) => sum + inst.loadFactor, 0) /
+      instances.length;
     const avgResponseTime = this.stats.averageResponseTime;
     const requestRate = this.stats.requestsPerSecond;
 
@@ -455,20 +495,34 @@ export class DistributedLoadBalancer extends EventEmitter {
     });
 
     // Get ML-based scaling prediction
-    const prediction = await this.predictiveScalingEngine.generatePrediction(currentInstanceCount);
+    const prediction =
+      await this.predictiveScalingEngine.generatePrediction(
+        currentInstanceCount,
+      );
 
     // Execute scaling based on ML prediction
-    if (prediction.scalingAction !== 'maintain') {
-      const success = await this.predictiveScalingEngine.executeScaling(prediction, currentInstanceCount);
+    if (prediction.scalingAction !== "maintain") {
+      const success = await this.predictiveScalingEngine.executeScaling(
+        prediction,
+        currentInstanceCount,
+      );
 
       if (success) {
-        if (prediction.scalingAction === 'scale_up') {
-          console.log(`📈 Load Balancer: ML-based scale up to ${prediction.recommendedInstances} instances`);
-          console.log(`   Reason: ${prediction.reason} (confidence: ${(prediction.confidence * 100).toFixed(1)}%)`);
+        if (prediction.scalingAction === "scale_up") {
+          console.log(
+            `📈 Load Balancer: ML-based scale up to ${prediction.recommendedInstances} instances`,
+          );
+          console.log(
+            `   Reason: ${prediction.reason} (confidence: ${(prediction.confidence * 100).toFixed(1)}%)`,
+          );
           await this.scaleUp();
-        } else if (prediction.scalingAction === 'scale_down') {
-          console.log(`📉 Load Balancer: ML-based scale down to ${prediction.recommendedInstances} instances`);
-          console.log(`   Reason: ${prediction.reason} (confidence: ${(prediction.confidence * 100).toFixed(1)}%)`);
+        } else if (prediction.scalingAction === "scale_down") {
+          console.log(
+            `📉 Load Balancer: ML-based scale down to ${prediction.recommendedInstances} instances`,
+          );
+          console.log(
+            `   Reason: ${prediction.reason} (confidence: ${(prediction.confidence * 100).toFixed(1)}%)`,
+          );
           await this.scaleDown();
         }
       }
@@ -478,12 +532,12 @@ export class DistributedLoadBalancer extends EventEmitter {
   private async scaleUp(): Promise<void> {
     // This would integrate with container orchestration (Kubernetes, Docker Swarm, etc.)
     // For now, emit event for external scaling
-    this.emit('scaleUp');
+    this.emit("scaleUp");
   }
 
   private async scaleDown(): Promise<void> {
     // This would integrate with container orchestration
-    this.emit('scaleDown');
+    this.emit("scaleDown");
   }
 
   private startHealthChecks(): void {
@@ -501,7 +555,9 @@ export class DistributedLoadBalancer extends EventEmitter {
   }
 
   private updateHealthStats(): void {
-    const healthy = Array.from(this.instances.values()).filter(inst => inst.healthy).length;
+    const healthy = Array.from(this.instances.values()).filter(
+      (inst) => inst.healthy,
+    ).length;
     const unhealthy = this.instances.size - healthy;
 
     this.stats.healthyInstances = healthy;
@@ -514,14 +570,22 @@ export class DistributedLoadBalancer extends EventEmitter {
 
     // Calculate requests per second
     this.requestHistory.push(now);
-    this.requestHistory = this.requestHistory.filter(time => now - time < 60000); // Last minute
+    this.requestHistory = this.requestHistory.filter(
+      (time) => now - time < 60000,
+    ); // Last minute
     this.stats.requestsPerSecond = this.requestHistory.length / 60;
 
     this.lastStatsUpdate = now;
   }
 
-  private setSessionAffinityCookie(res: ServerResponse, instanceId: string): void {
-    res.setHeader('Set-Cookie', `${this.config.sessionAffinityCookie}=${instanceId}; Path=/; HttpOnly`);
+  private setSessionAffinityCookie(
+    res: ServerResponse,
+    instanceId: string,
+  ): void {
+    res.setHeader(
+      "Set-Cookie",
+      `${this.config.sessionAffinityCookie}=${instanceId}; Path=/; HttpOnly`,
+    );
   }
 
   private parseCookies(req: IncomingMessage): Record<string, string> {
@@ -529,8 +593,8 @@ export class DistributedLoadBalancer extends EventEmitter {
     const cookieHeader = req.headers.cookie;
 
     if (cookieHeader) {
-      cookieHeader.split(';').forEach(cookie => {
-        const [name, value] = cookie.trim().split('=');
+      cookieHeader.split(";").forEach((cookie) => {
+        const [name, value] = cookie.trim().split("=");
         if (name && value) {
           cookies[name] = decodeURIComponent(value);
         }
@@ -540,16 +604,22 @@ export class DistributedLoadBalancer extends EventEmitter {
     return cookies;
   }
 
-  private sendError(res: ServerResponse, statusCode: number, message: string): void {
+  private sendError(
+    res: ServerResponse,
+    statusCode: number,
+    message: string,
+  ): void {
     res.statusCode = statusCode;
-    res.setHeader('Content-Type', 'application/json');
-    res.end(JSON.stringify({ error: message, timestamp: new Date().toISOString() }));
+    res.setHeader("Content-Type", "application/json");
+    res.end(
+      JSON.stringify({ error: message, timestamp: new Date().toISOString() }),
+    );
   }
 
   private extractHostFromInstanceId(instanceId: string): string {
     // Extract host from instance ID (would be more sophisticated in real implementation)
     // For now, assume localhost for all instances
-    return 'localhost';
+    return "localhost";
   }
 
   /**
@@ -569,7 +639,12 @@ export class DistributedLoadBalancer extends EventEmitter {
   /**
    * Manually add backend instance
    */
-  addInstance(instance: Omit<BackendInstance, 'connections' | 'lastHealthCheck' | 'responseTime' | 'failureCount'>): void {
+  addInstance(
+    instance: Omit<
+      BackendInstance,
+      "connections" | "lastHealthCheck" | "responseTime" | "failureCount"
+    >,
+  ): void {
     const fullInstance: BackendInstance = {
       ...instance,
       connections: 0,
@@ -599,7 +674,7 @@ export class DistributedLoadBalancer extends EventEmitter {
     // Shutdown predictive scaling engine
     await this.predictiveScalingEngine.shutdown();
 
-    console.log('🛑 Load Balancer: Shutdown complete');
+    console.log("🛑 Load Balancer: Shutdown complete");
   }
 
   get algorithm(): string {
@@ -610,7 +685,7 @@ export class DistributedLoadBalancer extends EventEmitter {
 // Factory function
 export const createDistributedLoadBalancer = (
   config: Partial<LoadBalancerConfig> = {},
-  stateManager: DistributedStateManager
+  stateManager: DistributedStateManager,
 ): DistributedLoadBalancer => {
   return new DistributedLoadBalancer(config, stateManager);
 };

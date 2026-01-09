@@ -8,18 +8,18 @@
  * @since 2026-01-08
  */
 
-import Redis from 'ioredis';
-import { EventEmitter } from 'events';
-import { v4 as uuidv4 } from 'uuid';
-import { RaftConsensus } from './raft-consensus';
-import { CircuitBreakerRegistry } from '../circuit-breaker/circuit-breaker';
+import Redis from "ioredis";
+import { EventEmitter } from "events";
+import { v4 as uuidv4 } from "uuid";
+import { RaftConsensus } from "./raft-consensus";
+import { CircuitBreakerRegistry } from "../circuit-breaker/circuit-breaker";
 
 export interface DistributedStateConfig {
   redisUrl: string;
   clusterMode: boolean;
   keyPrefix: string;
   ttlSeconds: number;
-  consistencyLevel: 'strong' | 'eventual';
+  consistencyLevel: "strong" | "eventual";
   replicationFactor: number;
   heartbeatInterval: number;
   failoverTimeout: number;
@@ -27,7 +27,7 @@ export interface DistributedStateConfig {
 
 export interface StateOperation {
   id: string;
-  type: 'set' | 'get' | 'delete' | 'watch';
+  type: "set" | "get" | "delete" | "watch";
   key: string;
   value?: any;
   timestamp: number;
@@ -42,13 +42,13 @@ export interface StateConflict {
   localValue: any;
   remoteValue: any;
   timestamp: number;
-  resolution?: 'local' | 'remote' | 'merge';
+  resolution?: "local" | "remote" | "merge";
 }
 
 export interface InstanceHealth {
   instanceId: string;
   lastHeartbeat: number;
-  status: 'healthy' | 'unhealthy' | 'failed';
+  status: "healthy" | "unhealthy" | "failed";
   loadFactor: number;
   activeSessions: number;
   memoryUsage: number;
@@ -61,9 +61,15 @@ export class DistributedStateManager extends EventEmitter {
   private redis!: Redis;
   private config: DistributedStateConfig;
   private instanceId: string;
-  private localCache = new Map<string, { value: any; version: number; timestamp: number }>();
+  private localCache = new Map<
+    string,
+    { value: any; version: number; timestamp: number }
+  >();
   private pendingOperations = new Map<string, StateOperation>();
-  private watchers = new Map<string, Set<(value: any, version: number) => void>>();
+  private watchers = new Map<
+    string,
+    Set<(value: any, version: number) => void>
+  >();
   private heartbeatTimer?: NodeJS.Timeout;
   private conflictResolver: ConflictResolver;
   private raftConsensus: RaftConsensus;
@@ -73,11 +79,11 @@ export class DistributedStateManager extends EventEmitter {
     super();
 
     this.config = {
-      redisUrl: process.env.REDIS_URL || 'redis://localhost:6379',
+      redisUrl: process.env.REDIS_URL || "redis://localhost:6379",
       clusterMode: false,
-      keyPrefix: 'strray:state:',
+      keyPrefix: "strray:state:",
       ttlSeconds: 3600,
-      consistencyLevel: 'strong',
+      consistencyLevel: "strong",
       replicationFactor: 3,
       heartbeatInterval: 5000,
       failoverTimeout: 30000,
@@ -92,7 +98,7 @@ export class DistributedStateManager extends EventEmitter {
       recoveryTimeout: 30000,
       monitoringPeriod: 60000,
       timeout: 5000,
-      name: 'distributed-state-manager',
+      name: "distributed-state-manager",
     });
 
     this.initializeRedis();
@@ -107,17 +113,19 @@ export class DistributedStateManager extends EventEmitter {
       enableReadyCheck: true,
     });
 
-    this.redis.on('connect', () => {
-      console.log(`🔗 Distributed State: Connected to Redis (${this.instanceId})`);
+    this.redis.on("connect", () => {
+      console.log(
+        `🔗 Distributed State: Connected to Redis (${this.instanceId})`,
+      );
     });
 
-    this.redis.on('error', (error: Error) => {
-      console.error('❌ Distributed State: Redis connection error:', error);
-      this.emit('redisError', error);
+    this.redis.on("error", (error: Error) => {
+      console.error("❌ Distributed State: Redis connection error:", error);
+      this.emit("redisError", error);
     });
 
-    this.redis.on('ready', () => {
-      this.emit('ready');
+    this.redis.on("ready", () => {
+      this.emit("ready");
     });
   }
 
@@ -127,7 +135,7 @@ export class DistributedStateManager extends EventEmitter {
         const healthData: InstanceHealth = {
           instanceId: this.instanceId,
           lastHeartbeat: Date.now(),
-          status: 'healthy',
+          status: "healthy",
           loadFactor: process.cpuUsage().user / 1000000, // CPU usage in seconds
           activeSessions: this.getActiveSessionCount(),
           memoryUsage: process.memoryUsage().heapUsed,
@@ -136,15 +144,14 @@ export class DistributedStateManager extends EventEmitter {
         await this.redis.setex(
           `${this.config.keyPrefix}heartbeat:${this.instanceId}`,
           Math.ceil(this.config.heartbeatInterval / 1000) * 2,
-          JSON.stringify(healthData)
+          JSON.stringify(healthData),
         );
 
         // Clean up stale heartbeats
         await this.cleanupStaleInstances();
-
       } catch (error) {
-        console.error('❌ Distributed State: Heartbeat failed:', error);
-        this.emit('heartbeatFailed', error);
+        console.error("❌ Distributed State: Heartbeat failed:", error);
+        this.emit("heartbeatFailed", error);
       }
     }, this.config.heartbeatInterval);
   }
@@ -153,17 +160,23 @@ export class DistributedStateManager extends EventEmitter {
     // Listen for state change notifications
     this.redis.subscribe(`${this.config.keyPrefix}changes`, (err) => {
       if (err) {
-        console.error('❌ Distributed State: Failed to subscribe to changes:', err);
+        console.error(
+          "❌ Distributed State: Failed to subscribe to changes:",
+          err,
+        );
       }
     });
 
-    this.redis.on('message', (channel, message) => {
+    this.redis.on("message", (channel, message) => {
       if (channel === `${this.config.keyPrefix}changes`) {
         try {
           const change: StateOperation = JSON.parse(message);
           this.handleRemoteStateChange(change);
         } catch (error) {
-          console.error('❌ Distributed State: Failed to parse state change:', error);
+          console.error(
+            "❌ Distributed State: Failed to parse state change:",
+            error,
+          );
         }
       }
     });
@@ -172,60 +185,67 @@ export class DistributedStateManager extends EventEmitter {
   /**
    * Set distributed state with conflict resolution and circuit breaker protection
    */
-  async set<T>(key: string, value: T, options: { ttl?: number; force?: boolean } = {}): Promise<boolean> {
-    return this.circuitBreakerRegistry.execute('redis-set', async () => {
-      const fullKey = `${this.config.keyPrefix}${key}`;
-      const operation: StateOperation = {
-        id: uuidv4(),
-        type: 'set',
-        key,
-        value,
-        timestamp: Date.now(),
-        instanceId: this.instanceId,
-        version: this.getNextVersion(key),
-      };
+  async set<T>(
+    key: string,
+    value: T,
+    options: { ttl?: number; force?: boolean } = {},
+  ): Promise<boolean> {
+    return this.circuitBreakerRegistry
+      .execute("redis-set", async () => {
+        const fullKey = `${this.config.keyPrefix}${key}`;
+        const operation: StateOperation = {
+          id: uuidv4(),
+          type: "set",
+          key,
+          value,
+          timestamp: Date.now(),
+          instanceId: this.instanceId,
+          version: this.getNextVersion(key),
+        };
 
-      // Check for conflicts if strong consistency is required
-      if (this.config.consistencyLevel === 'strong' && !options.force) {
-        const conflict = await this.checkForConflicts(key, operation);
-        if (conflict) {
-          const resolved = await this.conflictResolver.resolve(conflict);
-          if (!resolved) {
-            throw new Error(`State conflict unresolved for key: ${key}`);
+        // Check for conflicts if strong consistency is required
+        if (this.config.consistencyLevel === "strong" && !options.force) {
+          const conflict = await this.checkForConflicts(key, operation);
+          if (conflict) {
+            const resolved = await this.conflictResolver.resolve(conflict);
+            if (!resolved) {
+              throw new Error(`State conflict unresolved for key: ${key}`);
+            }
           }
         }
-      }
 
-      // Store in Redis with versioning
-      const stateData = {
-        value,
-        version: operation.version,
-        timestamp: operation.timestamp,
-        instanceId: this.instanceId,
-      };
+        // Store in Redis with versioning
+        const stateData = {
+          value,
+          version: operation.version,
+          timestamp: operation.timestamp,
+          instanceId: this.instanceId,
+        };
 
-      await this.redis.setex(
-        fullKey,
-        options.ttl || this.config.ttlSeconds,
-        JSON.stringify(stateData)
-      );
+        await this.redis.setex(
+          fullKey,
+          options.ttl || this.config.ttlSeconds,
+          JSON.stringify(stateData),
+        );
 
-      // Update local cache
-      this.localCache.set(key, {
-        value,
-        version: operation.version,
-        timestamp: operation.timestamp,
-      });
+        // Update local cache
+        this.localCache.set(key, {
+          value,
+          version: operation.version,
+          timestamp: operation.timestamp,
+        });
 
-      // Notify other instances with circuit breaker protection
-      await this.notifyStateChange(operation);
+        // Notify other instances with circuit breaker protection
+        await this.notifyStateChange(operation);
 
-      // Trigger watchers
-      this.triggerWatchers(key, value, operation.version);
+        // Trigger watchers
+        this.triggerWatchers(key, value, operation.version);
 
-      console.log(`✅ Distributed State: Set ${key} v${operation.version}`);
-      return true;
-    }).then(result => result.success).catch(() => false);
+        console.log(`✅ Distributed State: Set ${key} v${operation.version}`);
+        return true;
+      })
+      .then((result) => result.success)
+      .catch(() => false);
   }
 
   /**
@@ -238,27 +258,33 @@ export class DistributedStateManager extends EventEmitter {
       return cached.value as T;
     }
 
-    const result = await this.circuitBreakerRegistry.execute('redis-get', async () => {
-      const fullKey = `${this.config.keyPrefix}${key}`;
-      const data = await this.redis.get(fullKey);
+    const result = await this.circuitBreakerRegistry.execute(
+      "redis-get",
+      async () => {
+        const fullKey = `${this.config.keyPrefix}${key}`;
+        const data = await this.redis.get(fullKey);
 
-      if (!data) return undefined;
+        if (!data) return undefined;
 
-      const stateData = JSON.parse(data);
-      const value = stateData.value as T;
+        const stateData = JSON.parse(data);
+        const value = stateData.value as T;
 
-      // Update local cache
-      this.localCache.set(key, {
-        value,
-        version: stateData.version,
-        timestamp: stateData.timestamp,
-      });
+        // Update local cache
+        this.localCache.set(key, {
+          value,
+          version: stateData.version,
+          timestamp: stateData.timestamp,
+        });
 
-      return value;
-    });
+        return value;
+      },
+    );
 
     if (!result.success) {
-      console.error(`❌ Distributed State: Failed to get ${key}:`, result.error);
+      console.error(
+        `❌ Distributed State: Failed to get ${key}:`,
+        result.error,
+      );
       return undefined;
     }
 
@@ -268,7 +294,10 @@ export class DistributedStateManager extends EventEmitter {
   /**
    * Watch for state changes
    */
-  watch<T>(key: string, callback: (value: T, version: number) => void): () => void {
+  watch<T>(
+    key: string,
+    callback: (value: T, version: number) => void,
+  ): () => void {
     if (!this.watchers.has(key)) {
       this.watchers.set(key, new Set());
     }
@@ -299,7 +328,7 @@ export class DistributedStateManager extends EventEmitter {
 
       const operation: StateOperation = {
         id: uuidv4(),
-        type: 'delete',
+        type: "delete",
         key,
         timestamp: Date.now(),
         instanceId: this.instanceId,
@@ -311,7 +340,6 @@ export class DistributedStateManager extends EventEmitter {
 
       console.log(`🗑️ Distributed State: Deleted ${key}`);
       return true;
-
     } catch (error) {
       console.error(`❌ Distributed State: Failed to delete ${key}:`, error);
       return false;
@@ -322,24 +350,33 @@ export class DistributedStateManager extends EventEmitter {
    * Get all active instances with circuit breaker protection
    */
   async getActiveInstances(): Promise<InstanceHealth[]> {
-    const result = await this.circuitBreakerRegistry.execute('redis-keys', async () => {
-      const keys = await this.redis.keys(`${this.config.keyPrefix}heartbeat:*`);
-      const instances: InstanceHealth[] = [];
+    const result = await this.circuitBreakerRegistry.execute(
+      "redis-keys",
+      async () => {
+        const keys = await this.redis.keys(
+          `${this.config.keyPrefix}heartbeat:*`,
+        );
+        const instances: InstanceHealth[] = [];
 
-      for (const key of keys) {
-        const data = await this.redis.get(key);
-        if (data) {
-          instances.push(JSON.parse(data));
+        for (const key of keys) {
+          const data = await this.redis.get(key);
+          if (data) {
+            instances.push(JSON.parse(data));
+          }
         }
-      }
 
-      return instances.filter(instance =>
-        Date.now() - instance.lastHeartbeat < this.config.failoverTimeout
-      );
-    });
+        return instances.filter(
+          (instance) =>
+            Date.now() - instance.lastHeartbeat < this.config.failoverTimeout,
+        );
+      },
+    );
 
     if (!result.success) {
-      console.error('❌ Distributed State: Failed to get active instances:', result.error);
+      console.error(
+        "❌ Distributed State: Failed to get active instances:",
+        result.error,
+      );
       return [];
     }
 
@@ -361,7 +398,10 @@ export class DistributedStateManager extends EventEmitter {
     return this.raftConsensus.isLeader();
   }
 
-  private async checkForConflicts(key: string, operation: StateOperation): Promise<StateConflict | null> {
+  private async checkForConflicts(
+    key: string,
+    operation: StateOperation,
+  ): Promise<StateConflict | null> {
     try {
       const fullKey = `${this.config.keyPrefix}${key}`;
       const existing = await this.redis.get(fullKey);
@@ -382,27 +422,33 @@ export class DistributedStateManager extends EventEmitter {
       }
 
       return null;
-
     } catch (error) {
-      console.error(`❌ Distributed State: Conflict check failed for ${key}:`, error);
+      console.error(
+        `❌ Distributed State: Conflict check failed for ${key}:`,
+        error,
+      );
       return null;
     }
   }
 
-  private async handleRemoteStateChange(operation: StateOperation): Promise<void> {
+  private async handleRemoteStateChange(
+    operation: StateOperation,
+  ): Promise<void> {
     // Skip our own operations
     if (operation.instanceId === this.instanceId) return;
 
-    console.log(`🔄 Distributed State: Remote change ${operation.type} ${operation.key} v${operation.version}`);
+    console.log(
+      `🔄 Distributed State: Remote change ${operation.type} ${operation.key} v${operation.version}`,
+    );
 
     // Update local cache
-    if (operation.type === 'set') {
+    if (operation.type === "set") {
       this.localCache.set(operation.key, {
         value: operation.value,
         version: operation.version,
         timestamp: operation.timestamp,
       });
-    } else if (operation.type === 'delete') {
+    } else if (operation.type === "delete") {
       this.localCache.delete(operation.key);
     }
 
@@ -411,14 +457,19 @@ export class DistributedStateManager extends EventEmitter {
   }
 
   private async notifyStateChange(operation: StateOperation): Promise<void> {
-    await this.circuitBreakerRegistry.execute('redis-publish', async () => {
-      await this.redis.publish(
-        `${this.config.keyPrefix}changes`,
-        JSON.stringify(operation)
-      );
-    }).catch(error => {
-      console.error('❌ Distributed State: Failed to notify state change:', error);
-    });
+    await this.circuitBreakerRegistry
+      .execute("redis-publish", async () => {
+        await this.redis.publish(
+          `${this.config.keyPrefix}changes`,
+          JSON.stringify(operation),
+        );
+      })
+      .catch((error) => {
+        console.error(
+          "❌ Distributed State: Failed to notify state change:",
+          error,
+        );
+      });
   }
 
   private triggerWatchers(key: string, value: any, version: number): void {
@@ -428,7 +479,10 @@ export class DistributedStateManager extends EventEmitter {
         try {
           callback(value, version);
         } catch (error) {
-          console.error(`❌ Distributed State: Watcher error for ${key}:`, error);
+          console.error(
+            `❌ Distributed State: Watcher error for ${key}:`,
+            error,
+          );
         }
       }
     }
@@ -440,7 +494,7 @@ export class DistributedStateManager extends EventEmitter {
   }
 
   private isCacheValid(timestamp: number): boolean {
-    return Date.now() - timestamp < this.config.ttlSeconds * 1000 / 2; // Half TTL
+    return Date.now() - timestamp < (this.config.ttlSeconds * 1000) / 2; // Half TTL
   }
 
   private getActiveSessionCount(): number {
@@ -459,12 +513,17 @@ export class DistributedStateManager extends EventEmitter {
           const health: InstanceHealth = JSON.parse(data);
           if (now - health.lastHeartbeat > this.config.failoverTimeout) {
             await this.redis.del(key);
-            console.log(`🧹 Distributed State: Cleaned up stale instance ${health.instanceId}`);
+            console.log(
+              `🧹 Distributed State: Cleaned up stale instance ${health.instanceId}`,
+            );
           }
         }
       }
     } catch (error) {
-      console.error('❌ Distributed State: Failed to cleanup stale instances:', error);
+      console.error(
+        "❌ Distributed State: Failed to cleanup stale instances:",
+        error,
+      );
     }
   }
 
@@ -477,14 +536,21 @@ export class DistributedStateManager extends EventEmitter {
     await this.raftConsensus.shutdown();
 
     // Remove our heartbeat with circuit breaker protection
-    await this.circuitBreakerRegistry.execute('redis-del-heartbeat', async () => {
-      await this.redis.del(`${this.config.keyPrefix}heartbeat:${this.instanceId}`);
-    }).catch(error => {
-      console.warn('⚠️ Distributed State: Failed to remove heartbeat during shutdown:', error);
-    });
+    await this.circuitBreakerRegistry
+      .execute("redis-del-heartbeat", async () => {
+        await this.redis.del(
+          `${this.config.keyPrefix}heartbeat:${this.instanceId}`,
+        );
+      })
+      .catch((error) => {
+        console.warn(
+          "⚠️ Distributed State: Failed to remove heartbeat during shutdown:",
+          error,
+        );
+      });
 
     await this.redis.quit();
-    console.log('🛑 Distributed State: Shutdown complete');
+    console.log("🛑 Distributed State: Shutdown complete");
   }
 }
 
@@ -503,7 +569,9 @@ export class ConflictResolver {
     // Strategy 2: Timestamp-based resolution
     // Could implement more sophisticated strategies here
 
-    console.warn(`⚠️ Distributed State: Conflict detected for ${conflict.key}, using LWW strategy`);
+    console.warn(
+      `⚠️ Distributed State: Conflict detected for ${conflict.key}, using LWW strategy`,
+    );
     return false; // Remote wins (don't force local)
   }
 }
@@ -519,20 +587,17 @@ export class DistributedLockManager {
     this.redis = redis;
   }
 
-  async acquireLock(key: string, ttlMs: number = 30000): Promise<string | null> {
+  async acquireLock(
+    key: string,
+    ttlMs: number = 30000,
+  ): Promise<string | null> {
     const token = uuidv4();
     const fullKey = `lock:${key}`;
 
     try {
-      const result = await this.redis.set(
-        fullKey,
-        token,
-        'PX',
-        ttlMs,
-        'NX'
-      );
+      const result = await this.redis.set(fullKey, token, "PX", ttlMs, "NX");
 
-      if (result === 'OK') {
+      if (result === "OK") {
         this.locks.set(key, { token, expires: Date.now() + ttlMs });
         return token;
       }
@@ -575,7 +640,7 @@ export class DistributedLockManager {
 
 // Factory function
 export const createDistributedStateManager = (
-  config: Partial<DistributedStateConfig> = {}
+  config: Partial<DistributedStateConfig> = {},
 ): DistributedStateManager => {
   return new DistributedStateManager(config);
 };

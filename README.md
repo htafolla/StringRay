@@ -73,6 +73,10 @@ bun install
 # No manual initialization needed - the plugin loads on first use
 ```
 
+### oh-my-opencode Documentation
+
+For complete oh-my-opencode setup and usage instructions, see the [official oh-my-opencode documentation](https://github.com/code-yeongyu/oh-my-opencode).
+
 ### Configuration
 
 Update your `.opencode/oh-my-opencode.json`:

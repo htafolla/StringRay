@@ -15,12 +15,24 @@ describe("Session Lifecycle Management", () => {
   beforeEach(() => {
     stateManager = new StrRayStateManager();
     sessionCoordinator = createSessionCoordinator(stateManager);
-    cleanupManager = createSessionCleanupManager(stateManager);
+
+    // Create session monitor first (without cleanup manager initially)
     sessionMonitor = createSessionMonitor(
       stateManager,
       sessionCoordinator,
-      cleanupManager,
+      undefined as any, // Will be set later
     );
+
+    // Create cleanup manager with session monitor reference
+    cleanupManager = createSessionCleanupManager(
+      stateManager,
+      {},
+      sessionMonitor,
+    );
+
+    // Update session monitor with cleanup manager reference
+    (sessionMonitor as any).cleanupManager = cleanupManager;
+
     stateManagerInstance = createSessionStateManager(
       stateManager,
       sessionCoordinator,
@@ -258,7 +270,7 @@ describe("Session Lifecycle Management", () => {
 
       const health = await sessionMonitor.performHealthCheck(sessionId);
       expect(health).toBeDefined();
-      expect(health.status).toBe("critical"); // Session registered with monitor but not coordinator
+      expect(health.status).toBe("unknown"); // Session auto-unregistered when not found in coordinator
     });
   });
 

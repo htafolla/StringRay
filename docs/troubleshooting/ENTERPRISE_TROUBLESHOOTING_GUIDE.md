@@ -1580,7 +1580,7 @@ tail -f logs/framework.log
 cp .opencode/oh-my-opencode.json .opencode/backup.json
 
 # 2. Restore from known good configuration
-cp config/backup/oh-my-opencode.json .opencode/
+# Note: config/ directory removed - use .opencode/oh-my-opencode.json as primary config
 
 # 3. Validate configuration
 npm run validate:config

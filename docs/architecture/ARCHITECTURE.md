@@ -6,6 +6,68 @@ StrRay Framework implements a comprehensive multi-agent AI system integrated wit
 
 ## Core Architecture Principles
 
+### Hybrid Language Architecture
+
+StrRay Framework implements a **hybrid TypeScript/Python architecture** optimized for different system layers:
+
+#### TypeScript Frontend Layer (Primary)
+
+- **Configuration-Based Agents**: Agents defined as `AgentConfig` objects in `src/agents/`
+- **Plugin System**: Extensible MCP protocol integration
+- **Build System**: Node.js/TypeScript compilation and bundling
+- **Testing**: Vitest/Jest test suites with comprehensive coverage
+
+#### Python Backend Components (Secondary)
+
+- **Class-Based Agents**: Full-featured agents extending `BaseAgent` class in `src/strray/core/`
+- **State Management**: Advanced agent state persistence and recovery
+- **Performance Monitoring**: Integrated performance tracking and alerting
+- **Codex Integration**: Universal Development Codex compliance enforcement
+
+#### Architecture Benefits
+
+- **Type Safety**: TypeScript provides compile-time guarantees for framework core
+- **Performance**: Python enables complex state management and async coordination
+- **Flexibility**: Hybrid approach allows optimal language selection per component
+- **Maintainability**: Clear separation of concerns between framework layers
+
+#### Hybrid Architecture Diagram
+
+```
+StrRay Framework - Hybrid TypeScript/Python Architecture
+═══════════════════════════════════════════════════════════
+
+┌─────────────────────────────────────────────────────┐
+│                    TypeScript Layer                  │
+│                    (Primary Framework)               │
+├─────────────────────────────────────────────────────┤
+│ • Configuration-based agents (AgentConfig)          │
+│ • Plugin system & MCP protocol integration          │
+│ • Build system & bundling (Node.js/TypeScript)      │
+│ • Testing framework (Vitest/Jest)                   │
+│ • Framework orchestration & routing                 │
+└─────────────────────────────────────────────────────┘
+                              │
+                              │ Integration
+                              │
+┌─────────────────────────────────────────────────────┐
+│                     Python Layer                     │
+│                  (Backend Components)                │
+├─────────────────────────────────────────────────────┤
+│ • Class-based agents (BaseAgent inheritance)        │
+│ • Advanced state management & persistence           │
+│ • Performance monitoring & alerting                 │
+│ • Codex compliance enforcement                       │
+│ • Complex async coordination                         │
+└─────────────────────────────────────────────────────┘
+
+Integration Points:
+• TypeScript agents can invoke Python components via API
+• Shared configuration management across languages
+• Unified logging and monitoring systems
+• Common testing and validation frameworks
+```
+
 ### Multi-Agent Orchestration
 
 - **Specialized Agents**: 8 AI agents with distinct roles and capabilities

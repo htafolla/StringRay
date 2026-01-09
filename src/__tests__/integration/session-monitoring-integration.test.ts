@@ -106,8 +106,8 @@ describe("Session Monitoring Integration", () => {
       sessionMonitor.registerSession(sessionId);
 
       const health = await sessionMonitor.performHealthCheck(sessionId);
-      expect(health.status).toBe("critical");
-      expect(health.issues).toContain("Session not found in coordinator");
+      expect(health.status).toBe("unknown"); // Auto-unregistered when not found in coordinator
+      expect(health.issues).toContain("Session was cleaned up");
     });
 
     test("should detect degraded session with high memory usage", async () => {

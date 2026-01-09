@@ -321,17 +321,23 @@ export class LiveMetricsCollector extends EventEmitter {
   /**
    * Collect system-level metrics
    */
-  private async collectSystemMetrics(sourceId: string, timestamp: number): Promise<CollectedMetric[]> {
+  private async collectSystemMetrics(
+    sourceId: string,
+    timestamp: number,
+  ): Promise<CollectedMetric[]> {
     const metrics: CollectedMetric[] = [];
 
     try {
       if (sourceId === "system-cpu") {
         const cpus = os.cpus();
         const totalIdle = cpus.reduce((acc, cpu) => acc + cpu.times.idle, 0);
-        const totalTick = cpus.reduce((acc, cpu) => acc + Object.values(cpu.times).reduce((a, b) => a + b), 0);
+        const totalTick = cpus.reduce(
+          (acc, cpu) => acc + Object.values(cpu.times).reduce((a, b) => a + b),
+          0,
+        );
         const idle = totalIdle / cpus.length;
         const total = totalTick / cpus.length;
-        const usage = 100 - ~~(100 * idle / total);
+        const usage = 100 - ~~((100 * idle) / total);
 
         metrics.push({
           sourceId,
@@ -427,7 +433,10 @@ export class LiveMetricsCollector extends EventEmitter {
   /**
    * Collect performance metrics
    */
-  private async collectPerformanceMetrics(sourceId: string, timestamp: number): Promise<CollectedMetric[]> {
+  private async collectPerformanceMetrics(
+    sourceId: string,
+    timestamp: number,
+  ): Promise<CollectedMetric[]> {
     const metrics: CollectedMetric[] = [];
 
     try {
@@ -450,7 +459,9 @@ export class LiveMetricsCollector extends EventEmitter {
           tags: { unit: "bytes" },
         });
 
-        const usagePercent = (perfMetrics.bundleSize.current / perfMetrics.bundleSize.budget) * 100;
+        const usagePercent =
+          (perfMetrics.bundleSize.current / perfMetrics.bundleSize.budget) *
+          100;
         metrics.push({
           sourceId,
           timestamp,
@@ -486,7 +497,10 @@ export class LiveMetricsCollector extends EventEmitter {
         });
       }
     } catch (error) {
-      console.warn(`Error collecting performance metrics for ${sourceId}:`, error);
+      console.warn(
+        `Error collecting performance metrics for ${sourceId}:`,
+        error,
+      );
     }
 
     return metrics;
@@ -495,7 +509,10 @@ export class LiveMetricsCollector extends EventEmitter {
   /**
    * Collect application metrics
    */
-  private async collectApplicationMetrics(sourceId: string, timestamp: number): Promise<CollectedMetric[]> {
+  private async collectApplicationMetrics(
+    sourceId: string,
+    timestamp: number,
+  ): Promise<CollectedMetric[]> {
     const metrics: CollectedMetric[] = [];
 
     try {
@@ -556,7 +573,10 @@ export class LiveMetricsCollector extends EventEmitter {
         });
       }
     } catch (error) {
-      console.warn(`Error collecting application metrics for ${sourceId}:`, error);
+      console.warn(
+        `Error collecting application metrics for ${sourceId}:`,
+        error,
+      );
     }
 
     return metrics;
@@ -565,7 +585,10 @@ export class LiveMetricsCollector extends EventEmitter {
   /**
    * Collect custom metrics (extension point)
    */
-  private async collectCustomMetrics(sourceId: string, timestamp: number): Promise<CollectedMetric[]> {
+  private async collectCustomMetrics(
+    sourceId: string,
+    timestamp: number,
+  ): Promise<CollectedMetric[]> {
     // This is an extension point for custom metric collection
     // Emit event to allow external collectors to provide metrics
     const metrics: CollectedMetric[] = [];
@@ -704,7 +727,7 @@ export class LiveMetricsCollector extends EventEmitter {
       const initialLength = this.metricsBuffer.length;
 
       this.metricsBuffer = this.metricsBuffer.filter(
-        (metric) => metric.timestamp > cutoffTime
+        (metric) => metric.timestamp > cutoffTime,
       );
 
       const removed = initialLength - this.metricsBuffer.length;
@@ -724,7 +747,8 @@ export class LiveMetricsCollector extends EventEmitter {
       const timeDiff = (now - this.startTime) / 1000; // seconds
 
       this.stats.uptime = now - this.startTime;
-      this.stats.metricsPerSecond = timeDiff > 0 ? this.stats.totalMetrics / timeDiff : 0;
+      this.stats.metricsPerSecond =
+        timeDiff > 0 ? this.stats.totalMetrics / timeDiff : 0;
     }, 5000); // Update every 5 seconds
   }
 

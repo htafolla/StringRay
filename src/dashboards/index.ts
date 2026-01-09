@@ -9,7 +9,10 @@
  */
 
 // Core components
-export { liveMetricsCollector, LiveMetricsCollector } from "./live-metrics-collector.js";
+export {
+  liveMetricsCollector,
+  LiveMetricsCollector,
+} from "./live-metrics-collector.js";
 export { alertEngine, AlertEngine } from "./alert-engine.js";
 export { webSocketGateway, WebSocketGateway } from "./websocket-gateway.js";
 export { dashboardUIEngine, DashboardUIEngine } from "./dashboard-ui-engine.js";

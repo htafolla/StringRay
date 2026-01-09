@@ -8,9 +8,9 @@
  * @since 2026-01-08
  */
 
-import { EventEmitter } from 'events';
-import { DistributedStateManager, InstanceHealth } from './state-manager';
-import { BackendInstance } from './load-balancer';
+import { EventEmitter } from "events";
+import { DistributedStateManager, InstanceHealth } from "./state-manager";
+import { BackendInstance } from "./load-balancer";
 
 export interface FailoverConfig {
   enableAutoFailover: boolean;
@@ -24,7 +24,13 @@ export interface FailoverConfig {
 }
 
 export interface FailoverEvent {
-  type: 'instance_failure' | 'failover_started' | 'failover_completed' | 'failover_failed' | 'recovery_started' | 'recovery_completed';
+  type:
+    | "instance_failure"
+    | "failover_started"
+    | "failover_completed"
+    | "failover_failed"
+    | "recovery_started"
+    | "recovery_completed";
   instanceId: string;
   timestamp: number;
   details?: any;
@@ -32,7 +38,7 @@ export interface FailoverEvent {
 
 export interface CircuitBreakerState {
   instanceId: string;
-  state: 'closed' | 'open' | 'half-open';
+  state: "closed" | "open" | "half-open";
   failureCount: number;
   lastFailureTime: number;
   nextAttemptTime: number;
@@ -51,7 +57,7 @@ export class DistributedFailoverManager extends EventEmitter {
 
   constructor(
     config: Partial<FailoverConfig> = {},
-    stateManager: DistributedStateManager
+    stateManager: DistributedStateManager,
   ) {
     super();
 
@@ -78,24 +84,31 @@ export class DistributedFailoverManager extends EventEmitter {
     // Start circuit breaker monitoring
     this.startCircuitBreakerMonitoring();
 
-    console.log(`🛡️ Failover Manager: Initialized with auto-failover ${this.config.enableAutoFailover ? 'enabled' : 'disabled'}`);
+    console.log(
+      `🛡️ Failover Manager: Initialized with auto-failover ${this.config.enableAutoFailover ? "enabled" : "disabled"}`,
+    );
   }
 
   /**
    * Handle instance failure
    */
-  async handleInstanceFailure(instanceId: string, reason: string): Promise<void> {
-    console.log(`❌ Failover Manager: Instance failure detected: ${instanceId} (${reason})`);
+  async handleInstanceFailure(
+    instanceId: string,
+    reason: string,
+  ): Promise<void> {
+    console.log(
+      `❌ Failover Manager: Instance failure detected: ${instanceId} (${reason})`,
+    );
 
     const event: FailoverEvent = {
-      type: 'instance_failure',
+      type: "instance_failure",
       instanceId,
       timestamp: Date.now(),
       details: { reason },
     };
 
     this.failoverHistory.push(event);
-    this.emit('instanceFailure', event);
+    this.emit("instanceFailure", event);
 
     // Update circuit breaker
     this.updateCircuitBreaker(instanceId, true);
@@ -111,58 +124,68 @@ export class DistributedFailoverManager extends EventEmitter {
    */
   private async initiateFailover(failedInstanceId: string): Promise<void> {
     const event: FailoverEvent = {
-      type: 'failover_started',
+      type: "failover_started",
       instanceId: failedInstanceId,
       timestamp: Date.now(),
     };
 
     this.failoverHistory.push(event);
-    this.emit('failoverStarted', event);
+    this.emit("failoverStarted", event);
 
     try {
       // Find backup instances
       const backupInstances = await this.findBackupInstances(failedInstanceId);
 
       if (backupInstances.length === 0) {
-        throw new Error('No backup instances available');
+        throw new Error("No backup instances available");
       }
 
       // Attempt failover to first available backup
       for (const backupInstance of backupInstances) {
         try {
-          const success = await this.attemptFailover(failedInstanceId, backupInstance);
+          const success = await this.attemptFailover(
+            failedInstanceId,
+            backupInstance,
+          );
           if (success) {
             const successEvent: FailoverEvent = {
-              type: 'failover_completed',
+              type: "failover_completed",
               instanceId: failedInstanceId,
               timestamp: Date.now(),
               details: { backupInstance: backupInstance.id },
             };
 
             this.failoverHistory.push(successEvent);
-            this.emit('failoverCompleted', successEvent);
+            this.emit("failoverCompleted", successEvent);
             return;
           }
         } catch (error) {
-          console.error(`❌ Failover Manager: Failover attempt failed for ${backupInstance.id}:`, error);
+          console.error(
+            `❌ Failover Manager: Failover attempt failed for ${backupInstance.id}:`,
+            error,
+          );
         }
       }
 
       // All failover attempts failed
-      throw new Error('All failover attempts failed');
-
+      throw new Error("All failover attempts failed");
     } catch (error) {
-      console.error(`❌ Failover Manager: Failover failed for ${failedInstanceId}:`, error);
+      console.error(
+        `❌ Failover Manager: Failover failed for ${failedInstanceId}:`,
+        error,
+      );
 
       const failEvent: FailoverEvent = {
-        type: 'failover_failed',
+        type: "failover_failed",
         instanceId: failedInstanceId,
         timestamp: Date.now(),
-        details: { error: error instanceof Error ? error.message : String(error) },
+        details: {
+          error: error instanceof Error ? error.message : String(error),
+        },
       };
 
       this.failoverHistory.push(failEvent);
-      this.emit('failoverFailed', failEvent);
+      this.emit("failoverFailed", failEvent);
     }
   }
 
@@ -171,19 +194,24 @@ export class DistributedFailoverManager extends EventEmitter {
    */
   private async attemptFailover(
     failedInstanceId: string,
-    backupInstance: BackendInstance
+    backupInstance: BackendInstance,
   ): Promise<boolean> {
     try {
       // Check if backup instance is healthy
-      if (!await this.isInstanceHealthy(backupInstance.id)) {
+      if (!(await this.isInstanceHealthy(backupInstance.id))) {
         return false;
       }
 
       // Synchronize state from failed instance
-      const stateTransferred = await this.synchronizeInstanceState(failedInstanceId, backupInstance.id);
+      const stateTransferred = await this.synchronizeInstanceState(
+        failedInstanceId,
+        backupInstance.id,
+      );
 
       if (!stateTransferred) {
-        console.warn(`⚠️ Failover Manager: State synchronization failed for ${backupInstance.id}`);
+        console.warn(
+          `⚠️ Failover Manager: State synchronization failed for ${backupInstance.id}`,
+        );
       }
 
       // Transfer active sessions
@@ -193,11 +221,15 @@ export class DistributedFailoverManager extends EventEmitter {
       await this.updateRoutingTables(failedInstanceId, backupInstance.id);
 
       // Mark failover as successful
-      await this.stateManager.set(`failover:${failedInstanceId}:active`, backupInstance.id);
+      await this.stateManager.set(
+        `failover:${failedInstanceId}:active`,
+        backupInstance.id,
+      );
 
-      console.log(`✅ Failover Manager: Successfully failed over ${failedInstanceId} to ${backupInstance.id}`);
+      console.log(
+        `✅ Failover Manager: Successfully failed over ${failedInstanceId} to ${backupInstance.id}`,
+      );
       return true;
-
     } catch (error) {
       console.error(`❌ Failover Manager: Failover attempt failed:`, error);
       return false;
@@ -208,30 +240,34 @@ export class DistributedFailoverManager extends EventEmitter {
    * Handle instance recovery
    */
   async handleInstanceRecovery(instanceId: string): Promise<void> {
-    console.log(`🔄 Failover Manager: Instance recovery detected: ${instanceId}`);
+    console.log(
+      `🔄 Failover Manager: Instance recovery detected: ${instanceId}`,
+    );
 
     const event: FailoverEvent = {
-      type: 'recovery_started',
+      type: "recovery_started",
       instanceId,
       timestamp: Date.now(),
     };
 
     this.failoverHistory.push(event);
-    this.emit('recoveryStarted', event);
+    this.emit("recoveryStarted", event);
 
     try {
       // Wait for health check grace period
-      await new Promise(resolve =>
-        setTimeout(resolve, this.config.healthCheckGracePeriod)
+      await new Promise((resolve) =>
+        setTimeout(resolve, this.config.healthCheckGracePeriod),
       );
 
       // Verify instance is stable
-      if (!await this.verifyInstanceStability(instanceId)) {
-        throw new Error('Instance failed stability check');
+      if (!(await this.verifyInstanceStability(instanceId))) {
+        throw new Error("Instance failed stability check");
       }
 
       // Synchronize state back to recovered instance
-      const backupInstanceId = await this.stateManager.get<string>(`failover:${instanceId}:active`);
+      const backupInstanceId = await this.stateManager.get<string>(
+        `failover:${instanceId}:active`,
+      );
 
       if (backupInstanceId) {
         await this.synchronizeInstanceState(backupInstanceId, instanceId);
@@ -246,39 +282,46 @@ export class DistributedFailoverManager extends EventEmitter {
       this.updateCircuitBreaker(instanceId, false);
 
       const recoveryEvent: FailoverEvent = {
-        type: 'recovery_completed',
+        type: "recovery_completed",
         instanceId,
         timestamp: Date.now(),
       };
 
       this.failoverHistory.push(recoveryEvent);
-      this.emit('recoveryCompleted', recoveryEvent);
+      this.emit("recoveryCompleted", recoveryEvent);
 
-      console.log(`✅ Failover Manager: Instance recovery completed: ${instanceId}`);
-
+      console.log(
+        `✅ Failover Manager: Instance recovery completed: ${instanceId}`,
+      );
     } catch (error) {
-      console.error(`❌ Failover Manager: Instance recovery failed: ${instanceId}:`, error);
+      console.error(
+        `❌ Failover Manager: Instance recovery failed: ${instanceId}:`,
+        error,
+      );
     }
   }
 
   /**
    * Find suitable backup instances
    */
-  private async findBackupInstances(failedInstanceId: string): Promise<BackendInstance[]> {
+  private async findBackupInstances(
+    failedInstanceId: string,
+  ): Promise<BackendInstance[]> {
     const allInstances = await this.stateManager.getActiveInstances();
 
     // Filter healthy instances excluding the failed one
     const healthyInstances = allInstances
-      .filter(instance =>
-        instance.instanceId !== failedInstanceId &&
-        instance.status === 'healthy' &&
-        this.isCircuitBreakerClosed(instance.instanceId)
+      .filter(
+        (instance) =>
+          instance.instanceId !== failedInstanceId &&
+          instance.status === "healthy" &&
+          this.isCircuitBreakerClosed(instance.instanceId),
       )
       .sort((a, b) => a.loadFactor - b.loadFactor) // Sort by load (lowest first)
       .slice(0, this.config.backupInstanceCount);
 
     // Convert to BackendInstance format
-    return healthyInstances.map(instance => ({
+    return healthyInstances.map((instance) => ({
       id: instance.instanceId,
       host: this.extractHostFromInstanceId(instance.instanceId),
       port: 3000, // Default port
@@ -296,7 +339,7 @@ export class DistributedFailoverManager extends EventEmitter {
    */
   private async synchronizeInstanceState(
     fromInstanceId: string,
-    toInstanceId: string
+    toInstanceId: string,
   ): Promise<boolean> {
     try {
       // Get all state keys for the source instance
@@ -308,20 +351,26 @@ export class DistributedFailoverManager extends EventEmitter {
         const batch = stateKeys.slice(i, i + batchSize);
         await Promise.all(
           batch.map(async (key) => {
-            const value = await this.stateManager.get(key.replace(fromInstanceId, ''));
+            const value = await this.stateManager.get(
+              key.replace(fromInstanceId, ""),
+            );
             if (value !== undefined) {
               const newKey = key.replace(fromInstanceId, toInstanceId);
               await this.stateManager.set(newKey, value);
             }
-          })
+          }),
         );
       }
 
-      console.log(`🔄 Failover Manager: Synchronized ${stateKeys.length} state keys from ${fromInstanceId} to ${toInstanceId}`);
+      console.log(
+        `🔄 Failover Manager: Synchronized ${stateKeys.length} state keys from ${fromInstanceId} to ${toInstanceId}`,
+      );
       return true;
-
     } catch (error) {
-      console.error(`❌ Failover Manager: State synchronization failed:`, error);
+      console.error(
+        `❌ Failover Manager: State synchronization failed:`,
+        error,
+      );
       return false;
     }
   }
@@ -331,7 +380,7 @@ export class DistributedFailoverManager extends EventEmitter {
    */
   private async transferActiveSessions(
     fromInstanceId: string,
-    toInstanceId: string
+    toInstanceId: string,
   ): Promise<void> {
     // This would integrate with session management system
     // For now, notify via distributed state
@@ -340,7 +389,9 @@ export class DistributedFailoverManager extends EventEmitter {
       timestamp: Date.now(),
     });
 
-    console.log(`🔄 Failover Manager: Initiated session transfer from ${fromInstanceId} to ${toInstanceId}`);
+    console.log(
+      `🔄 Failover Manager: Initiated session transfer from ${fromInstanceId} to ${toInstanceId}`,
+    );
   }
 
   /**
@@ -348,12 +399,17 @@ export class DistributedFailoverManager extends EventEmitter {
    */
   private async updateRoutingTables(
     oldInstanceId: string,
-    newInstanceId: string
+    newInstanceId: string,
   ): Promise<void> {
-    await this.stateManager.set(`routing:${oldInstanceId}:redirect`, newInstanceId);
+    await this.stateManager.set(
+      `routing:${oldInstanceId}:redirect`,
+      newInstanceId,
+    );
     await this.stateManager.set(`routing:${newInstanceId}:active`, true);
 
-    console.log(`🔄 Failover Manager: Updated routing tables: ${oldInstanceId} → ${newInstanceId}`);
+    console.log(
+      `🔄 Failover Manager: Updated routing tables: ${oldInstanceId} → ${newInstanceId}`,
+    );
   }
 
   /**
@@ -365,7 +421,7 @@ export class DistributedFailoverManager extends EventEmitter {
     if (!breaker) {
       breaker = {
         instanceId,
-        state: 'closed',
+        state: "closed",
         failureCount: 0,
         lastFailureTime: 0,
         nextAttemptTime: 0,
@@ -378,14 +434,17 @@ export class DistributedFailoverManager extends EventEmitter {
       breaker.lastFailureTime = Date.now();
 
       if (breaker.failureCount >= this.config.circuitBreakerThreshold) {
-        breaker.state = 'open';
-        breaker.nextAttemptTime = Date.now() + this.config.circuitBreakerTimeout;
-        console.log(`🔴 Circuit Breaker: Opened for ${instanceId} (${breaker.failureCount} failures)`);
+        breaker.state = "open";
+        breaker.nextAttemptTime =
+          Date.now() + this.config.circuitBreakerTimeout;
+        console.log(
+          `🔴 Circuit Breaker: Opened for ${instanceId} (${breaker.failureCount} failures)`,
+        );
       }
     } else {
       // Success - reset failure count
       breaker.failureCount = 0;
-      breaker.state = 'closed';
+      breaker.state = "closed";
       console.log(`🟢 Circuit Breaker: Closed for ${instanceId}`);
     }
   }
@@ -394,13 +453,13 @@ export class DistributedFailoverManager extends EventEmitter {
     const breaker = this.circuitBreakers.get(instanceId);
     if (!breaker) return true;
 
-    if (breaker.state === 'open' && Date.now() > breaker.nextAttemptTime) {
+    if (breaker.state === "open" && Date.now() > breaker.nextAttemptTime) {
       // Try half-open state
-      breaker.state = 'half-open';
+      breaker.state = "half-open";
       return true;
     }
 
-    return breaker.state === 'closed' || breaker.state === 'half-open';
+    return breaker.state === "closed" || breaker.state === "half-open";
   }
 
   private startCircuitBreakerMonitoring(): void {
@@ -408,9 +467,9 @@ export class DistributedFailoverManager extends EventEmitter {
       const now = Date.now();
 
       for (const [instanceId, breaker] of this.circuitBreakers) {
-        if (breaker.state === 'half-open' && now > breaker.nextAttemptTime) {
+        if (breaker.state === "half-open" && now > breaker.nextAttemptTime) {
           // Reset to closed after successful half-open attempt
-          breaker.state = 'closed';
+          breaker.state = "closed";
           breaker.failureCount = 0;
           console.log(`🟡 Circuit Breaker: Reset to closed for ${instanceId}`);
         }
@@ -423,17 +482,25 @@ export class DistributedFailoverManager extends EventEmitter {
    */
   private watchInstanceHealth(): void {
     // Watch for health status changes
-    this.stateManager.watch('health:changed', async (healthData: InstanceHealth) => {
-      if (healthData.status === 'failed') {
-        await this.handleInstanceFailure(healthData.instanceId, 'Health check failed');
-      } else if (healthData.status === 'healthy') {
-        // Check if this was a recovery
-        const wasFailed = await this.stateManager.get(`failover:${healthData.instanceId}:active`);
-        if (wasFailed) {
-          await this.handleInstanceRecovery(healthData.instanceId);
+    this.stateManager.watch(
+      "health:changed",
+      async (healthData: InstanceHealth) => {
+        if (healthData.status === "failed") {
+          await this.handleInstanceFailure(
+            healthData.instanceId,
+            "Health check failed",
+          );
+        } else if (healthData.status === "healthy") {
+          // Check if this was a recovery
+          const wasFailed = await this.stateManager.get(
+            `failover:${healthData.instanceId}:active`,
+          );
+          if (wasFailed) {
+            await this.handleInstanceRecovery(healthData.instanceId);
+          }
         }
-      }
-    });
+      },
+    );
   }
 
   /**
@@ -441,8 +508,10 @@ export class DistributedFailoverManager extends EventEmitter {
    */
   private async isInstanceHealthy(instanceId: string): Promise<boolean> {
     try {
-      const health = await this.stateManager.get<InstanceHealth>(`health:${instanceId}`);
-      return health?.status === 'healthy' || false;
+      const health = await this.stateManager.get<InstanceHealth>(
+        `health:${instanceId}`,
+      );
+      return health?.status === "healthy" || false;
     } catch {
       return false;
     }
@@ -457,10 +526,10 @@ export class DistributedFailoverManager extends EventEmitter {
     const interval = 2000;
 
     for (let i = 0; i < checks; i++) {
-      if (!await this.isInstanceHealthy(instanceId)) {
+      if (!(await this.isInstanceHealthy(instanceId))) {
         return false;
       }
-      await new Promise(resolve => setTimeout(resolve, interval));
+      await new Promise((resolve) => setTimeout(resolve, interval));
     }
 
     return true;
@@ -468,7 +537,7 @@ export class DistributedFailoverManager extends EventEmitter {
 
   private extractHostFromInstanceId(instanceId: string): string {
     // Extract host from instance ID (simplified)
-    return 'localhost';
+    return "localhost";
   }
 
   private async getInstanceStateKeys(instanceId: string): Promise<string[]> {
@@ -487,19 +556,27 @@ export class DistributedFailoverManager extends EventEmitter {
     activeFailovers: number;
     circuitBreakersOpen: number;
   } {
-    const failovers = this.failoverHistory.filter(e => e.type === 'failover_completed');
-    const failed = this.failoverHistory.filter(e => e.type === 'failover_failed');
-    const active = this.failoverHistory.filter(e =>
-      e.type === 'failover_started' &&
-      !this.failoverHistory.some(fe =>
-        (fe.type === 'failover_completed' || fe.type === 'failover_failed') &&
-        fe.instanceId === e.instanceId &&
-        fe.timestamp > e.timestamp
-      )
+    const failovers = this.failoverHistory.filter(
+      (e) => e.type === "failover_completed",
+    );
+    const failed = this.failoverHistory.filter(
+      (e) => e.type === "failover_failed",
+    );
+    const active = this.failoverHistory.filter(
+      (e) =>
+        e.type === "failover_started" &&
+        !this.failoverHistory.some(
+          (fe) =>
+            (fe.type === "failover_completed" ||
+              fe.type === "failover_failed") &&
+            fe.instanceId === e.instanceId &&
+            fe.timestamp > e.timestamp,
+        ),
     );
 
-    const openBreakers = Array.from(this.circuitBreakers.values())
-      .filter(b => b.state === 'open').length;
+    const openBreakers = Array.from(this.circuitBreakers.values()).filter(
+      (b) => b.state === "open",
+    ).length;
 
     return {
       totalFailovers: failovers.length + failed.length,
@@ -532,14 +609,14 @@ export class DistributedFailoverManager extends EventEmitter {
     this.recoveryTimers.clear();
     this.healthCheckTimers.clear();
 
-    console.log('🛑 Failover Manager: Shutdown complete');
+    console.log("🛑 Failover Manager: Shutdown complete");
   }
 }
 
 // Factory function
 export const createDistributedFailoverManager = (
   config: Partial<FailoverConfig> = {},
-  stateManager: DistributedStateManager
+  stateManager: DistributedStateManager,
 ): DistributedFailoverManager => {
   return new DistributedFailoverManager(config, stateManager);
 };

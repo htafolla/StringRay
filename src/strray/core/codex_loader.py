@@ -21,6 +21,7 @@ logger = structlog.get_logger(__name__)
 
 from enum import Enum
 
+
 class CodexTerm(Enum):
     """Codex term identifiers."""
 
@@ -171,24 +172,123 @@ class CodexLoader:
         """Initialize term definitions for test compatibility."""
         self._term_definitions = {
             # Core terms
-            1: {"title": "Framework Foundation", "description": "Description for Framework Foundation", "category": "architecture", "severity": "critical", "dependencies": []},
-            2: {"title": "Agent Orchestration", "description": "Description for Agent Orchestration", "category": "architecture", "severity": "critical", "dependencies": [1]},
-            3: {"title": "State Management", "description": "Description for State Management", "category": "architecture", "severity": "medium", "dependencies": [1]},
-            4: {"title": "Communication Layer", "description": "Description for Communication Layer", "category": "architecture", "severity": "high", "dependencies": [1]},
-            5: {"title": "Error Prevention", "description": "Description for Error Prevention", "category": "quality", "severity": "critical", "dependencies": [1, 2]},
-            6: {"title": "Logging System", "description": "Description for Logging System", "category": "infrastructure", "severity": "medium", "dependencies": [1]},
-            7: {"title": "Data Validation", "description": "Description for Data Validation", "category": "quality", "severity": "high", "dependencies": [1]},
-            8: {"title": "Security Validation", "description": "Description for Security Validation", "category": "security", "severity": "critical", "dependencies": [1, 2]},
-            9: {"title": "Security Framework", "description": "Description for Security Framework", "category": "security", "severity": "critical", "dependencies": [1, 2]},
-            10: {"title": "Performance Monitoring", "description": "Description for Performance Monitoring", "category": "infrastructure", "severity": "medium", "dependencies": [1]},
-            11: {"title": "Configuration Management", "description": "Description for Configuration Management", "category": "infrastructure", "severity": "high", "dependencies": [1]},
-            12: {"title": "Task Scheduling", "description": "Description for Task Scheduling", "category": "architecture", "severity": "medium", "dependencies": [1, 2]},
-            13: {"title": "Resource Management", "description": "Description for Resource Management", "category": "infrastructure", "severity": "medium", "dependencies": [1]},
-            14: {"title": "API Integration", "description": "Description for API Integration", "category": "integration", "severity": "medium", "dependencies": [1, 4]},
-            15: {"title": "Deep Review", "description": "Description for Deep Review", "category": "quality", "severity": "medium", "dependencies": [1, 2, 5]},
-
+            1: {
+                "title": "Framework Foundation",
+                "description": "Description for Framework Foundation",
+                "category": "architecture",
+                "severity": "critical",
+                "dependencies": [],
+            },
+            2: {
+                "title": "Agent Orchestration",
+                "description": "Description for Agent Orchestration",
+                "category": "architecture",
+                "severity": "critical",
+                "dependencies": [1],
+            },
+            3: {
+                "title": "State Management",
+                "description": "Description for State Management",
+                "category": "architecture",
+                "severity": "medium",
+                "dependencies": [1],
+            },
+            4: {
+                "title": "Communication Layer",
+                "description": "Description for Communication Layer",
+                "category": "architecture",
+                "severity": "high",
+                "dependencies": [1],
+            },
+            5: {
+                "title": "Error Prevention",
+                "description": "Description for Error Prevention",
+                "category": "quality",
+                "severity": "critical",
+                "dependencies": [1, 2],
+            },
+            6: {
+                "title": "Logging System",
+                "description": "Description for Logging System",
+                "category": "infrastructure",
+                "severity": "medium",
+                "dependencies": [1],
+            },
+            7: {
+                "title": "Data Validation",
+                "description": "Description for Data Validation",
+                "category": "quality",
+                "severity": "high",
+                "dependencies": [1],
+            },
+            8: {
+                "title": "Security Validation",
+                "description": "Description for Security Validation",
+                "category": "security",
+                "severity": "critical",
+                "dependencies": [1, 2],
+            },
+            9: {
+                "title": "Security Framework",
+                "description": "Description for Security Framework",
+                "category": "security",
+                "severity": "critical",
+                "dependencies": [1, 2],
+            },
+            10: {
+                "title": "Performance Monitoring",
+                "description": "Description for Performance Monitoring",
+                "category": "infrastructure",
+                "severity": "medium",
+                "dependencies": [1],
+            },
+            11: {
+                "title": "Configuration Management",
+                "description": "Description for Configuration Management",
+                "category": "infrastructure",
+                "severity": "high",
+                "dependencies": [1],
+            },
+            12: {
+                "title": "Task Scheduling",
+                "description": "Description for Task Scheduling",
+                "category": "architecture",
+                "severity": "medium",
+                "dependencies": [1, 2],
+            },
+            13: {
+                "title": "Resource Management",
+                "description": "Description for Resource Management",
+                "category": "infrastructure",
+                "severity": "medium",
+                "dependencies": [1],
+            },
+            14: {
+                "title": "API Integration",
+                "description": "Description for API Integration",
+                "category": "integration",
+                "severity": "medium",
+                "dependencies": [1, 4],
+            },
+            15: {
+                "title": "Deep Review",
+                "description": "Description for Deep Review",
+                "category": "quality",
+                "severity": "medium",
+                "dependencies": [1, 2, 5],
+            },
             # Additional terms for comprehensive testing
-            **{i: {"title": f"Term {i}", "description": f"Description for Term {i}", "category": "advanced", "severity": "medium", "dependencies": []} for i in range(16, 44) if i not in [38, 39]}
+            **{
+                i: {
+                    "title": f"Term {i}",
+                    "description": f"Description for Term {i}",
+                    "category": "advanced",
+                    "severity": "medium",
+                    "dependencies": [],
+                }
+                for i in range(16, 44)
+                if i not in [38, 39]
+            },
         }
 
     def _find_codex_path(self) -> Optional[Path]:

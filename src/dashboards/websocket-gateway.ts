@@ -14,7 +14,10 @@ import WebSocket from "ws";
 import { IncomingMessage } from "http";
 import * as zlib from "zlib";
 import { realTimeStreamingService } from "../streaming/real-time-streaming-service.js";
-import { liveMetricsCollector, CollectedMetric } from "./live-metrics-collector.js";
+import {
+  liveMetricsCollector,
+  CollectedMetric,
+} from "./live-metrics-collector.js";
 import { alertEngine, Alert } from "./alert-engine.js";
 
 export interface DashboardConnection {
@@ -43,7 +46,14 @@ export interface DashboardSubscription {
 }
 
 export interface DashboardMessage {
-  type: "subscribe" | "unsubscribe" | "auth" | "ping" | "metrics" | "alert" | "system";
+  type:
+    | "subscribe"
+    | "unsubscribe"
+    | "auth"
+    | "ping"
+    | "metrics"
+    | "alert"
+    | "system";
   id?: string;
   data: any;
   timestamp: number;
@@ -86,7 +96,10 @@ export interface GatewayStats {
 export class WebSocketGateway extends EventEmitter {
   private config: WebSocketGatewayConfig;
   private connections = new Map<string, DashboardConnection>();
-  private messageRates = new Map<string, { count: number; resetTime: number }>();
+  private messageRates = new Map<
+    string,
+    { count: number; resetTime: number }
+  >();
   private stats: GatewayStats;
   private startTime: number;
   private isRunning = false;
@@ -284,7 +297,9 @@ export class WebSocketGateway extends EventEmitter {
       }
 
       this.stats.messagesReceived++;
-      this.stats.bytesReceived += Buffer.isBuffer(data) ? data.length : data.toString().length;
+      this.stats.bytesReceived += Buffer.isBuffer(data)
+        ? data.length
+        : data.toString().length;
 
       // Handle different message types
       switch (message.type) {
@@ -308,7 +323,10 @@ export class WebSocketGateway extends EventEmitter {
           this.emit("message", { connectionId, message });
       }
     } catch (error) {
-      console.error(`Error handling dashboard message from ${connectionId}:`, error);
+      console.error(
+        `Error handling dashboard message from ${connectionId}:`,
+        error,
+      );
       this.sendToConnection(connectionId, {
         type: "system",
         data: { type: "error", message: "Invalid message format" },
@@ -342,7 +360,10 @@ export class WebSocketGateway extends EventEmitter {
   /**
    * Handle subscription request
    */
-  private handleSubscription(connectionId: string, message: DashboardMessage): void {
+  private handleSubscription(
+    connectionId: string,
+    message: DashboardMessage,
+  ): void {
     const connection = this.connections.get(connectionId);
     if (!connection) return;
 
@@ -354,11 +375,15 @@ export class WebSocketGateway extends EventEmitter {
     };
 
     // Remove existing subscription with same ID
-    connection.subscriptions = connection.subscriptions.filter(s => s.id !== subscription.id);
+    connection.subscriptions = connection.subscriptions.filter(
+      (s) => s.id !== subscription.id,
+    );
     connection.subscriptions.push(subscription);
     this.stats.subscriptionsActive++;
 
-    console.log(`📡 Dashboard ${connectionId} subscribed to ${subscription.type}`);
+    console.log(
+      `📡 Dashboard ${connectionId} subscribed to ${subscription.type}`,
+    );
 
     this.sendToConnection(connectionId, {
       type: "system",
@@ -374,25 +399,35 @@ export class WebSocketGateway extends EventEmitter {
   /**
    * Handle unsubscription request
    */
-  private handleUnsubscription(connectionId: string, message: DashboardMessage): void {
+  private handleUnsubscription(
+    connectionId: string,
+    message: DashboardMessage,
+  ): void {
     const connection = this.connections.get(connectionId);
     if (!connection) return;
 
     const subscriptionId = message.data.subscriptionId;
     const initialLength = connection.subscriptions.length;
-    connection.subscriptions = connection.subscriptions.filter(s => s.id !== subscriptionId);
+    connection.subscriptions = connection.subscriptions.filter(
+      (s) => s.id !== subscriptionId,
+    );
     const removed = initialLength - connection.subscriptions.length;
 
     if (removed > 0) {
       this.stats.subscriptionsActive -= removed;
-      console.log(`📡 Dashboard ${connectionId} unsubscribed from ${subscriptionId}`);
+      console.log(
+        `📡 Dashboard ${connectionId} unsubscribed from ${subscriptionId}`,
+      );
     }
   }
 
   /**
    * Handle authentication
    */
-  private handleAuthentication(connectionId: string, message: DashboardMessage): void {
+  private handleAuthentication(
+    connectionId: string,
+    message: DashboardMessage,
+  ): void {
     const connection = this.connections.get(connectionId);
     if (!connection) return;
 
@@ -407,7 +442,11 @@ export class WebSocketGateway extends EventEmitter {
 
       this.sendToConnection(connectionId, {
         type: "system",
-        data: { type: "auth-success", userId, permissions: connection.permissions },
+        data: {
+          type: "auth-success",
+          userId,
+          permissions: connection.permissions,
+        },
         timestamp: Date.now(),
       });
     } else {
@@ -501,11 +540,17 @@ export class WebSocketGateway extends EventEmitter {
   /**
    * Check if metric should be sent to connection
    */
-  private shouldSendMetricToConnection(connection: DashboardConnection, metric: CollectedMetric): boolean {
+  private shouldSendMetricToConnection(
+    connection: DashboardConnection,
+    metric: CollectedMetric,
+  ): boolean {
     if (!connection.authenticated && this.config.authRequired) return false;
 
     const relevantSubscriptions = connection.subscriptions.filter(
-      sub => sub.type === "metrics" || sub.type === "performance" || sub.type === "system"
+      (sub) =>
+        sub.type === "metrics" ||
+        sub.type === "performance" ||
+        sub.type === "system",
     );
 
     if (relevantSubscriptions.length === 0) return false;
@@ -530,11 +575,14 @@ export class WebSocketGateway extends EventEmitter {
   /**
    * Check if alert should be sent to connection
    */
-  private shouldSendAlertToConnection(connection: DashboardConnection, alert: Alert): boolean {
+  private shouldSendAlertToConnection(
+    connection: DashboardConnection,
+    alert: Alert,
+  ): boolean {
     if (!connection.authenticated && this.config.authRequired) return false;
 
     const relevantSubscriptions = connection.subscriptions.filter(
-      sub => sub.type === "alerts" || sub.type === "system"
+      (sub) => sub.type === "alerts" || sub.type === "system",
     );
 
     if (relevantSubscriptions.length === 0) return false;
@@ -551,7 +599,10 @@ export class WebSocketGateway extends EventEmitter {
   /**
    * Check if metric matches subscription filters
    */
-  private matchesSubscriptionFilters(subscription: DashboardSubscription, metric: CollectedMetric): boolean {
+  private matchesSubscriptionFilters(
+    subscription: DashboardSubscription,
+    metric: CollectedMetric,
+  ): boolean {
     // Check metric pattern
     if (subscription.filters.metricPattern) {
       const pattern = new RegExp(subscription.filters.metricPattern);
@@ -577,9 +628,15 @@ export class WebSocketGateway extends EventEmitter {
   /**
    * Check if alert matches subscription filters
    */
-  private matchesAlertSubscriptionFilters(subscription: DashboardSubscription, alert: Alert): boolean {
+  private matchesAlertSubscriptionFilters(
+    subscription: DashboardSubscription,
+    alert: Alert,
+  ): boolean {
     // Check severity filter
-    if (subscription.filters.severity && subscription.filters.severity.length > 0) {
+    if (
+      subscription.filters.severity &&
+      subscription.filters.severity.length > 0
+    ) {
       if (!subscription.filters.severity.includes(alert.severity)) return false;
     }
 
@@ -596,7 +653,10 @@ export class WebSocketGateway extends EventEmitter {
   /**
    * Send message to specific connection
    */
-  private sendToConnection(connectionId: string, message: DashboardMessage): void {
+  private sendToConnection(
+    connectionId: string,
+    message: DashboardMessage,
+  ): void {
     const connection = this.connections.get(connectionId);
     if (!connection || connection.ws.readyState !== WebSocket.OPEN) {
       return;
@@ -616,9 +676,14 @@ export class WebSocketGateway extends EventEmitter {
 
       connection.ws.send(dataToSend);
       this.stats.messagesSent++;
-      this.stats.bytesSent += Buffer.isBuffer(dataToSend) ? dataToSend.length : dataToSend.length;
+      this.stats.bytesSent += Buffer.isBuffer(dataToSend)
+        ? dataToSend.length
+        : dataToSend.length;
     } catch (error) {
-      console.error(`Error sending message to dashboard ${connectionId}:`, error);
+      console.error(
+        `Error sending message to dashboard ${connectionId}:`,
+        error,
+      );
     }
   }
 
@@ -639,7 +704,7 @@ export class WebSocketGateway extends EventEmitter {
   private startHeartbeatMonitoring(): void {
     setInterval(() => {
       const now = Date.now();
-      const timeoutThreshold = now - (this.config.heartbeatInterval * 2);
+      const timeoutThreshold = now - this.config.heartbeatInterval * 2;
 
       for (const [connectionId, connection] of this.connections) {
         if (connection.heartbeat < timeoutThreshold) {
@@ -674,7 +739,8 @@ export class WebSocketGateway extends EventEmitter {
 
     // Calculate compression ratio
     if (this.stats.messagesSent > 0) {
-      this.stats.compressionRatio = this.stats.bytesSent / (this.stats.messagesSent * 100);
+      this.stats.compressionRatio =
+        this.stats.bytesSent / (this.stats.messagesSent * 100);
     }
 
     return { ...this.stats };

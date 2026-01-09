@@ -81,22 +81,10 @@ class ModelRouter:
 
     def _get_agent_model(self, agent_type: str) -> Optional[str]:
         """Get model specific to agent type."""
-        agent_models = self.config.get("agent_models", {})
+        model_routing = self.config.get("model_routing", {})
 
-        # Map agent types to model keys
-        model_mapping = {
-            "librarian": "librarian",
-            "explore": "explore",
-            "frontend_ui_ux_engineer": "ui_engineer",
-            "document_writer": "document_writer",
-            "multimodal_looker": "multimodal_looker",
-        }
-
-        model_key = model_mapping.get(agent_type)
-        if model_key:
-            return agent_models.get(f"{model_key}_model")
-
-        return None
+        # Direct mapping from agent type to model
+        return model_routing.get(agent_type)
 
     def _is_model_available(self, model: str) -> bool:
         """Check if model is available and not deprecated."""

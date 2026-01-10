@@ -1,6 +1,6 @@
 /**
  * StrRay Framework - JSON Codex Integration Tests (Mock-Based)
- * 
+ *
  * Tests JSON codex parsing and integration using real utilities but mocked plugin behavior
  * to avoid ES6 import conflicts when running directly with Node.js.
  */
@@ -43,8 +43,8 @@ const validJsonCodex = JSON.stringify({
       category: "extended",
       zeroTolerance: true,
       enforcementLevel: "blocking",
-    }
-  }
+    },
+  },
 });
 
 const invalidJsonCodex = `{
@@ -83,7 +83,7 @@ describe.skip("JSON Codex Integration", () => {
   describe("JSON Codex Parsing", () => {
     test("should parse valid JSON codex content", () => {
       const result = parseCodexContent(validJsonCodex);
-      
+
       expect(result.success).toBe(true);
       expect(result.data).toHaveProperty("version", "1.2.22");
       expect(result.data).toHaveProperty("terms");
@@ -107,7 +107,7 @@ describe.skip("JSON Codex Integration", () => {
 
     test("should extract metadata from valid JSON", () => {
       const metadata = extractCodexMetadata(validJsonCodex);
-      
+
       expect(metadata).toHaveProperty("version", "1.2.22");
       expect(metadata).toHaveProperty("termCount", 3);
       expect(metadata).toHaveProperty("categories");
@@ -120,10 +120,10 @@ describe.skip("JSON Codex Integration", () => {
         version: "1.2.22",
         terms: {
           "1": { number: 1, title: "Test 1" },
-          "2": { number: 2, title: "Test 2" }
-        }
+          "2": { number: 2, title: "Test 2" },
+        },
       });
-      
+
       const result = parseCodexContent(mixedKeyJson);
       expect(result.success).toBe(true);
       expect(result.data.terms).toHaveProperty("1");
@@ -136,24 +136,24 @@ describe.skip("JSON Codex Integration", () => {
       // Mock fs to return our test codex
       const mockFs = {
         existsSync: vi.fn(() => true),
-        readFileSync: vi.fn(() => validJsonCodex)
+        readFileSync: vi.fn(() => validJsonCodex),
       };
-      
+
       // Temporarily replace fs methods
       const originalExistsSync = require("fs").existsSync;
       const originalReadFileSync = require("fs").readFileSync;
-      
+
       require("fs").existsSync = mockFs.existsSync;
       require("fs").readFileSync = mockFs.readFileSync;
-      
+
       try {
         const result = await contextLoader.loadCodexContext(testProjectRoot);
-        
+
         expect(result.success).toBe(true);
         expect(result.context).toBeDefined();
         expect(Array.isArray(result.context)).toBe(true);
         expect(result.context!.length).toBeGreaterThan(0);
-        
+
         // Check that the loaded context contains our test data
         const firstEntry = result.context![0];
         expect(firstEntry).toHaveProperty("source");
@@ -171,18 +171,20 @@ describe.skip("JSON Codex Integration", () => {
       // Mock fs to return no files found
       const mockFs = {
         existsSync: vi.fn(() => false),
-        readFileSync: vi.fn(() => { throw new Error("File not found"); })
+        readFileSync: vi.fn(() => {
+          throw new Error("File not found");
+        }),
       };
-      
+
       const originalExistsSync = require("fs").existsSync;
       const originalReadFileSync = require("fs").readFileSync;
-      
+
       require("fs").existsSync = mockFs.existsSync;
       require("fs").readFileSync = mockFs.readFileSync;
-      
+
       try {
         const result = await contextLoader.loadCodexContext(testProjectRoot);
-        
+
         expect(result.success).toBe(false);
         expect(result.error).toContain("No codex files found");
         expect(result.warnings).toBeDefined();
@@ -197,18 +199,18 @@ describe.skip("JSON Codex Integration", () => {
       // Mock fs to return invalid JSON
       const mockFs = {
         existsSync: vi.fn(() => true),
-        readFileSync: vi.fn(() => invalidJsonCodex)
+        readFileSync: vi.fn(() => invalidJsonCodex),
       };
-      
+
       const originalExistsSync = require("fs").existsSync;
       const originalReadFileSync = require("fs").readFileSync;
-      
+
       require("fs").existsSync = mockFs.existsSync;
       require("fs").readFileSync = mockFs.readFileSync;
-      
+
       try {
         const result = await contextLoader.loadCodexContext(testProjectRoot);
-        
+
         expect(result.success).toBe(false);
         expect(result.error).toContain("JSON");
         expect(result.warnings).toBeDefined();
@@ -225,12 +227,12 @@ describe.skip("JSON Codex Integration", () => {
       const mockPluginHook = {
         "tool.execute.before": async (input: any) => {
           const content = input.args?.content || "";
-          
+
           // Simulate codex enforcement
           if (content.includes("TODO")) {
             throw new Error("Codex violation: TODO comments not allowed");
           }
-          
+
           if (content.includes(": any")) {
             throw new Error("Codex violation: any type not allowed");
           }
@@ -241,20 +243,35 @@ describe.skip("JSON Codex Integration", () => {
             output.output = `📚 Codex Context: ${validJsonCodex.substring(0, 50)}...\n${output.output}`;
           }
           return output;
-        }
+        },
       };
 
       // Test valid content
-      const validInput = { tool: "edit", args: { content: "const x: string = 'test';" } };
-      await expect(mockPluginHook["tool.execute.before"](validInput)).resolves.toBeUndefined();
+      const validInput = {
+        tool: "edit",
+        args: { content: "const x: string = 'test';" },
+      };
+      await expect(
+        mockPluginHook["tool.execute.before"](validInput),
+      ).resolves.toBeUndefined();
 
       // Test invalid content (TODO)
-      const invalidInput1 = { tool: "edit", args: { content: "// TODO: fix this" } };
-      await expect(mockPluginHook["tool.execute.before"](invalidInput1)).rejects.toThrow("TODO");
+      const invalidInput1 = {
+        tool: "edit",
+        args: { content: "// TODO: fix this" },
+      };
+      await expect(
+        mockPluginHook["tool.execute.before"](invalidInput1),
+      ).rejects.toThrow("TODO");
 
       // Test invalid content (any type)
-      const invalidInput2 = { tool: "edit", args: { content: "const x: any = 'test';" } };
-      await expect(mockPluginHook["tool.execute.before"](invalidInput2)).rejects.toThrow("any");
+      const invalidInput2 = {
+        tool: "edit",
+        args: { content: "const x: any = 'test';" },
+      };
+      await expect(
+        mockPluginHook["tool.execute.before"](invalidInput2),
+      ).rejects.toThrow("any");
 
       // Test output injection
       const testOutput = { output: "original content" };
@@ -267,10 +284,12 @@ describe.skip("JSON Codex Integration", () => {
       const mockPluginHook = {
         "tool.execute.before": async () => {
           throw new Error("Plugin hook failed");
-        }
+        },
       };
 
-      await expect(mockPluginHook["tool.execute.before"]({})).rejects.toThrow("Plugin hook failed");
+      await expect(mockPluginHook["tool.execute.before"]({})).rejects.toThrow(
+        "Plugin hook failed",
+      );
     });
   });
 
@@ -285,13 +304,15 @@ describe.skip("JSON Codex Integration", () => {
       expect(metadata.termCount).toBe(3);
 
       // Step 3: Simulate context loading
-      const mockContext = [{
-        id: "test-codex",
-        source: "/test/codex.json",
-        content: validJsonCodex,
-        metadata: metadata,
-        priority: "critical"
-      }];
+      const mockContext = [
+        {
+          id: "test-codex",
+          source: "/test/codex.json",
+          content: validJsonCodex,
+          metadata: metadata,
+          priority: "critical",
+        },
+      ];
 
       expect(mockContext).toHaveLength(1);
       expect(mockContext[0].metadata.version).toBe("1.2.22");

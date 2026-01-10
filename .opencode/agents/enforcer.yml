@@ -1,0 +1,91 @@
+name: enforcer
+description: "Enforcer agent for codex compliance and error prevention"
+version: "1.0.0"
+model: opencode/grok-code
+
+# Logging Configuration
+logging:
+  level: warn
+  format: json
+  destinations:
+    - console
+    - file
+    - monitoring
+  retention_days: 90
+  sensitive_data_filtering: true
+  audit_trail: true
+
+# Processor Pipeline Configuration
+processor_pipeline:
+  - name: codex-validation
+    type: validation
+    priority: critical
+    timeout_ms: 10000
+    retry_attempts: 3
+  - name: error-prevention
+    type: validation
+    priority: critical
+    timeout_ms: 8000
+    retry_attempts: 3
+  - name: compliance-monitoring
+    type: monitoring
+    priority: high
+    timeout_ms: 5000
+    retry_attempts: 2
+  - name: threshold-enforcement
+    type: enforcement
+    priority: high
+    timeout_ms: 12000
+    retry_attempts: 2
+
+# Agent Capabilities
+capabilities:
+  - codex-compliance-validation
+  - error-prevention
+  - threshold-enforcement
+  - automation-orchestration
+  - quality-gate-enforcement
+
+# Error Handling Configuration
+error_handling:
+  retry_attempts: 3
+  circuit_breaker:
+    enabled: true
+    failure_threshold: 3
+    recovery_timeout_ms: 30000
+  fallback_strategy: strict
+  alert_on_failure: true
+
+# Performance Configuration
+performance:
+  timeout_ms: 25000
+  concurrency_limit: 5
+  memory_limit_mb: 128
+  cpu_limit_percent: 30
+
+# Integration Hooks
+integration:
+  pre_commit: true
+  post_commit: true
+  daily_scan: true
+  deployment_validation: true
+  webhook_endpoints:
+    - url: "https://compliance-monitoring.example.com/webhook"
+      events: ["policy_violation", "threshold_exceeded"]
+
+# Security Configuration
+security:
+  sandboxed_execution: true
+  permission_level: elevated
+  data_classification: internal
+  encryption_required: false
+
+# Monitoring Configuration
+monitoring:
+  metrics_collection: true
+  health_checks: true
+  performance_tracking: true
+  alert_thresholds:
+    response_time_ms: 20000
+    error_rate_percent: 2
+    memory_usage_mb: 100

@@ -175,7 +175,11 @@ export class BootOrchestrator {
    */
   private async activateProcessors(): Promise<boolean> {
     try {
-      frameworkLogger.log("boot-orchestrator", "activateProcessors started", "info");
+      frameworkLogger.log(
+        "boot-orchestrator",
+        "activateProcessors started",
+        "info",
+      );
 
       this.processorManager.registerProcessor({
         name: "preValidate",
@@ -183,7 +187,11 @@ export class BootOrchestrator {
         priority: 10,
         enabled: true,
       });
-      frameworkLogger.log("boot-orchestrator", "registered preValidate processor", "success");
+      frameworkLogger.log(
+        "boot-orchestrator",
+        "registered preValidate processor",
+        "success",
+      );
 
       this.processorManager.registerProcessor({
         name: "codexCompliance",
@@ -191,7 +199,11 @@ export class BootOrchestrator {
         priority: 20,
         enabled: true,
       });
-      frameworkLogger.log("boot-orchestrator", "registered codexCompliance processor", "success");
+      frameworkLogger.log(
+        "boot-orchestrator",
+        "registered codexCompliance processor",
+        "success",
+      );
 
       this.processorManager.registerProcessor({
         name: "errorBoundary",
@@ -199,7 +211,11 @@ export class BootOrchestrator {
         priority: 30,
         enabled: true,
       });
-      frameworkLogger.log("boot-orchestrator", "registered errorBoundary processor", "success");
+      frameworkLogger.log(
+        "boot-orchestrator",
+        "registered errorBoundary processor",
+        "success",
+      );
 
       this.processorManager.registerProcessor({
         name: "stateValidation",
@@ -207,24 +223,45 @@ export class BootOrchestrator {
         priority: 130,
         enabled: true,
       });
-      frameworkLogger.log("boot-orchestrator", "registered stateValidation processor", "success");
+      frameworkLogger.log(
+        "boot-orchestrator",
+        "registered stateValidation processor",
+        "success",
+      );
 
       const initSuccess = await this.processorManager.initializeProcessors();
       if (!initSuccess) {
-        frameworkLogger.log("boot-orchestrator", "processor initialization failed", "error");
+        frameworkLogger.log(
+          "boot-orchestrator",
+          "processor initialization failed",
+          "error",
+        );
         throw new Error("Processor initialization failed");
       }
 
-      frameworkLogger.log("boot-orchestrator", "processors initialized successfully", "success");
+      frameworkLogger.log(
+        "boot-orchestrator",
+        "processors initialized successfully",
+        "success",
+      );
 
       this.stateManager.set("processor:manager", this.processorManager);
       this.stateManager.set("processor:active", true);
 
-      frameworkLogger.log("boot-orchestrator", "processors activated and stored in state", "success");
+      frameworkLogger.log(
+        "boot-orchestrator",
+        "processors activated and stored in state",
+        "success",
+      );
 
       return true;
     } catch (error) {
-      frameworkLogger.log("boot-orchestrator", "activateProcessors failed", "error", error);
+      frameworkLogger.log(
+        "boot-orchestrator",
+        "activateProcessors failed",
+        "error",
+        error,
+      );
       console.error("❌ Failed to activate processors:", error);
       return false;
     }
@@ -449,7 +486,11 @@ export class BootOrchestrator {
    * Execute the boot sequence (internal framework initialization)
    */
   async executeBootSequence(): Promise<BootResult> {
-    frameworkLogger.log("boot-orchestrator", "executeBootSequence started", "info");
+    frameworkLogger.log(
+      "boot-orchestrator",
+      "executeBootSequence started",
+      "info",
+    );
 
     const result: BootResult = {
       success: false,
@@ -463,27 +504,55 @@ export class BootOrchestrator {
     };
 
     try {
-      frameworkLogger.log("boot-orchestrator", "loading StrRay configuration", "info");
+      frameworkLogger.log(
+        "boot-orchestrator",
+        "loading StrRay configuration",
+        "info",
+      );
       // Phase 0: Load StrRay configuration from Python ConfigManager
       await this.loadStrRayConfiguration();
-      frameworkLogger.log("boot-orchestrator", "StrRay configuration loaded", "success");
+      frameworkLogger.log(
+        "boot-orchestrator",
+        "StrRay configuration loaded",
+        "success",
+      );
       // Phase 1: Initialize core systems
-      frameworkLogger.log("boot-orchestrator", "initializing core systems", "info");
+      frameworkLogger.log(
+        "boot-orchestrator",
+        "initializing core systems",
+        "info",
+      );
       result.orchestratorLoaded = await this.loadOrchestrator();
       if (!result.orchestratorLoaded) {
-        frameworkLogger.log("boot-orchestrator", "orchestrator loading failed", "error");
+        frameworkLogger.log(
+          "boot-orchestrator",
+          "orchestrator loading failed",
+          "error",
+        );
         result.errors.push("Failed to load orchestrator");
         return result;
       }
-      frameworkLogger.log("boot-orchestrator", "orchestrator loaded successfully", "success");
+      frameworkLogger.log(
+        "boot-orchestrator",
+        "orchestrator loaded successfully",
+        "success",
+      );
 
       const delegationInitialized = await this.initializeDelegationSystem();
       if (!delegationInitialized) {
-        frameworkLogger.log("boot-orchestrator", "delegation system initialization failed", "error");
+        frameworkLogger.log(
+          "boot-orchestrator",
+          "delegation system initialization failed",
+          "error",
+        );
         result.errors.push("Failed to initialize delegation system");
         return result;
       }
-      frameworkLogger.log("boot-orchestrator", "delegation system initialized", "success");
+      frameworkLogger.log(
+        "boot-orchestrator",
+        "delegation system initialized",
+        "success",
+      );
 
       // Phase 2: Session management
       if (this.config.sessionManagement) {
@@ -497,23 +566,43 @@ export class BootOrchestrator {
 
       // Phase 3: Processors
       if (this.config.processorActivation) {
-        frameworkLogger.log("boot-orchestrator", "activating processors", "info");
+        frameworkLogger.log(
+          "boot-orchestrator",
+          "activating processors",
+          "info",
+        );
         result.processorsActivated = await this.activateProcessors();
         if (!result.processorsActivated) {
-          frameworkLogger.log("boot-orchestrator", "processor activation failed", "error");
+          frameworkLogger.log(
+            "boot-orchestrator",
+            "processor activation failed",
+            "error",
+          );
           result.errors.push("Failed to activate processors");
           return result;
         }
-        frameworkLogger.log("boot-orchestrator", "processors activated successfully", "success");
+        frameworkLogger.log(
+          "boot-orchestrator",
+          "processors activated successfully",
+          "success",
+        );
 
         // Validate processor health
         const healthValid = await this.validateProcessorHealth();
         if (!healthValid) {
-          frameworkLogger.log("boot-orchestrator", "processor health validation failed", "error");
+          frameworkLogger.log(
+            "boot-orchestrator",
+            "processor health validation failed",
+            "error",
+          );
           result.errors.push("Processor health validation failed");
           return result;
         }
-        frameworkLogger.log("boot-orchestrator", "processor health validated", "success");
+        frameworkLogger.log(
+          "boot-orchestrator",
+          "processor health validated",
+          "success",
+        );
       }
 
       // Phase 4: Load agents

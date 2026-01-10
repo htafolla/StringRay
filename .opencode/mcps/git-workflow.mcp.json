@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "git-workflow": {
+      "command": "node",
+      "args": ["mcps/git-workflow.server.js"]
+    }
+  }
+}

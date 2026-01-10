@@ -1,6 +1,6 @@
 /**
  * StrRay Framework - Framework Initialization Integration Tests (Mock-Based)
- * 
+ *
  * Tests framework initialization using real state/context components but mocked plugin behavior
  * to avoid ES6 import conflicts when running directly with Node.js.
  */
@@ -24,13 +24,17 @@ const createMockStrRayCodexInjectorHook = () => {
           throw new Error("Codex violation detected");
         }
       },
-      "tool.execute.after": async (input: any, output: any, sessionId: string) => {
+      "tool.execute.after": async (
+        input: any,
+        output: any,
+        sessionId: string,
+      ) => {
         if (output && output.output) {
           output.output = `📚 Codex Context: Framework initialized\n${output.output}`;
         }
         return output;
-      }
-    }
+      },
+    },
   };
 };
 
@@ -77,31 +81,31 @@ describe.skip("StrRay Framework Initialization Integration", () => {
         sessionId: testSessionId,
         codexLoaded: true,
         agentCount: 11,
-        lastActivity: new Date().toISOString()
+        lastActivity: new Date().toISOString(),
       };
 
       // Save state
       await stateManager.saveState(testSessionId, testState);
-      
+
       // Load state
       const loadedState = await stateManager.loadState(testSessionId);
-      
+
       expect(loadedState).toEqual(testState);
     });
 
     test("should handle state persistence across sessions", async () => {
       const session1 = "session-1";
       const session2 = "session-2";
-      
+
       const state1 = { data: "session1-data" };
       const state2 = { data: "session2-data" };
-      
+
       await stateManager.saveState(session1, state1);
       await stateManager.saveState(session2, state2);
-      
+
       const loaded1 = await stateManager.loadState(session1);
       const loaded2 = await stateManager.loadState(session2);
-      
+
       expect(loaded1).toEqual(state1);
       expect(loaded2).toEqual(state2);
       expect(loaded1).not.toEqual(loaded2);
@@ -119,25 +123,25 @@ describe.skip("StrRay Framework Initialization Integration", () => {
       const mockCodexContent = JSON.stringify({
         version: "1.2.22",
         terms: {
-          "1": { title: "Test Term", description: "Test description" }
-        }
+          "1": { title: "Test Term", description: "Test description" },
+        },
       });
 
       const mockFs = {
         existsSync: vi.fn(() => true),
-        readFileSync: vi.fn(() => mockCodexContent)
+        readFileSync: vi.fn(() => mockCodexContent),
       };
 
       // Temporarily replace fs
       const originalExistsSync = require("fs").existsSync;
       const originalReadFileSync = require("fs").readFileSync;
-      
+
       require("fs").existsSync = mockFs.existsSync;
       require("fs").readFileSync = mockFs.readFileSync;
 
       try {
         const result = await contextLoader.loadCodexContext(process.cwd());
-        
+
         expect(result.success).toBe(true);
         expect(result.context).toBeDefined();
         expect(Array.isArray(result.context)).toBe(true);
@@ -153,18 +157,20 @@ describe.skip("StrRay Framework Initialization Integration", () => {
       // Mock fs to simulate file errors
       const mockFs = {
         existsSync: vi.fn(() => true),
-        readFileSync: vi.fn(() => { throw new Error("File read error"); })
+        readFileSync: vi.fn(() => {
+          throw new Error("File read error");
+        }),
       };
 
       const originalExistsSync = require("fs").existsSync;
       const originalReadFileSync = require("fs").readFileSync;
-      
+
       require("fs").existsSync = mockFs.existsSync;
       require("fs").readFileSync = mockFs.readFileSync;
 
       try {
         const result = await contextLoader.loadCodexContext(process.cwd());
-        
+
         expect(result.success).toBe(false);
         expect(result.error).toBeDefined();
         expect(result.warnings).toBeDefined();
@@ -179,28 +185,39 @@ describe.skip("StrRay Framework Initialization Integration", () => {
     test("should simulate framework initialization sequence", async () => {
       // Step 1: Initialize state manager
       expect(stateManager).toBeDefined();
-      
+
       // Step 2: Initialize context loader
       expect(contextLoader).toBeDefined();
-      
+
       // Step 3: Initialize plugin hooks
       expect(mockCodexHook.hooks["agent.start"]).toBeDefined();
       expect(mockCodexHook.hooks["tool.execute.before"]).toBeDefined();
       expect(mockCodexHook.hooks["tool.execute.after"]).toBeDefined();
-      
+
       // Step 4: Simulate agent startup
       await mockCodexHook.hooks["agent.start"](testSessionId);
-      
+
       // Step 5: Simulate tool execution with codex enforcement
       const validInput = { tool: "read", args: { path: "/test/file.ts" } };
-      await expect(mockCodexHook.hooks["tool.execute.before"](validInput, testSessionId)).resolves.toBeUndefined();
-      
-      const invalidInput = { tool: "edit", args: { content: "// TODO: fix this" } };
-      await expect(mockCodexHook.hooks["tool.execute.before"](invalidInput, testSessionId)).rejects.toThrow("Codex violation");
-      
+      await expect(
+        mockCodexHook.hooks["tool.execute.before"](validInput, testSessionId),
+      ).resolves.toBeUndefined();
+
+      const invalidInput = {
+        tool: "edit",
+        args: { content: "// TODO: fix this" },
+      };
+      await expect(
+        mockCodexHook.hooks["tool.execute.before"](invalidInput, testSessionId),
+      ).rejects.toThrow("Codex violation");
+
       // Step 6: Simulate output processing
       const testOutput = { output: "tool result" };
-      const processedOutput = await mockCodexHook.hooks["tool.execute.after"]({}, testOutput, testSessionId);
+      const processedOutput = await mockCodexHook.hooks["tool.execute.after"](
+        {},
+        testOutput,
+        testSessionId,
+      );
       expect(processedOutput.output).toContain("📚 Codex Context:");
       expect(processedOutput.output).toContain("tool result");
     });
@@ -210,11 +227,13 @@ describe.skip("StrRay Framework Initialization Integration", () => {
         hooks: {
           "agent.start": async () => {
             throw new Error("Plugin initialization failed");
-          }
-        }
+          },
+        },
       };
-      
-      await expect(failingHook.hooks["agent.start"](testSessionId)).rejects.toThrow("Plugin initialization failed");
+
+      await expect(
+        failingHook.hooks["agent.start"](testSessionId),
+      ).rejects.toThrow("Plugin initialization failed");
     });
   });
 
@@ -224,53 +243,61 @@ describe.skip("StrRay Framework Initialization Integration", () => {
       expect(stateManager).toBeDefined();
       expect(contextLoader).toBeDefined();
       expect(mockCodexHook).toBeDefined();
-      
+
       // 2. Load initial state
       const initialState = { initialized: true, timestamp: Date.now() };
       await stateManager.saveState(testSessionId, initialState);
-      
+
       // 3. Initialize codex context
       const mockCodexContent = JSON.stringify({
         version: "1.2.22",
-        terms: { "1": { title: "Test" } }
+        terms: { "1": { title: "Test" } },
       });
-      
+
       const mockFs = {
         existsSync: vi.fn(() => true),
-        readFileSync: vi.fn(() => mockCodexContent)
+        readFileSync: vi.fn(() => mockCodexContent),
       };
-      
+
       const originalExistsSync = require("fs").existsSync;
       const originalReadFileSync = require("fs").readFileSync;
-      
+
       require("fs").existsSync = mockFs.existsSync;
       require("fs").readFileSync = mockFs.readFileSync;
-      
+
       try {
-        const contextResult = await contextLoader.loadCodexContext(process.cwd());
+        const contextResult = await contextLoader.loadCodexContext(
+          process.cwd(),
+        );
         expect(contextResult.success).toBe(true);
-        
+
         // 4. Execute plugin hooks
         await mockCodexHook.hooks["agent.start"](testSessionId);
-        
+
         const validToolInput = { tool: "read", args: { path: "/test.ts" } };
-        await mockCodexHook.hooks["tool.execute.before"](validToolInput, testSessionId);
-        
+        await mockCodexHook.hooks["tool.execute.before"](
+          validToolInput,
+          testSessionId,
+        );
+
         const toolOutput = { output: "file content" };
-        const processedOutput = await mockCodexHook.hooks["tool.execute.after"](validToolInput, toolOutput, testSessionId);
+        const processedOutput = await mockCodexHook.hooks["tool.execute.after"](
+          validToolInput,
+          toolOutput,
+          testSessionId,
+        );
         expect(processedOutput.output).toContain("Codex Context");
-        
+
         // 5. Save final state
-        const finalState = { 
-          ...initialState, 
-          contextLoaded: true, 
-          hooksExecuted: true 
+        const finalState = {
+          ...initialState,
+          contextLoaded: true,
+          hooksExecuted: true,
         };
         await stateManager.saveState(testSessionId, finalState);
-        
+
         const savedState = await stateManager.loadState(testSessionId);
         expect(savedState).toEqual(finalState);
-        
       } finally {
         require("fs").existsSync = originalExistsSync;
         require("fs").readFileSync = originalReadFileSync;

@@ -60,20 +60,20 @@ Performance Optimization: parallel execution for maximum efficiency.
 Error Recovery: comprehensive error handling and recovery strategies.
 
 Your mission is to flawlessly coordinate StrRay Framework operations through intelligent orchestration and delegation.`,
-   temperature: 0.1,
-   tools: {
-     include: [
-       "read",
-       "grep",
-       "lsp_*",
-       "run_terminal_cmd",
-       "background_task",
-       "call_omo_agent",
-       "session_list",
-       "session_read",
-       "session_search",
-     ],
-   },
+  temperature: 0.1,
+  tools: {
+    include: [
+      "read",
+      "grep",
+      "lsp_*",
+      "run_terminal_cmd",
+      "background_task",
+      "call_omo_agent",
+      "session_list",
+      "session_read",
+      "session_search",
+    ],
+  },
   permission: {
     edit: "allow",
     bash: {

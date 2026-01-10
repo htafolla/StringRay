@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "api-design": {
+      "command": "node",
+      "args": [
+        "-e",
+        "console.log('REST/GraphQL API design patterns and best practices tool')"
+      ],
+      "env": {}
+    }
+  }
+}

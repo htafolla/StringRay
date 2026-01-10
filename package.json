@@ -5,97 +5,120 @@
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "bin": {
+    "strray": "./dist/cli.js"
+  },
   "scripts": {
     "build": "tsc",
     "dev": "tsc && node dist/server.js",
     "start": "node dist/server.js",
     "stop": "pkill -f 'node dist/server.js'",
-    "init": "bash scripts/init.sh",
+    "init": "npx tsx scripts/init.ts",
     "validate": "node scripts/validate-codex.js",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint src --ext .ts,.tsx",
+    "lint": "eslint src",
+    "lint:fix": "eslint src --fix",
     "clean": "rm -rf dist",
     "prepublishOnly": "npm run build",
+    
     "test": "node scripts/test-utils/smart-test-runner.mjs",
     "test:direct": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage --reporter=verbose",
-    "test:unit": "vitest run --config vitest.unit.config.ts",
+    "test:unit": "vitest run --config test-config/vitest.unit.config.ts",
+    "test:integration": "vitest run --config test-config/vitest.integration.config.ts",
+    "test:e2e": "vitest run --config test-config/vitest.contract.config.ts",
+    "test:security": "vitest run --config test-config/vitest.security.config.ts",
+    "test:performance": "node tests/performance/load-test.js",
     "test:smart": "node scripts/test-utils/smart-test-runner.mjs",
     "test:quarantine": "node scripts/test-utils/test-quarantine.mjs",
     "test:quarantine:list": "node scripts/test-utils/test-quarantine.mjs list",
     "test:quarantine:stats": "node scripts/test-utils/test-quarantine.mjs stats",
+    "test:validation": "bash tests/validation/simple-validation.sh",
+    "test:scripts": "node tests/scripts/test-plugin.js",
+    "test:python": "python3 tests/python/test_codex_loader.py",
+    
     "performance:monitor": "node -e \"import('./dist/performance/index.js').then(m => m.performanceSystem.initialize().then(() => m.performanceSystem.start()))\"",
     "performance:report": "node -e \"import('./dist/performance/index.js').then(m => m.performanceSystem.initialize().then(() => m.performanceSystem.generateReport().then(r => console.log(JSON.stringify(r, null, 2))))\"",
     "performance:gates": "node -e \"import('./dist/performance/index.js').then(m => m.performanceSystem.initialize().then(() => m.performanceSystem.runGates()))\"",
+    
     "audit": "npm audit",
     "security-audit": "node scripts/basic-security-audit.cjs",
     "security-check": "npm run security-audit && npm audit --audit-level=moderate",
     "security-monitor": "node scripts/basic-security-audit.cjs --monitor",
     "deps:check": "npm audit && npm outdated",
-    "deps:update": "npm update && npm audit fix",
-    "deps:scan": "node scripts/dependency-scan.cjs",
-    "eval:phase1": "node scripts/verify-phase1.js",
-    "eval:boot": "node scripts/boot-check.cjs",
-    "eval:processors": "node scripts/test-processor-activation.js",
-    "validate:all": "echo '🔬 StrRay Framework - Complete Validation Suite' && echo '================================================' && echo -e '\\n📝 1. TypeScript Compilation...' && npm run typecheck && echo '✅ PASSED' && echo -e '\\n🔍 2. ESLint Code Quality...' && npm run lint && echo '✅ PASSED' && echo -e '\\n🧪 3. Test Suite Execution...' && npm test && echo '✅ PASSED' && echo -e '\\n📊 4. Test Coverage Analysis...' && npm run test:coverage && echo '✅ PASSED' && echo -e '\\n⚡ 5. Performance Evaluation...' && npm run test:performance && echo '✅ PASSED' && echo -e '\\n🔒 6. Security Audit...' && npm run security-audit && echo '✅ PASSED' && echo -e '\\n📦 7. Dependency Scan...' && npm run deps:scan && echo '✅ PASSED' && echo -e '\\n🚀 8. Phase 1 Integration...' && timeout 60 npm run eval:phase1 && echo '✅ PASSED' && echo -e '\\n💻 9. Boot Health...' && npm run eval:boot && echo '✅ PASSED' && echo -e '\\n⚙️ 10. Processor Activation...' && npm run eval:processors && echo '✅ PASSED' && echo -e '\\n🎉 ALL VALIDATIONS PASSED!' || echo '❌ Some validations failed - check output above'"
+    
+    "framework:init": "bash .opencode/init.sh",
+    "framework:validate": "npm run test:validation",
+    "framework:health": "npm run framework:init && npm run framework:validate"
   },
   "keywords": [
     "ai",
-    "development",
-    "framework",
-    "typescript",
-    "codex",
+    "agent",
     "orchestration",
-    "enterprise",
-    "monitoring",
-    "performance",
-    "security",
-    "code-quality",
+    "codex",
+    "development",
     "automation",
-    "agentic-ai",
-    "production-ready"
+    "typescript",
+    "framework"
   ],
   "author": "StrRay Framework Team",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/strray/framework.git"
+    "url": "https://github.com/strray-framework/stringray.git"
   },
   "bugs": {
-    "url": "https://github.com/strray/framework/issues"
+    "url": "https://github.com/strray-framework/stringray/issues"
   },
   "homepage": "https://strray.dev",
   "engines": {
     "node": ">=18.0.0",
     "npm": ">=8.0.0"
   },
-  "devDependencies": {
-    "@types/node": "^20.10.0",
-    "@typescript-eslint/eslint-plugin": "^6.13.0",
-    "@typescript-eslint/parser": "^6.13.0",
-    "@vitest/coverage-v8": "^1.0.0",
-    "eslint": "^8.54.0",
-    "tsx": "^4.6.0",
-    "typescript": "^5.3.0",
-    "vitest": "^1.0.0"
+  "peerDependencies": {
+    "oh-my-opencode": "^2.12.0"
   },
   "dependencies": {
-    "zod": "^3.22.0"
+    "@modelcontextprotocol/sdk": "^0.4.0",
+    "@opencode-ai/sdk": "^1.0.0",
+    "structlog": "^1.0.0",
+    "zod": "^3.22.4"
   },
-  "peerDependencies": {
-    "@opencode-ai/sdk": "*"
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "@vitest/coverage-v8": "^1.0.0",
+    "eslint": "^8.0.0",
+    "jsdom": "^22.0.0",
+    "typescript": "^5.0.0",
+    "vitest": "^1.0.0"
   },
   "files": [
     "dist",
     "src",
-    "scripts",
+    ".opencode",
+    ".strray",
     "docs",
-    "README.md",
-    "LICENSE",
-    "package.json"
+    "README.md"
   ],
-  "bin": {
-    "strray": "./dist/cli.js"
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./agents": {
+      "types": "./dist/agents/index.d.ts",
+      "import": "./dist/agents/index.js"
+    },
+    "./orchestrator": {
+      "types": "./dist/orchestrator.d.ts",
+      "import": "./dist/orchestrator.js"
+    },
+    "./codex": {
+      "types": "./dist/codex-injector.d.ts",
+      "import": "./dist/codex-injector.js"
+    }
   }
 }

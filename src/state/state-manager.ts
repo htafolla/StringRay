@@ -11,7 +11,10 @@ export class StrRayStateManager implements StateManager {
 
   get<T>(key: string): T | undefined {
     const value = this.store.get(key) as T | undefined;
-    frameworkLogger.log("state-manager", "get operation", "info", { key, hasValue: value !== undefined });
+    frameworkLogger.log("state-manager", "get operation", "info", {
+      key,
+      hasValue: value !== undefined,
+    });
     return value;
   }
 
@@ -23,6 +26,11 @@ export class StrRayStateManager implements StateManager {
   clear(key: string): void {
     const existed = this.store.has(key);
     this.store.delete(key);
-    frameworkLogger.log("state-manager", "clear operation", existed ? "success" : "info", { key, existed });
+    frameworkLogger.log(
+      "state-manager",
+      "clear operation",
+      existed ? "success" : "info",
+      { key, existed },
+    );
   }
 }

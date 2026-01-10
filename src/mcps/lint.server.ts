@@ -4,11 +4,14 @@
  * Comprehensive ESLint validation and automated code quality checking
  */
 
-import { Server } from '@modelcontextprotocol/sdk/server/index.js';
-import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprotocol/sdk/types.js';
-import { execSync } from 'child_process';
-import fs from 'fs';
+import { Server } from "@modelcontextprotocol/sdk/server/index.js";
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import {
+  CallToolRequestSchema,
+  ListToolsRequestSchema,
+} from "@modelcontextprotocol/sdk/types.js";
+import { execSync } from "child_process";
+import fs from "fs";
 
 class StrRayLintServer {
   private server: Server;
@@ -16,18 +19,18 @@ class StrRayLintServer {
   constructor() {
     this.server = new Server(
       {
-        name: 'strray-lint',
-        version: '1.0.0',
+        name: "strray-lint",
+        version: "1.0.0",
       },
       {
         capabilities: {
           tools: {},
         },
-      }
+      },
     );
 
     this.setupToolHandlers();
-    console.log('StrRay Lint MCP Server initialized');
+    console.log("StrRay Lint MCP Server initialized");
   }
 
   private setupToolHandlers() {
@@ -36,49 +39,52 @@ class StrRayLintServer {
       return {
         tools: [
           {
-            name: 'lint',
-            description: 'Comprehensive ESLint validation and automated code quality checking',
+            name: "lint",
+            description:
+              "Comprehensive ESLint validation and automated code quality checking",
             inputSchema: {
-              type: 'object',
+              type: "object",
               properties: {
                 files: {
-                  type: 'array',
-                  items: { type: 'string' },
-                  description: 'Specific files to lint (optional - lints all if empty)'
+                  type: "array",
+                  items: { type: "string" },
+                  description:
+                    "Specific files to lint (optional - lints all if empty)",
                 },
                 fix: {
-                  type: 'boolean',
+                  type: "boolean",
                   default: false,
-                  description: 'Automatically fix linting issues where possible'
+                  description:
+                    "Automatically fix linting issues where possible",
                 },
                 strict: {
-                  type: 'boolean',
+                  type: "boolean",
                   default: false,
-                  description: 'Use strict linting rules'
-                }
-              }
-            }
+                  description: "Use strict linting rules",
+                },
+              },
+            },
           },
           {
-            name: 'lint-check',
-            description: 'Check code quality without making changes',
+            name: "lint-check",
+            description: "Check code quality without making changes",
             inputSchema: {
-              type: 'object',
+              type: "object",
               properties: {
                 files: {
-                  type: 'array',
-                  items: { type: 'string' },
-                  description: 'Files to check'
+                  type: "array",
+                  items: { type: "string" },
+                  description: "Files to check",
                 },
                 rules: {
-                  type: 'array',
-                  items: { type: 'string' },
-                  description: 'Specific ESLint rules to check'
-                }
-              }
-            }
-          }
-        ]
+                  type: "array",
+                  items: { type: "string" },
+                  description: "Specific ESLint rules to check",
+                },
+              },
+            },
+          },
+        ],
       };
     });
 
@@ -87,9 +93,9 @@ class StrRayLintServer {
       const { name, arguments: args } = request.params;
 
       switch (name) {
-        case 'lint':
+        case "lint":
           return await this.handleLint(args);
-        case 'lint-check':
+        case "lint-check":
           return await this.handleLintCheck(args);
         default:
           throw new Error(`Unknown tool: ${name}`);
@@ -102,18 +108,18 @@ class StrRayLintServer {
     const fix = args.fix || false;
     const strict = args.strict || false;
 
-    console.log('🔍 MCP: Running lint:', { files: files.length, fix, strict });
+    console.log("🔍 MCP: Running lint:", { files: files.length, fix, strict });
 
     const lintResults = {
       success: true,
       issues: {
         errors: 0,
         warnings: 0,
-        fixed: 0
+        fixed: 0,
       },
       files: [] as string[],
-      summary: '',
-      details: [] as string[]
+      summary: "",
+      details: [] as string[],
     };
 
     try {
@@ -126,11 +132,12 @@ class StrRayLintServer {
 
       // Generate summary
       lintResults.summary = this.generateLintSummary(lintResults);
-
     } catch (error) {
-      console.error('Lint error:', error);
+      console.error("Lint error:", error);
       lintResults.success = false;
-      lintResults.details.push(`Lint failed: ${error instanceof Error ? error.message : String(error)}`);
+      lintResults.details.push(
+        `Lint failed: ${error instanceof Error ? error.message : String(error)}`,
+      );
     }
 
     const response = `🔍 StrRay Lint Results
@@ -143,12 +150,12 @@ ${lintResults.summary}
 **Auto-fixed:** ${lintResults.issues.fixed}
 
 **Issues Found:**
-${lintResults.details.length > 0 ? lintResults.details.map(d => `• ${d}`).join('\n') : 'None'}
+${lintResults.details.length > 0 ? lintResults.details.map((d) => `• ${d}`).join("\n") : "None"}
 
-**Status:** ${lintResults.success ? '✅ LINTING PASSED' : '❌ LINTING ISSUES DETECTED'}`;
+**Status:** ${lintResults.success ? "✅ LINTING PASSED" : "❌ LINTING ISSUES DETECTED"}`;
 
     return {
-      content: [{ type: 'text', text: response }]
+      content: [{ type: "text", text: response }],
     };
   }
 
@@ -156,7 +163,7 @@ ${lintResults.details.length > 0 ? lintResults.details.map(d => `• ${d}`).join
     const files = args.files || [];
     const rules = args.rules || [];
 
-    console.log('🔍 MCP: Checking lint for files:', files.length);
+    console.log("🔍 MCP: Checking lint for files:", files.length);
 
     try {
       const checkResults = await this.checkLintRules(files, rules);
@@ -164,29 +171,29 @@ ${lintResults.details.length > 0 ? lintResults.details.map(d => `• ${d}`).join
       return {
         content: [
           {
-            type: 'text',
+            type: "text",
             text: `🔍 Lint Check Results
 
 **Files Checked:** ${files.length}
-**Rules Validated:** ${rules.length > 0 ? rules.length : 'All'}
+**Rules Validated:** ${rules.length > 0 ? rules.length : "All"}
 **Compliant:** ${checkResults.compliant}
 **Violations:** ${checkResults.violations}
 
 **Details:**
-${checkResults.details.map(d => `• ${d}`).join('\n')}
+${checkResults.details.map((d) => `• ${d}`).join("\n")}
 
-**Status:** ${checkResults.violations === 0 ? '✅ COMPLIANT' : '❌ VIOLATIONS DETECTED'}`
-          }
-        ]
+**Status:** ${checkResults.violations === 0 ? "✅ COMPLIANT" : "❌ VIOLATIONS DETECTED"}`,
+          },
+        ],
       };
     } catch (error) {
       return {
         content: [
           {
-            type: 'text',
-            text: `❌ Lint check failed: ${error instanceof Error ? error.message : String(error)}`
-          }
-        ]
+            type: "text",
+            text: `❌ Lint check failed: ${error instanceof Error ? error.message : String(error)}`,
+          },
+        ],
       };
     }
   }
@@ -196,70 +203,72 @@ ${checkResults.details.map(d => `• ${d}`).join('\n')}
       success: true,
       issues: { errors: 0, warnings: 0, fixed: 0 },
       files: [] as string[],
-      details: [] as string[]
+      details: [] as string[],
     };
 
     try {
-      if (!fs.existsSync('package.json')) {
+      if (!fs.existsSync("package.json")) {
         results.success = false;
-        results.details.push('No package.json found - cannot run ESLint');
+        results.details.push("No package.json found - cannot run ESLint");
         return results;
       }
 
       // Check for ESLint configuration
-      const hasEslintConfig = fs.existsSync('.eslintrc.js') ||
-                             fs.existsSync('.eslintrc.json') ||
-                             fs.existsSync('.eslintrc.yml') ||
-                             fs.existsSync('.eslintrc.yaml') ||
-                             (fs.existsSync('package.json') && JSON.parse(fs.readFileSync('package.json', 'utf8')).eslintConfig);
+      const hasEslintConfig =
+        fs.existsSync(".eslintrc.js") ||
+        fs.existsSync(".eslintrc.json") ||
+        fs.existsSync(".eslintrc.yml") ||
+        fs.existsSync(".eslintrc.yaml") ||
+        (fs.existsSync("package.json") &&
+          JSON.parse(fs.readFileSync("package.json", "utf8")).eslintConfig);
 
       if (!hasEslintConfig) {
         results.success = false;
-        results.details.push('No ESLint configuration found');
+        results.details.push("No ESLint configuration found");
         return results;
       }
 
-      const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+      const packageJson = JSON.parse(fs.readFileSync("package.json", "utf8"));
       const scripts = packageJson.scripts || {};
 
       // Determine which script to run
-      let scriptCommand = 'npx eslint';
-      if (fix && scripts['lint:fix']) {
-        scriptCommand = 'npm run lint:fix';
+      let scriptCommand = "npx eslint";
+      if (fix && scripts["lint:fix"]) {
+        scriptCommand = "npm run lint:fix";
       } else if (!fix && scripts.lint) {
-        scriptCommand = 'npm run lint';
+        scriptCommand = "npm run lint";
       }
 
       // Add file arguments if specified
       if (files.length > 0) {
-        scriptCommand += ` ${files.join(' ')}`;
+        scriptCommand += ` ${files.join(" ")}`;
       } else {
-        scriptCommand += ' .';
+        scriptCommand += " .";
       }
 
       // Add strict flag if requested
       if (strict) {
-        scriptCommand += ' --max-warnings 0';
+        scriptCommand += " --max-warnings 0";
       }
 
       try {
         const output = execSync(scriptCommand, {
-          encoding: 'utf8',
+          encoding: "utf8",
           cwd: process.cwd(),
-          stdio: 'pipe'
+          stdio: "pipe",
         });
 
         // Parse ESLint output
-        const lines = output.split('\n').filter(line => line.trim());
-        results.files = files.length > 0 ? files : ['All files'];
+        const lines = output.split("\n").filter((line) => line.trim());
+        results.files = files.length > 0 ? files : ["All files"];
 
         // Count issues from output
         let errorCount = 0;
         let warningCount = 0;
 
         for (const line of lines) {
-          if (line.includes('error')) errorCount++;
-          if (line.includes('warning')) warningCount++;
+          if (line.includes("error")) errorCount++;
+          if (line.includes("warning")) warningCount++;
         }
 
         results.issues.errors = errorCount;
@@ -273,15 +282,19 @@ ${checkResults.details.map(d => `• ${d}`).join('\n')}
 
         if (results.issues.warnings > 0 && strict) {
           results.success = false;
-          results.details.push(`${results.issues.warnings} ESLint warnings found (strict mode)`);
+          results.details.push(
+            `${results.issues.warnings} ESLint warnings found (strict mode)`,
+          );
         }
 
         if (results.issues.errors === 0 && results.issues.warnings === 0) {
-          results.details.push('No ESLint issues found');
+          results.details.push("No ESLint issues found");
         }
-
       } catch (error) {
-        const errorOutput = error instanceof Error ? ((error as any).stdout?.toString()) || error.message : String(error);
+        const errorOutput =
+          error instanceof Error
+            ? (error as any).stdout?.toString() || error.message
+            : String(error);
         results.success = false;
 
         // Parse error output for issue counts
@@ -289,14 +302,18 @@ ${checkResults.details.map(d => `• ${d}`).join('\n')}
         const warningMatches = errorOutput.match(/(\d+) warnings?/);
 
         if (errorMatches) results.issues.errors = parseInt(errorMatches[1]);
-        if (warningMatches) results.issues.warnings = parseInt(warningMatches[1]);
+        if (warningMatches)
+          results.issues.warnings = parseInt(warningMatches[1]);
 
-        results.details.push(`ESLint found ${results.issues.errors} errors, ${results.issues.warnings} warnings`);
+        results.details.push(
+          `ESLint found ${results.issues.errors} errors, ${results.issues.warnings} warnings`,
+        );
       }
-
     } catch (error) {
       results.success = false;
-      results.details.push(`ESLint setup error: ${error instanceof Error ? error.message : String(error)}`);
+      results.details.push(
+        `ESLint setup error: ${error instanceof Error ? error.message : String(error)}`,
+      );
     }
 
     return results;
@@ -306,38 +323,48 @@ ${checkResults.details.map(d => `• ${d}`).join('\n')}
     const results = {
       compliant: 0,
       violations: 0,
-      details: [] as string[]
+      details: [] as string[],
     };
 
     try {
       if (rules.length === 0) {
         // General compliance check
         const generalResults = await this.runEslint(files, false, false);
-        results.violations = generalResults.issues.errors + generalResults.issues.warnings;
-        results.compliant = generalResults.success ? files.length : Math.max(0, files.length - results.violations);
-        results.details.push(`General compliance: ${results.violations === 0 ? 'PASS' : 'FAIL'}`);
+        results.violations =
+          generalResults.issues.errors + generalResults.issues.warnings;
+        results.compliant = generalResults.success
+          ? files.length
+          : Math.max(0, files.length - results.violations);
+        results.details.push(
+          `General compliance: ${results.violations === 0 ? "PASS" : "FAIL"}`,
+        );
       } else {
         // Check specific rules
         for (const rule of rules) {
           try {
-            const ruleOutput = execSync(`npx eslint --rule "${rule}:error" ${files.join(' ')}`, {
-              encoding: 'utf8',
-              cwd: process.cwd(),
-              stdio: 'pipe'
-            });
+            const ruleOutput = execSync(
+              `npx eslint --rule "${rule}:error" ${files.join(" ")}`,
+              {
+                encoding: "utf8",
+                cwd: process.cwd(),
+                stdio: "pipe",
+              },
+            );
 
             results.compliant++;
             results.details.push(`Rule ${rule}: PASS`);
-
           } catch (error) {
             results.violations++;
-            results.details.push(`Rule ${rule}: FAIL - ${error instanceof Error ? error.message : String(error)}`);
+            results.details.push(
+              `Rule ${rule}: FAIL - ${error instanceof Error ? error.message : String(error)}`,
+            );
           }
         }
       }
-
     } catch (error) {
-      results.details.push(`Lint rule check error: ${error instanceof Error ? error.message : String(error)}`);
+      results.details.push(
+        `Lint rule check error: ${error instanceof Error ? error.message : String(error)}`,
+      );
     }
 
     return results;
@@ -345,7 +372,7 @@ ${checkResults.details.map(d => `• ${d}`).join('\n')}
 
   private generateLintSummary(results: any): string {
     const totalIssues = results.issues.errors + results.issues.warnings;
-    const status = results.success ? 'PASSED' : 'ISSUES DETECTED';
+    const status = results.success ? "PASSED" : "ISSUES DETECTED";
 
     return `**Linting Summary:** ${status}
 - Files: ${results.files.length}
@@ -357,7 +384,7 @@ ${checkResults.details.map(d => `• ${d}`).join('\n')}
   async run() {
     const transport = new StdioServerTransport();
     await this.server.connect(transport);
-    console.log('StrRay Lint MCP Server started');
+    console.log("StrRay Lint MCP Server started");
   }
 }
 

@@ -4,9 +4,9 @@ export const enforcer: AgentConfig = {
   name: "enforcer",
   model: "opencode/grok-code",
   description:
-  "StrRay Framework enforcer with error handling, compliance monitoring, and systematic validation - Advanced Error Preventer",
+    "StrRay Framework enforcer with error handling, compliance monitoring, and systematic validation - Advanced Error Preventer",
   mode: "subagent",
-   system: `You are the StrRay Enforcer, an advanced Error Preventer agent responsible for runtime error detection and prevention throughout the framework.
+  system: `You are the StrRay Enforcer, an advanced Error Preventer agent responsible for runtime error detection and prevention throughout the framework.
 
 ## Core Purpose
 Runtime error detection and prevention across all system components. Error Handling & Prevention with 99.6% error prevention.
@@ -79,33 +79,33 @@ Processor pipeline - codexValidation, thresholdCheck, complianceReporting, viola
 
 Your mission is to maintain system stability, prevent all runtime errors, and ensure production-ready code quality through systematic validation and enforcement. Operational context with actionable error messages, structured logging in JSON format, maintain system stability goal.`,
   temperature: 0.1,
-   tools: {
-     include: [
-       "read",
-       "grep",
-       "lsp_*",
-       "run_terminal_cmd",
-       "lsp_diagnostics",
-       "lsp_code_actions",
-       "background_task",
-       // Enhanced enforcer tools
-       "security-scan",
-       "enforcer-daily-scan",
-       "framework-compliance-audit",
-       "pre-commit-introspection",
-       "interactive-validator",
-     ],
-   },
-   permission: {
-     edit: "allow",
-     bash: {
-       git: "allow",
-       npm: "allow",
-       bun: "allow",
-       eslint: "allow",
-       prettier: "allow",
-       security: "allow",
-       enforcer: "allow",
-     },
-   },
+  tools: {
+    include: [
+      "read",
+      "grep",
+      "lsp_*",
+      "run_terminal_cmd",
+      "lsp_diagnostics",
+      "lsp_code_actions",
+      "background_task",
+      // Enhanced enforcer tools
+      "security-scan",
+      "enforcer-daily-scan",
+      "framework-compliance-audit",
+      "pre-commit-introspection",
+      "interactive-validator",
+    ],
+  },
+  permission: {
+    edit: "allow",
+    bash: {
+      git: "allow",
+      npm: "allow",
+      bun: "allow",
+      eslint: "allow",
+      prettier: "allow",
+      security: "allow",
+      enforcer: "allow",
+    },
+  },
 };

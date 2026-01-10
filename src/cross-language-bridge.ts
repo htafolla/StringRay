@@ -38,14 +38,20 @@ export interface RPCNotification {
 
 export interface BaseAgentCapabilities {
   // Codex compliance validation
-  validateCodexCompliance(content: string, context: any): Promise<{
+  validateCodexCompliance(
+    content: string,
+    context: any,
+  ): Promise<{
     compliant: boolean;
     violations: Array<{ term_id: string; message: string; severity: string }>;
     recommendations: string[];
   }>;
 
   // Advanced AI reasoning
-  performDeepReasoning(query: string, context: any): Promise<{
+  performDeepReasoning(
+    query: string,
+    context: any,
+  ): Promise<{
     reasoning: string;
     confidence: number;
     recommendations: any[];
@@ -63,7 +69,10 @@ export interface BaseAgentCapabilities {
   }>;
 
   // Security validation
-  validateSecurity(content: string, operation: string): Promise<{
+  validateSecurity(
+    content: string,
+    operation: string,
+  ): Promise<{
     safe: boolean;
     threats: string[];
     recommendations: string[];
@@ -73,11 +82,14 @@ export interface BaseAgentCapabilities {
 export class CrossLanguageBridge extends EventEmitter {
   private ws: WebSocket | null = null;
   private connected = false;
-  private pendingRequests = new Map<string | number, {
-    resolve: (value: any) => void;
-    reject: (error: Error) => void;
-    timeout: NodeJS.Timeout;
-  }>();
+  private pendingRequests = new Map<
+    string | number,
+    {
+      resolve: (value: any) => void;
+      reject: (error: Error) => void;
+      timeout: NodeJS.Timeout;
+    }
+  >();
   private requestId = 0;
   private reconnectAttempts = 0;
   private maxReconnectAttempts = 5;
@@ -85,7 +97,7 @@ export class CrossLanguageBridge extends EventEmitter {
 
   constructor(
     private pythonServerUrl = "ws://localhost:8765",
-    private connectionTimeout = 5000
+    private connectionTimeout = 5000,
   ) {
     super();
     this.connect();
@@ -95,7 +107,11 @@ export class CrossLanguageBridge extends EventEmitter {
     if (this.connected) return;
 
     try {
-      await frameworkLogger.log("cross-lang-bridge", `connecting to Python server: ${this.pythonServerUrl}`, "info");
+      await frameworkLogger.log(
+        "cross-lang-bridge",
+        `connecting to Python server: ${this.pythonServerUrl}`,
+        "info",
+      );
 
       this.ws = new WebSocket(this.pythonServerUrl, {
         handshakeTimeout: this.connectionTimeout,
@@ -104,7 +120,9 @@ export class CrossLanguageBridge extends EventEmitter {
       return new Promise((resolve, reject) => {
         const timeout = setTimeout(() => {
           this.ws?.close();
-          reject(new Error(`Connection timeout after ${this.connectionTimeout}ms`));
+          reject(
+            new Error(`Connection timeout after ${this.connectionTimeout}ms`),
+          );
         }, this.connectionTimeout);
 
         this.ws!.on("open", () => {
@@ -112,7 +130,11 @@ export class CrossLanguageBridge extends EventEmitter {
           this.connected = true;
           this.reconnectAttempts = 0;
           this.emit("connected");
-          frameworkLogger.log("cross-lang-bridge", "connected to Python server", "success");
+          frameworkLogger.log(
+            "cross-lang-bridge",
+            "connected to Python server",
+            "success",
+          );
           resolve();
         });
 
@@ -122,42 +144,69 @@ export class CrossLanguageBridge extends EventEmitter {
 
         this.ws!.on("error", (error) => {
           clearTimeout(timeout);
-          frameworkLogger.log("cross-lang-bridge", `connection error: ${error.message}`, "error");
+          frameworkLogger.log(
+            "cross-lang-bridge",
+            `connection error: ${error.message}`,
+            "error",
+          );
           reject(error);
         });
 
         this.ws!.on("close", () => {
           this.connected = false;
           this.emit("disconnected");
-          frameworkLogger.log("cross-lang-bridge", "disconnected from Python server", "info");
+          frameworkLogger.log(
+            "cross-lang-bridge",
+            "disconnected from Python server",
+            "info",
+          );
 
           // Auto-reconnect if not manually closed
           if (this.reconnectAttempts < this.maxReconnectAttempts) {
-            setTimeout(() => {
-              this.reconnectAttempts++;
-              this.connect();
-            }, this.reconnectDelay * Math.pow(2, this.reconnectAttempts));
+            setTimeout(
+              () => {
+                this.reconnectAttempts++;
+                this.connect();
+              },
+              this.reconnectDelay * Math.pow(2, this.reconnectAttempts),
+            );
           }
         });
       });
     } catch (error) {
-      frameworkLogger.log("cross-lang-bridge", `connection failed: ${(error as Error).message}`, "error");
+      frameworkLogger.log(
+        "cross-lang-bridge",
+        `connection failed: ${(error as Error).message}`,
+        "error",
+      );
       throw error;
     }
   }
 
   private handleMessage(data: Buffer): void {
     try {
-      const message = JSON.parse(data.toString()) as RPCResponse | RPCNotification;
+      const message = JSON.parse(data.toString()) as
+        | RPCResponse
+        | RPCNotification;
 
-      if ("id" in message && message.id !== undefined && this.pendingRequests.has(message.id)) {
+      if (
+        "id" in message &&
+        message.id !== undefined &&
+        this.pendingRequests.has(message.id)
+      ) {
         // Handle RPC response
-        const { resolve, reject, timeout } = this.pendingRequests.get(message.id)!;
+        const { resolve, reject, timeout } = this.pendingRequests.get(
+          message.id,
+        )!;
         clearTimeout(timeout);
         this.pendingRequests.delete(message.id);
 
         if ("error" in message && message.error) {
-          reject(new Error(`RPC Error ${message.error.code}: ${message.error.message}`));
+          reject(
+            new Error(
+              `RPC Error ${message.error.code}: ${message.error.message}`,
+            ),
+          );
         } else if ("result" in message) {
           resolve(message.result);
         }
@@ -166,11 +215,19 @@ export class CrossLanguageBridge extends EventEmitter {
         this.emit("notification", message.method, message.params);
       }
     } catch (error) {
-      frameworkLogger.log("cross-lang-bridge", `message handling error: ${(error as Error).message}`, "error");
+      frameworkLogger.log(
+        "cross-lang-bridge",
+        `message handling error: ${(error as Error).message}`,
+        "error",
+      );
     }
   }
 
-  async sendRequest(method: string, params?: any, timeoutMs = 30000): Promise<any> {
+  async sendRequest(
+    method: string,
+    params?: any,
+    timeoutMs = 30000,
+  ): Promise<any> {
     if (!this.connected) {
       await this.connect();
     }
@@ -258,7 +315,10 @@ export function getCrossLanguageBridge(): CrossLanguageBridge {
 }
 
 // Convenience function for TypeScript agents to access BaseAgent capabilities
-export async function callBaseAgent(method: string, params: any = {}): Promise<any> {
+export async function callBaseAgent(
+  method: string,
+  params: any = {},
+): Promise<any> {
   const bridge = getCrossLanguageBridge();
   return bridge.sendRequest(method, params);
 }

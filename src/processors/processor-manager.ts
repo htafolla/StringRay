@@ -121,10 +121,17 @@ export class ProcessorManager {
    * Initialize all registered processors
    */
   async initializeProcessors(): Promise<boolean> {
-    frameworkLogger.log("processor-manager", "initializeProcessors called", "info", {
-      totalProcessors: this.processors.size,
-      enabledProcessors: Array.from(this.processors.values()).filter(p => p.enabled).length
-    });
+    frameworkLogger.log(
+      "processor-manager",
+      "initializeProcessors called",
+      "info",
+      {
+        totalProcessors: this.processors.size,
+        enabledProcessors: Array.from(this.processors.values()).filter(
+          (p) => p.enabled,
+        ).length,
+      },
+    );
 
     console.log("🔄 Initializing processors...");
 
@@ -133,13 +140,23 @@ export class ProcessorManager {
       .map(async (config) => {
         try {
           await this.initializeProcessor(config.name);
-          frameworkLogger.log("processor-manager", "processor initialized successfully", "success", { processor: config.name });
+          frameworkLogger.log(
+            "processor-manager",
+            "processor initialized successfully",
+            "success",
+            { processor: config.name },
+          );
           return { name: config.name, success: true };
         } catch (error) {
-          frameworkLogger.log("processor-manager", "processor initialization failed", "error", {
-            processor: config.name,
-            error: error instanceof Error ? error.message : String(error)
-          });
+          frameworkLogger.log(
+            "processor-manager",
+            "processor initialization failed",
+            "error",
+            {
+              processor: config.name,
+              error: error instanceof Error ? error.message : String(error),
+            },
+          );
           console.error(
             `❌ Failed to initialize processor ${config.name}:`,
             error,
@@ -211,10 +228,17 @@ export class ProcessorManager {
     operation: string,
     data: any,
   ): Promise<ProcessorResult[]> {
-    frameworkLogger.log("processor-manager", "executePreProcessors called", "info", {
-      operation,
-      processorCount: Array.from(this.processors.values()).filter((p) => p.type === "pre" && p.enabled).length
-    });
+    frameworkLogger.log(
+      "processor-manager",
+      "executePreProcessors called",
+      "info",
+      {
+        operation,
+        processorCount: Array.from(this.processors.values()).filter(
+          (p) => p.type === "pre" && p.enabled,
+        ).length,
+      },
+    );
 
     const preProcessors = Array.from(this.processors.values())
       .filter((p) => p.type === "pre" && p.enabled)
@@ -234,25 +258,40 @@ export class ProcessorManager {
         console.warn(
           `⚠️ Pre-processor ${config.name} failed, continuing with other processors`,
         );
-        frameworkLogger.log("processor-manager", "pre-processor failed", "error", {
-          processor: config.name,
-          operation,
-          error: result.error
-        });
+        frameworkLogger.log(
+          "processor-manager",
+          "pre-processor failed",
+          "error",
+          {
+            processor: config.name,
+            operation,
+            error: result.error,
+          },
+        );
       } else {
-        frameworkLogger.log("processor-manager", "pre-processor succeeded", "success", {
-          processor: config.name,
-          operation,
-          duration: result.duration
-        });
+        frameworkLogger.log(
+          "processor-manager",
+          "pre-processor succeeded",
+          "success",
+          {
+            processor: config.name,
+            operation,
+            duration: result.duration,
+          },
+        );
       }
     }
 
-    frameworkLogger.log("processor-manager", "executePreProcessors completed", "success", {
-      operation,
-      totalResults: results.length,
-      successCount: results.filter(r => r.success).length
-    });
+    frameworkLogger.log(
+      "processor-manager",
+      "executePreProcessors completed",
+      "success",
+      {
+        operation,
+        totalResults: results.length,
+        successCount: results.filter((r) => r.success).length,
+      },
+    );
 
     return results;
   }
@@ -265,11 +304,18 @@ export class ProcessorManager {
     data: any,
     preResults: ProcessorResult[],
   ): Promise<ProcessorResult[]> {
-    frameworkLogger.log("processor-manager", "executePostProcessors called", "info", {
-      operation,
-      preResultCount: preResults.length,
-      processorCount: Array.from(this.processors.values()).filter((p) => p.type === "post" && p.enabled).length
-    });
+    frameworkLogger.log(
+      "processor-manager",
+      "executePostProcessors called",
+      "info",
+      {
+        operation,
+        preResultCount: preResults.length,
+        processorCount: Array.from(this.processors.values()).filter(
+          (p) => p.type === "post" && p.enabled,
+        ).length,
+      },
+    );
 
     const postProcessors = Array.from(this.processors.values())
       .filter((p) => p.type === "post" && p.enabled)
@@ -288,25 +334,40 @@ export class ProcessorManager {
       // Continue execution even if post-processors fail
       if (!result.success) {
         console.warn(`⚠️ Post-processor ${config.name} failed, continuing...`);
-        frameworkLogger.log("processor-manager", "post-processor failed", "error", {
-          processor: config.name,
-          operation,
-          error: result.error
-        });
+        frameworkLogger.log(
+          "processor-manager",
+          "post-processor failed",
+          "error",
+          {
+            processor: config.name,
+            operation,
+            error: result.error,
+          },
+        );
       } else {
-        frameworkLogger.log("processor-manager", "post-processor succeeded", "success", {
-          processor: config.name,
-          operation,
-          duration: result.duration
-        });
+        frameworkLogger.log(
+          "processor-manager",
+          "post-processor succeeded",
+          "success",
+          {
+            processor: config.name,
+            operation,
+            duration: result.duration,
+          },
+        );
       }
     }
 
-    frameworkLogger.log("processor-manager", "executePostProcessors completed", "success", {
-      operation,
-      totalResults: results.length,
-      successCount: results.filter(r => r.success).length
-    });
+    frameworkLogger.log(
+      "processor-manager",
+      "executePostProcessors completed",
+      "success",
+      {
+        operation,
+        totalResults: results.length,
+        successCount: results.filter((r) => r.success).length,
+      },
+    );
 
     return results;
   }

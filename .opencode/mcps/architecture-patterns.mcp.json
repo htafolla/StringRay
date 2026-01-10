@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "architecture-patterns": {
+      "command": "node",
+      "args": [
+        "-e",
+        "console.log('System architecture and design pattern guidance tool')"
+      ],
+      "env": {}
+    }
+  }
+}

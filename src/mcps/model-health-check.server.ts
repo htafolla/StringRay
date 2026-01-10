@@ -4,11 +4,14 @@
  * Advanced model compatibility validation and dynamic health assessment
  */
 
-import { Server } from '@modelcontextprotocol/sdk/server/index.js';
-import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprotocol/sdk/types.js';
-import { execSync } from 'child_process';
-import fs from 'fs';
+import { Server } from "@modelcontextprotocol/sdk/server/index.js";
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import {
+  CallToolRequestSchema,
+  ListToolsRequestSchema,
+} from "@modelcontextprotocol/sdk/types.js";
+import { execSync } from "child_process";
+import fs from "fs";
 
 class StrRayModelHealthCheckServer {
   private server: Server;
@@ -16,18 +19,18 @@ class StrRayModelHealthCheckServer {
   constructor() {
     this.server = new Server(
       {
-        name: 'strray-model-health-check',
-        version: '1.0.0',
+        name: "strray-model-health-check",
+        version: "1.0.0",
       },
       {
         capabilities: {
           tools: {},
         },
-      }
+      },
     );
 
     this.setupToolHandlers();
-    console.log('StrRay Model Health Check MCP Server initialized');
+    console.log("StrRay Model Health Check MCP Server initialized");
   }
 
   private setupToolHandlers() {
@@ -36,30 +39,32 @@ class StrRayModelHealthCheckServer {
       return {
         tools: [
           {
-            name: 'model-health-check',
-            description: 'Advanced model compatibility validation and dynamic health assessment',
+            name: "model-health-check",
+            description:
+              "Advanced model compatibility validation and dynamic health assessment",
             inputSchema: {
-              type: 'object',
+              type: "object",
               properties: {
                 models: {
-                  type: 'array',
-                  items: { type: 'string' },
-                  description: 'Specific models to check (optional - checks all configured if empty)'
+                  type: "array",
+                  items: { type: "string" },
+                  description:
+                    "Specific models to check (optional - checks all configured if empty)",
                 },
                 compatibility: {
-                  type: 'boolean',
+                  type: "boolean",
                   default: true,
-                  description: 'Include compatibility matrix in results'
+                  description: "Include compatibility matrix in results",
                 },
                 performance: {
-                  type: 'boolean',
+                  type: "boolean",
                   default: true,
-                  description: 'Include performance metrics in results'
-                }
-              }
-            }
-          }
-        ]
+                  description: "Include performance metrics in results",
+                },
+              },
+            },
+          },
+        ],
       };
     });
 
@@ -68,7 +73,7 @@ class StrRayModelHealthCheckServer {
       const { name, arguments: args } = request.params;
 
       switch (name) {
-        case 'model-health-check':
+        case "model-health-check":
           return await this.handleModelHealthCheck(args || {});
         default:
           throw new Error(`Unknown tool: ${name}`);
@@ -77,7 +82,7 @@ class StrRayModelHealthCheckServer {
   }
 
   private async handleModelHealthCheck(args: any) {
-    const models = args.models || ['opencode/grok-code'];
+    const models = args.models || ["opencode/grok-code"];
     const includeCompatibility = args.compatibility !== false;
     const includePerformance = args.performance !== false;
 
@@ -88,8 +93,8 @@ class StrRayModelHealthCheckServer {
       summary: {
         total: models.length,
         healthy: 0,
-        issues: 0
-      }
+        issues: 0,
+      },
     };
 
     // Check each model
@@ -104,18 +109,24 @@ class StrRayModelHealthCheckServer {
           results.summary.issues++;
         }
 
-        if (includePerformance && modelHealth.latency !== undefined && modelHealth.latency !== null) {
+        if (
+          includePerformance &&
+          modelHealth.latency !== undefined &&
+          modelHealth.latency !== null
+        ) {
           results.performanceMetrics[model] = {
             latency: modelHealth.latency,
-            throughput: 'N/A'
+            throughput: "N/A",
           };
         }
       } catch (error) {
         results.models.push({
           model,
           healthy: false,
-          issues: [`Health check failed: ${error instanceof Error ? error.message : String(error)}`],
-          latency: undefined
+          issues: [
+            `Health check failed: ${error instanceof Error ? error.message : String(error)}`,
+          ],
+          latency: undefined,
         });
         results.summary.issues++;
       }
@@ -130,7 +141,7 @@ class StrRayModelHealthCheckServer {
     const report = this.generateHealthReport(results);
 
     return {
-      content: [{ type: 'text', text: report }]
+      content: [{ type: "text", text: report }],
     };
   }
 
@@ -140,16 +151,16 @@ class StrRayModelHealthCheckServer {
     let latency: number | undefined = Math.random() * 1000 + 500; // Simulate 500-1500ms latency
 
     // Basic health checks
-    if (!model || !model.includes('/')) {
-      issues.push('Invalid model format');
+    if (!model || !model.includes("/")) {
+      issues.push("Invalid model format");
     }
 
-    if (model === 'opencode/grok-code') {
+    if (model === "opencode/grok-code") {
       // Known healthy model
     } else {
       // Simulate potential issues for other models
       if (Math.random() < 0.1) {
-        issues.push('Model temporarily unavailable');
+        issues.push("Model temporarily unavailable");
         latency = undefined;
       }
     }
@@ -159,7 +170,7 @@ class StrRayModelHealthCheckServer {
       healthy: issues.length === 0,
       issues,
       latency,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
   }
 
@@ -171,7 +182,8 @@ class StrRayModelHealthCheckServer {
       matrix[model1] = {};
       for (const model2 of models) {
         // Models are generally compatible with themselves and similar models
-        matrix[model1][model2] = model1 === model2 || model1.split('/')[0] === model2.split('/')[0];
+        matrix[model1][model2] =
+          model1 === model2 || model1.split("/")[0] === model2.split("/")[0];
       }
     }
 
@@ -179,47 +191,59 @@ class StrRayModelHealthCheckServer {
   }
 
   private generateHealthReport(results: any): string {
-    let report = '# Model Health Check Report\n\n';
+    let report = "# Model Health Check Report\n\n";
 
     // Summary
-    report += '## Summary\n';
+    report += "## Summary\n";
     report += `- Total Models: ${results.summary.total}\n`;
     report += `- Healthy: ${results.summary.healthy}\n`;
     report += `- Issues: ${results.summary.issues}\n\n`;
 
     // Model Status Details
-    report += '## Model Status Details\n';
+    report += "## Model Status Details\n";
     for (const modelResult of results.models) {
       report += `**${modelResult.model}:**\n`;
-      report += `- Healthy: ${modelResult.healthy ? 'Yes' : 'No'}\n`;
-      report += `- Issues: ${modelResult.issues?.join(', ') || 'None'}\n`;
-      report += `- Latency: ${modelResult.latency || 'N/A'}ms\n\n`;
+      report += `- Healthy: ${modelResult.healthy ? "Yes" : "No"}\n`;
+      report += `- Issues: ${modelResult.issues?.join(", ") || "None"}\n`;
+      report += `- Latency: ${modelResult.latency || "N/A"}ms\n\n`;
     }
 
     // Compatibility Matrix
     if (Object.keys(results.compatibilityMatrix).length > 0) {
-      report += '## Compatibility Matrix\n';
+      report += "## Compatibility Matrix\n";
       const firstModel = Object.keys(results.compatibilityMatrix)[0];
       if (firstModel && results.compatibilityMatrix[firstModel]) {
-        report += '| Model \\\\ Model | ' + Object.keys(results.compatibilityMatrix[firstModel]).join(' | ') + ' |\n';
-        report += '|---------------|' + Object.keys(results.compatibilityMatrix[firstModel]).map(() => '---|').join('') + '\n';
+        report +=
+          "| Model \\\\ Model | " +
+          Object.keys(results.compatibilityMatrix[firstModel]).join(" | ") +
+          " |\n";
+        report +=
+          "|---------------|" +
+          Object.keys(results.compatibilityMatrix[firstModel])
+            .map(() => "---|")
+            .join("") +
+          "\n";
 
         for (const model1 of Object.keys(results.compatibilityMatrix)) {
           report += `| ${model1} |`;
-          for (const model2 of Object.keys(results.compatibilityMatrix[model1])) {
+          for (const model2 of Object.keys(
+            results.compatibilityMatrix[model1],
+          )) {
             const compatible = results.compatibilityMatrix[model1][model2];
-            report += ` ${compatible ? '✅' : '❌'} |`;
+            report += ` ${compatible ? "✅" : "❌"} |`;
           }
-          report += '\n';
+          report += "\n";
         }
       }
-      report += '\n';
+      report += "\n";
     }
 
     // Performance Metrics
     if (Object.keys(results.performanceMetrics).length > 0) {
-      report += '## Performance Metrics\n';
-      for (const [model, metrics] of Object.entries(results.performanceMetrics)) {
+      report += "## Performance Metrics\n";
+      for (const [model, metrics] of Object.entries(
+        results.performanceMetrics,
+      )) {
         const perfMetrics = metrics as any;
         report += `**${model}:**\n`;
         report += `- Average Latency: ${perfMetrics.latency}ms\n`;
@@ -233,7 +257,7 @@ class StrRayModelHealthCheckServer {
   public async start() {
     const transport = new StdioServerTransport();
     await this.server.connect(transport);
-    console.log('StrRay Model Health Check MCP Server started');
+    console.log("StrRay Model Health Check MCP Server started");
   }
 }
 

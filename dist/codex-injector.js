@@ -154,7 +154,7 @@ export function createStrRayCodexInjectorHook() {
                     await frameworkLogger.log("framework-activity", `tool called: ${input.tool}`, "info", {
                         tool: input.tool,
                         args: input.args,
-                        sessionId
+                        sessionId,
                     });
                     // Skip codex enforcement during testing
                     if (process.env.NODE_ENV === "test" ||
@@ -199,7 +199,7 @@ export function createStrRayCodexInjectorHook() {
                             console.error(errorMsg);
                             frameworkLogger.log("codex-injector", "blocking codex violation detected", "error", {
                                 violationCount: blockingViolations.length,
-                                tool: input.tool
+                                tool: input.tool,
                             });
                             throw new Error(`Codex enforcement blocked action: ${blockingViolations[0]?.reason || "Unknown violation"}`);
                         }
@@ -211,7 +211,7 @@ export function createStrRayCodexInjectorHook() {
                         console.log(`💡 Recommendations: ${validation.recommendations.join(", ")}`);
                         frameworkLogger.log("codex-injector", "non-blocking codex warnings", "info", {
                             warningCount: validation.violations.length,
-                            tool: input.tool
+                            tool: input.tool,
                         });
                     }
                     else {
@@ -221,7 +221,7 @@ export function createStrRayCodexInjectorHook() {
                 catch (error) {
                     frameworkLogger.log("codex-injector", "tool.execute.before hook error", "error", {
                         error: error instanceof Error ? error.message : String(error),
-                        tool: input.tool
+                        tool: input.tool,
                     });
                     console.error(`❌ StrRay: Error in tool.execute.before hook:`, error);
                     // For blocking violations, re-throw to prevent action
@@ -250,7 +250,7 @@ export function createStrRayCodexInjectorHook() {
                     console.log(`📚 StrRay: Loaded ${codexContexts.length} codex contexts`);
                     frameworkLogger.log("codex-injector", "codex contexts loaded for injection", "success", {
                         contextCount: codexContexts.length,
-                        tool: input.tool
+                        tool: input.tool,
                     });
                     if (codexContexts.length === 0) {
                         return output;
@@ -262,14 +262,14 @@ export function createStrRayCodexInjectorHook() {
                     };
                     frameworkLogger.log("codex-injector", "codex context injected into output", "success", {
                         tool: input.tool,
-                        outputLength: injectedOutput.output?.length
+                        outputLength: injectedOutput.output?.length,
                     });
                     return injectedOutput;
                 }
                 catch (error) {
                     frameworkLogger.log("codex-injector", "tool.execute.after hook error", "error", {
                         error: error instanceof Error ? error.message : String(error),
-                        tool: input.tool
+                        tool: input.tool,
                     });
                     console.error(`❌ StrRay: Error in tool.execute.after hook:`, error);
                     // Return original output on error to not break the session

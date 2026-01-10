@@ -33,7 +33,12 @@ export default defineConfig({
     hookTimeout: 30000,
     bail: 5, // Stop after 5 test failures - prevents resource waste
     pool: "threads",
-    maxWorkers: 4, // Explicit worker limit for stability
+    poolOptions: {
+      threads: {
+        minThreads: 1,
+        maxThreads: 4,
+      },
+    },
     retry: 2,
   },
   resolve: {

@@ -5,6 +5,7 @@
 ## Integration Architecture
 
 **Dual Orchestration Model:**
+
 - **oh-my-opencode**: Primary orchestration (Prometheus planner + Sisyphus executor)
 - **StrRay**: Advanced multi-agent delegation for complex tasks
 - **Complementary**: Both systems work together, each handling appropriate task types
@@ -21,11 +22,13 @@ User Request → oh-my-opencode Planning → Task Complexity Analysis → Route 
 ### Agent Ecosystem
 
 **oh-my-opencode Built-in Agents:**
+
 - Librarian, Explore, Oracle, Frontend, Document-Writer, Multimodal-Looker
 - General-purpose development assistance
 - Integrated planning and execution workflow
 
 **StrRay Specialized Agents:**
+
 - Enforcer, Architect, Orchestrator, Bug-Triage-Specialist, Code-Reviewer, Security-Auditor, Refactorer, Test-Architect
 - Advanced multi-agent orchestration
 - Codex compliance and systematic error prevention
@@ -33,6 +36,7 @@ User Request → oh-my-opencode Planning → Task Complexity Analysis → Route 
 ### Plugin Registration
 
 **OpenCode Configuration:**
+
 ```json
 ~/.config/opencode/opencode.json
 {
@@ -41,6 +45,7 @@ User Request → oh-my-opencode Planning → Task Complexity Analysis → Route 
 ```
 
 **Separate Configuration Files:**
+
 - `oh-my-opencode.json` - oh-my-opencode settings
 - `strray-config.json` - StrRay-specific settings
 
@@ -80,6 +85,7 @@ StrRay uses a **hybrid TypeScript/Python architecture** with three key directory
 **Purpose**: Complete oh-my-opencode ecosystem integration
 
 **Contains:**
+
 - **oh-my-opencode Configuration**: `oh-my-opencode.json`, `enforcer-config.json`
 - **StrRay Python Backend**: `src/strray/` - BaseAgent classes and orchestration
 - **Agent Specifications**: `agents/*.yml` - YAML specs for both oh-my-opencode and StrRay agents
@@ -95,6 +101,7 @@ StrRay uses a **hybrid TypeScript/Python architecture** with three key directory
 **Purpose**: Core TypeScript implementations and agent definitions
 
 **Contents:**
+
 - **Agent Implementations**: `agents/*.ts` - 8 full AgentConfig objects with system prompts
 - **Framework Core**: `orchestrator.ts`, `delegation/`, `processors/` - Core orchestration logic
 - **Plugin Integration**: `codex-injector.ts` - Codex injection hooks
@@ -105,6 +112,7 @@ StrRay uses a **hybrid TypeScript/Python architecture** with three key directory
 **Purpose**: Comprehensive framework documentation and specifications
 
 **Contents:**
+
 - **AGENTS.md**: Complete agent specifications and orchestration details (THIS FILE)
 - **Architecture docs**: Framework design and integration guides
 - **API docs**: Component interfaces and usage patterns
@@ -126,6 +134,7 @@ User Request → .opencode/plugin (hooks) → src/delegation (analysis) → src/
 **Three-tier configuration system for clean separation:**
 
 #### 📁 Configuration Architecture Now:
+
 ```
 ├── .opencode/oh-my-opencode.json    # oh-my-opencode settings only
 ├── ~/.config/opencode/opencode.json  # Plugin registration
@@ -135,6 +144,7 @@ User Request → .opencode/plugin (hooks) → src/delegation (analysis) → src/
 #### 🎯 Settings Separation:
 
 **.opencode/oh-my-opencode.json** (oh-my-opencode):
+
 ```json
 {
   "disabled_agents": [],
@@ -143,6 +153,7 @@ User Request → .opencode/plugin (hooks) → src/delegation (analysis) → src/
 ```
 
 **.strray/config.json** (StrRay):
+
 ```json
 {
   "multi_agent_orchestration": {
@@ -290,6 +301,7 @@ Include direct code modification capabilities with surgical precision.
 - **Hook System**: `agent.start`, `tool.execute.before`, `tool.execute.after` hooks
 - **Security Sandboxing**: VM isolation, resource limits, module restrictions
 - **Hot-Reload**: Dynamic plugin updates without framework restart
+
 ## Multi-Agent Orchestration System
 
 **StrRay implements comprehensive automatic multi-agent orchestration** through intelligent complexity analysis and agent delegation.
@@ -297,11 +309,13 @@ Include direct code modification capabilities with surgical precision.
 ### Orchestration Architecture
 
 **Complexity-Driven Delegation:**
+
 - **ComplexityAnalyzer**: Automatically evaluates task complexity using 6 metrics
 - **AgentDelegator**: Routes tasks to appropriate agents based on analysis
 - **Configuration Control**: `multi_agent_orchestration` settings control behavior
 
 **Agent-Level Coordination:**
+
 - **Orchestrator Agent**: Uses `call_omo_agent` tool to coordinate other agents
 - **Parallel Execution**: `background_task` support for concurrent operations
 - **Conflict Resolution**: Multiple strategies (expert priority, majority vote, consensus)
@@ -309,6 +323,7 @@ Include direct code modification capabilities with surgical precision.
 ### Orchestration Flow
 
 **✅ IMPLEMENTED: Automatic Triggering**
+
 - Plugin hooks automatically analyze complexity on every tool execution
 - Tasks with score > 70 automatically trigger multi-agent delegation
 - Tasks with score > 95 automatically trigger orchestrator-led workflows
@@ -321,6 +336,7 @@ User Request → Complexity Analysis → Delegation Decision → Agent Execution
 ```
 
 **Automatic Multi-Agent Triggers:**
+
 - Tasks with score > 70 → Multi-agent execution
 - Tasks with score > 95 → Orchestrator-led enterprise workflow
 - Configurable concurrent agent limits
@@ -329,12 +345,14 @@ User Request → Complexity Analysis → Delegation Decision → Agent Execution
 ### Python Backend Integration
 
 **Advanced Orchestration Components:**
+
 - **BaseAgent Class**: Full Python implementation with async coordination
 - **AsyncCoordinator**: Workflow management with dependency graphs
 - **State Management**: Persistent agent state across sessions
 - **Communication Bus**: Inter-agent messaging infrastructure
 
 **Key Python Components:**
+
 - `strray.core.agent.BaseAgent` - Agent base class with AI integration
 - `strray.core.orchestration.AsyncCoordinator` - Multi-agent workflow coordination
 - `strray.config.manager.ConfigManager` - Multi-source configuration loading
@@ -344,6 +362,7 @@ User Request → Complexity Analysis → Delegation Decision → Agent Execution
 ### Configuration Integration
 
 **Multi-Agent Settings** (`.opencode/oh-my-opencode.json`):
+
 ```json
 {
   "multi_agent_orchestration": {
@@ -388,8 +407,6 @@ Example agent implementation:
 ```
 
 **Delegation respects these settings automatically.**
-
-
 
 ## Agent Implementation
 
@@ -454,47 +471,56 @@ For agent monitoring and optimization guidance, see [PERFORMANCE_MONITORING.md](
 _This overview provides a high-level introduction to StrRay agents. For complete technical specifications, refer to the comprehensive documentation._
 
 ## Common Misunderstandings & Clarifications
+
 **This section addresses frequent confusion points in the integrated oh-my-opencode + StrRay architecture.**
 
 ### Dual System Architecture
+
 - **oh-my-opencode**: Primary orchestration (Prometheus + Sisyphus) for planning and general tasks
 - **StrRay**: Advanced multi-agent delegation for complex, specialized tasks
 - **Integration**: Both systems coexist without conflicts, automatic task routing
 - **Configuration**: Separate config files prevent interference
 
 ### Agent Ecosystems
+
 - **oh-my-opencode Agents**: Librarian, Explore, Oracle, Frontend, Document-Writer, Multimodal-Looker
 - **StrRay Agents**: Enforcer, Architect, Orchestrator, Bug-Triage-Specialist, Code-Reviewer, Security-Auditor, Refactorer, Test-Architect
 - **No Conflicts**: Different agent names and separate registration systems
 - **Complementary**: Each system handles appropriate task types
 
 ### Plugin Integration
+
 - **StrRay Framework is integrated within oh-my-opencode - no separate plugin registration required.**
 - **Configuration Files**: `.opencode/oh-my-opencode.json` (includes StrRay agents), `.strray/config.json` (optional)
 - **Clean Separation**: No mixing of configuration concerns
 
 ### Multi-Agent Orchestration
+
 - **Architecture**: Orchestration happens at **agent level** via `call_omo_agent` tool, not processor pipeline
 - **Automatic**: Complexity analysis automatically triggers multi-agent execution (score > 70)
 - **Configuration**: `multi_agent_orchestration` settings control behavior, delegation respects them
 - **Coordination**: Orchestrator agent manages multi-agent workflows with 6-phase protocol
 
 ### Directory Structure Confusion
+
 - **`.opencode/`**: oh-my-opencode integration, Python backend, YAML specs, MCP servers
 - **`src/`**: TypeScript implementations, agent configs, core orchestration logic
 - **`docs/`**: Documentation and specifications (including this file)
 
 ### Component Interactions
+
 - **Plugin Hooks** → **Delegation System** → **Agent Execution** → **Python Backend**
 - **Configuration** flows: JSON settings → TypeScript agents → Python orchestration
 - **Multi-agent** coordination: Agent-level via `call_omo_agent` tool
 
 ### Testing Approach
+
 - **Mock-based testing** required due to oh-my-opencode plugin architecture
 - **Direct Node.js execution fails** with ES6 import conflicts
 - **Integration testing** through oh-my-opencode runtime, not direct imports
 
 ### Framework Completeness
+
 - **100% Complete**: Comprehensive implementations across all layers with automatic multi-agent triggering
 - **Multi-agent orchestration**: Fully functional at agent level
 - **Codex compliance**: 45-term enforcement with zero-tolerance blocking

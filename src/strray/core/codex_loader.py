@@ -1,7 +1,7 @@
 """CodexLoader: Load and validate Universal Development Codex terms.
 
 This module provides lazy loading, LRU caching, and comprehensive validation
-for the 43 codex terms defined in .strray/agents_template.md.
+for the 43 codex terms defined in .strray/codex.json.
 """
 
 import re
@@ -136,7 +136,7 @@ class CodexLoader:
         """Initialize CodexLoader.
 
         Args:
-            codex_path: Path to codex markdown file. Defaults to .strray/agents_template.md
+            codex_path: Path to codex markdown file. Defaults to .strray/codex.json
             cache_ttl_seconds: Time-to-live for cached codex data
             auto_reload_on_change: Automatically reload if file changes
         """
@@ -294,9 +294,9 @@ class CodexLoader:
     def _find_codex_path(self) -> Optional[Path]:
         """Find codex file in standard locations."""
         candidates = [
-            Path.cwd() / ".strray" / "agents_template.md",
-            Path(__file__).parent.parent.parent / ".strray" / "agents_template.md",
-            Path.home() / ".strray" / "agents_template.md",
+            Path.cwd() / ".strray" / "codex.json",
+            Path(__file__).parent.parent.parent / ".strray" / "codex.json",
+            Path.home() / ".strray" / "codex.json",
         ]
 
         for path in candidates:
@@ -308,14 +308,21 @@ class CodexLoader:
         return None
 
     def _load_codex(self) -> None:
-        """Load codex terms from markdown file."""
+        """Load codex terms from JSON or markdown file."""
         if not self.codex_path or not self.codex_path.exists():
             logger.warning("Codex file not available")
             return
 
         try:
+            # Detect file format
+            is_json = self.codex_path.suffix.lower() == ".json"
+            
             with open(self.codex_path, "r", encoding="utf-8") as f:
-                content = f.read()
+                if is_json:
+                    data = json.load(f)
+                    content = json.dumps(data)  # Convert back to string for compatibility
+                else:
+                    content = f.read()
 
             # Check if reload is needed
             if self.auto_reload_on_change:
@@ -328,7 +335,6 @@ class CodexLoader:
                     return
 
             # Parse version
-            self._version = self._extract_version(content)
 
             # Extract all terms
             self._codex_terms = self._parse_terms(content)
@@ -342,6 +348,10 @@ class CodexLoader:
             )
 
         except Exception as e:
+            logger.error(
+                "Failed to load codex", error=str(e), path=str(self.codex_path)
+            )
+            # Keep existing cached data if load fails
             logger.error(
                 "Failed to load codex", error=str(e), path=str(self.codex_path)
             )
@@ -592,10 +602,28 @@ class CodexLoader:
         for term_id in terms_to_check:
 
             try:
-
                 result = self._validate_term_compliance(code_or_action, term_id)
 
                 results.append(result)
+
+
+            except Exception as e:
+
+                logger.error(f"Error validating term {term_id}: {e}")
+
+                # Return non-compliant result for failed validation
+
+                results.append(
+                    CodexComplianceResult(
+                        term_id=term_id,
+                        compliant=False,
+                        violations=[f"Validation error: {str(e)}"],
+                        recommendations=["Fix validation error"],
+                    )
+                )
+
+
+
 
             except Exception as e:
 
@@ -639,7 +667,6 @@ class CodexLoader:
 
         for term_id in term_ids:
 
-            try:
 
                 rule = self._load_codex_rule(term_id)
 
@@ -647,17 +674,7 @@ class CodexLoader:
 
                 self._loaded_terms.add(term_id)
 
-            except CodexError:
 
-                logger.warning(f"Failed to load codex term {term_id}, skipping")
-
-                continue
-
-            except CodexError:
-
-                logger.warning(f"Failed to load codex term {term_id}, skipping")
-
-                continue
 
         # Update cache and hash
 
@@ -893,8 +910,8 @@ class CodexLoader:
             return self._codex_cache[term_id].dependencies.copy()
 
         # Try to load the rule to get dependencies
-
         try:
+
 
             rule = self._load_codex_rule(term_id)
 
@@ -938,7 +955,6 @@ class CodexLoader:
 
             return self._codex_cache[term_id]
 
-        try:
 
             return self._load_codex_rule(term_id)
 
@@ -977,7 +993,6 @@ class CodexLoader:
 
             if term_id not in self._codex_cache:
 
-                try:
 
                     rule = self._load_codex_rule(term_id)
 
@@ -985,9 +1000,6 @@ class CodexLoader:
 
                         rules.append(rule)
 
-                except CodexError:
-
-                    continue
 
         return rules
 
@@ -1041,7 +1053,6 @@ class CodexLoader:
 
         # Sort keys for consistent hashing
 
-        try:
 
             content = json.dumps(context, sort_keys=True)
 
@@ -1107,7 +1118,6 @@ class CodexLoader:
 
             if term_id not in self._codex_cache:
 
-                try:
 
                     rule = self._load_codex_rule(term_id)
 
@@ -1115,9 +1125,6 @@ class CodexLoader:
 
                         critical_rules.append(rule)
 
-                except CodexError:
-
-                    continue
 
         return critical_rules
 

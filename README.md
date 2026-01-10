@@ -4,7 +4,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9+-blue.svg)](https://www.typescriptlang.org/)
-[![Tests](https://img.shields.io/badge/tests-179%2F179-brightgreen.svg)](https://github.com/htafolla/StringRay)
+[![Tests](https://img.shields.io/badge/tests-833%2F833-brightgreen.svg)](https://github.com/htafolla/StringRay)
 [![Error Prevention](https://img.shields.io/badge/error%20prevention-99.6%25-red.svg)](https://github.com/htafolla/StringRay)
 
 ## ⚠️ Important Notice
@@ -223,7 +223,7 @@ npm run init
 ### Core Performance Metrics
 
 - **Error Prevention Rate**: 99.6% systematic validation
-- **Test Pass Rate**: 179/179 tests (100% success)
+- **Test Pass Rate**: 833/833 tests (100% success)
 - **Response Time**: Sub-millisecond task processing
 - **Cache Hit Rate**: 85%+ with LRU/LFU optimization
 - **Memory Efficiency**: Pool-based object reuse with <1% overhead
@@ -256,7 +256,7 @@ npm run init
 
 ### Development Commands
 
-```bash
+````bash
 # Core Development
 npm run build          # TypeScript compilation with strict checks
 npm test              # Run complete test suite (179 tests)
@@ -284,34 +284,42 @@ npm run test:e2e         # End-to-end tests through oh-my-opencode runtime
 ```typescript
 // This fails due to ES6 import conflicts
 import { createStrRayCodexInjectorHook } from "./codex-injector";
-```
+````
 
 **✅ Mock-Based Plugin Testing (Recommended):**
+
 ```typescript
 // This works - simulates plugin behavior without imports
 const mockPlugin = {
   hooks: {
-    "agent.start": async (sessionId) => { /* mock behavior */ },
-    "tool.execute.before": async (input) => { /* mock enforcement */ }
-  }
+    "agent.start": async (sessionId) => {
+      /* mock behavior */
+    },
+    "tool.execute.before": async (input) => {
+      /* mock enforcement */
+    },
+  },
 };
 ```
 
 **Why Mock Testing?**
+
 - **Plugin Architecture**: Framework runs as oh-my-opencode plugin, not standalone Node.js
 - **ES6 Import Conflicts**: Direct plugin imports fail when run outside oh-my-opencode
 - **Behavioral Testing**: Mocks test hook contracts and enforcement logic
 - **Reliability**: No environment-specific import issues
 
 **Testing Strategy:**
+
 - **Unit Tests**: Mock plugin behavior, test utility functions
 - **Integration Tests**: Simulate oh-my-opencode runtime with mocks
 - **E2E Tests**: Test through actual oh-my-opencode execution
 
-npm run test:coverage  # Test coverage analysis (>85% required)
+npm run test:coverage # Test coverage analysis (>85% required)
 npm run test:performance # Performance regression testing
-npm run test:security   # Security-focused test suite
-```
+npm run test:security # Security-focused test suite
+
+````
 
 ### Advanced Configuration
 
@@ -356,7 +364,7 @@ Update your `.opencode/oh-my-opencode.json` for enterprise deployment:
     "health_dashboards": true
   }
 }
-```
+````
 
 ### Environment Variables
 
@@ -381,7 +389,7 @@ STRRAY_LOG_LEVEL=info
 
 ### ✅ Production Ready (v1.0.0)
 
-- **100% Test Pass Rate**: 179/179 comprehensive tests
+- **100% Test Pass Rate**: 833/833 comprehensive tests
 - **Zero Compilation Errors**: Full TypeScript compliance
 - **Enterprise Features**: All advanced modules implemented and tested
 - **99.6% Error Prevention**: Systematic validation across all operations

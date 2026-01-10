@@ -1,0 +1,92 @@
+name: multimodal-looker
+description: "Multimodal file analysis and interpretation specialist for images, diagrams, PDFs, and media files"
+version: "1.0.0"
+model: opencode/grok-code
+
+# Logging Configuration
+logging:
+  level: warn
+  format: json
+  destinations:
+    - console
+    - file
+    - monitoring
+  retention_days: 90
+  sensitive_data_filtering: true
+  audit_trail: true
+
+# Processor Pipeline Configuration
+processor_pipeline:
+  - name: media-analysis
+    type: analysis
+    priority: critical
+    timeout_ms: 20000
+    retry_attempts: 3
+  - name: content-extraction
+    type: extraction
+    priority: high
+    timeout_ms: 15000
+    retry_attempts: 2
+  - name: diagram-interpretation
+    type: interpretation
+    priority: high
+    timeout_ms: 12000
+    retry_attempts: 2
+  - name: technical-validation
+    type: validation
+    priority: medium
+    timeout_ms: 10000
+    retry_attempts: 1
+
+# Agent Capabilities
+capabilities:
+  - image-analysis
+  - diagram-interpretation
+  - pdf-content-extraction
+  - visual-technical-analysis
+  - media-file-processing
+  - multimodal-content-understanding
+
+# Error Handling Configuration
+error_handling:
+  retry_attempts: 3
+  circuit_breaker:
+    enabled: true
+    failure_threshold: 3
+    recovery_timeout_ms: 30000
+  fallback_strategy: degrade
+  alert_on_failure: true
+
+# Performance Configuration
+performance:
+  timeout_ms: 25000
+  concurrency_limit: 3
+  memory_limit_mb: 256
+  cpu_limit_percent: 40
+
+# Integration Hooks
+integration:
+  pre_media_processing: true
+  post_analysis_validation: true
+  content_extraction_tracking: true
+  interpretation_accuracy_monitoring: true
+  webhook_endpoints:
+    - url: "https://multimodal-monitoring.example.com/webhook"
+      events: ["media_analyzed", "content_extracted", "diagram_interpreted", "validation_completed"]
+
+# Security Configuration
+security:
+  sandboxed_execution: true
+  permission_level: elevated
+  data_classification: sensitive
+  encryption_required: true
+
+# Monitoring Configuration
+monitoring:
+  metrics_collection: true
+  health_checks: true
+  performance_tracking: true
+  alert_thresholds:
+    response_time_ms: 20000
+    error_rate_percent: 2
+    memory_usage_mb: 200

@@ -12,7 +12,12 @@ describe("StrRay Framework - End-to-End Orchestration Integration", () => {
           const complexityScore = 6; // Low complexity
 
           // Record the orchestrated execution
-          mockEnvironment.toolCalls.push({ tool, args, complexity: complexityScore, agents });
+          mockEnvironment.toolCalls.push({
+            tool,
+            args,
+            complexity: complexityScore,
+            agents,
+          });
 
           return {
             success: true,
@@ -22,9 +27,12 @@ describe("StrRay Framework - End-to-End Orchestration Integration", () => {
         },
       };
 
-      const result = await mockEnvironment.executeToolWithOrchestration("read", {
-        filePath: "simple.ts"
-      });
+      const result = await mockEnvironment.executeToolWithOrchestration(
+        "read",
+        {
+          filePath: "simple.ts",
+        },
+      );
 
       expect(result.success).toBe(true);
       expect(result.orchestration.strategy).toBe("single-agent");
@@ -41,7 +49,12 @@ describe("StrRay Framework - End-to-End Orchestration Integration", () => {
           const complexityScore = 35; // Medium complexity
 
           // Record the orchestrated execution
-          mockEnvironment.toolCalls.push({ tool, args, complexity: complexityScore, agents });
+          mockEnvironment.toolCalls.push({
+            tool,
+            args,
+            complexity: complexityScore,
+            agents,
+          });
 
           return {
             success: true,
@@ -51,11 +64,14 @@ describe("StrRay Framework - End-to-End Orchestration Integration", () => {
         },
       };
 
-      const result = await mockEnvironment.executeToolWithOrchestration("edit", {
-        filePath: "complex.ts",
-        oldString: "old code",
-        newString: "new code"
-      });
+      const result = await mockEnvironment.executeToolWithOrchestration(
+        "edit",
+        {
+          filePath: "complex.ts",
+          oldString: "old code",
+          newString: "new code",
+        },
+      );
 
       expect(result.success).toBe(true);
       expect(result.orchestration.strategy).toBe("multi-agent");
@@ -73,15 +89,15 @@ describe("StrRay Framework - End-to-End Orchestration Integration", () => {
       };
 
       await expect(
-        mockEnvironment.executeToolWithOrchestration("failing-tool", {})
+        mockEnvironment.executeToolWithOrchestration("failing-tool", {}),
       ).rejects.toThrow("Orchestration failed");
     });
 
     it("should validate orchestration configuration", async () => {
       const mockPipeline = {
         configLoader: {
-          loadConfig: () => ({ valid: true })
-        }
+          loadConfig: () => ({ valid: true }),
+        },
       };
 
       const config = mockPipeline.configLoader.loadConfig();
@@ -94,37 +110,41 @@ describe("StrRay Framework - End-to-End Orchestration Integration", () => {
       const mockEnvironment = {
         executeToolWithOrchestration: async (tool: string) => ({
           success: true,
-          result: `Executed ${tool}`
+          result: `Executed ${tool}`,
         }),
       };
 
       const operations = ["read", "write", "edit", "grep"];
       const results = await Promise.all(
-        operations.map(op => mockEnvironment.executeToolWithOrchestration(op))
+        operations.map((op) =>
+          mockEnvironment.executeToolWithOrchestration(op),
+        ),
       );
 
       expect(results).toHaveLength(4);
-      results.forEach(result => {
+      results.forEach((result) => {
         expect(result.success).toBe(true);
       });
     });
 
     it("should maintain state consistency across operations", async () => {
       const mockState = { operations: 0 };
-      
+
       const mockEnvironment = {
         executeToolWithOrchestration: async (tool: string) => {
           mockState.operations++;
           return {
             success: true,
             result: `Operation ${mockState.operations}`,
-            state: { ...mockState }
+            state: { ...mockState },
           };
         },
       };
 
-      const result1 = await mockEnvironment.executeToolWithOrchestration("read");
-      const result2 = await mockEnvironment.executeToolWithOrchestration("write");
+      const result1 =
+        await mockEnvironment.executeToolWithOrchestration("read");
+      const result2 =
+        await mockEnvironment.executeToolWithOrchestration("write");
 
       expect(result1.state.operations).toBe(1);
       expect(result2.state.operations).toBe(2);

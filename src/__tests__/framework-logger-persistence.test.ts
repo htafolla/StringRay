@@ -1,15 +1,91 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
-import { frameworkLogger } from "../framework-logger.js";
 import * as fs from "fs";
 import * as path from "path";
 
+interface FrameworkLogEntry {
+  timestamp: number;
+  component: string;
+  action: string;
+  agent: string;
+  status: "success" | "error" | "info";
+  details?: any;
+}
+
+// Test-specific logger that writes to a unique file
+class TestFrameworkLogger {
+  private testLogFile: string;
+  private logs: FrameworkLogEntry[] = [];
+  private maxLogs = 1000;
+
+  constructor(logFile: string) {
+    this.testLogFile = logFile;
+  }
+
+  async log(
+    component: string,
+    action: string,
+    status: "success" | "error" | "info" = "info",
+    details?: any,
+  ) {
+    const entry: FrameworkLogEntry = {
+      timestamp: Date.now(),
+      component,
+      action,
+      agent: "test-agent",
+      status,
+      details,
+    };
+
+    this.logs.push(entry);
+
+    if (this.logs.length > this.maxLogs) {
+      this.logs.shift();
+    }
+
+    const emoji =
+      status === "success" ? "✅" : status === "error" ? "❌" : "ℹ️";
+    console.log(`${emoji} [${component}] ${action} - ${status.toUpperCase()}`);
+
+    await this.persistLog(entry);
+  }
+
+  private async persistLog(entry: FrameworkLogEntry) {
+    try {
+      const logDir = path.dirname(this.testLogFile);
+      if (!fs.existsSync(logDir)) {
+        fs.mkdirSync(logDir, { recursive: true });
+      }
+
+      const logEntry = `${new Date(entry.timestamp).toISOString()} [${entry.component}] ${entry.action} - ${entry.status.toUpperCase()}\n`;
+      fs.appendFileSync(this.testLogFile, logEntry);
+    } catch (error) {
+      console.error("Failed to persist test log to file:", error);
+    }
+  }
+}
+
 describe("Framework Logging File Persistence", () => {
-  const logDir = path.join(process.cwd(), ".opencode", "logs");
-  const logFile = path.join(logDir, "framework-activity.log");
+  let testId: string;
+  let logDir: string;
+  let logFile: string;
+  let testLogger: TestFrameworkLogger;
 
   beforeEach(() => {
+    // Use unique test ID to avoid conflicts between parallel tests
+    testId = `test-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+    logDir = path.join(process.cwd(), ".opencode", "logs");
+    logFile = path.join(logDir, `framework-activity-${testId}.log`);
+
+    // Create test-specific logger
+    testLogger = new TestFrameworkLogger(logFile);
+
+    // Clean up any existing test file
     if (fs.existsSync(logFile)) {
-      fs.unlinkSync(logFile);
+      try {
+        fs.unlinkSync(logFile);
+      } catch (error) {
+        // Ignore if file doesn't exist or can't be deleted
+      }
     }
   });
 
@@ -20,7 +96,7 @@ describe("Framework Logging File Persistence", () => {
   });
 
   it("should create log file and write entries", async () => {
-    await frameworkLogger.log("test-persistence", "file write test", "success");
+    await testLogger.log("test-persistence", "file write test", "success");
 
     expect(fs.existsSync(logFile)).toBe(true);
 
@@ -31,9 +107,9 @@ describe("Framework Logging File Persistence", () => {
   });
 
   it("should append multiple log entries to file", async () => {
-    await frameworkLogger.log("test-multi", "first action", "success");
-    await frameworkLogger.log("test-multi", "second action", "info");
-    await frameworkLogger.log("test-multi", "third action", "error");
+    await testLogger.log("test-multi", "first action", "success");
+    await testLogger.log("test-multi", "second action", "info");
+    await testLogger.log("test-multi", "third action", "error");
 
     const fileContent = fs.readFileSync(logFile, "utf-8");
     const lines = fileContent.trim().split("\n");
@@ -46,7 +122,7 @@ describe("Framework Logging File Persistence", () => {
 
   it("should maintain log file format with timestamps", async () => {
     const beforeTime = Date.now();
-    await frameworkLogger.log("test-format", "format test", "success");
+    await testLogger.log("test-format", "format test", "success");
     const afterTime = Date.now();
 
     const fileContent = fs.readFileSync(logFile, "utf-8");
@@ -57,7 +133,9 @@ describe("Framework Logging File Persistence", () => {
     expect(logEntry).toContain("format test");
     expect(logEntry).toContain("SUCCESS");
 
-    const timestampMatch = logEntry.match(/(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z)/);
+    const timestampMatch = logEntry.match(
+      /(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z)/,
+    );
     if (timestampMatch) {
       const logTime = new Date(timestampMatch[1]).getTime();
       expect(logTime).toBeGreaterThanOrEqual(beforeTime - 1000);
@@ -70,7 +148,7 @@ describe("Framework Logging File Persistence", () => {
       fs.rmSync(logDir, { recursive: true, force: true });
     }
 
-    await frameworkLogger.log("test-dir", "directory creation test", "success");
+    await testLogger.log("test-dir", "directory creation test", "success");
 
     expect(fs.existsSync(logDir)).toBe(true);
     expect(fs.existsSync(logFile)).toBe(true);

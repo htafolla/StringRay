@@ -3,7 +3,10 @@ export class StrRayStateManager {
     store = new Map();
     get(key) {
         const value = this.store.get(key);
-        frameworkLogger.log("state-manager", "get operation", "info", { key, hasValue: value !== undefined });
+        frameworkLogger.log("state-manager", "get operation", "info", {
+            key,
+            hasValue: value !== undefined,
+        });
         return value;
     }
     set(key, value) {

@@ -29,10 +29,18 @@ export default async function strrayCodexPlugin(input: {
 }) {
   // Plugin initialization logic
   return {
-    "experimental.chat.system.transform": async (input, output) => { /* codex injection */ },
-    "tool.execute.before": async (input, output) => { /* enforcement + orchestration */ },
-    "tool.execute.after": async (input, output) => { /* test generation */ },
-    config: async (config) => { /* MCP server registration */ }
+    "experimental.chat.system.transform": async (input, output) => {
+      /* codex injection */
+    },
+    "tool.execute.before": async (input, output) => {
+      /* enforcement + orchestration */
+    },
+    "tool.execute.after": async (input, output) => {
+      /* test generation */
+    },
+    config: async (config) => {
+      /* MCP server registration */
+    },
   };
 }
 ```
@@ -40,12 +48,14 @@ export default async function strrayCodexPlugin(input: {
 ### 3. Hook Execution Lifecycle
 
 #### System Prompt Injection (`experimental.chat.system.transform`)
+
 - **When**: Before LLM receives system prompt
 - **Purpose**: Inject Universal Development Codex v1.2.20 terms
 - **Mechanism**: Loads codex from `.strray/agents_template.md` and `AGENTS.md`
 - **Output**: Prepends formatted codex context to system messages
 
 #### Pre-Execution Validation (`tool.execute.before`)
+
 - **When**: Before tool execution (write, edit, multiedit)
 - **Purpose**: Real-time codex compliance validation + automatic orchestration
 - **Mechanism**:
@@ -55,11 +65,13 @@ export default async function strrayCodexPlugin(input: {
 - **Failure Mode**: Blocks execution with detailed violation reports
 
 #### Post-Execution Automation (`tool.execute.after`)
+
 - **When**: After successful tool execution
 - **Purpose**: Automatic test generation for new source files
 - **Mechanism**: Detects new `.ts/.tsx/.js/.jsx` files and calls test-architect MCP server
 
 #### Configuration Setup (`config`)
+
 - **When**: Plugin initialization
 - **Purpose**: Register MCP servers and run framework bootstrap
 - **Mechanism**:
@@ -75,23 +87,23 @@ Tasks are automatically analyzed using 6 metrics:
 
 ```typescript
 interface ComplexityMetrics {
-  fileCount: number;      // Files affected (0-20 points)
-  changeVolume: number;   // Lines changed (0-25 points)
-  operationType: string;  // create|modify|refactor|analyze|debug|test (multiplier)
-  dependencies: number;   // Component dependencies (0-15 points)
-  riskLevel: string;      // low|medium|high|critical (multiplier)
+  fileCount: number; // Files affected (0-20 points)
+  changeVolume: number; // Lines changed (0-25 points)
+  operationType: string; // create|modify|refactor|analyze|debug|test (multiplier)
+  dependencies: number; // Component dependencies (0-15 points)
+  riskLevel: string; // low|medium|high|critical (multiplier)
   estimatedDuration: number; // Minutes (0-15 points)
 }
 ```
 
 ### Delegation Thresholds
 
-| Score Range | Strategy | Agent Count | Trigger |
-|-------------|----------|-------------|---------|
-| 0-25 | Single-agent | 1 | Direct execution |
-| 26-50 | Single-agent | 1 | Direct execution |
-| 51-95 | Multi-agent | 2+ | Automatic delegation |
-| 96-100 | Orchestrator-led | 3+ | Enterprise workflow |
+| Score Range | Strategy         | Agent Count | Trigger              |
+| ----------- | ---------------- | ----------- | -------------------- |
+| 0-25        | Single-agent     | 1           | Direct execution     |
+| 26-50       | Single-agent     | 1           | Direct execution     |
+| 51-95       | Multi-agent      | 2+          | Automatic delegation |
+| 96-100      | Orchestrator-led | 3+          | Enterprise workflow  |
 
 ### Runtime Orchestration Flow
 
@@ -107,11 +119,13 @@ interface ComplexityMetrics {
 ### Dual Configuration System
 
 **oh-my-opencode Configuration** (`.opencode/oh-my-opencode.json`):
+
 - Agent definitions and model routing
 - Framework settings and permissions
 - oh-my-opencode-specific parameters
 
 **StrRay Configuration** (`.strray/config.json`):
+
 - Multi-agent orchestration settings
 - Codex enforcement levels
 - Performance tuning parameters
@@ -139,12 +153,14 @@ Plugins are registered through oh-my-opencode's configuration system. The framew
 ## Performance Characteristics
 
 ### Execution Times
+
 - **Plugin Load**: <100ms
 - **Codex Injection**: <50ms
 - **Complexity Analysis**: <10ms
 - **Validation**: <200ms (includes Python script execution)
 
 ### Resource Usage
+
 - **Memory**: <50MB baseline, <200MB under load
 - **CPU**: Minimal overhead (<5% additional)
 - **Network**: Only for MCP server communication
@@ -152,12 +168,14 @@ Plugins are registered through oh-my-opencode's configuration system. The framew
 ## Security Considerations
 
 ### Sandboxed Execution
+
 - Plugins run in restricted Node.js environment
 - File system access limited to project directory
 - Network access controlled through configuration
 - Dangerous modules blocked by default
 
 ### Input Validation
+
 - All tool inputs validated before execution
 - Codex compliance checked for code modifications
 - MCP server calls validated for security
@@ -174,6 +192,7 @@ Plugins are registered through oh-my-opencode's configuration system. The framew
 ### Debug Logging
 
 Enable detailed logging by setting environment variables:
+
 ```bash
 STRRAY_DEBUG=true
 STRRAY_LOG_LEVEL=debug
@@ -194,12 +213,14 @@ The plugin includes comprehensive integration tests that simulate the oh-my-open
 ## Future Enhancements
 
 ### Planned Features
+
 - **Hot Reload**: Dynamic plugin updates without restart
 - **Plugin Marketplace**: Curated third-party plugin ecosystem
 - **Advanced Orchestration**: Machine learning-based task routing
 - **Distributed Execution**: Cross-instance agent coordination
 
 ### Performance Optimizations
+
 - **Caching**: Codex context and validation result caching
 - **Parallel Processing**: Concurrent agent execution optimization
 - **Memory Pooling**: Object reuse for reduced GC pressure

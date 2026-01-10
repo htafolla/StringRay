@@ -3,7 +3,7 @@ export interface FrameworkLogEntry {
   component: string;
   action: string;
   agent: string;
-  status: 'success' | 'error' | 'info';
+  status: "success" | "error" | "info";
   details?: any;
 }
 
@@ -11,14 +11,19 @@ export class FrameworkUsageLogger {
   private logs: FrameworkLogEntry[] = [];
   private maxLogs = 1000;
 
-  async log(component: string, action: string, status: 'success' | 'error' | 'info' = 'info', details?: any) {
+  async log(
+    component: string,
+    action: string,
+    status: "success" | "error" | "info" = "info",
+    details?: any,
+  ) {
     const entry: FrameworkLogEntry = {
       timestamp: Date.now(),
       component,
       action,
-      agent: 'sisyphus',
+      agent: "sisyphus",
       status,
-      details
+      details,
     };
 
     this.logs.push(entry);
@@ -27,7 +32,8 @@ export class FrameworkUsageLogger {
       this.logs.shift();
     }
 
-    const emoji = status === 'success' ? '✅' : status === 'error' ? '❌' : 'ℹ️';
+    const emoji =
+      status === "success" ? "✅" : status === "error" ? "❌" : "ℹ️";
     console.log(`${emoji} [${component}] ${action} - ${status.toUpperCase()}`);
 
     await this.persistLog(entry);
@@ -36,10 +42,10 @@ export class FrameworkUsageLogger {
   private async persistLog(entry: FrameworkLogEntry) {
     // Write to log file for monitoring subagent
     try {
-      const fs = await import('fs');
-      const path = await import('path');
-      const logDir = path.join(process.cwd(), '.opencode', 'logs');
-      const logFile = path.join(logDir, 'framework-activity.log');
+      const fs = await import("fs");
+      const path = await import("path");
+      const logDir = path.join(process.cwd(), ".opencode", "logs");
+      const logFile = path.join(logDir, "framework-activity.log");
 
       // Ensure log directory exists
       if (!fs.existsSync(logDir)) {
@@ -50,7 +56,7 @@ export class FrameworkUsageLogger {
       fs.appendFileSync(logFile, logEntry);
     } catch (error) {
       // Fallback to console if file writing fails
-      console.error('Failed to persist log to file:', error);
+      console.error("Failed to persist log to file:", error);
     }
   }
 
@@ -59,27 +65,35 @@ export class FrameworkUsageLogger {
   }
 
   getComponentUsage(component: string): FrameworkLogEntry[] {
-    return this.logs.filter(log => log.component === component);
+    return this.logs.filter((log) => log.component === component);
   }
 
   printRundown() {
-    console.log('\n🎯 STRRAY FRAMEWORK USAGE RUNDOWN');
-    console.log('=====================================');
+    console.log("\n🎯 STRRAY FRAMEWORK USAGE RUNDOWN");
+    console.log("=====================================");
 
-    const components = [...new Set(this.logs.map(l => l.component))];
+    const components = [...new Set(this.logs.map((l) => l.component))];
 
-    components.forEach(component => {
+    components.forEach((component) => {
       const componentLogs = this.getComponentUsage(component);
-      const successCount = componentLogs.filter(l => l.status === 'success').length;
-      const errorCount = componentLogs.filter(l => l.status === 'error').length;
+      const successCount = componentLogs.filter(
+        (l) => l.status === "success",
+      ).length;
+      const errorCount = componentLogs.filter(
+        (l) => l.status === "error",
+      ).length;
 
       console.log(`\n📊 ${component.toUpperCase()}`);
       console.log(`   Total Actions: ${componentLogs.length}`);
       console.log(`   Success: ${successCount}, Errors: ${errorCount}`);
-      console.log(`   Last Activity: ${new Date(componentLogs[componentLogs.length - 1]?.timestamp || 0).toLocaleTimeString()}`);
+      console.log(
+        `   Last Activity: ${new Date(componentLogs[componentLogs.length - 1]?.timestamp || 0).toLocaleTimeString()}`,
+      );
     });
 
-    console.log('\n✅ VERIFICATION: Framework components are actively being used');
+    console.log(
+      "\n✅ VERIFICATION: Framework components are actively being used",
+    );
   }
 }
 

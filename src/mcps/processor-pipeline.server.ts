@@ -4,33 +4,42 @@
  * Advanced processor pipeline with codex validation, compliance monitoring, and framework enforcement
  */
 
-import { Server } from '@modelcontextprotocol/sdk/server/index.js';
-import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprotocol/sdk/types.js';
+import { Server } from "@modelcontextprotocol/sdk/server/index.js";
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import {
+  CallToolRequestSchema,
+  ListToolsRequestSchema,
+} from "@modelcontextprotocol/sdk/types.js";
 
 class StrRayProcessorPipelineServer {
   private server: Server;
   private codexTerms: string[] = [
-    'Progressive Prod-Ready Code', 'No Stubs/Patches', 'Surgical Fixes',
-    'Type Safety First', 'Single Source of Truth', 'Error Boundaries',
-    'Performance Budget Enforcement', 'Security by Design', 'Test Coverage >85%'
+    "Progressive Prod-Ready Code",
+    "No Stubs/Patches",
+    "Surgical Fixes",
+    "Type Safety First",
+    "Single Source of Truth",
+    "Error Boundaries",
+    "Performance Budget Enforcement",
+    "Security by Design",
+    "Test Coverage >85%",
   ];
 
   constructor() {
     this.server = new Server(
       {
-        name: 'strray-processor-pipeline',
-        version: '1.0.0',
+        name: "strray-processor-pipeline",
+        version: "1.0.0",
       },
       {
         capabilities: {
           tools: {},
         },
-      }
+      },
     );
 
     this.setupToolHandlers();
-    console.log('StrRay Processor Pipeline MCP Server initialized');
+    console.log("StrRay Processor Pipeline MCP Server initialized");
   }
 
   private setupToolHandlers() {
@@ -39,64 +48,68 @@ class StrRayProcessorPipelineServer {
       return {
         tools: [
           {
-            name: 'execute-pre-processors',
-            description: 'Run pre-execution processors on content with codex validation',
+            name: "execute-pre-processors",
+            description:
+              "Run pre-execution processors on content with codex validation",
             inputSchema: {
-              type: 'object',
+              type: "object",
               properties: {
-                content: { type: 'string' },
-                context: { type: 'object' },
-                validateCodex: { type: 'boolean', default: true },
-                strictMode: { type: 'boolean', default: false }
+                content: { type: "string" },
+                context: { type: "object" },
+                validateCodex: { type: "boolean", default: true },
+                strictMode: { type: "boolean", default: false },
               },
-              required: ['content']
-            }
+              required: ["content"],
+            },
           },
           {
-            name: 'execute-post-processors',
-            description: 'Run post-execution processors on results with compliance monitoring',
+            name: "execute-post-processors",
+            description:
+              "Run post-execution processors on results with compliance monitoring",
             inputSchema: {
-              type: 'object',
+              type: "object",
               properties: {
-                content: { type: 'string' },
-                results: { type: 'object' },
-                enforceCompliance: { type: 'boolean', default: true },
-                auditTrail: { type: 'boolean', default: true }
+                content: { type: "string" },
+                results: { type: "object" },
+                enforceCompliance: { type: "boolean", default: true },
+                auditTrail: { type: "boolean", default: true },
               },
-              required: ['content']
-            }
+              required: ["content"],
+            },
           },
           {
-            name: 'codex-validation',
-            description: 'Validate content against Universal Development Codex terms',
+            name: "codex-validation",
+            description:
+              "Validate content against Universal Development Codex terms",
             inputSchema: {
-              type: 'object',
+              type: "object",
               properties: {
-                content: { type: 'string' },
+                content: { type: "string" },
                 terms: {
-                  type: 'array',
-                  items: { type: 'string' },
-                  default: ['all']
+                  type: "array",
+                  items: { type: "string" },
+                  default: ["all"],
                 },
-                strict: { type: 'boolean', default: false }
+                strict: { type: "boolean", default: false },
               },
-              required: ['content']
-            }
+              required: ["content"],
+            },
           },
           {
-            name: 'framework-compliance-check',
-            description: 'Check framework compliance and generate enforcement actions',
+            name: "framework-compliance-check",
+            description:
+              "Check framework compliance and generate enforcement actions",
             inputSchema: {
-              type: 'object',
+              type: "object",
               properties: {
-                content: { type: 'string' },
-                operation: { type: 'string' },
-                context: { type: 'object' }
+                content: { type: "string" },
+                operation: { type: "string" },
+                context: { type: "object" },
               },
-              required: ['content', 'operation']
-            }
-          }
-        ]
+              required: ["content", "operation"],
+            },
+          },
+        ],
       };
     });
 
@@ -105,13 +118,13 @@ class StrRayProcessorPipelineServer {
       const { name, arguments: args } = request.params;
 
       switch (name) {
-        case 'execute-pre-processors':
+        case "execute-pre-processors":
           return await this.handlePreProcessors(args);
-        case 'execute-post-processors':
+        case "execute-post-processors":
           return await this.handlePostProcessors(args);
-        case 'codex-validation':
+        case "codex-validation":
           return await this.handleCodexValidation(args);
-        case 'framework-compliance-check':
+        case "framework-compliance-check":
           return await this.handleComplianceCheck(args);
         default:
           throw new Error(`Unknown tool: ${name}`);
@@ -125,14 +138,18 @@ class StrRayProcessorPipelineServer {
     const validateCodex = args.validateCodex !== false;
     const strictMode = args.strictMode || false;
 
-    console.log('🔄 MCP: Running pre-processors:', { contentLength: content.length, validateCodex, strictMode });
+    console.log("🔄 MCP: Running pre-processors:", {
+      contentLength: content.length,
+      validateCodex,
+      strictMode,
+    });
 
     const results = {
       processed: content,
       validations: [] as string[],
       warnings: [] as string[],
       blocked: false,
-      reason: ''
+      reason: "",
     };
 
     try {
@@ -141,7 +158,10 @@ class StrRayProcessorPipelineServer {
 
       // 2. Codex validation (if enabled)
       if (validateCodex) {
-        const codexResults = await this.validateAgainstCodex(results.processed, strictMode);
+        const codexResults = await this.validateAgainstCodex(
+          results.processed,
+          strictMode,
+        );
         results.validations.push(...codexResults.validations);
         results.warnings.push(...codexResults.warnings);
 
@@ -157,7 +177,6 @@ class StrRayProcessorPipelineServer {
       // 4. Security checks
       const securityResults = this.performSecurityChecks(results.processed);
       results.warnings.push(...securityResults.warnings);
-
     } catch (error) {
       results.blocked = true;
       results.reason = `Pre-processing error: ${error instanceof Error ? error.message : String(error)}`;
@@ -168,12 +187,12 @@ class StrRayProcessorPipelineServer {
 **Content Length:** ${results.processed.length} characters
 **Validations Passed:** ${results.validations.length}
 **Warnings:** ${results.warnings.length}
-${results.warnings.length > 0 ? results.warnings.map((w: string) => `• ⚠️ ${w}`).join('\n') : ''}
+${results.warnings.length > 0 ? results.warnings.map((w: string) => `• ⚠️ ${w}`).join("\n") : ""}
 
-**Status:** ${results.blocked ? `❌ BLOCKED - ${results.reason}` : '✅ APPROVED FOR EXECUTION'}`;
+**Status:** ${results.blocked ? `❌ BLOCKED - ${results.reason}` : "✅ APPROVED FOR EXECUTION"}`;
 
     return {
-      content: [{ type: 'text', text: response }]
+      content: [{ type: "text", text: response }],
     };
   }
 
@@ -183,14 +202,18 @@ ${results.warnings.length > 0 ? results.warnings.map((w: string) => `• ⚠️ 
     const enforceCompliance = args.enforceCompliance !== false;
     const auditTrail = args.auditTrail !== false;
 
-    console.log('🔄 MCP: Running post-processors:', { contentLength: content.length, enforceCompliance, auditTrail });
+    console.log("🔄 MCP: Running post-processors:", {
+      contentLength: content.length,
+      enforceCompliance,
+      auditTrail,
+    });
 
     const postResults = {
       processed: content,
       compliance: [] as string[],
       auditEntries: [] as string[],
       recommendations: [] as string[],
-      finalApproval: true
+      finalApproval: true,
     };
 
     try {
@@ -199,7 +222,9 @@ ${results.warnings.length > 0 ? results.warnings.map((w: string) => `• ⚠️ 
 
       // 2. Compliance enforcement
       if (enforceCompliance) {
-        const complianceResults = await this.enforceCompliance(postResults.processed);
+        const complianceResults = await this.enforceCompliance(
+          postResults.processed,
+        );
         postResults.compliance.push(...complianceResults.compliance);
         postResults.recommendations.push(...complianceResults.recommendations);
 
@@ -210,77 +235,92 @@ ${results.warnings.length > 0 ? results.warnings.map((w: string) => `• ⚠️ 
 
       // 3. Audit trail generation
       if (auditTrail) {
-        postResults.auditEntries = this.generateAuditTrail(content, results, postResults);
+        postResults.auditEntries = this.generateAuditTrail(
+          content,
+          results,
+          postResults,
+        );
       }
 
       // 4. Quality assurance
       const qaResults = this.performQualityAssurance(postResults.processed);
       postResults.recommendations.push(...qaResults.recommendations);
-
     } catch (error) {
       postResults.finalApproval = false;
-      postResults.recommendations.push(`Post-processing error: ${error instanceof Error ? error.message : String(error)}`);
+      postResults.recommendations.push(
+        `Post-processing error: ${error instanceof Error ? error.message : String(error)}`,
+      );
     }
 
     const response = `🔄 Post-Processor Results
 
-**Final Approval:** ${postResults.finalApproval ? '✅ APPROVED' : '❌ REQUIRES REVIEW'}
+**Final Approval:** ${postResults.finalApproval ? "✅ APPROVED" : "❌ REQUIRES REVIEW"}
 **Compliance Checks:** ${postResults.compliance.length}
 **Audit Entries:** ${postResults.auditEntries.length}
 **Recommendations:** ${postResults.recommendations.length}
 
 **Recommendations:**
-${postResults.recommendations.length > 0 ? postResults.recommendations.map((r: string) => `• 💡 ${r}`).join('\n') : 'None'}
+${postResults.recommendations.length > 0 ? postResults.recommendations.map((r: string) => `• 💡 ${r}`).join("\n") : "None"}
 
 **Audit Summary:**
-${postResults.auditEntries.slice(0, 3).map(a => `• 📝 ${a}`).join('\n')}${postResults.auditEntries.length > 3 ? '\n• ...' : ''}`;
+${postResults.auditEntries
+  .slice(0, 3)
+  .map((a) => `• 📝 ${a}`)
+  .join("\n")}${postResults.auditEntries.length > 3 ? "\n• ..." : ""}`;
 
     return {
-      content: [{ type: 'text', text: response }]
+      content: [{ type: "text", text: response }],
     };
   }
 
   private async handleCodexValidation(args: any) {
     const content = args.content;
-    const terms = args.terms || ['all'];
+    const terms = args.terms || ["all"];
     const strict = args.strict || false;
 
-    console.log('📚 MCP: Performing codex validation:', { terms: terms.length, strict });
+    console.log("📚 MCP: Performing codex validation:", {
+      terms: terms.length,
+      strict,
+    });
 
     try {
-      const validationResults = await this.validateAgainstCodex(content, strict, terms);
+      const validationResults = await this.validateAgainstCodex(
+        content,
+        strict,
+        terms,
+      );
 
       return {
         content: [
           {
-            type: 'text',
+            type: "text",
             text: `📚 Codex Validation Results
 
 **Content Validated:** ${content.length} characters
-**Terms Checked:** ${terms.length === 1 && terms[0] === 'all' ? 'All 43 terms' : terms.length}
+**Terms Checked:** ${terms.length === 1 && terms[0] === "all" ? "All 43 terms" : terms.length}
 **Compliance:** ${validationResults.compliance}%
 
 **Violations:** ${validationResults.violations.length}
-${validationResults.violations.map((v: string) => `• ❌ ${v}`).join('\n') || 'None'}
+${validationResults.violations.map((v: string) => `• ❌ ${v}`).join("\n") || "None"}
 
 **Warnings:** ${validationResults.warnings.length}
-${validationResults.warnings.map((w: string) => `• ⚠️ ${w}`).join('\n') || 'None'}
+${validationResults.warnings.map((w: string) => `• ⚠️ ${w}`).join("\n") || "None"}
 
 **Recommendations:**
-${validationResults.recommendations.map((r: string) => `• 💡 ${r}`).join('\n') || 'None'}
+${validationResults.recommendations.map((r: string) => `• 💡 ${r}`).join("\n") || "None"}
 
-**Status:** ${validationResults.blocked ? '❌ BLOCKED' : '✅ COMPLIANT'}`
-          }
-        ]
+**Status:** ${validationResults.blocked ? "❌ BLOCKED" : "✅ COMPLIANT"}`,
+          },
+        ],
       };
     } catch (error) {
       return {
         content: [
           {
-            type: 'text',
-            text: `❌ Codex validation failed: ${error instanceof Error ? error.message : String(error)}`
-          }
-        ]
+            type: "text",
+            text: `❌ Codex validation failed: ${error instanceof Error ? error.message : String(error)}`,
+          },
+        ],
       };
     }
   }
@@ -290,15 +330,22 @@ ${validationResults.recommendations.map((r: string) => `• 💡 ${r}`).join('\n
     const operation = args.operation;
     const context = args.context || {};
 
-    console.log('📋 MCP: Performing compliance check:', { operation, contentLength: content.length });
+    console.log("📋 MCP: Performing compliance check:", {
+      operation,
+      contentLength: content.length,
+    });
 
     try {
-      const complianceResults = await this.checkFrameworkCompliance(content, operation, context);
+      const complianceResults = await this.checkFrameworkCompliance(
+        content,
+        operation,
+        context,
+      );
 
       return {
         content: [
           {
-            type: 'text',
+            type: "text",
             text: `📋 Framework Compliance Check
 
 **Operation:** ${operation}
@@ -309,26 +356,26 @@ ${validationResults.recommendations.map((r: string) => `• 💡 ${r}`).join('\n
 **Warnings:** ${complianceResults.warnings.length}
 
 **Critical Issues:**
-${complianceResults.criticalIssues.map((i: string) => `• ❌ ${i}`).join('\n') || 'None'}
+${complianceResults.criticalIssues.map((i: string) => `• ❌ ${i}`).join("\n") || "None"}
 
 **Warnings:**
-${complianceResults.warnings.map((w: string) => `• ⚠️ ${w}`).join('\n') || 'None'}
+${complianceResults.warnings.map((w: string) => `• ⚠️ ${w}`).join("\n") || "None"}
 
 **Enforcement Actions:**
-${complianceResults.actions.map((a: string) => `• 🔧 ${a}`).join('\n') || 'None required'}
+${complianceResults.actions.map((a: string) => `• 🔧 ${a}`).join("\n") || "None required"}
 
-**Status:** ${complianceResults.approved ? '✅ COMPLIANT' : '❌ REQUIRES CORRECTION'}`
-          }
-        ]
+**Status:** ${complianceResults.approved ? "✅ COMPLIANT" : "❌ REQUIRES CORRECTION"}`,
+          },
+        ],
       };
     } catch (error) {
       return {
         content: [
           {
-            type: 'text',
-            text: `❌ Compliance check failed: ${error instanceof Error ? error.message : String(error)}`
-          }
-        ]
+            type: "text",
+            text: `❌ Compliance check failed: ${error instanceof Error ? error.message : String(error)}`,
+          },
+        ],
       };
     }
   }
@@ -336,12 +383,19 @@ ${complianceResults.actions.map((a: string) => `• 🔧 ${a}`).join('\n') || 'N
   private sanitizeInput(content: string): string {
     // Basic input sanitization
     return content
-      .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '[SCRIPT REMOVED]')
-      .replace(/javascript:/gi, '[JAVASCRIPT REMOVED]')
+      .replace(
+        /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
+        "[SCRIPT REMOVED]",
+      )
+      .replace(/javascript:/gi, "[JAVASCRIPT REMOVED]")
       .trim();
   }
 
-  private async validateAgainstCodex(content: string, strict: boolean, terms?: string[]): Promise<any> {
+  private async validateAgainstCodex(
+    content: string,
+    strict: boolean,
+    terms?: string[],
+  ): Promise<any> {
     const results = {
       validations: [] as string[],
       warnings: [] as string[],
@@ -349,10 +403,13 @@ ${complianceResults.actions.map((a: string) => `• 🔧 ${a}`).join('\n') || 'N
       recommendations: [] as string[],
       compliance: 0,
       blocked: false,
-      reason: ''
+      reason: "",
     };
 
-    const termsToCheck = terms && terms.length > 0 && !terms.includes('all') ? terms : this.codexTerms;
+    const termsToCheck =
+      terms && terms.length > 0 && !terms.includes("all")
+        ? terms
+        : this.codexTerms;
     let passed = 0;
 
     for (const term of termsToCheck) {
@@ -380,33 +437,36 @@ ${complianceResults.actions.map((a: string) => `• 🔧 ${a}`).join('\n') || 'N
   private checkCodexTerm(content: string, term: string): any {
     // Simplified codex term checking
     switch (term) {
-      case 'Type Safety First':
+      case "Type Safety First":
         return {
-          passed: !content.includes('any') || content.includes('// @ts-ignore'),
-          reason: 'Type safety violations detected',
-          recommendation: 'Use proper TypeScript types instead of any',
-          critical: false
+          passed: !content.includes("any") || content.includes("// @ts-ignore"),
+          reason: "Type safety violations detected",
+          recommendation: "Use proper TypeScript types instead of any",
+          critical: false,
         };
-      case 'No Stubs/Patches':
+      case "No Stubs/Patches":
         return {
-          passed: !content.includes('TODO') && !content.includes('FIXME'),
-          reason: 'Stub code or patches detected',
-          recommendation: 'Implement complete functionality or remove placeholder code',
-          critical: true
+          passed: !content.includes("TODO") && !content.includes("FIXME"),
+          reason: "Stub code or patches detected",
+          recommendation:
+            "Implement complete functionality or remove placeholder code",
+          critical: true,
         };
-      case 'Progressive Prod-Ready Code':
+      case "Progressive Prod-Ready Code":
         return {
-          passed: !content.includes('console.log') || content.includes('production'),
-          reason: 'Non-production ready code detected',
-          recommendation: 'Remove debug statements and ensure production readiness',
-          critical: false
+          passed:
+            !content.includes("console.log") || content.includes("production"),
+          reason: "Non-production ready code detected",
+          recommendation:
+            "Remove debug statements and ensure production readiness",
+          critical: false,
         };
       default:
         return {
           passed: true,
-          reason: '',
-          recommendation: '',
-          critical: false
+          reason: "",
+          recommendation: "",
+          critical: false,
         };
     }
   }
@@ -422,12 +482,12 @@ ${complianceResults.actions.map((a: string) => `• 🔧 ${a}`).join('\n') || 'N
   private performSecurityChecks(content: string): any {
     const warnings = [];
 
-    if (content.includes('eval(')) {
-      warnings.push('Use of eval() detected - security risk');
+    if (content.includes("eval(")) {
+      warnings.push("Use of eval() detected - security risk");
     }
 
-    if (content.includes('innerHTML')) {
-      warnings.push('Direct innerHTML manipulation detected - XSS risk');
+    if (content.includes("innerHTML")) {
+      warnings.push("Direct innerHTML manipulation detected - XSS risk");
     }
 
     return { warnings };
@@ -435,7 +495,7 @@ ${complianceResults.actions.map((a: string) => `• 🔧 ${a}`).join('\n') || 'N
 
   private validateResults(content: string, results: any): string {
     // Basic result validation
-    if (typeof results === 'object' && results.error) {
+    if (typeof results === "object" && results.error) {
       return `${content}\n/* ERROR: ${results.error} */`;
     }
     return content;
@@ -445,29 +505,43 @@ ${complianceResults.actions.map((a: string) => `• 🔧 ${a}`).join('\n') || 'N
     const results = {
       compliance: [] as string[],
       recommendations: [] as string[],
-      approved: true
+      approved: true,
     };
 
     // Check bundle size compliance (if applicable)
-    if (content.includes('import') && content.length > 50000) {
-      results.compliance.push('Large module detected - consider code splitting');
-      results.recommendations.push('Implement lazy loading or split large modules');
+    if (content.includes("import") && content.length > 50000) {
+      results.compliance.push(
+        "Large module detected - consider code splitting",
+      );
+      results.recommendations.push(
+        "Implement lazy loading or split large modules",
+      );
     }
 
     // Check for performance issues
-    if (content.includes('for') && content.includes('length') && content.includes('i++')) {
-      results.recommendations.push('Consider using for...of loops or array methods for better performance');
+    if (
+      content.includes("for") &&
+      content.includes("length") &&
+      content.includes("i++")
+    ) {
+      results.recommendations.push(
+        "Consider using for...of loops or array methods for better performance",
+      );
     }
 
     return results;
   }
 
-  private generateAuditTrail(content: string, results: any, postResults: any): string[] {
+  private generateAuditTrail(
+    content: string,
+    results: any,
+    postResults: any,
+  ): string[] {
     const audit = [
       `Operation completed at ${new Date().toISOString()}`,
       `Content length: ${content.length}`,
-      `Processing time: ${results.duration || 'unknown'}ms`,
-      `Compliance status: ${postResults.finalApproval ? 'approved' : 'requires review'}`
+      `Processing time: ${results.duration || "unknown"}ms`,
+      `Compliance status: ${postResults.finalApproval ? "approved" : "requires review"}`,
     ];
 
     return audit;
@@ -477,54 +551,68 @@ ${complianceResults.actions.map((a: string) => `• 🔧 ${a}`).join('\n') || 'N
     const recommendations = [];
 
     // Basic quality checks
-    if (content.split('\n').length > 100) {
-      recommendations.push('Consider breaking down large files into smaller modules');
+    if (content.split("\n").length > 100) {
+      recommendations.push(
+        "Consider breaking down large files into smaller modules",
+      );
     }
 
-    if (content.includes('function') && content.split('function').length > 10) {
-      recommendations.push('High function count - consider consolidating related functions');
+    if (content.includes("function") && content.split("function").length > 10) {
+      recommendations.push(
+        "High function count - consider consolidating related functions",
+      );
     }
 
     return { recommendations };
   }
 
   private detectContentType(content: string): string {
-    if (content.includes('function') || content.includes('const') || content.includes('let')) {
-      return 'JavaScript/TypeScript';
+    if (
+      content.includes("function") ||
+      content.includes("const") ||
+      content.includes("let")
+    ) {
+      return "JavaScript/TypeScript";
     }
-    if (content.includes('class') || content.includes('def ')) {
-      return 'Python';
+    if (content.includes("class") || content.includes("def ")) {
+      return "Python";
     }
-    if (content.includes('<') && content.includes('>')) {
-      return 'HTML/XML';
+    if (content.includes("<") && content.includes(">")) {
+      return "HTML/XML";
     }
-    return 'Text';
+    return "Text";
   }
 
-  private async checkFrameworkCompliance(content: string, operation: string, context: any): Promise<any> {
+  private async checkFrameworkCompliance(
+    content: string,
+    operation: string,
+    context: any,
+  ): Promise<any> {
     const results = {
       score: 100,
       criticalIssues: [] as string[],
       warnings: [] as string[],
       actions: [] as string[],
-      approved: true
+      approved: true,
     };
 
     // Operation-specific compliance checks
     switch (operation) {
-      case 'code-review':
-        if (!content.includes('function') && !content.includes('class')) {
-          results.warnings.push('No functions or classes detected in code review');
+      case "code-review":
+        if (!content.includes("function") && !content.includes("class")) {
+          results.warnings.push(
+            "No functions or classes detected in code review",
+          );
         }
         break;
-      case 'security-audit':
-        if (!content.includes('auth') && !content.includes('security')) {
-          results.warnings.push('Limited security-related content detected');
+      case "security-audit":
+        if (!content.includes("auth") && !content.includes("security")) {
+          results.warnings.push("Limited security-related content detected");
         }
         break;
-      case 'testing':
-        if (!content.includes('test') && !content.includes('spec')) {
-          results.warnings.push('No test-related content detected');
+      case "testing":
+        if (!content.includes("test") && !content.includes("spec")) {
+          results.warnings.push("No test-related content detected");
         }
         break;
     }
@@ -532,7 +620,7 @@ ${complianceResults.actions.map((a: string) => `• 🔧 ${a}`).join('\n') || 'N
     // General compliance checks
     if (content.length > 10000) {
       results.score -= 10;
-      results.warnings.push('Large content size - consider splitting');
+      results.warnings.push("Large content size - consider splitting");
     }
 
     if (results.criticalIssues.length > 0) {
@@ -546,7 +634,7 @@ ${complianceResults.actions.map((a: string) => `• 🔧 ${a}`).join('\n') || 'N
   async run() {
     const transport = new StdioServerTransport();
     await this.server.connect(transport);
-    console.log('StrRay Processor Pipeline MCP Server started');
+    console.log("StrRay Processor Pipeline MCP Server started");
   }
 }
 

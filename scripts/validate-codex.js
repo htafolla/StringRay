@@ -9,7 +9,10 @@ if (!fs.existsSync("src/codex-injector.ts")) {
 }
 
 // Check if codex files exist
-const codexFiles = ["src/agents_template.md", "src/codex/agents_template.md"];
+const codexFiles = [
+  "docs/framework/agents_template.md",
+  ".strray/agents_template.md",
+];
 
 let codexFound = false;
 for (const file of codexFiles) {
@@ -48,9 +51,9 @@ if (fs.existsSync("package.json")) {
   process.exit(1);
 }
 
-// Check .opencode directory
-if (fs.existsSync(".opencode")) {
-  if (fs.existsSync(".opencode/codex-injector.js")) {
+// Check .strray directory
+if (fs.existsSync(".strray")) {
+  if (fs.existsSync(".strray/codex.json")) {
   } else {
   }
 } else {

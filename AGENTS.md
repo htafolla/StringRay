@@ -1,8 +1,8 @@
 # StrRay Framework v1.0.0 - Complete Agent Context & Universal Development Codex v1.2.20
 
 **Framework Version**: 1.0.0
-**Last Updated**: 2026-01-09 (Integrated Architecture)
-**Last Updated**: 2026-01-09
+**Last Updated**: 2026-01-10 (Integrated Architecture)
+**Last Updated**: 2026-01-10
 **Purpose**: Enterprise AI orchestration with systematic error prevention and production-ready development
 
 ## 🚀 StrRay Framework - oh-my-opencode Integration
@@ -47,6 +47,7 @@ StrRay Framework - Integrated Dual-Orchestration Architecture
 StrRay provides 8 specialized agents that integrate with oh-my-opencode's 11 built-in agents:
 
 #### StrRay Core Agents (8):
+
 1. **enforcer** - Codex compliance & error prevention
 2. **architect** - System design & technical decisions
 3. **orchestrator** - Multi-agent workflow coordination
@@ -57,6 +58,7 @@ StrRay provides 8 specialized agents that integrate with oh-my-opencode's 11 bui
 8. **test-architect** - Testing strategy & coverage optimization
 
 #### oh-my-opencode Built-in Agents (11):
+
 - Librarian, Explore, Oracle, Frontend, Document-Writer, Multimodal-Looker, etc.
 
 **Total: 19 agents** working together in a complementary orchestration model.
@@ -64,10 +66,10 @@ StrRay provides 8 specialized agents that integrate with oh-my-opencode's 11 bui
 ### Dual Orchestration Integration
 
 **StrRay integrates alongside oh-my-opencode's orchestration system**:
+
 - **oh-my-opencode**: Primary orchestration (Prometheus planner + Sisyphus executor)
 - **StrRay**: Advanced multi-agent delegation for complex tasks
 - **Automatic Routing**: Complexity analysis determines which system handles each task
-
 
 All agents operate in `subagent` mode with full tool access and automatic delegation:
 
@@ -89,6 +91,7 @@ All agents operate in `subagent` mode with full tool access and automatic delega
 **StrRay Framework is integrated within oh-my-opencode - no separate plugin registration required.**
 
 **Configuration Files:**
+
 - `.opencode/oh-my-opencode.json` - Project-specific oh-my-opencode orchestration settings
 - `~/.config/opencode/opencode.json` - Global OpenCode settings (user preferences, includes agent model routing and plugins)
 - `.strray/config.json` - StrRay multi-agent orchestration settings (optional)
@@ -98,15 +101,18 @@ All agents operate in `subagent` mode with full tool access and automatic delega
 **Configuration follows OpenCode's precedence hierarchy with StrRay integration:**
 
 #### 📁 Configuration Architecture:
+
 ```
 ├── ~/.config/opencode/opencode.json    # Global OpenCode settings (user preferences, agent routing, plugins)
 ├── .opencode/oh-my-opencode.json       # Project-specific oh-my-opencode settings
 └── .strray/config.json                 # StrRay-specific multi-agent orchestration (optional)
 ```
-├── .opencode/oh-my-opencode.json    # oh-my-opencode settings (includes StrRay agents)
-├── ~/.config/opencode/opencode.json  # Global oh-my-opencode settings (no plugin registration needed)
-└── .strray/config.json              # StrRay-specific settings (optional)
-```
+
+├── .opencode/oh-my-opencode.json # oh-my-opencode settings (includes StrRay agents)
+├── ~/.config/opencode/opencode.json # Global oh-my-opencode settings (no plugin registration needed)
+└── .strray/config.json # StrRay-specific settings (optional)
+
+````
 
 #### 🎯 Settings Separation:
 
@@ -121,9 +127,10 @@ All agents operate in `subagent` mode with full tool access and automatic delega
     "architect": "opencode/grok-code"
   }
 }
-```
+````
 
 **.opencode/oh-my-opencode.json** (Project-specific oh-my-opencode):
+
 ```json
 {
   "disabled_agents": [],
@@ -132,6 +139,7 @@ All agents operate in `subagent` mode with full tool access and automatic delega
 ```
 
 **.strray/config.json** (StrRay):
+
 ```json
 {
   "multi_agent_orchestration": {
@@ -149,12 +157,10 @@ All agents operate in `subagent` mode with full tool access and automatic delega
 
 **Benefits:** Follows OpenCode's configuration merging hierarchy (global → project → StrRay), preventing conflicts while allowing layered customization.
 
-
 #### Plugin Architecture
 
 - **StrRay Plugin**: `stringray-framework.js` - Registers 8 specialized agents
 - **Codex Plugin**: `plugin/strray-codex-injection.ts` - Automatic codex injection and delegation triggering
-
 
 #### oh-my-opencode Integration Points
 
@@ -894,8 +900,8 @@ Evaluate performance characteristics:
 
 #### MCP Server Integration
 
-- **9 MCP Servers**: 7 agent-specific servers + 2 knowledge skill servers
-- **Knowledge Skills**: project-analysis, testing-strategy, architecture-patterns, performance-optimization, git-workflow, api-design
+- **11 MCP Servers**: 7 agent-specific + 4 knowledge skills
+- **Knowledge Skills**: project-analysis, testing-strategy, architecture-patterns, performance-optimization
 - **Protocol**: Model Context Protocol for standardized AI integration
 
 ### Agent Communication & Coordination
@@ -1010,32 +1016,7 @@ score = Math.min(Math.max(score, 0), 100); // Normalize 0-100
 
 ### MCP Protocol Implementation
 
-- **9 MCP Servers**: 7 agent-specific + 2 knowledge skill servers
-- **Tool Registration**: Dynamic tool discovery and permission systems
-- **Resource Access**: Controlled access to framework resources
-- **Protocol Versions**: Automatic compatibility negotiation
-
----
-
-## 🔌 Plugin Ecosystem Architecture
-
-### Plugin Lifecycle Management
-
-- **Plugin States**: registered → validated → activated → running → deactivated
-- **Security Sandboxing**: VM isolation, resource limits, module restrictions
-- **Hot-Reload**: Dynamic plugin updates without framework restart
-- **Dependency Resolution**: Version compatibility and automatic updates
-
-### oh-my-opencode Hook System
-
-- **`agent.start`**: Loads codex context on agent initialization
-- **`tool.execute.before`**: Validates actions against codex terms
-- **`tool.execute.after`**: Injects codex context into responses
-- **Hook Priority**: Configurable execution order and failure handling
-
-### MCP Protocol Implementation
-
-- **9 MCP Servers**: 7 agent-specific + 2 knowledge skill servers
+- **11 MCP Servers**: 7 agent-specific + 4 knowledge skills
 - **Tool Registration**: Dynamic tool discovery and permission systems
 - **Resource Access**: Controlled access to framework resources
 - **Protocol Versions**: Automatic compatibility negotiation
@@ -1151,65 +1132,6 @@ Framework initializes in strict dependency order:
 - **Shared State Manager**: Consistent state across TypeScript/Python boundaries
 - **Automatic Reconciliation**: Conflict resolution for concurrent state updates
 - **Persistence Layer**: Unified storage with cross-language access
-
----
-
-## 🌉 Cross-Language Integration
-
-### Python/TypeScript Communication
-
-- **Inter-process Communication**: JSON-RPC/WebSocket protocols for cross-language calls
-- **Data Serialization**: Type-safe data exchange with validation
-- **Error Propagation**: Consistent error handling across language boundaries
-- **Performance Optimization**: Lazy loading and caching for cross-language operations
-
-### Hybrid Architecture Benefits
-
-- **TypeScript Layer**: Fast, type-safe configuration and UI components
-- **Python Layer**: Advanced async coordination, state management, and AI services
-- **Unified Interface**: Seamless integration through shared configuration and APIs
-
-### State Synchronization
-
-- **Shared State Manager**: Consistent state across TypeScript/Python boundaries
-- **Automatic Reconciliation**: Conflict resolution for concurrent state updates
-- **Persistence Layer**: Unified storage with cross-language access
-
-### Codex Compliance Validation
-
-**Every operation must be validated against all applicable codex terms:**
-
-- **Pre-execution**: Block violations before they occur
-- **Runtime**: Continuous validation during execution
-- **Post-execution**: Verify compliance of results
-- **Escalation**: Automatic escalation for critical violations
-
-### Performance Budget Awareness
-
-**All operations must respect performance budgets:**
-
-- **Bundle Size**: < 2MB (gzipped < 700KB)
-- **Response Times**: FCP < 2s, TTI < 5s
-- **Resource Usage**: Monitor memory, CPU, and network usage
-- **Scalability**: Ensure operations scale with load
-
-### Security-First Approach
-
-**Security validation at every layer:**
-
-- **Input Sanitization**: All user inputs validated and sanitized
-- **Access Control**: Proper authentication and authorization
-- **Data Protection**: Encryption and secure storage
-- **Audit Logging**: Comprehensive security event logging
-
-### Error Prevention & Recovery
-
-**Zero-tolerance error handling:**
-
-- **Prevention First**: Validate inputs and preconditions
-- **Graceful Degradation**: Maintain functionality during failures
-- **Automatic Recovery**: Retry mechanisms and fallback strategies
-- **Comprehensive Logging**: Detailed error information for debugging
 
 ---
 
@@ -1337,7 +1259,7 @@ Framework initializes in strict dependency order:
 ### Implemented Features ✅
 
 - **8 Specialized Agents**: All configured with proper tools and permissions
-- **Codex Compliance**: 43-term validation with zero-tolerance blocking
+- **Codex Compliance**: 45-term validation with zero-tolerance blocking
 - **Hybrid Architecture**: TypeScript/Python integration operational
 - **Boot Orchestration**: Dependency-ordered initialization working
 - **State Management**: Session persistence and cross-session coordination
@@ -1360,4 +1282,3 @@ Framework initializes in strict dependency order:
 **Framework Status**: Production-ready integrated AI orchestration platform with dual-system orchestration and systematic error prevention. Documentation updated to provide complete operational context for integrated agent ecosystem.
 
 **Accuracy**: Core architecture and capabilities accurately documented. Integration details and dual-system orchestration fully implemented and documented.
-

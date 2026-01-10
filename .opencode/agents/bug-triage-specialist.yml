@@ -2,6 +2,7 @@ name: bug-triage-specialist
 description: "Bug triage specialist agent for systematic error investigation and surgical fixes"
 version: "1.0.0"
 model: opencode/grok-code
+mode: subagent
 
 # Error Handling Configuration
 error_handling:

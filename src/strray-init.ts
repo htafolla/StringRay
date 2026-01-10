@@ -1,6 +1,6 @@
 /**
  * StrRay Framework Initialization
- * 
+ *
  * This file integrates StrRay framework activation directly into oh-my-opencode's
  * core initialization process.
  */
@@ -13,11 +13,23 @@ import { frameworkLogger } from "./framework-logger.js";
 export async function initializeStrRay(): Promise<void> {
   try {
     await activateStrRayFramework();
-    frameworkLogger.log("strray-init", "StrRay framework initialized successfully", "success");
-        } catch (error: unknown) {
-    frameworkLogger.log("strray-init", "StrRay framework initialization failed", "error", error);
+    frameworkLogger.log(
+      "strray-init",
+      "StrRay framework initialized successfully",
+      "success",
+    );
+  } catch (error: unknown) {
+    frameworkLogger.log(
+      "strray-init",
+      "StrRay framework initialization failed",
+      "error",
+      error,
+    );
     // Don't throw - allow oh-my-opencode to continue without StrRay
-    console.warn("⚠️ StrRay framework failed to initialize:", error instanceof Error ? error.message : String(error));
+    console.warn(
+      "⚠️ StrRay framework failed to initialize:",
+      error instanceof Error ? error.message : String(error),
+    );
   }
 }
 

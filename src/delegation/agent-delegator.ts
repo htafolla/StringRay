@@ -144,14 +144,14 @@ export class AgentDelegator {
         },
       );
 
-       // Override strategy based on configuration
-       if (!multiAgentEnabled && delegation.strategy === "multi-agent") {
-         console.log(
-           "⚠️  Multi-agent orchestration disabled, falling back to single-agent",
-         );
-         delegation.strategy = "single-agent";
-         delegation.agents = delegation.agents.slice(0, 1);
-       }
+      // Override strategy based on configuration
+      if (!multiAgentEnabled && delegation.strategy === "multi-agent") {
+        console.log(
+          "⚠️  Multi-agent orchestration disabled, falling back to single-agent",
+        );
+        delegation.strategy = "single-agent";
+        delegation.agents = delegation.agents.slice(0, 1);
+      }
 
       // Apply max concurrent agents limit
       if (

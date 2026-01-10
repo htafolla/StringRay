@@ -2,6 +2,7 @@ name: test-architect
 description: "Test architect agent for comprehensive testing strategy and validation"
 version: "1.0.0"
 model: opencode/grok-code
+mode: subagent
 
 # Logging Configuration
 logging:

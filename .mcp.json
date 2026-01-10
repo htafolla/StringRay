@@ -1,60 +1,20 @@
 {
-  "version": "1.0",
-  "mcps": {
-    "strray-orchestrator": {
-      "server": "node dist/mcps/orchestrator.server.js",
-      "config": "dist/mcps/orchestrator.server.json"
+  "mcpServers": {
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-everything", "context7"]
     },
-    "strray-processor-pipeline": {
-      "server": "node dist/mcps/processor-pipeline.server.js",
-      "config": "dist/mcps/processor-pipeline.server.json"
+    "global-filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "/"]
     },
-    "strray-framework-compliance-audit": {
-      "server": "node dist/mcps/framework-compliance-audit.server.js",
-      "config": "dist/mcps/framework-compliance-audit.server.json"
+    "grep_app": {
+      "command": "npx", 
+      "args": ["-y", "@modelcontextprotocol/server-grep", "."]
     },
-    "strray-performance-analysis": {
-      "server": "node dist/mcps/performance-analysis.server.js",
-      "config": "dist/mcps/performance-analysis.server.json"
-    },
-    "strray-security-scan": {
-      "server": "node dist/mcps/security-scan.server.js",
-      "config": "dist/mcps/security-scan.server.json"
-    },
-    "strray-auto-format": {
-      "server": "node dist/mcps/auto-format.server.js",
-      "config": "dist/mcps/auto-format.server.json"
-    },
-    "strray-lint": {
-      "server": "node dist/mcps/lint.server.js",
-      "config": "dist/mcps/lint.server.json"
-    },
-    "strray-model-health-check": {
-      "server": "node dist/mcps/model-health-check.server.js",
-      "config": "dist/mcps/model-health-check.server.json"
-    },
-    "strray-state-manager": {
-      "server": "node dist/mcps/state-manager.server.js",
-      "config": "dist/mcps/state-manager.server.json"
-    },
-    "strray-boot-orchestrator": {
-      "server": "node dist/mcps/boot-orchestrator.server.js",
-      "config": "dist/mcps/boot-orchestrator.server.json"
-    }
-  },
-  "globalConfig": {
-    "logLevel": "info",
-    "enableMetrics": true,
-    "retryAttempts": 3,
-    "strrayFramework": {
-      "enabled": true,
-      "codexInjection": true,
-      "complexityAnalysis": true,
-      "multiAgentOrchestration": {
-        "enabled": true,
-        "maxConcurrentAgents": 5,
-        "coordinationModel": "async-multi-agent"
-      }
+    "websearch": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-brave-search"]
     }
   }
 }

@@ -5,9 +5,11 @@
 **Model**: opencode/grok-code
 
 ## Purpose
+
 Security vulnerability detection, compliance validation, and security remediation.
 
 ## Capabilities
+
 - Vulnerability scanning and assessment
 - Security compliance validation
 - Input validation and sanitization
@@ -15,6 +17,7 @@ Security vulnerability detection, compliance validation, and security remediatio
 - OWASP Top 10 compliance checking
 
 ## Commands
+
 - vulnerability-scan: Scan for security vulnerabilities
 - compliance-audit: Validate security compliance
 - input-validation-review: Review input validation

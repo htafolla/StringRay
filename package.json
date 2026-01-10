@@ -20,7 +20,6 @@
     "lint:fix": "eslint src --fix",
     "clean": "rm -rf dist",
     "prepublishOnly": "npm run build",
-    
     "test": "node scripts/test-utils/smart-test-runner.mjs",
     "test:direct": "vitest run",
     "test:watch": "vitest",
@@ -37,17 +36,14 @@
     "test:validation": "bash tests/validation/simple-validation.sh",
     "test:scripts": "node tests/scripts/test-plugin.js",
     "test:python": "python3 tests/python/test_codex_loader.py",
-    
     "performance:monitor": "node -e \"import('./dist/performance/index.js').then(m => m.performanceSystem.initialize().then(() => m.performanceSystem.start()))\"",
     "performance:report": "node -e \"import('./dist/performance/index.js').then(m => m.performanceSystem.initialize().then(() => m.performanceSystem.generateReport().then(r => console.log(JSON.stringify(r, null, 2))))\"",
     "performance:gates": "node -e \"import('./dist/performance/index.js').then(m => m.performanceSystem.initialize().then(() => m.performanceSystem.runGates()))\"",
-    
     "audit": "npm audit",
     "security-audit": "node scripts/basic-security-audit.cjs",
     "security-check": "npm run security-audit && npm audit --audit-level=moderate",
     "security-monitor": "node scripts/basic-security-audit.cjs --monitor",
     "deps:check": "npm audit && npm outdated",
-    
     "framework:init": "bash .opencode/init.sh",
     "framework:validate": "npm run test:validation",
     "framework:health": "npm run framework:init && npm run framework:validate"

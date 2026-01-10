@@ -220,5 +220,10 @@
       "monitoring_enabled": true
     }
   },
-    "disabled_agents": ["frontend-ui-ux-engineer", "document-writer", "oracle", "multimodal-looker"]
+  "disabled_agents": [
+    "frontend-ui-ux-engineer",
+    "document-writer",
+    "oracle",
+    "multimodal-looker"
+  ]
 }

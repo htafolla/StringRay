@@ -358,14 +358,14 @@ describe("AgentDelegator", () => {
 
     it("should resolve multi-agent conflicts", async () => {
       const request: DelegationRequest = {
-         operation: "refactor",
-         description: "Conflict test",
-         context: {
-           files: ["test.ts", "another.ts"], // Ensure multi-agent selection
-           changeVolume: 300, // Increase to ensure multi-agent
-           dependencies: 6, // Increase to ensure multi-agent
-           riskLevel: "low", // Adjust risk to ensure complex level
-         },
+        operation: "refactor",
+        description: "Conflict test",
+        context: {
+          files: ["test.ts", "another.ts"], // Ensure multi-agent selection
+          changeVolume: 300, // Increase to ensure multi-agent
+          dependencies: 6, // Increase to ensure multi-agent
+          riskLevel: "low", // Adjust risk to ensure complex level
+        },
       };
 
       // Mock agents with conflicting results
@@ -388,7 +388,9 @@ describe("AgentDelegator", () => {
       stateManager.set("agent:enforcer", mockAgent2);
 
       const delegation = await agentDelegator.analyzeDelegation(request);
-      expect(["single-agent", "multi-agent", "orchestrator-led"]).toContain(delegation.strategy); // Ensure multi-agent strategy
+      expect(["single-agent", "multi-agent", "orchestrator-led"]).toContain(
+        delegation.strategy,
+      ); // Ensure multi-agent strategy
 
       const result = await agentDelegator.executeDelegation(
         delegation,
@@ -642,7 +644,9 @@ describe("AgentDelegator", () => {
       };
 
       const delegation = await agentDelegator.analyzeDelegation(request);
-      expect(["single-agent", "multi-agent", "orchestrator-led"]).toContain(delegation.strategy);
+      expect(["single-agent", "multi-agent", "orchestrator-led"]).toContain(
+        delegation.strategy,
+      );
       expect(delegation.agents.length).toBeGreaterThan(1);
     });
 
@@ -659,7 +663,9 @@ describe("AgentDelegator", () => {
       };
 
       const delegation = await agentDelegator.analyzeDelegation(request);
-      expect(["single-agent", "multi-agent", "orchestrator-led"]).toContain(delegation.strategy);
+      expect(["single-agent", "multi-agent", "orchestrator-led"]).toContain(
+        delegation.strategy,
+      );
       expect(delegation.agents.length).toBeGreaterThan(1);
     });
 
@@ -776,7 +782,9 @@ describe("AgentDelegator", () => {
       };
 
       const delegation = await agentDelegator.analyzeDelegation(request);
-      expect(["single-agent", "multi-agent", "orchestrator-led"]).toContain(delegation.strategy);
+      expect(["single-agent", "multi-agent", "orchestrator-led"]).toContain(
+        delegation.strategy,
+      );
 
       // Mock agents for execution
       const mockAgent1 = {

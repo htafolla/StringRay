@@ -23,21 +23,23 @@ def validate_code(code: str, file_path: str = "<unknown>") -> dict:
     Returns validation result with violations if any.
     """
     loader = CodexLoader()
-    
+
     # validate_compliance returns a list of CodexComplianceResult objects
     results = loader.validate_compliance(code)
-    
+
     violations = []
     is_compliant = True
-    
+
     for result in results:
-        if hasattr(result, 'compliant') and not result.compliant:
+        if hasattr(result, "compliant") and not result.compliant:
             is_compliant = False
-            violations.append({
-                'term_id': getattr(result, 'term_id', 'unknown'),
-                'description': getattr(result, 'description', 'Unknown violation'),
-                'severity': getattr(result, 'severity', 'medium')
-            })
+            violations.append(
+                {
+                    "term_id": getattr(result, "term_id", "unknown"),
+                    "description": getattr(result, "description", "Unknown violation"),
+                    "severity": getattr(result, "severity", "medium"),
+                }
+            )
 
     result = {
         "compliant": is_compliant,

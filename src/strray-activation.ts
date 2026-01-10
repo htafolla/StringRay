@@ -112,11 +112,19 @@ async function activateStateManagement(): Promise<void> {
 }
 
 async function activateOrchestrator(): Promise<void> {
-  frameworkLogger.log("strray-activation", "activating StrRay orchestrator", "info");
+  frameworkLogger.log(
+    "strray-activation",
+    "activating StrRay orchestrator",
+    "info",
+  );
 
   const { strRayOrchestrator } = await import("./orchestrator.js");
 
-  frameworkLogger.log("strray-activation", "StrRay orchestrator activated", "success");
+  frameworkLogger.log(
+    "strray-activation",
+    "StrRay orchestrator activated",
+    "success",
+  );
 }
 
 async function activateProcessors(): Promise<void> {

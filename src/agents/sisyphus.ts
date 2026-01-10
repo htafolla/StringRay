@@ -3,7 +3,8 @@ import { AgentConfig } from "./types";
 export const sisyphusAgent: AgentConfig = {
   name: "Sisyphus",
   model: "opencode/grok-code",
-  description: "Main orchestrator and command center for multi-agent coordination and workflow management",
+  description:
+    "Main orchestrator and command center for multi-agent coordination and workflow management",
   mode: "primary",
 
   system: `You are Sisyphus, the main orchestrator and command center for multi-agent coordination and workflow management in the StrRay Framework.
@@ -36,14 +37,23 @@ When delegating tasks, always provide complete context and clear success criteri
 
   tools: {
     include: [
-      "read", "grep", "lsp_diagnostics", "lsp_code_actions", "lsp_rename",
-      "run_terminal_cmd", "background_task", "call_omo_agent",
-      "session_list", "session_read", "session_search", "session_info"
-    ]
+      "read",
+      "grep",
+      "lsp_diagnostics",
+      "lsp_code_actions",
+      "lsp_rename",
+      "run_terminal_cmd",
+      "background_task",
+      "call_omo_agent",
+      "session_list",
+      "session_read",
+      "session_search",
+      "session_info",
+    ],
   },
 
   permission: {
     edit: "allow",
-    bash: "allow"
-  }
+    bash: "allow",
+  },
 };

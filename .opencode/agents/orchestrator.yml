@@ -1,7 +1,8 @@
 name: orchestrator
 description: "Orchestrator agent for workflow coordination and task delegation"
-version: "1.0.0"
+version: "2.0.0"
 model: opencode/grok-code
+mode: primary
 
 # State Management Configuration
 state_management:

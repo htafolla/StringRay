@@ -2,6 +2,7 @@ name: enforcer
 description: "Enforcer agent for codex compliance and error prevention"
 version: "1.0.0"
 model: opencode/grok-code
+mode: subagent
 
 # Logging Configuration
 logging:

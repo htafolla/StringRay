@@ -2,6 +2,7 @@ name: code-reviewer
 description: "Code reviewer agent for quality assessment and compliance validation"
 version: "1.0.0"
 model: opencode/grok-code
+mode: subagent
 
 # Logging Configuration
 logging:

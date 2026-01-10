@@ -2,6 +2,7 @@ name: security-auditor
 description: "Security auditor agent for vulnerability detection and compliance"
 version: "1.0.0"
 model: opencode/grok-code
+mode: subagent
 
 # Logging Configuration
 logging:

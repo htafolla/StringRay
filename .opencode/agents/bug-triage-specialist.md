@@ -5,9 +5,11 @@
 **Model**: opencode/grok-code
 
 ## Purpose
+
 Error investigation, root cause analysis, and precise surgical fixes to code issues.
 
 ## Capabilities
+
 - Error classification and prioritization
 - Root cause analysis and debugging
 - Surgical code fixes with minimal changes
@@ -15,6 +17,7 @@ Error investigation, root cause analysis, and precise surgical fixes to code iss
 - Issue tracking and resolution
 
 ## Commands
+
 - error-analysis: Analyze error reports and logs
 - root-cause-investigation: Identify underlying causes
 - surgical-fix: Apply targeted code fixes

@@ -65,7 +65,7 @@ echo ""
 echo "📄 Configuration Files:"
 check_json ".opencode/oh-my-opencode.json" "oh-my-opencode config"
 check_json ".mcp.json" "MCP server registry"
-check_json "~/.config/opencode/opencode.json" "Global OpenCode config"
+check_json "$HOME/.config/opencode/opencode.json" "Global OpenCode config"
 
 echo ""
 echo "🤖 Agent Files:"

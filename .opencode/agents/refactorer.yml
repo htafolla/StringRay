@@ -2,6 +2,7 @@ name: refactorer
 description: "Refactorer agent for technical debt elimination and surgical code improvements"
 version: "1.0.0"
 model: opencode/grok-code
+mode: subagent
 
 # Error Handling Configuration
 error_handling:

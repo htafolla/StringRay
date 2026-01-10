@@ -2,6 +2,7 @@ name: architect
 description: "Architect agent for design and architecture validation"
 version: "1.0.0"
 model: opencode/grok-code
+mode: subagent
 
 # State Management Configuration
 state_management:

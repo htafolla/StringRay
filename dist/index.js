@@ -31,4 +31,9 @@ export const loadAdvancedFeatures = async () => {
         bootOrchestrator: bootOrchestrator.bootOrchestrator,
     };
 };
+// StrRay Framework Direct Integration
+export { activateStrRayFramework, defaultStrRayConfig } from "./strray-activation.js";
+export { initializeStrRay } from "./strray-init.js";
+// Auto-activate StrRay framework when oh-my-opencode starts
+import "./strray-init.js";
 //# sourceMappingURL=index.js.map

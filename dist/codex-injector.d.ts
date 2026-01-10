@@ -17,7 +17,7 @@
 export declare function createStrRayCodexInjectorHook(): {
     name: "strray-codex-injector";
     hooks: {
-        "agent.start": (sessionId: string) => void;
+        "agent.start": (sessionId: string) => Promise<void>;
         "tool.execute.before": (input: {
             tool: string;
             args?: Record<string, unknown>;
@@ -28,12 +28,12 @@ export declare function createStrRayCodexInjectorHook(): {
         }, output: {
             output?: string;
             [key: string]: unknown;
-        }, sessionId: string) => {
+        }, sessionId: string) => Promise<{
             [key: string]: unknown;
             output?: string;
         } | {
             output: string;
-        };
+        }>;
     };
 };
 /**

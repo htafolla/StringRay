@@ -1,0 +1,67 @@
+{
+  "version": "1.0",
+  "mcps": {
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "."],
+      "env": {
+        "NODE_ENV": "development"
+      }
+    },
+    "git": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-git", "--repository", "."],
+      "env": {
+        "GIT_AUTHOR_NAME": "OpenCode Agent",
+        "GIT_AUTHOR_EMAIL": "agent@opencode.ai"
+      }
+    },
+    "sqlite": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-sqlite", "--db-path", "./data/app.db"],
+      "env": {
+        "SQLITE_BUSY_TIMEOUT": "5000"
+      }
+    },
+
+    "project-analysis": {
+      "server": "node .opencode/mcps/project-analysis.server.js",
+      "config": ".opencode/mcps/project-analysis.mcp.json"
+    },
+    "testing-strategy": {
+      "server": "node .opencode/mcps/testing-strategy.server.js",
+      "config": ".opencode/mcps/testing-strategy.mcp.json"
+    },
+    "architecture-patterns": {
+      "server": "node .opencode/mcps/architecture-patterns.server.js",
+      "config": ".opencode/mcps/architecture-patterns.mcp.json"
+    },
+    "performance-optimization": {
+      "server": "node .opencode/mcps/performance-optimization.server.js",
+      "config": ".opencode/mcps/performance-optimization.mcp.json"
+    },
+    "git-workflow": {
+      "server": "node .opencode/mcps/git-workflow.server.js",
+      "config": ".opencode/mcps/git-workflow.mcp.json"
+    },
+    "api-design": {
+      "server": "node .opencode/mcps/api-design.server.js",
+      "config": ".opencode/mcps/api-design.mcp.json"
+    }
+  },
+  "globalConfig": {
+    "logLevel": "info",
+    "enableMetrics": true,
+    "retryAttempts": 3,
+    "strrayFramework": {
+      "enabled": true,
+      "codexInjection": true,
+      "complexityAnalysis": true,
+      "multiAgentOrchestration": {
+        "enabled": true,
+        "maxConcurrentAgents": 5,
+        "coordinationModel": "async-multi-agent"
+      }
+    }
+  }
+}

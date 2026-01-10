@@ -9,18 +9,20 @@
 
 ## ⚠️ Important Notice
 
-**StringRay Framework v1.0.0 - Alpha Release**
+**StringRay Framework v1.0.0 - Integrated Plugin**
 
-This framework is currently in alpha stage and is provided for **experimental use only**. It is **not recommended** for production environments or existing projects at this time.
+StrRay Framework is **not distributed as a standalone npm package**. It is integrated within the oh-my-opencode framework as a plugin.
 
-**Use at Your Own Risk:**
+**❌ Do NOT install "stringray-framework" or "@strray/framework" as a package**
 
-- May contain bugs or incomplete features
-- API may change without notice
-- Not suitable for mission-critical applications
-- Back up your data before testing
+**✅ Install oh-my-opencode instead (which includes StrRay Framework)**
 
-For production use, please wait for stable releases or contact the development team for enterprise support.
+```bash
+npm install -g oh-my-opencode
+# StrRay Framework is automatically included
+```
+
+This repository contains the StrRay Framework source code, which is embedded within oh-my-opencode. The package.json is for development and build purposes only.
 
 ---
 
@@ -58,19 +60,37 @@ For production use, please wait for stable releases or contact the development t
 ### Installation
 
 ```bash
-# Install oh-my-opencode globally
+# Install oh-my-opencode globally (includes StrRay Framework)
 npm install -g oh-my-opencode
 # or
 bun install -g oh-my-opencode
 
-# Install StringRay dependencies
-npm install
-# or
-bun install
+# StrRay Framework is automatically included as a plugin
+# No separate installation required - it's integrated within oh-my-opencode
+```
 
-# Initialize StringRay in your project
-# StringRay integrates with oh-my-opencode automatically via plugin system
-# No manual initialization needed - the plugin loads on first use
+### Configuration
+
+StrRay Framework is pre-configured within oh-my-opencode. The framework automatically:
+
+- Loads the Universal Development Codex v1.2.20
+- Enables automatic multi-agent orchestration
+- Registers all 8 specialized agents
+- Sets up MCP servers for agent communication
+
+### Usage
+
+Once oh-my-opencode is installed, StrRay Framework is ready to use:
+
+```bash
+# Start oh-my-opencode (includes StrRay Framework)
+opencode
+
+# StrRay will automatically:
+# - Load codex terms into agent system prompts
+# - Enable multi-agent orchestration for complex tasks
+# - Provide 8 specialized agents (enforcer, architect, orchestrator, etc.)
+# - Monitor and enforce code quality standards
 ```
 
 ### oh-my-opencode Documentation
@@ -251,6 +271,43 @@ npm run monitoring    # Start monitoring dashboard
 npm run optimize      # Performance optimization analysis
 
 # Quality Assurance
+# Testing Architecture
+npm run test:unit        # Unit tests with mock-based plugin testing
+npm run test:integration # Integration tests with oh-my-opencode simulation
+npm run test:e2e         # End-to-end tests through oh-my-opencode runtime
+
+### 🧪 Testing Approach
+
+**StrRay Framework uses mock-based testing** due to its oh-my-opencode plugin architecture:
+
+**❌ Direct Plugin Testing (Not Supported):**
+```typescript
+// This fails due to ES6 import conflicts
+import { createStrRayCodexInjectorHook } from "./codex-injector";
+```
+
+**✅ Mock-Based Plugin Testing (Recommended):**
+```typescript
+// This works - simulates plugin behavior without imports
+const mockPlugin = {
+  hooks: {
+    "agent.start": async (sessionId) => { /* mock behavior */ },
+    "tool.execute.before": async (input) => { /* mock enforcement */ }
+  }
+};
+```
+
+**Why Mock Testing?**
+- **Plugin Architecture**: Framework runs as oh-my-opencode plugin, not standalone Node.js
+- **ES6 Import Conflicts**: Direct plugin imports fail when run outside oh-my-opencode
+- **Behavioral Testing**: Mocks test hook contracts and enforcement logic
+- **Reliability**: No environment-specific import issues
+
+**Testing Strategy:**
+- **Unit Tests**: Mock plugin behavior, test utility functions
+- **Integration Tests**: Simulate oh-my-opencode runtime with mocks
+- **E2E Tests**: Test through actual oh-my-opencode execution
+
 npm run test:coverage  # Test coverage analysis (>85% required)
 npm run test:performance # Performance regression testing
 npm run test:security   # Security-focused test suite

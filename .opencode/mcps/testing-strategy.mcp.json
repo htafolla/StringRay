@@ -1,9 +1,0 @@
-{
-  "mcpServers": {
-    "testing-strategy": {
-      "command": "node",
-      "args": ["strray/mcps/testing-strategy.server.js"],
-      "env": {}
-    }
-  }
-}

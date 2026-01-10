@@ -1,0 +1,70 @@
+{
+  "$schema": "./codex.json",
+  "version": "1.0.0",
+  "framework": "StrRay",
+  "multi_agent_orchestration": {
+    "enabled": true,
+    "coordination_model": "async-multi-agent",
+    "max_concurrent_agents": 3,
+    "task_distribution_strategy": "capability-based",
+    "conflict_resolution": "expert-priority",
+    "progress_tracking": true,
+    "session_persistence": true
+  },
+  "sisyphus_orchestrator": {
+    "enabled": true,
+    "relentless_execution": true,
+    "todo_enforcement": true,
+    "max_retries": 3,
+    "backoff_strategy": "exponential",
+    "progress_persistence": true
+  },
+  "agents": {
+    "enforcer": {
+      "enabled": true,
+      "priority": "high",
+      "capabilities": ["compliance-monitoring", "error-prevention"]
+    },
+    "architect": {
+      "enabled": true,
+      "priority": "high", 
+      "capabilities": ["design-review", "state-management"]
+    },
+    "orchestrator": {
+      "enabled": true,
+      "priority": "critical",
+      "capabilities": ["task-coordination", "multi-agent-delegation"]
+    },
+    "bug-triage-specialist": {
+      "enabled": true,
+      "priority": "high",
+      "capabilities": ["error-analysis", "surgical-fixes"]
+    },
+    "code-reviewer": {
+      "enabled": true,
+      "priority": "high",
+      "capabilities": ["code-quality-assessment", "standards-validation"]
+    },
+    "security-auditor": {
+      "enabled": true,
+      "priority": "high",
+      "capabilities": ["vulnerability-detection", "security-validation"]
+    },
+    "refactorer": {
+      "enabled": true,
+      "priority": "medium",
+      "capabilities": ["code-modernization", "technical-debt-reduction"]
+    },
+    "test-architect": {
+      "enabled": true,
+      "priority": "medium",
+      "capabilities": ["test-strategy-design", "coverage-optimization"]
+    }
+  },
+  "integration": {
+    "oh_my_opencode_compatibility": true,
+    "plugin_registration": "stringray-framework",
+    "agent_prefix": "strray-",
+    "orchestration_mode": "complementary"
+  }
+}

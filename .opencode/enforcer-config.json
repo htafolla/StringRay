@@ -220,5 +220,5 @@
       "monitoring_enabled": true
     }
   },
-  "disabled_agents": ["security-auditor", "refactorer", "bug-triage-specialist"]
+    "disabled_agents": ["frontend-ui-ux-engineer", "document-writer", "oracle", "multimodal-looker"]
 }

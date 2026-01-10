@@ -9,7 +9,26 @@
  */
 import * as fs from "fs";
 import * as path from "path";
-import { extractCodexMetadata } from "./utils/codex-parser.js";
+import { frameworkLogger } from "./framework-logger.js";
+// Dynamic imports for cross-environment compatibility
+let extractCodexMetadata;
+let StrRayContextLoader;
+let importsInitialized = false;
+async function initializeImports() {
+    if (importsInitialized)
+        return;
+    try {
+        // Try import with .js extension first (for Node.js/test environment)
+        ({ extractCodexMetadata } = await import("./utils/codex-parser.js"));
+        ({ StrRayContextLoader } = await import("./context-loader.js"));
+    }
+    catch (error) {
+        // Fallback to import without .js extension (for oh-my-opencode plugin environment)
+        ({ extractCodexMetadata } = await import("./utils/codex-parser"));
+        ({ StrRayContextLoader } = await import("./context-loader"));
+    }
+    importsInitialized = true;
+}
 /**
  * Session cache for codex context
  */
@@ -40,7 +59,8 @@ function readFileContent(filePath) {
 /**
  * Create codex context entry
  */
-function createCodexContextEntry(filePath, content) {
+async function createCodexContextEntry(filePath, content) {
+    await initializeImports();
     const metadata = extractCodexMetadata(content);
     return {
         id: `strray-codex-${path.basename(filePath)}`,
@@ -57,7 +77,7 @@ function createCodexContextEntry(filePath, content) {
 /**
  * Load codex context for current session
  */
-function loadCodexContext(sessionId) {
+async function loadCodexContext(sessionId) {
     if (codexCache.has(sessionId)) {
         return codexCache.get(sessionId);
     }
@@ -67,7 +87,7 @@ function loadCodexContext(sessionId) {
             const fullPath = path.join(process.cwd(), relativePath);
             const content = readFileContent(fullPath);
             if (content) {
-                const entry = createCodexContextEntry(fullPath, content);
+                const entry = await createCodexContextEntry(fullPath, content);
                 codexContexts.push(entry);
             }
         }
@@ -106,51 +126,68 @@ export function createStrRayCodexInjectorHook() {
     return {
         name: "strray-codex-injector",
         hooks: {
-            "agent.start": (sessionId) => {
+            "agent.start": async (sessionId) => {
                 try {
+                    await frameworkLogger.log("codex-injector", "agent.start hook triggered", "info", { sessionId });
                     // Load codex context to ensure it's available for the session
-                    loadCodexContext(sessionId);
+                    await loadCodexContext(sessionId);
                     const stats = getCodexStats(sessionId);
                     if (stats.loaded) {
                         console.log(`✅ StrRay Codex loaded: ${stats.totalTerms} terms, ${stats.fileCount} sources`);
+                        await frameworkLogger.log("codex-injector", "codex context loaded successfully", "success", stats);
                     }
                     else {
                         console.log("⚠️  No codex files found. Checked: .strray/codex.json, codex.json, src/codex.json, docs/agents/codex.json");
+                        await frameworkLogger.log("codex-injector", "no codex files found", "error");
                     }
                 }
                 catch (error) {
+                    await frameworkLogger.log("codex-injector", "agent.start hook failed", "error", error);
                     console.error(`❌ StrRay: Error in agent.start hook:`, error);
                     throw error;
                 }
             },
             "tool.execute.before": async (input, sessionId) => {
                 try {
+                    await frameworkLogger.log("codex-injector", "tool.execute.before hook triggered", "info", { tool: input.tool, sessionId });
+                    // Log ALL tool usage for framework transparency
+                    await frameworkLogger.log("framework-activity", `tool called: ${input.tool}`, "info", {
+                        tool: input.tool,
+                        args: input.args,
+                        sessionId
+                    });
                     // Skip codex enforcement during testing
                     if (process.env.NODE_ENV === "test" ||
                         process.env.STRRAY_TEST_MODE === "true") {
+                        await frameworkLogger.log("codex-injector", "skipping enforcement in test mode", "info");
                         return;
                     }
                     // Only enforce on critical tools that could violate codex terms
                     const criticalTools = ["write", "edit", "multiedit", "batch"];
                     if (!criticalTools.includes(input.tool)) {
+                        await frameworkLogger.log("codex-injector", "non-critical tool allowed", "info", { tool: input.tool });
                         return; // Allow non-critical tools
                     }
+                    await frameworkLogger.log("codex-injector", "enforcing codex on critical tool", "info", { tool: input.tool });
                     // Load codex context for validation
-                    const codexContexts = loadCodexContext(sessionId);
+                    const codexContexts = await loadCodexContext(sessionId);
                     if (codexContexts.length === 0) {
                         console.log("⚠️  No codex loaded - allowing action but enforcement disabled");
+                        await frameworkLogger.log("codex-injector", "no codex context available", "error", { sessionId });
                         return;
                     }
-                    // Use the exported context loader instance
-                    const { strRayContextLoader } = await import("./context-loader");
-                    const loadResult = await strRayContextLoader.loadCodexContext(sessionId);
+                    await frameworkLogger.log("codex-injector", "codex context loaded for validation", "success", { contextCount: codexContexts.length });
+                    // Use the initialized context loader
+                    await initializeImports();
+                    const contextLoader = new StrRayContextLoader();
+                    const loadResult = await contextLoader.loadCodexContext(sessionId);
                     if (!loadResult.success || !loadResult.context) {
                         console.log("⚠️  No codex context available - allowing action");
                         return;
                     }
                     // Validate action against codex
                     const actionDescription = `${input.tool} ${JSON.stringify(input.args || {})}`;
-                    const validation = strRayContextLoader.validateAgainstCodex(loadResult.context, actionDescription, {
+                    const validation = contextLoader.validateAgainstCodex(loadResult.context, actionDescription, {
                         strictMode: true,
                         blockOnViolations: true,
                     });
@@ -160,6 +197,10 @@ export function createStrRayCodexInjectorHook() {
                         if (blockingViolations.length > 0) {
                             const errorMsg = `🚫 BLOCKED: Codex violation detected\n${blockingViolations.map((v) => `• ${v.reason}`).join("\n")}`;
                             console.error(errorMsg);
+                            frameworkLogger.log("codex-injector", "blocking codex violation detected", "error", {
+                                violationCount: blockingViolations.length,
+                                tool: input.tool
+                            });
                             throw new Error(`Codex enforcement blocked action: ${blockingViolations[0]?.reason || "Unknown violation"}`);
                         }
                         // Log non-blocking violations but allow action
@@ -168,9 +209,20 @@ export function createStrRayCodexInjectorHook() {
                             console.log(`   • ${v.reason}`);
                         });
                         console.log(`💡 Recommendations: ${validation.recommendations.join(", ")}`);
+                        frameworkLogger.log("codex-injector", "non-blocking codex warnings", "info", {
+                            warningCount: validation.violations.length,
+                            tool: input.tool
+                        });
+                    }
+                    else {
+                        frameworkLogger.log("codex-injector", "codex validation passed", "success", { tool: input.tool });
                     }
                 }
                 catch (error) {
+                    frameworkLogger.log("codex-injector", "tool.execute.before hook error", "error", {
+                        error: error instanceof Error ? error.message : String(error),
+                        tool: input.tool
+                    });
                     console.error(`❌ StrRay: Error in tool.execute.before hook:`, error);
                     // For blocking violations, re-throw to prevent action
                     if (error instanceof Error &&
@@ -180,19 +232,26 @@ export function createStrRayCodexInjectorHook() {
                     // For other errors, log but allow action to prevent breaking workflow
                 }
             },
-            "tool.execute.after": (input, output, sessionId) => {
+            "tool.execute.after": async (input, output, sessionId) => {
                 try {
+                    frameworkLogger.log("codex-injector", "tool.execute.after hook triggered", "info", { tool: input.tool, sessionId });
                     // Skip codex enforcement during testing
                     if (process.env.NODE_ENV === "test" ||
                         process.env.STRRAY_TEST_MODE === "true") {
+                        frameworkLogger.log("codex-injector", "skipping injection in test mode", "info");
                         return output;
                     }
                     if (!["read", "write", "edit", "multiedit", "batch"].includes(input.tool)) {
+                        frameworkLogger.log("codex-injector", "non-critical tool - no injection", "info", { tool: input.tool });
                         return output;
                     }
                     console.log(`🔧 StrRay: Tool execution hook triggered for ${input.tool}`);
-                    const codexContexts = loadCodexContext(sessionId);
+                    const codexContexts = await loadCodexContext(sessionId);
                     console.log(`📚 StrRay: Loaded ${codexContexts.length} codex contexts`);
+                    frameworkLogger.log("codex-injector", "codex contexts loaded for injection", "success", {
+                        contextCount: codexContexts.length,
+                        tool: input.tool
+                    });
                     if (codexContexts.length === 0) {
                         return output;
                     }
@@ -201,9 +260,17 @@ export function createStrRayCodexInjectorHook() {
                         ...output,
                         output: `${formattedCodex}\n${output.output || ""}`,
                     };
+                    frameworkLogger.log("codex-injector", "codex context injected into output", "success", {
+                        tool: input.tool,
+                        outputLength: injectedOutput.output?.length
+                    });
                     return injectedOutput;
                 }
                 catch (error) {
+                    frameworkLogger.log("codex-injector", "tool.execute.after hook error", "error", {
+                        error: error instanceof Error ? error.message : String(error),
+                        tool: input.tool
+                    });
                     console.error(`❌ StrRay: Error in tool.execute.after hook:`, error);
                     // Return original output on error to not break the session
                     return output;

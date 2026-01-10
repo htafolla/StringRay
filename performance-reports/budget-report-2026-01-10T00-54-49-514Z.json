@@ -1,0 +1,93 @@
+{
+  "timestamp": 1768006489440,
+  "bundleSize": {
+    "totalSize": 137638,
+    "gzippedSize": 31041,
+    "fileCount": 9,
+    "largestFile": {
+      "name": "enterprise-monitoring.js",
+      "size": 46013,
+      "gzippedSize": 8429
+    },
+    "breakdown": [
+      {
+        "name": "enterprise-monitoring.js",
+        "size": 46013,
+        "gzippedSize": 8429,
+        "percentage": 33.43044798674784
+      },
+      {
+        "name": "enterprise-monitoring-config.js",
+        "size": 31197,
+        "gzippedSize": 6501,
+        "percentage": 22.665978872113808
+      },
+      {
+        "name": "boot-orchestrator.js",
+        "size": 20915,
+        "gzippedSize": 4312,
+        "percentage": 15.195658175794474
+      },
+      {
+        "name": "codex-injector.js",
+        "size": 13670,
+        "gzippedSize": 3671,
+        "percentage": 9.931850215783431
+      },
+      {
+        "name": "context-loader.js",
+        "size": 9513,
+        "gzippedSize": 2707,
+        "percentage": 6.911608712710153
+      },
+      {
+        "name": "orchestrator.js",
+        "size": 6644,
+        "gzippedSize": 2111,
+        "percentage": 4.827155291416615
+      },
+      {
+        "name": "config-loader.js",
+        "size": 4691,
+        "gzippedSize": 1396,
+        "percentage": 3.4082157543701594
+      },
+      {
+        "name": "server.js",
+        "size": 3568,
+        "gzippedSize": 1344,
+        "percentage": 2.5923073569799038
+      },
+      {
+        "name": "index.js",
+        "size": 1427,
+        "gzippedSize": 570,
+        "percentage": 1.0367776340836106
+      }
+    ]
+  },
+  "webVitals": {
+    "firstContentfulPaint": 988.1579676514195,
+    "timeToInteractive": 3770.3831916772597,
+    "largestContentfulPaint": 1977.3325791433786,
+    "cumulativeLayoutShift": 0.013002332759950552,
+    "firstInputDelay": 54.4398057682175,
+    "timestamp": 1768006489440
+  },
+  "runtime": {
+    "memoryUsage": {
+      "rss": 137805824,
+      "heapUsed": 12917312,
+      "heapTotal": 30015488,
+      "external": 3032914
+    },
+    "startupTime": 815.683333,
+    "cpuUsage": 592.534,
+    "timestamp": 1768006489440
+  },
+  "violations": [],
+  "recommendations": [
+    "Reduce Time to Interactive by minimizing main thread blocking JavaScript"
+  ],
+  "overallStatus": "pass"
+}

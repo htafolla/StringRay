@@ -21,4 +21,7 @@ export declare const loadAdvancedFeatures: () => Promise<{
     BootOrchestrator: typeof import("./boot-orchestrator.js").BootOrchestrator;
     bootOrchestrator: import("./boot-orchestrator.js").BootOrchestrator;
 }>;
+export { activateStrRayFramework, defaultStrRayConfig } from "./strray-activation.js";
+export { initializeStrRay } from "./strray-init.js";
+import "./strray-init.js";
 //# sourceMappingURL=index.d.ts.map

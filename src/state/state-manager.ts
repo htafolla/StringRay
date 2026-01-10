@@ -4,18 +4,25 @@ export interface StateManager {
   clear: (key: string) => void;
 }
 
+import { frameworkLogger } from "../framework-logger.js";
+
 export class StrRayStateManager implements StateManager {
   private store = new Map<string, unknown>();
 
   get<T>(key: string): T | undefined {
-    return this.store.get(key) as T | undefined;
+    const value = this.store.get(key) as T | undefined;
+    frameworkLogger.log("state-manager", "get operation", "info", { key, hasValue: value !== undefined });
+    return value;
   }
 
   set<T>(key: string, value: T): void {
     this.store.set(key, value);
+    frameworkLogger.log("state-manager", "set operation", "success", { key });
   }
 
   clear(key: string): void {
+    const existed = this.store.has(key);
     this.store.delete(key);
+    frameworkLogger.log("state-manager", "clear operation", existed ? "success" : "info", { key, existed });
   }
 }

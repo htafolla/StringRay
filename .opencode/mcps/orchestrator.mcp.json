@@ -1,8 +1,0 @@
-{
-  "mcpServers": {
-    "orchestrator": {
-      "command": "node",
-      "args": ["mcps/orchestrator.server.js"]
-    }
-  }
-}

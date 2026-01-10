@@ -1,0 +1,86 @@
+/**
+ * StrRay Processor Pipeline MCP Server
+ */
+
+import { Server } from '@modelcontextprotocol/sdk/server/index.js';
+import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprotocol/sdk/types.js';
+
+class StrRayProcessorPipelineServer {
+  private server: Server;
+
+  constructor() {
+    this.server = new Server(
+      {
+        name: 'strray-processor-pipeline',
+        version: '1.0.0',
+      },
+      {
+        capabilities: {
+          tools: {},
+        },
+      }
+    );
+
+    this.setupToolHandlers();
+    console.log('StrRay Processor Pipeline MCP Server initialized');
+  }
+
+  private setupToolHandlers() {
+    this.server.setRequestHandler(ListToolsRequestSchema, async () => {
+      return {
+        tools: [
+          {
+            name: 'execute-pre-processors',
+            description: 'Run pre-execution processors on content',
+            inputSchema: {
+              type: 'object',
+              properties: {
+                content: { type: 'string' },
+                context: { type: 'object' }
+              },
+              required: ['content']
+            }
+          },
+          {
+            name: 'execute-post-processors',
+            description: 'Run post-execution processors on results',
+            inputSchema: {
+              type: 'object',
+              properties: {
+                content: { type: 'string' },
+                results: { type: 'object' }
+              },
+              required: ['content']
+            }
+          }
+        ]
+      };
+    });
+
+    this.server.setRequestHandler(CallToolRequestSchema, async (request) => {
+      const { name, arguments: args } = request.params;
+
+      switch (name) {
+        case 'execute-pre-processors':
+          const content = (args as any)?.content || '';
+          return { content: [{ type: 'text', text: `Pre-processed: ${content.substring(0, 100)}...` }] };
+        case 'execute-post-processors':
+          const postContent = (args as any)?.content || '';
+          const results = (args as any)?.results || {};
+          return { content: [{ type: 'text', text: `Post-processed results: ${JSON.stringify(results)}` }] };
+        default:
+          throw new Error(`Unknown tool: ${name}`);
+      }
+    });
+  }
+
+  async run() {
+    const transport = new StdioServerTransport();
+    await this.server.connect(transport);
+    console.log('StrRay Processor Pipeline MCP Server started');
+  }
+}
+
+const server = new StrRayProcessorPipelineServer();
+server.run().catch(console.error);

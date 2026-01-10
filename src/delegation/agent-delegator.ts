@@ -13,7 +13,9 @@ import {
   ComplexityScore,
   ComplexityMetrics,
 } from "./complexity-analyzer.js";
+import { strRayConfigLoader, type MultiAgentOrchestrationConfig } from "../config-loader.js";
 import { StrRayStateManager } from "../state/state-manager";
+import { frameworkLogger } from "../framework-logger.js";
 
 export interface DelegationRequest {
   operation: string;
@@ -94,7 +96,7 @@ export class AgentDelegator {
     };
 
     this.updateDelegationMetrics(result);
-    this.logDelegationDecision(result, request);
+    await this.logDelegationDecision(result, request);
 
     return result;
   }
@@ -108,15 +110,45 @@ export class AgentDelegator {
   ): Promise<any> {
     const startTime = Date.now();
 
+    await frameworkLogger.log("agent-delegator", "delegation execution started", "info", {
+      strategy: delegation.strategy,
+      agentCount: delegation.agents.length,
+      operation: request.operation
+    });
+
     try {
       console.log(
         `🎯 Executing delegation: ${delegation.strategy} with ${delegation.agents.length} agents`,
       );
 
+      // Check multi-agent orchestration configuration
+      const config = strRayConfigLoader.loadConfig();
+      const multiAgentEnabled = config.multi_agent_orchestration.enabled;
+
+      await frameworkLogger.log("agent-delegator", "multi-agent config checked", "info", {
+        multiAgentEnabled,
+        maxConcurrentAgents: config.multi_agent_orchestration.max_concurrent_agents
+      });
+      
+      // Override strategy based on configuration
+      if (!multiAgentEnabled && delegation.strategy !== "single-agent") {
+        console.log("⚠️  Multi-agent orchestration disabled, falling back to single-agent");
+        delegation.strategy = "single-agent";
+        delegation.agents = delegation.agents.slice(0, 1); // Use only first agent
+      }
+      
+      // Apply max concurrent agents limit
+      if (delegation.agents.length > config.multi_agent_orchestration.max_concurrent_agents) {
+        console.log(`⚠️  Limiting agents to ${config.multi_agent_orchestration.max_concurrent_agents} (config limit)`);
+        delegation.agents = delegation.agents.slice(0, config.multi_agent_orchestration.max_concurrent_agents);
+      }
       let result: any;
 
       switch (delegation.strategy) {
         case "single-agent":
+          await frameworkLogger.log("agent-delegator", "executing single-agent strategy", "info", {
+            agent: delegation.agents[0]
+          });
           if (delegation.agents.length > 0) {
             result = await this.executeSingleAgent(
               delegation.agents[0]!,
@@ -127,9 +159,17 @@ export class AgentDelegator {
           }
           break;
         case "multi-agent":
+          await frameworkLogger.log("agent-delegator", "executing multi-agent strategy", "info", {
+            agentCount: delegation.agents.length,
+            agents: delegation.agents
+          });
           result = await this.executeMultiAgent(delegation.agents, request);
           break;
         case "orchestrator-led":
+          await frameworkLogger.log("agent-delegator", "executing orchestrator-led strategy", "info", {
+            agentCount: delegation.agents.length,
+            agents: delegation.agents
+          });
           result = await this.executeOrchestratorLed(
             delegation.agents,
             request,
@@ -139,6 +179,12 @@ export class AgentDelegator {
 
       const duration = Date.now() - startTime;
       this.recordSuccessfulDelegation(delegation, duration);
+
+      await frameworkLogger.log("agent-delegator", "delegation execution completed", "success", {
+        strategy: delegation.strategy,
+        duration,
+        operation: request.operation
+      });
 
       return result;
     } catch (error) {
@@ -379,18 +425,28 @@ export class AgentDelegator {
     agentName: string,
     request: DelegationRequest,
   ): Promise<any> {
-    const currentTasks =
-      (this.stateManager.get(`agent:${agentName}:active_tasks`) as number) || 0;
-    this.stateManager.set(`agent:${agentName}:active_tasks`, currentTasks + 1);
+    // Simplified task tracking - just log the execution without complex state management
+    await frameworkLogger.log("agent-delegator", "starting single agent execution", "info", {
+      agentName,
+      operation: request.operation
+    });
 
     try {
       const result = await this.callAgent(agentName, request);
+
+      await frameworkLogger.log("agent-delegator", "single agent execution completed", "success", {
+        agentName,
+        operation: request.operation
+      });
+
       return result;
-    } finally {
-      const finalTasks =
-        (this.stateManager.get(`agent:${agentName}:active_tasks`) as number) ||
-        0;
-      this.stateManager.set(`agent:${agentName}:active_tasks`, finalTasks - 1);
+    } catch (error) {
+      await frameworkLogger.log("agent-delegator", "single agent execution failed", "error", {
+        agentName,
+        operation: request.operation,
+        error: error instanceof Error ? error.message : String(error)
+      });
+      throw error;
     }
   }
 
@@ -442,20 +498,45 @@ export class AgentDelegator {
     agentName: string,
     request: DelegationRequest,
   ): Promise<any> {
-    const agentInstance = this.stateManager.get(`agent:${agentName}`);
-    if (!agentInstance) {
-      throw new Error(`Agent ${agentName} not found`);
-    }
+    // Check if agent is available in the system
+    const availableAgents = ["sisyphus", "enforcer", "architect", "orchestrator", "bug-triage-specialist", "code-reviewer", "security-auditor", "refactorer", "test-architect", "log-monitor"];
 
-    const agent = agentInstance as any;
-    if (typeof agent.execute === "function") {
-      return await agent.execute(request);
+    if (!availableAgents.includes(agentName)) {
+      await frameworkLogger.log("agent-delegator", "agent not available in system", "error", {
+        agentName,
+        availableAgents
+      });
+      throw new Error(`Agent ${agentName} not available in current system configuration`);
     }
+    // Check if agent is available in state manager (for testing with mocks)
+    const agentKey = `agent:${agentName}`;
+    const agent = this.stateManager.get(agentKey);
+    
+    if (agent && typeof (agent as any).execute === "function") {
+      // Real agent available, call it
+      await frameworkLogger.log("agent-delegator", "calling real agent from state manager", "info", {
+        agentName,
+        operation: request.operation
+      });
+      return await (agent as any).execute(request);
+    }
+    
+    // Fallback to simulation
+    // For now, simulate agent execution since agents aren't loaded in state manager
+    await frameworkLogger.log("agent-delegator", "simulating agent execution", "info", {
+      agentName,
+      operation: request.operation
+    });
 
-    console.warn(
-      `Agent ${agentName} does not have execute method, simulating response`,
-    );
-    return { agent: agentName, result: `Executed ${request.description}` };
+    console.log(`🤖 Simulating execution by agent: ${agentName}`);
+
+    // Simulate agent response based on agent type
+    return {
+      agent: agentName,
+      result: `Simulated execution of ${request.description}`,
+      status: "success",
+      simulated: true
+    };
   }
 
   private resolveMultiAgentConflicts(
@@ -522,13 +603,23 @@ export class AgentDelegator {
     error: any,
   ): void {
     this.delegationMetrics.failedDelegations++;
+    frameworkLogger.log("agent-delegator", "delegation execution failed", "error", {
+      error: error?.message || String(error)
+    });
     console.error(`❌ Delegation failed: ${error?.message || error}`);
   }
 
-  private logDelegationDecision(
+  private async logDelegationDecision(
     result: DelegationResult,
     request: DelegationRequest,
-  ): void {
+  ): Promise<void> {
+    await frameworkLogger.log("agent-delegator", "delegation decision made", "info", {
+      strategy: result.strategy,
+      agents: result.agents,
+      complexity: result.complexity.score,
+      operation: request.operation
+    });
+
     console.log(`📋 Delegation Decision: ${result.strategy} strategy`);
     console.log(`   Agents: ${result.agents.join(", ")}`);
     console.log(

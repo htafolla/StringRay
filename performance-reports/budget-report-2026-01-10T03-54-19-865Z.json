@@ -1,0 +1,135 @@
+{
+  "timestamp": 1768017259729,
+  "bundleSize": {
+    "totalSize": 157013,
+    "gzippedSize": 36392,
+    "fileCount": 16,
+    "largestFile": {
+      "name": "enterprise-monitoring.js",
+      "size": 46013,
+      "gzippedSize": 8429
+    },
+    "breakdown": [
+      {
+        "name": "enterprise-monitoring.js",
+        "size": 46013,
+        "gzippedSize": 8429,
+        "percentage": 29.305216765490755
+      },
+      {
+        "name": "enterprise-monitoring-config.js",
+        "size": 31197,
+        "gzippedSize": 6501,
+        "percentage": 19.869055428531397
+      },
+      {
+        "name": "boot-orchestrator.js",
+        "size": 22594,
+        "gzippedSize": 4436,
+        "percentage": 14.389891282887405
+      },
+      {
+        "name": "codex-injector.js",
+        "size": 17342,
+        "gzippedSize": 4146,
+        "percentage": 11.044945322998732
+      },
+      {
+        "name": "context-loader.js",
+        "size": 9513,
+        "gzippedSize": 2707,
+        "percentage": 6.058733990179157
+      },
+      {
+        "name": "cross-language-bridge.js",
+        "size": 6772,
+        "gzippedSize": 1775,
+        "percentage": 4.313018667244114
+      },
+      {
+        "name": "orchestrator.js",
+        "size": 6388,
+        "gzippedSize": 2021,
+        "percentage": 4.0684529306490544
+      },
+      {
+        "name": "config-loader.js",
+        "size": 4691,
+        "gzippedSize": 1396,
+        "percentage": 2.9876507040818274
+      },
+      {
+        "name": "server.js",
+        "size": 3568,
+        "gzippedSize": 1344,
+        "percentage": 2.2724233025290896
+      },
+      {
+        "name": "strray-activation.js",
+        "size": 2898,
+        "gzippedSize": 906,
+        "percentage": 1.8457070433658358
+      },
+      {
+        "name": "framework-logger.js",
+        "size": 2773,
+        "gzippedSize": 1101,
+        "percentage": 1.766095800984632
+      },
+      {
+        "name": "index.js",
+        "size": 1694,
+        "gzippedSize": 663,
+        "percentage": 1.078891556750078
+      },
+      {
+        "name": "strray-init.js",
+        "size": 1049,
+        "gzippedSize": 498,
+        "percentage": 0.6680975460630648
+      },
+      {
+        "name": "test-file.js",
+        "size": 266,
+        "gzippedSize": 190,
+        "percentage": 0.16941272378720235
+      },
+      {
+        "name": "test-integration.js",
+        "size": 171,
+        "gzippedSize": 166,
+        "percentage": 0.10890817957748722
+      },
+      {
+        "name": "test-processor.js",
+        "size": 84,
+        "gzippedSize": 113,
+        "percentage": 0.05349875488016916
+      }
+    ]
+  },
+  "webVitals": {
+    "firstContentfulPaint": 1210.793546678256,
+    "timeToInteractive": 3558.9270858056807,
+    "largestContentfulPaint": 1540.874537099662,
+    "cumulativeLayoutShift": 0.049924524975861084,
+    "firstInputDelay": 55.155330520688935,
+    "timestamp": 1768017259729
+  },
+  "runtime": {
+    "memoryUsage": {
+      "rss": 138067968,
+      "heapUsed": 14451936,
+      "heapTotal": 29753344,
+      "external": 3033166
+    },
+    "startupTime": 1146.456083,
+    "cpuUsage": 619.338,
+    "timestamp": 1768017259729
+  },
+  "violations": [],
+  "recommendations": [
+    "Reduce Time to Interactive by minimizing main thread blocking JavaScript"
+  ],
+  "overallStatus": "pass"
+}

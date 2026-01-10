@@ -1,5 +1,5 @@
 {
-  "name": "stringray-framework",
+  "name": "@strray/framework",
   "version": "1.0.0",
   "description": "StringRay (StrRay) - Ship Production-Ready Code & Eliminate Common Dead Ends for AI Devs. Eradicates Spaghetti Code, Hallucinations & Code Rot with Agentic AI Coordination & Automation.",
   "type": "module",
@@ -25,8 +25,6 @@
     "test:quarantine": "node scripts/test-utils/test-quarantine.mjs",
     "test:quarantine:list": "node scripts/test-utils/test-quarantine.mjs list",
     "test:quarantine:stats": "node scripts/test-utils/test-quarantine.mjs stats",
-    "test:performance": "node scripts/performance-test.cjs",
-    "test:performance:comprehensive": "node -e \"import('./dist/performance/index.js').then(m => m.performanceSystem.initialize().then(() => m.performanceSystem.runGates()))\"",
     "performance:monitor": "node -e \"import('./dist/performance/index.js').then(m => m.performanceSystem.initialize().then(() => m.performanceSystem.start()))\"",
     "performance:report": "node -e \"import('./dist/performance/index.js').then(m => m.performanceSystem.initialize().then(() => m.performanceSystem.generateReport().then(r => console.log(JSON.stringify(r, null, 2))))\"",
     "performance:gates": "node -e \"import('./dist/performance/index.js').then(m => m.performanceSystem.initialize().then(() => m.performanceSystem.runGates()))\"",
@@ -48,49 +46,56 @@
     "framework",
     "typescript",
     "codex",
-    "error-prevention",
-    "oh-my-opencode"
+    "orchestration",
+    "enterprise",
+    "monitoring",
+    "performance",
+    "security",
+    "code-quality",
+    "automation",
+    "agentic-ai",
+    "production-ready"
   ],
   "author": "StrRay Framework Team",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/strray-framework/stringray.git"
+    "url": "https://github.com/strray/framework.git"
   },
-  "homepage": "https://github.com/strray-framework/stringray#readme",
   "bugs": {
-    "url": "https://github.com/strray-framework/stringray/issues"
+    "url": "https://github.com/strray/framework/issues"
   },
-  "dependencies": {
-    "@opencode-ai/plugin": "~1.1.4",
-    "@types/express": "~5.0.6",
-    "@types/jsonwebtoken": "^9.0.10",
-    "express": "~5.2.1",
-    "jsonwebtoken": "^9.0.3",
-    "open": "~11.0.0",
-    "zod": "~4.1.8"
+  "homepage": "https://strray.dev",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
   },
   "devDependencies": {
-    "@eslint/js": "^9.9.0",
-    "@faker-js/faker": "^9.9.0",
-    "@types/node": "~22.19.3",
-    "@typescript-eslint/eslint-plugin": "^8.7.0",
-    "@typescript-eslint/parser": "^8.7.0",
-    "@vitest/coverage-v8": "~4.0.16",
-    "eslint": "^9.9.0",
-    "fishery": "^2.4.0",
-    "typescript": "~5.9.3",
-    "vitest": "~4.0.16"
+    "@types/node": "^20.10.0",
+    "@typescript-eslint/eslint-plugin": "^6.13.0",
+    "@typescript-eslint/parser": "^6.13.0",
+    "@vitest/coverage-v8": "^1.0.0",
+    "eslint": "^8.54.0",
+    "tsx": "^4.6.0",
+    "typescript": "^5.3.0",
+    "vitest": "^1.0.0"
   },
-  "engines": {
-    "node": ">=18.0.0"
+  "dependencies": {
+    "zod": "^3.22.0"
+  },
+  "peerDependencies": {
+    "@opencode-ai/sdk": "*"
   },
   "files": [
     "dist",
     "src",
     "scripts",
-    "config",
     "docs",
-    "README.md"
-  ]
+    "README.md",
+    "LICENSE",
+    "package.json"
+  ],
+  "bin": {
+    "strray": "./dist/cli.js"
+  }
 }

@@ -7,8 +7,11 @@ import { codeReviewer } from "./code-reviewer.js";
 import { securityAuditor } from "./security-auditor.js";
 import { refactorer } from "./refactorer.js";
 import { testArchitect } from "./test-architect.js";
+import { sisyphusAgent } from "./sisyphus.js";
+import { logMonitorAgent } from "./log-monitor.js";
 
 export const builtinAgents: Record<string, AgentConfig> = {
+  sisyphus: sisyphusAgent,
   enforcer,
   architect,
   orchestrator,
@@ -17,9 +20,11 @@ export const builtinAgents: Record<string, AgentConfig> = {
   "security-auditor": securityAuditor,
   refactorer,
   "test-architect": testArchitect,
+  "log-monitor": logMonitorAgent,
 };
 
 export {
+  sisyphusAgent,
   enforcer,
   architect,
   orchestrator,
@@ -28,4 +33,5 @@ export {
   securityAuditor,
   refactorer,
   testArchitect,
+  logMonitorAgent,
 };

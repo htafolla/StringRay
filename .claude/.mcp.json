@@ -1,0 +1,36 @@
+{
+  "version": "1.0",
+  "mcpServers": {
+    "project-filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "./src"],
+      "env": {
+        "NODE_ENV": "development",
+        "LOG_LEVEL": "debug"
+      },
+      "timeout": 45000
+    },
+    "project-git": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-git", "--repository", "."],
+      "env": {
+        "GIT_CONFIG_GLOBAL": "/dev/null",
+        "GIT_AUTHOR_NAME": "StrRay Agent",
+        "GIT_AUTHOR_EMAIL": "strray@framework.ai"
+      },
+      "timeout": 30000
+    },
+    "typescript": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-typescript", "--project", "./tsconfig.json"],
+      "env": {
+        "TSC_NONPOLLING_WATCHER": "true"
+      }
+    }
+  },
+  "projectConfig": {
+    "autoStart": ["filesystem", "git"],
+    "healthCheckInterval": 30000,
+    "maxRetries": 5
+  }
+}

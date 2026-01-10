@@ -1,0 +1,550 @@
+/**
+ * StrRay Framework - End-to-End Orchestration Integration Tests
+ *
+ * Comprehensive testing of complete multi-agent orchestration workflows
+ * from complexity analysis through final execution and validation.
+ *
+ * Tests the full pipeline: Complexity Analysis → Delegation → Multi-Agent Execution → Result Consolidation
+ *
+ * @version 1.0.0
+ * @since 2026-01-09
+ */
+
+import { describe, test, expect, beforeAll, afterAll, vi } from "vitest";
+
+// Mock the complete StrRay orchestration pipeline
+const createMockOrchestrationPipeline = () => {
+  let stateManager: any = null;
+  let complexityAnalyzer: any = null;
+  let agentDelegator: any = null;
+  let configLoader: any = null;
+
+  const initializePipeline = async () => {
+    // Mock state manager
+    stateManager = {
+      saveState: vi.fn().mockResolvedValue(true),
+      loadState: vi.fn().mockResolvedValue({ initialized: true }),
+      clearState: vi.fn().mockResolvedValue(true),
+    };
+
+    // Mock complexity analyzer
+    complexityAnalyzer = {
+      analyzeComplexity: vi.fn(),
+    };
+
+    // Mock agent delegator
+    agentDelegator = {
+      analyzeDelegation: vi.fn(),
+      executeDelegation: vi.fn(),
+    };
+
+    // Mock config loader
+    configLoader = {
+      loadConfig: vi.fn().mockReturnValue({
+        multi_agent_orchestration: { enabled: true, max_concurrent_agents: 3 },
+        sisyphus_orchestrator: { enabled: true, relentless_execution: true },
+      }),
+    };
+
+    return { stateManager, complexityAnalyzer, agentDelegator, configLoader };
+  };
+
+  const resetMocks = () => {
+    vi.clearAllMocks();
+  };
+
+  return { initializePipeline, resetMocks };
+};
+
+// Mock oh-my-opencode plugin environment
+const createMockOhMyOpenCodeEnvironment = () => {
+  const toolCalls: Array<{ tool: string; args: any; complexity: number; agents: string[] }> = [];
+  let currentSession = { id: "test-session", state: {} };
+
+  const executeToolWithOrchestration = async (tool: string, args: any) => {
+    // Calculate complexity score
+    const complexityScore = calculateComplexityScore(tool, args);
+
+    // Determine orchestration strategy
+    let strategy = "single-agent";
+    let agents: string[] = [];
+
+    if (complexityScore > 95) {
+      strategy = "orchestrator-led";
+      agents = ["orchestrator", "architect", "enforcer"];
+    } else if (complexityScore > 70) {
+      strategy = "multi-agent";
+      agents = ["architect", "enforcer"];
+    } else {
+      strategy = "single-agent";
+      agents = ["enforcer"];
+    }
+
+    // Record the orchestrated execution
+    toolCalls.push({ tool, args, complexity: complexityScore, agents });
+
+    // Simulate successful execution
+    return {
+      success: true,
+      result: `Executed ${tool} with ${strategy} orchestration`,
+      orchestration: { strategy, agents, complexityScore },
+    };
+  };
+
+  const calculateComplexityScore = (tool: string, args: any): number => {
+    let score = 0;
+
+    // File count impact (0-20 points)
+    const filePaths = extractFilePaths(args);
+    score += Math.min(filePaths.length * 2, 20);
+
+    // Change volume impact (0-25 points)
+    const contentLength = args?.content?.length || 0;
+    score += Math.min(contentLength / 100, 25); // Rough estimate
+
+    // Operation type multiplier
+    const operationMultipliers: Record<string, number> = {
+      write: 1.2,
+      edit: 1.2,
+      multiedit: 1.8,
+      read: 1.0,
+      grep: 1.5,
+      run_terminal_cmd: 2.0,
+    };
+    score *= operationMultipliers[tool] || 1.0;
+
+    // Dependencies impact (0-15 points)
+    const dependencies = estimateDependencies(args);
+    score += Math.min(dependencies * 3, 15);
+
+    // Risk level multiplier
+    const riskMultiplier = estimateRiskLevel(tool, args);
+    score *= riskMultiplier;
+
+    // Duration impact (0-15 points)
+    const estimatedDuration = estimateDuration(tool, args);
+    score += Math.min(estimatedDuration / 10, 15);
+
+    return Math.min(Math.max(Math.round(score), 0), 100);
+  };
+
+  const extractFilePaths = (args: any): string[] => {
+    const paths: string[] = [];
+    if (args?.filePath) paths.push(args.filePath);
+    if (args?.files) paths.push(...args.files);
+    if (args?.path) paths.push(args.path);
+    return paths;
+  };
+
+  const estimateDependencies = (args: any): number => {
+    // Simple heuristic: more files = more dependencies
+    const fileCount = extractFilePaths(args).length;
+    return Math.min(fileCount, 5);
+  };
+
+  const estimateRiskLevel = (tool: string, args: any): number => {
+    const highRiskTools = ["run_terminal_cmd", "multiedit"];
+    const criticalContent = args?.content?.includes?.("rm -rf") ||
+                           args?.content?.includes?.("DROP TABLE") ||
+                           args?.content?.includes?.("DELETE FROM");
+
+    if (highRiskTools.includes(tool) || criticalContent) {
+      return 1.6; // critical
+    }
+    if (tool === "edit" || args?.content?.length > 1000) {
+      return 1.3; // high
+    }
+    return 1.0; // medium
+  };
+
+  const estimateDuration = (tool: string, args: any): number => {
+    const baseDuration = 5; // minutes
+    const contentMultiplier = Math.max(1, (args?.content?.length || 0) / 500);
+    const fileMultiplier = Math.max(1, extractFilePaths(args).length);
+    return Math.round(baseDuration * contentMultiplier * fileMultiplier);
+  };
+
+  const getToolCalls = () => toolCalls;
+  const resetToolCalls = () => { toolCalls.length = 0; };
+
+  return {
+    executeToolWithOrchestration,
+    getToolCalls,
+    resetToolCalls,
+    getCurrentSession: () => currentSession,
+  };
+};
+
+describe("StrRay Framework - End-to-End Orchestration Integration", () => {
+  let mockPipeline: any;
+  let mockEnvironment: any;
+
+  beforeAll(async () => {
+    mockPipeline = createMockOrchestrationPipeline();
+    await mockPipeline.initializePipeline();
+
+    mockEnvironment = createMockOhMyOpenCodeEnvironment();
+  });
+
+  afterAll(() => {
+    vi.clearAllMocks();
+  });
+
+  describe("Complexity Analysis Engine", () => {
+    test("should calculate correct complexity scores for different operations", async () => {
+      const testCases = [
+        {
+          tool: "read",
+          args: { filePath: "simple.ts" },
+          expectedMinComplexity: 6,
+          description: "Simple file read",
+        },
+        {
+          tool: "write",
+          args: { filePath: "component.tsx", content: "const x = 1;" },
+          expectedMinComplexity: 26
+          description: "Simple file write",
+        },
+        {
+          tool: "edit",
+          args: {
+            filePath: "complex.ts",
+            oldString: "old",
+            newString: "new",
+            content: "A".repeat(2000), // Large content
+          },
+          expected "multi-agent"
+          description: "Complex file edit with large content",
+        },
+        {
+          tool: "multiedit",
+          args: {
+            files: ["file1.ts", "file2.ts", "file3.ts", "file4.ts"],
+            content: "const api = new API();",
+          },
+          expectedRange: [96, 100], // orchestrator-led
+          description: "Multi-file edit with high complexity",
+        },
+        {
+          tool: "run_terminal_cmd",
+          args: { command: "npm install", cwd: "/project" },
+          expectedRange: [96, 100], // orchestrator-led (high risk)
+          description: "Terminal command execution",
+        },
+      ];
+
+      for (const testCase of testCases) {
+        const result = await mockEnvironment.executeToolWithOrchestration(
+          testCase.tool,
+          testCase.args,
+        );
+
+        expect(result.orchestration.complexityScore).toBeGreaterThanOrEqual(testCase.expectedRange[0]);
+        expect(result.orchestration.complexityScore).toBeLessThanOrEqual(testCase.expectedRange[1]);
+        expect(result.success).toBe(true);
+
+        console.log(`${testCase.description}: Score ${result.orchestration.complexityScore}, Strategy: ${result.orchestration.strategy}`);
+      }
+    });
+
+    test("should handle edge cases in complexity calculation", async () => {
+      // Test empty args
+      const result1 = await mockEnvironment.executeToolWithOrchestration("read", {});
+      expect(result1.orchestration.complexityScore).toBeGreaterThanOrEqual(0);
+      expect(result1.orchestration.complexityScore).toBeLessThanOrEqual(25);
+
+      // Test null/undefined content
+      const result2 = await mockEnvironment.executeToolWithOrchestration("write", {
+        filePath: "test.ts",
+        content: null,
+      });
+      expect(result2.orchestration.complexityScore).toBeGreaterThanOrEqual(0);
+      expect(result2.orchestration.complexityScore).toBeLessThanOrEqual(50);
+    });
+  });
+
+  describe("Orchestration Strategy Selection", () => {
+    test("should select single-agent strategy for low complexity tasks", async () => {
+      const result = await mockEnvironment.executeToolWithOrchestration("read", {
+        filePath: "simple.txt",
+      });
+
+      expect(result.orchestration.strategy).toBe("single-agent");
+      expect(result.orchestration.agents).toEqual(["enforcer"]);
+    });
+
+    test("should select multi-agent strategy for medium complexity tasks", async () => {
+      const result = await mockEnvironment.executeToolWithOrchestration("edit", {
+        filePath: "component.tsx",
+        oldString: "old",
+        newString: "new",
+        content: "A".repeat(1500), // Medium complexity
+      });
+
+      expect(result.orchestration.strategy).toBe("multi-agent");
+      expect(result.orchestration.agents).toContain("architect");
+      expect(result.orchestration.agents).toContain("enforcer");
+    });
+
+    test("should select orchestrator-led strategy for high complexity tasks", async () => {
+      const result = await mockEnvironment.executeToolWithOrchestration("multiedit", {
+        files: ["api.ts", "utils.ts", "types.ts", "components.tsx"],
+        content: "export const newFeature = () => {};",
+      });
+
+      expect(result.orchestration.strategy).toBe("orchestrator-led");
+      expect(result.orchestration.agents).toContain("orchestrator");
+      expect(result.orchestration.agents).toContain("architect");
+      expect(result.orchestration.agents).toContain("enforcer");
+    });
+  });
+
+  describe("Complete Orchestration Workflows", () => {
+    test("should execute simple workflow end-to-end", async () => {
+      // Reset call history
+      mockEnvironment.resetToolCalls();
+
+      // Execute a simple read operation
+      const result = await mockEnvironment.executeToolWithOrchestration("read", {
+        filePath: "README.md",
+      });
+
+      // Verify execution
+      expect(result.success).toBe(true);
+      expect(result.orchestration.strategy).toBe("single-agent");
+
+      // Verify call tracking
+      const calls = mockEnvironment.getToolCalls();
+      expect(calls).toHaveLength(1);
+      expect(calls[0].tool).toBe("read");
+      expect(calls[0].agents).toEqual(["enforcer"]);
+    });
+
+    test("should execute complex multi-agent workflow", async () => {
+      mockEnvironment.resetToolCalls();
+
+      // Execute a complex refactoring operation
+      const result = await mockEnvironment.executeToolWithOrchestration("multiedit", {
+        files: ["auth.ts", "api.ts", "store.ts", "components/Auth.tsx"],
+        content: `// Refactored authentication system
+export class AuthManager {
+  async login(credentials: LoginCredentials): Promise<User> {
+    // Implementation
+  }
+}`,
+      });
+
+      // Verify orchestrator-led execution
+      expect(result.success).toBe(true);
+      expect(result.orchestration.strategy).toBe("orchestrator-led");
+      expect(result.orchestration.agents).toHaveLength(3);
+
+      // Verify call tracking
+      const calls = mockEnvironment.getToolCalls();
+      expect(calls).toHaveLength(1);
+      expect(calls[0].complexity).toBeGreaterThanOrEqual(96);
+    });
+
+    test("should handle concurrent orchestration requests", async () => {
+      mockEnvironment.resetToolCalls();
+
+      const operations = [
+        mockEnvironment.executeToolWithOrchestration("write", {
+          filePath: "user.ts",
+          content: "export interface User { id: string; name: string; }",
+        }),
+        mockEnvironment.executeToolWithOrchestration("edit", {
+          filePath: "api.ts",
+          oldString: "old",
+          newString: "new",
+          content: "A".repeat(2000),
+        }),
+        mockEnvironment.executeToolWithOrchestration("run_terminal_cmd", {
+          command: "npm test",
+          cwd: "/project",
+        }),
+      ];
+
+      const results = await Promise.all(operations);
+
+      // All operations should succeed
+      results.forEach((result, index) => {
+        expect(result.success).toBe(true);
+        expect(result.orchestration).toBeDefined();
+      });
+
+      // Verify different strategies were applied
+      const strategies = results.map(r => r.orchestration.strategy);
+      expect(strategies).toContain("single-agent");
+      expect(strategies).toContain("multi-agent");
+      expect(strategies).toContain("orchestrator-led");
+
+      // Verify call tracking
+      const calls = mockEnvironment.getToolCalls();
+      expect(calls).toHaveLength(3);
+    });
+  });
+
+  describe("Error Handling and Recovery", () => {
+    test("should handle orchestration failures gracefully", async () => {
+      // Mock a failure scenario
+      const mockEnvironmentWithFailure = createMockOhMyOpenCodeEnvironment();
+
+      // Override executeToolWithOrchestration to simulate failure
+      const originalExecute = mockEnvironmentWithFailure.executeToolWithOrchestration;
+      mockEnvironmentWithFailure.executeToolWithOrchestration = async (tool: string, args: any) => {
+        if (tool === "run_terminal_cmd" && args.command?.includes("dangerous")) {
+          throw new Error("High-risk operation blocked by orchestration");
+        }
+        return originalExecute(tool, args);
+      };
+
+      // Test failure handling
+      await expect(
+        mockEnvironmentWithFailure.executeToolWithOrchestration("run_terminal_cmd", {
+          command: "rm -rf dangerous",
+          cwd: "/project",
+        })
+      ).rejects.toThrow("High-risk operation blocked");
+
+      // Test successful operations still work
+      const result = await mockEnvironmentWithFailure.executeToolWithOrchestration("read", {
+        filePath: "safe.ts",
+      });
+      expect(result.success).toBe(true);
+    });
+
+    test("should validate orchestration configuration", async () => {
+      const config = mockPipeline.configLoader.loadConfig();
+
+      expect(config.multi_agent_orchestration).toBeDefined();
+      expect(config.multi_agent_orchestration.enabled).toBe(true);
+      expect(config.multi_agent_orchestration.max_concurrent_agents).toBe(3);
+
+      expect(config.sisyphus_orchestrator).toBeDefined();
+      expect(config.sisyphus_orchestrator.enabled).toBe(true);
+      expect(config.sisyphus_orchestrator.relentless_execution).toBe(true);
+    });
+  });
+
+  describe("Performance and Scalability", () => {
+    test("should handle high-volume orchestration requests", async () => {
+      const startTime = Date.now();
+      mockEnvironment.resetToolCalls();
+
+      // Simulate 10 concurrent operations
+      const operations = Array.from({ length: 10 }, (_, i) =>
+        mockEnvironment.executeToolWithOrchestration("write", {
+          filePath: `file${i}.ts`,
+          content: `export const value${i} = ${i};`,
+        })
+      );
+
+      const results = await Promise.all(operations);
+      const endTime = Date.now();
+
+      // All operations should succeed
+      results.forEach(result => {
+        expect(result.success).toBe(true);
+      });
+
+      // Should complete within reasonable time (under 1 second for mock)
+      expect(endTime - startTime).toBeLessThan(1000);
+
+      // Verify all calls were tracked
+      const calls = mockEnvironment.getToolCalls();
+      expect(calls).toHaveLength(10);
+    });
+
+    test("should maintain state consistency across operations", async () => {
+      mockEnvironment.resetToolCalls();
+
+      // Execute a series of related operations
+      const operations = [
+        "write", // Create initial file
+        "edit",  // Modify file
+        "read",  // Read modified file
+        "grep",  // Search in file
+      ];
+
+      for (const operation of operations) {
+        const result = await mockEnvironment.executeToolWithOrchestration(operation, {
+          filePath: "state-test.ts",
+          content: operation === "write" ? "initial content" : undefined,
+          oldString: operation === "edit" ? "initial" : undefined,
+          newString: operation === "edit" ? "modified" : undefined,
+          pattern: operation === "grep" ? "content" : undefined,
+        });
+
+        expect(result.success).toBe(true);
+        expect(result.orchestration).toBeDefined();
+      }
+
+      // Verify operation sequence
+      const calls = mockEnvironment.getToolCalls();
+      expect(calls).toHaveLength(4);
+      expect(calls.map(c => c.tool)).toEqual(operations);
+    });
+  });
+
+  describe("Integration with oh-my-opencode", () => {
+    test("should integrate with oh-my-opencode plugin system", async () => {
+      // Simulate oh-my-opencode plugin loading
+      const mockPlugin = {
+        "experimental.chat.system.transform": async (input: any, output: any) => {
+          output.system = output.system || [];
+          output.system.unshift("StrRay Codex Context Loaded");
+        },
+        "tool.execute.before": async (input: any) => {
+          // Simulate codex validation
+          const content = input.args?.content || "";
+          if (content.includes("TODO") || content.includes("FIXME")) {
+            throw new Error("Codex violation: Unresolved tasks detected");
+          }
+        },
+        "tool.execute.after": async (input: any, output: any) => {
+          // Simulate codex injection
+          if (output && output.output) {
+            output.output = `Codex validated: ${output.output}`;
+          }
+        },
+      };
+
+      // Test plugin integration
+      const output = { system: [] };
+      await mockPlugin["experimental.chat.system.transform"]({}, output);
+      expect(output.system).toContain("StrRay Codex Context Loaded");
+
+      // Test validation
+      await expect(
+        mockPlugin["tool.execute.before"]({ args: { content: "TODO: fix this" } })
+      ).rejects.toThrow("Codex violation");
+
+      // Test successful validation
+      await mockPlugin["tool.execute.before"]({ args: { content: "const x = 1;" } });
+
+      // Test output injection
+      const testOutput = { output: "operation result" };
+      await mockPlugin["tool.execute.after"]({}, testOutput);
+      expect(testOutput.output).toBe("Codex validated: operation result");
+    });
+
+    test("should handle oh-my-opencode session lifecycle", async () => {
+      const session = mockEnvironment.getCurrentSession();
+      expect(session.id).toBe("test-session");
+      expect(session.state).toBeDefined();
+
+      // Simulate session operations
+      const operations = ["read", "write", "edit"];
+      for (const op of operations) {
+        await mockEnvironment.executeToolWithOrchestration(op, {
+          filePath: "session-test.ts",
+        });
+      }
+
+      // Session should maintain state
+      const finalSession = mockEnvironment.getCurrentSession();
+      expect(finalSession.id).toBe("test-session");
+    });
+  });
+});

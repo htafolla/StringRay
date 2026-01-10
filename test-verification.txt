@@ -1,0 +1,4 @@
+// Test file to trigger framework validation
+// This should trigger codex-injector and processor-manager activity
+// Testing framework enforcement with file operations
+// Framework activity logged: File edit operation performed

@@ -1,0 +1,85 @@
+/**
+ * StrRay State Manager MCP Server
+ */
+
+import { Server } from '@modelcontextprotocol/sdk/server/index.js';
+import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprotocol/sdk/types.js';
+
+class StrRayStateManagerServer {
+  private server: Server;
+
+  constructor() {
+    this.server = new Server(
+      {
+        name: 'strray-state-manager',
+        version: '1.0.0',
+      },
+      {
+        capabilities: {
+          tools: {},
+        },
+      }
+    );
+
+    this.setupToolHandlers();
+    console.log('StrRay State Manager MCP Server initialized');
+  }
+
+  private setupToolHandlers() {
+    this.server.setRequestHandler(ListToolsRequestSchema, async () => {
+      return {
+        tools: [
+          {
+            name: 'get-state',
+            description: 'Get state value by key',
+            inputSchema: {
+              type: 'object',
+              properties: {
+                key: { type: 'string' }
+              },
+              required: ['key']
+            }
+          },
+          {
+            name: 'set-state',
+            description: 'Set state value by key',
+            inputSchema: {
+              type: 'object',
+              properties: {
+                key: { type: 'string' },
+                value: { type: 'string' }
+              },
+              required: ['key', 'value']
+            }
+          }
+        ]
+      };
+    });
+
+    this.server.setRequestHandler(CallToolRequestSchema, async (request) => {
+      const { name, arguments: args } = request.params;
+
+      switch (name) {
+        case 'get-state':
+          const key = (args as any)?.key || '';
+          return { content: [{ type: 'text', text: `State value for ${key}: [mock value]` }] };
+        case 'set-state':
+          const setKey = (args as any)?.key || '';
+          const value = (args as any)?.value || '';
+          return { content: [{ type: 'text', text: `State set: ${setKey} = ${value}` }] };
+        default:
+          throw new Error(`Unknown tool: ${name}`);
+      }
+    });
+  }
+
+  async run() {
+    const transport = new StdioServerTransport();
+    await this.server.connect(transport);
+    console.log('StrRay State Manager MCP Server started');
+  }
+}
+
+const server = new StrRayStateManagerServer();
+server.run().catch(console.error);

@@ -1,0 +1,20 @@
+{
+  "mcpServers": {
+    "strray-orchestrator": {
+      "command": "node",
+      "args": ["dist/mcps/orchestrator.server.js"],
+      "env": {
+        "STRRAY_FRAMEWORK_ENABLED": "true",
+        "STRRAY_CONFIG_PATH": ".strray/config.json"
+      }
+    },
+    "strray-state-manager": {
+      "command": "node", 
+      "args": ["dist/mcps/state-manager.server.js"]
+    },
+    "strray-processor-pipeline": {
+      "command": "node",
+      "args": ["dist/mcps/processor-pipeline.server.js"]
+    }
+  }
+}

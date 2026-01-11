@@ -11,23 +11,26 @@ log() {
 LOG_FILE="logs/strray-init-$(date +%Y%m%d-%H%M%S).log"
 mkdir -p "logs"
 
-# ASCII Art Header
-log "//═══════════════════════════════════════════════════════//"
-log "//                                                       //"
-log "//   ███████╗████████╗██████╗ ██████╗  █████╗ ██╗   ██╗  //"
-log "//   ██╔════╝╚══██╔══╝██╔══██╗██╔══██╗██╔══██╗╚██╗ ██╔╝  //"
-log "//   ███████╗   ██║   ██████╔╝██████╔╝███████║ ╚████╔╝   //"
-log "//   ╚════██║   ██║   ██╔══██╗██╔══██╗██╔══██║  ╚██╔╝    //"
-log "//   ███████║   ██║   ██║  ██║██║  ██║██║  ██║   ██║     //"
-log "//   ╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝     //"
-log "//                                                       //"
-log "//        ⚡ Precision-Guided AI Development ⚡          //"
-log "//          Platform • 99.6% Error Prevention            //"
-log "//                                                       //"
-log "//═══════════════════════════════════════════════════════//"
+# ASCII Art Header with Purple Color
+PURPLE='\033[0;35m'
+NC='\033[0m' # No Color
+
+log "${PURPLE}//═══════════════════════════════════════════════════════//${NC}"
+log "${PURPLE}//                                                       //${NC}"
+log "${PURPLE}//   ███████╗████████╗██████╗ ██████╗  █████╗ ██╗   ██╗  //${NC}"
+log "${PURPLE}//   ██╔════╝╚══██╔══╝██╔══██╗██╔══██╗██╔══██╗╚██╗ ██╔╝  //${NC}"
+log "${PURPLE}//   ███████╗   ██║   ██████╔╝██████╔╝███████║ ╚████╔╝   //${NC}"
+log "${PURPLE}//   ╚════██║   ██║   ██╔══██╗██╔══██╗██╔══██║  ╚██╔╝    //${NC}"
+log "${PURPLE}//   ███████║   ██║   ██║  ██║██║  ██║██║  ██║   ██║     //${NC}"
+log "${PURPLE}//   ╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝     //${NC}"
+log "${PURPLE}//                                                       //${NC}"
+log "${PURPLE}//        ⚡ Precision-Guided AI Development ⚡          //${NC}"
+log "${PURPLE}//          Platform • 99.6% Error Prevention            //${NC}"
+log "${PURPLE}//                                                       //${NC}"
+log "${PURPLE}//═══════════════════════════════════════════════════════//${NC}"
 sleep 0.5
-log "//   🚀 Initializing orchestrator-first boot sequence... //"
-log "//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━//"
+log "${PURPLE}//   🚀 Initializing orchestrator-first boot sequence... //${NC}"
+log "${PURPLE}//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━//${NC}"
 sleep 1
 
 # Ensure we're running from the .opencode directory

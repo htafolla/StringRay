@@ -81,8 +81,6 @@ export class SessionCleanupManager {
     this._metadataLoaded = true;
   }
 
-
-
   /**
    * Initialize cleanup manager and start auto-cleanup if enabled
    */

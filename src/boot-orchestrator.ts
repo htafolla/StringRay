@@ -30,36 +30,36 @@ import { memoryMonitor } from "./monitoring/memory-monitor.js";
 function setupGracefulShutdown(): void {
   let isShuttingDown = false;
 
-  process.on('SIGINT', async () => {
+  process.on("SIGINT", async () => {
     if (isShuttingDown) {
-      console.log('🔄 Force exit requested...');
+      console.log("🔄 Force exit requested...");
       process.exit(1);
     }
 
     isShuttingDown = true;
-    console.log('⏹️  Received interrupt signal, shutting down gracefully...');
+    console.log("⏹️  Received interrupt signal, shutting down gracefully...");
 
     try {
       // Stop memory monitoring
       memoryMonitor.stop();
 
       // Give ongoing operations a moment to complete
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      console.log('✅ Graceful shutdown completed');
+      console.log("✅ Graceful shutdown completed");
       process.exit(0);
     } catch (error) {
-      console.error('❌ Error during graceful shutdown:', error);
+      console.error("❌ Error during graceful shutdown:", error);
       process.exit(1);
     }
   });
 
-  process.on('SIGTERM', async () => {
-    console.log('⏹️  Received termination signal, shutting down gracefully...');
+  process.on("SIGTERM", async () => {
+    console.log("⏹️  Received termination signal, shutting down gracefully...");
 
     try {
       memoryMonitor.stop();
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 500));
       process.exit(0);
     } catch (error) {
       process.exit(1);
@@ -67,14 +67,14 @@ function setupGracefulShutdown(): void {
   });
 
   // Handle uncaught exceptions that might cause JSON parsing errors
-  process.on('uncaughtException', (error) => {
-    console.error('❌ Uncaught Exception:', error);
+  process.on("uncaughtException", (error) => {
+    console.error("❌ Uncaught Exception:", error);
     memoryMonitor.stop();
     process.exit(1);
   });
 
-  process.on('unhandledRejection', (reason, promise) => {
-    console.error('❌ Unhandled Rejection at:', promise, 'reason:', reason);
+  process.on("unhandledRejection", (reason, promise) => {
+    console.error("❌ Unhandled Rejection at:", promise, "reason:", reason);
     memoryMonitor.stop();
     process.exit(1);
   });
@@ -554,14 +554,22 @@ export class BootOrchestrator {
     memoryMonitor.start();
 
     // Set up alert handlers
-    memoryMonitor.on('alert', (alert) => {
-      const level = alert.severity === 'critical' ? 'error' :
-                   alert.severity === 'high' ? 'warn' : 'info';
+    memoryMonitor.on("alert", (alert) => {
+      const level =
+        alert.severity === "critical"
+          ? "error"
+          : alert.severity === "high"
+            ? "warn"
+            : "info";
 
-      frameworkLogger.log('boot-orchestrator', `🚨 MEMORY ALERT: ${alert.message}`, 'error');
+      frameworkLogger.log(
+        "boot-orchestrator",
+        `🚨 MEMORY ALERT: ${alert.message}`,
+        "error",
+      );
 
       // Store alert in state for dashboard access
-      const alerts = (this.stateManager.get('memory:alerts') as any[]) || [];
+      const alerts = (this.stateManager.get("memory:alerts") as any[]) || [];
       alerts.push({
         ...alert,
         timestamp: Date.now(),
@@ -572,24 +580,24 @@ export class BootOrchestrator {
         alerts.shift();
       }
 
-      this.stateManager.set('memory:alerts', alerts);
+      this.stateManager.set("memory:alerts", alerts);
 
       // Log recommendations
       alert.details.recommendations.forEach((rec: string) => {
-        frameworkLogger.log('boot-orchestrator', `💡 ${rec}`, 'info');
+        frameworkLogger.log("boot-orchestrator", `💡 ${rec}`, "info");
       });
     });
 
     // Log initial memory status
     const initialStats = memoryMonitor.getCurrentStats();
     frameworkLogger.log(
-      'boot-orchestrator',
+      "boot-orchestrator",
       `🧠 Initial memory: ${initialStats.heapUsed.toFixed(1)}MB heap, ${initialStats.heapTotal.toFixed(1)}MB total`,
-      'info'
+      "info",
     );
 
     // Store initial memory baseline
-    this.stateManager.set('memory:baseline', initialStats);
+    this.stateManager.set("memory:baseline", initialStats);
   }
 
   /**
@@ -610,17 +618,21 @@ export class BootOrchestrator {
 
     // Check for memory issues
     if (summary.current.heapUsed > 400) {
-      issues.push(`Critical heap usage: ${summary.current.heapUsed.toFixed(1)}MB`);
+      issues.push(
+        `Critical heap usage: ${summary.current.heapUsed.toFixed(1)}MB`,
+      );
     } else if (summary.current.heapUsed > 200) {
       issues.push(`High heap usage: ${summary.current.heapUsed.toFixed(1)}MB`);
     }
 
-    if (summary.trend === 'increasing') {
-      issues.push('Memory usage trending upward - potential leak detected');
+    if (summary.trend === "increasing") {
+      issues.push("Memory usage trending upward - potential leak detected");
     }
 
     if (summary.peak.heapUsed > 500) {
-      issues.push(`Peak usage exceeded safe limits: ${summary.peak.heapUsed.toFixed(1)}MB`);
+      issues.push(
+        `Peak usage exceeded safe limits: ${summary.peak.heapUsed.toFixed(1)}MB`,
+      );
     }
 
     return {

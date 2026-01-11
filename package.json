@@ -53,6 +53,8 @@
     "memory:pools": "bash test-memory-pools.sh",
     "memory:shutdown": "bash test-graceful-shutdown.sh",
     "memory:regression": "bash run-memory-regression.sh",
+    "validate:orchestration": "bash validate-multi-agent-orchestration.sh",
+    "health:orchestration": "bash check-agent-orchestration-health.sh",
     "memory:health": "npm run memory:dashboard",
     "logging:disable": "bash scripts/disable-logging.sh",
     "logging:enable": "echo '🔊 Logging is ENABLED (default). To disable: export STRRAY_LOGGING_ENABLED=false'"

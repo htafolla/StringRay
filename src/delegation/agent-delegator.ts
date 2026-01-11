@@ -279,6 +279,319 @@ export class AgentDelegator {
   }
 
   /**
+   * Handle file creation events - delegate to appropriate agents
+   */
+  async handleFileCreation(filePath: string, content?: string): Promise<void> {
+    const fileType = this.getFileType(filePath);
+    const complexity = this.analyzeFileComplexity(filePath, content);
+
+    // Always consult test-architect for new files
+    if (this.shouldConsultTestArchitect(fileType, complexity)) {
+      await this.delegateToTestArchitect(filePath, fileType, complexity);
+    }
+
+    // Consult other agents based on file type and complexity
+    if (this.shouldConsultCodeReviewer(fileType)) {
+      await this.delegateToCodeReviewer(filePath, fileType);
+    }
+
+    if (this.shouldConsultSecurityAuditor(fileType, content)) {
+      await this.delegateToSecurityAuditor(filePath, fileType);
+    }
+
+    if (this.shouldConsultArchitect(filePath, fileType, complexity)) {
+      await this.delegateToArchitect(filePath, fileType, complexity);
+    }
+  }
+
+  /**
+   * Handle file modification events
+   */
+  async handleFileModification(filePath: string, changes: any): Promise<void> {
+    const fileType = this.getFileType(filePath);
+
+    // Consult bug triage for significant changes
+    if (this.shouldConsultBugTriage(changes)) {
+      await this.delegateToBugTriage(filePath, changes);
+    }
+
+    // Consult refactorer for complex changes
+    if (this.shouldConsultRefactorer(changes)) {
+      await this.delegateToRefactorer(filePath, changes);
+    }
+  }
+
+  /**
+   * Determine if test architect should be consulted
+   */
+  private shouldConsultTestArchitect(fileType: string, complexity: number): boolean {
+    // Consult for all code files and significant complexity
+    return ['.ts', '.js', '.py', '.java', '.cpp', '.rs'].includes(fileType) || complexity > 50;
+  }
+
+  /**
+   * Determine if code reviewer should be consulted
+   */
+  private shouldConsultCodeReviewer(fileType: string): boolean {
+    return ['.ts', '.js', '.py', '.java', '.cpp', '.rs', '.md'].includes(fileType);
+  }
+
+  /**
+   * Determine if security auditor should be consulted
+   */
+  private shouldConsultSecurityAuditor(fileType: string, content?: string): boolean {
+    const isCode = ['.ts', '.js', '.py', '.java', '.cpp', '.rs'].includes(fileType);
+    const hasSecurityKeywords = content && (
+      content.includes('password') ||
+      content.includes('secret') ||
+      content.includes('auth') ||
+      content.includes('security')
+    );
+    return isCode && !!hasSecurityKeywords;
+  }
+
+  /**
+   * Determine if architect should be consulted
+   */
+  private shouldConsultArchitect(filePath: string, fileType: string, complexity: number): boolean {
+    return complexity > 100 || fileType === '.md' || filePath.includes('architecture') || filePath.includes('design');
+  }
+
+  /**
+   * Determine if bug triage should be consulted
+   */
+  private shouldConsultBugTriage(changes: any): boolean {
+    return changes.addedLines > 50 || changes.deletedLines > 20;
+  }
+
+  /**
+   * Determine if refactorer should be consulted
+   */
+  private shouldConsultRefactorer(changes: any): boolean {
+    return changes.complexityIncrease > 20 || changes.fileSizeIncrease > 1000;
+  }
+
+  /**
+   * Delegate to test architect for new file analysis
+   */
+  private async delegateToTestArchitect(
+    filePath: string,
+    fileType: string,
+    complexity: number
+  ): Promise<void> {
+    const delegation = await this.analyzeDelegation({
+      operation: 'new-file-analysis',
+      description: `Analyze new ${fileType} file: ${filePath}`,
+      context: {
+        filePath,
+        fileType,
+        complexity,
+        action: 'new-file-created'
+      },
+      priority: 'medium'
+    });
+
+    if (delegation.agents.includes('test-architect')) {
+      await this.executeDelegation(delegation, {
+        operation: 'new-file-analysis',
+        description: `Analyze new ${fileType} file: ${filePath}`,
+        context: {
+          filePath,
+          fileType,
+          complexity,
+          action: 'new-file-created'
+        },
+        priority: 'medium'
+      });
+    }
+  }
+
+  /**
+   * Delegate to code reviewer
+   */
+  private async delegateToCodeReviewer(filePath: string, fileType: string): Promise<void> {
+    const delegation = await this.analyzeDelegation({
+      operation: 'code-review',
+      description: `Review new ${fileType} file: ${filePath}`,
+      context: {
+        filePath,
+        fileType,
+        action: 'new-file-review'
+      },
+      priority: 'low'
+    });
+
+    if (delegation.agents.includes('code-reviewer')) {
+      await this.executeDelegation(delegation, {
+        operation: 'code-review',
+        description: `Review new ${fileType} file: ${filePath}`,
+        context: {
+          filePath,
+          fileType,
+          action: 'new-file-review'
+        },
+        priority: 'low'
+      });
+    }
+  }
+
+  /**
+   * Delegate to security auditor
+   */
+  private async delegateToSecurityAuditor(filePath: string, fileType: string): Promise<void> {
+    const delegation = await this.analyzeDelegation({
+      operation: 'security-scan',
+      description: `Security scan for ${fileType} file: ${filePath}`,
+      context: {
+        filePath,
+        fileType,
+        action: 'security-review'
+      },
+      priority: 'high'
+    });
+
+    if (delegation.agents.includes('security-auditor')) {
+      await this.executeDelegation(delegation, {
+        operation: 'security-scan',
+        description: `Security scan for ${fileType} file: ${filePath}`,
+        context: {
+          filePath,
+          fileType,
+          action: 'security-review'
+        },
+        priority: 'high'
+      });
+    }
+  }
+
+  /**
+   * Delegate to architect
+   */
+  private async delegateToArchitect(
+    filePath: string,
+    fileType: string,
+    complexity: number
+  ): Promise<void> {
+    const delegation = await this.analyzeDelegation({
+      operation: 'architecture-review',
+      description: `Architecture review for ${fileType} file: ${filePath}`,
+      context: {
+        filePath,
+        fileType,
+        complexity,
+        action: 'architecture-review'
+      },
+      priority: 'medium'
+    });
+
+    if (delegation.agents.includes('architect')) {
+      await this.executeDelegation(delegation, {
+        operation: 'architecture-review',
+        description: `Architecture review for ${fileType} file: ${filePath}`,
+        context: {
+          filePath,
+          fileType,
+          complexity,
+          action: 'architecture-review'
+        },
+        priority: 'medium'
+      });
+    }
+  }
+
+  /**
+   * Delegate to bug triage
+   */
+  private async delegateToBugTriage(filePath: string, changes: any): Promise<void> {
+    const delegation = await this.analyzeDelegation({
+      operation: 'change-analysis',
+      description: `Analyze significant changes in ${filePath}`,
+      context: {
+        filePath,
+        changes,
+        action: 'change-review'
+      },
+      priority: 'medium'
+    });
+
+    if (delegation.agents.includes('bug-triage-specialist')) {
+      await this.executeDelegation(delegation, {
+        operation: 'change-analysis',
+        description: `Analyze significant changes in ${filePath}`,
+        context: {
+          filePath,
+          changes,
+          action: 'change-review'
+        },
+        priority: 'medium'
+      });
+    }
+  }
+
+  /**
+   * Delegate to refactorer
+   */
+  private async delegateToRefactorer(filePath: string, changes: any): Promise<void> {
+    const delegation = await this.analyzeDelegation({
+      operation: 'refactoring-analysis',
+      description: `Analyze refactoring opportunities in ${filePath}`,
+      context: {
+        filePath,
+        changes,
+        action: 'refactoring-review'
+      },
+      priority: 'low'
+    });
+
+    if (delegation.agents.includes('refactorer')) {
+      await this.executeDelegation(delegation, {
+        operation: 'refactoring-analysis',
+        description: `Analyze refactoring opportunities in ${filePath}`,
+        context: {
+          filePath,
+          changes,
+          action: 'refactoring-review'
+        },
+        priority: 'low'
+      });
+    }
+  }
+
+  /**
+   * Get file type from path
+   */
+  private getFileType(filePath: string): string {
+    const ext = filePath.substring(filePath.lastIndexOf('.'));
+    return ext || 'unknown';
+  }
+
+  /**
+   * Analyze file complexity
+   */
+  private analyzeFileComplexity(filePath: string, content?: string): number {
+    let complexity = 0;
+
+    if (content) {
+      // Count lines, functions, classes, etc.
+      const lines = content.split('\n').length;
+      const functions = (content.match(/function\s+|=>|class\s+/g) || []).length;
+      const imports = (content.match(/import\s+|require\s*\(/g) || []).length;
+
+      complexity = lines + (functions * 5) + (imports * 2);
+    }
+
+    // File size contributes to complexity
+    try {
+      const stats = require('fs').statSync(filePath);
+      complexity += Math.floor(stats.size / 1000); // 1 point per KB
+    } catch {
+      // Ignore file access errors
+    }
+
+    return complexity;
+  }
+
+  /**
    * Get available agents and their current status
    */
   getAvailableAgents(): AgentCapability[] {

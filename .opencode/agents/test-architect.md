@@ -21,4 +21,5 @@ Testing strategy design, coverage optimization, and test quality assurance.
 - test-strategy-design: Design comprehensive test strategies
 - coverage-analysis: Analyze and optimize test coverage
 - test-quality-assessment: Assess test quality and effectiveness
+- new-file-analysis: Analyze new files and recommend test approaches
 - ci-cd-integration: Integrate testing into CI/CD pipelines

@@ -1,4 +1,4 @@
-import { EventEmitter } from 'events';
+import { EventEmitter } from "events";
 
 /**
  * Memory Regression Testing Suite
@@ -8,12 +8,12 @@ import { EventEmitter } from 'events';
 export interface MemoryRegressionTest {
   name: string;
   description: string;
-  setup: () => Promise<void> | void;
+  setup?: (() => Promise<void> | void) | undefined;
   execute: () => Promise<any> | any;
-  cleanup: () => Promise<void> | void;
+  cleanup?: (() => Promise<void> | void) | undefined;
   expectedMemoryDelta: {
-    maxIncrease: number; // MB
-    acceptableLeak: number; // MB per minute
+    maxIncrease: number;
+    acceptableLeak: number;
   };
 }
 
@@ -75,7 +75,10 @@ export class MemoryRegressionTester extends EventEmitter {
           leakRate: 0,
           duration: 0,
           error: error instanceof Error ? error.message : String(error),
-          recommendations: ['Check test implementation', 'Verify memory cleanup'],
+          recommendations: [
+            "Check test implementation",
+            "Verify memory cleanup",
+          ],
         });
       }
     }
@@ -86,13 +89,15 @@ export class MemoryRegressionTester extends EventEmitter {
   /**
    * Run a single regression test
    */
-  private async runTest(test: MemoryRegressionTest): Promise<MemoryRegressionResult> {
+  private async runTest(
+    test: MemoryRegressionTest,
+  ): Promise<MemoryRegressionResult> {
     const startTime = Date.now();
 
     try {
       // Setup
       if (test.setup) {
-        await test.setup();
+        await Promise.resolve(test.setup());
       }
 
       // Memory sampling during test
@@ -105,7 +110,10 @@ export class MemoryRegressionTester extends EventEmitter {
       // Execute test with timeout
       const testPromise = test.execute();
       const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('Test timeout')), this.config.testTimeout)
+        setTimeout(
+          () => reject(new Error("Test timeout")),
+          this.config.testTimeout,
+        ),
       );
 
       await Promise.race([testPromise, timeoutPromise]);
@@ -116,38 +124,46 @@ export class MemoryRegressionTester extends EventEmitter {
       const duration = endTime - startTime;
 
       if (samples.length === 0) {
-        throw new Error('No memory samples collected');
+        throw new Error("No memory samples collected");
       }
 
-      const startMemory = samples[0];
-      const endMemory = samples[samples.length - 1];
+      const startMemory = samples[0]!;
+      const endMemory = samples[samples.length - 1]!;
       const memoryDelta = (endMemory - startMemory) / 1024 / 1024; // MB
 
       // Calculate leak rate (MB per minute)
-      const leakRate = duration > 0 ? (memoryDelta / (duration / 1000 / 60)) : 0;
+      const leakRate = duration > 0 ? memoryDelta / (duration / 1000 / 60) : 0;
 
       // Determine pass/fail
-      const passed = Math.abs(memoryDelta) <= test.expectedMemoryDelta.maxIncrease &&
-                    Math.abs(leakRate) <= test.expectedMemoryDelta.acceptableLeak;
+      const passed =
+        Math.abs(memoryDelta) <= test.expectedMemoryDelta.maxIncrease &&
+        Math.abs(leakRate) <= test.expectedMemoryDelta.acceptableLeak;
 
       // Generate recommendations
       const recommendations: string[] = [];
       if (memoryDelta > test.expectedMemoryDelta.maxIncrease) {
-        recommendations.push(`Memory increased by ${memoryDelta.toFixed(2)}MB (expected ≤${test.expectedMemoryDelta.maxIncrease}MB)`);
+        recommendations.push(
+          `Memory increased by ${memoryDelta.toFixed(2)}MB (expected ≤${test.expectedMemoryDelta.maxIncrease}MB)`,
+        );
       }
       if (leakRate > test.expectedMemoryDelta.acceptableLeak) {
-        recommendations.push(`Memory leak rate: ${leakRate.toFixed(2)}MB/min (expected ≤${test.expectedMemoryDelta.acceptableLeak}MB/min)`);
+        recommendations.push(
+          `Memory leak rate: ${leakRate.toFixed(2)}MB/min (expected ≤${test.expectedMemoryDelta.acceptableLeak}MB/min)`,
+        );
       }
       if (samples.length > 10) {
         const variance = this.calculateVariance(samples);
-        if (variance > 5 * 1024 * 1024) { // 5MB variance
-          recommendations.push('High memory variance detected - consider stabilizing allocations');
+        if (variance > 5 * 1024 * 1024) {
+          // 5MB variance
+          recommendations.push(
+            "High memory variance detected - consider stabilizing allocations",
+          );
         }
       }
 
       // Cleanup
       if (test.cleanup) {
-        await test.cleanup();
+        await Promise.resolve(test.cleanup());
       }
 
       return {
@@ -158,7 +174,6 @@ export class MemoryRegressionTester extends EventEmitter {
         duration,
         recommendations,
       };
-
     } catch (error) {
       // Cleanup on error
       if (test.cleanup) {
@@ -185,7 +200,7 @@ export class MemoryRegressionTester extends EventEmitter {
       acceptableLeakRate?: number;
       setup?: () => Promise<void> | void;
       cleanup?: () => Promise<void> | void;
-    } = {}
+    } = {},
   ): MemoryRegressionTest {
     return {
       name,
@@ -194,8 +209,10 @@ export class MemoryRegressionTester extends EventEmitter {
       execute: testFunction,
       cleanup: options.cleanup,
       expectedMemoryDelta: {
-        maxIncrease: options.maxMemoryIncrease || this.config.acceptableMemoryGrowth,
-        acceptableLeak: options.acceptableLeakRate || this.config.leakDetectionThreshold,
+        maxIncrease:
+          options.maxMemoryIncrease || this.config.acceptableMemoryGrowth,
+        acceptableLeak:
+          options.acceptableLeakRate || this.config.leakDetectionThreshold,
       },
     };
   }
@@ -204,7 +221,7 @@ export class MemoryRegressionTester extends EventEmitter {
    * Generate test report
    */
   generateReport(results: MemoryRegressionResult[]): string {
-    const passed = results.filter(r => r.passed).length;
+    const passed = results.filter((r) => r.passed).length;
     const failed = results.length - passed;
 
     let report = `# Memory Regression Test Report\n\n`;
@@ -212,27 +229,31 @@ export class MemoryRegressionTester extends EventEmitter {
 
     if (failed > 0) {
       report += `## Failed Tests\n\n`;
-      results.filter(r => !r.passed).forEach(result => {
-        report += `### ${result.testName}\n`;
-        report += `- Memory Delta: ${result.memoryDelta.toFixed(2)}MB\n`;
-        report += `- Leak Rate: ${result.leakRate.toFixed(2)}MB/min\n`;
-        report += `- Duration: ${result.duration}ms\n`;
-        if (result.error) {
-          report += `- Error: ${result.error}\n`;
-        }
-        if (result.recommendations.length > 0) {
-          report += `- Recommendations:\n`;
-          result.recommendations.forEach(rec => {
-            report += `  - ${rec}\n`;
-          });
-        }
-        report += `\n`;
-      });
+      results
+        .filter((r) => !r.passed)
+        .forEach((result) => {
+          report += `### ${result.testName}\n`;
+          report += `- Memory Delta: ${result.memoryDelta.toFixed(2)}MB\n`;
+          report += `- Leak Rate: ${result.leakRate.toFixed(2)}MB/min\n`;
+          report += `- Duration: ${result.duration}ms\n`;
+          if (result.error) {
+            report += `- Error: ${result.error}\n`;
+          }
+          if (result.recommendations.length > 0) {
+            report += `- Recommendations:\n`;
+            result.recommendations.forEach((rec) => {
+              report += `  - ${rec}\n`;
+            });
+          }
+          report += `\n`;
+        });
     }
 
     report += `## Performance Metrics\n\n`;
-    const avgDelta = results.reduce((sum, r) => sum + r.memoryDelta, 0) / results.length;
-    const avgLeakRate = results.reduce((sum, r) => sum + r.leakRate, 0) / results.length;
+    const avgDelta =
+      results.reduce((sum, r) => sum + r.memoryDelta, 0) / results.length;
+    const avgLeakRate =
+      results.reduce((sum, r) => sum + r.leakRate, 0) / results.length;
     const totalDuration = results.reduce((sum, r) => sum + r.duration, 0);
 
     report += `- Average Memory Delta: ${avgDelta.toFixed(2)}MB\n`;
@@ -247,7 +268,9 @@ export class MemoryRegressionTester extends EventEmitter {
    */
   private calculateVariance(samples: number[]): number {
     const mean = samples.reduce((sum, s) => sum + s, 0) / samples.length;
-    const variance = samples.reduce((sum, s) => sum + Math.pow(s - mean, 2), 0) / samples.length;
+    const variance =
+      samples.reduce((sum, s) => sum + Math.pow(s - mean, 2), 0) /
+      samples.length;
     return variance;
   }
 }
@@ -255,7 +278,7 @@ export class MemoryRegressionTester extends EventEmitter {
 // Pre-configured test templates
 export const memoryTestTemplates = {
   sessionOperations: (sessionCount: number = 100) => ({
-    name: 'Session Operations Memory Test',
+    name: "Session Operations Memory Test",
     description: `Test memory usage during ${sessionCount} session operations`,
     setup: async () => {
       // Setup would initialize session manager
@@ -267,14 +290,14 @@ export const memoryTestTemplates = {
       for (let i = 0; i < sessionCount; i++) {
         operations.push({
           id: `session-${i}`,
-          data: { userId: i, metadata: { created: Date.now(), active: true } }
+          data: { userId: i, metadata: { created: Date.now(), active: true } },
         });
       }
       return operations;
     },
     cleanup: async () => {
       // Cleanup sessions
-      console.log('Cleaning up test sessions...');
+      console.log("Cleaning up test sessions...");
     },
     expectedMemoryDelta: {
       maxIncrease: sessionCount * 0.01, // ~10KB per session
@@ -283,7 +306,7 @@ export const memoryTestTemplates = {
   }),
 
   cacheOperations: (cacheSize: number = 1000) => ({
-    name: 'Cache Operations Memory Test',
+    name: "Cache Operations Memory Test",
     description: `Test memory usage during ${cacheSize} cache operations`,
     execute: async () => {
       const cache = new Map();
@@ -306,7 +329,7 @@ export const memoryTestTemplates = {
   }),
 
   streamingOperations: (messageCount: number = 1000) => ({
-    name: 'Streaming Operations Memory Test',
+    name: "Streaming Operations Memory Test",
     description: `Test memory usage during ${messageCount} streaming operations`,
     execute: async () => {
       const messages = [];
@@ -317,7 +340,7 @@ export const memoryTestTemplates = {
           timestamp: Date.now(),
         });
         // Simulate processing delay
-        await new Promise(resolve => setTimeout(resolve, 1));
+        await new Promise((resolve) => setTimeout(resolve, 1));
       }
       return messages.length;
     },

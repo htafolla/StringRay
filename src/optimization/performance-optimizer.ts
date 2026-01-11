@@ -8,7 +8,13 @@
  * @since 2026-01-07
  */
 
-import { MemoryPool, MemoryPoolManager, createSessionPool, createMetricsPool, createAlertPool } from '../utils/memory-pool.js';
+import {
+  MemoryPool,
+  MemoryPoolManager,
+  createSessionPool,
+  createMetricsPool,
+  createAlertPool,
+} from "../utils/memory-pool.js";
 
 /**
  * LRU Cache with automatic eviction policies for performance optimization
@@ -19,7 +25,8 @@ export class LRUCache<T> {
   private maxSize: number;
   private defaultTTL: number;
 
-  constructor(maxSize: number = 1000, defaultTTL: number = 300000) { // 5 minutes default TTL
+  constructor(maxSize: number = 1000, defaultTTL: number = 300000) {
+    // 5 minutes default TTL
     this.maxSize = maxSize;
     this.defaultTTL = defaultTTL;
   }
@@ -120,20 +127,25 @@ export class LRUCache<T> {
     totalAccesses: number;
     averageTTL: number;
   } {
-    const totalAccesses = Array.from(this.cache.values())
-      .reduce((sum, entry) => sum + entry.accessCount, 0);
+    const totalAccesses = Array.from(this.cache.values()).reduce(
+      (sum, entry) => sum + entry.accessCount,
+      0,
+    );
 
     const totalHits = Array.from(this.cache.values())
-      .filter(entry => entry.accessCount > 1)
+      .filter((entry) => entry.accessCount > 1)
       .reduce((sum, entry) => sum + (entry.accessCount - 1), 0);
 
     const hitRate = totalAccesses > 0 ? totalHits / totalAccesses : 0;
 
     const now = Date.now();
-    const averageTTL = this.cache.size > 0
-      ? Array.from(this.cache.values())
-          .reduce((sum, entry) => sum + (now - entry.timestamp), 0) / this.cache.size
-      : 0;
+    const averageTTL =
+      this.cache.size > 0
+        ? Array.from(this.cache.values()).reduce(
+            (sum, entry) => sum + (now - entry.timestamp),
+            0,
+          ) / this.cache.size
+        : 0;
 
     return {
       size: this.cache.size,
@@ -360,8 +372,6 @@ export class HighPerformanceCache<T> {
     return 16; // Default object size
   }
 }
-
-
 
 export class OptimizedTaskProcessor {
   private cache = new HighPerformanceCache<any>();

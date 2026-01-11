@@ -1,4 +1,4 @@
-import { EventEmitter } from 'events';
+import { EventEmitter } from "events";
 
 /**
  * Memory Monitor - Comprehensive memory tracking and leak detection
@@ -15,13 +15,13 @@ export interface MemoryStats {
 }
 
 export interface MemoryLeakAlert {
-  type: 'leak_detected' | 'high_usage' | 'spike_detected';
-  severity: 'low' | 'medium' | 'high' | 'critical';
+  type: "leak_detected" | "high_usage" | "spike_detected";
+  severity: "low" | "medium" | "high" | "critical";
   message: string;
   details: {
     currentUsage: number;
     threshold: number;
-    trend: 'increasing' | 'stable' | 'decreasing';
+    trend: "increasing" | "stable" | "decreasing";
     recommendations: string[];
   };
 }
@@ -44,7 +44,7 @@ export interface MemorySummary {
   current: MemoryStats;
   peak: MemoryStats;
   average: number;
-  trend: 'increasing' | 'stable' | 'decreasing';
+  trend: "increasing" | "stable" | "decreasing";
 }
 
 export class MemoryMonitor extends EventEmitter {
@@ -79,7 +79,7 @@ export class MemoryMonitor extends EventEmitter {
    * Start memory monitoring
    */
   start(): void {
-    this.log('🔍 Starting Memory Monitor...');
+    this.log("🔍 Starting Memory Monitor...");
     this.monitoringInterval = setInterval(() => {
       this.checkMemory();
     }, this.config.checkInterval);
@@ -95,7 +95,7 @@ export class MemoryMonitor extends EventEmitter {
       clearInterval(this.monitoringInterval);
     }
     this.monitoringInterval = null;
-    this.log('🛑 Memory Monitor stopped');
+    this.log("🛑 Memory Monitor stopped");
   }
 
   /**
@@ -104,10 +104,10 @@ export class MemoryMonitor extends EventEmitter {
   getCurrentStats(): MemoryStats {
     const memUsage = process.memoryUsage();
     return {
-      heapUsed: Math.round(memUsage.heapUsed / 1024 / 1024 * 100) / 100,
-      heapTotal: Math.round(memUsage.heapTotal / 1024 / 1024 * 100) / 100,
-      external: Math.round(memUsage.external / 1024 / 1024 * 100) / 100,
-      rss: Math.round(memUsage.rss / 1024 / 1024 * 100) / 100,
+      heapUsed: Math.round((memUsage.heapUsed / 1024 / 1024) * 100) / 100,
+      heapTotal: Math.round((memUsage.heapTotal / 1024 / 1024) * 100) / 100,
+      external: Math.round((memUsage.external / 1024 / 1024) * 100) / 100,
+      rss: Math.round((memUsage.rss / 1024 / 1024) * 100) / 100,
       timestamp: Date.now(),
     };
   }
@@ -125,7 +125,10 @@ export class MemoryMonitor extends EventEmitter {
 
     this.checkThresholds(stats);
 
-    if (this.leakDetectionEnabled && Date.now() - this.lastLeakCheck > this.leakCheckInterval) {
+    if (
+      this.leakDetectionEnabled &&
+      Date.now() - this.lastLeakCheck > this.leakCheckInterval
+    ) {
       this.detectMemoryLeaks();
       this.lastLeakCheck = Date.now();
     }
@@ -143,34 +146,34 @@ export class MemoryMonitor extends EventEmitter {
 
     if (heapMB >= this.config.alertThresholds.critical) {
       this.emitAlert({
-        type: 'high_usage',
-        severity: 'critical',
+        type: "high_usage",
+        severity: "critical",
         message: `Critical memory usage: ${heapMB.toFixed(2)}MB (threshold: ${this.config.alertThresholds.critical}MB)`,
         details: {
           currentUsage: heapMB,
           threshold: this.config.alertThresholds.critical,
           trend: this.calculateTrend(),
           recommendations: [
-            'Force garbage collection if available',
-            'Check for memory leaks in caches and event listeners',
-            'Consider reducing concurrent operations',
-            'Monitor large data structures (Maps, Sets, Arrays)',
+            "Force garbage collection if available",
+            "Check for memory leaks in caches and event listeners",
+            "Consider reducing concurrent operations",
+            "Monitor large data structures (Maps, Sets, Arrays)",
           ],
         },
       });
     } else if (heapMB >= this.config.alertThresholds.warning) {
       this.emitAlert({
-        type: 'high_usage',
-        severity: 'high',
+        type: "high_usage",
+        severity: "high",
         message: `High memory usage: ${heapMB.toFixed(2)}MB (threshold: ${this.config.alertThresholds.warning}MB)`,
         details: {
           currentUsage: heapMB,
           threshold: this.config.alertThresholds.warning,
           trend: this.calculateTrend(),
           recommendations: [
-            'Monitor memory growth rate',
-            'Check for inefficient algorithms',
-            'Consider memory optimization techniques',
+            "Monitor memory growth rate",
+            "Check for inefficient algorithms",
+            "Consider memory optimization techniques",
           ],
         },
       });
@@ -186,7 +189,9 @@ export class MemoryMonitor extends EventEmitter {
     const recentStats = this.statsHistory.slice(-20);
     if (recentStats.length < 2) return;
 
-    const timeSpan = recentStats[recentStats.length - 1]!.timestamp - recentStats[0]!.timestamp;
+    const timeSpan =
+      recentStats[recentStats.length - 1]!.timestamp -
+      recentStats[0]!.timestamp;
     const timeSpanMinutes = timeSpan / (1000 * 60);
 
     if (timeSpanMinutes < 1) return;
@@ -196,22 +201,23 @@ export class MemoryMonitor extends EventEmitter {
     const growthRate = (endUsage - startUsage) / timeSpanMinutes;
 
     if (growthRate > this.config.alertThresholds.leakDetection.growthRate) {
-      const sustainedPeriod = this.config.alertThresholds.leakDetection.sustainedPeriod;
+      const sustainedPeriod =
+        this.config.alertThresholds.leakDetection.sustainedPeriod;
       if (timeSpanMinutes >= sustainedPeriod) {
         this.emitAlert({
-          type: 'leak_detected',
-          severity: 'medium',
+          type: "leak_detected",
+          severity: "medium",
           message: `Potential memory leak detected: ${growthRate.toFixed(2)}MB/min growth rate over ${timeSpanMinutes.toFixed(1)} minutes`,
           details: {
             currentUsage: endUsage,
             threshold: this.config.alertThresholds.leakDetection.growthRate,
-            trend: 'increasing',
+            trend: "increasing",
             recommendations: [
-              'Check for uncleansed event listeners',
-              'Review timer/interval cleanup',
-              'Inspect cache growth in Map/Set structures',
-              'Monitor object retention in closures',
-              'Consider memory profiling tools',
+              "Check for uncleansed event listeners",
+              "Review timer/interval cleanup",
+              "Inspect cache growth in Map/Set structures",
+              "Monitor object retention in closures",
+              "Consider memory profiling tools",
             ],
           },
         });
@@ -222,39 +228,41 @@ export class MemoryMonitor extends EventEmitter {
   /**
    * Calculate memory usage trend
    */
-  private calculateTrend(): 'increasing' | 'stable' | 'decreasing' {
-    if (this.statsHistory.length < 5) return 'stable';
+  private calculateTrend(): "increasing" | "stable" | "decreasing" {
+    if (this.statsHistory.length < 5) return "stable";
 
     const recent = this.statsHistory.slice(-5);
     const older = this.statsHistory.slice(-10, -5);
 
-    const recentAvg = recent.reduce((sum, s) => sum + s.heapUsed, 0) / recent.length;
-    const olderAvg = older.reduce((sum, s) => sum + s.heapUsed, 0) / older.length;
+    const recentAvg =
+      recent.reduce((sum, s) => sum + s.heapUsed, 0) / recent.length;
+    const olderAvg =
+      older.reduce((sum, s) => sum + s.heapUsed, 0) / older.length;
 
     const diff = recentAvg - olderAvg;
     const threshold = 5;
 
-    if (diff > threshold) return 'increasing';
-    if (diff < -threshold) return 'decreasing';
-    return 'stable';
+    if (diff > threshold) return "increasing";
+    if (diff < -threshold) return "decreasing";
+    return "stable";
   }
 
   /**
    * Emit memory alert
    */
   private emitAlert(alert: MemoryLeakAlert): void {
-    this.emit('alert', alert);
+    this.emit("alert", alert);
 
     const severityEmoji: { [key: string]: string } = {
-      low: 'ℹ️',
-      medium: '⚠️',
-      high: '🔴',
-      critical: '🚨',
+      low: "ℹ️",
+      medium: "⚠️",
+      high: "🔴",
+      critical: "🚨",
     };
 
     this.log(`${severityEmoji[alert.severity]} MEMORY ALERT: ${alert.message}`);
 
-    alert.details.recommendations.forEach(rec => {
+    alert.details.recommendations.forEach((rec) => {
       this.log(`  💡 ${rec}`);
     });
   }
@@ -271,8 +279,8 @@ export class MemoryMonitor extends EventEmitter {
    * Get memory usage history
    */
   getHistory(hours: number = 1): MemoryStats[] {
-    const cutoff = Date.now() - (hours * 60 * 60 * 1000);
-    return this.statsHistory.filter(stat => stat.timestamp >= cutoff);
+    const cutoff = Date.now() - hours * 60 * 60 * 1000;
+    return this.statsHistory.filter((stat) => stat.timestamp >= cutoff);
   }
 
   /**
@@ -280,13 +288,15 @@ export class MemoryMonitor extends EventEmitter {
    */
   getSummary(): MemorySummary {
     const current = this.getCurrentStats();
-    const peak = this.statsHistory.reduce((max, stat) =>
-      stat.heapUsed > max.heapUsed ? stat : max,
-      this.statsHistory[0] || current
+    const peak = this.statsHistory.reduce(
+      (max, stat) => (stat.heapUsed > max.heapUsed ? stat : max),
+      this.statsHistory[0] || current,
     );
-    const average = this.statsHistory.length > 0
-      ? this.statsHistory.reduce((sum, stat) => sum + stat.heapUsed, 0) / this.statsHistory.length
-      : current.heapUsed;
+    const average =
+      this.statsHistory.length > 0
+        ? this.statsHistory.reduce((sum, stat) => sum + stat.heapUsed, 0) /
+          this.statsHistory.length
+        : current.heapUsed;
 
     return {
       current,
@@ -306,7 +316,9 @@ export class MemoryMonitor extends EventEmitter {
       const after = this.getCurrentStats().heapUsed;
       const freed = before - after;
 
-      this.log(`🗑️ GC: Freed ${freed.toFixed(2)}MB (${before.toFixed(2)}MB → ${after.toFixed(2)}MB)`);
+      this.log(
+        `🗑️ GC: Freed ${freed.toFixed(2)}MB (${before.toFixed(2)}MB → ${after.toFixed(2)}MB)`,
+      );
       return true;
     }
     return false;
@@ -318,9 +330,9 @@ export class MemoryMonitor extends EventEmitter {
   private log(message: string): void {
     // Write to framework activity log instead of console
     try {
-      const fs = require('fs');
-      const logDir = './.opencode/logs';
-      const logFile = `${logDir}/memory-monitor-${new Date().toISOString().split('T')[0]}.log`;
+      const fs = require("fs");
+      const logDir = "./.opencode/logs";
+      const logFile = `${logDir}/memory-monitor-${new Date().toISOString().split("T")[0]}.log`;
 
       if (!fs.existsSync(logDir)) {
         fs.mkdirSync(logDir, { recursive: true });
@@ -344,7 +356,9 @@ export function getMemoryUsage(): MemoryStats {
 
 export function logMemoryUsage(): void {
   const stats = getMemoryUsage();
-  console.log(`🧠 Memory Usage: ${stats.heapUsed}MB heap, ${stats.heapTotal}MB total, ${stats.external}MB external`);
+  console.log(
+    `🧠 Memory Usage: ${stats.heapUsed}MB heap, ${stats.heapTotal}MB total, ${stats.external}MB external`,
+  );
 }
 
 export function checkMemoryHealth(): { healthy: boolean; issues: string[] } {
@@ -355,8 +369,8 @@ export function checkMemoryHealth(): { healthy: boolean; issues: string[] } {
     issues.push(`High heap usage: ${summary.current.heapUsed}MB`);
   }
 
-  if (summary.trend === 'increasing') {
-    issues.push('Memory usage trending upward');
+  if (summary.trend === "increasing") {
+    issues.push("Memory usage trending upward");
   }
 
   return {

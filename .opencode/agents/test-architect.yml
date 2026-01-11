@@ -47,6 +47,7 @@ capabilities:
   - integration_testing
   - test_automation
   - quality_assurance
+  - new_file_analysis
 
 # Error Handling Configuration
 error_handling:

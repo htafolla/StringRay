@@ -1,4 +1,4 @@
-import { EventEmitter } from 'events';
+import { EventEmitter } from "events";
 
 /**
  * Memory Pool System - Reusable object pooling to reduce GC pressure
@@ -84,10 +84,10 @@ export class MemoryPool<T = any> extends EventEmitter {
     this.created++;
     const obj = this.config.factory();
 
-    this.emit('objectCreated', {
+    this.emit("objectCreated", {
       pool: this,
       object: obj,
-      totalCreated: this.created
+      totalCreated: this.created,
     });
 
     return obj;
@@ -97,15 +97,17 @@ export class MemoryPool<T = any> extends EventEmitter {
    * Get pool metrics and statistics
    */
   getMetrics(): PoolMetrics {
-    const hitRate = this.totalRequests > 0 ? this.cacheHits / this.totalRequests : 0;
+    const hitRate =
+      this.totalRequests > 0 ? this.cacheHits / this.totalRequests : 0;
 
     return {
-      name: 'memoryPool',
+      name: "memoryPool",
       allocated: this.created - this.available.length,
       available: this.available.length,
       totalCreated: this.created,
       hitRate,
-      averageUsage: this.totalRequests > 0 ? this.created / this.totalRequests : 0,
+      averageUsage:
+        this.totalRequests > 0 ? this.created / this.totalRequests : 0,
     };
   }
 
@@ -114,7 +116,7 @@ export class MemoryPool<T = any> extends EventEmitter {
    */
   clear(): void {
     this.available = [];
-    this.emit('poolCleared', { pool: this });
+    this.emit("poolCleared", { pool: this });
   }
 
   /**
@@ -125,7 +127,10 @@ export class MemoryPool<T = any> extends EventEmitter {
       available: this.available.length,
       created: this.created,
       maxSize: this.config.maxSize,
-      utilization: this.created > 0 ? (this.created - this.available.length) / this.created : 0,
+      utilization:
+        this.created > 0
+          ? (this.created - this.available.length) / this.created
+          : 0,
     };
   }
 }
@@ -151,12 +156,12 @@ export class MemoryPoolManager extends EventEmitter {
       const pool = new MemoryPool<T>(config);
       this.pools.set(name, pool);
 
-      pool.on('objectCreated', (data) => {
-        this.emit('poolObjectCreated', { poolName: name, ...data });
+      pool.on("objectCreated", (data) => {
+        this.emit("poolObjectCreated", { poolName: name, ...data });
       });
 
-      pool.on('poolCleared', (data) => {
-        this.emit('poolCleared', { poolName: name, ...data });
+      pool.on("poolCleared", (data) => {
+        this.emit("poolCleared", { poolName: name, ...data });
       });
     }
 
@@ -187,21 +192,21 @@ export class MemoryPoolManager extends EventEmitter {
       if (metric.hitRate < 0.5) {
         recommendations.push(
           `Pool '${name}' has low hit rate (${(metric.hitRate * 100).toFixed(1)}%). ` +
-          'Consider reducing pool size or increasing object lifetime.'
+            "Consider reducing pool size or increasing object lifetime.",
         );
       }
 
       if (metric.averageUsage > 2) {
         recommendations.push(
           `Pool '${name}' has high object creation rate (${metric.averageUsage.toFixed(1)} objects per request). ` +
-          'Consider increasing pool size or implementing object reuse.'
+            "Consider increasing pool size or implementing object reuse.",
         );
       }
 
       if (metric.available === 0 && metric.allocated > 10) {
         recommendations.push(
           `Pool '${name}' is fully utilized (${metric.allocated} objects). ` +
-          'Consider increasing max pool size.'
+            "Consider increasing max pool size.",
         );
       }
     }
@@ -215,12 +220,12 @@ export class MemoryPoolManager extends EventEmitter {
   private startMonitoring(): void {
     this.monitoringInterval = setInterval(() => {
       const metrics = this.getAllMetrics();
-      this.emit('metricsUpdate', metrics);
+      this.emit("metricsUpdate", metrics);
 
       // Check for optimization opportunities
       const recommendations = this.getOptimizationRecommendations();
       if (recommendations.length > 0) {
-        this.emit('optimizationRecommendations', recommendations);
+        this.emit("optimizationRecommendations", recommendations);
       }
     }, 300000); // Every 5 minutes
   }
@@ -247,17 +252,17 @@ export const memoryPoolManager = new MemoryPoolManager();
 
 // Convenience functions for common object types
 export function createSessionPool(maxSize = 100): MemoryPool<any> {
-  return memoryPoolManager.getPool('sessions', {
+  return memoryPoolManager.getPool("sessions", {
     maxSize,
     factory: () => ({
-      id: '',
+      id: "",
       createdAt: Date.now(),
       lastActivity: Date.now(),
       metadata: new Map(),
       isActive: true,
     }),
     reset: (session) => {
-      session.id = '';
+      session.id = "";
       session.createdAt = Date.now();
       session.lastActivity = Date.now();
       session.metadata.clear();
@@ -267,17 +272,17 @@ export function createSessionPool(maxSize = 100): MemoryPool<any> {
 }
 
 export function createMetricsPool(maxSize = 200): MemoryPool<any> {
-  return memoryPoolManager.getPool('metrics', {
+  return memoryPoolManager.getPool("metrics", {
     maxSize,
     factory: () => ({
       timestamp: Date.now(),
-      type: '',
+      type: "",
       value: 0,
       metadata: {},
     }),
     reset: (metric) => {
       metric.timestamp = Date.now();
-      metric.type = '';
+      metric.type = "";
       metric.value = 0;
       metric.metadata = {};
     },
@@ -285,21 +290,21 @@ export function createMetricsPool(maxSize = 200): MemoryPool<any> {
 }
 
 export function createAlertPool(maxSize = 50): MemoryPool<any> {
-  return memoryPoolManager.getPool('alerts', {
+  return memoryPoolManager.getPool("alerts", {
     maxSize,
     factory: () => ({
-      id: '',
-      type: '',
-      severity: 'low',
-      message: '',
+      id: "",
+      type: "",
+      severity: "low",
+      message: "",
       timestamp: Date.now(),
       resolved: false,
     }),
     reset: (alert) => {
-      alert.id = '';
-      alert.type = '';
-      alert.severity = 'low';
-      alert.message = '';
+      alert.id = "";
+      alert.type = "";
+      alert.severity = "low";
+      alert.message = "";
       alert.timestamp = Date.now();
       alert.resolved = false;
     },

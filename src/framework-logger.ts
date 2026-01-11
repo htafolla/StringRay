@@ -1,9 +1,15 @@
+import {
+  isLoggingEnabled,
+  shouldLog,
+  getLoggingConfig,
+} from "./logging-config.js";
+
 export interface FrameworkLogEntry {
   timestamp: number;
   component: string;
   action: string;
   agent: string;
-  status: "success" | "error" | "info";
+  status: "success" | "error" | "info" | "debug";
   details?: any;
 }
 
@@ -14,9 +20,19 @@ export class FrameworkUsageLogger {
   async log(
     component: string,
     action: string,
-    status: "success" | "error" | "info" = "info",
+    status: "success" | "error" | "info" | "debug" = "info",
     details?: any,
   ) {
+    // Check if logging is enabled globally
+    if (!isLoggingEnabled()) {
+      return;
+    }
+
+    // Check if this log level should be logged
+    if (!shouldLog(status)) {
+      return;
+    }
+
     const entry: FrameworkLogEntry = {
       timestamp: Date.now(),
       component,
@@ -33,7 +49,13 @@ export class FrameworkUsageLogger {
     }
 
     const emoji =
-      status === "success" ? "✅" : status === "error" ? "❌" : "ℹ️";
+      status === "success"
+        ? "✅"
+        : status === "error"
+          ? "❌"
+          : status === "debug"
+            ? "🔍"
+            : "ℹ️";
     console.log(`${emoji} [${component}] ${action} - ${status.toUpperCase()}`);
 
     await this.persistLog(entry);

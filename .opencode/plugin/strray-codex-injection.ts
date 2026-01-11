@@ -13,6 +13,10 @@ import * as fs from "fs";
 import * as path from "path";
 import { spawn } from "child_process";
 
+// Import StrRay framework components from dist
+import { ProcessorManager } from "../../dist/processors/processor-manager.js";
+import { StrRayStateManager } from "../../dist/state/state-manager.js";
+
 function spawnPromise(
   command: string,
   args: string[],
@@ -284,9 +288,32 @@ export default async function strrayCodexPlugin(input: {
       },
       _output: unknown,
     ) => {
+      const logger = await getOrCreateLogger(directory);
+      logger.log(
+        `PLUGIN HOOK TRIGGERED: tool=${input.tool}, hasArgs=${!!input.args}`,
+      );
+
       const { tool, args } = input;
 
       if (["write", "edit", "multiedit"].includes(tool)) {
+        try {
+          // First, invoke the StrRay processor pipeline for orchestration
+          const stateManager = new StrRayStateManager();
+          const processorManager = new ProcessorManager(stateManager);
+          await processorManager.executePreProcessors(tool, args);
+          logger.log(`Pre-processors executed for ${tool} operation`);
+        } catch (processorError: unknown) {
+          const errorMessage =
+            processorError instanceof Error
+              ? processorError.message
+              : String(processorError);
+          logger.error(
+            `Processor orchestration failed for ${tool}: ${errorMessage}`,
+          );
+          // Continue with external validation even if processors fail
+        }
+
+        // Fallback to external validation (preserved from migration)
         const code = args?.content || "";
         const filePath = args?.filePath || "<unknown>";
 
@@ -299,7 +326,6 @@ export default async function strrayCodexPlugin(input: {
           );
 
           if (fs.existsSync(validationScript)) {
-            const logger = await getOrCreateLogger(directory);
             try {
               const { stdout } = await spawnPromise(
                 "python3",

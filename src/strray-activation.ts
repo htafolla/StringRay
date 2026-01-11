@@ -53,6 +53,18 @@ export async function activateStrRayFramework(
       await activateOrchestrator();
     }
 
+    if (activationConfig.enableBootOrchestrator) {
+      await activateBootOrchestrator();
+    }
+
+    if (activationConfig.enableStateManagement) {
+      await activateStateManagement();
+    }
+
+    if (activationConfig.enableProcessors) {
+      await activateProcessors();
+    }
+
     // Loading display moved to init.sh for dramatic line-by-line presentation
 
     frameworkLogger.log(
@@ -100,14 +112,40 @@ async function activateHooks(): Promise<void> {
 }
 
 async function activateBootOrchestrator(): Promise<void> {
-  throw new Error(
-    "Boot orchestrator disabled due to framework-logger import issues",
+  frameworkLogger.log(
+    "strray-activation",
+    "activating boot orchestrator",
+    "info",
+  );
+
+  const { bootOrchestrator } = await import("./boot-orchestrator.js");
+
+  await bootOrchestrator.executeBootSequence();
+
+  frameworkLogger.log(
+    "strray-activation",
+    "boot orchestrator activated",
+    "success",
   );
 }
 
 async function activateStateManagement(): Promise<void> {
-  throw new Error(
-    "State management disabled due to framework-logger import issues",
+  frameworkLogger.log(
+    "strray-activation",
+    "activating state management",
+    "info",
+  );
+
+  const { StrRayStateManager } = await import("./state/state-manager.js");
+  const stateManager = new StrRayStateManager();
+
+  // Store the state manager instance globally for framework use
+  (globalThis as any).strRayStateManager = stateManager;
+
+  frameworkLogger.log(
+    "strray-activation",
+    "state management activated",
+    "success",
   );
 }
 
@@ -128,5 +166,25 @@ async function activateOrchestrator(): Promise<void> {
 }
 
 async function activateProcessors(): Promise<void> {
-  throw new Error("Processors disabled due to dependencies");
+  frameworkLogger.log(
+    "strray-activation",
+    "activating processor pipeline",
+    "info",
+  );
+
+  const { ProcessorManager } =
+    await import("./processors/processor-manager.js");
+  const { StrRayStateManager } = await import("./state/state-manager.js");
+
+  const stateManager = new StrRayStateManager();
+  const processorManager = new ProcessorManager(stateManager);
+
+  // Store the processor manager instance globally for framework use
+  (globalThis as any).strRayProcessorManager = processorManager;
+
+  frameworkLogger.log(
+    "strray-activation",
+    "processor pipeline activated",
+    "success",
+  );
 }

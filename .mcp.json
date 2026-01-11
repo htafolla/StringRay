@@ -9,7 +9,7 @@
       "args": ["-y", "@modelcontextprotocol/server-filesystem", "/"]
     },
     "grep_app": {
-      "command": "npx", 
+      "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-grep", "."]
     },
     "websearch": {

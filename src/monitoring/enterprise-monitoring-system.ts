@@ -190,6 +190,7 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
   private clusterNodes: Map<string, ClusterNode> = new Map();
   private collectionTimer?: NodeJS.Timeout | undefined;
   private healthCheckTimer?: NodeJS.Timeout | undefined;
+  private cleanupTimer?: NodeJS.Timeout | undefined;
   private isRunning = false;
   private instanceId: string;
 
@@ -297,6 +298,11 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
     if (this.healthCheckTimer) {
       clearInterval(this.healthCheckTimer);
       this.healthCheckTimer = undefined;
+    }
+
+    if (this.cleanupTimer) {
+      clearInterval(this.cleanupTimer);
+      this.cleanupTimer = undefined;
     }
 
     console.log("✅ Enterprise Monitoring System stopped");
@@ -815,7 +821,7 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
    */
   private startDataCleanup(): void {
     // Clean up old data every hour
-    setInterval(
+    this.cleanupTimer = setInterval(
       () => {
         this.cleanupOldData();
       },

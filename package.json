@@ -33,7 +33,7 @@
     "test:quarantine": "node scripts/test-utils/test-quarantine.mjs",
     "test:quarantine:list": "node scripts/test-utils/test-quarantine.mjs list",
     "test:quarantine:stats": "node scripts/test-utils/test-quarantine.mjs stats",
-    "test:validation": "bash tests/validation/simple-validation.sh",
+    "test:validation": "bash tests/validation/enhanced-validation.sh",
     "test:scripts": "node tests/scripts/test-plugin.js",
     "test:python": "python3 tests/python/test_codex_loader.py",
     "performance:monitor": "node -e \"import('./dist/performance/index.js').then(m => m.performanceSystem.initialize().then(() => m.performanceSystem.start()))\"",
@@ -46,7 +46,10 @@
     "deps:check": "npm audit && npm outdated",
     "framework:init": "bash .opencode/init.sh",
     "framework:validate": "npm run test:validation",
-    "framework:health": "npm run framework:init && npm run framework:validate"
+    "framework:health": "npm run framework:init && npm run framework:validate",
+    "framework:monitor": "bash tests/validation/enhanced-validation.sh --monitor",
+    "logging:disable": "bash scripts/disable-logging.sh",
+    "logging:enable": "echo '🔊 Logging is ENABLED (default). To disable: export STRRAY_LOGGING_ENABLED=false'"
   },
   "keywords": [
     "ai",

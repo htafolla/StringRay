@@ -8,6 +8,177 @@
  * @since 2026-01-07
  */
 
+import { MemoryPool, MemoryPoolManager, createSessionPool, createMetricsPool, createAlertPool } from '../utils/memory-pool.js';
+
+/**
+ * LRU Cache with automatic eviction policies for performance optimization
+ */
+export class LRUCache<T> {
+  private cache = new Map<string, CacheEntry<T>>();
+  private accessOrder: string[] = [];
+  private maxSize: number;
+  private defaultTTL: number;
+
+  constructor(maxSize: number = 1000, defaultTTL: number = 300000) { // 5 minutes default TTL
+    this.maxSize = maxSize;
+    this.defaultTTL = defaultTTL;
+  }
+
+  /**
+   * Get value from cache with LRU update
+   */
+  get(key: string): T | undefined {
+    const entry = this.cache.get(key);
+    if (!entry) return undefined;
+
+    // Check if expired
+    if (Date.now() - entry.timestamp > this.defaultTTL) {
+      this.delete(key);
+      return undefined;
+    }
+
+    // Update LRU order
+    this.updateAccessOrder(key);
+    entry.lastAccessed = Date.now();
+    entry.accessCount++;
+
+    return entry.value;
+  }
+
+  /**
+   * Set value in cache with LRU eviction
+   */
+  set(key: string, value: T, ttl?: number): void {
+    const now = Date.now();
+
+    if (this.cache.has(key)) {
+      // Update existing entry
+      const entry = this.cache.get(key)!;
+      entry.value = value;
+      entry.timestamp = now;
+      entry.lastAccessed = now;
+      entry.accessCount++;
+      this.updateAccessOrder(key);
+    } else {
+      // Add new entry
+      if (this.cache.size >= this.maxSize) {
+        this.evictLRU();
+      }
+
+      const entry: CacheEntry<T> = {
+        value,
+        timestamp: now,
+        accessCount: 1,
+        lastAccessed: now,
+        size: this.estimateSize(value),
+      };
+
+      this.cache.set(key, entry);
+      this.accessOrder.push(key);
+    }
+  }
+
+  /**
+   * Delete entry from cache
+   */
+  delete(key: string): boolean {
+    const deleted = this.cache.delete(key);
+    if (deleted) {
+      const index = this.accessOrder.indexOf(key);
+      if (index > -1) {
+        this.accessOrder.splice(index, 1);
+      }
+    }
+    return deleted;
+  }
+
+  /**
+   * Clear expired entries
+   */
+  cleanupExpired(): number {
+    let cleaned = 0;
+    const now = Date.now();
+
+    for (const [key, entry] of this.cache.entries()) {
+      if (now - entry.timestamp > this.defaultTTL) {
+        this.delete(key);
+        cleaned++;
+      }
+    }
+
+    return cleaned;
+  }
+
+  /**
+   * Get cache statistics
+   */
+  getStats(): {
+    size: number;
+    maxSize: number;
+    utilization: number;
+    hitRate: number;
+    totalAccesses: number;
+    averageTTL: number;
+  } {
+    const totalAccesses = Array.from(this.cache.values())
+      .reduce((sum, entry) => sum + entry.accessCount, 0);
+
+    const totalHits = Array.from(this.cache.values())
+      .filter(entry => entry.accessCount > 1)
+      .reduce((sum, entry) => sum + (entry.accessCount - 1), 0);
+
+    const hitRate = totalAccesses > 0 ? totalHits / totalAccesses : 0;
+
+    const now = Date.now();
+    const averageTTL = this.cache.size > 0
+      ? Array.from(this.cache.values())
+          .reduce((sum, entry) => sum + (now - entry.timestamp), 0) / this.cache.size
+      : 0;
+
+    return {
+      size: this.cache.size,
+      maxSize: this.maxSize,
+      utilization: this.cache.size / this.maxSize,
+      hitRate,
+      totalAccesses,
+      averageTTL,
+    };
+  }
+
+  /**
+   * Update access order for LRU
+   */
+  private updateAccessOrder(key: string): void {
+    const index = this.accessOrder.indexOf(key);
+    if (index > -1) {
+      this.accessOrder.splice(index, 1);
+    }
+    this.accessOrder.push(key);
+  }
+
+  /**
+   * Evict least recently used entry
+   */
+  private evictLRU(): void {
+    if (this.accessOrder.length === 0) return;
+
+    const lruKey = this.accessOrder.shift()!;
+    this.cache.delete(lruKey);
+  }
+
+  /**
+   * Estimate object size (simplified)
+   */
+  private estimateSize(obj: any): number {
+    try {
+      const str = JSON.stringify(obj);
+      return str.length;
+    } catch {
+      return 1000; // Default estimate
+    }
+  }
+}
+
 export interface OptimizationMetrics {
   operation: string;
   originalTime: number;
@@ -190,64 +361,11 @@ export class HighPerformanceCache<T> {
   }
 }
 
-export class MemoryPool<T> {
-  private pool: T[] = [];
-  private createFn: () => T;
-  private resetFn: (obj: T) => void;
-  private maxSize: number;
 
-  constructor(
-    createFn: () => T,
-    resetFn: (obj: T) => void,
-    maxSize: number = 1000,
-  ) {
-    this.createFn = createFn;
-    this.resetFn = resetFn;
-    this.maxSize = maxSize;
-  }
-
-  /**
-   * Get object from pool or create new one
-   */
-  acquire(): T {
-    const obj = this.pool.pop();
-    if (obj) {
-      this.resetFn(obj);
-      return obj;
-    }
-    return this.createFn();
-  }
-
-  /**
-   * Return object to pool
-   */
-  release(obj: T): void {
-    if (this.pool.length < this.maxSize) {
-      this.pool.push(obj);
-    }
-  }
-
-  /**
-   * Get pool statistics
-   */
-  getStats(): { size: number; available: number; utilization: number } {
-    return {
-      size: this.maxSize,
-      available: this.pool.length,
-      utilization: (this.maxSize - this.pool.length) / this.maxSize,
-    };
-  }
-}
 
 export class OptimizedTaskProcessor {
   private cache = new HighPerformanceCache<any>();
-  private resultPool = new MemoryPool(
-    () => ({}),
-    (obj: any) => {
-      Object.keys(obj).forEach((key) => delete obj[key]);
-    },
-    500,
-  );
+  private resultPool = createMetricsPool(500);
 
   /**
    * Process task with optimizations
@@ -260,7 +378,7 @@ export class OptimizedTaskProcessor {
       return cachedResult;
     }
 
-    const result = this.resultPool.acquire();
+    const result = this.resultPool.get();
 
     try {
       const processedResult = await this.executeOptimizedTask(task, result);
@@ -471,7 +589,7 @@ export class OptimizedTaskProcessor {
 export class PerformanceOptimizer {
   private optimizations: OptimizationMetrics[] = [];
   private taskProcessor = new OptimizedTaskProcessor();
-  private memoryPools = new Map<string, MemoryPool<any>>();
+  private poolManager = new MemoryPoolManager();
 
   /**
    * Apply performance optimizations to framework operations
@@ -565,32 +683,13 @@ export class PerformanceOptimizer {
    */
   createMemoryPool<T>(
     name: string,
-    createFn: () => T,
-    resetFn: (obj: T) => void,
-    maxSize: number = 100,
+    config: { factory: () => T; reset?: (obj: T) => void; maxSize?: number },
   ): MemoryPool<T> {
-    const pool = new MemoryPool(createFn, resetFn, maxSize);
-    this.memoryPools.set(name, pool);
-    return pool;
-  }
-
-  /**
-   * Get memory pool statistics
-   */
-  getMemoryPoolStats(): Record<
-    string,
-    { size: number; available: number; utilization: number }
-  > {
-    const stats: Record<
-      string,
-      { size: number; available: number; utilization: number }
-    > = {};
-
-    for (const [name, pool] of this.memoryPools) {
-      stats[name] = pool.getStats();
-    }
-
-    return stats;
+    return this.poolManager.getPool(name, {
+      maxSize: config.maxSize || 1000,
+      factory: config.factory,
+      reset: config.reset as ((obj: any) => void) | undefined,
+    });
   }
 
   /**
@@ -601,10 +700,10 @@ export class PerformanceOptimizer {
   }
 
   /**
-   * Process batch of tasks with optimizations
+   * Get memory pool statistics
    */
-  async processOptimizedBatch(tasks: any[]): Promise<any[]> {
-    return this.taskProcessor.processBatch(tasks);
+  getMemoryPoolStats(): Record<string, any> {
+    return this.poolManager.getAllMetrics();
   }
 
   /**

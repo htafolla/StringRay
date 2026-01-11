@@ -42,7 +42,8 @@ export class SessionCleanupManager {
   private stateManager: StrRayStateManager;
   private config: CleanupConfig;
   private cleanupInterval?: NodeJS.Timeout | undefined;
-  private sessionMetadata = new Map<string, SessionMetadata>();
+  private _sessionMetadata?: Map<string, SessionMetadata>;
+  private _metadataLoaded = false;
   private sessionMonitor: SessionMonitor | undefined;
 
   constructor(
@@ -63,6 +64,24 @@ export class SessionCleanupManager {
 
     this.initialize();
   }
+
+  /**
+   * Lazy-loaded session metadata - loads from state manager on first access
+   */
+  private get sessionMetadata(): Map<string, SessionMetadata> {
+    if (!this._metadataLoaded) {
+      this.loadSessionMetadata();
+      this._metadataLoaded = true;
+    }
+    return this._sessionMetadata!;
+  }
+
+  private set sessionMetadata(value: Map<string, SessionMetadata>) {
+    this._sessionMetadata = value;
+    this._metadataLoaded = true;
+  }
+
+
 
   /**
    * Initialize cleanup manager and start auto-cleanup if enabled
@@ -330,13 +349,15 @@ export class SessionCleanupManager {
   }
 
   /**
-   * Load session metadata from state manager
+   * Load session metadata from state manager (lazy loading)
    */
   private loadSessionMetadata(): void {
     try {
       const storedMetadata = this.stateManager.get<
         Record<string, SessionMetadata>
       >("cleanup:session_metadata");
+      this._sessionMetadata = new Map();
+
       if (
         storedMetadata &&
         typeof storedMetadata === "object" &&
@@ -344,11 +365,11 @@ export class SessionCleanupManager {
       ) {
         for (const [sessionId, metadata] of Object.entries(storedMetadata)) {
           if (metadata && typeof metadata === "object" && metadata.sessionId) {
-            this.sessionMetadata.set(sessionId, metadata as SessionMetadata);
+            this._sessionMetadata.set(sessionId, metadata as SessionMetadata);
           }
         }
         console.log(
-          `📋 Session Cleanup Manager: Loaded metadata for ${this.sessionMetadata.size} sessions`,
+          `📋 Session Cleanup Manager: Lazy-loaded metadata for ${this._sessionMetadata.size} sessions`,
         );
       } else if (storedMetadata) {
         console.warn(

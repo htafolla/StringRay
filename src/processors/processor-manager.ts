@@ -231,7 +231,7 @@ export class ProcessorManager {
     frameworkLogger.log(
       "processor-manager",
       "executePreProcessors called",
-      "info",
+      "debug",
       {
         operation,
         processorCount: Array.from(this.processors.values()).filter(
@@ -285,7 +285,7 @@ export class ProcessorManager {
     frameworkLogger.log(
       "processor-manager",
       "executePreProcessors completed",
-      "success",
+      "debug",
       {
         operation,
         totalResults: results.length,
@@ -307,7 +307,7 @@ export class ProcessorManager {
     frameworkLogger.log(
       "processor-manager",
       "executePostProcessors called",
-      "info",
+      "debug",
       {
         operation,
         preResultCount: preResults.length,
@@ -361,7 +361,7 @@ export class ProcessorManager {
     frameworkLogger.log(
       "processor-manager",
       "executePostProcessors completed",
-      "success",
+      "debug",
       {
         operation,
         totalResults: results.length,

@@ -1,6 +1,8 @@
 import { frameworkLogger } from "../framework-logger.js";
 export class StrRayStateManager {
-    store = new Map();
+    constructor() {
+        this.store = new Map();
+    }
     get(key) {
         const value = this.store.get(key);
         frameworkLogger.log("state-manager", "get operation", "info", {

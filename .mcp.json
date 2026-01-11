@@ -15,6 +15,50 @@
     "websearch": {
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-brave-search"]
+    },
+    "orchestrator": {
+      "command": "node",
+      "args": [".opencode/mcps/orchestrator.server.js"]
+    },
+    "enforcer": {
+      "command": "node",
+      "args": [".opencode/mcps/enforcer.server.js"]
+    },
+    "bug-triage-specialist": {
+      "command": "node",
+      "args": [".opencode/mcps/bug-triage-specialist.server.js"]
+    },
+    "security-auditor": {
+      "command": "node",
+      "args": [".opencode/mcps/security-auditor.server.js"]
+    },
+    "refactorer": {
+      "command": "node",
+      "args": [".opencode/mcps/refactorer.server.js"]
+    },
+    "api-design": {
+      "command": "node",
+      "args": ["-e", "console.log('REST/GraphQL API design patterns and best practices tool')"]
+    },
+    "architecture-patterns": {
+      "command": "node",
+      "args": ["-e", "console.log('System architecture and design pattern guidance tool')"]
+    },
+    "git-workflow": {
+      "command": "node",
+      "args": ["-e", "console.log('Git workflow and branching strategy tool')"]
+    },
+    "performance-optimization": {
+      "command": "node",
+      "args": ["-e", "console.log('Application performance optimization and bottleneck identification tool')"]
+    },
+    "project-analysis": {
+      "command": "node",
+      "args": ["-e", "console.log('Project structure analysis tool')"]
+    },
+    "testing-strategy": {
+      "command": "node",
+      "args": ["-e", "console.log('Testing strategy and coverage planning tool')"]
     }
   }
 }

@@ -2,13 +2,15 @@
   "sisyphus_orchestrator": {
     "enabled": true,
     "relentless_execution": true,
-    "coordination_model": "async-multi-agent",
-    "max_concurrent_agents": 1
+    "progress_tracking": true,
+    "error_recovery": true
   },
   "multi_agent_orchestration": {
-    "enabled": false,
-    "max_concurrent_agents": 1,
-    "conflict_resolution": "expert-priority"
+    "enabled": true,
+    "max_concurrent_agents": 5,
+    "coordination_model": "async-multi-agent",
+    "task_distribution_strategy": "capability-based",
+    "conflict_resolution_strategy": "consensus"
   },
   "codex_terms": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 24, 29, 32, 38, 42, 43],
   "session_initialization": {

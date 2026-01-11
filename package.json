@@ -57,7 +57,10 @@
     "health:orchestration": "bash check-agent-orchestration-health.sh",
     "memory:health": "npm run memory:dashboard",
     "logging:disable": "bash scripts/disable-logging.sh",
-    "logging:enable": "echo '🔊 Logging is ENABLED (default). To disable: export STRRAY_LOGGING_ENABLED=false'"
+    "logging:enable": "echo '🔊 Logging is ENABLED (default). To disable: export STRRAY_LOGGING_ENABLED=false'",
+    "profiling:demo": "bash advanced-profiling-integration.sh",
+    "profiling:validate": "bash validate-profiling.sh",
+    "profiling:dashboard": "bash profiling-dashboard.sh"
   },
   "keywords": [
     "ai",

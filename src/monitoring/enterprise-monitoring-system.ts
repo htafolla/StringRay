@@ -14,6 +14,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { performance } from "perf_hooks";
 import { securityHardeningSystem } from "../security/security-hardening-system";
+import { advancedProfiler } from "./advanced-profiler.js";
 
 export interface SystemMetrics {
   timestamp: number;
@@ -198,11 +199,12 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
     super();
 
     this.instanceId = this.generateInstanceId();
-    this.config = {
+
+    const defaultConfig: MonitoringConfig = {
       enabled: true,
       collectionInterval: 30000, // 30 seconds
       retentionPeriod: 24, // 24 hours
-      alertRules: this.getDefaultAlertRules(),
+      alertRules: [],
       healthChecks: {
         enabled: true,
         interval: 60000, // 1 minute
@@ -220,8 +222,10 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
         responseTimeWarning: 1000, // 1 second
         responseTimeCritical: 5000, // 5 seconds
       },
-      ...config,
     };
+
+    this.config = { ...defaultConfig, ...config };
+    this.config.alertRules = this.getDefaultAlertRules();
 
     this.setupEventHandlers();
   }
@@ -233,6 +237,11 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
     this.on("alert-triggered", this.handleAlertTriggered.bind(this));
     this.on("health-check-failed", this.handleHealthCheckFailed.bind(this));
     this.on("metrics-collected", this.handleMetricsCollected.bind(this));
+
+    advancedProfiler.on('profileCompleted', this.handleProfileCompleted.bind(this));
+    advancedProfiler.on('performanceAnomaly', this.handlePerformanceAnomaly.bind(this));
+    advancedProfiler.on('memoryAnomaly', this.handleMemoryAnomaly.bind(this));
+    advancedProfiler.on('reportGenerated', this.handleReportGenerated.bind(this));
   }
 
   /**
@@ -873,6 +882,55 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
         `📊 Metrics collected - CPU: ${data.system.cpu.usage.toFixed(1)}%, Memory: ${data.system.memory.usagePercent.toFixed(1)}%`,
       );
     }
+  }
+
+  private handleProfileCompleted(profileData: any): void {
+    this.recordMetric('agent.profile.completed', {
+      agentName: profileData.agentName,
+      operation: profileData.operation,
+      duration: profileData.duration,
+      success: profileData.success
+    }, { agent: profileData.agentName });
+  }
+
+  private handlePerformanceAnomaly(anomaly: any): void {
+    const alert: Alert = {
+      id: `perf-anomaly-${Date.now()}`,
+      ruleId: 'performance-anomaly',
+      severity: 'high',
+      message: `Performance anomaly detected: ${anomaly.agentName} ${anomaly.operation} is ${anomaly.deviation.toFixed(1)}x slower than average`,
+      metric: 'agent.performance.duration',
+      value: anomaly.duration,
+      threshold: anomaly.averageDuration,
+      timestamp: Date.now(),
+      resolved: false,
+      instanceId: this.instanceId,
+    };
+
+    this.alerts.push(alert);
+    this.emit('alert-triggered', alert);
+  }
+
+  private handleMemoryAnomaly(anomaly: any): void {
+    const alert: Alert = {
+      id: `memory-anomaly-${Date.now()}`,
+      ruleId: 'memory-anomaly',
+      severity: 'critical',
+      message: `Memory anomaly detected: ${anomaly.agentName} ${anomaly.operation} used ${anomaly.memoryDelta} bytes`,
+      metric: 'agent.memory.delta',
+      value: anomaly.memoryDelta,
+      threshold: 50 * 1024 * 1024, // 50MB
+      timestamp: Date.now(),
+      resolved: false,
+      instanceId: this.instanceId,
+    };
+
+    this.alerts.push(alert);
+    this.emit('alert-triggered', alert);
+  }
+
+  private handleReportGenerated(reportPath: string): void {
+    console.log(`📊 Performance report generated: ${reportPath}`);
   }
 
   /**

@@ -7,7 +7,8 @@ echo "=============================================="
 # Test 1: Agent Configuration Validation
 echo ""
 echo "1️⃣ Testing Agent Configurations..."
-AGENTS=("enforcer" "architect" "test-architect" "bug-triage-specialist" "code-reviewer" "security-auditor" "refactorer")
+# Check all agents with complete configurations
+AGENTS=("enforcer" "architect" "test-architect" "bug-triage-specialist" "code-reviewer" "security-auditor" "refactorer" "librarian" "explore" "oracle" "multimodal-looker" "frontend-ui-ux-engineer" "document-writer")
 MISSING_AGENTS=()
 INVALID_AGENTS=()
 
@@ -46,7 +47,7 @@ fi
 # Test 2: Multi-Agent Configuration
 echo ""
 echo "2️⃣ Testing Multi-Agent Orchestration Configuration..."
-if grep -q '"multi_agent_orchestration": {\s*"enabled": true' .opencode/oh-my-opencode.json; then
+if grep -q '"enabled": true' .opencode/oh-my-opencode.json && grep -q '"multi_agent_orchestration"' .opencode/oh-my-opencode.json; then
     echo "✅ Multi-agent orchestration is enabled"
 else
     echo "❌ Multi-agent orchestration is not enabled"

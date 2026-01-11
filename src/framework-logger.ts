@@ -94,7 +94,7 @@ export class FrameworkUsageLogger {
     console.log("\n🎯 STRRAY FRAMEWORK USAGE RUNDOWN");
     console.log("=====================================");
 
-    const components = [...new Set(this.logs.map((l) => l.component))];
+    const components = Array.from(new Set(this.logs.map((l) => l.component)));
 
     components.forEach((component) => {
       const componentLogs = this.getComponentUsage(component);

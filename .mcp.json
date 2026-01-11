@@ -51,6 +51,18 @@
     "testing-strategy": {
       "command": "node",
       "args": ["dist/mcps/knowledge-skills/testing-strategy.server.js"]
+    },
+    "code-review": {
+      "command": "node",
+      "args": ["dist/mcps/knowledge-skills/code-review.server.js"]
+    },
+    "security-audit": {
+      "command": "node",
+      "args": ["dist/mcps/knowledge-skills/security-audit.server.js"]
+    },
+    "ui-ux-design": {
+      "command": "node",
+      "args": ["dist/mcps/knowledge-skills/ui-ux-design.server.js"]
     }
   }
 }

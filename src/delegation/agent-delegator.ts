@@ -20,10 +20,38 @@ import {
 import { StrRayStateManager } from "../state/state-manager";
 import { frameworkLogger } from "../framework-logger.js";
 
+export interface DelegationContext {
+  fileCount?: number;
+  changeVolume?: number;
+  dependencies?: number | string[];
+  riskLevel?: "low" | "medium" | "high" | "critical";
+  estimatedDuration?: number;
+  [key: string]: unknown;
+}
+
+export interface FileChanges {
+  added?: number;
+  deleted?: number;
+  modified?: number;
+  addedLines?: number;
+  deletedLines?: number;
+  complexityIncrease?: number;
+  fileSizeIncrease?: number;
+  type?: "typescript" | "javascript" | "python" | "other";
+  [key: string]: unknown;
+}
+
+export interface AgentExecutionResult {
+  agent: string;
+  result?: unknown;
+  success: boolean;
+  error?: string;
+}
+
 export interface DelegationRequest {
   operation: string;
   description: string;
-  context: any;
+  context: DelegationContext;
   sessionId?: string;
   priority?: "high" | "medium" | "low";
   forceMultiAgent?: boolean;
@@ -91,7 +119,7 @@ export class AgentDelegator {
 
     let finalStrategy = complexity.recommendedStrategy;
     let finalAgents = request.forceMultiAgent
-      ? (request.requiredAgents || this.selectDefaultMultiAgentTeam(request))
+      ? request.requiredAgents || this.selectDefaultMultiAgentTeam(request)
       : this.selectAgents(complexity, request);
 
     // Handle @mention requests
@@ -150,10 +178,10 @@ export class AgentDelegator {
       const config = strRayConfigLoader.loadConfig();
       const multiAgentEnabled = config.multi_agent_orchestration.enabled;
 
-      console.log('🔧 Multi-agent config loaded:', {
+      console.log("🔧 Multi-agent config loaded:", {
         enabled: multiAgentEnabled,
         maxConcurrent: config.multi_agent_orchestration.max_concurrent_agents,
-        model: config.multi_agent_orchestration.coordination_model
+        model: config.multi_agent_orchestration.coordination_model,
       });
 
       await frameworkLogger.log(
@@ -177,14 +205,13 @@ export class AgentDelegator {
       }
 
       // Apply max concurrent agents limit
-      const maxAgents = config.multi_agent_orchestration?.max_concurrent_agents || 5;
+      const maxAgents =
+        config.multi_agent_orchestration?.max_concurrent_agents || 5;
       if (delegation.agents.length > maxAgents) {
-        console.log(
-          `⚠️  Limiting agents to ${maxAgents} (config limit)`,
-        );
+        console.log(`⚠️  Limiting agents to ${maxAgents} (config limit)`);
         delegation.agents = delegation.agents.slice(0, maxAgents);
       }
-      let result: any;
+      let result: unknown;
 
       switch (delegation.strategy) {
         case "single-agent":
@@ -325,7 +352,7 @@ export class AgentDelegator {
   /**
    * Handle file modification events
    */
-  async handleFileModification(filePath: string, changes: any): Promise<void> {
+  async handleFileModification(filePath: string, changes: FileChanges): Promise<void> {
     const fileType = this.getFileType(filePath);
 
     // Consult bug triage for significant changes
@@ -400,15 +427,15 @@ export class AgentDelegator {
   /**
    * Determine if bug triage should be consulted
    */
-  private shouldConsultBugTriage(changes: any): boolean {
-    return changes.addedLines > 50 || changes.deletedLines > 20;
+  private shouldConsultBugTriage(changes: FileChanges): boolean {
+    return (changes.addedLines ?? 0) > 50 || (changes.deletedLines ?? 0) > 20;
   }
 
   /**
    * Determine if refactorer should be consulted
    */
-  private shouldConsultRefactorer(changes: any): boolean {
-    return changes.complexityIncrease > 20 || changes.fileSizeIncrease > 1000;
+  private shouldConsultRefactorer(changes: FileChanges): boolean {
+    return (changes.complexityIncrease ?? 0) > 20 || (changes.fileSizeIncrease ?? 0) > 1000;
   }
 
   /**
@@ -550,7 +577,7 @@ export class AgentDelegator {
    */
   private async delegateToBugTriage(
     filePath: string,
-    changes: any,
+    changes: FileChanges,
   ): Promise<void> {
     const delegation = await this.analyzeDelegation({
       operation: "change-analysis",
@@ -582,7 +609,7 @@ export class AgentDelegator {
    */
   private async delegateToRefactorer(
     filePath: string,
-    changes: any,
+    changes: FileChanges,
   ): Promise<void> {
     const delegation = await this.analyzeDelegation({
       operation: "refactoring-analysis",
@@ -890,11 +917,11 @@ export class AgentDelegator {
   private async executeOrchestratorLed(
     agentNames: string[],
     request: DelegationRequest,
-  ): Promise<any> {
+  ): Promise<unknown> {
     // For orchestrator-led execution, coordinate multiple agents through oh-my-opencode
     // This is similar to multi-agent but with orchestrator oversight
 
-    const results = [];
+    const results: AgentExecutionResult[] = [];
     for (const agentName of agentNames) {
       try {
         const result = await this.callAgent(agentName, request);
@@ -959,7 +986,10 @@ export class AgentDelegator {
     );
 
     try {
-      const result = await this.invokeOhMyOpenCodeAgent(agentName, taskDescription);
+      const result = await this.invokeOhMyOpenCodeAgent(
+        agentName,
+        taskDescription,
+      );
       return result;
     } catch (invokeError) {
       await frameworkLogger.log(
@@ -969,7 +999,10 @@ export class AgentDelegator {
         {
           agentName,
           operation: request.operation,
-          error: invokeError instanceof Error ? invokeError.message : String(invokeError),
+          error:
+            invokeError instanceof Error
+              ? invokeError.message
+              : String(invokeError),
         },
       );
       return this.simulateAgentExecution(agentName, request);
@@ -979,7 +1012,7 @@ export class AgentDelegator {
   private resolveMultiAgentConflicts(
     results: any[],
     agentNames: string[],
-  ): any[] {
+  ): unknown[] {
     if (results.length <= 1) return results;
 
     const consensusResults = results.filter((r) => r.consensus === true);
@@ -993,11 +1026,7 @@ export class AgentDelegator {
     return [results[0]];
   }
 
-  private consolidateOrchestratorResults(results: any[]): any {
-    if (!Array.isArray(results) || results.length === 0) {
-      return { consolidated: true, results: [] };
-    }
-
+  private consolidateOrchestratorResults(results: AgentExecutionResult[]): unknown {
     const successful = results.filter((r) => r.success);
     const failed = results.filter((r) => !r.success);
 
@@ -1005,8 +1034,8 @@ export class AgentDelegator {
       consolidated: true,
       successful: successful.length,
       failed: failed.length,
-      totalDuration: results.reduce((sum, r) => sum + (r.duration || 0), 0),
       results: successful.map((r) => r.result),
+      errors: failed.map((r) => ({ agent: r.agent, error: r.error })),
     };
   }
 
@@ -1037,18 +1066,18 @@ export class AgentDelegator {
   private recordFailedDelegation(
     delegation: DelegationResult,
     duration: number,
-    error: any,
+    error: unknown,
   ): void {
     this.delegationMetrics.failedDelegations++;
     frameworkLogger.log(
       "agent-delegator",
       "delegation execution failed",
       "error",
-      {
-        error: error?.message || String(error),
-      },
-    );
-    console.error(`❌ Delegation failed: ${error?.message || error}`);
+        {
+          error: error instanceof Error ? error.message : String(error),
+        },
+      );
+    console.error(`❌ Delegation failed: ${error instanceof Error ? error.message : error}`);
   }
 
   private async logDelegationDecision(
@@ -1084,23 +1113,29 @@ export class AgentDelegator {
     const operation = request.operation.toLowerCase();
     const context = request.context || {};
 
-    if (operation.includes('security') || operation.includes('audit')) {
-      return ['security-auditor', 'code-reviewer', 'enforcer'];
-    } else if (operation.includes('refactor') || operation.includes('architecture')) {
-      return ['architect', 'refactorer', 'code-reviewer'];
-    } else if (operation.includes('test') || operation.includes('quality')) {
-      return ['test-architect', 'code-reviewer', 'enforcer'];
-    } else if (operation.includes('debug') || operation.includes('fix')) {
-      return ['bug-triage-specialist', 'code-reviewer', 'enforcer'];
+    if (operation.includes("security") || operation.includes("audit")) {
+      return ["security-auditor", "code-reviewer", "enforcer"];
+    } else if (
+      operation.includes("refactor") ||
+      operation.includes("architecture")
+    ) {
+      return ["architect", "refactorer", "code-reviewer"];
+    } else if (operation.includes("test") || operation.includes("quality")) {
+      return ["test-architect", "code-reviewer", "enforcer"];
+    } else if (operation.includes("debug") || operation.includes("fix")) {
+      return ["bug-triage-specialist", "code-reviewer", "enforcer"];
     } else {
-      return ['architect', 'code-reviewer', 'security-auditor'];
+      return ["architect", "code-reviewer", "security-auditor"];
     }
   }
 
   /**
    * Format task description for oh-my-opencode agent system
    */
-  private formatTaskForAgent(agentName: string, request: DelegationRequest): string {
+  private formatTaskForAgent(
+    agentName: string,
+    request: DelegationRequest,
+  ): string {
     const operation = request.operation;
     const description = request.description;
     const context = request.context || {};
@@ -1118,10 +1153,15 @@ Please analyze this request and provide your specialized assistance as a ${agent
   /**
    * Invoke agent through oh-my-opencode system
    */
-  private async invokeOhMyOpenCodeAgent(agentName: string, taskDescription: string): Promise<any> {
+  private async invokeOhMyOpenCodeAgent(
+    agentName: string,
+    taskDescription: string,
+  ): Promise<any> {
     const omoAgent = await this.getOhMyOpenCodeAgent(agentName);
     if (!omoAgent) {
-      throw new Error(`Agent ${agentName} not available in oh-my-opencode system`);
+      throw new Error(
+        `Agent ${agentName} not available in oh-my-opencode system`,
+      );
     }
 
     await frameworkLogger.log(
@@ -1152,10 +1192,20 @@ Please analyze this request and provide your specialized assistance as a ${agent
    */
   private async getOhMyOpenCodeAgent(agentName: string): Promise<any> {
     const configuredAgents = [
-      "orchestrator", "enforcer", "architect", "test-architect",
-      "bug-triage-specialist", "code-reviewer", "security-auditor", "refactorer",
-      "librarian", "explore", "oracle", "frontend-ui-ux-engineer",
-      "document-writer", "multimodal-looker"
+      "orchestrator",
+      "enforcer",
+      "architect",
+      "test-architect",
+      "bug-triage-specialist",
+      "code-reviewer",
+      "security-auditor",
+      "refactorer",
+      "librarian",
+      "explore",
+      "oracle",
+      "frontend-ui-ux-engineer",
+      "document-writer",
+      "multimodal-looker",
     ];
 
     if (!configuredAgents.includes(agentName)) {
@@ -1167,9 +1217,9 @@ Please analyze this request and provide your specialized assistance as a ${agent
         const processingTime = this.simulateAgentExecutionTime(agentName, {
           operation: "delegated-task",
           description: "Delegated task execution",
-          context: {}
+          context: {},
         });
-        await new Promise(resolve => setTimeout(resolve, processingTime));
+        await new Promise((resolve) => setTimeout(resolve, processingTime));
 
         return {
           agent: agentName,
@@ -1177,14 +1227,17 @@ Please analyze this request and provide your specialized assistance as a ${agent
           confidence: Math.random() * 0.3 + 0.7,
           processingTime,
         };
-      }
+      },
     };
   }
 
   /**
    * Simulate agent execution (fallback when oh-my-opencode integration fails)
    */
-  private async simulateAgentExecution(agentName: string, request: DelegationRequest): Promise<any> {
+  private async simulateAgentExecution(
+    agentName: string,
+    request: DelegationRequest,
+  ): Promise<any> {
     await frameworkLogger.log(
       "agent-delegator",
       "simulating agent execution",
@@ -1197,7 +1250,7 @@ Please analyze this request and provide your specialized assistance as a ${agent
 
     // Simulate execution time based on agent type
     const executionTime = this.simulateAgentExecutionTime(agentName, request);
-    await new Promise(resolve => setTimeout(resolve, executionTime));
+    await new Promise((resolve) => setTimeout(resolve, executionTime));
 
     return {
       success: true,
@@ -1210,17 +1263,20 @@ Please analyze this request and provide your specialized assistance as a ${agent
   /**
    * Simulate agent execution time based on agent type
    */
-  private simulateAgentExecutionTime(agentName: string, request: DelegationRequest): number {
+  private simulateAgentExecutionTime(
+    agentName: string,
+    request: DelegationRequest,
+  ): number {
     const baseTime = 1000;
     const agentMultipliers: Record<string, number> = {
       enforcer: 1.5,
       architect: 2.0,
       orchestrator: 1.8,
-      'bug-triage-specialist': 1.2,
-      'code-reviewer': 1.6,
-      'security-auditor': 2.5,
+      "bug-triage-specialist": 1.2,
+      "code-reviewer": 1.6,
+      "security-auditor": 2.5,
       refactorer: 2.2,
-      'test-architect': 1.4,
+      "test-architect": 1.4,
     };
 
     const multiplier = agentMultipliers[agentName] || 1.0;
@@ -1239,14 +1295,24 @@ Please analyze this request and provide your specialized assistance as a ${agent
     if (match) {
       const agentName = match[1]!;
       const configuredAgents = [
-        "orchestrator", "enforcer", "architect", "test-architect",
-        "bug-triage-specialist", "code-reviewer", "security-auditor", "refactorer",
-        "librarian", "explore", "oracle", "frontend-ui-ux-engineer",
-        "document-writer", "multimodal-looker"
+        "orchestrator",
+        "enforcer",
+        "architect",
+        "test-architect",
+        "bug-triage-specialist",
+        "code-reviewer",
+        "security-auditor",
+        "refactorer",
+        "librarian",
+        "explore",
+        "oracle",
+        "frontend-ui-ux-engineer",
+        "document-writer",
+        "multimodal-looker",
       ];
 
       if (configuredAgents.includes(agentName)) {
-        const cleanText = text.replace(mentionRegex, '').trim();
+        const cleanText = text.replace(mentionRegex, "").trim();
         return { agentName, cleanText };
       }
     }

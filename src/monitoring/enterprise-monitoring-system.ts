@@ -238,10 +238,19 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
     this.on("health-check-failed", this.handleHealthCheckFailed.bind(this));
     this.on("metrics-collected", this.handleMetricsCollected.bind(this));
 
-    advancedProfiler.on('profileCompleted', this.handleProfileCompleted.bind(this));
-    advancedProfiler.on('performanceAnomaly', this.handlePerformanceAnomaly.bind(this));
-    advancedProfiler.on('memoryAnomaly', this.handleMemoryAnomaly.bind(this));
-    advancedProfiler.on('reportGenerated', this.handleReportGenerated.bind(this));
+    advancedProfiler.on(
+      "profileCompleted",
+      this.handleProfileCompleted.bind(this),
+    );
+    advancedProfiler.on(
+      "performanceAnomaly",
+      this.handlePerformanceAnomaly.bind(this),
+    );
+    advancedProfiler.on("memoryAnomaly", this.handleMemoryAnomaly.bind(this));
+    advancedProfiler.on(
+      "reportGenerated",
+      this.handleReportGenerated.bind(this),
+    );
   }
 
   /**
@@ -885,21 +894,25 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
   }
 
   private handleProfileCompleted(profileData: any): void {
-    this.recordMetric('agent.profile.completed', {
-      agentName: profileData.agentName,
-      operation: profileData.operation,
-      duration: profileData.duration,
-      success: profileData.success
-    }, { agent: profileData.agentName });
+    this.recordMetric(
+      "agent.profile.completed",
+      {
+        agentName: profileData.agentName,
+        operation: profileData.operation,
+        duration: profileData.duration,
+        success: profileData.success,
+      },
+      { agent: profileData.agentName },
+    );
   }
 
   private handlePerformanceAnomaly(anomaly: any): void {
     const alert: Alert = {
       id: `perf-anomaly-${Date.now()}`,
-      ruleId: 'performance-anomaly',
-      severity: 'high',
+      ruleId: "performance-anomaly",
+      severity: "high",
       message: `Performance anomaly detected: ${anomaly.agentName} ${anomaly.operation} is ${anomaly.deviation.toFixed(1)}x slower than average`,
-      metric: 'agent.performance.duration',
+      metric: "agent.performance.duration",
       value: anomaly.duration,
       threshold: anomaly.averageDuration,
       timestamp: Date.now(),
@@ -908,16 +921,16 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
     };
 
     this.alerts.push(alert);
-    this.emit('alert-triggered', alert);
+    this.emit("alert-triggered", alert);
   }
 
   private handleMemoryAnomaly(anomaly: any): void {
     const alert: Alert = {
       id: `memory-anomaly-${Date.now()}`,
-      ruleId: 'memory-anomaly',
-      severity: 'critical',
+      ruleId: "memory-anomaly",
+      severity: "critical",
       message: `Memory anomaly detected: ${anomaly.agentName} ${anomaly.operation} used ${anomaly.memoryDelta} bytes`,
-      metric: 'agent.memory.delta',
+      metric: "agent.memory.delta",
       value: anomaly.memoryDelta,
       threshold: 50 * 1024 * 1024, // 50MB
       timestamp: Date.now(),
@@ -926,7 +939,7 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
     };
 
     this.alerts.push(alert);
-    this.emit('alert-triggered', alert);
+    this.emit("alert-triggered", alert);
   }
 
   private handleReportGenerated(reportPath: string): void {

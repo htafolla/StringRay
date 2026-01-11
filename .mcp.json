@@ -38,11 +38,17 @@
     },
     "api-design": {
       "command": "node",
-      "args": ["-e", "console.log('REST/GraphQL API design patterns and best practices tool')"]
+      "args": [
+        "-e",
+        "console.log('REST/GraphQL API design patterns and best practices tool')"
+      ]
     },
     "architecture-patterns": {
       "command": "node",
-      "args": ["-e", "console.log('System architecture and design pattern guidance tool')"]
+      "args": [
+        "-e",
+        "console.log('System architecture and design pattern guidance tool')"
+      ]
     },
     "git-workflow": {
       "command": "node",
@@ -50,7 +56,10 @@
     },
     "performance-optimization": {
       "command": "node",
-      "args": ["-e", "console.log('Application performance optimization and bottleneck identification tool')"]
+      "args": [
+        "-e",
+        "console.log('Application performance optimization and bottleneck identification tool')"
+      ]
     },
     "project-analysis": {
       "command": "node",
@@ -58,7 +67,10 @@
     },
     "testing-strategy": {
       "command": "node",
-      "args": ["-e", "console.log('Testing strategy and coverage planning tool')"]
+      "args": [
+        "-e",
+        "console.log('Testing strategy and coverage planning tool')"
+      ]
     }
   }
 }

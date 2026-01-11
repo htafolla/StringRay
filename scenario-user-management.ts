@@ -25,15 +25,21 @@ export class UserManagementService {
   private users = new Map<string, UserProfile>();
   private sessions = new Map<string, { userId: string; expires: Date }>();
 
-  async createUser(email: string, password: string, profile: any): Promise<UserProfile> {
+  async createUser(
+    email: string,
+    password: string,
+    profile: any,
+  ): Promise<UserProfile> {
     // Complex validation and creation logic
     if (!this.validateEmail(email)) {
-      throw new Error('Invalid email format');
+      throw new Error("Invalid email format");
     }
-    
-    const existing = Array.from(this.users.values()).find(u => u.email === email);
+
+    const existing = Array.from(this.users.values()).find(
+      (u) => u.email === email,
+    );
     if (existing) {
-      throw new Error('User already exists');
+      throw new Error("User already exists");
     }
 
     const user: UserProfile = {
@@ -41,31 +47,37 @@ export class UserManagementService {
       email,
       profile: {
         ...profile,
-        preferences: profile.preferences || {}
+        preferences: profile.preferences || {},
       },
       security: {
         passwordHash: await this.hashPassword(password),
         twoFactorEnabled: false,
         lastLogin: new Date(),
-        failedAttempts: 0
+        failedAttempts: 0,
       },
-      permissions: ['user'],
+      permissions: ["user"],
       metadata: {
         createdAt: new Date(),
         updatedAt: new Date(),
-        version: 1
-      }
+        version: 1,
+      },
     };
 
     this.users.set(user.id, user);
     return user;
   }
 
-  async authenticateUser(email: string, password: string): Promise<{ user: UserProfile; token: string } | null> {
-    const user = Array.from(this.users.values()).find(u => u.email === email);
+  async authenticateUser(
+    email: string,
+    password: string,
+  ): Promise<{ user: UserProfile; token: string } | null> {
+    const user = Array.from(this.users.values()).find((u) => u.email === email);
     if (!user) return null;
 
-    const isValid = await this.verifyPassword(password, user.security.passwordHash);
+    const isValid = await this.verifyPassword(
+      password,
+      user.security.passwordHash,
+    );
     if (!isValid) {
       user.security.failedAttempts++;
       return null;
@@ -76,9 +88,9 @@ export class UserManagementService {
     user.security.lastLogin = new Date();
 
     const token = this.generateSessionToken();
-    this.sessions.set(token, { 
-      userId: user.id, 
-      expires: new Date(Date.now() + 24 * 60 * 60 * 1000) 
+    this.sessions.set(token, {
+      userId: user.id,
+      expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
     });
 
     return { user, token };
@@ -98,7 +110,10 @@ export class UserManagementService {
     return `hashed_${password}_salt`;
   }
 
-  private async verifyPassword(password: string, hash: string): Promise<boolean> {
+  private async verifyPassword(
+    password: string,
+    hash: string,
+  ): Promise<boolean> {
     return hash === `hashed_${password}_salt`;
   }
 

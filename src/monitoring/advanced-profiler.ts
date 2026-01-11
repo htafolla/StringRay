@@ -1,7 +1,7 @@
-import { EventEmitter } from 'events';
-import { performance } from 'perf_hooks';
-import { writeFileSync, existsSync, mkdirSync } from 'fs';
-import { join } from 'path';
+import { EventEmitter } from "events";
+import { performance } from "perf_hooks";
+import { writeFileSync, existsSync, mkdirSync } from "fs";
+import { join } from "path";
 
 interface ProfileData {
   agentName: string;
@@ -34,7 +34,7 @@ export class AdvancedProfiler extends EventEmitter {
   private profilingEnabled: boolean = true;
   private profileStoragePath: string;
 
-  constructor(storagePath: string = './.strray/profiles') {
+  constructor(storagePath: string = "./.strray/profiles") {
     super();
     this.profileStoragePath = storagePath;
     this.ensureStorageDirectory();
@@ -48,16 +48,27 @@ export class AdvancedProfiler extends EventEmitter {
   }
 
   private setupPeriodicReporting(): void {
-    setInterval(() => {
-      this.generatePerformanceReport();
-    }, 5 * 60 * 1000);
+    setInterval(
+      () => {
+        this.generatePerformanceReport();
+      },
+      5 * 60 * 1000,
+    );
 
-    setInterval(() => {
-      this.cleanupOldProfiles();
-    }, 24 * 60 * 60 * 1000);
+    setInterval(
+      () => {
+        this.cleanupOldProfiles();
+      },
+      24 * 60 * 60 * 1000,
+    );
   }
 
-  startProfiling(operationId: string, agentName: string, operation: string, metadata: Record<string, any> = {}): void {
+  startProfiling(
+    operationId: string,
+    agentName: string,
+    operation: string,
+    metadata: Record<string, any> = {},
+  ): void {
     if (!this.profilingEnabled) return;
 
     const profileData: ProfileData = {
@@ -65,16 +76,20 @@ export class AdvancedProfiler extends EventEmitter {
       operation,
       startTime: performance.now(),
       memoryUsage: {
-        before: process.memoryUsage()
+        before: process.memoryUsage(),
       },
       success: false,
-      metadata
+      metadata,
     };
 
     this.activeProfiles.set(operationId, profileData);
   }
 
-  endProfiling(operationId: string, success: boolean = true, error?: string): void {
+  endProfiling(
+    operationId: string,
+    success: boolean = true,
+    error?: string,
+  ): void {
     const profileData = this.activeProfiles.get(operationId);
     if (!profileData) return;
 
@@ -92,7 +107,7 @@ export class AdvancedProfiler extends EventEmitter {
     this.profiles.get(profileData.agentName)!.push(profileData);
     this.activeProfiles.delete(operationId);
 
-    this.emit('profileCompleted', profileData);
+    this.emit("profileCompleted", profileData);
     this.detectAnomalies(profileData);
   }
 
@@ -103,26 +118,28 @@ export class AdvancedProfiler extends EventEmitter {
     if (agentProfiles.length < 10) return;
 
     const recentProfiles = agentProfiles.slice(-20);
-    const avgDuration = recentProfiles.reduce((sum, p) => sum + (p.duration || 0), 0) / recentProfiles.length;
+    const avgDuration =
+      recentProfiles.reduce((sum, p) => sum + (p.duration || 0), 0) /
+      recentProfiles.length;
 
     if (profileData.duration > avgDuration * 2) {
-      this.emit('performanceAnomaly', {
+      this.emit("performanceAnomaly", {
         agentName: profileData.agentName,
         operation: profileData.operation,
         duration: profileData.duration,
         averageDuration: avgDuration,
-        deviation: profileData.duration / avgDuration
+        deviation: profileData.duration / avgDuration,
       });
     }
 
     const memoryDelta = this.calculateMemoryDelta(profileData);
     if (memoryDelta > 50 * 1024 * 1024) {
-      this.emit('memoryAnomaly', {
+      this.emit("memoryAnomaly", {
         agentName: profileData.agentName,
         operation: profileData.operation,
         memoryDelta,
         memoryBefore: profileData.memoryUsage.before,
-        memoryAfter: profileData.memoryUsage.after
+        memoryAfter: profileData.memoryUsage.after,
       });
     }
   }
@@ -141,7 +158,7 @@ export class AdvancedProfiler extends EventEmitter {
 
     if (agentName) {
       profiles = this.profiles.get(agentName) || [];
-      } else {
+    } else {
       for (const agentProfiles of Array.from(this.profiles.values())) {
         profiles.push(...agentProfiles);
       }
@@ -154,14 +171,17 @@ export class AdvancedProfiler extends EventEmitter {
         failedOperations: 0,
         averageDuration: 0,
         memoryDelta: 0,
-        slowestOperation: '',
-        fastestOperation: ''
+        slowestOperation: "",
+        fastestOperation: "",
       };
     }
 
-    const successfulProfiles = profiles.filter(p => p.success);
-    const totalDuration = profiles.reduce((sum, p) => sum + (p.duration || 0), 0);
-    const memoryDeltas = profiles.map(p => this.calculateMemoryDelta(p));
+    const successfulProfiles = profiles.filter((p) => p.success);
+    const totalDuration = profiles.reduce(
+      (sum, p) => sum + (p.duration || 0),
+      0,
+    );
+    const memoryDeltas = profiles.map((p) => this.calculateMemoryDelta(p));
 
     if (profiles.length === 0) {
       return {
@@ -170,8 +190,8 @@ export class AdvancedProfiler extends EventEmitter {
         failedOperations: 0,
         averageDuration: 0,
         memoryDelta: 0,
-        slowestOperation: '',
-        fastestOperation: ''
+        slowestOperation: "",
+        fastestOperation: "",
       };
     }
 
@@ -192,9 +212,11 @@ export class AdvancedProfiler extends EventEmitter {
       successfulOperations: successfulProfiles.length,
       failedOperations: profiles.length - successfulProfiles.length,
       averageDuration: totalDuration / profiles.length,
-      memoryDelta: memoryDeltas.reduce((sum, delta) => sum + delta, 0) / memoryDeltas.length,
+      memoryDelta:
+        memoryDeltas.reduce((sum, delta) => sum + delta, 0) /
+        memoryDeltas.length,
       slowestOperation: slowestOp.operation,
-      fastestOperation: fastestOp.operation
+      fastestOperation: fastestOp.operation,
     };
   }
 
@@ -203,17 +225,20 @@ export class AdvancedProfiler extends EventEmitter {
       timestamp: new Date().toISOString(),
       agents: {} as Record<string, ProfilingMetrics>,
       system: this.getMetrics(),
-      recommendations: this.generateRecommendations()
+      recommendations: this.generateRecommendations(),
     };
 
     for (const agentName of Array.from(this.profiles.keys())) {
       report.agents[agentName] = this.getMetrics(agentName);
     }
 
-    const reportPath = join(this.profileStoragePath, `performance-report-${Date.now()}.json`);
+    const reportPath = join(
+      this.profileStoragePath,
+      `performance-report-${Date.now()}.json`,
+    );
     writeFileSync(reportPath, JSON.stringify(report, null, 2));
 
-    this.emit('reportGenerated', reportPath);
+    this.emit("reportGenerated", reportPath);
   }
 
   private generateRecommendations(): string[] {
@@ -221,20 +246,28 @@ export class AdvancedProfiler extends EventEmitter {
     const systemMetrics = this.getMetrics();
 
     if (systemMetrics.averageDuration > 5000) {
-      recommendations.push('Consider optimizing slow operations - average duration exceeds 5 seconds');
+      recommendations.push(
+        "Consider optimizing slow operations - average duration exceeds 5 seconds",
+      );
     }
 
     if (systemMetrics.failedOperations > systemMetrics.totalOperations * 0.1) {
-      recommendations.push('High failure rate detected - investigate error patterns');
+      recommendations.push(
+        "High failure rate detected - investigate error patterns",
+      );
     }
 
     if (systemMetrics.memoryDelta > 10 * 1024 * 1024) {
-      recommendations.push('Memory usage increasing significantly - check for leaks');
+      recommendations.push(
+        "Memory usage increasing significantly - check for leaks",
+      );
     }
 
     for (const [agentName, metrics] of Object.entries(this.getMetrics())) {
       if (metrics.failedOperations > metrics.totalOperations * 0.2) {
-        recommendations.push(`Agent ${agentName} has high failure rate - review implementation`);
+        recommendations.push(
+          `Agent ${agentName} has high failure rate - review implementation`,
+        );
       }
     }
 
@@ -242,10 +275,10 @@ export class AdvancedProfiler extends EventEmitter {
   }
 
   private cleanupOldProfiles(): void {
-    const cutoffTime = Date.now() - (7 * 24 * 60 * 60 * 1000);
+    const cutoffTime = Date.now() - 7 * 24 * 60 * 60 * 1000;
 
     for (const [agentName, profiles] of Array.from(this.profiles.entries())) {
-      const recentProfiles = profiles.filter(p => p.startTime > cutoffTime);
+      const recentProfiles = profiles.filter((p) => p.startTime > cutoffTime);
       if (recentProfiles.length !== profiles.length) {
         this.profiles.set(agentName, recentProfiles);
       }

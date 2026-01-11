@@ -48,6 +48,12 @@
     "framework:validate": "npm run test:validation",
     "framework:health": "npm run framework:init && npm run framework:validate",
     "framework:monitor": "bash tests/validation/enhanced-validation.sh --monitor",
+    "memory:dashboard": "bash memory-dashboard.sh",
+    "memory:test": "bash test-memory-monitor.sh",
+    "memory:pools": "bash test-memory-pools.sh",
+    "memory:shutdown": "bash test-graceful-shutdown.sh",
+    "memory:regression": "bash run-memory-regression.sh",
+    "memory:health": "npm run memory:dashboard",
     "logging:disable": "bash scripts/disable-logging.sh",
     "logging:enable": "echo '🔊 Logging is ENABLED (default). To disable: export STRRAY_LOGGING_ENABLED=false'"
   },
@@ -118,6 +124,18 @@
     "./codex": {
       "types": "./dist/codex-injector.d.ts",
       "import": "./dist/codex-injector.js"
+    },
+    "./memory-monitor": {
+      "types": "./dist/monitoring/memory-monitor.d.ts",
+      "import": "./dist/monitoring/memory-monitor.js"
+    },
+    "./memory-pools": {
+      "types": "./dist/utils/memory-pool.d.ts",
+      "import": "./dist/utils/memory-pool.js"
+    },
+    "./memory-regression": {
+      "types": "./dist/testing/memory-regression-suite.d.ts",
+      "import": "./dist/testing/memory-regression-suite.js"
     }
   }
 }

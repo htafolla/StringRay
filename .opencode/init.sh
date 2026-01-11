@@ -39,46 +39,23 @@ sleep 1
 log "============================================================"
 log "StrRay Framework Initialization Log"
 log "Timestamp: $(date '+%Y-%m-%d %H:%M:%S %Z')"
-log "Log File: $LOG_FILE"
+RELATIVE_LOG_FILE=$(basename "$LOG_FILE")
+log "Log File: .opencode/logs/$RELATIVE_LOG_FILE"
 log "============================================================"
 log ""
 
-# Real-time component evaluation
-log ""
-log "🔍 Framework Configuration Check"
-log "-------------------------------------------------------------"
-
-if [ -f ".opencode/enforcer-config.json" ]; then
-    log "✅ Framework configuration loaded: .opencode/enforcer-config.json"
-    CONFIG_LOADED=true
-else
-    log "❌ ERROR: Framework configuration not found"
-    log "   Expected: .opencode/enforcer-config.json"
-    exit 1
-fi
-
-log ""
-log "🔧 Automation Hooks"
-log "-------------------------------------------------------------"
-
+# Component validation (quiet mode - count only)
 HOOKS=("pre-commit-introspection" "auto-format" "security-scan" "enforcer-daily-scan")
 HOOKS_LOADED=0
 HOOKS_MISSING=0
 
 for hook in "${HOOKS[@]}"; do
     if [ -f ".opencode/commands/${hook}.md" ]; then
-        log "✅ Automation hook loaded: ${hook}"
         ((HOOKS_LOADED++))
     else
-        log "❌ WARNING: Automation hook missing: ${hook}"
-        log "   Expected: .opencode/commands/${hook}.md"
         ((HOOKS_MISSING++))
     fi
 done
-
-log ""
-log "📚 MCP Knowledge Skills"
-log "-------------------------------------------------------------"
 
 MCPS=("project-analysis" "testing-strategy" "architecture-patterns" "performance-optimization" "git-workflow" "api-design")
 MCPS_LOADED=0
@@ -86,18 +63,11 @@ MCPS_MISSING=0
 
 for mcp in "${MCPS[@]}"; do
     if [ -f ".opencode/mcps/${mcp}.mcp.json" ]; then
-        log "✅ MCP knowledge skill loaded: ${mcp}"
         ((MCPS_LOADED++))
     else
-        log "❌ WARNING: MCP knowledge skill missing: ${mcp}"
-        log "   Expected: .opencode/mcps/${mcp}.mcp.json"
         ((MCPS_MISSING++))
     fi
 done
-
-log ""
-log "🤖 Agent Configurations"
-log "-------------------------------------------------------------"
 
 AGENTS=("enforcer" "architect" "orchestrator" "bug-triage-specialist" "code-reviewer" "security-auditor" "refactorer" "test-architect")
 AGENTS_LOADED=0
@@ -105,36 +75,24 @@ AGENTS_MISSING=0
 
 for agent in "${AGENTS[@]}"; do
     if [ -f ".opencode/agents/${agent}.md" ]; then
-        log "✅ Agent configuration loaded: ${agent}"
         ((AGENTS_LOADED++))
     else
-        log "❌ WARNING: Agent configuration missing: ${agent}"
-        log "   Expected: .opencode/agents/${agent}.md"
         ((AGENTS_MISSING++))
     fi
 done
 
-log ""
-log "📋 Workflow Templates"
-log "-------------------------------------------------------------"
-
-if [ -f ".opencode/workflows/post-deployment-audit.yml" ]; then
-    log "✅ Workflow template loaded: post-deployment-audit"
-    WORKFLOWS_LOADED=true
-else
-    log "⚠️  WARNING: Workflow template missing: post-deployment-audit"
-    WORKFLOWS_LOADED=false
+# Framework config check
+if [ ! -f "$PROJECT_ROOT/.opencode/enforcer-config.json" ]; then
+    log "❌ ERROR: Framework configuration not found"
+    log "   Expected: $PROJECT_ROOT/.opencode/enforcer-config.json"
+    exit 1
 fi
 
-# Status display with emojis and delays (old style)
+# Status display (single lines, no delays)
 log "✅ Framework configuration loaded"
-sleep 0.5
 log "🔧 Automation hooks: $HOOKS_LOADED loaded, $HOOKS_MISSING missing"
-sleep 0.5
 log "🧠 MCP skills: $MCPS_LOADED loaded, $MCPS_MISSING missing"
-sleep 0.5
 log "🤖 Agent configs: $AGENTS_LOADED loaded, $AGENTS_MISSING missing"
-sleep 0.5
     # Check codex system status (old style with emojis)
     if [ -f "$PROJECT_ROOT/.strray/codex.json" ]; then
         CODEX_VERSION=$(grep '"version"' "$PROJECT_ROOT/.strray/codex.json" | head -1 | sed 's/.*"version": *"\([^"]*\)".*/\1/')

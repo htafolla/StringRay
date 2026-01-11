@@ -20,17 +20,10 @@ class StrRayStateManagerServer {
   private backups: Map<string, any> = new Map();
 
   constructor() {
-    this.server = new Server(
-      {
-        name: "strray-state-manager",
-        version: "1.0.0",
-      },
-      {
-        capabilities: {
-          tools: {},
-        },
-      },
-    );
+    this.server = new Server({
+      name: "strray-state-manager",
+      version: "1.0.0",
+    });
 
     this.stateFile = path.join(
       process.cwd(),

@@ -309,6 +309,17 @@ export class RuleEnforcer {
       validator: this.validateEmergentImprovement.bind(this)
     });
 
+    // Phase 4.1: Module System Consistency (CRITICAL FIX)
+    this.addRule({
+      id: 'module-system-consistency',
+      name: 'Module System Consistency',
+      description: 'Enforces consistent use of ES modules, preventing CommonJS/ES module mixing',
+      category: 'architecture',
+      severity: 'error', // CRITICAL - blocking
+      enabled: true,
+      validator: this.validateModuleSystemConsistency.bind(this)
+    });
+
      // Development Triage Rule: Clean Debug Logs
      this.addRule({
        id: 'clean-debug-logs',
@@ -346,6 +357,7 @@ export class RuleEnforcer {
    */
   async validateOperation(operation: string, context: RuleValidationContext): Promise<ValidationReport> {
     const applicableRules = this.getApplicableRules(operation, context);
+    console.log(`🔍 DEBUG: ${applicableRules.length} applicable rules for operation '${operation}': ${applicableRules.map(r => r.id).join(', ')}`);
     const results: RuleValidationResult[] = [];
     const errors: string[] = [];
     const warnings: string[] = [];
@@ -880,13 +892,89 @@ export class RuleEnforcer {
        return { passed: true, message: 'Type-only imports are allowed' };
      }
 
+       return {
+         passed: true,
+         message: 'Import patterns are consistent'
+       };
+     }
+
+    /**
+     * CRITICAL FIX: Module System Consistency (Codex Term #47)
+     * Enforces ES module consistency and prevents CommonJS/ES module mixing
+     */
+     private async validateModuleSystemConsistency(context: RuleValidationContext): Promise<RuleValidationResult> {
+       const { newCode, operation } = context;
+
+       if (!newCode || operation !== 'write') {
+         return { passed: true, message: 'No code to validate for module system consistency' };
+       }
+
+       const violations: string[] = [];
+       const suggestions: string[] = [];
+
+      // CRITICAL: CommonJS patterns in ES module environment
+      if (newCode!.includes('require.main')) {
+        violations.push('CommonJS require.main pattern detected in ES module');
+        suggestions.push('Replace require.main === module with import.meta.url === `file://${process.argv[1]}`');
+      }
+
+      if (newCode!.includes('require(') && !newCode!.includes('// Allow require for') && !newCode!.includes('dynamic import')) {
+        violations.push('CommonJS require() calls detected in ES module');
+        suggestions.push('Use ES module import statements instead of require()');
+      }
+
+      if (newCode!.includes('__dirname') || newCode!.includes('__filename')) {
+        violations.push('CommonJS __dirname/__filename usage detected in ES module');
+        suggestions.push('Use import.meta.url with fileURLToPath() and dirname()');
+      }
+
+      if (newCode!.includes('module.exports') || newCode!.includes('exports.')) {
+        violations.push('CommonJS module.exports pattern detected in ES module');
+        suggestions.push('Use ES module export statements');
+      }
+
+      if (newCode!.includes('global.') && !newCode!.includes('// Allow global for')) {
+        violations.push('Global namespace usage detected');
+        suggestions.push('Avoid global variables; use proper module scoping');
+      }
+
+      // Check for mixed module patterns
+      const hasImport = newCode!.includes('import ');
+      const hasRequire = newCode!.includes('require(');
+      const hasExport = newCode!.includes('export ');
+      const hasModuleExports = newCode!.includes('module.exports');
+
+      if ((hasImport || hasExport) && (hasRequire || hasModuleExports)) {
+        violations.push('Mixed ES module and CommonJS patterns detected');
+        suggestions.push('Choose one module system: use either ES modules OR CommonJS, not both');
+      }
+
+      // Package.json consistency check (if this is package.json related)
+      if (newCode!.includes('"type": "module"') && (hasRequire || hasModuleExports)) {
+        violations.push('ES module package using CommonJS patterns');
+        suggestions.push('Remove CommonJS patterns or change "type" to "commonjs"');
+      }
+
+      if (violations.length > 0) {
+        return {
+          passed: false,
+          message: `Module system consistency violations: ${violations.join(', ')}`,
+          suggestions: [
+            'This codebase uses ES modules exclusively',
+            'CommonJS patterns will cause runtime failures',
+            ...suggestions,
+            'Run: npm run lint:fix to auto-correct module patterns'
+          ]
+        };
+      }
+
       return {
         passed: true,
-        message: 'Import patterns are consistent'
+        message: 'Module system consistency validated - ES modules only'
       };
     }
 
-  /**
+   /**
    * Validate state management patterns (Codex Term #41 - CRITICAL)
    * Ensures proper state management throughout the application
    */

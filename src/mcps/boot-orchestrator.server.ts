@@ -40,17 +40,10 @@ class StrRayBootOrchestratorServer {
   ];
 
   constructor() {
-    this.server = new Server(
-      {
-        name: "strray-boot-orchestrator",
-        version: "1.0.0",
-      },
-      {
-        capabilities: {
-          tools: {},
-        },
-      },
-    );
+    this.server = new Server({
+      name: "strray-boot-orchestrator",
+      version: "1.0.0",
+    });
 
     this.bootStatus = {
       initialized: false,

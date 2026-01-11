@@ -18,17 +18,10 @@ class StrRayOrchestratorServer {
   private agentCapabilities: Map<string, any> = new Map();
 
   constructor() {
-    this.server = new Server(
-      {
-        name: "strray-orchestrator",
-        version: "1.0.0",
-      },
-      {
-        capabilities: {
-          tools: {},
-        },
-      },
-    );
+    this.server = new Server({
+      name: "strray-orchestrator",
+      version: "1.0.0",
+    });
 
     this.initializeAgentCapabilities();
     this.setupToolHandlers();

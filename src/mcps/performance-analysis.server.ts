@@ -20,17 +20,10 @@ class StrRayPerformanceAnalysisServer {
   private startTime: number;
 
   constructor() {
-    this.server = new Server(
-      {
-        name: "strray-performance-analysis",
-        version: "1.0.0",
-      },
-      {
-        capabilities: {
-          tools: {},
-        },
-      },
-    );
+    this.server = new Server({
+      name: "strray-performance-analysis",
+      version: "1.0.0",
+    });
 
     this.startTime = Date.now();
     this.setupToolHandlers();

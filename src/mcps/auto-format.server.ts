@@ -18,17 +18,10 @@ class StrRayAutoFormatServer {
   private server: Server;
 
   constructor() {
-    this.server = new Server(
-      {
-        name: "strray-auto-format",
-        version: "1.0.0",
-      },
-      {
-        capabilities: {
-          tools: {},
-        },
-      },
-    );
+    this.server = new Server({
+      name: "strray-auto-format",
+      version: "1.0.0",
+    });
 
     this.setupToolHandlers();
     console.log("StrRay Auto Format MCP Server initialized");

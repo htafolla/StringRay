@@ -18,59 +18,39 @@
     },
     "orchestrator": {
       "command": "node",
-      "args": [".opencode/mcps/orchestrator.server.js"]
+      "args": ["dist/mcps/orchestrator.server.js"]
+    },
+    "enhanced-orchestrator": {
+      "command": "node",
+      "args": ["dist/mcps/enhanced-orchestrator.server.js"]
     },
     "enforcer": {
       "command": "node",
-      "args": [".opencode/mcps/enforcer.server.js"]
-    },
-    "bug-triage-specialist": {
-      "command": "node",
-      "args": [".opencode/mcps/bug-triage-specialist.server.js"]
-    },
-    "security-auditor": {
-      "command": "node",
-      "args": [".opencode/mcps/security-auditor.server.js"]
-    },
-    "refactorer": {
-      "command": "node",
-      "args": [".opencode/mcps/refactorer.server.js"]
+      "args": ["dist/mcps/enforcer-tools.server.js"]
     },
     "api-design": {
       "command": "node",
-      "args": [
-        "-e",
-        "console.log('REST/GraphQL API design patterns and best practices tool')"
-      ]
+      "args": ["dist/mcps/knowledge-skills/api-design.server.js"]
     },
     "architecture-patterns": {
       "command": "node",
-      "args": [
-        "-e",
-        "console.log('System architecture and design pattern guidance tool')"
-      ]
+      "args": ["dist/mcps/knowledge-skills/architecture-patterns.server.js"]
     },
     "git-workflow": {
       "command": "node",
-      "args": ["-e", "console.log('Git workflow and branching strategy tool')"]
+      "args": ["dist/mcps/knowledge-skills/git-workflow.server.js"]
     },
     "performance-optimization": {
       "command": "node",
-      "args": [
-        "-e",
-        "console.log('Application performance optimization and bottleneck identification tool')"
-      ]
+      "args": ["dist/mcps/knowledge-skills/performance-optimization.server.js"]
     },
     "project-analysis": {
       "command": "node",
-      "args": ["-e", "console.log('Project structure analysis tool')"]
+      "args": ["dist/mcps/knowledge-skills/project-analysis.server.js"]
     },
     "testing-strategy": {
       "command": "node",
-      "args": [
-        "-e",
-        "console.log('Testing strategy and coverage planning tool')"
-      ]
+      "args": ["dist/mcps/knowledge-skills/testing-strategy.server.js"]
     }
   }
 }

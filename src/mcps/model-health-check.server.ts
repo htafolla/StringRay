@@ -17,17 +17,10 @@ class StrRayModelHealthCheckServer {
   private server: Server;
 
   constructor() {
-    this.server = new Server(
-      {
-        name: "strray-model-health-check",
-        version: "1.0.0",
-      },
-      {
-        capabilities: {
-          tools: {},
-        },
-      },
-    );
+    this.server = new Server({
+      name: "strray-model-health-check",
+      version: "1.0.0",
+    });
 
     this.setupToolHandlers();
     console.log("StrRay Model Health Check MCP Server initialized");

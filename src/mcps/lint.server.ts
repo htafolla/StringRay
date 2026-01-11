@@ -17,17 +17,10 @@ class StrRayLintServer {
   private server: Server;
 
   constructor() {
-    this.server = new Server(
-      {
-        name: "strray-lint",
-        version: "1.0.0",
-      },
-      {
-        capabilities: {
-          tools: {},
-        },
-      },
-    );
+    this.server = new Server({
+      name: "strray-lint",
+      version: "1.0.0",
+    });
 
     this.setupToolHandlers();
     console.log("StrRay Lint MCP Server initialized");

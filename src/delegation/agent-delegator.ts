@@ -352,7 +352,10 @@ export class AgentDelegator {
   /**
    * Handle file modification events
    */
-  async handleFileModification(filePath: string, changes: FileChanges): Promise<void> {
+  async handleFileModification(
+    filePath: string,
+    changes: FileChanges,
+  ): Promise<void> {
     const fileType = this.getFileType(filePath);
 
     // Consult bug triage for significant changes
@@ -435,7 +438,10 @@ export class AgentDelegator {
    * Determine if refactorer should be consulted
    */
   private shouldConsultRefactorer(changes: FileChanges): boolean {
-    return (changes.complexityIncrease ?? 0) > 20 || (changes.fileSizeIncrease ?? 0) > 1000;
+    return (
+      (changes.complexityIncrease ?? 0) > 20 ||
+      (changes.fileSizeIncrease ?? 0) > 1000
+    );
   }
 
   /**
@@ -927,15 +933,19 @@ export class AgentDelegator {
         const result = await this.callAgent(agentName, request);
         results.push({ agent: agentName, result, success: true });
       } catch (error) {
-        results.push({ agent: agentName, error: error instanceof Error ? error.message : String(error), success: false });
+        results.push({
+          agent: agentName,
+          error: error instanceof Error ? error.message : String(error),
+          success: false,
+        });
       }
     }
 
     return {
-      strategy: 'orchestrator-led',
+      strategy: "orchestrator-led",
       agents: agentNames,
       results: results,
-      summary: `${results.filter(r => r.success).length}/${agentNames.length} agents completed successfully`
+      summary: `${results.filter((r) => r.success).length}/${agentNames.length} agents completed successfully`,
     };
   }
 
@@ -1026,7 +1036,9 @@ export class AgentDelegator {
     return [results[0]];
   }
 
-  private consolidateOrchestratorResults(results: AgentExecutionResult[]): unknown {
+  private consolidateOrchestratorResults(
+    results: AgentExecutionResult[],
+  ): unknown {
     const successful = results.filter((r) => r.success);
     const failed = results.filter((r) => !r.success);
 
@@ -1073,11 +1085,13 @@ export class AgentDelegator {
       "agent-delegator",
       "delegation execution failed",
       "error",
-        {
-          error: error instanceof Error ? error.message : String(error),
-        },
-      );
-    console.error(`❌ Delegation failed: ${error instanceof Error ? error.message : error}`);
+      {
+        error: error instanceof Error ? error.message : String(error),
+      },
+    );
+    console.error(
+      `❌ Delegation failed: ${error instanceof Error ? error.message : error}`,
+    );
   }
 
   private async logDelegationDecision(

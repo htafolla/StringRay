@@ -33,13 +33,15 @@ class EnhancedMultiAgentOrchestratorServer {
         tools: [
           {
             name: "spawn-agent",
-            description: "Spawn an agent with clickable monitoring and dependency management",
+            description:
+              "Spawn an agent with clickable monitoring and dependency management",
             inputSchema: {
               type: "object",
               properties: {
                 agentType: {
                   type: "string",
-                  description: "Type of agent to spawn (architect, enforcer, librarian, etc.)",
+                  description:
+                    "Type of agent to spawn (architect, enforcer, librarian, etc.)",
                 },
                 task: {
                   type: "string",
@@ -53,7 +55,8 @@ class EnhancedMultiAgentOrchestratorServer {
                 dependencies: {
                   type: "array",
                   items: { type: "string" },
-                  description: "Agent IDs that must complete before this agent starts",
+                  description:
+                    "Agent IDs that must complete before this agent starts",
                 },
                 timeout: {
                   type: "number",
@@ -65,7 +68,8 @@ class EnhancedMultiAgentOrchestratorServer {
           },
           {
             name: "get-monitoring-interface",
-            description: "Get real-time monitoring interface for all active agents",
+            description:
+              "Get real-time monitoring interface for all active agents",
             inputSchema: {
               type: "object",
               properties: {},
@@ -95,7 +99,8 @@ class EnhancedMultiAgentOrchestratorServer {
           },
           {
             name: "execute-complex-task",
-            description: "Execute a complex multi-step task with automatic agent orchestration",
+            description:
+              "Execute a complex multi-step task with automatic agent orchestration",
             inputSchema: {
               type: "object",
               properties: {
@@ -160,7 +165,9 @@ class EnhancedMultiAgentOrchestratorServer {
             const agent = await enhancedMultiAgentOrchestrator.spawnAgent({
               agentType: args.agentType as string,
               task: args.task as string,
-              priority: (args.priority as "low" | "medium" | "high" | "critical") || "medium",
+              priority:
+                (args.priority as "low" | "medium" | "high" | "critical") ||
+                "medium",
               dependencies: (args.dependencies as string[]) || [],
               timeout: args.timeout as number,
             });
@@ -175,7 +182,8 @@ class EnhancedMultiAgentOrchestratorServer {
             };
 
           case "get-monitoring-interface":
-            const monitoringData = enhancedMultiAgentOrchestrator.getMonitoringInterface();
+            const monitoringData =
+              enhancedMultiAgentOrchestrator.getMonitoringInterface();
 
             return {
               content: [
@@ -187,7 +195,9 @@ class EnhancedMultiAgentOrchestratorServer {
             };
 
           case "cancel-agent":
-            const cancelled = await enhancedMultiAgentOrchestrator.cancelAgent(args.agentId as string);
+            const cancelled = await enhancedMultiAgentOrchestrator.cancelAgent(
+              args.agentId as string,
+            );
 
             return {
               content: [
@@ -222,7 +232,7 @@ class EnhancedMultiAgentOrchestratorServer {
             const results = await orchestrator.executeComplexTask(
               args.description as string,
               args.tasks as any[],
-              args.sessionId as string
+              args.sessionId as string,
             );
 
             return {

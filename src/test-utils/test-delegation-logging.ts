@@ -27,7 +27,7 @@ async function testDelegationLogging() {
     const executionResult = await delegator.executeDelegation(result, {
       operation: "test-complex-task",
       description: "Testing delegation logging",
-      context: result.metrics,
+      context: result.metrics as any,
     });
 
     console.log("✅ Delegation execution completed");

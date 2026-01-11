@@ -1,24 +1,24 @@
-import { defineConfig } from 'vitest/config';
-import { resolve } from 'path';
+import { defineConfig } from "vitest/config";
+import { resolve } from "path";
 
 export default defineConfig({
   test: {
     globals: true,
-    environment: 'node',
-    setupFiles: ['./src/__tests__/setup.ts'],
-    include: ['src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
-    exclude: ['node_modules', 'dist', 'coverage'],
+    environment: "node",
+    setupFiles: ["./src/__tests__/setup.ts"],
+    include: ["src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],
+    exclude: ["node_modules", "dist", "coverage"],
     coverage: {
-      provider: 'v8',
-      reporter: ['text', 'json', 'html', 'lcov'],
+      provider: "v8",
+      reporter: ["text", "json", "html", "lcov"],
       exclude: [
-        'node_modules/',
-        'dist/',
-        'coverage/',
-        '**/*.d.ts',
-        '**/*.config.{js,ts}',
-        'src/__tests__/',
-        'scripts/',
+        "node_modules/",
+        "dist/",
+        "coverage/",
+        "**/*.d.ts",
+        "**/*.config.{js,ts}",
+        "src/__tests__/",
+        "scripts/",
       ],
       thresholds: {
         global: {
@@ -32,14 +32,14 @@ export default defineConfig({
     testTimeout: 30000,
     hookTimeout: 30000,
     bail: 5, // Stop after 5 test failures - prevents resource waste
-    pool: 'threads',
+    pool: "threads",
     minThreads: 1,
-    maxThreads: 4,  // Explicit worker limit for stability
+    maxThreads: 4, // Explicit worker limit for stability
     retry: 2,
   },
   resolve: {
     alias: {
-      '@': resolve(__dirname, './src'),
+      "@": resolve(__dirname, "./src"),
     },
   },
 });

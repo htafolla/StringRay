@@ -1,0 +1,66 @@
+# StrRay Framework - Production Monitoring Configuration
+
+# Prometheus Configuration
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  - "alert_rules.yml"
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          - alertmanager:9093
+
+scrape_configs:
+  - job_name: 'strray-framework'
+    static_configs:
+      - targets: ['localhost:3000']
+    metrics_path: '/metrics'
+    scrape_interval: 5s
+
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['localhost:9100']
+
+# Alert Rules
+groups:
+  - name: strray-alerts
+    rules:
+      - alert: HighMemoryUsage
+        expr: process_resident_memory_bytes / 1024 / 1024 > 512
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage detected"
+          description: "Process memory usage is {{ $value }} MB"
+
+      - alert: HighCPUUsage
+        expr: rate(process_cpu_user_seconds_total[5m]) > 0.8
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage detected"
+          description: "CPU usage is above 80% for 2 minutes"
+
+      - alert: PerformanceBudgetViolation
+        expr: strray_performance_budget_violations_total > 0
+        for: 1m
+        labels:
+          severity: error
+        annotations:
+          summary: "Performance budget violation detected"
+          description: "Performance budget has been violated"
+
+      - alert: FrameworkNotHealthy
+        expr: up{job="strray-framework"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "StrRay Framework is down"
+          description: "StrRay Framework has been down for more than 1 minute"

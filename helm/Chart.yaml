@@ -1,0 +1,17 @@
+apiVersion: v2
+name: strray-framework
+description: StrRay Framework - Enterprise AI orchestration platform
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+keywords:
+  - ai
+  - orchestration
+  - codex
+  - framework
+home: https://strray.dev
+sources:
+  - https://github.com/strray-framework/stringray
+maintainers:
+  - name: StrRay Team
+    email: team@strray.dev

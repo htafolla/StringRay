@@ -1,0 +1,79 @@
+/**
+ * Test the integrated orchestration pipeline with clickable monitoring
+ */
+
+import { StrRayOrchestrator } from './dist/orchestrator.js';
+import { enhancedMultiAgentOrchestrator } from './dist/orchestrator/enhanced-multi-agent-orchestrator.js';
+
+async function testIntegratedOrchestration() {
+  console.log('🧪 Testing Integrated Orchestration Pipeline\n');
+
+  // Create orchestrator instance
+  const orchestrator = new StrRayOrchestrator({
+    maxConcurrentTasks: 3,
+    conflictResolutionStrategy: 'expert_priority'
+  });
+
+  // Define test tasks
+  const tasks = [
+    {
+      id: 'design-auth',
+      description: 'Design authentication system architecture',
+      subagentType: 'architect',
+      priority: 'high'
+    },
+    {
+      id: 'validate-auth',
+      description: 'Validate authentication system against codex rules',
+      subagentType: 'enforcer',
+      priority: 'high',
+      dependencies: ['design-auth']
+    },
+    {
+      id: 'research-auth',
+      description: 'Research authentication best practices',
+      subagentType: 'librarian',
+      priority: 'medium'
+    }
+  ];
+
+  console.log('📋 Executing complex task with integrated orchestration...\n');
+
+  // Execute the complex task
+  const results = await orchestrator.executeComplexTask(
+    'Build secure authentication system',
+    tasks
+  );
+
+  console.log('📊 Task Execution Results:');
+  results.forEach((result, index) => {
+    const task = tasks[index];
+    console.log(`  ${task.id}: ${result.success ? '✅' : '❌'} (${result.duration}ms)`);
+    if (result.result) {
+      console.log(`    Result: ${JSON.stringify(result.result).substring(0, 100)}...`);
+    }
+    if (result.error) {
+      console.log(`    Error: ${result.error}`);
+    }
+  });
+
+  console.log('\n📈 Enhanced Orchestrator Statistics:');
+  const stats = enhancedMultiAgentOrchestrator.getStatistics();
+  console.log(`  Active Agents: ${stats.activeAgents}`);
+  console.log(`  Completed Agents: ${stats.completedAgents}`);
+  console.log(`  Failed Agents: ${stats.failedAgents}`);
+  console.log(`  Total Spawned: ${stats.totalSpawned}`);
+
+  console.log('\n🖱️ Clickable Monitoring Interface:');
+  const monitoringData = enhancedMultiAgentOrchestrator.getMonitoringInterface();
+  Object.entries(monitoringData).forEach(([id, agent]) => {
+    console.log(`  ${id}: ${agent.agentType} (${agent.status}) - ${agent.progress}% ${agent.clickable ? '🖱️' : ''}`);
+  });
+
+  // Cleanup
+  await enhancedMultiAgentOrchestrator.shutdown();
+  console.log('\n✅ Integration test completed successfully!');
+}
+
+// Run the test
+testIntegratedOrchestration().catch(console.error);

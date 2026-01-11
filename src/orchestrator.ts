@@ -8,6 +8,8 @@
  * @since 2026-01-07
  */
 
+import { enhancedMultiAgentOrchestrator } from "./orchestrator/enhanced-multi-agent-orchestrator.js";
+
 export interface OrchestratorConfig {
   maxConcurrentTasks: number;
   taskTimeout: number;
@@ -32,6 +34,7 @@ export interface TaskResult {
 export class StrRayOrchestrator {
   private config: OrchestratorConfig;
   private activeTasks: Map<string, Promise<TaskResult>> = new Map();
+  private taskToAgentMap: Map<string, string> = new Map(); // taskId -> agentId
 
   constructor(config: Partial<OrchestratorConfig> = {}) {
     this.config = {
@@ -142,30 +145,65 @@ export class StrRayOrchestrator {
   }
 
   /**
-   * Delegate task to appropriate subagent
+   * Delegate task to appropriate subagent using enhanced orchestration
    */
   private async delegateToSubagent(task: TaskDefinition): Promise<any> {
-    // This is a placeholder - would integrate with actual agent delegation system
-    // For now, simulate subagent execution
-    await new Promise((resolve) =>
-      setTimeout(resolve, Math.random() * 1000 + 500),
-    );
-
-    switch (task.subagentType) {
-      case "explore":
-        return { type: "exploration", data: `Explored ${task.description}` };
-      case "librarian":
-        return {
-          type: "documentation",
-          data: `Researched ${task.description}`,
-        };
-      case "architect":
-        return { type: "design", data: `Designed ${task.description}` };
-      case "enforcer":
-        return { type: "validation", data: `Enforced ${task.description}` };
-      default:
-        return { type: "generic", data: `Executed ${task.description}` };
+    // Convert task dependencies to agent IDs
+    const agentDependencies: string[] = [];
+    if (task.dependencies) {
+      for (const depTaskId of task.dependencies) {
+        const depAgentId = this.taskToAgentMap.get(depTaskId);
+        if (depAgentId) {
+          agentDependencies.push(depAgentId);
+        }
+      }
     }
+
+    // Use enhanced multi-agent orchestrator with clickable monitoring
+    const agentRequest = {
+      agentType: task.subagentType,
+      task: task.description,
+      context: {
+        taskId: task.id,
+        priority: task.priority || "medium",
+        orchestratorSession: "main-orchestrator",
+      },
+      priority: (task.priority as "low" | "medium" | "high") || "medium",
+      dependencies: agentDependencies,
+    };
+
+    const spawnedAgent =
+      await enhancedMultiAgentOrchestrator.spawnAgent(agentRequest);
+
+    // Map task ID to agent ID for future dependencies
+    this.taskToAgentMap.set(task.id, spawnedAgent.id);
+
+    // Wait for agent completion with monitoring
+    return new Promise((resolve, reject) => {
+      const checkCompletion = () => {
+        const monitoringData =
+          enhancedMultiAgentOrchestrator.getMonitoringInterface();
+        const agent = monitoringData[spawnedAgent.id];
+
+        if (!agent) {
+          reject(
+            new Error(`Agent ${spawnedAgent.id} not found in monitoring data`),
+          );
+          return;
+        }
+
+        if (agent.status === "completed") {
+          resolve(agent.result);
+        } else if (agent.status === "failed") {
+          reject(new Error(agent.error || `Agent ${spawnedAgent.id} failed`));
+        } else {
+          // Continue monitoring
+          setTimeout(checkCompletion, 500);
+        }
+      };
+
+      checkCompletion();
+    });
   }
 
   /**

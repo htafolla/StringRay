@@ -1,8 +1,6 @@
 import { frameworkLogger } from "../framework-logger.js";
 export class StrRayStateManager {
-    constructor() {
-        this.store = new Map();
-    }
+    store = new Map();
     get(key) {
         const value = this.store.get(key);
         frameworkLogger.log("state-manager", "get operation", "info", {
@@ -21,3 +19,4 @@ export class StrRayStateManager {
         frameworkLogger.log("state-manager", "clear operation", existed ? "success" : "info", { key, existed });
     }
 }
+//# sourceMappingURL=state-manager.js.map

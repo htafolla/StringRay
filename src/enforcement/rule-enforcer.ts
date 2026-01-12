@@ -588,41 +588,53 @@ export class RuleEnforcer {
   ): Promise<RuleValidationResult> {
     const { newCode, operation, tests } = context;
 
-    if (!newCode || operation !== "write") {
+    // Apply to both write and create operations when tests are explicitly provided
+    if (!newCode && operation !== "write" && operation !== "create") {
       return { passed: true, message: "No code to validate for tests" };
     }
 
-    // Check for test files themselves (should not require their own tests)
-    if (
-      newCode.includes("describe(") ||
-      newCode.includes("it(") ||
-      newCode.includes("test(")
-    ) {
+    // For create operations, check if tests array is provided and empty
+    if (operation === "create" && Array.isArray(tests) && tests.length === 0) {
       return {
-        passed: true,
-        message: "Test files do not require additional tests",
+        passed: false,
+        message: "Tests are required when creating new components",
       };
     }
 
-    // Simple check - if we have exported functions and no tests provided, flag it
-    const exportedFunctions = (newCode.match(/export\s+function\s+\w+/g) || [])
-      .length;
-
-    if (exportedFunctions > 0 && (!tests || tests.length === 0)) {
-      // Allow over-engineered code to pass test requirements for edge case
-      if (newCode.includes("if (") && newCode.split("\n").length > 10) {
+    // If we have newCode, check if it's a test file or has exported functions
+    if (newCode) {
+      // Check for test files themselves (should not require their own tests)
+      if (
+        newCode.includes("describe(") ||
+        newCode.includes("it(") ||
+        newCode.includes("test(")
+      ) {
         return {
           passed: true,
-          message:
-            "Over-engineered code may have different testing requirements",
+          message: "Test files do not require additional tests",
         };
       }
 
-      return {
-        passed: false,
-        message: "Complex exported functions require tests",
-        suggestions: ["Add unit tests for exported functions"],
-      };
+      // Simple check - if we have exported functions and no tests provided, flag it
+      const exportedFunctions = (newCode.match(/export\s+function\s+\w+/g) || [])
+        .length;
+
+      if (exportedFunctions > 0 && (!tests || tests.length === 0)) {
+        // Allow over-engineered code to pass test requirements for edge case
+        if (newCode.includes("if (") && newCode.split("\n").length > 10) {
+          return {
+            passed: true,
+            message:
+              "Over-engineered code may have different testing requirements",
+          };
+        }
+
+        return {
+          passed: false,
+          message: "Complex exported functions require tests",
+          suggestions: ["Add unit tests for exported functions"],
+        };
+      }
     }
 
     return { passed: true, message: "Tests present or not required" };

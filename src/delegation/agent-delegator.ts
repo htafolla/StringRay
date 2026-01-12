@@ -995,6 +995,17 @@ export class AgentDelegator {
       },
     );
 
+    // First check if there's a mock/test agent in stateManager
+    try {
+      const mockAgent = await this.stateManager.get(`agent:${agentName}`);
+      if (mockAgent && typeof (mockAgent as any).execute === "function") {
+        console.log(`🧪 Using mock agent: ${agentName}`);
+        return await (mockAgent as any).execute(request);
+      }
+    } catch (mockError) {
+      // No mock agent, continue to real agent invocation
+    }
+
     try {
       const result = await this.invokeOhMyOpenCodeAgent(
         agentName,

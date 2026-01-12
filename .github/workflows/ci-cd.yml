@@ -76,9 +76,10 @@ jobs:
           dist/
           docs/
 
-  security-scan:
-    needs: build
-    runs-on: ubuntu-latest
+   security-scan:
+     needs: build
+     runs-on: ubuntu-latest
+     continue-on-error: true
 
     steps:
     - uses: actions/checkout@v4

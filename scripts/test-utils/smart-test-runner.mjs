@@ -13,35 +13,56 @@
 import { execSync, spawn } from 'child_process';
 import fs from 'fs';
 import path from 'path';
+import { StrRayOrchestrator } from '../dist/orchestrator.js';
 
 const MAX_OUTPUT_SIZE = 100000; // Increased buffer for large test outputs
 const MAX_FILES_THRESHOLD = 50; // Run individually if more than 50 test files
 const CHUNK_SIZE = 10; // Process tests in chunks of 10
+const CHUNK_TIMEOUT_MS = 30000; // 30-second timeout per chunk (Codex Term #45)
+const TOTAL_TIMEOUT_MS = 600000; // 10-minute total timeout (Codex Term #45)
+const MAX_SUITE_SIZE = 100; // Maximum 100 files per suite (Codex Term #45)
 
 class SmartTestRunner {
   constructor() {
     this.testResults = [];
     this.outputChunks = [];
     this.quarantinedTests = [];
+    this.startTime = Date.now();
+  }
+
+  /**
+   * Check if total execution time has exceeded limit (Codex Term #45)
+   */
+  hasExceededTotalTimeout() {
+    return (Date.now() - this.startTime) > TOTAL_TIMEOUT_MS;
   }
 
   /**
    * Main execution method
    */
-  async run(options = {}) {
-    const { pattern = '**/*.test.ts', quarantineMode = false } = options;
-    
-    console.log('🚀 Smart Test Runner - Surgical fixes for large test suites');
-    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-    
-    try {
+   async run(options = {}) {
+     const { pattern = '**/*.test.ts', quarantineMode = false, autoHeal = false } = options;
+     this.startTime = Date.now();
+
+     console.log('🚀 Smart Test Runner - Surgical fixes for large test suites');
+     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+     console.log(`⏱️  Total timeout: ${TOTAL_TIMEOUT_MS / 1000}s | Chunk timeout: ${CHUNK_TIMEOUT_MS / 1000}s`);
+
+     try {
       // Step 1: Discover test files
       const testFiles = this.discoverTestFiles(pattern);
       console.log(`📋 Discovered ${testFiles.length} test files`);
-      
+
       if (testFiles.length === 0) {
         console.log('❌ No test files found');
         return { success: false, results: [] };
+      }
+
+      // Step 1.5: Apply suite size limits (Codex Term #45)
+      if (testFiles.length > MAX_SUITE_SIZE) {
+        console.log(`🚫 Test suite too large (${testFiles.length} files > ${MAX_SUITE_SIZE} max)`);
+        console.log('❌ Aborting execution - refactor test suite to comply with size limits');
+        return { success: false, results: [], error: 'SUITE_TOO_LARGE' };
       }
       
       // Step 2: Apply max test rule
@@ -120,6 +141,13 @@ class SmartTestRunner {
     let failedTests = 0;
 
     for (const testFile of testFiles) {
+      // Check total timeout before each individual test (Codex Term #45)
+      if (this.hasExceededTotalTimeout()) {
+        console.log(`⏰ Total timeout exceeded (${TOTAL_TIMEOUT_MS / 1000}s) - aborting remaining tests`);
+        console.log(`📊 Partial results: ${passedFiles} passed, ${failedFiles} failed files`);
+        break;
+      }
+
       console.log(`\n📄 Running: ${path.basename(testFile)}`);
 
       try {
@@ -188,6 +216,13 @@ class SmartTestRunner {
     const allFailedTests = [];
 
     for (let i = 0; i < chunks.length; i++) {
+      // Check total timeout before processing chunk (Codex Term #45)
+      if (this.hasExceededTotalTimeout()) {
+        console.log(`⏰ Total timeout exceeded (${TOTAL_TIMEOUT_MS / 1000}s) - aborting remaining chunks`);
+        console.log(`📊 Partial results: ${totalPassedFiles} passed, ${totalFailedFiles} failed files`);
+        break;
+      }
+
       const chunk = chunks[i];
 
       const chunkResult = await this.runChunk(chunk, i, chunks.length);
@@ -219,7 +254,7 @@ class SmartTestRunner {
       }
     }
 
-    return {
+    const testResult = {
       success: totalFailedTests === 0,
       results,
       summary: {
@@ -231,6 +266,56 @@ class SmartTestRunner {
         failedFiles: totalFailedFiles
       }
     };
+
+    // Auto-healing integration through orchestrator (if enabled and tests failed)
+    if (autoHeal && totalFailedTests > 0) {
+      console.log('\n🎯 ORCHESTRATED AUTO-HEALING ENGAGED - Coordinating multi-agent response...');
+
+      try {
+        // Create orchestrator instance
+        const orchestrator = new StrRayOrchestrator({
+          maxConcurrentTasks: 3,
+          taskTimeout: 300000, // 5 minutes per task
+          conflictResolutionStrategy: 'expert_priority'
+        });
+
+        // Prepare failure context for orchestration
+        const failureContext = {
+          failedTests: allFailedTests.map(t => t.file),
+          timeoutIssues: testResult.timeoutIssues || [],
+          performanceIssues: testResult.slowTests || [],
+          flakyTests: testResult.flakyTests || [],
+          errorLogs: testResult.errorLogs || [],
+          testExecutionTime: testResult.executionTime || 0
+        };
+
+        // Execute orchestrated auto-healing
+        const healingResult = await orchestrator.orchestrateTestAutoHealing(failureContext, `test-session-${Date.now()}`);
+
+        console.log(`✅ Orchestrated auto-healing complete:`);
+        console.log(`   • Success: ${healingResult.success ? 'Yes' : 'No'}`);
+        console.log(`   • Performance improvement: ${healingResult.performanceImprovement}%`);
+        console.log(`   • Agent coordination: ${healingResult.agentCoordination.join(', ')}`);
+
+        if (healingResult.healingResult.recommendations?.length > 0) {
+          console.log(`   • Recommendations: ${healingResult.healingResult.recommendations.slice(0, 3).join(', ')}`);
+        }
+
+        if (healingResult.healingResult.summary) {
+          console.log(`   • Summary: ${healingResult.healingResult.summary}`);
+        }
+
+        // Update test result with healing outcomes
+        testResult.autoHealed = healingResult.success;
+        testResult.performanceImprovement = healingResult.performanceImprovement;
+
+      } catch (error) {
+        console.log(`❌ Orchestrated auto-healing failed: ${error instanceof Error ? error.message : String(error)}`);
+        console.log('   Falling back to basic error reporting...');
+      }
+    }
+
+    return testResult;
   }
 
   /**
@@ -315,7 +400,25 @@ class SmartTestRunner {
     // Use JSON reporter for large chunks to avoid output truncation
     const useJson = chunk.length > 5;
     const promises = chunk.map(file => this.runSingleTest(file, useJson));
-    const results = await Promise.all(promises);
+
+    // Implement chunk timeout (Codex Term #45)
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error(`Chunk timeout after ${CHUNK_TIMEOUT_MS}ms`)), CHUNK_TIMEOUT_MS);
+    });
+
+    let results;
+    try {
+      results = await Promise.race([Promise.all(promises), timeoutPromise]);
+    } catch (error) {
+      console.log(`⏰ Chunk ${chunkIndex + 1} timed out - ${error.message}`);
+      // Return timeout results for all tests in chunk
+      results = chunk.map(file => ({
+        file,
+        success: false,
+        timedOut: true,
+        error: 'Chunk timeout'
+      }));
+    }
 
     const passedFiles = results.filter(r => r.success).length;
     const failedFiles = results.filter(r => !r.success).length;

@@ -358,7 +358,7 @@
     "45": {
       "number": 45,
       "title": "Test Execution Optimization",
-      "description": "Test execution must be optimized for speed and reliability: Run unit tests with multiple workers (minimum 4 threads), Run E2E tests with parallel workers (minimum 4 workers), Implement chunked output processing for large test results, Stop execution if 5+ tests fail (triage threshold), Use sub-agents for handling large test outputs (>30k characters)",
+      "description": "Test execution must be optimized for speed and reliability: Run unit tests with multiple workers (minimum 4 threads), Run E2E tests with parallel workers (minimum 4 workers), Implement chunked output processing for large test results, Stop execution if 5+ tests fail (triage threshold), Use sub-agents for handling large test outputs (>30k characters), Large test suites (>50 files) must use intelligent chunking with 30-second timeouts per chunk, Automatic fallback to individual test execution for suites exceeding 10-minute total runtime, Test suite size limits: maximum 100 files per suite, implement parallel chunk execution with progress monitoring",
       "category": "advanced",
       "zeroTolerance": false,
       "enforcementLevel": "medium"

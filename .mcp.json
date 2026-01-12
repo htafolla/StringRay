@@ -63,6 +63,14 @@
     "ui-ux-design": {
       "command": "node",
       "args": ["dist/mcps/knowledge-skills/ui-ux-design.server.js"]
+    },
+    "refactoring-strategies": {
+      "command": "node",
+      "args": ["dist/mcps/knowledge-skills/refactoring-strategies.server.js"]
+    },
+    "testing-best-practices": {
+      "command": "node",
+      "args": ["dist/mcps/knowledge-skills/testing-best-practices.server.js"]
     }
   }
 }

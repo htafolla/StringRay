@@ -31,6 +31,16 @@ export interface TaskResult {
   duration: number;
 }
 
+export interface TestFailureContext {
+  failedTests: string[];
+  timeoutIssues: string[];
+  performanceIssues: string[];
+  flakyTests: string[];
+  errorLogs: string[];
+  testExecutionTime: number;
+  sessionId?: string;
+}
+
 export class StrRayOrchestrator {
   private config: OrchestratorConfig;
   private activeTasks: Map<string, Promise<TaskResult>> = new Map();
@@ -142,6 +152,244 @@ export class StrRayOrchestrator {
         duration,
       };
     }
+  }
+
+  /**
+   * Auto-healing orchestration for test failures - coordinates multi-agent response
+   */
+  async orchestrateTestAutoHealing(
+    failureContext: TestFailureContext,
+    sessionId?: string,
+  ): Promise<{
+    success: boolean;
+    healingResult: any;
+    agentCoordination: string[];
+    performanceImprovement: number;
+  }> {
+    const startTime = Date.now();
+    console.log(`🔧 Orchestrator: Initiating auto-healing for ${failureContext.failedTests.length} test failures`);
+
+    try {
+      // Step 1: Analyze failure patterns and create healing strategy
+      const healingStrategy = await this.analyzeTestFailurePatterns(failureContext);
+
+      // Step 2: Create coordinated multi-agent tasks
+      const healingTasks = this.createHealingTaskDefinitions(healingStrategy, failureContext);
+
+      // Step 3: Execute healing tasks through enhanced orchestration
+      const taskResults = await this.executeComplexTask(
+        `Auto-healing test failures: ${failureContext.failedTests.length} issues detected`,
+        healingTasks,
+        sessionId
+      );
+
+      // Step 4: Consolidate results and measure improvements
+      const consolidationResult = await this.consolidateHealingResults(taskResults, failureContext);
+
+      const duration = Date.now() - startTime;
+      console.log(`✅ Orchestrator: Auto-healing completed in ${duration}ms`);
+
+      return {
+        success: consolidationResult.success,
+        healingResult: consolidationResult,
+        agentCoordination: healingStrategy.agentsNeeded,
+        performanceImprovement: consolidationResult.performanceImprovement
+      };
+
+    } catch (error) {
+      console.error(`❌ Orchestrator: Auto-healing orchestration failed:`, error);
+      return {
+        success: false,
+        healingResult: { error: error instanceof Error ? error.message : String(error) },
+        agentCoordination: [],
+        performanceImprovement: 0
+      };
+    }
+  }
+
+  /**
+   * Analyze test failure patterns to determine healing strategy
+   */
+  private async analyzeTestFailurePatterns(failureContext: TestFailureContext): Promise<{
+    priorityLevel: 'low' | 'medium' | 'high' | 'critical';
+    agentsNeeded: string[];
+    estimatedTime: number;
+    complexityScore: number;
+    healingApproach: 'simple' | 'coordinated' | 'enterprise';
+  }> {
+    const totalIssues = failureContext.failedTests.length +
+                       failureContext.timeoutIssues.length +
+                       failureContext.performanceIssues.length +
+                       failureContext.flakyTests.length;
+
+    // Calculate complexity score (0-100)
+    const complexityScore = Math.min(100,
+      (failureContext.timeoutIssues.length * 20) +
+      (failureContext.performanceIssues.length * 15) +
+      (failureContext.flakyTests.length * 25) +
+      (failureContext.failedTests.length * 5) +
+      (failureContext.testExecutionTime > 600000 ? 25 : 0) // 10+ minutes
+    );
+
+    // Determine priority and approach
+    let priorityLevel: 'low' | 'medium' | 'high' | 'critical';
+    let agentsNeeded: string[] = [];
+    let healingApproach: 'simple' | 'coordinated' | 'enterprise';
+
+    if (complexityScore < 25) {
+      priorityLevel = 'low';
+      agentsNeeded = ['test-architect'];
+      healingApproach = 'simple';
+    } else if (complexityScore < 50) {
+      priorityLevel = 'medium';
+      agentsNeeded = ['test-architect', 'refactorer'];
+      healingApproach = 'coordinated';
+    } else if (complexityScore < 75) {
+      priorityLevel = 'high';
+      agentsNeeded = ['test-architect', 'refactorer', 'bug-triage-specialist'];
+      healingApproach = 'coordinated';
+    } else {
+      priorityLevel = 'critical';
+      agentsNeeded = ['orchestrator', 'architect', 'security-auditor', 'test-architect', 'refactorer', 'bug-triage-specialist'];
+      healingApproach = 'enterprise';
+    }
+
+    const estimatedTime = totalIssues * (complexityScore > 50 ? 15 : 5); // minutes
+
+    return {
+      priorityLevel,
+      agentsNeeded,
+      estimatedTime,
+      complexityScore,
+      healingApproach
+    };
+  }
+
+  /**
+   * Create task definitions for healing orchestration
+   */
+  private createHealingTaskDefinitions(
+    strategy: any,
+    failureContext: TestFailureContext
+  ): TaskDefinition[] {
+    const tasks: TaskDefinition[] = [];
+
+    // Analysis task (always first)
+    tasks.push({
+      id: 'failure-analysis',
+      description: 'Analyze test failure patterns and root causes',
+      subagentType: 'bug-triage-specialist',
+      priority: 'high'
+    });
+
+    // Timeout optimization tasks
+    if (failureContext.timeoutIssues.length > 0) {
+      tasks.push({
+        id: 'timeout-optimization',
+        description: `Optimize ${failureContext.timeoutIssues.length} timeout issues`,
+        subagentType: 'test-architect',
+        priority: strategy.priorityLevel === 'critical' ? 'high' : 'medium',
+        dependencies: ['failure-analysis']
+      });
+    }
+
+    // Performance optimization tasks
+    if (failureContext.performanceIssues.length > 0) {
+      tasks.push({
+        id: 'performance-optimization',
+        description: `Fix ${failureContext.performanceIssues.length} performance bottlenecks`,
+        subagentType: 'refactorer',
+        priority: strategy.priorityLevel === 'critical' ? 'high' : 'medium',
+        dependencies: ['failure-analysis']
+      });
+    }
+
+    // Flaky test investigation
+    if (failureContext.flakyTests.length > 0) {
+      tasks.push({
+        id: 'flaky-test-investigation',
+        description: `Investigate ${failureContext.flakyTests.length} flaky tests`,
+        subagentType: 'bug-triage-specialist',
+        priority: 'high',
+        dependencies: ['failure-analysis']
+      });
+    }
+
+    // General test refactoring
+    if (failureContext.failedTests.length > 0) {
+      tasks.push({
+        id: 'test-refactoring',
+        description: `Refactor ${failureContext.failedTests.length} failing tests`,
+        subagentType: 'refactorer',
+        priority: 'medium',
+        dependencies: ['failure-analysis']
+      });
+    }
+
+    // Architecture review for critical issues
+    if (strategy.priorityLevel === 'critical') {
+      tasks.push({
+        id: 'architecture-review',
+        description: 'Review test architecture for systemic issues',
+        subagentType: 'architect',
+        priority: 'high',
+        dependencies: ['failure-analysis', 'timeout-optimization', 'performance-optimization']
+      });
+    }
+
+    return tasks;
+  }
+
+  /**
+   * Consolidate healing results from multiple agents
+   */
+  private async consolidateHealingResults(
+    taskResults: TaskResult[],
+    originalContext: TestFailureContext
+  ): Promise<{
+    success: boolean;
+    fixesApplied: number;
+    testsOptimized: number;
+    performanceImprovement: number;
+    recommendations: string[];
+    summary: string;
+  }> {
+    const successfulTasks = taskResults.filter(r => r.success);
+    const failedTasks = taskResults.filter(r => !r.success);
+
+    // Aggregate results from successful tasks
+    let totalFixesApplied = 0;
+    let totalTestsOptimized = 0;
+    let totalPerformanceImprovement = 0;
+    const recommendations: string[] = [];
+
+    for (const result of successfulTasks) {
+      if (result.result) {
+        totalFixesApplied += result.result.fixesApplied || 0;
+        totalTestsOptimized += result.result.testsOptimized || 0;
+        totalPerformanceImprovement += result.result.performanceImprovement || 0;
+
+        if (result.result.recommendations) {
+          recommendations.push(...result.result.recommendations);
+        }
+      }
+    }
+
+    const successRate = successfulTasks.length / taskResults.length;
+    const overallSuccess = successRate >= 0.8; // 80% success threshold
+
+    const summary = `Auto-healing completed: ${successfulTasks.length}/${taskResults.length} tasks successful. ` +
+                   `Applied ${totalFixesApplied} fixes, optimized ${totalTestsOptimized} tests, ` +
+                   `achieved ${totalPerformanceImprovement}% performance improvement.`;
+
+    return {
+      success: overallSuccess,
+      fixesApplied: totalFixesApplied,
+      testsOptimized: totalTestsOptimized,
+      performanceImprovement: totalPerformanceImprovement,
+      recommendations: recommendations.slice(0, 5), // Top 5 recommendations
+      summary
+    };
   }
 
   /**

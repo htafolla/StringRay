@@ -21,8 +21,8 @@
     "ci-report": "node scripts/github-actions-monitor.cjs --report",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "lint": "eslint src --ext .ts",
-    "lint:fix": "eslint src --ext .ts --fix",
+    "lint": "eslint src",
+    "lint:fix": "eslint src --fix",
     "framework:init": "bash .opencode/init.sh"
   },
   "keywords": [

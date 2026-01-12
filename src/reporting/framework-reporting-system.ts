@@ -338,48 +338,50 @@ const report = await reportingSystem.generateCustomReport('${template.name}');
     startTime: number,
     endTime: number,
   ): Promise<any[]> {
-    return new Promise(async (resolve, reject) => {
+    return new Promise((resolve, reject) => {
       const logs: any[] = [];
 
-      try {
-        const zlib = await import("zlib");
-        const fs = await import("fs");
+      (async () => {
+        try {
+          const zlib = await import("zlib");
+          const fs = await import("fs");
 
-        const readStream = fs.createReadStream(filePath);
-        const gunzip = zlib.createGunzip();
-        let buffer = "";
+          const readStream = fs.createReadStream(filePath);
+          const gunzip = zlib.createGunzip();
+          let buffer = "";
 
-        readStream
-          .pipe(gunzip)
-          .on("data", (chunk) => {
-            buffer += chunk.toString();
+          readStream
+            .pipe(gunzip)
+            .on("data", (chunk) => {
+              buffer += chunk.toString();
 
-            // Process complete lines
-            const lines = buffer.split("\n");
-            buffer = lines.pop() || ""; // Keep incomplete line in buffer
+              // Process complete lines
+              const lines = buffer.split("\n");
+              buffer = lines.pop() || ""; // Keep incomplete line in buffer
 
-            for (const line of lines) {
-              if (line.trim()) {
-                try {
-                  const logEntry = this.parseLogLine(line);
-                  if (
-                    logEntry &&
-                    logEntry.timestamp >= startTime &&
-                    logEntry.timestamp <= endTime
-                  ) {
-                    logs.push(logEntry);
+              for (const line of lines) {
+                if (line.trim()) {
+                  try {
+                    const logEntry = this.parseLogLine(line);
+                    if (
+                      logEntry &&
+                      logEntry.timestamp >= startTime &&
+                      logEntry.timestamp <= endTime
+                    ) {
+                      logs.push(logEntry);
+                    }
+                  } catch (error) {
+                    // Skip malformed lines
                   }
-                } catch (error) {
-                  // Skip malformed lines
                 }
               }
-            }
-          })
-          .on("end", () => resolve(logs))
-          .on("error", reject);
-      } catch (error) {
-        reject(error);
-      }
+            })
+            .on("end", () => resolve(logs))
+            .on("error", reject);
+        } catch (error) {
+          reject(error);
+        }
+      })();
     });
   }
 

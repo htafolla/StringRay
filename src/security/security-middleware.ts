@@ -187,7 +187,7 @@ export class SecurityMiddleware {
       data = data.replace(/javascript:/gi, ""); // Protocol injection
     } else if (typeof data === "object" && data !== null) {
       for (const key in data) {
-        if (data.hasOwnProperty(key)) {
+        if (Object.prototype.hasOwnProperty.call(data, key)) {
           data[key] = this.sanitizeInput(data[key]);
         }
       }

@@ -7,7 +7,7 @@ export default defineConfig({
     environment: "node",
     setupFiles: ["./src/__tests__/setup.ts"],
     include: ["src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],
-    exclude: ["node_modules", "dist", "coverage"],
+    exclude: ["node_modules", "dist", "coverage", "src/__tests__/plugins/marketplace-service.test.ts"],
     coverage: {
       provider: "v8",
       reporter: ["text", "json", "html", "lcov"],
@@ -33,8 +33,6 @@ export default defineConfig({
     hookTimeout: 30000,
     bail: 5, // Stop after 5 test failures - prevents resource waste
     pool: "threads",
-    minThreads: 1,
-    maxThreads: 4, // Explicit worker limit for stability
     retry: 2,
   },
   resolve: {

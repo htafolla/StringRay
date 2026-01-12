@@ -76,12 +76,12 @@ jobs:
           dist/
           docs/
 
-   security-scan:
-     needs: build
-     runs-on: ubuntu-latest
-     continue-on-error: true
+  security-scan:
+    needs: build
+    runs-on: ubuntu-latest
+    continue-on-error: true
 
-     steps:
+    steps:
     - uses: actions/checkout@v4
 
     - name: Run Trivy vulnerability scanner

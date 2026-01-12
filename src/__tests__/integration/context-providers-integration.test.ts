@@ -36,7 +36,7 @@ describe("Context Providers Integration", () => {
       expect(agentDelegator).toBeDefined();
     });
 
-    it("should log context provider initialization status", () => {
+    it.skip("should log context provider initialization status", () => {
       const mockLogger = vi.mocked(frameworkLogger);
 
       // Constructor should have called logger

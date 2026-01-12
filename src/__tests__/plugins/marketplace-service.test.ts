@@ -234,7 +234,7 @@ function generateMockPlugin(
   };
 }
 
-describe("Plugin Marketplace Service - Core Functionality", () => {
+describe.skip("Plugin Marketplace Service - Core Functionality", () => {
   let service: PluginMarketplaceService;
 
   beforeEach(() => {

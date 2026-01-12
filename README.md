@@ -1,20 +1,15 @@
-# ⚡ StringRay (StrRay) Framework v1.0.0 – Enterprise AI Agent Coordination Platform
+# ⚡ StringRay (StrRay) v1.0.0 – Bulletproof AI Orchestration for Production-Grade Development
 
-[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/htafolla/StringRay)
+[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/htafolla/strray)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9+-blue.svg)](https://www.typescriptlang.org/)
-[![Tests](https://img.shields.io/badge/tests-833%2F833-brightgreen.svg)](https://github.com/htafolla/StringRay)
-[![Error Prevention](https://img.shields.io/badge/error%20prevention-99.6%25-red.svg)](https://github.com/htafolla/StringRay)
+[![Tests](https://img.shields.io/badge/tests-833%2F833-brightgreen.svg)](https://github.com/htafolla/strray)
+[![Error Prevention](https://img.shields.io/badge/error%20prevention-99.6%25-red.svg)](https://github.com/htafolla/strray)
 
-# StrRay Plugin for oh-my-opencode
+**Enterprise AI agent coordination with systematic error prevention. Zero dead ends. Ship clean, tested, optimized code — every time.**
 
-[![Version](https://img.shields.io/npm/v/oh-my-opencode-strray.svg)](https://www.npmjs.com/package/oh-my-opencode-strray)
-[![License](https://img.shields.io/npm/l/oh-my-opencode-strray.svg)](https://github.com/strray-framework/strray-plugin/blob/main/LICENSE)
-
-**Enterprise AI orchestration with systematic error prevention for oh-my-opencode.**
-
-StrRay enhances oh-my-opencode with intelligent multi-agent coordination, codex-based code quality enforcement, and enterprise-grade development practices. Eliminate spaghetti code, hallucinations, and code rot through systematic validation and intelligent agent delegation.
+StrRay provides intelligent multi-agent coordination, codex-based code quality enforcement, and enterprise-grade development practices. Eliminate spaghetti code, hallucinations, and code rot through systematic validation and intelligent agent delegation.
 
 ---
 
@@ -48,42 +43,46 @@ StrRay enhances oh-my-opencode with intelligent multi-agent coordination, codex-
 
 ### Prerequisites
 
+- Node.js 18+ / Bun (recommended)
+- OpenCode installed & running
+
 ## 📦 Installation
 
 ### Installation
 
 ```bash
-npm install oh-my-opencode-strray
+npm install strray
 ```
 
 ### Setup
 
-After installation, run the setup command:
+**Important:** After installation, you must run the setup command manually:
 
 ```bash
-npx strray_setup
+npx strray init
 ```
+
+**Note:** npm does not run postinstall scripts automatically for local package installations (file paths or tar.gz files) for security reasons. The setup must be run manually.
 
 This will automatically:
 
-- ✅ Add StrRay plugin to your oh-my-opencode configuration
-- ✅ Configure all 8 StrRay agents
+- ✅ Configure all 9 StrRay agents
 - ✅ Enable multi-agent orchestration settings
-- ✅ Set up Claude Code compatibility
+- ✅ Set up configuration for AI development workflows
 
 ### Manual Installation
 
 If automatic setup fails:
 
 ```bash
-npm install oh-my-opencode-strray
+npm install strray
 ```
 
-Then manually add to your `.opencode/oh-my-opencode.json`:
+Then manually add to your development configuration (example for oh-my-opencode):
 
 ```json
 {
-  "plugin": ["oh-my-opencode-strray/dist/plugin/strray-codex-injection.js"],
+  "plugin": ["strray/dist/plugin/strray-codex-injection.js"],
   "agent": {
     "orchestrator": { "model": "opencode/grok-code" },
     "enforcer": { "model": "opencode/grok-code" },
@@ -220,7 +219,7 @@ opencode --version
 cat .opencode/oh-my-opencode.json
 
 # Check for errors
-npm ls oh-my-opencode-strray
+npm ls strray
 ```
 
 ### Agent Commands Not Working
@@ -279,14 +278,14 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 ## 🙏 Acknowledgments
 
-- oh-my-opencode team for the excellent platform
+- Open source AI development communities
 - Claude Code for MCP protocol inspiration
 - The AI engineering community for best practices
 
 ## 📞 Support
 
-- **Issues**: [GitHub Issues](https://github.com/strray-framework/strray-plugin/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/strray-framework/strray-plugin/discussions)
+- **Issues**: [GitHub Issues](https://github.com/htafolla/strray/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/htafolla/strray/discussions)
 - **Documentation**: [StrRay Docs](https://strray.dev)
 
 ---
@@ -308,7 +307,7 @@ npm run init
 
 ### Core Documentation
 
-- **[Installation Guide](./docs/StrRay_INSTALLATION_GUIDE.md)** - Complete setup for oh-my-opencode integration
+- **[Installation Guide](./docs/StrRay_INSTALLATION_GUIDE.md)** - Complete setup and integration guide
 - **[Model Configuration](./docs/StrRay_MODEL_CONFIG.md)** - Model setup with opencode/grok-code assignments
 - **[API Reference](./docs/api/API_REFERENCE.md)** - Developer API documentation for programmatic access
 - **[Agent Documentation](./docs/agents/)** - Detailed specifications for all 8 agents with operating procedures

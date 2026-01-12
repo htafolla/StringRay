@@ -21,7 +21,8 @@ const getSecurityMiddleware = async () => {
       console.warn(
         "Security middleware not available, continuing without security headers",
       );
-      securityMiddleware = (req: Request, res: Response, next: NextFunction) => next(); // No-op middleware
+      securityMiddleware = (req: Request, res: Response, next: NextFunction) =>
+        next(); // No-op middleware
     }
   }
   return securityMiddleware;

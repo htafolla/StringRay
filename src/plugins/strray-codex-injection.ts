@@ -83,19 +83,16 @@ export default async function strrayPlugin(input: {
             });
           }
         } catch (error) {
-          console.log("🤖 StrRay Framework Active - Enterprise AI orchestration enabled");
+          console.log(
+            "🤖 StrRay Framework Active - Enterprise AI orchestration enabled",
+          );
         }
       }
 
       // Inject StrRay codex context
       const codexContext = getStrRayCodexContext();
       if (output.system && Array.isArray(output.system)) {
-        output.system.unshift(
-          codexContext,
-          "",
-          "---",
-          "",
-        );
+        output.system.unshift(codexContext, "", "---", "");
       }
     },
 
@@ -129,7 +126,9 @@ export default async function strrayPlugin(input: {
             });
           }
         } catch (error) {
-          console.log("🤖 StrRay Framework Active - Enterprise AI orchestration enabled");
+          console.log(
+            "🤖 StrRay Framework Active - Enterprise AI orchestration enabled",
+          );
         }
       }
 
@@ -178,7 +177,9 @@ export default async function strrayPlugin(input: {
      * Configuration hook - initialize StrRay components
      */
     config: async (_config: Record<string, unknown>) => {
-      console.log("🤖 StrRay Framework Active - Enterprise AI orchestration enabled");
+      console.log(
+        "🤖 StrRay Framework Active - Enterprise AI orchestration enabled",
+      );
 
       // Display ASCII art banner immediately
       console.log("🎨 Running ASCII art script...");

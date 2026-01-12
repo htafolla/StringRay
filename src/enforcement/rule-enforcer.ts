@@ -616,8 +616,9 @@ export class RuleEnforcer {
       }
 
       // Simple check - if we have exported functions and no tests provided, flag it
-      const exportedFunctions = (newCode.match(/export\s+function\s+\w+/g) || [])
-        .length;
+      const exportedFunctions = (
+        newCode.match(/export\s+function\s+\w+/g) || []
+      ).length;
 
       if (exportedFunctions > 0 && (!tests || tests.length === 0)) {
         // Allow over-engineered code to pass test requirements for edge case

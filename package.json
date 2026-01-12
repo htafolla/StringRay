@@ -6,7 +6,7 @@
   "main": "./dist/plugin/index.js",
   "types": "./dist/plugin/index.d.ts",
   "oh-my-opencode": {
-    "plugin": "./dist/plugin/strray-codex-injection.js"
+    "plugin": "./dist/plugin/plugins/strray-codex-injection.js"
   },
   "bin": {
     "strray_setup": "scripts/setup.cjs"

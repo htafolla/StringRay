@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Request, Response, NextFunction } from "express";
 import { exec } from "child_process";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
@@ -21,14 +21,14 @@ const getSecurityMiddleware = async () => {
       console.warn(
         "Security middleware not available, continuing without security headers",
       );
-      securityMiddleware = (req: any, res: any, next: any) => next(); // No-op middleware
+      securityMiddleware = (req: Request, res: Response, next: NextFunction) => next(); // No-op middleware
     }
   }
   return securityMiddleware;
 };
 
 // Apply security headers middleware lazily
-app.use(async (req, res, next) => {
+app.use(async (req: Request, res: Response, next: NextFunction) => {
   try {
     const middleware = await getSecurityMiddleware();
     return middleware(req, res, next);
@@ -45,7 +45,7 @@ app.use(async (req, res, next) => {
 app.use(express.static(join(__dirname, "public")));
 
 // API endpoints
-app.get("/api/status", (req: any, res: any) => {
+app.get("/api/status", (req: Request, res: Response) => {
   // Return framework status
   res.json({
     framework: "StringRay",

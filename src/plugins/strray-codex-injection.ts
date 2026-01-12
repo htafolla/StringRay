@@ -65,12 +65,32 @@ export default async function strrayPlugin(input: {
     ) => {
       if (!config.codexEnforcement) return;
 
+      // Display ASCII art on first chat interaction
+      if (!(globalThis as any).strrayAsciiShown) {
+        (globalThis as any).strrayAsciiShown = true;
+        console.log("🎨 Displaying StrRay ASCII art...");
+        try {
+          const { execSync } = await import("child_process");
+          const path = await import("path");
+
+          const initScript = path.join(projectDir, ".opencode", "init.sh");
+          const { existsSync } = await import("fs");
+
+          if (existsSync(initScript)) {
+            execSync(`bash "${initScript}"`, {
+              cwd: projectDir,
+              stdio: "inherit",
+            });
+          }
+        } catch (error) {
+          console.log("🤖 StrRay Framework Active - Enterprise AI orchestration enabled");
+        }
+      }
+
       // Inject StrRay codex context
       const codexContext = getStrRayCodexContext();
       if (output.system && Array.isArray(output.system)) {
         output.system.unshift(
-          "🤖 StrRay Framework Active - Enterprise AI orchestration enabled",
-          "",
           codexContext,
           "",
           "---",
@@ -90,6 +110,28 @@ export default async function strrayPlugin(input: {
       _output: unknown,
     ) => {
       if (!config.codexEnforcement) return;
+
+      // Display ASCII art on first tool execution
+      if (!(globalThis as any).strrayAsciiShown) {
+        (globalThis as any).strrayAsciiShown = true;
+        console.log("🎨 Displaying StrRay ASCII art...");
+        try {
+          const { execSync } = await import("child_process");
+          const path = await import("path");
+
+          const initScript = path.join(projectDir, ".opencode", "init.sh");
+          const { existsSync } = await import("fs");
+
+          if (existsSync(initScript)) {
+            execSync(`bash "${initScript}"`, {
+              cwd: projectDir,
+              stdio: "inherit",
+            });
+          }
+        } catch (error) {
+          console.log("🤖 StrRay Framework Active - Enterprise AI orchestration enabled");
+        }
+      }
 
       const { tool, args } = input;
 
@@ -136,6 +178,32 @@ export default async function strrayPlugin(input: {
      * Configuration hook - initialize StrRay components
      */
     config: async (_config: Record<string, unknown>) => {
+      console.log("🤖 StrRay Framework Active - Enterprise AI orchestration enabled");
+
+      // Display ASCII art banner immediately
+      console.log("🎨 Running ASCII art script...");
+      try {
+        const { execSync } = await import("child_process");
+        const path = await import("path");
+
+        const initScript = path.join(projectDir, ".opencode", "init.sh");
+        const { existsSync } = await import("fs");
+
+        console.log(`📁 Checking script at: ${initScript}`);
+        if (existsSync(initScript)) {
+          console.log("✅ Script exists, executing...");
+          const result = execSync(`bash "${initScript}"`, {
+            cwd: projectDir,
+            encoding: "utf8",
+          });
+          console.log("📄 Script output:", result.substring(0, 100));
+        } else {
+          console.log("❌ Script not found");
+        }
+      } catch (error) {
+        console.log("❌ ASCII art execution failed:", error);
+      }
+
       console.log(
         "🚀 StrRay Plugin: Initializing enterprise AI orchestration...",
       );

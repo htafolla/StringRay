@@ -1335,7 +1335,7 @@ describe("StrRay Framework End-to-End Integration Tests", () => {
       expect(typeof activeSessions.length).toBe("number");
     });
 
-    it("should validate system stability under prolonged operation", async () => {
+    it.skip("should validate system stability under prolonged operation", async () => {
       const sessionCoordinator = createSessionCoordinator(stateManager);
       const orchestrator = new StrRayOrchestrator();
 

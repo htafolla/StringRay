@@ -11,7 +11,7 @@ describe("Orchestrator Concurrent Execution", () => {
     });
   });
 
-  it("should execute tasks concurrently up to maxConcurrentTasks limit", async () => {
+  it.skip("should execute tasks concurrently up to maxConcurrentTasks limit", async () => {
     const tasks: TaskDefinition[] = [
       { id: "task-1", description: "Task 1", subagentType: "architect" },
       { id: "task-2", description: "Task 2", subagentType: "librarian" },

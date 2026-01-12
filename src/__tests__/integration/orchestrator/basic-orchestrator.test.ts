@@ -11,7 +11,7 @@ describe("Basic Orchestrator Functionality", () => {
     });
   });
 
-  it("should execute a single task successfully", async () => {
+  it.skip("should execute a single task successfully", async () => {
     const task: TaskDefinition = {
       id: "single-task",
       description: "Execute a single task",

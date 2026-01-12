@@ -827,7 +827,9 @@ describe("Processor Activation", () => {
       expect(results).toHaveLength(1);
 
       // The refactoring logging processor should have executed
-      const loggingResult = results.find(r => r.processorName === "refactoringLogging");
+      const loggingResult = results.find(
+        (r) => r.processorName === "refactoringLogging",
+      );
       expect(loggingResult).toBeDefined();
       expect(loggingResult?.success).toBe(true);
     });

@@ -33,10 +33,7 @@
     "slack": false,
     "datadog": false
   },
-  "plugin": [
-    "oh-my-opencode",
-    ".opencode/plugin/strray-codex-injection.ts"
-  ],
+  "plugin": ["oh-my-opencode", ".opencode/plugin/strray-codex-injection.ts"],
   "claude_code": {
     "mcp": true,
     "commands": true,

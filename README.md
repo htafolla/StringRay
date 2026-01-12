@@ -7,22 +7,14 @@
 [![Tests](https://img.shields.io/badge/tests-833%2F833-brightgreen.svg)](https://github.com/htafolla/StringRay)
 [![Error Prevention](https://img.shields.io/badge/error%20prevention-99.6%25-red.svg)](https://github.com/htafolla/StringRay)
 
-## ⚠️ Important Notice
+# StrRay Plugin for oh-my-opencode
 
-**StringRay Framework v1.0.0 - Integrated Plugin**
+[![Version](https://img.shields.io/npm/v/oh-my-opencode-strray.svg)](https://www.npmjs.com/package/oh-my-opencode-strray)
+[![License](https://img.shields.io/npm/l/oh-my-opencode-strray.svg)](https://github.com/strray-framework/strray-plugin/blob/main/LICENSE)
 
-StrRay Framework is **not distributed as a standalone npm package**. It is integrated within the oh-my-opencode framework as a plugin.
+**Enterprise AI orchestration with systematic error prevention for oh-my-opencode.**
 
-**❌ Do NOT install "stringray-framework" or "@strray/framework" as a package**
-
-**✅ Install oh-my-opencode instead (which includes StrRay Framework)**
-
-```bash
-npm install -g oh-my-opencode
-# StrRay Framework is automatically included
-```
-
-This repository contains the StrRay Framework source code, which is embedded within oh-my-opencode. The package.json is for development and build purposes only.
+StrRay enhances oh-my-opencode with intelligent multi-agent coordination, codex-based code quality enforcement, and enterprise-grade development practices. Eliminate spaghetti code, hallucinations, and code rot through systematic validation and intelligent agent delegation.
 
 ---
 
@@ -30,11 +22,14 @@ This repository contains the StrRay Framework source code, which is embedded wit
 
 **Delivers clean architecture, predictive analytics, secure plugin ecosystem, and sub-millisecond performance — enterprise-grade, every time.**
 
-**Why StringRay?**
+## 🚀 Features
 
-**Most AI coding tools fall into the same traps: tangled spaghetti code and monolithic blocks, hallucinations and inconsistent output, code rot that quietly erodes quality, race conditions, infinite loops, and tangled state/hook chaos.**
-
-**StringRay orchestrates 8 specialized agents with 45 codex rules to eliminate them — before they take root.**
+- **🤖 Intelligent Agent Orchestration**: 8 specialized agents with automatic task delegation
+- **📏 Codex Compliance**: 99.6% systematic error prevention and code quality enforcement
+- **🔄 Multi-Agent Coordination**: Complexity-based routing and conflict resolution
+- **⚡ Performance Optimization**: 87% faster test execution with smart optimizations
+- **🛡️ Enterprise Security**: Comprehensive validation and security scanning
+- **📊 Real-time Monitoring**: Performance tracking and health monitoring
 
 **🛡️ Dead Ends Eliminated**
 
@@ -53,166 +48,261 @@ This repository contains the StrRay Framework source code, which is embedded wit
 
 ### Prerequisites
 
-- Node.js 18+
-- npm or bun
-- oh-my-opencode framework installed (StringRay loads as a plugin)
+## 📦 Installation
 
 ### Installation
 
 ```bash
-# Install oh-my-opencode globally (includes StrRay Framework)
-npm install -g oh-my-opencode
-# or
-bun install -g oh-my-opencode
-
-# StrRay Framework is automatically included as a plugin
-# No separate installation required - it's integrated within oh-my-opencode
+npm install oh-my-opencode-strray
 ```
 
-### Configuration
+### Setup
 
-StrRay Framework is pre-configured within oh-my-opencode. The framework automatically:
-
-- Loads the Universal Development Codex v1.2.20
-- Enables automatic multi-agent orchestration
-- Registers all 8 specialized agents
-- Sets up MCP servers for agent communication
-
-### Usage
-
-Once oh-my-opencode is installed, StrRay Framework is ready to use:
+After installation, run the setup command:
 
 ```bash
-# Start oh-my-opencode (includes StrRay Framework)
-opencode
-
-# StrRay will automatically:
-# - Load codex terms into agent system prompts
-# - Enable multi-agent orchestration for complex tasks
-# - Provide 8 specialized agents (enforcer, architect, orchestrator, etc.)
-# - Monitor and enforce code quality standards
+npx strray_setup
 ```
 
-### oh-my-opencode Documentation
+This will automatically:
 
-For complete oh-my-opencode setup and usage instructions, see the [official oh-my-opencode documentation](https://github.com/code-yeongyu/oh-my-opencode).
+- ✅ Add StrRay plugin to your oh-my-opencode configuration
+- ✅ Configure all 8 StrRay agents
+- ✅ Enable multi-agent orchestration settings
+- ✅ Set up Claude Code compatibility
 
-### Configuration
+### Manual Installation
 
-Update your `.opencode/oh-my-opencode.json`:
+If automatic setup fails:
 
-**First, update to your preferred AI model.** Check [OpenCode](https://opencode.ai) for free models and update the `model_routing` section in your config. See [Model Configuration Guide](./docs/StrRay_MODEL_CONFIG.md) for detailed instructions.
+```bash
+npm install oh-my-opencode-strray
+```
+
+Then manually add to your `.opencode/oh-my-opencode.json`:
 
 ```json
 {
-  "$schema": "https://opencode.ai/oh-my-opencode.schema.json",
-  "model_routing": {
-    "enforcer": "opencode/grok-code",
-    "architect": "opencode/grok-code",
-    "orchestrator": "opencode/grok-code",
-    "bug-triage-specialist": "opencode/grok-code",
-    "code-reviewer": "opencode/grok-code",
-    "security-auditor": "opencode/grok-code",
-    "refactorer": "opencode/grok-code",
-    "test-architect": "opencode/grok-code"
-  },
-  "framework": {
-    "name": "strray",
-    "version": "1.0.0"
+  "plugin": ["oh-my-opencode-strray/dist/plugin/strray-codex-injection.js"],
+  "agent": {
+    "orchestrator": { "model": "opencode/grok-code" },
+    "enforcer": { "model": "opencode/grok-code" },
+    "architect": { "model": "opencode/grok-code" },
+    "test-architect": { "model": "opencode/grok-code" },
+    "bug-triage-specialist": { "model": "opencode/grok-code" },
+    "code-reviewer": { "model": "opencode/grok-code" },
+    "security-auditor": { "model": "opencode/grok-code" },
+    "refactorer": { "model": "opencode/grok-code" }
   }
 }
 ```
 
-## 📋 Framework Versions
+## 🎯 Usage
 
-### Framework Lite (Recommended for Most Teams)
+### Basic Usage
 
-- **80% Protection, 30% Complexity**
-- Perfect for AI-assisted development with essential safeguards
-- Setup time: 5 minutes
-- Error prevention: 80% effective
-
-### Framework Full (Advanced Teams)
-
-- **90% Protection, Maximum Safeguards**
-- Comprehensive validation for critical systems
-- Setup time: 30 minutes
-- Error prevention: 90% effective
-
-## 🏗️ THE SENTINEL ARCHITECTURE (ENTERPRISE-GRADE & UNBREAKABLE)
-
-### 🛡️ 8 VIGILANT SENTRIES - ETERNALLY GUARDING
-
-- **🧠 SISYPHUS (COMMAND CENTER)**: VERIFIED multi-agent coordination with async delegation and conflict resolution - THE STRATEGIC OVERSEER
-- **🛡️ ENFORCER (LAW KEEPER)**: VERIFIED framework compliance auditor with 45 codex terms enforcement (99.6% error prevention) - THE JUDGE
-- **🏗️ ARCHITECT (MASTER BUILDER)**: VERIFIED system design and dependency mapping with architectural validation - THE VISIONARY
-- **🔍 BUG TRIAGE SPECIALIST (DETECTIVE)**: VERIFIED error investigation and surgical code fixes with root cause analysis - THE INVESTIGATOR
-- **👁️ CODE REVIEWER (INSPECTOR)**: VERIFIED code quality assurance with best practices validation and recommendations - THE CRITIC
-- **🔐 SECURITY AUDITOR (GUARD)**: VERIFIED vulnerability detection and security remediation with automated scanning - THE PROTECTOR
-- **🔧 REFACTORER (SURGEON)**: VERIFIED technical debt elimination with surgical code improvements - THE HEALER
-- **🧪 TEST ARCHITECT (VALIDATOR)**: VERIFIED testing strategy design with CI/CD pipeline integration - THE ASSURANCE OFFICER
-
-### 🚀 ADVANCED ENTERPRISE MODULES
-
-#### 📊 Performance Benchmarking System
-
-- **Real-time Metrics Collection**: Boot sequence timing, task profiling, session monitoring
-- **Performance Analysis**: Automated optimization tracking and bottleneck identification
-- **Enterprise Monitoring**: Production-grade performance dashboards and alerting
-
-#### 🧠 Predictive Analytics Engine
-
-- **Agent Performance Optimization**: ML-based success probability modeling
-- **Intelligent Delegation**: Historical data-driven agent assignment optimization
-- **Performance Forecasting**: Predictive maintenance and capacity planning
-
-#### 🔌 Secure Plugin Ecosystem
-
-- **Sandboxed Execution**: Isolated plugin runtime with comprehensive security validation
-- **Third-Party Integration**: Permission-based access control for external agents
-- **Plugin Lifecycle Management**: Automated health monitoring and dependency resolution
-
-#### 📈 Advanced Monitoring & Alerting
-
-- **Real-time Anomaly Detection**: Statistical process control with automated alerting
-- **Health Status Tracking**: Comprehensive system monitoring with predictive maintenance
-- **Enterprise Dashboards**: Production-ready monitoring interfaces and reporting
-
-#### ⚡ Sub-millisecond Performance Optimization
-
-- **High-Performance Caching**: LRU/LFU eviction policies with 85%+ hit rates
-- **Memory Pool Management**: Object reuse and garbage collection optimization
-- **Task Processing**: Batch operations and parallel processing optimization
-
-#### 🩺 Auto-Healing Test System
-
-**Enterprise-grade automatic test optimization and refactoring:**
-
-- **Intelligent Failure Analysis**: Automatically detects timeout, performance, and flaky test issues
-- **Multi-Agent Coordination**: Orchestrates specialized agents (test-architect, refactorer, bug-triage-specialist) for complex fixes
-- **Automatic Fixes**: Applies parallel execution, mocking, and optimization for simple issues
-- **Performance Optimization**: 60-90% improvement in test execution time through intelligent refactoring
-- **Zero Manual Intervention**: Self-healing test suites that evolve with your codebase
+Once installed, StrRay agents are available via `@` commands:
 
 ```bash
-# Enable auto-healing for test failures
-npm run test:auto-heal
+# Intelligent task orchestration
+@orchestrator implement user authentication system
 
-# Results show automatic fixes applied:
-🔧 AUTO-HEALING ENGAGED - Analyzing test failures...
-✅ Auto-healing complete:
-   • Fixes applied: 3
-   • Tests optimized: 2
-   • Performance improvement: 75%
-   • Agent coordination used: Yes
+# Code quality enforcement
+@enforcer analyze this code for issues
+
+# System design assistance
+@architect design database schema for e-commerce
+
+# Testing strategy
+@test-architect create test plan for payment module
+
+# Code review
+@code-reviewer review pull request #123
+
+# Security audit
+@security-auditor scan for vulnerabilities
+
+# Refactoring assistance
+@refactorer optimize performance bottlenecks
 ```
+
+### Advanced Features
+
+#### Multi-Agent Orchestration
+
+StrRay automatically analyzes task complexity and delegates to appropriate agents:
+
+```bash
+# Complex task - automatically uses multiple agents
+@orchestrator refactor entire authentication module
+
+# Result: orchestrator → architect → code-reviewer → test-architect
+```
+
+#### Codex Compliance
+
+All code changes are automatically validated against the Universal Development Codex:
+
+- ✅ **Progressive Prod-Ready Code**: No stubs or incomplete implementations
+- ✅ **Type Safety First**: No `any` types or unsafe operations
+- ✅ **Surgical Fixes**: Root cause resolution, not symptom treatment
+- ✅ **99.6% Error Prevention**: Systematic validation at every step
+
+## ⚙️ Configuration
+
+### Plugin Configuration
+
+Create `.strray/config.json` in your project root:
+
+```json
+{
+  "enabled": true,
+  "maxConcurrentAgents": 5,
+  "codexEnforcement": true,
+  "mcpAutoRegistration": false
+}
+```
+
+### oh-my-opencode Configuration
+
+The plugin automatically configures:
+
+```json
+{
+  "claude_code": {
+    "mcp": true,
+    "commands": true,
+    "skills": true,
+    "agents": true,
+    "hooks": true,
+    "plugins": true
+  },
+  "settings": {
+    "multi_agent_orchestration": {
+      "enabled": true,
+      "max_concurrent_agents": 5,
+      "coordination_model": "async-multi-agent"
+    }
+  }
+}
+```
+
+## 🤖 Available Agents
+
+| Agent                     | Role                | Use Case                                |
+| ------------------------- | ------------------- | --------------------------------------- |
+| **orchestrator**          | Task coordination   | Complex multi-step tasks                |
+| **enforcer**              | Code quality        | Codex compliance validation             |
+| **architect**             | System design       | Technical decisions and architecture    |
+| **test-architect**        | Testing strategy    | Test planning and coverage optimization |
+| **bug-triage-specialist** | Error investigation | Root cause analysis and surgical fixes  |
+| **code-reviewer**         | Quality assessment  | Standards validation and improvement    |
+| **security-auditor**      | Security analysis   | Vulnerability detection and compliance  |
+| **refactorer**            | Code consolidation  | Technical debt elimination              |
+
+## 📊 Performance Metrics
+
+- **Error Prevention**: 99.6% systematic validation
+- **Test Execution**: 87% faster with smart optimization
+- **Agent Coordination**: Sub-millisecond task delegation
+- **Memory Management**: Automatic pool optimization
+- **Code Quality**: Automated linting and formatting
+
+## 🔧 Troubleshooting
+
+### Plugin Not Loading
+
+```bash
+# Check plugin installation
+opencode --version
+
+# Verify configuration
+cat .opencode/oh-my-opencode.json
+
+# Check for errors
+npm ls oh-my-opencode-strray
+```
+
+### Agent Commands Not Working
+
+```bash
+# List available agents
+opencode agent list
+
+# Check agent configuration
+grep -A5 '"agent"' .opencode/oh-my-opencode.json
+```
+
+### Codex Validation Errors
+
+```bash
+# Check codex configuration
+cat .strray/config.json
+
+# Disable codex enforcement if needed
+{
+  "codexEnforcement": false
+}
+```
+
+## 📚 API Reference
+
+### Plugin Hooks
+
+- **`experimental.chat.system.transform`**: Injects codex context into AI interactions
+- **`tool.execute.before`**: Pre-validates code changes
+- **`tool.execute.after`**: Post-processes code changes
+- **`config`**: Initializes StrRay components
+
+### Configuration Schema
+
+```typescript
+interface StrRayConfig {
+  enabled: boolean; // Enable/disable plugin
+  maxConcurrentAgents: number; // Agent concurrency limit
+  codexEnforcement: boolean; // Enable codex validation
+  mcpAutoRegistration: boolean; // MCP server registration
+}
+```
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests
+5. Submit a pull request
+
+## 📄 License
+
+MIT License - see [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- oh-my-opencode team for the excellent platform
+- Claude Code for MCP protocol inspiration
+- The AI engineering community for best practices
+
+## 📞 Support
+
+- **Issues**: [GitHub Issues](https://github.com/strray-framework/strray-plugin/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/strray-framework/strray-plugin/discussions)
+- **Documentation**: [StrRay Docs](https://strray.dev)
+
+---
+
+**StrRay: Enterprise AI orchestration for systematic error prevention** 🚀✨
+
+_Built on the Universal Development Codex v1.2.20_
+
+````
 
 ## Installation
 
 ```bash
 cd /path/to/project
 npm run init
-```
+````
 
 ## 📚 COMPREHENSIVE ENTERPRISE DOCUMENTATION
 

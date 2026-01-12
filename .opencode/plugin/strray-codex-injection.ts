@@ -243,61 +243,6 @@ function formatCodexContext(contexts: CodexContextEntry[]): string {
 }
 
 /**
- * Register StrRay MCP servers with oh-my-opencode
- */
-async function registerStrRayMcpServers(directory: string, logger: PluginLogger): Promise<void> {
-  logger.log("🔧 Auto-registering StrRay MCP servers...");
-
-  // Define StrRay MCP servers to register
-  const strrayMcpServers = [
-    { name: "enforcer", command: "node dist/mcps/enforcer-tools.server.js" },
-    { name: "orchestrator", command: "node dist/mcps/orchestrator.server.js" },
-    { name: "enhanced-orchestrator", command: "node dist/mcps/enhanced-orchestrator.server.js" },
-    { name: "project-analysis", command: "node dist/mcps/knowledge-skills/project-analysis.server.js" },
-    { name: "testing-strategy", command: "node dist/mcps/knowledge-skills/testing-strategy.server.js" },
-    { name: "architecture-patterns", command: "node dist/mcps/knowledge-skills/architecture-patterns.server.js" },
-    { name: "performance-optimization", command: "node dist/mcps/knowledge-skills/performance-optimization.server.js" },
-    { name: "git-workflow", command: "node dist/mcps/knowledge-skills/git-workflow.server.js" },
-    { name: "api-design", command: "node dist/mcps/knowledge-skills/api-design.server.js" },
-    { name: "security-audit", command: "node dist/mcps/knowledge-skills/security-audit.server.js" },
-    { name: "ui-ux-design", command: "node dist/mcps/knowledge-skills/ui-ux-design.server.js" },
-    { name: "refactoring-strategies", command: "node dist/mcps/knowledge-skills/refactoring-strategies.server.js" },
-    { name: "testing-best-practices", command: "node dist/mcps/knowledge-skills/testing-best-practices.server.js" },
-  ];
-
-  // Try to register each MCP server
-  for (const server of strrayMcpServers) {
-    try {
-      // Check if server file exists
-      const serverPath = path.join(directory, server.command.split(' ')[1]);
-      if (!fs.existsSync(serverPath)) {
-        logger.log(`⚠️ MCP server file not found: ${serverPath}`);
-        continue;
-      }
-
-      // Attempt to register with oh-my-opencode
-      const { stderr } = await spawnPromise(
-        "opencode",
-        ["mcp", "add", server.name, server.command],
-        directory
-      );
-
-      if (stderr && stderr.trim().length > 0) {
-        logger.log(`⚠️ MCP registration warning for ${server.name}: ${stderr.trim()}`);
-      } else {
-        logger.log(`✅ MCP server registered: ${server.name}`);
-      }
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      logger.log(`⚠️ Failed to register MCP server ${server.name}: ${errorMessage}`);
-      // Continue with other servers even if one fails
-    }
-  }
-
-  logger.log("🎉 MCP server auto-registration complete");
-}
-
-/**
  * Main plugin function
  *
  * This plugin hooks into experimental.chat.system.transform event
@@ -437,7 +382,9 @@ export default async function strrayCodexPlugin(input: {
 
     config: async (_config: Record<string, unknown>) => {
       const logger = await getOrCreateLogger(directory);
-      logger.log("🔧 Plugin config hook triggered - initializing StrRay integration");
+      logger.log(
+        "🔧 Plugin config hook triggered - initializing StrRay integration",
+      );
 
       // Initialize StrRay framework
       const initScriptPath = path.join(directory, ".opencode", "init.sh");
@@ -459,9 +406,6 @@ export default async function strrayCodexPlugin(input: {
         }
       }
 
-      // Auto-register StrRay MCP servers with oh-my-opencode
-      logger.log("🚀 Starting MCP server auto-registration");
-      await registerStrRayMcpServers(directory, logger);
       logger.log("✅ Plugin config hook completed");
     },
   };

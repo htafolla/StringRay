@@ -269,48 +269,49 @@ export class RuleEnforcer {
       validator: this.validateDeploymentSafety.bind(this),
     });
 
-     // Development Triage Rule: Clean Debug Logs
-     this.addRule({
-       id: "clean-debug-logs",
-       name: "Clean Debug Logs (Development Triage)",
-       description:
-         "Ensures debug logs are removed before production deployment",
-       category: "code-quality",
-       severity: "error",
-       enabled: true,
-       validator: this.validateCleanDebugLogs.bind(this),
-     });
+    // Development Triage Rule: Clean Debug Logs
+    this.addRule({
+      id: "clean-debug-logs",
+      name: "Clean Debug Logs (Development Triage)",
+      description:
+        "Ensures debug logs are removed before production deployment",
+      category: "code-quality",
+      severity: "error",
+      enabled: true,
+      validator: this.validateCleanDebugLogs.bind(this),
+    });
 
-     // Reporting Rules - Integrated with existing framework
-     this.addRule({
-       id: "test-failure-reporting",
-       name: "Test Failure Report Generation",
-       description: "Automatically generates reports when tests fail",
-       category: "reporting",
-       severity: "warning",
-       enabled: true,
-       validator: this.validateTestFailureReporting.bind(this),
-     });
+    // Reporting Rules - Integrated with existing framework
+    this.addRule({
+      id: "test-failure-reporting",
+      name: "Test Failure Report Generation",
+      description: "Automatically generates reports when tests fail",
+      category: "reporting",
+      severity: "warning",
+      enabled: true,
+      validator: this.validateTestFailureReporting.bind(this),
+    });
 
-     this.addRule({
-       id: "performance-regression-reporting",
-       name: "Performance Regression Report Generation",
-       description: "Generates reports when performance regressions are detected",
-       category: "reporting",
-       severity: "warning",
-       enabled: true,
-       validator: this.validatePerformanceRegressionReporting.bind(this),
-     });
+    this.addRule({
+      id: "performance-regression-reporting",
+      name: "Performance Regression Report Generation",
+      description:
+        "Generates reports when performance regressions are detected",
+      category: "reporting",
+      severity: "warning",
+      enabled: true,
+      validator: this.validatePerformanceRegressionReporting.bind(this),
+    });
 
-     this.addRule({
-       id: "security-vulnerability-reporting",
-       name: "Security Vulnerability Report Generation",
-       description: "Automatically reports security vulnerabilities found",
-       category: "reporting",
-       severity: "error",
-       enabled: true,
-       validator: this.validateSecurityVulnerabilityReporting.bind(this),
-     });
+    this.addRule({
+      id: "security-vulnerability-reporting",
+      name: "Security Vulnerability Report Generation",
+      description: "Automatically reports security vulnerabilities found",
+      category: "reporting",
+      severity: "error",
+      enabled: true,
+      validator: this.validateSecurityVulnerabilityReporting.bind(this),
+    });
 
     // Phase 3: Multi-Agent Ensemble Rule
     this.addRule({
@@ -412,9 +413,15 @@ export class RuleEnforcer {
   /**
    * Get rule statistics
    */
-  getRuleStats(): { totalRules: number; enabledRules: number; disabledRules: number } {
+  getRuleStats(): {
+    totalRules: number;
+    enabledRules: number;
+    disabledRules: number;
+  } {
     const totalRules = this.rules.size;
-    const enabledRules = Array.from(this.rules.values()).filter(rule => rule.enabled).length;
+    const enabledRules = Array.from(this.rules.values()).filter(
+      (rule) => rule.enabled,
+    ).length;
     const disabledRules = totalRules - enabledRules;
 
     return { totalRules, enabledRules, disabledRules };
@@ -1647,125 +1654,149 @@ export class RuleEnforcer {
   }
 
   /**
-    * Validate security by design (Codex Term #29)
-    */
-   private async validateSecurityByDesign(
-     context: RuleValidationContext,
-   ): Promise<RuleValidationResult> {
-     const { newCode, operation } = context;
+   * Validate security by design (Codex Term #29)
+   */
+  private async validateSecurityByDesign(
+    context: RuleValidationContext,
+  ): Promise<RuleValidationResult> {
+    const { newCode, operation } = context;
 
-     if (!newCode || operation !== "write") {
-       return { passed: true, message: "No code to validate for security" };
-     }
-
-     const violations: string[] = [];
-     const suggestions: string[] = [];
-
-     // Check for user input handling without validation (skip for safe contexts)
-     const userInputs = newCode.match(/(?:req\.body|req\.query|req\.params)/g);
-     const hasInputKeyword =
-       newCode.includes("input") &&
-       (newCode.includes("function") || newCode.includes("validate"));
-
-     if (
-       (userInputs || hasInputKeyword) &&
-       !newCode.includes("useContext") &&
-       !newCode.includes("Context.") &&
-       !newCode.includes("performance") &&
-       !newCode.includes("optimized") &&
-       !newCode.includes("internal") &&
-       !newCode.includes("utility")
-     ) {
-       // Look for validation patterns
-       const hasValidation =
-         newCode.includes("validate") ||
-         newCode.includes("sanitize") ||
-         newCode.includes("zod") ||
-         newCode.includes("joi") ||
-         newCode.includes("yup") ||
-         newCode.includes("express-validator");
-
-       if (!hasValidation) {
-         violations.push("User input handling detected without validation");
-         suggestions.push("Add input validation and sanitization");
-       }
-     }
-
-     // Check for SQL injection patterns
-
-     if (violations.length > 0) {
-       return {
-         passed: false,
-         message: `Security violations: ${violations.join(", ")}`,
-         suggestions,
-       };
-     }
-
-      return { passed: true, message: "Security by design principles followed" };
+    if (!newCode || operation !== "write") {
+      return { passed: true, message: "No code to validate for security" };
     }
 
-    // Missing validator methods need to be implemented
-    // For now, return basic implementations
+    const violations: string[] = [];
+    const suggestions: string[] = [];
 
-    private async validateContinuousIntegration(
-      context: RuleValidationContext,
-    ): Promise<RuleValidationResult> {
-      return { passed: true, message: "Continuous integration validation placeholder" };
+    // Check for user input handling without validation (skip for safe contexts)
+    const userInputs = newCode.match(/(?:req\.body|req\.query|req\.params)/g);
+    const hasInputKeyword =
+      newCode.includes("input") &&
+      (newCode.includes("function") || newCode.includes("validate"));
+
+    if (
+      (userInputs || hasInputKeyword) &&
+      !newCode.includes("useContext") &&
+      !newCode.includes("Context.") &&
+      !newCode.includes("performance") &&
+      !newCode.includes("optimized") &&
+      !newCode.includes("internal") &&
+      !newCode.includes("utility")
+    ) {
+      // Look for validation patterns
+      const hasValidation =
+        newCode.includes("validate") ||
+        newCode.includes("sanitize") ||
+        newCode.includes("zod") ||
+        newCode.includes("joi") ||
+        newCode.includes("yup") ||
+        newCode.includes("express-validator");
+
+      if (!hasValidation) {
+        violations.push("User input handling detected without validation");
+        suggestions.push("Add input validation and sanitization");
+      }
     }
 
-    private async validateDeploymentSafety(
-      context: RuleValidationContext,
-    ): Promise<RuleValidationResult> {
-      return { passed: true, message: "Deployment safety validation placeholder" };
+    // Check for SQL injection patterns
+
+    if (violations.length > 0) {
+      return {
+        passed: false,
+        message: `Security violations: ${violations.join(", ")}`,
+        suggestions,
+      };
     }
 
-    private async validateCleanDebugLogs(
-      context: RuleValidationContext,
-    ): Promise<RuleValidationResult> {
-      return { passed: true, message: "Clean debug logs validation placeholder" };
-    }
+    return { passed: true, message: "Security by design principles followed" };
+  }
 
-    private async validateTestFailureReporting(
-      context: RuleValidationContext,
-    ): Promise<RuleValidationResult> {
-      return { passed: true, message: "Test failure reporting validation placeholder" };
-    }
+  // Missing validator methods need to be implemented
+  // For now, return basic implementations
 
-    private async validatePerformanceRegressionReporting(
-      context: RuleValidationContext,
-    ): Promise<RuleValidationResult> {
-      return { passed: true, message: "Performance regression reporting validation placeholder" };
-    }
+  private async validateContinuousIntegration(
+    context: RuleValidationContext,
+  ): Promise<RuleValidationResult> {
+    return {
+      passed: true,
+      message: "Continuous integration validation placeholder",
+    };
+  }
 
-    private async validateSecurityVulnerabilityReporting(
-      context: RuleValidationContext,
-    ): Promise<RuleValidationResult> {
-      return { passed: true, message: "Security vulnerability reporting validation placeholder" };
-    }
+  private async validateDeploymentSafety(
+    context: RuleValidationContext,
+  ): Promise<RuleValidationResult> {
+    return {
+      passed: true,
+      message: "Deployment safety validation placeholder",
+    };
+  }
 
-    private async validateMultiAgentEnsemble(
-      context: RuleValidationContext,
-    ): Promise<RuleValidationResult> {
-      return { passed: true, message: "Multi-agent ensemble validation placeholder" };
-    }
+  private async validateCleanDebugLogs(
+    context: RuleValidationContext,
+  ): Promise<RuleValidationResult> {
+    return { passed: true, message: "Clean debug logs validation placeholder" };
+  }
 
-    private async validateSubstrateExternalization(
-      context: RuleValidationContext,
-    ): Promise<RuleValidationResult> {
-      return { passed: true, message: "Substrate externalization validation placeholder" };
-    }
+  private async validateTestFailureReporting(
+    context: RuleValidationContext,
+  ): Promise<RuleValidationResult> {
+    return {
+      passed: true,
+      message: "Test failure reporting validation placeholder",
+    };
+  }
 
-    private async validateFrameworkSelfValidation(
-      context: RuleValidationContext,
-    ): Promise<RuleValidationResult> {
-      return { passed: true, message: "Framework self-validation placeholder" };
-    }
+  private async validatePerformanceRegressionReporting(
+    context: RuleValidationContext,
+  ): Promise<RuleValidationResult> {
+    return {
+      passed: true,
+      message: "Performance regression reporting validation placeholder",
+    };
+  }
 
-    private async validateEmergentImprovement(
-      context: RuleValidationContext,
-    ): Promise<RuleValidationResult> {
-      return { passed: true, message: "Emergent improvement validation placeholder" };
-    }
+  private async validateSecurityVulnerabilityReporting(
+    context: RuleValidationContext,
+  ): Promise<RuleValidationResult> {
+    return {
+      passed: true,
+      message: "Security vulnerability reporting validation placeholder",
+    };
+  }
+
+  private async validateMultiAgentEnsemble(
+    context: RuleValidationContext,
+  ): Promise<RuleValidationResult> {
+    return {
+      passed: true,
+      message: "Multi-agent ensemble validation placeholder",
+    };
+  }
+
+  private async validateSubstrateExternalization(
+    context: RuleValidationContext,
+  ): Promise<RuleValidationResult> {
+    return {
+      passed: true,
+      message: "Substrate externalization validation placeholder",
+    };
+  }
+
+  private async validateFrameworkSelfValidation(
+    context: RuleValidationContext,
+  ): Promise<RuleValidationResult> {
+    return { passed: true, message: "Framework self-validation placeholder" };
+  }
+
+  private async validateEmergentImprovement(
+    context: RuleValidationContext,
+  ): Promise<RuleValidationResult> {
+    return {
+      passed: true,
+      message: "Emergent improvement validation placeholder",
+    };
+  }
 }
 
 // Export singleton instance

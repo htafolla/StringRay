@@ -23,7 +23,9 @@ export interface PipelineResult {
 /**
  * Execute complete end-to-end simulation of StrRay pipeline
  */
-export async function executeCompleteE2ESimulation(userPrompt: string): Promise<PipelineResult> {
+export async function executeCompleteE2ESimulation(
+  userPrompt: string,
+): Promise<PipelineResult> {
   const startTime = Date.now();
   const phases: string[] = [];
 
@@ -42,7 +44,7 @@ export async function executeCompleteE2ESimulation(userPrompt: string): Promise<
     const processedPrompt = {
       original: userPrompt,
       enriched: `${userPrompt} [context-enriched]`,
-      codexInjected: true
+      codexInjected: true,
     };
 
     console.log("✅ Prompt processed and context enriched");
@@ -56,7 +58,7 @@ export async function executeCompleteE2ESimulation(userPrompt: string): Promise<
     const orchestrator = new StrRayOrchestrator({
       maxConcurrentTasks: 3,
       taskTimeout: 300000,
-      conflictResolutionStrategy: "expert_priority"
+      conflictResolutionStrategy: "expert_priority",
     });
 
     console.log("✅ Orchestrator initialized with session management");
@@ -86,26 +88,31 @@ export async function executeCompleteE2ESimulation(userPrompt: string): Promise<
       {
         id: "analyze-requirements",
         description: "Analyze user requirements and break down into tasks",
-        subagentType: "architect"
+        subagentType: "architect",
       },
       {
         id: "validate-approach",
         description: "Validate technical approach against codex rules",
         subagentType: "enforcer",
-        dependencies: ["analyze-requirements"]
+        dependencies: ["analyze-requirements"],
       },
       {
         id: "implement-solution",
         description: "Implement the validated solution",
         subagentType: "test-architect",
-        dependencies: ["analyze-requirements", "validate-approach"]
-      }
+        dependencies: ["analyze-requirements", "validate-approach"],
+      },
     ];
 
-    const executionResults = await orchestrator.executeComplexTask(taskDescription, tasks);
-    const successfulTasks = executionResults.filter(r => r.success).length;
+    const executionResults = await orchestrator.executeComplexTask(
+      taskDescription,
+      tasks,
+    );
+    const successfulTasks = executionResults.filter((r) => r.success).length;
 
-    console.log(`✅ Agent execution completed: ${successfulTasks}/${tasks.length} tasks successful`);
+    console.log(
+      `✅ Agent execution completed: ${successfulTasks}/${tasks.length} tasks successful`,
+    );
     console.log("");
 
     // Phase 5: MCP Integration
@@ -115,14 +122,16 @@ export async function executeCompleteE2ESimulation(userPrompt: string): Promise<
 
     // Simulate MCP integration
     const mcpCalls = ["code-review", "security-audit", "testing-strategy"];
-    const mcpResults = mcpCalls.map(server => ({
+    const mcpResults = mcpCalls.map((server) => ({
       server,
       success: Math.random() > 0.1, // 90% success rate
-      executionTime: Math.floor(Math.random() * 5000) + 1000
+      executionTime: Math.floor(Math.random() * 5000) + 1000,
     }));
 
-    const successfulMCP = mcpResults.filter(r => r.success).length;
-    console.log(`✅ MCP integration completed: ${successfulMCP}/${mcpCalls.length} servers responded`);
+    const successfulMCP = mcpResults.filter((r) => r.success).length;
+    console.log(
+      `✅ MCP integration completed: ${successfulMCP}/${mcpCalls.length} servers responded`,
+    );
     console.log("");
 
     // Phase 6: Result Processing
@@ -134,7 +143,7 @@ export async function executeCompleteE2ESimulation(userPrompt: string): Promise<
     const processedResults = {
       consolidatedOutput: "Comprehensive solution generated",
       qualityScore: 95,
-      validationPassed: true
+      validationPassed: true,
     };
 
     console.log("✅ Results processed and quality validated");
@@ -149,7 +158,7 @@ export async function executeCompleteE2ESimulation(userPrompt: string): Promise<
       totalExecutionTime: Date.now() - startTime,
       agentUtilization: 85,
       mcpEfficiency: 92,
-      qualityImprovement: 78
+      qualityImprovement: 78,
     };
 
     console.log("✅ Analytics generated and monitoring completed");
@@ -167,12 +176,17 @@ export async function executeCompleteE2ESimulation(userPrompt: string): Promise<
     console.log(`Performance Improvement: ${performanceImprovement}%`);
     console.log(`Pipeline Coverage: 100%`);
 
-    await frameworkLogger.log("e2e-simulation", "simulation-complete", "success", {
-      executionTime,
-      phasesCompleted: phases.length,
-      performanceImprovement,
-      pipelineCoverage: 100
-    });
+    await frameworkLogger.log(
+      "e2e-simulation",
+      "simulation-complete",
+      "success",
+      {
+        executionTime,
+        phasesCompleted: phases.length,
+        performanceImprovement,
+        pipelineCoverage: 100,
+      },
+    );
 
     return {
       success: true,
@@ -181,17 +195,16 @@ export async function executeCompleteE2ESimulation(userPrompt: string): Promise<
       metrics: {
         totalPhases: 7,
         completedPhases: phases.length,
-        performanceImprovement
+        performanceImprovement,
       },
       results: {
         processedPrompt,
         executionResults,
         mcpResults,
         processedResults,
-        analytics
-      }
+        analytics,
+      },
     };
-
   } catch (error: any) {
     const executionTime = Date.now() - startTime;
 
@@ -203,7 +216,7 @@ export async function executeCompleteE2ESimulation(userPrompt: string): Promise<
     await frameworkLogger.log("e2e-simulation", "simulation-failed", "error", {
       error: error.message,
       phasesCompleted: phases.length,
-      executionTime
+      executionTime,
     });
 
     return {
@@ -213,9 +226,9 @@ export async function executeCompleteE2ESimulation(userPrompt: string): Promise<
       metrics: {
         totalPhases: 7,
         completedPhases: phases.length,
-        performanceImprovement: 0
+        performanceImprovement: 0,
       },
-      results: { error: error.message }
+      results: { error: error.message },
     };
   }
 }

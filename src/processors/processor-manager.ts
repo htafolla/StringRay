@@ -644,18 +644,25 @@ export class ProcessorManager {
   private async executeRefactoringLogging(context: any): Promise<any> {
     try {
       // Import the refactoring logging processor dynamically
-      const { RefactoringLoggingProcessor } = await import("./refactoring-logging-processor.js");
+      const { RefactoringLoggingProcessor } =
+        await import("./refactoring-logging-processor.js");
 
       const processor = new RefactoringLoggingProcessor();
 
       // Check if context is agent task completion context
-      if (context.agentName && context.task && typeof context.startTime === "number") {
+      if (
+        context.agentName &&
+        context.task &&
+        typeof context.startTime === "number"
+      ) {
         const result = await processor.execute(context);
 
         return {
           logged: result.logged || false,
           success: true,
-          message: result.logged ? "Agent completion logged" : "No logging needed",
+          message: result.logged
+            ? "Agent completion logged"
+            : "No logging needed",
         };
       }
 
@@ -664,7 +671,6 @@ export class ProcessorManager {
         success: true,
         message: "Not an agent task completion context",
       };
-
     } catch (error) {
       console.error("Refactoring logging failed:", error);
       return {

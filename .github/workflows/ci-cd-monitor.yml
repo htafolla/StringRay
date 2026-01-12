@@ -1,0 +1,56 @@
+name: CI/CD Health Monitor
+
+on:
+  workflow_run:
+    workflows: ["ci-cd", "lint", "security-audit"]
+    types:
+      - completed
+  schedule:
+    # Daily health check
+    - cron: '0 8 * * *'  # Every day at 8 AM UTC
+  workflow_dispatch:
+
+jobs:
+  monitor-ci-health:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Run CI/CD Health Monitor
+      run: node scripts/github-actions-monitor.cjs --report
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_REPOSITORY: ${{ github.repository }}
+
+    - name: Upload monitoring report
+      uses: actions/upload-artifact@v4
+      with:
+        name: ci-cd-health-report
+        path: .opencode/logs/ci-cd-monitor-report.json
+
+    - name: Health status notification
+      if: failure()
+      run: |
+        echo "🚨 CI/CD Health Alert"
+        echo "CI/CD pipelines may be unhealthy"
+        echo "Check the monitoring report for details"
+
+    - name: Summary report
+      run: |
+        if [ -f .opencode/logs/ci-cd-monitor-report.json ]; then
+          echo "## CI/CD Health Summary" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`json" >> $GITHUB_STEP_SUMMARY
+          cat .opencode/logs/ci-cd-monitor-report.json >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+        fi

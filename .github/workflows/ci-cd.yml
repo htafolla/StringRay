@@ -62,6 +62,12 @@ jobs:
     - name: Run build validation
       run: npm run validate
 
+    - name: CI/CD Health Check
+      run: npm run ci-report
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_REPOSITORY: ${{ github.repository }}
+
     - name: Upload build artifacts
       uses: actions/upload-artifact@v3
       with:

@@ -59,7 +59,7 @@ export class RefactoringLoggingProcessor implements ProcessorHook {
           task: taskContext.task.substring(0, 100),
           duration,
           success: taskContext.success,
-        }
+        },
       );
 
       return {
@@ -67,7 +67,6 @@ export class RefactoringLoggingProcessor implements ProcessorHook {
         logEntry: logEntry.substring(0, 200) + "...", // Truncated for response
         duration,
       };
-
     } catch (error) {
       await frameworkLogger.log(
         "refactoring-logging",
@@ -76,7 +75,7 @@ export class RefactoringLoggingProcessor implements ProcessorHook {
         {
           agentName: taskContext.agentName,
           error: error instanceof Error ? error.message : String(error),
-        }
+        },
       );
 
       return {
@@ -147,11 +146,16 @@ ${this.summarizeResult(context.result)}
   private categorizeTask(task: string): string {
     const lowerTask = task.toLowerCase();
 
-    if (lowerTask.includes("review") || lowerTask.includes("audit")) return "Code Review";
-    if (lowerTask.includes("design") || lowerTask.includes("architect")) return "System Design";
-    if (lowerTask.includes("test") || lowerTask.includes("testing")) return "Testing";
-    if (lowerTask.includes("refactor") || lowerTask.includes("improve")) return "Refactoring";
-    if (lowerTask.includes("debug") || lowerTask.includes("fix")) return "Debugging";
+    if (lowerTask.includes("review") || lowerTask.includes("audit"))
+      return "Code Review";
+    if (lowerTask.includes("design") || lowerTask.includes("architect"))
+      return "System Design";
+    if (lowerTask.includes("test") || lowerTask.includes("testing"))
+      return "Testing";
+    if (lowerTask.includes("refactor") || lowerTask.includes("improve"))
+      return "Refactoring";
+    if (lowerTask.includes("debug") || lowerTask.includes("fix"))
+      return "Debugging";
     if (lowerTask.includes("security")) return "Security";
 
     return "General Development";
@@ -223,7 +227,7 @@ export function createAgentTaskContext(
   success: boolean,
   result?: any,
   capabilities?: string[],
-  sessionId?: string
+  sessionId?: string,
 ): AgentTaskContext {
   return {
     agentName,

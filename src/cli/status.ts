@@ -28,20 +28,32 @@ export async function statusCommand(options: StatusOptions): Promise<void> {
   console.log("==========================");
 
   // Framework info
-  console.log(`Framework: ${status.framework.name} v${status.framework.version}`);
+  console.log(
+    `Framework: ${status.framework.name} v${status.framework.version}`,
+  );
   console.log(`Uptime: ${status.framework.uptime}`);
   console.log(`Environment: ${status.framework.environment}`);
 
   // System health
   console.log(`\n🏥 System Health:`);
-  console.log(`Status: ${getStatusIcon(status.health.overall)} ${status.health.overall.toUpperCase()}`);
-  console.log(`Components: ${status.health.components.healthy}/${status.health.components.total}`);
+  console.log(
+    `Status: ${getStatusIcon(status.health.overall)} ${status.health.overall.toUpperCase()}`,
+  );
+  console.log(
+    `Components: ${status.health.components.healthy}/${status.health.components.total}`,
+  );
 
   if (options.detailed) {
-    console.log(`\nAgents: ${status.agents.active}/${status.agents.total} active`);
-    console.log(`Processors: ${status.processors.active}/${status.processors.total} running`);
+    console.log(
+      `\nAgents: ${status.agents.active}/${status.agents.total} active`,
+    );
+    console.log(
+      `Processors: ${status.processors.active}/${status.processors.total} running`,
+    );
     console.log(`Memory: ${status.memory.used} MB used`);
-    console.log(`Tasks: ${status.tasks.pending} pending, ${status.tasks.completed} completed`);
+    console.log(
+      `Tasks: ${status.tasks.pending} pending, ${status.tasks.completed} completed`,
+    );
   }
 
   // Recent activity
@@ -61,7 +73,9 @@ export async function statusCommand(options: StatusOptions): Promise<void> {
   }
 
   // Footer
-  console.log(`\n✅ Status check complete. Use 'strray doctor' for detailed diagnostics.`);
+  console.log(
+    `\n✅ Status check complete. Use 'strray doctor' for detailed diagnostics.`,
+  );
 }
 
 /**
@@ -108,19 +122,26 @@ async function gatherSystemStatus(): Promise<any> {
   try {
     // Add some sample activity
     status.activity.recent = [
-      { timestamp: new Date().toISOString(), message: "Status check performed" },
-      { timestamp: new Date(Date.now() - 60000).toISOString(), message: "Framework initialized" },
+      {
+        timestamp: new Date().toISOString(),
+        message: "Status check performed",
+      },
+      {
+        timestamp: new Date(Date.now() - 60000).toISOString(),
+        message: "Framework initialized",
+      },
     ];
 
     // Add recommendations based on status
     if (status.agents.active === 0) {
-      status.recommendations.push("Run 'strray run \"your task\"' to activate agents");
+      status.recommendations.push(
+        "Run 'strray run \"your task\"' to activate agents",
+      );
     }
 
     if (status.memory.used > 256) {
       status.recommendations.push("Consider restarting to free memory");
     }
-
   } catch (error) {
     status.health.overall = "degraded";
     status.recommendations.push("Framework components not fully accessible");

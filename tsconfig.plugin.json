@@ -1,0 +1,27 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./dist/plugin",
+    "rootDir": "./src",
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true
+  },
+  "include": [
+    "src/plugins/**/*.ts",
+    "src/orchestrator/**/*.ts",
+    "src/state/**/*.ts",
+    "src/processors/**/*.ts",
+    "src/utils/**/*.ts",
+    "src/agents/**/*.ts",
+    "src/mcps/**/*.ts"
+  ],
+  "exclude": [
+    "src/cli/**/*",
+    "src/server/**/*",
+    "src/__tests__/**/*",
+    "src/**/*.test.ts",
+    "src/**/*.spec.ts",
+    "node_modules"
+  ]
+}

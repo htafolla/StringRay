@@ -36,7 +36,9 @@ export const authCommand = {
     console.log(`   export ${getEnvVarName(provider)}=your_api_key_here`);
     console.log("4. Restart StrRay");
 
-    console.log("\n✅ Once configured, your API key will be automatically used.");
+    console.log(
+      "\n✅ Once configured, your API key will be automatically used.",
+    );
   },
 
   async logout(options: AuthLogoutOptions): Promise<void> {
@@ -64,7 +66,9 @@ export const authCommand = {
 
     for (const provider of providers) {
       const envVar = getEnvVarName(provider);
-      const hasKey = process.env[envVar] ? "✅ Configured" : "❌ Not configured";
+      const hasKey = process.env[envVar]
+        ? "✅ Configured"
+        : "❌ Not configured";
 
       console.log(`${provider.toUpperCase()}: ${hasKey}`);
     }

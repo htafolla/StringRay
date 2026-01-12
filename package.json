@@ -1,68 +1,28 @@
 {
-  "name": "@strray/framework",
+  "name": "oh-my-opencode-strray",
   "version": "1.0.0",
-  "description": "StringRay (StrRay) - Ship Production-Ready Code & Eliminate Common Dead Ends for AI Devs. Eradicates Spaghetti Code, Hallucinations & Code Rot with Agentic AI Coordination & Automation.",
+  "description": "StrRay Framework Plugin for oh-my-opencode - Enterprise AI orchestration with systematic error prevention",
   "type": "module",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "./dist/plugin/index.js",
+  "types": "./dist/plugin/index.d.ts",
+  "oh-my-opencode": {
+    "plugin": "./dist/plugin/strray-codex-injection.js"
+  },
   "bin": {
-    "strray": "./dist/cli/index.js"
+    "strray_setup": "scripts/setup.cjs"
   },
   "scripts": {
     "build": "tsc",
-    "dev": "tsc && node dist/server.js",
-    "start": "node dist/server.js",
-    "stop": "pkill -f 'node dist/server.js'",
-    "init": "npx tsx scripts/init.ts",
-    "validate": "node scripts/validate-codex.js",
-    "typecheck": "tsc --noEmit",
-    "lint": "eslint src",
-    "lint:fix": "eslint src --fix",
+    "build:plugin": "tsc --project tsconfig.plugin.json",
     "clean": "rm -rf dist",
-    "prepublishOnly": "npm run build",
-    "test": "node scripts/test-utils/smart-test-runner.mjs",
-    "test:direct": "vitest run",
-    "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage --reporter=verbose",
-    "test:unit": "vitest run --config test-config/vitest.unit.config.ts",
-    "test:integration": "vitest run --config test-config/vitest.integration.config.ts",
-    "test:e2e": "vitest run --config test-config/vitest.contract.config.ts",
-    "test:security": "vitest run --config test-config/vitest.security.config.ts",
-    "test:performance": "node tests/performance/load-test.js",
-    "test:smart": "node scripts/test-utils/smart-test-runner.mjs",
-    "test:aggressive": "node scripts/test-utils/smart-test-runner.mjs --aggressive",
-    "test:auto-heal": "node scripts/test-utils/smart-test-runner.mjs --auto-heal",
-    "test:quarantine": "node scripts/test-utils/test-quarantine.mjs",
-    "test:quarantine:list": "node scripts/test-utils/test-quarantine.mjs list",
-    "test:quarantine:stats": "node scripts/test-utils/test-quarantine.mjs stats",
-    "test:validation": "bash tests/validation/enhanced-validation.sh",
-    "test:scripts": "node tests/scripts/test-plugin.js",
-    "test:python": "python3 tests/python/test_codex_loader.py",
-    "performance:monitor": "node -e \"import('./dist/performance/index.js').then(m => m.performanceSystem.initialize().then(() => m.performanceSystem.start()))\"",
-    "performance:report": "node -e \"import('./dist/performance/index.js').then(m => m.performanceSystem.initialize().then(() => m.performanceSystem.generateReport().then(r => console.log(JSON.stringify(r, null, 2))))\"",
-    "performance:gates": "node -e \"import('./dist/performance/index.js').then(m => m.performanceSystem.initialize().then(() => m.performanceSystem.runGates()))\"",
-    "audit": "npm audit",
-    "security-audit": "node scripts/basic-security-audit.cjs",
-    "security-check": "npm run security-audit && npm audit --audit-level=moderate",
-    "security-monitor": "node scripts/basic-security-audit.cjs --monitor",
-    "deps:check": "npm audit && npm outdated",
-    "framework:init": "bash .opencode/init.sh",
-    "framework:validate": "npm run test:validation",
-    "framework:health": "npm run framework:init && npm run framework:validate",
-    "framework:monitor": "bash tests/validation/enhanced-validation.sh --monitor",
-    "memory:dashboard": "bash memory-dashboard.sh",
-    "memory:test": "bash test-memory-monitor.sh",
-    "memory:pools": "bash test-memory-pools.sh",
-    "memory:shutdown": "bash test-graceful-shutdown.sh",
-    "memory:regression": "bash run-memory-regression.sh",
-    "validate:orchestration": "bash validate-multi-agent-orchestration.sh",
-    "health:orchestration": "bash check-agent-orchestration-health.sh",
-    "memory:health": "npm run memory:dashboard",
-    "logging:disable": "bash scripts/disable-logging.sh",
-    "logging:enable": "echo '🔊 Logging is ENABLED (default). To disable: export STRRAY_LOGGING_ENABLED=false'",
-    "profiling:demo": "bash advanced-profiling-integration.sh",
-    "profiling:validate": "bash validate-profiling.sh",
-    "profiling:dashboard": "bash profiling-dashboard.sh"
+    "prepublishOnly": "npm run build:plugin",
+    "postinstall": "node scripts/postinstall.cjs",
+    "ci-monitor": "node scripts/github-actions-monitor.cjs",
+    "ci-report": "node scripts/github-actions-monitor.cjs --report",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "lint": "eslint src --ext .ts",
+    "lint:fix": "eslint src --ext .ts --fix"
   },
   "keywords": [
     "ai",
@@ -78,7 +38,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/strray-framework/stringray.git"
+    "url": "git+https://github.com/strray-framework/stringray.git"
   },
   "bugs": {
     "url": "https://github.com/strray-framework/stringray/issues"
@@ -108,12 +68,16 @@
     "vitest": "^1.0.0"
   },
   "files": [
-    "dist",
-    "src",
-    ".opencode",
-    ".strray",
-    "docs",
-    "README.md"
+    "dist/plugin",
+    "dist/mcps",
+    "dist/agents",
+    "dist/orchestrator",
+    "dist/processors",
+    "dist/state",
+    "dist/utils",
+    "scripts",
+    "README.md",
+    "LICENSE"
   ],
   "exports": {
     ".": {

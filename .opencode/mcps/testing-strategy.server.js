@@ -1,819 +1,668 @@
-#!/usr/bin/env node
-
 /**
- * StrRay Framework - Testing Strategy MCP Server
- * Provides tools for testing strategy design, coverage analysis, and test architecture
+ * StrRay Testing Strategy MCP Server
+ *
+ * Knowledge skill for test planning, coverage optimization,
+ * and testing methodology recommendations
  */
-
-const { Server } = require("@modelcontextprotocol/sdk/server/index.js");
-const {
-  StdioServerTransport,
-} = require("@modelcontextprotocol/sdk/server/stdio.js");
-const {
-  CallToolRequestSchema,
-  ListToolsRequestSchema,
-} = require("@modelcontextprotocol/sdk/types.js");
-const fs = require("fs").promises;
-const path = require("path");
-
-class TestingStrategyServer {
-  constructor() {
-    this.server = new Server(
-      {
-        name: "testing-strategy",
-        version: "1.0.0",
-      },
-      {
-        capabilities: {
-          tools: {},
-        },
-      },
-    );
-
-    this.setupToolHandlers();
-  }
-
-  setupToolHandlers() {
-    // List available tools
-    this.server.setRequestHandler(ListToolsRequestSchema, async () => {
-      return {
-        tools: [
-          {
-            name: "analyze_test_coverage",
-            description: "Analyze current test coverage and identify gaps",
-            inputSchema: {
-              type: "object",
-              properties: {
-                rootPath: {
-                  type: "string",
-                  description: "Root path of the project to analyze",
-                  default: ".",
-                },
-                coverageReportPath: {
-                  type: "string",
-                  description: "Path to coverage report file",
-                  default: "coverage/lcov-report/index.html",
-                },
-              },
-            },
-          },
-          {
-            name: "design_test_strategy",
-            description:
-              "Design a comprehensive testing strategy for the project",
-            inputSchema: {
-              type: "object",
-              properties: {
-                projectType: {
-                  type: "string",
-                  description: "Type of project (react, node, library, etc.)",
-                  default: "react",
-                },
-                complexity: {
-                  type: "string",
-                  enum: ["simple", "medium", "complex"],
-                  description: "Project complexity level",
-                  default: "medium",
-                },
-              },
-            },
-          },
-          {
-            name: "identify_test_gaps",
-            description:
-              "Identify areas of code that lack adequate test coverage",
-            inputSchema: {
-              type: "object",
-              properties: {
-                sourcePath: {
-                  type: "string",
-                  description: "Path to source code directory",
-                  default: "src",
-                },
-                testPath: {
-                  type: "string",
-                  description: "Path to test directory",
-                  default: "__tests__",
-                },
-              },
-            },
-          },
-          {
-            name: "recommend_test_frameworks",
-            description: "Recommend appropriate testing frameworks and tools",
-            inputSchema: {
-              type: "object",
-              properties: {
-                projectType: {
-                  type: "string",
-                  description: "Type of project",
-                  default: "react",
-                },
-                language: {
-                  type: "string",
-                  description: "Primary programming language",
-                  default: "typescript",
-                },
-              },
-            },
-          },
-          {
-            name: "generate_tests",
-            description: "Generate comprehensive test files for source code",
-            inputSchema: {
-              type: "object",
-              properties: {
-                filePath: {
-                  type: "string",
-                  description: "Path to the source file to generate tests for",
-                },
-                testType: {
-                  type: "string",
-                  enum: ["unit", "integration", "component"],
-                  description: "Type of tests to generate",
-                  default: "unit",
-                },
-                framework: {
-                  type: "string",
-                  description: "Testing framework to use",
-                  default: "vitest",
-                },
-              },
-              required: ["filePath"],
-            },
-          },
-        ],
-      };
-    });
-
-    // Handle tool calls
-    this.server.setRequestHandler(CallToolRequestSchema, async (request) => {
-      const { name, arguments: args } = request.params;
-
-      try {
-        switch (name) {
-          case "analyze_test_coverage":
-            return await this.analyzeTestCoverage(args);
-          case "design_test_strategy":
-            return await this.designTestStrategy(args);
-          case "identify_test_gaps":
-            return await this.identifyTestGaps(args);
-          case "recommend_test_frameworks":
-            return await this.recommendTestFrameworks(args);
-          case "generate_tests":
-            return await this.generateTests(args);
-          default:
-            throw new Error(`Unknown tool: ${name}`);
-        }
-      } catch (error) {
+import { Server } from "@modelcontextprotocol/sdk/server/index.js";
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { CallToolRequestSchema, ListToolsRequestSchema, } from "@modelcontextprotocol/sdk/types.js";
+import * as fs from "fs";
+import * as path from "path";
+class StrRayTestingStrategyServer {
+    server;
+    constructor() {
+        this.server = new Server({
+            name: "strray-testing-strategy",
+            version: "1.0.0",
+        });
+        this.setupToolHandlers();
+        console.log("StrRay Testing Strategy MCP Server initialized");
+    }
+    setupToolHandlers() {
+        this.server.setRequestHandler(ListToolsRequestSchema, async () => {
+            return {
+                tools: [
+                    {
+                        name: "analyze-test-coverage",
+                        description: "Analyze current test coverage and identify gaps",
+                        inputSchema: {
+                            type: "object",
+                            properties: {
+                                projectRoot: { type: "string" },
+                                includeBreakdown: { type: "boolean", default: true },
+                                coverageThreshold: { type: "number", default: 80 },
+                            },
+                            required: ["projectRoot"],
+                        },
+                    },
+                    {
+                        name: "design-test-strategy",
+                        description: "Design comprehensive testing strategy for the project",
+                        inputSchema: {
+                            type: "object",
+                            properties: {
+                                projectRoot: { type: "string" },
+                                projectType: {
+                                    type: "string",
+                                    enum: ["web", "api", "mobile", "desktop"],
+                                },
+                                complexity: {
+                                    type: "string",
+                                    enum: ["simple", "medium", "complex"],
+                                },
+                                timeline: {
+                                    type: "string",
+                                    enum: ["agile", "waterfall", "continuous"],
+                                },
+                            },
+                            required: ["projectRoot"],
+                        },
+                    },
+                    {
+                        name: "identify-test-gaps",
+                        description: "Identify untested code and recommend test cases",
+                        inputSchema: {
+                            type: "object",
+                            properties: {
+                                projectRoot: { type: "string" },
+                                sourceFiles: { type: "array", items: { type: "string" } },
+                                existingTests: { type: "array", items: { type: "string" } },
+                            },
+                            required: ["projectRoot"],
+                        },
+                    },
+                    {
+                        name: "optimize-test-coverage",
+                        description: "Analyze and optimize test coverage patterns",
+                        inputSchema: {
+                            type: "object",
+                            properties: {
+                                projectRoot: { type: "string" },
+                                currentCoverage: { type: "number" },
+                                targetCoverage: { type: "number", default: 85 },
+                                focusAreas: { type: "array", items: { type: "string" } },
+                            },
+                            required: ["projectRoot"],
+                        },
+                    },
+                ],
+            };
+        });
+        this.server.setRequestHandler(CallToolRequestSchema, async (request) => {
+            const { name, arguments: args } = request.params;
+            try {
+                switch (name) {
+                    case "analyze-test-coverage":
+                        return await this.analyzeTestCoverage(args);
+                    case "design-test-strategy":
+                        return await this.designTestStrategy(args);
+                    case "identify-test-gaps":
+                        return await this.identifyTestGaps(args);
+                    case "optimize-test-coverage":
+                        return await this.optimizeTestCoverage(args);
+                    default:
+                        throw new Error(`Unknown tool: ${name}`);
+                }
+            }
+            catch (error) {
+                console.error(`Error in testing strategy tool ${name}:`, error);
+                throw error;
+            }
+        });
+    }
+    async analyzeTestCoverage(args) {
+        const { projectRoot, includeBreakdown = true, coverageThreshold = 80, } = args;
+        const analysis = this.performTestCoverageAnalysis(projectRoot);
         return {
-          content: [{ type: "text", text: `Error: ${error.message}` }],
-          isError: true,
+            content: [
+                {
+                    type: "text",
+                    text: JSON.stringify({
+                        projectRoot,
+                        analysis,
+                        threshold: coverageThreshold,
+                        status: analysis.coverage >= coverageThreshold
+                            ? "adequate"
+                            : "insufficient",
+                        analyzedAt: new Date().toISOString(),
+                    }, null, 2),
+                },
+            ],
         };
-      }
-    });
-  }
-
-  async analyzeTestCoverage(args = {}) {
-    const rootPath = args.rootPath || ".";
-    const coverageReportPath =
-      args.coverageReportPath || "coverage/lcov-report/index.html";
-
-    try {
-      const coverage = await this.getCoverageAnalysis(
-        rootPath,
-        coverageReportPath,
-      );
-
-      return {
-        content: [
-          {
-            type: "text",
-            text: `## Test Coverage Analysis
-
-### Overall Coverage:
-- **Statements:** ${coverage.overall.statements}%
-- **Branches:** ${coverage.overall.branches}%
-- **Functions:** ${coverage.overall.functions}%
-- **Lines:** ${coverage.overall.lines}%
-
-### Coverage by Directory:
-${coverage.byDirectory.map((dir) => `- **${dir.name}**: ${dir.coverage}% (${dir.status})`).join("\n")}
-
-### Uncovered Files:
-${coverage.uncoveredFiles.map((file) => `- ${file.path} (${file.lines} lines uncovered)`).join("\n")}
-
-### Recommendations:
-${coverage.recommendations.map((rec) => `- ${rec}`).join("\n")}`,
-          },
-        ],
-      };
-    } catch (error) {
-      throw new Error(`Failed to analyze test coverage: ${error.message}`);
     }
-  }
-
-  async designTestStrategy(args = {}) {
-    const projectType = args.projectType || "react";
-    const complexity = args.complexity || "medium";
-
-    try {
-      const strategy = this.createTestStrategy(projectType, complexity);
-
-      return {
-        content: [
-          {
-            type: "text",
-            text: `## Testing Strategy Design
-
-**Project Type:** ${projectType}
-**Complexity Level:** ${complexity}
-
-### Test Pyramid Structure:
-${strategy.pyramid.map((layer) => `#### ${layer.name} (${layer.percentage}%)\n${layer.description}\n- **Tools:** ${layer.tools.join(", ")}\n- **Focus:** ${layer.focus}`).join("\n\n")}
-
-### Test Categories:
-${strategy.categories.map((cat) => `#### ${cat.name}\n${cat.description}\n- **Coverage Target:** ${cat.target}%\n- **Execution:** ${cat.execution}`).join("\n\n")}
-
-### CI/CD Integration:
-${strategy.ci.map((step) => `- ${step}`).join("\n")}
-
-### Quality Gates:
-${strategy.qualityGates.map((gate) => `- ${gate.metric}: ${gate.threshold} (${gate.action})`).join("\n")}`,
-          },
-        ],
-      };
-    } catch (error) {
-      throw new Error(`Failed to design test strategy: ${error.message}`);
+    async designTestStrategy(args) {
+        const { projectRoot, projectType, complexity, timeline } = args;
+        const strategy = this.generateTestStrategy(projectRoot, projectType, complexity, timeline);
+        return {
+            content: [
+                {
+                    type: "text",
+                    text: JSON.stringify({
+                        projectRoot,
+                        strategy,
+                        recommendations: this.generateStrategyRecommendations(strategy, projectType),
+                        implementation: this.createImplementationPlan(strategy, timeline),
+                        analyzedAt: new Date().toISOString(),
+                    }, null, 2),
+                },
+            ],
+        };
     }
-  }
-
-  async identifyTestGaps(args = {}) {
-    const sourcePath = args.sourcePath || "src";
-    const testPath = args.testPath || "__tests__";
-
-    try {
-      const gaps = await this.findTestGaps(sourcePath, testPath);
-
-      return {
-        content: [
-          {
-            type: "text",
-            text: `## Test Coverage Gaps Analysis
-
-### Files Without Tests:
-${gaps.untestedFiles.map((file) => `- **${file.path}**: ${file.type} (${file.complexity} complexity)`).join("\n")}
-
-### Partially Tested Files:
-${gaps.partialCoverage.map((file) => `- **${file.path}**: ${file.coverage}% coverage (${file.missing} missing)`).join("\n")}
-
-### Critical Paths Without Tests:
-${gaps.criticalPaths.map((path) => `- ${path.description} (${path.risk})`).join("\n")}
-
-### Priority Recommendations:
-${gaps.priorities.map((rec, i) => `${i + 1}. ${rec}`).join("\n")}`,
-          },
-        ],
-      };
-    } catch (error) {
-      throw new Error(`Failed to identify test gaps: ${error.message}`);
+    async identifyTestGaps(args) {
+        const { projectRoot, sourceFiles, existingTests } = args;
+        const gaps = this.analyzeTestGaps(sourceFiles || [], existingTests || []);
+        return {
+            content: [
+                {
+                    type: "text",
+                    text: JSON.stringify({
+                        projectRoot,
+                        gaps,
+                        coverage: this.calculateGapCoverage(gaps, sourceFiles?.length || 0),
+                        recommendations: this.generateGapRecommendations(gaps),
+                        analyzedAt: new Date().toISOString(),
+                    }, null, 2),
+                },
+            ],
+        };
     }
-  }
-
-  async recommendTestFrameworks(args = {}) {
-    const projectType = args.projectType || "react";
-    const language = args.language || "typescript";
-
-    try {
-      const recommendations = this.getFrameworkRecommendations(
-        projectType,
-        language,
-      );
-
-      return {
-        content: [
-          {
-            type: "text",
-            text: `## Testing Framework Recommendations
-
-**Project Type:** ${projectType}
-**Language:** ${language}
-
-### Primary Testing Framework:
-**${recommendations.primary.name}**
-- **Why:** ${recommendations.primary.reason}
-- **Setup:** ${recommendations.primary.setup}
-- **Best for:** ${recommendations.primary.bestFor}
-
-### Supporting Tools:
-${recommendations.supporting.map((tool) => `#### ${tool.category}: ${tool.name}\n- **Purpose:** ${tool.purpose}\n- **Alternative:** ${tool.alternative}`).join("\n\n")}
-
-### Configuration Template:
-\`\`\`javascript
-${recommendations.configTemplate}
-\`\`\`
-
-### Getting Started:
-${recommendations.gettingStarted.map((step) => `${step.order}. ${step.description}`).join("\n")}`,
-          },
-        ],
-      };
-    } catch (error) {
-      throw new Error(`Failed to recommend test frameworks: ${error.message}`);
+    async optimizeTestCoverage(args) {
+        const { projectRoot, currentCoverage, targetCoverage = 85, focusAreas, } = args;
+        const optimization = this.createCoverageOptimizationPlan(projectRoot, currentCoverage, targetCoverage, focusAreas);
+        return {
+            content: [
+                {
+                    type: "text",
+                    text: JSON.stringify({
+                        projectRoot,
+                        optimization,
+                        timeline: this.estimateOptimizationTimeline(optimization),
+                        roi: this.calculateOptimizationROI(optimization),
+                        analyzedAt: new Date().toISOString(),
+                    }, null, 2),
+                },
+            ],
+        };
     }
-  }
-
-  async getCoverageAnalysis(rootPath, coverageReportPath) {
-    // Mock coverage analysis - in real implementation would parse actual coverage reports
-    const coverage = {
-      overall: {
-        statements: 85,
-        branches: 78,
-        functions: 92,
-        lines: 86,
-      },
-      byDirectory: [
-        { name: "src/components", coverage: 88, status: "Good" },
-        { name: "src/hooks", coverage: 76, status: "Needs improvement" },
-        { name: "src/utils", coverage: 95, status: "Excellent" },
-        { name: "src/services", coverage: 65, status: "Critical" },
-      ],
-      uncoveredFiles: [
-        { path: "src/services/api.ts", lines: 45 },
-        { path: "src/utils/helpers.ts", lines: 23 },
-      ],
-      recommendations: [
-        "Focus on testing API service functions",
-        "Add integration tests for critical user flows",
-        "Consider using test doubles for external dependencies",
-      ],
-    };
-
-    return coverage;
-  }
-
-  createTestStrategy(projectType, complexity) {
-    const strategies = {
-      react: {
-        simple: {
-          pyramid: [
+    // Helper methods
+    performTestCoverageAnalysis(projectRoot) {
+        const testFiles = this.findTestFiles(projectRoot);
+        const sourceFiles = this.findSourceFiles(projectRoot);
+        const analysis = {
+            coverage: this.calculateCoverage(testFiles, sourceFiles),
+            testTypes: this.categorizeTests(testFiles),
+            testFrameworks: this.detectTestFrameworks(testFiles),
+            testPatterns: this.analyzeTestPatterns(testFiles),
+            gaps: this.identifyCoverageGaps(sourceFiles, testFiles),
+            recommendations: [],
+        };
+        analysis.recommendations = this.generateCoverageRecommendations(analysis);
+        return analysis;
+    }
+    generateTestStrategy(projectRoot, projectType, complexity, timeline) {
+        const baseTests = this.estimateBaseTestCounts(projectType, complexity);
+        // Adjust for timeline
+        const multiplier = timeline === "agile" ? 1.2 : timeline === "continuous" ? 1.4 : 1.0;
+        return {
+            unitTests: Math.round(baseTests.unit * multiplier),
+            integrationTests: Math.round(baseTests.integration * multiplier),
+            e2eTests: Math.round(baseTests.e2e * multiplier),
+            performanceTests: Math.round(baseTests.performance * multiplier),
+            securityTests: Math.round(baseTests.security * multiplier),
+            totalEstimated: 0, // Will be calculated
+        };
+    }
+    analyzeTestGaps(sourceFiles, existingTests) {
+        const gaps = [];
+        for (const sourceFile of sourceFiles) {
+            const expectedTest = this.generateExpectedTestFile(sourceFile);
+            const hasTest = existingTests.some((test) => test.includes(expectedTest));
+            if (!hasTest) {
+                gaps.push({
+                    sourceFile,
+                    expectedTest,
+                    type: this.inferTestType(sourceFile),
+                    priority: this.calculateTestPriority(sourceFile),
+                    complexity: this.estimateTestComplexity(sourceFile),
+                });
+            }
+        }
+        return gaps.sort((a, b) => b.priority - a.priority);
+    }
+    createCoverageOptimizationPlan(projectRoot, currentCoverage, targetCoverage, focusAreas) {
+        const gap = targetCoverage - currentCoverage;
+        const plan = {
+            currentCoverage,
+            targetCoverage,
+            gap,
+            phases: [],
+            estimatedEffort: this.estimateOptimizationEffort(gap),
+            priorityAreas: this.identifyPriorityAreas(projectRoot, focusAreas),
+        };
+        // Create optimization phases
+        if (gap > 0) {
+            plan.phases = this.createOptimizationPhases(gap, focusAreas);
+        }
+        return plan;
+    }
+    // Implementation helpers
+    findTestFiles(projectRoot) {
+        return this.findFiles(projectRoot, (file) => file.includes(".test.") ||
+            file.includes(".spec.") ||
+            file.includes("/__tests__/"));
+    }
+    findSourceFiles(projectRoot) {
+        return this.findFiles(projectRoot, (file) => {
+            const ext = path.extname(file);
+            return ([".ts", ".js", ".tsx", ".jsx", ".py", ".java"].includes(ext) &&
+                !file.includes(".test.") &&
+                !file.includes(".spec.") &&
+                !file.includes("/__tests__/"));
+        });
+    }
+    findFiles(projectRoot, filter) {
+        const files = [];
+        const traverse = (dir) => {
+            try {
+                const entries = fs.readdirSync(dir, { withFileTypes: true });
+                for (const entry of entries) {
+                    const entryPath = path.join(dir, entry.name);
+                    if (this.shouldIgnorePath(entryPath))
+                        continue;
+                    if (entry.isFile() && filter(entryPath)) {
+                        files.push(entryPath);
+                    }
+                    else if (entry.isDirectory()) {
+                        traverse(entryPath);
+                    }
+                }
+            }
+            catch (error) {
+                // Skip inaccessible directories
+            }
+        };
+        traverse(projectRoot);
+        return files;
+    }
+    calculateCoverage(testFiles, sourceFiles) {
+        if (sourceFiles.length === 0)
+            return 0;
+        return Math.min(100, Math.round((testFiles.length / sourceFiles.length) * 100));
+    }
+    categorizeTests(testFiles) {
+        const categories = {
+            unit: 0,
+            integration: 0,
+            e2e: 0,
+            performance: 0,
+            security: 0,
+        };
+        for (const testFile of testFiles) {
+            const content = fs.readFileSync(testFile, "utf8").toLowerCase();
+            if (content.includes("integration") || content.includes("e2e")) {
+                categories.integration = (categories.integration || 0) + 1;
+            }
+            else if (content.includes("performance") ||
+                content.includes("benchmark")) {
+                categories.performance = (categories.performance || 0) + 1;
+            }
+            else if (content.includes("security") || content.includes("auth")) {
+                categories.security = (categories.security || 0) + 1;
+            }
+            else {
+                categories.unit = (categories.unit || 0) + 1;
+            }
+        }
+        return categories;
+    }
+    detectTestFrameworks(testFiles) {
+        const frameworks = [];
+        const sampleFiles = testFiles.slice(0, 5);
+        for (const file of sampleFiles) {
+            try {
+                const content = fs.readFileSync(file, "utf8");
+                if (content.includes("describe(") && content.includes("it(")) {
+                    if (content.includes("vitest"))
+                        frameworks.push("vitest");
+                    else if (content.includes("jest"))
+                        frameworks.push("jest");
+                    else
+                        frameworks.push("mocha/chai");
+                }
+                if (content.includes("pytest"))
+                    frameworks.push("pytest");
+                if (content.includes("junit"))
+                    frameworks.push("junit");
+            }
+            catch (error) {
+                // Skip
+            }
+        }
+        return Array.from(new Set(frameworks));
+    }
+    analyzeTestPatterns(testFiles) {
+        const patterns = [];
+        const sampleFiles = testFiles.slice(0, 3);
+        for (const file of sampleFiles) {
+            try {
+                const content = fs.readFileSync(file, "utf8");
+                if (content.includes("beforeEach") || content.includes("afterEach")) {
+                    patterns.push("setup/teardown");
+                }
+                if (content.includes("mock") || content.includes("stub")) {
+                    patterns.push("mocking");
+                }
+                if (content.includes("fixture") || content.includes("factory")) {
+                    patterns.push("test data factories");
+                }
+            }
+            catch (error) {
+                // Skip
+            }
+        }
+        return Array.from(new Set(patterns));
+    }
+    identifyCoverageGaps(sourceFiles, testFiles) {
+        const gaps = [];
+        for (const sourceFile of sourceFiles) {
+            const hasTest = testFiles.some((testFile) => testFile
+                .replace(".test.", ".")
+                .replace(".spec.", ".")
+                .replace("/__tests__/", "/")
+                .includes(path.basename(sourceFile, path.extname(sourceFile))));
+            if (!hasTest) {
+                gaps.push(sourceFile);
+            }
+        }
+        return gaps;
+    }
+    generateCoverageRecommendations(analysis) {
+        const recommendations = [];
+        if (analysis.coverage < 70) {
+            recommendations.push("Increase test coverage to at least 80%");
+        }
+        if ((analysis.testTypes.unit || 0) < (analysis.testTypes.integration || 0)) {
+            recommendations.push("Focus more on unit tests before integration tests");
+        }
+        if (analysis.gaps.length > 5) {
+            recommendations.push(`Address ${analysis.gaps.length} files without test coverage`);
+        }
+        return recommendations;
+    }
+    estimateBaseTestCounts(projectType, complexity) {
+        const baseMultipliers = {
+            web: { unit: 10, integration: 3, e2e: 2, performance: 1, security: 1 },
+            api: { unit: 8, integration: 4, e2e: 1, performance: 2, security: 2 },
+            mobile: { unit: 12, integration: 5, e2e: 3, performance: 1, security: 1 },
+            desktop: {
+                unit: 15,
+                integration: 4,
+                e2e: 2,
+                performance: 1,
+                security: 1,
+            },
+        };
+        const complexityMultipliers = {
+            simple: 0.7,
+            medium: 1.0,
+            complex: 1.5,
+        };
+        const base = baseMultipliers[projectType] ||
+            baseMultipliers.web;
+        const multiplier = complexityMultipliers[complexity] ||
+            1.0;
+        return {
+            unit: Math.round(base.unit * multiplier),
+            integration: Math.round(base.integration * multiplier),
+            e2e: Math.round(base.e2e * multiplier),
+            performance: Math.round(base.performance * multiplier),
+            security: Math.round(base.security * multiplier),
+        };
+    }
+    generateStrategyRecommendations(strategy, projectType) {
+        const recommendations = [];
+        if (strategy.unitTests < strategy.integrationTests) {
+            recommendations.push("Prioritize unit tests for better test pyramid balance");
+        }
+        if (projectType === "api" && strategy.e2eTests < 2) {
+            recommendations.push("Increase E2E tests for API contract validation");
+        }
+        return recommendations;
+    }
+    createImplementationPlan(strategy, timeline) {
+        const phases = timeline === "agile"
+            ? ["sprint1", "sprint2", "sprint3"]
+            : timeline === "continuous"
+                ? ["week1", "week2", "week3", "week4"]
+                : ["phase1", "phase2", "phase3"];
+        return {
+            phases: phases.map((phase, index) => ({
+                name: phase,
+                focus: index === 0
+                    ? "unit-tests"
+                    : index === 1
+                        ? "integration-tests"
+                        : "e2e-tests",
+                estimatedTests: Math.round(strategy.totalEstimated / phases.length),
+            })),
+            timeline,
+            milestones: this.generateMilestones(strategy, timeline),
+        };
+    }
+    generateExpectedTestFile(sourceFile) {
+        const ext = path.extname(sourceFile);
+        const baseName = path.basename(sourceFile, ext);
+        const dir = path.dirname(sourceFile);
+        return path.join(dir, "__tests__", `${baseName}.test${ext}`);
+    }
+    inferTestType(sourceFile) {
+        const content = fs.readFileSync(sourceFile, "utf8");
+        if (content.includes("export") && content.includes("function")) {
+            return "unit";
+        }
+        if (content.includes("router") || content.includes("endpoint")) {
+            return "integration";
+        }
+        if (content.includes("component") || content.includes("render")) {
+            return "component";
+        }
+        return "unit";
+    }
+    calculateTestPriority(sourceFile) {
+        const content = fs.readFileSync(sourceFile, "utf8");
+        let priority = 1;
+        // Critical business logic gets higher priority
+        if (content.includes("auth") ||
+            content.includes("security") ||
+            content.includes("payment")) {
+            priority += 3;
+        }
+        // Complex functions get higher priority
+        if ((content.match(/function/g) || []).length > 5) {
+            priority += 2;
+        }
+        // Public APIs get higher priority
+        if (content.includes("export")) {
+            priority += 1;
+        }
+        return Math.min(priority, 5);
+    }
+    estimateTestComplexity(sourceFile) {
+        const content = fs.readFileSync(sourceFile, "utf8");
+        const functions = (content.match(/function|class|interface/g) || []).length;
+        const branches = (content.match(/if|switch|catch/g) || []).length;
+        const asyncOps = (content.match(/async|await|Promise/g) || []).length;
+        return Math.min(Math.round((functions + branches + asyncOps) / 3), 5);
+    }
+    calculateGapCoverage(gaps, totalFiles) {
+        if (totalFiles === 0)
+            return 100;
+        return Math.round(((totalFiles - gaps.length) / totalFiles) * 100);
+    }
+    generateGapRecommendations(gaps) {
+        const recommendations = [];
+        const highPriorityGaps = gaps.filter((g) => g.priority >= 4);
+        if (highPriorityGaps.length > 0) {
+            recommendations.push(`Address ${highPriorityGaps.length} high-priority test gaps first`);
+        }
+        const complexGaps = gaps.filter((g) => g.complexity >= 4);
+        if (complexGaps.length > 0) {
+            recommendations.push(`Plan additional time for ${complexGaps.length} complex test implementations`);
+        }
+        return recommendations;
+    }
+    estimateOptimizationEffort(gap) {
+        if (gap <= 10)
+            return "1-2 days";
+        if (gap <= 20)
+            return "3-5 days";
+        if (gap <= 30)
+            return "1-2 weeks";
+        return "2-4 weeks";
+    }
+    identifyPriorityAreas(projectRoot, focusAreas) {
+        const areas = focusAreas || [
+            "authentication",
+            "data-validation",
+            "api-endpoints",
+            "ui-components",
+        ];
+        // Analyze codebase to identify actual priority areas
+        const sourceFiles = this.findSourceFiles(projectRoot);
+        const priorityAreas = [];
+        for (const area of areas) {
+            const relevantFiles = sourceFiles.filter((file) => fs
+                .readFileSync(file, "utf8")
+                .toLowerCase()
+                .includes(area.toLowerCase()));
+            if (relevantFiles.length > 0) {
+                priorityAreas.push(`${area} (${relevantFiles.length} files)`);
+            }
+        }
+        return priorityAreas;
+    }
+    createOptimizationPhases(gap, focusAreas) {
+        const phases = [];
+        if (gap > 30) {
+            phases.push({
+                name: "Phase 1: Critical Paths",
+                focus: "authentication, security, payment flows",
+                targetCoverage: 70,
+                estimatedTests: Math.round(gap * 0.4),
+            });
+        }
+        if (gap > 20) {
+            phases.push({
+                name: "Phase 2: Core Functionality",
+                focus: "main business logic, data validation",
+                targetCoverage: 80,
+                estimatedTests: Math.round(gap * 0.4),
+            });
+        }
+        phases.push({
+            name: "Phase 3: Edge Cases & UI",
+            focus: "error handling, ui components, edge cases",
+            targetCoverage: 85,
+            estimatedTests: Math.round(gap * 0.2),
+        });
+        return phases;
+    }
+    estimateOptimizationTimeline(optimization) {
+        const baseDays = optimization.phases.length * 3;
+        const complexityMultiplier = optimization.gap > 20 ? 1.5 : 1.0;
+        return {
+            estimatedDays: Math.round(baseDays * complexityMultiplier),
+            phases: optimization.phases.map((phase) => ({
+                name: phase.name,
+                estimatedDays: Math.round(phase.estimatedTests / 5), // 5 tests per day estimate
+            })),
+        };
+    }
+    calculateOptimizationROI(optimization) {
+        const effortDays = optimization.estimatedEffort.includes("days")
+            ? parseInt(optimization.estimatedEffort)
+            : 14;
+        const coverageIncrease = optimization.gap;
+        return {
+            coverageIncrease: `${coverageIncrease}%`,
+            effortDays,
+            bugsPrevented: Math.round(coverageIncrease * 0.8), // Rough estimate
+            confidenceIncrease: `${Math.min(coverageIncrease * 2, 90)}%`,
+        };
+    }
+    generateMilestones(strategy, timeline) {
+        const totalTests = strategy.unitTests +
+            strategy.integrationTests +
+            strategy.e2eTests +
+            strategy.performanceTests +
+            strategy.securityTests;
+        strategy.totalEstimated = totalTests;
+        if (timeline === "agile") {
+            return [
+                {
+                    milestone: "Sprint 1 Complete",
+                    tests: Math.round(totalTests * 0.3),
+                    focus: "unit tests",
+                },
+                {
+                    milestone: "Sprint 2 Complete",
+                    tests: Math.round(totalTests * 0.6),
+                    focus: "integration tests",
+                },
+                {
+                    milestone: "Sprint 3 Complete",
+                    tests: totalTests,
+                    focus: "e2e and performance tests",
+                },
+            ];
+        }
+        return [
             {
-              name: "Unit Tests",
-              percentage: 70,
-              description: "Component and hook testing",
-              tools: ["Vitest", "React Testing Library"],
-              focus: "Logic and rendering",
+                milestone: "Phase 1 Complete",
+                tests: Math.round(totalTests * 0.4),
+                focus: "foundation tests",
             },
             {
-              name: "Integration Tests",
-              percentage: 20,
-              description: "Component interaction testing",
-              tools: ["Vitest", "React Testing Library"],
-              focus: "User interactions",
+                milestone: "Phase 2 Complete",
+                tests: Math.round(totalTests * 0.75),
+                focus: "feature tests",
             },
             {
-              name: "E2E Tests",
-              percentage: 10,
-              description: "Critical user journey testing",
-              tools: ["Playwright"],
-              focus: "End-to-end flows",
+                milestone: "Phase 3 Complete",
+                tests: totalTests,
+                focus: "complete coverage",
             },
-          ],
-        },
-        medium: {
-          pyramid: [
-            {
-              name: "Unit Tests",
-              percentage: 60,
-              description: "Component, hook, and utility testing",
-              tools: ["Vitest", "React Testing Library"],
-              focus: "Isolated functionality",
-            },
-            {
-              name: "Integration Tests",
-              percentage: 25,
-              description: "Multi-component and API integration",
-              tools: ["Vitest", "React Testing Library", "MSW"],
-              focus: "Component interactions",
-            },
-            {
-              name: "E2E Tests",
-              percentage: 15,
-              description: "Complete user journey validation",
-              tools: ["Playwright"],
-              focus: "Critical paths",
-            },
-          ],
-        },
-      },
-    };
-
-    const strategy =
-      strategies[projectType]?.[complexity] || strategies.react.medium;
-
-    return {
-      pyramid: strategy.pyramid,
-      categories: [
-        {
-          name: "Unit Tests",
-          description: "Test individual functions and components in isolation",
-          target: "90%",
-          execution: "Fast, frequent execution",
-        },
-        {
-          name: "Integration Tests",
-          description: "Test component and module interactions",
-          target: "80%",
-          execution: "Regular CI execution",
-        },
-        {
-          name: "E2E Tests",
-          description: "Test complete user workflows",
-          target: "70%",
-          execution: "Deployment pipeline",
-        },
-      ],
-      ci: [
-        "Run unit tests on every commit",
-        "Run integration tests on pull requests",
-        "Run E2E tests before deployment",
-        "Generate coverage reports daily",
-      ],
-      qualityGates: [
-        {
-          metric: "Unit test coverage",
-          threshold: "85%",
-          action: "Block merge",
-        },
-        {
-          metric: "Integration test pass rate",
-          threshold: "95%",
-          action: "Block deployment",
-        },
-        {
-          metric: "E2E test stability",
-          threshold: "90%",
-          action: "Require manual review",
-        },
-      ],
-    };
-  }
-
-  async findTestGaps(sourcePath, testPath) {
-    // Mock gap analysis - would analyze actual source and test files
-    const gaps = {
-      untestedFiles: [
-        {
-          path: "src/services/payment.ts",
-          type: "Service",
-          complexity: "High",
-        },
-        {
-          path: "src/components/CheckoutForm.tsx",
-          type: "Component",
-          complexity: "Medium",
-        },
-        { path: "src/utils/validation.ts", type: "Utility", complexity: "Low" },
-      ],
-      partialCoverage: [
-        {
-          path: "src/hooks/useAuth.ts",
-          coverage: 75,
-          missing: "Error handling paths",
-        },
-        {
-          path: "src/context/AppContext.tsx",
-          coverage: 60,
-          missing: "State update edge cases",
-        },
-      ],
-      criticalPaths: [
-        { description: "User authentication flow", risk: "High" },
-        { description: "Payment processing", risk: "Critical" },
-        { description: "Data persistence", risk: "Medium" },
-      ],
-      priorities: [
-        "Implement tests for payment service functions",
-        "Add error handling tests for authentication hooks",
-        "Create integration tests for checkout flow",
-        "Add tests for form validation utilities",
-      ],
-    };
-
-    return gaps;
-  }
-
-  getFrameworkRecommendations(projectType, language) {
-    const recommendations = {
-      react: {
-        typescript: {
-          primary: {
-            name: "Vitest + React Testing Library",
-            reason:
-              "Modern, fast testing framework with excellent React support",
-            setup:
-              "npm install -D vitest @testing-library/react @testing-library/jest-dom jsdom",
-            bestFor: "Component testing, hooks, and user interactions",
-          },
-          supporting: [
-            {
-              category: "Coverage",
-              name: "@vitest/coverage-v8",
-              purpose: "Generate detailed coverage reports",
-              alternative: "nyc",
-            },
-            {
-              category: "Mocking",
-              name: "MSW (Mock Service Worker)",
-              purpose: "Mock API calls and external services",
-              alternative: "jest-mock",
-            },
-            {
-              category: "E2E",
-              name: "Playwright",
-              purpose: "End-to-end testing across browsers",
-              alternative: "Cypress",
-            },
-          ],
-          configTemplate: `// vitest.config.ts
-import { defineConfig } from 'vitest/config'
-import react from '@vitejs/plugin-react'
-
-export default defineConfig({
-  plugins: [react()],
-  test: {
-    environment: 'jsdom',
-    setupFiles: ['./src/test/setup.ts'],
-    globals: true
-  }
-})`,
-          gettingStarted: [
-            { order: 1, description: "Install testing dependencies" },
-            {
-              order: 2,
-              description:
-                "Create test setup file with React Testing Library configuration",
-            },
-            { order: 3, description: "Write your first component test" },
-            {
-              order: 4,
-              description: "Configure CI/CD to run tests automatically",
-            },
-          ],
-        },
-      },
-    };
-
-    return (
-      recommendations[projectType]?.[language] ||
-      recommendations.react.typescript
-    );
-  }
-
-  async generateTests(args = {}) {
-    const filePath = args.filePath;
-    const testType = args.testType || "unit";
-    const framework = args.framework || "vitest";
-
-    if (!filePath) {
-      throw new Error("filePath is required");
+        ];
     }
-
-    try {
-      // Check if file exists
-      try {
-        await fs.access(filePath);
-      } catch (error) {
-        throw new Error(`Source file not found: ${filePath}`);
-      }
-
-      // Determine test file path
-      const testFilePath = this.getTestFilePath(filePath);
-
-      // Analyze the source file
-      const analysis = await this.analyzeSourceFile(filePath);
-      const testTemplate = this.createTestTemplate(
-        filePath,
-        testFilePath,
-        analysis,
-        testType,
-        framework,
-      );
-
-      // Ensure the directory exists
-      const testDir = path.dirname(testFilePath);
-      await fs.mkdir(testDir, { recursive: true });
-
-      // Write the test file
-      await fs.writeFile(testFilePath, testTemplate, "utf-8");
-
-      return {
-        content: [
-          {
-            type: "text",
-            text: `## Test Generation Complete
-
-✅ **Test file created:** \`${testFilePath}\`
-
-### Source File Analysis:
-- **File:** ${filePath}
-- **Type:** ${analysis.fileType}
-- **Language:** ${analysis.language}
-- **Exports:** ${analysis.exports.length} (${analysis.exports.join(", ")})
-
-### Generated Tests:
-- **Framework:** ${framework}
-- **Test Type:** ${testType}
-- **Coverage:** ${analysis.exports.length} functions/classes tested
-
-### Test Structure:
-${testTemplate.split("\n").slice(0, 10).join("\n")}
-
-... (full test file written to disk)
-
-### Next Steps:
-1. Review the generated tests
-2. Add specific test cases for your business logic
-3. Run tests: \`npm test ${testFilePath}\`
-4. Verify coverage: \`npm run test:coverage\``,
-          },
-        ],
-      };
-    } catch (error) {
-      throw new Error(`Failed to generate tests: ${error.message}`);
+    shouldIgnorePath(filePath) {
+        const ignorePatterns = [
+            /node_modules/,
+            /\.git/,
+            /dist/,
+            /build/,
+            /\.next/,
+            /\.nuxt/,
+            /\.cache/,
+            /\.temp/,
+            /coverage/,
+            /\.nyc_output/,
+            /logs/,
+            /\.DS_Store/,
+            /Thumbs\.db/,
+        ];
+        return ignorePatterns.some((pattern) => pattern.test(filePath));
     }
-  }
-
-  async analyzeSourceFile(filePath) {
-    const content = await fs.readFile(filePath, "utf-8");
-    const ext = path.extname(filePath);
-    const isTypeScript = [".ts", ".tsx"].includes(ext);
-    const isReact = [".tsx", ".jsx"].includes(ext);
-
-    // Extract exports
-    const exports = [];
-    const exportRegex =
-      /export\s+(?:const|function|class|let|var|default)\s+(\w+)/g;
-    let match;
-    while ((match = exportRegex.exec(content)) !== null) {
-      if (match[1] && !exports.includes(match[1])) {
-        exports.push(match[1]);
-      }
+    async run() {
+        const transport = new StdioServerTransport();
+        await this.server.connect(transport);
+        console.log("StrRay Testing Strategy MCP Server started");
     }
-
-    // Determine file type
-    let fileType = "utility";
-    if (isReact) {
-      fileType = "component";
-    } else if (content.includes("class ")) {
-      fileType = "class";
-    } else if (
-      content.includes("export default function") ||
-      content.includes("export function")
-    ) {
-      fileType = "function";
-    }
-
-    return {
-      filePath,
-      content,
-      exports,
-      fileType,
-      language: isTypeScript ? "TypeScript" : "JavaScript",
-      isReact,
-      isTypeScript,
-    };
-  }
-
-  createTestTemplate(filePath, testFilePath, analysis, testType, framework) {
-    const { exports, fileType, isTypeScript, isReact } = analysis;
-    const fileName = path.basename(filePath, path.extname(filePath));
-
-    const testImports = this.getTestImports(
-      filePath,
-      testFilePath,
-      analysis.exports,
-      framework,
-      isReact,
-      isTypeScript,
-    );
-    const testStructure = this.getTestStructure(
-      fileType,
-      exports,
-      testType,
-      framework,
-    );
-
-    return `${testImports}
-
-describe('${fileName}', () => {
-${testStructure}
-});
-`;
-  }
-
-  getTestImports(
-    filePath,
-    testFilePath,
-    exports,
-    framework,
-    isReact,
-    isTypeScript,
-  ) {
-    const typeAnnotation = isTypeScript ? ": RenderResult" : "";
-    const typeImport = isTypeScript ? ", RenderResult" : "";
-
-    let imports = `import { expect, describe, it } from '${framework === "vitest" ? "vitest" : "jest"}';`;
-
-    if (isReact) {
-      imports += `
-import { render, screen } from '@testing-library/react';`;
-      if (typeImport) {
-        imports += `
-import type { RenderResult } from '@testing-library/react';`;
-      }
-    }
-
-    // Add source file import
-    if (exports.length > 0) {
-      const fileName = path.basename(filePath, path.extname(filePath));
-      const testDir = path.dirname(testFilePath);
-      const sourceDir = path.dirname(filePath);
-      const relativePath = path.relative(testDir, sourceDir);
-
-      let importPath;
-      if (relativePath === "") {
-        importPath = `./${fileName}`;
-      } else {
-        importPath = path.join(relativePath, fileName);
-      }
-
-      imports += `
-import { ${exports.join(", ")} } from '${importPath}';`;
-    }
-
-    return imports;
-  }
-
-  getTestStructure(fileType, exports, testType, framework) {
-    const tests = [];
-
-    if (fileType === "component" && testType === "component") {
-      tests.push(`  it('should render successfully', () => {
-    const { container } = render(<${exports[0] || "Component"} />);
-    expect(container).toBeInTheDocument();
-  });
-
-  it('should handle props correctly', () => {
-    render(<${exports[0] || "Component"} testProp="value" />);
-    expect(screen.getByText('value')).toBeInTheDocument();
-  });
-
-  it('should be accessible', () => {
-    const { container } = render(<${exports[0] || "Component"} />);
-    expect(container).toBeAccessible();
-  });`);
-    } else {
-      // Unit tests for functions/classes
-      exports.forEach((exportName) => {
-        tests.push(`  describe('${exportName}', () => {
-    it('should be defined', () => {
-      expect(typeof ${exportName}).toBe('${fileType === "class" ? "function" : "function"}');
-    });
-
-    it('should handle basic functionality', () => {
-      // Add specific test logic here
-      expect(true).toBe(true); // Placeholder - customize based on function behavior
-    });
-
-    it('should handle edge cases', () => {
-      // Test null/undefined inputs, error conditions
-      expect(true).toBe(true); // Placeholder - customize based on function behavior
-    });
-  });`);
-      });
-    }
-
-    return tests.join("\n\n");
-  }
-
-  getTestFilePath(sourcePath, framework) {
-    const dir = path.dirname(sourcePath);
-    const fileName = path.basename(sourcePath, path.extname(sourcePath));
-    const ext = framework === "vitest" ? ".test.ts" : ".test.js";
-
-    // Place tests in __tests__ directory
-    const testDir = path.join(dir, "__tests__");
-    return path.join(testDir, fileName + ext);
-  }
-
-  async run() {
-    const transport = new StdioServerTransport();
-    await this.server.connect(transport);
-    console.error("Testing Strategy MCP server running...");
-  }
 }
-
-// Run the server
-const server = new TestingStrategyServer();
-server.run().catch(console.error);
+// Start the server if run directly
+if (import.meta.url === `file://${process.argv[1]}`) {
+    const server = new StrRayTestingStrategyServer();
+    server.run().catch(console.error);
+}
+export default StrRayTestingStrategyServer;
+//# sourceMappingURL=testing-strategy.server.js.map

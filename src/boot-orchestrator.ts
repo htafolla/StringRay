@@ -293,6 +293,18 @@ export class BootOrchestrator {
         "success",
       );
 
+      this.processorManager.registerProcessor({
+        name: "refactoringLogging",
+        type: "post",
+        priority: 140,
+        enabled: true,
+      });
+      frameworkLogger.log(
+        "boot-orchestrator",
+        "registered refactoringLogging processor",
+        "success",
+      );
+
       const initSuccess = await this.processorManager.initializeProcessors();
       if (!initSuccess) {
         frameworkLogger.log(

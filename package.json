@@ -6,7 +6,7 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "bin": {
-    "strray": "./dist/cli.js"
+    "strray": "./dist/cli/index.js"
   },
   "scripts": {
     "build": "tsc",
@@ -30,6 +30,7 @@
     "test:security": "vitest run --config test-config/vitest.security.config.ts",
     "test:performance": "node tests/performance/load-test.js",
     "test:smart": "node scripts/test-utils/smart-test-runner.mjs",
+    "test:aggressive": "node scripts/test-utils/smart-test-runner.mjs --aggressive",
     "test:auto-heal": "node scripts/test-utils/smart-test-runner.mjs --auto-heal",
     "test:quarantine": "node scripts/test-utils/test-quarantine.mjs",
     "test:quarantine:list": "node scripts/test-utils/test-quarantine.mjs list",

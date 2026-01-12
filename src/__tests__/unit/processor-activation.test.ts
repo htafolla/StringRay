@@ -773,4 +773,84 @@ describe("Processor Activation", () => {
       expect(health[0]?.status).toBeDefined();
     });
   });
+
+  // Refactoring Logging Processor Tests
+  describe("Refactoring Logging Processor", () => {
+    it("should register and execute refactoring logging processor", async () => {
+      processorManager.registerProcessor({
+        name: "refactoringLogging",
+        type: "post",
+        priority: 140,
+        enabled: true,
+      });
+
+      await processorManager.initializeProcessors();
+
+      const health = processorManager.getProcessorHealth();
+      expect(health).toContainEqual(
+        expect.objectContaining({
+          name: "refactoringLogging",
+          status: "healthy",
+        }),
+      );
+    });
+
+    it("should execute refactoring logging for agent task completion", async () => {
+      processorManager.registerProcessor({
+        name: "refactoringLogging",
+        type: "post",
+        priority: 140,
+        enabled: true,
+      });
+
+      await processorManager.initializeProcessors();
+
+      // Create agent task context
+      const agentContext = {
+        agentName: "architect",
+        task: "Design new API architecture",
+        startTime: Date.now() - 1000,
+        endTime: Date.now(),
+        success: true,
+        result: { apiDesign: "RESTful API with GraphQL" },
+        capabilities: ["design", "architecture"],
+      };
+
+      // Execute post-processors
+      const results = await processorManager.executePostProcessors(
+        "agent-architect",
+        agentContext,
+        [],
+      );
+
+      // Should have at least one result
+      expect(results).toHaveLength(1);
+
+      // The refactoring logging processor should have executed
+      const loggingResult = results.find(r => r.processorName === "refactoringLogging");
+      expect(loggingResult).toBeDefined();
+      expect(loggingResult?.success).toBe(true);
+    });
+
+    it("should handle invalid agent context gracefully", async () => {
+      processorManager.registerProcessor({
+        name: "refactoringLogging",
+        type: "post",
+        priority: 140,
+        enabled: true,
+      });
+
+      await processorManager.initializeProcessors();
+
+      // Execute with invalid context (not an agent task)
+      const results = await processorManager.executePostProcessors(
+        "invalid-operation",
+        { someOtherData: "test" },
+        [],
+      );
+
+      expect(results).toHaveLength(1);
+      expect(results[0].success).toBe(true); // Should succeed but not log
+    });
+  });
 });

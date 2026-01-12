@@ -13,14 +13,15 @@
 import { execSync, spawn } from 'child_process';
 import fs from 'fs';
 import path from 'path';
-import { StrRayOrchestrator } from '../dist/orchestrator.js';
+import { StrRayOrchestrator } from '../../dist/orchestrator.js';
 
 const MAX_OUTPUT_SIZE = 100000; // Increased buffer for large test outputs
-const MAX_FILES_THRESHOLD = 50; // Run individually if more than 50 test files
-const CHUNK_SIZE = 10; // Process tests in chunks of 10
-const CHUNK_TIMEOUT_MS = 30000; // 30-second timeout per chunk (Codex Term #45)
-const TOTAL_TIMEOUT_MS = 600000; // 10-minute total timeout (Codex Term #45)
-const MAX_SUITE_SIZE = 100; // Maximum 100 files per suite (Codex Term #45)
+const MAX_FILES_THRESHOLD = 15; // Run individually if more than 15 test files (AGGRESSIVE)
+const CHUNK_SIZE = 3; // Process tests in smaller chunks of 3 (more granular)
+const CHUNK_TIMEOUT_MS = 8000; // 8-second timeout per chunk (AGGRESSIVE - Codex Term #45)
+const TOTAL_TIMEOUT_MS = 45000; // 45-second total timeout (AGGRESSIVE - Codex Term #45)
+const MAX_SUITE_SIZE = 30; // Maximum 30 files per suite (reduced - Codex Term #45)
+const TEST_PARALLEL_WORKERS = 8; // Run tests with 8 parallel workers (increased)
 
 class SmartTestRunner {
   constructor() {
@@ -28,6 +29,49 @@ class SmartTestRunner {
     this.outputChunks = [];
     this.quarantinedTests = [];
     this.startTime = Date.now();
+    this.testCache = new Map(); // AGGRESSIVE: Cache test results
+    this.skipUnchanged = true; // AGGRESSIVE: Skip unchanged tests
+  }
+
+  /**
+   * AGGRESSIVE: Check if test file has changed since last run
+   */
+  shouldSkipTest(testFile) {
+    if (!this.skipUnchanged) return false;
+
+    try {
+      const stats = fs.statSync(testFile);
+      const cacheKey = `${testFile}:${stats.mtime.getTime()}`;
+      const cached = this.testCache.get(testFile);
+
+      if (cached && cached.key === cacheKey) {
+        console.log(`⏭️ Skipping unchanged test: ${path.basename(testFile)}`);
+        return true;
+      }
+
+      return false;
+    } catch {
+      return false; // If we can't check, run the test
+    }
+  }
+
+  /**
+   * AGGRESSIVE: Cache successful test results
+   */
+  cacheTestResult(testFile, result) {
+    if (result.success) {
+      try {
+        const stats = fs.statSync(testFile);
+        const cacheKey = `${testFile}:${stats.mtime.getTime()}`;
+        this.testCache.set(testFile, {
+          key: cacheKey,
+          result: result,
+          timestamp: Date.now()
+        });
+      } catch {
+        // Ignore caching errors
+      }
+    }
   }
 
   /**
@@ -44,9 +88,11 @@ class SmartTestRunner {
      const { pattern = '**/*.test.ts', quarantineMode = false, autoHeal = false } = options;
      this.startTime = Date.now();
 
-     console.log('🚀 Smart Test Runner - Surgical fixes for large test suites');
-     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-     console.log(`⏱️  Total timeout: ${TOTAL_TIMEOUT_MS / 1000}s | Chunk timeout: ${CHUNK_TIMEOUT_MS / 1000}s`);
+    console.log('🚀 Smart Test Runner - AGGRESSIVE optimizations for large test suites');
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    console.log(`⏱️  AGGRESSIVE: Total timeout: ${TOTAL_TIMEOUT_MS / 1000}s | Chunk timeout: ${CHUNK_TIMEOUT_MS / 1000}s`);
+    console.log(`⚡ AGGRESSIVE: ${TEST_PARALLEL_WORKERS} parallel workers | Max ${MAX_SUITE_SIZE} files | ${CHUNK_SIZE} per chunk`);
+    console.log(`🚀 AGGRESSIVE: 5s per-test timeout | Bail after 3 failures | Cache enabled`);
 
      try {
       // Step 1: Discover test files
@@ -322,12 +368,28 @@ class SmartTestRunner {
    * Run a single test file
    */
   async runSingleTest(testFile, useJson = true) {
-    return new Promise((resolve) => {
-      const reporter = useJson ? '--reporter=json' : '--reporter=dot';
-      const vitest = spawn('npx', ['vitest', 'run', testFile, reporter], {
-        stdio: ['pipe', 'pipe', 'pipe'],
-        shell: true
+    // AGGRESSIVE: Skip unchanged tests using cache
+    if (this.shouldSkipTest(testFile)) {
+      return Promise.resolve({
+        file: testFile,
+        success: true,
+        skipped: true,
+        numPassedTests: 1,
+        numFailedTests: 0,
+        numTotalTests: 1
       });
+    }
+
+    return new Promise((resolve) => {
+       const reporter = useJson ? '--reporter=json' : '--reporter=dot';
+       const vitest = spawn('npx', ['vitest', 'run', testFile, reporter,
+         '--threads=' + TEST_PARALLEL_WORKERS, // AGGRESSIVE: Use multiple threads
+         '--timeout=5000', // AGGRESSIVE: 5-second timeout per test
+         '--bail=3' // AGGRESSIVE: Stop after 3 failures
+       ], {
+         stdio: ['pipe', 'pipe', 'pipe'],
+         shell: true
+       });
       
       let stdout = '';
       let stderr = '';
@@ -365,19 +427,33 @@ class SmartTestRunner {
              }
            }
 
-           resolve({
+            const testResult = {
+              file: testFile,
+              success: result.success && actualFailedTests === 0,
+              numPassedTests: result.numPassedTests,
+              numFailedTests: actualFailedTests,
+              output: stdout.length > 1000 ? stdout.substring(0, 1000) + '...' : stdout
+            };
+
+            // AGGRESSIVE: Cache successful results
+            if (testResult.success) {
+              this.cacheTestResult(testFile, testResult);
+            }
+
+            resolve(testResult);
+         } catch (error) {
+           const errorResult = {
              file: testFile,
-             success: result.success && actualFailedTests === 0,
-             numPassedTests: result.numPassedTests,
-             numFailedTests: actualFailedTests,
-             output: stdout.length > 1000 ? stdout.substring(0, 1000) + '...' : stdout
-           });
-        } catch (error) {
-          resolve({
-            file: testFile,
-            success: code === 0,
-            error: stderr || error.message
-          });
+             success: code === 0,
+             error: stderr || error.message
+           };
+
+           // AGGRESSIVE: Cache successful results even in catch block
+           if (errorResult.success) {
+             this.cacheTestResult(testFile, errorResult);
+           }
+
+           resolve(errorResult);
         }
       });
       

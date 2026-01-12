@@ -23,8 +23,8 @@ interface DocumentationAnalysis {
 }
 
 interface DocumentationIssue {
-  type: 'missing' | 'incomplete' | 'outdated' | 'inconsistent' | 'poor-quality';
-  severity: 'low' | 'medium' | 'high' | 'critical';
+  type: "missing" | "incomplete" | "outdated" | "inconsistent" | "poor-quality";
+  severity: "low" | "medium" | "high" | "critical";
   file?: string;
   element?: string;
   description: string;
@@ -94,7 +94,7 @@ interface APIExample {
 }
 
 interface AuthDocumentation {
-  type: 'bearer' | 'basic' | 'oauth2' | 'api-key';
+  type: "bearer" | "basic" | "oauth2" | "api-key";
   description: string;
   parameters: APIParameter[];
   examples: AuthExample[];
@@ -132,89 +132,116 @@ class StrRayDocumentationGenerationServer {
         tools: [
           {
             name: "analyze_documentation",
-            description: "Analyze existing documentation for completeness, quality, and gaps",
+            description:
+              "Analyze existing documentation for completeness, quality, and gaps",
             inputSchema: {
               type: "object",
               properties: {
                 docsPath: {
                   type: "string",
-                  description: "Path to documentation directory or files"
+                  description: "Path to documentation directory or files",
                 },
                 codePath: {
                   type: "string",
-                  description: "Path to corresponding code for comparison"
+                  description: "Path to corresponding code for comparison",
                 },
                 docTypes: {
                   type: "array",
                   items: {
                     type: "string",
-                    enum: ["readme", "api", "code", "architecture", "deployment", "user-guide"]
+                    enum: [
+                      "readme",
+                      "api",
+                      "code",
+                      "architecture",
+                      "deployment",
+                      "user-guide",
+                    ],
                   },
-                  description: "Types of documentation to analyze"
-                }
+                  description: "Types of documentation to analyze",
+                },
               },
-              required: ["docsPath"]
-            }
+              required: ["docsPath"],
+            },
           },
           {
             name: "generate_api_docs",
-            description: "Generate comprehensive API documentation from code analysis",
+            description:
+              "Generate comprehensive API documentation from code analysis",
             inputSchema: {
               type: "object",
               properties: {
                 codePath: {
                   type: "string",
-                  description: "Path to API code files"
+                  description: "Path to API code files",
                 },
                 framework: {
                   type: "string",
-                  enum: ["express", "fastify", "koa", "nestjs", "spring", "django", "flask", "fastapi"],
-                  description: "API framework being used"
+                  enum: [
+                    "express",
+                    "fastify",
+                    "koa",
+                    "nestjs",
+                    "spring",
+                    "django",
+                    "flask",
+                    "fastapi",
+                  ],
+                  description: "API framework being used",
                 },
                 format: {
                   type: "string",
                   enum: ["openapi", "markdown", "html", "postman"],
                   description: "Output documentation format",
-                  default: "openapi"
+                  default: "openapi",
                 },
                 includeExamples: {
                   type: "boolean",
                   description: "Include request/response examples",
-                  default: true
-                }
+                  default: true,
+                },
               },
-              required: ["codePath", "framework"]
-            }
+              required: ["codePath", "framework"],
+            },
           },
           {
             name: "generate_code_documentation",
-            description: "Generate inline code documentation and improve existing docs",
+            description:
+              "Generate inline code documentation and improve existing docs",
             inputSchema: {
               type: "object",
               properties: {
                 codePath: {
                   type: "string",
-                  description: "Path to code files to document"
+                  description: "Path to code files to document",
                 },
                 language: {
                   type: "string",
-                  enum: ["typescript", "javascript", "python", "java", "csharp", "go", "rust"],
-                  description: "Programming language"
+                  enum: [
+                    "typescript",
+                    "javascript",
+                    "python",
+                    "java",
+                    "csharp",
+                    "go",
+                    "rust",
+                  ],
+                  description: "Programming language",
                 },
                 style: {
                   type: "string",
                   enum: ["jsdoc", "docstring", "xml", "markdown"],
                   description: "Documentation comment style",
-                  default: "jsdoc"
+                  default: "jsdoc",
                 },
                 includePrivate: {
                   type: "boolean",
                   description: "Include documentation for private members",
-                  default: false
-                }
+                  default: false,
+                },
               },
-              required: ["codePath", "language"]
-            }
+              required: ["codePath", "language"],
+            },
           },
           {
             name: "generate_readme",
@@ -224,28 +251,34 @@ class StrRayDocumentationGenerationServer {
               properties: {
                 projectPath: {
                   type: "string",
-                  description: "Path to project root directory"
+                  description: "Path to project root directory",
                 },
                 projectType: {
                   type: "string",
                   enum: ["library", "application", "api", "cli", "framework"],
-                  description: "Type of project"
+                  description: "Type of project",
                 },
                 includeSections: {
                   type: "array",
                   items: { type: "string" },
                   description: "Specific sections to include",
-                  default: ["installation", "usage", "api", "contributing", "license"]
+                  default: [
+                    "installation",
+                    "usage",
+                    "api",
+                    "contributing",
+                    "license",
+                  ],
                 },
                 existingReadme: {
                   type: "string",
-                  description: "Path to existing README to improve"
-                }
+                  description: "Path to existing README to improve",
+                },
               },
-              required: ["projectPath", "projectType"]
-            }
-          }
-        ]
+              required: ["projectPath", "projectType"],
+            },
+          },
+        ],
       };
     });
 
@@ -271,42 +304,55 @@ class StrRayDocumentationGenerationServer {
     const { docsPath, codePath, docTypes = ["readme", "api", "code"] } = args;
 
     try {
-      const analysis = await this.performDocumentationAnalysis(docsPath, codePath, docTypes);
+      const analysis = await this.performDocumentationAnalysis(
+        docsPath,
+        codePath,
+        docTypes,
+      );
 
       return {
         content: [
           {
             type: "text",
-            text: `Documentation Analysis Report:\n\n` +
-                  `📊 OVERALL SCORES\n` +
-                  `Completeness: ${analysis.completeness}/100\n` +
-                  `Quality: ${analysis.quality}/100\n\n` +
-                  `📈 COVERAGE BY TYPE\n${Object.entries(analysis.coverage).map(([type, score]) =>
-                    `${type}: ${score}%`
-                  ).join('\n')}\n\n` +
-                  `🚨 ISSUES FOUND: ${analysis.issues.length}\n${analysis.issues.slice(0, 5).map(issue =>
-                    `${this.getSeverityIcon(issue.severity)} ${issue.type.toUpperCase()}: ${issue.description}`
-                  ).join('\n')}\n\n` +
-                  `💡 RECOMMENDATIONS\n${analysis.recommendations.map((rec, i) => `${i + 1}. ${rec}`).join('\n')}`
-          }
+            text:
+              `Documentation Analysis Report:\n\n` +
+              `📊 OVERALL SCORES\n` +
+              `Completeness: ${analysis.completeness}/100\n` +
+              `Quality: ${analysis.quality}/100\n\n` +
+              `📈 COVERAGE BY TYPE\n${Object.entries(analysis.coverage)
+                .map(([type, score]) => `${type}: ${score}%`)
+                .join("\n")}\n\n` +
+              `🚨 ISSUES FOUND: ${analysis.issues.length}\n${analysis.issues
+                .slice(0, 5)
+                .map(
+                  (issue) =>
+                    `${this.getSeverityIcon(issue.severity)} ${issue.type.toUpperCase()}: ${issue.description}`,
+                )
+                .join("\n")}\n\n` +
+              `💡 RECOMMENDATIONS\n${analysis.recommendations.map((rec, i) => `${i + 1}. ${rec}`).join("\n")}`,
+          },
         ],
-        data: analysis
+        data: analysis,
       };
-
     } catch (error) {
       return {
         content: [
           {
             type: "text",
-            text: `Error analyzing documentation: ${error instanceof Error ? error.message : String(error)}`
-          }
-        ]
+            text: `Error analyzing documentation: ${error instanceof Error ? error.message : String(error)}`,
+          },
+        ],
       };
     }
   }
 
   private async generateAPIDocs(args: any): Promise<any> {
-    const { codePath, framework, format = "openapi", includeExamples = true } = args;
+    const {
+      codePath,
+      framework,
+      format = "openapi",
+      includeExamples = true,
+    } = args;
 
     try {
       const apiDocs = await this.analyzeAPICode(codePath, framework);
@@ -333,144 +379,192 @@ class StrRayDocumentationGenerationServer {
         content: [
           {
             type: "text",
-            text: `API Documentation Generated (${format.toUpperCase()}):\n\n` +
-                  `📊 API ANALYSIS\n` +
-                  `Endpoints: ${apiDocs.endpoints.length}\n` +
-                  `Schemas: ${apiDocs.schemas.length}\n` +
-                  `Examples: ${apiDocs.examples.length}\n` +
-                  `Error Codes: ${apiDocs.errorCodes.length}\n\n` +
-                  `🔐 AUTHENTICATION: ${apiDocs.authentication.type.toUpperCase()}\n` +
-                  `${apiDocs.authentication.description}\n\n` +
-                  `${format === 'markdown' ? output.substring(0, 2000) + (output.length > 2000 ? '\n\n... (truncated)' : '') : 'Full documentation generated successfully.'}`
-          }
+            text:
+              `API Documentation Generated (${format.toUpperCase()}):\n\n` +
+              `📊 API ANALYSIS\n` +
+              `Endpoints: ${apiDocs.endpoints.length}\n` +
+              `Schemas: ${apiDocs.schemas.length}\n` +
+              `Examples: ${apiDocs.examples.length}\n` +
+              `Error Codes: ${apiDocs.errorCodes.length}\n\n` +
+              `🔐 AUTHENTICATION: ${apiDocs.authentication.type.toUpperCase()}\n` +
+              `${apiDocs.authentication.description}\n\n` +
+              `${format === "markdown" ? output.substring(0, 2000) + (output.length > 2000 ? "\n\n... (truncated)" : "") : "Full documentation generated successfully."}`,
+          },
         ],
         fullDocumentation: output,
-        data: apiDocs
+        data: apiDocs,
       };
-
     } catch (error) {
       return {
         content: [
           {
             type: "text",
-            text: `Error generating API documentation: ${error instanceof Error ? error.message : String(error)}`
-          }
-        ]
+            text: `Error generating API documentation: ${error instanceof Error ? error.message : String(error)}`,
+          },
+        ],
       };
     }
   }
 
   private async generateCodeDocumentation(args: any): Promise<any> {
-    const { codePath, language, style = "jsdoc", includePrivate = false } = args;
+    const {
+      codePath,
+      language,
+      style = "jsdoc",
+      includePrivate = false,
+    } = args;
 
     try {
-      const documentation = await this.analyzeCodeForDocumentation(codePath, language, includePrivate);
-      const generatedDocs = this.generateDocumentationComments(documentation, style);
+      const documentation = await this.analyzeCodeForDocumentation(
+        codePath,
+        language,
+        includePrivate,
+      );
+      const generatedDocs = this.generateDocumentationComments(
+        documentation,
+        style,
+      );
 
       return {
         content: [
           {
             type: "text",
-            text: `Code Documentation Analysis:\n\n` +
-                  `📊 ANALYSIS RESULTS\n` +
-                  `Files Processed: ${documentation.filesProcessed}\n` +
-                  `Functions Documented: ${documentation.functionsDocumented}/${documentation.totalFunctions}\n` +
-                  `Classes Documented: ${documentation.classesDocumented}/${documentation.totalClasses}\n` +
-                  `Coverage: ${documentation.coverage}%\n\n` +
-                  `📝 GENERATED DOCUMENTATION\n` +
-                  `Style: ${style.toUpperCase()}\n` +
-                  `Comments Added: ${generatedDocs.length}\n\n` +
-                  `💡 SAMPLE GENERATED DOCS\n${generatedDocs.slice(0, 3).map(doc => `\`\`\`${language}\n${doc}\n\`\`\``).join('\n\n')}`
-          }
+            text:
+              `Code Documentation Analysis:\n\n` +
+              `📊 ANALYSIS RESULTS\n` +
+              `Files Processed: ${documentation.filesProcessed}\n` +
+              `Functions Documented: ${documentation.functionsDocumented}/${documentation.totalFunctions}\n` +
+              `Classes Documented: ${documentation.classesDocumented}/${documentation.totalClasses}\n` +
+              `Coverage: ${documentation.coverage}%\n\n` +
+              `📝 GENERATED DOCUMENTATION\n` +
+              `Style: ${style.toUpperCase()}\n` +
+              `Comments Added: ${generatedDocs.length}\n\n` +
+              `💡 SAMPLE GENERATED DOCS\n${generatedDocs
+                .slice(0, 3)
+                .map((doc) => `\`\`\`${language}\n${doc}\n\`\`\``)
+                .join("\n\n")}`,
+          },
         ],
         documentationUpdates: generatedDocs,
-        data: documentation
+        data: documentation,
       };
-
     } catch (error) {
       return {
         content: [
           {
             type: "text",
-            text: `Error generating code documentation: ${error instanceof Error ? error.message : String(error)}`
-          }
-        ]
+            text: `Error generating code documentation: ${error instanceof Error ? error.message : String(error)}`,
+          },
+        ],
       };
     }
   }
 
   private async generateReadme(args: any): Promise<any> {
-    const { projectPath, projectType, includeSections = ["installation", "usage", "api", "contributing", "license"], existingReadme } = args;
+    const {
+      projectPath,
+      projectType,
+      includeSections = [
+        "installation",
+        "usage",
+        "api",
+        "contributing",
+        "license",
+      ],
+      existingReadme,
+    } = args;
 
     try {
-      const projectAnalysis = await this.analyzeProjectStructure(projectPath, projectType);
-      const readmeContent = this.generateReadmeContent(projectAnalysis, includeSections, existingReadme);
+      const projectAnalysis = await this.analyzeProjectStructure(
+        projectPath,
+        projectType,
+      );
+      const readmeContent = this.generateReadmeContent(
+        projectAnalysis,
+        includeSections,
+        existingReadme,
+      );
 
       return {
         content: [
           {
             type: "text",
-            text: `README Generation Complete:\n\n` +
-                  `📋 PROJECT ANALYSIS\n` +
-                  `Type: ${projectType.toUpperCase()}\n` +
-                  `Languages: ${projectAnalysis.languages.join(', ')}\n` +
-                  `Dependencies: ${projectAnalysis.dependencies.length}\n` +
-                  `Entry Points: ${projectAnalysis.entryPoints.length}\n\n` +
-                  `📝 README STRUCTURE\n` +
-                  `Sections: ${includeSections.join(', ')}\n` +
-                  `Length: ${readmeContent.length} characters\n\n` +
-                  `📖 GENERATED README\n${readmeContent.substring(0, 1000)}${readmeContent.length > 1000 ? '\n\n... (truncated - see full content)' : ''}`
-          }
+            text:
+              `README Generation Complete:\n\n` +
+              `📋 PROJECT ANALYSIS\n` +
+              `Type: ${projectType.toUpperCase()}\n` +
+              `Languages: ${projectAnalysis.languages.join(", ")}\n` +
+              `Dependencies: ${projectAnalysis.dependencies.length}\n` +
+              `Entry Points: ${projectAnalysis.entryPoints.length}\n\n` +
+              `📝 README STRUCTURE\n` +
+              `Sections: ${includeSections.join(", ")}\n` +
+              `Length: ${readmeContent.length} characters\n\n` +
+              `📖 GENERATED README\n${readmeContent.substring(0, 1000)}${readmeContent.length > 1000 ? "\n\n... (truncated - see full content)" : ""}`,
+          },
         ],
         fullReadme: readmeContent,
-        data: projectAnalysis
+        data: projectAnalysis,
       };
-
     } catch (error) {
       return {
         content: [
           {
             type: "text",
-            text: `Error generating README: ${error instanceof Error ? error.message : String(error)}`
-          }
-        ]
+            text: `Error generating README: ${error instanceof Error ? error.message : String(error)}`,
+          },
+        ],
       };
     }
   }
 
-  private async performDocumentationAnalysis(docsPath: string, codePath: string | undefined, docTypes: string[]): Promise<DocumentationAnalysis> {
+  private async performDocumentationAnalysis(
+    docsPath: string,
+    codePath: string | undefined,
+    docTypes: string[],
+  ): Promise<DocumentationAnalysis> {
     const analysis: DocumentationAnalysis = {
       completeness: 0,
       quality: 0,
       coverage: {},
       issues: [],
-      recommendations: []
+      recommendations: [],
     };
 
     // Analyze existing documentation
     for (const docType of docTypes) {
-      analysis.coverage[docType] = await this.analyzeDocTypeCoverage(docsPath, docType);
+      analysis.coverage[docType] = await this.analyzeDocTypeCoverage(
+        docsPath,
+        docType,
+      );
     }
 
     // Compare with code if provided
     if (codePath) {
-      analysis.issues = await this.compareDocsWithCode(docsPath, codePath, docTypes);
+      analysis.issues = await this.compareDocsWithCode(
+        docsPath,
+        codePath,
+        docTypes,
+      );
     }
 
     // Check documentation quality
-    analysis.issues.push(...await this.analyzeDocumentationQuality(docsPath));
+    analysis.issues.push(...(await this.analyzeDocumentationQuality(docsPath)));
 
     // Calculate scores
     analysis.completeness = this.calculateCompletenessScore(analysis.coverage);
     analysis.quality = this.calculateQualityScore(analysis.issues);
 
     // Generate recommendations
-    analysis.recommendations = this.generateDocumentationRecommendations(analysis);
+    analysis.recommendations =
+      this.generateDocumentationRecommendations(analysis);
 
     return analysis;
   }
 
-  private async analyzeDocTypeCoverage(docsPath: string, docType: string): Promise<number> {
+  private async analyzeDocTypeCoverage(
+    docsPath: string,
+    docType: string,
+  ): Promise<number> {
     let coverage = 0;
 
     try {
@@ -478,22 +572,54 @@ class StrRayDocumentationGenerationServer {
 
       switch (docType) {
         case "readme":
-          coverage = files.some(f => typeof f === 'string' && f.toLowerCase().includes('readme')) ? 100 : 0;
+          coverage = files.some(
+            (f) => typeof f === "string" && f.toLowerCase().includes("readme"),
+          )
+            ? 100
+            : 0;
           break;
         case "api":
-          coverage = files.some(f => typeof f === 'string' && (f.includes('api') || f.includes('swagger') || f.includes('openapi'))) ? 100 : 0;
+          coverage = files.some(
+            (f) =>
+              typeof f === "string" &&
+              (f.includes("api") ||
+                f.includes("swagger") ||
+                f.includes("openapi")),
+          )
+            ? 100
+            : 0;
           break;
         case "code":
-          coverage = files.some(f => typeof f === 'string' && f.includes('code')) ? 100 : 0;
+          coverage = files.some(
+            (f) => typeof f === "string" && f.includes("code"),
+          )
+            ? 100
+            : 0;
           break;
         case "architecture":
-          coverage = files.some(f => typeof f === 'string' && (f.includes('arch') || f.includes('design'))) ? 100 : 0;
+          coverage = files.some(
+            (f) =>
+              typeof f === "string" &&
+              (f.includes("arch") || f.includes("design")),
+          )
+            ? 100
+            : 0;
           break;
         case "deployment":
-          coverage = files.some(f => typeof f === 'string' && f.includes('deploy')) ? 100 : 0;
+          coverage = files.some(
+            (f) => typeof f === "string" && f.includes("deploy"),
+          )
+            ? 100
+            : 0;
           break;
         case "user-guide":
-          coverage = files.some(f => typeof f === 'string' && (f.includes('guide') || f.includes('tutorial'))) ? 100 : 0;
+          coverage = files.some(
+            (f) =>
+              typeof f === "string" &&
+              (f.includes("guide") || f.includes("tutorial")),
+          )
+            ? 100
+            : 0;
           break;
       }
     } catch {
@@ -503,67 +629,75 @@ class StrRayDocumentationGenerationServer {
     return coverage;
   }
 
-  private async compareDocsWithCode(docsPath: string, codePath: string, docTypes: string[]): Promise<DocumentationIssue[]> {
+  private async compareDocsWithCode(
+    docsPath: string,
+    codePath: string,
+    docTypes: string[],
+  ): Promise<DocumentationIssue[]> {
     const issues: DocumentationIssue[] = [];
 
     // Check for missing API documentation
-    if (docTypes.includes('api')) {
+    if (docTypes.includes("api")) {
       // This would analyze code for exported functions/classes and check if they're documented
       issues.push({
-        type: 'missing',
-        severity: 'medium',
-        description: 'API documentation not found for exported functions',
-        suggestion: 'Generate API documentation for all public exports'
+        type: "missing",
+        severity: "medium",
+        description: "API documentation not found for exported functions",
+        suggestion: "Generate API documentation for all public exports",
       });
     }
 
     // Check for README completeness
-    if (docTypes.includes('readme')) {
+    if (docTypes.includes("readme")) {
       issues.push({
-        type: 'incomplete',
-        severity: 'low',
-        description: 'README missing usage examples',
-        suggestion: 'Add practical usage examples to README'
+        type: "incomplete",
+        severity: "low",
+        description: "README missing usage examples",
+        suggestion: "Add practical usage examples to README",
       });
     }
 
     return issues;
   }
 
-  private async analyzeDocumentationQuality(docsPath: string): Promise<DocumentationIssue[]> {
+  private async analyzeDocumentationQuality(
+    docsPath: string,
+  ): Promise<DocumentationIssue[]> {
     const issues: DocumentationIssue[] = [];
 
     try {
       const files = fs.readdirSync(docsPath, { recursive: true });
 
       for (const file of files) {
-        if (typeof file === 'string' && (file.endsWith('.md') || file.endsWith('.txt'))) {
+        if (
+          typeof file === "string" &&
+          (file.endsWith(".md") || file.endsWith(".txt"))
+        ) {
           try {
-            const content = fs.readFileSync(path.join(docsPath, file), 'utf-8');
+            const content = fs.readFileSync(path.join(docsPath, file), "utf-8");
 
             // Check for outdated information
-            if (content.includes('TODO') || content.includes('FIXME')) {
+            if (content.includes("TODO") || content.includes("FIXME")) {
               issues.push({
-                type: 'incomplete',
-                severity: 'low',
+                type: "incomplete",
+                severity: "low",
                 file,
-                description: 'Documentation contains TODO/FIXME comments',
-                suggestion: 'Address pending documentation tasks'
+                description: "Documentation contains TODO/FIXME comments",
+                suggestion: "Address pending documentation tasks",
               });
             }
 
             // Check for broken links (simplified)
             const links = content.match(/\[([^\]]+)\]\(([^)]+)\)/g);
-            if (links && links.some(link => link.includes('http'))) {
+            if (links && links.some((link) => link.includes("http"))) {
               issues.push({
-                type: 'inconsistent',
-                severity: 'low',
+                type: "inconsistent",
+                severity: "low",
                 file,
-                description: 'External links should be validated',
-                suggestion: 'Verify all external links are accessible'
+                description: "External links should be validated",
+                suggestion: "Verify all external links are accessible",
               });
             }
-
           } catch {
             // Skip files that can't be read
           }
@@ -578,58 +712,85 @@ class StrRayDocumentationGenerationServer {
 
   private calculateCompletenessScore(coverage: Record<string, number>): number {
     const values = Object.values(coverage);
-    return values.length > 0 ? Math.round(values.reduce((sum, val) => sum + val, 0) / values.length) : 0;
+    return values.length > 0
+      ? Math.round(values.reduce((sum, val) => sum + val, 0) / values.length)
+      : 0;
   }
 
   private calculateQualityScore(issues: DocumentationIssue[]): number {
     let score = 100;
 
-    issues.forEach(issue => {
+    issues.forEach((issue) => {
       switch (issue.severity) {
-        case 'critical': score -= 15; break;
-        case 'high': score -= 10; break;
-        case 'medium': score -= 5; break;
-        case 'low': score -= 2; break;
+        case "critical":
+          score -= 15;
+          break;
+        case "high":
+          score -= 10;
+          break;
+        case "medium":
+          score -= 5;
+          break;
+        case "low":
+          score -= 2;
+          break;
       }
     });
 
     return Math.max(0, score);
   }
 
-  private generateDocumentationRecommendations(analysis: DocumentationAnalysis): string[] {
+  private generateDocumentationRecommendations(
+    analysis: DocumentationAnalysis,
+  ): string[] {
     const recommendations: string[] = [];
 
     if (analysis.completeness < 70) {
-      recommendations.push("Improve documentation completeness - cover all major functionality");
+      recommendations.push(
+        "Improve documentation completeness - cover all major functionality",
+      );
     }
 
     if (analysis.quality < 80) {
-      recommendations.push("Enhance documentation quality - ensure clarity and accuracy");
+      recommendations.push(
+        "Enhance documentation quality - ensure clarity and accuracy",
+      );
     }
 
-    const lowCoverage = Object.entries(analysis.coverage).filter(([_, score]) => score < 50);
+    const lowCoverage = Object.entries(analysis.coverage).filter(
+      ([_, score]) => score < 50,
+    );
     if (lowCoverage.length > 0) {
-      recommendations.push(`Add documentation for: ${lowCoverage.map(([type]) => type).join(', ')}`);
+      recommendations.push(
+        `Add documentation for: ${lowCoverage.map(([type]) => type).join(", ")}`,
+      );
     }
 
-    recommendations.push("Set up automated documentation validation in CI/CD pipeline");
-    recommendations.push("Establish documentation review process for all changes");
+    recommendations.push(
+      "Set up automated documentation validation in CI/CD pipeline",
+    );
+    recommendations.push(
+      "Establish documentation review process for all changes",
+    );
 
     return recommendations;
   }
 
-  private async analyzeAPICode(codePath: string, framework: string): Promise<APIDocumentation> {
+  private async analyzeAPICode(
+    codePath: string,
+    framework: string,
+  ): Promise<APIDocumentation> {
     const apiDocs: APIDocumentation = {
       endpoints: [],
       schemas: [],
       examples: [],
       authentication: {
-        type: 'bearer',
-        description: 'Bearer token authentication',
+        type: "bearer",
+        description: "Bearer token authentication",
         parameters: [],
-        examples: []
+        examples: [],
       },
-      errorCodes: []
+      errorCodes: [],
     };
 
     // Simplified API analysis - in production would be more sophisticated
@@ -637,9 +798,12 @@ class StrRayDocumentationGenerationServer {
       const files = fs.readdirSync(codePath, { recursive: true });
 
       for (const file of files) {
-        if (typeof file === 'string' && (file.endsWith('.ts') || file.endsWith('.js'))) {
+        if (
+          typeof file === "string" &&
+          (file.endsWith(".ts") || file.endsWith(".js"))
+        ) {
           try {
-            const content = fs.readFileSync(path.join(codePath, file), 'utf-8');
+            const content = fs.readFileSync(path.join(codePath, file), "utf-8");
 
             // Extract route definitions based on framework
             const routes = this.extractRoutes(content, framework);
@@ -648,7 +812,6 @@ class StrRayDocumentationGenerationServer {
             // Extract schemas/types
             const schemas = this.extractSchemas(content, framework);
             apiDocs.schemas.push(...schemas);
-
           } catch {
             // Skip files that can't be read
           }
@@ -672,9 +835,11 @@ class StrRayDocumentationGenerationServer {
 
     // Simplified route extraction - would be framework-specific in production
     const routePatterns = {
-      express: /(?:app|router)\.(get|post|put|delete|patch)\s*\(\s*['"]([^'"]+)['"]/g,
-      fastify: /(?:fastify|app)\.(get|post|put|delete|patch)\s*\(\s*['"]([^'"]+)['"]/g,
-      nestjs: /@(Get|Post|Put|Delete|Patch)\s*\(\s*['"]([^'"]+)['"]\s*\)/g
+      express:
+        /(?:app|router)\.(get|post|put|delete|patch)\s*\(\s*['"]([^'"]+)['"]/g,
+      fastify:
+        /(?:fastify|app)\.(get|post|put|delete|patch)\s*\(\s*['"]([^'"]+)['"]/g,
+      nestjs: /@(Get|Post|Put|Delete|Patch)\s*\(\s*['"]([^'"]+)['"]\s*\)/g,
     };
 
     const pattern = routePatterns[framework as keyof typeof routePatterns];
@@ -693,18 +858,18 @@ class StrRayDocumentationGenerationServer {
             responses: [
               {
                 statusCode: 200,
-                description: 'Success response'
+                description: "Success response",
               },
               {
                 statusCode: 400,
-                description: 'Bad request'
+                description: "Bad request",
               },
               {
                 statusCode: 500,
-                description: 'Internal server error'
-              }
+                description: "Internal server error",
+              },
             ],
-            tags: ['API']
+            tags: ["API"],
           });
         }
       }
@@ -719,25 +884,27 @@ class StrRayDocumentationGenerationServer {
     // Extract TypeScript interfaces/classes
     const interfaceMatches = content.match(/interface\s+(\w+)\s*{([^}]*)}/g);
     if (interfaceMatches) {
-      interfaceMatches.forEach(match => {
-        const [, name, properties] = match.match(/interface\s+(\w+)\s*{([^}]*)}/) || [];
+      interfaceMatches.forEach((match) => {
+        const [, name, properties] =
+          match.match(/interface\s+(\w+)\s*{([^}]*)}/) || [];
 
         if (name && properties) {
           const schema: APISchema = {
             name,
-            type: 'object',
-            properties: {}
+            type: "object",
+            properties: {},
           };
 
           // Parse properties (simplified)
           const propMatches = properties.match(/(\w+):\s*([^;]+)/g);
           if (propMatches) {
-            propMatches.forEach(prop => {
-              const [, propName, propType] = prop.match(/(\w+):\s*([^;]+)/) || [];
+            propMatches.forEach((prop) => {
+              const [, propName, propType] =
+                prop.match(/(\w+):\s*([^;]+)/) || [];
               if (propName && propType) {
                 schema.properties[propName] = {
                   type: this.mapTypeScriptType(propType.trim()),
-                  description: `${propName} field`
+                  description: `${propName} field`,
                 };
               }
             });
@@ -753,145 +920,167 @@ class StrRayDocumentationGenerationServer {
 
   private mapTypeScriptType(tsType: string): string {
     const typeMap: Record<string, string> = {
-      'string': 'string',
-      'number': 'number',
-      'boolean': 'boolean',
-      'string[]': 'array',
-      'number[]': 'array',
-      'boolean[]': 'array',
-      'Date': 'string',
-      'any': 'object'
+      string: "string",
+      number: "number",
+      boolean: "boolean",
+      "string[]": "array",
+      "number[]": "array",
+      "boolean[]": "array",
+      Date: "string",
+      any: "object",
     };
 
-    return typeMap[tsType] || 'string';
+    return typeMap[tsType] || "string";
   }
 
   private generateAPIExamples(endpoints: APIEndpoint[]): APIExample[] {
-    return endpoints.slice(0, 3).map(endpoint => ({
+    return endpoints.slice(0, 3).map((endpoint) => ({
       title: `${endpoint.method} ${endpoint.path}`,
       request: {
         method: endpoint.method,
         path: endpoint.path,
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer <token>'
-        }
+          "Content-Type": "application/json",
+          Authorization: "Bearer <token>",
+        },
       },
       response: {
         statusCode: 200,
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
-        body: { success: true, data: {} }
-      }
+        body: { success: true, data: {} },
+      },
     }));
   }
 
   private generateErrorCodes(): ErrorCode[] {
     return [
       {
-        code: 'VALIDATION_ERROR',
-        message: 'Input validation failed',
-        description: 'The provided input does not meet the required validation criteria',
-        resolution: 'Check the input parameters and ensure they match the expected format'
+        code: "VALIDATION_ERROR",
+        message: "Input validation failed",
+        description:
+          "The provided input does not meet the required validation criteria",
+        resolution:
+          "Check the input parameters and ensure they match the expected format",
       },
       {
-        code: 'UNAUTHORIZED',
-        message: 'Authentication required',
-        description: 'Access to this resource requires authentication',
-        resolution: 'Provide valid authentication credentials'
+        code: "UNAUTHORIZED",
+        message: "Authentication required",
+        description: "Access to this resource requires authentication",
+        resolution: "Provide valid authentication credentials",
       },
       {
-        code: 'FORBIDDEN',
-        message: 'Access denied',
-        description: 'You do not have permission to access this resource',
-        resolution: 'Contact administrator for access permissions'
+        code: "FORBIDDEN",
+        message: "Access denied",
+        description: "You do not have permission to access this resource",
+        resolution: "Contact administrator for access permissions",
       },
       {
-        code: 'NOT_FOUND',
-        message: 'Resource not found',
-        description: 'The requested resource could not be found',
-        resolution: 'Verify the resource identifier and try again'
+        code: "NOT_FOUND",
+        message: "Resource not found",
+        description: "The requested resource could not be found",
+        resolution: "Verify the resource identifier and try again",
       },
       {
-        code: 'INTERNAL_ERROR',
-        message: 'Internal server error',
-        description: 'An unexpected error occurred on the server',
-        resolution: 'Try again later or contact support if the problem persists'
-      }
+        code: "INTERNAL_ERROR",
+        message: "Internal server error",
+        description: "An unexpected error occurred on the server",
+        resolution:
+          "Try again later or contact support if the problem persists",
+      },
     ];
   }
 
-  private generateOpenAPISpec(apiDocs: APIDocumentation, includeExamples: boolean): string {
+  private generateOpenAPISpec(
+    apiDocs: APIDocumentation,
+    includeExamples: boolean,
+  ): string {
     const spec = {
-      openapi: '3.0.0',
+      openapi: "3.0.0",
       info: {
-        title: 'API Documentation',
-        version: '1.0.0',
-        description: 'Generated API documentation'
+        title: "API Documentation",
+        version: "1.0.0",
+        description: "Generated API documentation",
       },
       servers: [
         {
-          url: 'https://api.example.com/v1'
-        }
+          url: "https://api.example.com/v1",
+        },
       ],
       security: [
         {
-          bearerAuth: []
-        }
+          bearerAuth: [],
+        },
       ],
       components: {
         securitySchemes: {
           bearerAuth: {
-            type: 'http',
-            scheme: 'bearer'
-          }
+            type: "http",
+            scheme: "bearer",
+          },
         },
-        schemas: apiDocs.schemas.reduce((acc, schema) => {
-          acc[schema.name] = {
-            type: schema.type,
-            properties: schema.properties,
-            required: schema.required
-          };
-          return acc;
-        }, {} as Record<string, any>)
-      },
-      paths: apiDocs.endpoints.reduce((acc, endpoint) => {
-        const pathKey = endpoint.path.replace(/:(\w+)/g, '{$1}');
-        if (!acc[pathKey]) acc[pathKey] = {};
-
-        acc[pathKey][endpoint.method.toLowerCase()] = {
-          summary: endpoint.summary,
-          description: endpoint.description,
-          parameters: endpoint.parameters.map(param => ({
-            name: param.name,
-            in: 'path',
-            required: param.required,
-            schema: { type: param.type },
-            description: param.description
-          })),
-          responses: endpoint.responses.reduce((resAcc, response) => {
-            resAcc[response.statusCode] = {
-              description: response.description,
-              content: {
-                'application/json': {
-                  schema: response.schema ? { $ref: `#/components/schemas/${response.schema.name}` } : {}
-                }
-              }
+        schemas: apiDocs.schemas.reduce(
+          (acc, schema) => {
+            acc[schema.name] = {
+              type: schema.type,
+              properties: schema.properties,
+              required: schema.required,
             };
-            return resAcc;
-          }, {} as Record<string, any>),
-          tags: endpoint.tags
-        };
+            return acc;
+          },
+          {} as Record<string, any>,
+        ),
+      },
+      paths: apiDocs.endpoints.reduce(
+        (acc, endpoint) => {
+          const pathKey = endpoint.path.replace(/:(\w+)/g, "{$1}");
+          if (!acc[pathKey]) acc[pathKey] = {};
 
-        return acc;
-      }, {} as Record<string, any>)
+          acc[pathKey][endpoint.method.toLowerCase()] = {
+            summary: endpoint.summary,
+            description: endpoint.description,
+            parameters: endpoint.parameters.map((param) => ({
+              name: param.name,
+              in: "path",
+              required: param.required,
+              schema: { type: param.type },
+              description: param.description,
+            })),
+            responses: endpoint.responses.reduce(
+              (resAcc, response) => {
+                resAcc[response.statusCode] = {
+                  description: response.description,
+                  content: {
+                    "application/json": {
+                      schema: response.schema
+                        ? {
+                            $ref: `#/components/schemas/${response.schema.name}`,
+                          }
+                        : {},
+                    },
+                  },
+                };
+                return resAcc;
+              },
+              {} as Record<string, any>,
+            ),
+            tags: endpoint.tags,
+          };
+
+          return acc;
+        },
+        {} as Record<string, any>,
+      ),
     };
 
     return JSON.stringify(spec, null, 2);
   }
 
-  private generateMarkdownAPIDocs(apiDocs: APIDocumentation, includeExamples: boolean): string {
+  private generateMarkdownAPIDocs(
+    apiDocs: APIDocumentation,
+    includeExamples: boolean,
+  ): string {
     let markdown = `# API Documentation\n\n`;
 
     markdown += `## Authentication\n\n`;
@@ -899,7 +1088,7 @@ class StrRayDocumentationGenerationServer {
 
     if (includeExamples && apiDocs.authentication.examples.length > 0) {
       markdown += `### Authentication Examples\n\n`;
-      apiDocs.authentication.examples.forEach(example => {
+      apiDocs.authentication.examples.forEach((example) => {
         markdown += `#### ${example.title}\n\n`;
         markdown += `\`\`\`\n`;
         Object.entries(example.headers).forEach(([key, value]) => {
@@ -911,22 +1100,22 @@ class StrRayDocumentationGenerationServer {
     }
 
     markdown += `## Endpoints\n\n`;
-    apiDocs.endpoints.forEach(endpoint => {
+    apiDocs.endpoints.forEach((endpoint) => {
       markdown += `### ${endpoint.method} ${endpoint.path}\n\n`;
       markdown += `${endpoint.description}\n\n`;
 
       if (endpoint.parameters.length > 0) {
         markdown += `**Parameters:**\n\n`;
-        endpoint.parameters.forEach(param => {
+        endpoint.parameters.forEach((param) => {
           markdown += `- \`${param.name}\` (${param.type})`;
-          if (param.required) markdown += ' **required**';
+          if (param.required) markdown += " **required**";
           markdown += ` - ${param.description}\n`;
         });
         markdown += `\n`;
       }
 
       markdown += `**Responses:**\n\n`;
-      endpoint.responses.forEach(response => {
+      endpoint.responses.forEach((response) => {
         markdown += `- \`${response.statusCode}\`: ${response.description}\n`;
       });
       markdown += `\n`;
@@ -934,7 +1123,7 @@ class StrRayDocumentationGenerationServer {
 
     if (apiDocs.errorCodes.length > 0) {
       markdown += `## Error Codes\n\n`;
-      apiDocs.errorCodes.forEach(error => {
+      apiDocs.errorCodes.forEach((error) => {
         markdown += `### ${error.code}\n\n`;
         markdown += `**Message:** ${error.message}\n\n`;
         markdown += `**Description:** ${error.description}\n\n`;
@@ -945,71 +1134,86 @@ class StrRayDocumentationGenerationServer {
     return markdown;
   }
 
-  private generateHTMLAPIDocs(apiDocs: APIDocumentation, includeExamples: boolean): string {
+  private generateHTMLAPIDocs(
+    apiDocs: APIDocumentation,
+    includeExamples: boolean,
+  ): string {
     return `<html><body><h1>API Documentation</h1><p>Generated documentation</p></body></html>`;
   }
 
-  private generatePostmanCollection(apiDocs: APIDocumentation, includeExamples: boolean): string {
+  private generatePostmanCollection(
+    apiDocs: APIDocumentation,
+    includeExamples: boolean,
+  ): string {
     const collection = {
       info: {
-        name: 'API Collection',
-        schema: 'https://schema.getpostman.com/json/collection/v2.1.0/collection.json'
+        name: "API Collection",
+        schema:
+          "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
       },
-      item: apiDocs.endpoints.map(endpoint => ({
+      item: apiDocs.endpoints.map((endpoint) => ({
         name: `${endpoint.method} ${endpoint.path}`,
         request: {
           method: endpoint.method,
           header: [
             {
-              key: 'Content-Type',
-              value: 'application/json'
-            }
+              key: "Content-Type",
+              value: "application/json",
+            },
           ],
           url: {
             raw: `{{baseUrl}}${endpoint.path}`,
-            host: ['{{baseUrl}}'],
-            path: endpoint.path.split('/').filter(p => p)
-          }
-        }
-      }))
+            host: ["{{baseUrl}}"],
+            path: endpoint.path.split("/").filter((p) => p),
+          },
+        },
+      })),
     };
 
     return JSON.stringify(collection, null, 2);
   }
 
-  private async analyzeCodeForDocumentation(codePath: string, language: string, includePrivate: boolean): Promise<any> {
+  private async analyzeCodeForDocumentation(
+    codePath: string,
+    language: string,
+    includePrivate: boolean,
+  ): Promise<any> {
     const analysis = {
       filesProcessed: 0,
       totalFunctions: 0,
       functionsDocumented: 0,
       totalClasses: 0,
       classesDocumented: 0,
-      coverage: 0
+      coverage: 0,
     };
 
     try {
       const files = fs.readdirSync(codePath, { recursive: true });
 
       for (const file of files) {
-        if (typeof file === 'string' &&
-            ((language === 'typescript' && file.endsWith('.ts')) ||
-             (language === 'javascript' && file.endsWith('.js')) ||
-             (language === 'python' && file.endsWith('.py')))) {
-
+        if (
+          typeof file === "string" &&
+          ((language === "typescript" && file.endsWith(".ts")) ||
+            (language === "javascript" && file.endsWith(".js")) ||
+            (language === "python" && file.endsWith(".py")))
+        ) {
           try {
-            const content = fs.readFileSync(path.join(codePath, file), 'utf-8');
+            const content = fs.readFileSync(path.join(codePath, file), "utf-8");
             analysis.filesProcessed++;
 
             // Analyze functions
             const functions = this.extractFunctions(content, language);
             analysis.totalFunctions += functions.length;
-            analysis.functionsDocumented += functions.filter(f => this.hasDocumentation(f, content, language)).length;
+            analysis.functionsDocumented += functions.filter((f) =>
+              this.hasDocumentation(f, content, language),
+            ).length;
 
             // Analyze classes
             const classes = this.extractClasses(content, language);
             analysis.totalClasses += classes.length;
-            analysis.classesDocumented += classes.filter(c => this.hasDocumentation(c, content, language)).length;
-
+            analysis.classesDocumented += classes.filter((c) =>
+              this.hasDocumentation(c, content, language),
+            ).length;
           } catch {
             // Skip files that can't be read
           }
@@ -1021,8 +1225,12 @@ class StrRayDocumentationGenerationServer {
 
     // Calculate coverage
     const totalDocumentable = analysis.totalFunctions + analysis.totalClasses;
-    const documented = analysis.functionsDocumented + analysis.classesDocumented;
-    analysis.coverage = totalDocumentable > 0 ? Math.round((documented / totalDocumentable) * 100) : 0;
+    const documented =
+      analysis.functionsDocumented + analysis.classesDocumented;
+    analysis.coverage =
+      totalDocumentable > 0
+        ? Math.round((documented / totalDocumentable) * 100)
+        : 0;
 
     return analysis;
   }
@@ -1031,19 +1239,27 @@ class StrRayDocumentationGenerationServer {
     const functions: string[] = [];
 
     switch (language) {
-      case 'typescript':
-      case 'javascript':
+      case "typescript":
+      case "javascript":
         // Match function declarations and arrow functions
-        const jsFunctions = content.match(/(?:function\s+(\w+)|const\s+(\w+)\s*=\s*(?:\([^)]*\)\s*=>|function\s*\([^)]*\)))/g);
+        const jsFunctions = content.match(
+          /(?:function\s+(\w+)|const\s+(\w+)\s*=\s*(?:\([^)]*\)\s*=>|function\s*\([^)]*\)))/g,
+        );
         if (jsFunctions) {
-          functions.push(...jsFunctions.map(f => f.replace(/^(?:function\s+|const\s+|=\s*)/, '').replace(/\s*=.*$/, '')));
+          functions.push(
+            ...jsFunctions.map((f) =>
+              f
+                .replace(/^(?:function\s+|const\s+|=\s*)/, "")
+                .replace(/\s*=.*$/, ""),
+            ),
+          );
         }
         break;
-      case 'python':
+      case "python":
         // Match function definitions
         const pyFunctions = content.match(/def\s+(\w+)/g);
         if (pyFunctions) {
-          functions.push(...pyFunctions.map(f => f.replace('def ', '')));
+          functions.push(...pyFunctions.map((f) => f.replace("def ", "")));
         }
         break;
     }
@@ -1055,17 +1271,17 @@ class StrRayDocumentationGenerationServer {
     const classes: string[] = [];
 
     switch (language) {
-      case 'typescript':
-      case 'javascript':
+      case "typescript":
+      case "javascript":
         const jsClasses = content.match(/class\s+(\w+)/g);
         if (jsClasses) {
-          classes.push(...jsClasses.map(c => c.replace('class ', '')));
+          classes.push(...jsClasses.map((c) => c.replace("class ", "")));
         }
         break;
-      case 'python':
+      case "python":
         const pyClasses = content.match(/class\s+(\w+)/g);
         if (pyClasses) {
-          classes.push(...pyClasses.map(c => c.replace('class ', '')));
+          classes.push(...pyClasses.map((c) => c.replace("class ", "")));
         }
         break;
     }
@@ -1073,14 +1289,18 @@ class StrRayDocumentationGenerationServer {
     return classes;
   }
 
-  private hasDocumentation(element: string, content: string, language: string): boolean {
+  private hasDocumentation(
+    element: string,
+    content: string,
+    language: string,
+  ): boolean {
     // Check if there's documentation before the element
     const elementIndex = content.indexOf(element);
     if (elementIndex === -1) return false;
 
     // Look for documentation comments before the element
     const beforeElement = content.substring(0, elementIndex);
-    const lines = beforeElement.split('\n');
+    const lines = beforeElement.split("\n");
     let consecutiveCommentLines = 0;
 
     for (let i = lines.length - 1; i >= 0; i--) {
@@ -1088,16 +1308,21 @@ class StrRayDocumentationGenerationServer {
       if (!line) continue;
       const trimmedLine = line.trim();
 
-      if (language === 'python' && trimmedLine.startsWith('"""')) {
+      if (language === "python" && trimmedLine.startsWith('"""')) {
         return true;
       }
 
-      if ((language === 'typescript' || language === 'javascript') &&
-          (trimmedLine.startsWith('/**') || trimmedLine.startsWith('*') || trimmedLine.startsWith('*/') ||
-           trimmedLine.startsWith('//') || trimmedLine.match(/\/\*\*/))) {
+      if (
+        (language === "typescript" || language === "javascript") &&
+        (trimmedLine.startsWith("/**") ||
+          trimmedLine.startsWith("*") ||
+          trimmedLine.startsWith("*/") ||
+          trimmedLine.startsWith("//") ||
+          trimmedLine.match(/\/\*\*/))
+      ) {
         consecutiveCommentLines++;
         if (consecutiveCommentLines >= 2) return true;
-      } else if (trimmedLine === '') {
+      } else if (trimmedLine === "") {
         continue; // Skip empty lines
       } else {
         break; // Stop if we hit non-comment, non-empty line
@@ -1107,7 +1332,10 @@ class StrRayDocumentationGenerationServer {
     return false;
   }
 
-  private generateDocumentationComments(documentation: any, style: string): string[] {
+  private generateDocumentationComments(
+    documentation: any,
+    style: string,
+  ): string[] {
     const comments: string[] = [];
 
     // This would generate actual documentation comments based on code analysis
@@ -1128,47 +1356,51 @@ class StrRayDocumentationGenerationServer {
     return comments;
   }
 
-  private async analyzeProjectStructure(projectPath: string, projectType: string): Promise<any> {
+  private async analyzeProjectStructure(
+    projectPath: string,
+    projectType: string,
+  ): Promise<any> {
     const analysis = {
       languages: [] as string[],
       dependencies: [] as string[],
       entryPoints: [] as string[],
-      structure: {} as Record<string, any>
+      structure: {} as Record<string, any>,
     };
 
     try {
       // Analyze package.json if it exists
-      const packagePath = path.join(projectPath, 'package.json');
+      const packagePath = path.join(projectPath, "package.json");
       if (fs.existsSync(packagePath)) {
-        const packageJson = JSON.parse(fs.readFileSync(packagePath, 'utf-8'));
+        const packageJson = JSON.parse(fs.readFileSync(packagePath, "utf-8"));
         analysis.dependencies = Object.keys(packageJson.dependencies || {});
-        analysis.entryPoints = [packageJson.main || 'index.js'];
+        analysis.entryPoints = [packageJson.main || "index.js"];
       }
 
       // Analyze languages used
       const files = fs.readdirSync(projectPath, { recursive: true });
       const extensions = new Set<string>();
 
-      files.forEach(file => {
-        if (typeof file === 'string') {
+      files.forEach((file) => {
+        if (typeof file === "string") {
           const ext = path.extname(file);
           if (ext) extensions.add(ext);
         }
       });
 
       const langMap: Record<string, string> = {
-        '.ts': 'TypeScript',
-        '.tsx': 'TypeScript',
-        '.js': 'JavaScript',
-        '.jsx': 'JavaScript',
-        '.py': 'Python',
-        '.java': 'Java',
-        '.go': 'Go',
-        '.rs': 'Rust'
+        ".ts": "TypeScript",
+        ".tsx": "TypeScript",
+        ".js": "JavaScript",
+        ".jsx": "JavaScript",
+        ".py": "Python",
+        ".java": "Java",
+        ".go": "Go",
+        ".rs": "Rust",
       };
 
-      analysis.languages = Array.from(extensions).map(ext => langMap[ext] || ext.substring(1));
-
+      analysis.languages = Array.from(extensions).map(
+        (ext) => langMap[ext] || ext.substring(1),
+      );
     } catch {
       // Use defaults if analysis fails
     }
@@ -1176,46 +1408,50 @@ class StrRayDocumentationGenerationServer {
     return analysis;
   }
 
-  private generateReadmeContent(projectAnalysis: any, includeSections: string[], existingReadme?: string): string {
-    let content = '';
+  private generateReadmeContent(
+    projectAnalysis: any,
+    includeSections: string[],
+    existingReadme?: string,
+  ): string {
+    let content = "";
 
     // Title
-    content += `# ${projectAnalysis.name || 'Project Name'}\n\n`;
+    content += `# ${projectAnalysis.name || "Project Name"}\n\n`;
 
     // Description
-    content += `${projectAnalysis.description || 'A software project.'}\n\n`;
+    content += `${projectAnalysis.description || "A software project."}\n\n`;
 
     // Badges (if applicable)
-    if (projectAnalysis.languages.includes('TypeScript')) {
+    if (projectAnalysis.languages.includes("TypeScript")) {
       content += `[![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)\n`;
     }
-    content += '\n';
+    content += "\n";
 
     // Table of Contents
     if (includeSections.length > 3) {
-      content += '## Table of Contents\n\n';
-      includeSections.forEach(section => {
+      content += "## Table of Contents\n\n";
+      includeSections.forEach((section) => {
         content += `- [${section.charAt(0).toUpperCase() + section.slice(1)}](#${section})\n`;
       });
-      content += '\n';
+      content += "\n";
     }
 
     // Generate each requested section
-    includeSections.forEach(section => {
+    includeSections.forEach((section) => {
       switch (section) {
-        case 'installation':
+        case "installation":
           content += this.generateInstallationSection(projectAnalysis);
           break;
-        case 'usage':
+        case "usage":
           content += this.generateUsageSection(projectAnalysis);
           break;
-        case 'api':
+        case "api":
           content += this.generateAPISection(projectAnalysis);
           break;
-        case 'contributing':
+        case "contributing":
           content += this.generateContributingSection();
           break;
-        case 'license':
+        case "license":
           content += this.generateLicenseSection();
           break;
       }
@@ -1225,100 +1461,107 @@ class StrRayDocumentationGenerationServer {
   }
 
   private generateInstallationSection(projectAnalysis: any): string {
-    let content = '## Installation\n\n';
+    let content = "## Installation\n\n";
 
-    if (projectAnalysis.languages.includes('JavaScript') || projectAnalysis.languages.includes('TypeScript')) {
-      content += '```bash\n';
-      content += '# Clone the repository\n';
-      content += 'git clone <repository-url>\n';
-      content += 'cd <project-directory>\n\n';
-      content += '# Install dependencies\n';
-      content += 'npm install\n';
-      content += '# or\n';
-      content += 'yarn install\n';
-      content += '```\n\n';
+    if (
+      projectAnalysis.languages.includes("JavaScript") ||
+      projectAnalysis.languages.includes("TypeScript")
+    ) {
+      content += "```bash\n";
+      content += "# Clone the repository\n";
+      content += "git clone <repository-url>\n";
+      content += "cd <project-directory>\n\n";
+      content += "# Install dependencies\n";
+      content += "npm install\n";
+      content += "# or\n";
+      content += "yarn install\n";
+      content += "```\n\n";
     }
 
-    if (projectAnalysis.languages.includes('Python')) {
-      content += '```bash\n';
-      content += '# Install with pip\n';
-      content += 'pip install <package-name>\n\n';
-      content += '# Or install from source\n';
-      content += 'git clone <repository-url>\n';
-      content += 'cd <project-directory>\n';
-      content += 'pip install -e .\n';
-      content += '```\n\n';
+    if (projectAnalysis.languages.includes("Python")) {
+      content += "```bash\n";
+      content += "# Install with pip\n";
+      content += "pip install <package-name>\n\n";
+      content += "# Or install from source\n";
+      content += "git clone <repository-url>\n";
+      content += "cd <project-directory>\n";
+      content += "pip install -e .\n";
+      content += "```\n\n";
     }
 
     return content;
   }
 
   private generateUsageSection(projectAnalysis: any): string {
-    let content = '## Usage\n\n';
+    let content = "## Usage\n\n";
 
-    content += '```javascript\n';
-    content += '// Basic usage example\n';
-    content += 'const result = await performOperation();\n';
-    content += 'console.log(result);\n';
-    content += '```\n\n';
+    content += "```javascript\n";
+    content += "// Basic usage example\n";
+    content += "const result = await performOperation();\n";
+    content += "console.log(result);\n";
+    content += "```\n\n";
 
-    content += '### Advanced Usage\n\n';
-    content += 'For more advanced features, see the [API documentation](./docs/api.md).\n\n';
+    content += "### Advanced Usage\n\n";
+    content +=
+      "For more advanced features, see the [API documentation](./docs/api.md).\n\n";
 
     return content;
   }
 
   private generateAPISection(projectAnalysis: any): string {
-    let content = '## API\n\n';
+    let content = "## API\n\n";
 
-    content += '### Core Functions\n\n';
-    content += '- `performOperation()` - Performs the main operation\n';
-    content += '- `configure(options)` - Configures the library\n';
-    content += '- `validateInput(input)` - Validates input data\n\n';
+    content += "### Core Functions\n\n";
+    content += "- `performOperation()` - Performs the main operation\n";
+    content += "- `configure(options)` - Configures the library\n";
+    content += "- `validateInput(input)` - Validates input data\n\n";
 
-    content += 'For detailed API documentation, see [API Reference](./docs/api.md).\n\n';
+    content +=
+      "For detailed API documentation, see [API Reference](./docs/api.md).\n\n";
 
     return content;
   }
 
   private generateContributingSection(): string {
-    let content = '## Contributing\n\n';
+    let content = "## Contributing\n\n";
 
-    content += 'We welcome contributions! Please see our [Contributing Guide](./CONTRIBUTING.md) for details.\n\n';
+    content +=
+      "We welcome contributions! Please see our [Contributing Guide](./CONTRIBUTING.md) for details.\n\n";
 
-    content += '### Development Setup\n\n';
-    content += '```bash\n';
-    content += 'git clone <repository-url>\n';
-    content += 'cd <project-directory>\n';
-    content += 'npm install\n';
-    content += 'npm run dev\n';
-    content += '```\n\n';
+    content += "### Development Setup\n\n";
+    content += "```bash\n";
+    content += "git clone <repository-url>\n";
+    content += "cd <project-directory>\n";
+    content += "npm install\n";
+    content += "npm run dev\n";
+    content += "```\n\n";
 
-    content += '### Testing\n\n';
-    content += '```bash\n';
-    content += 'npm test\n';
-    content += 'npm run test:coverage\n';
-    content += '```\n\n';
+    content += "### Testing\n\n";
+    content += "```bash\n";
+    content += "npm test\n";
+    content += "npm run test:coverage\n";
+    content += "```\n\n";
 
     return content;
   }
 
   private generateLicenseSection(): string {
-    let content = '## License\n\n';
+    let content = "## License\n\n";
 
-    content += 'This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.\n\n';
+    content +=
+      "This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.\n\n";
 
     return content;
   }
 
   private getSeverityIcon(severity: string): string {
     const icons = {
-      'critical': '🚨',
-      'high': '🔴',
-      'medium': '🟡',
-      'low': '🟢'
+      critical: "🚨",
+      high: "🔴",
+      medium: "🟡",
+      low: "🟢",
     };
-    return icons[severity as keyof typeof icons] || '❓';
+    return icons[severity as keyof typeof icons] || "❓";
   }
 
   async run(): Promise<void> {

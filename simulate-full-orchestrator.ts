@@ -41,14 +41,14 @@ async function simulateCompleteOrchestratorPipeline() {
       description:
         "Design the overall authentication system architecture including components, data flow, and security boundaries",
       subagentType: "architect",
-      priority: "high",
+      priority: "high" as const,
     },
     {
       id: "validate-security-design",
       description:
         "Validate the authentication design against OWASP security principles and codex compliance",
       subagentType: "enforcer",
-      priority: "critical",
+      priority: "high" as const,
       dependencies: ["design-auth-architecture"],
     },
     {
@@ -56,14 +56,14 @@ async function simulateCompleteOrchestratorPipeline() {
       description:
         "Research industry best practices for authentication systems and modern security patterns",
       subagentType: "librarian",
-      priority: "medium",
+      priority: "medium" as const,
     },
     {
       id: "implement-auth-components",
       description:
         "Implement the core authentication components based on approved design",
       subagentType: "test-architect",
-      priority: "high",
+      priority: "high" as const,
       dependencies: ["design-auth-architecture", "validate-security-design"],
     },
   ];

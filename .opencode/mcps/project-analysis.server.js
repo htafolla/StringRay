@@ -1,560 +1,706 @@
-#!/usr/bin/env node
-
 /**
- * StrRay Framework - Project Analysis MCP Server
- * Provides tools for analyzing project structure, dependencies, and architecture
+ * StrRay Project Analysis MCP Server
+ *
+ * Knowledge skill for project structure analysis, complexity assessment,
+ * and pattern recognition - provides deep project intelligence
  */
-
-const { Server } = require("@modelcontextprotocol/sdk/server/index.js");
-const {
-  StdioServerTransport,
-} = require("@modelcontextprotocol/sdk/server/stdio.js");
-const {
-  CallToolRequestSchema,
-  ListToolsRequestSchema,
-} = require("@modelcontextprotocol/sdk/types.js");
-const fs = require("fs").promises;
-const path = require("path");
-const { execSync } = require("child_process");
-
-class ProjectAnalysisServer {
-  constructor() {
-    this.server = new Server(
-      {
-        name: "project-analysis",
-        version: "1.0.0",
-      },
-      {
-        capabilities: {
-          tools: {},
-        },
-      },
-    );
-
-    this.setupToolHandlers();
-  }
-
-  setupToolHandlers() {
-    // List available tools
-    this.server.setRequestHandler(ListToolsRequestSchema, async () => {
-      return {
-        tools: [
-          {
-            name: "analyze_project_structure",
-            description:
-              "Analyze the overall project structure and identify key directories, files, and patterns",
-            inputSchema: {
-              type: "object",
-              properties: {
-                rootPath: {
-                  type: "string",
-                  description:
-                    "Root path of the project to analyze (default: current directory)",
-                  default: ".",
-                },
-                includePatterns: {
-                  type: "array",
-                  items: { type: "string" },
-                  description: "File patterns to include in analysis",
-                  default: ["**/*"],
-                },
-                excludePatterns: {
-                  type: "array",
-                  items: { type: "string" },
-                  description: "File patterns to exclude from analysis",
-                  default: [
-                    "node_modules/**",
-                    ".git/**",
-                    "dist/**",
-                    "build/**",
-                  ],
-                },
-              },
-            },
-          },
-          {
-            name: "analyze_dependencies",
-            description:
-              "Analyze project dependencies from package.json and other dependency files",
-            inputSchema: {
-              type: "object",
-              properties: {
-                rootPath: {
-                  type: "string",
-                  description: "Root path of the project to analyze",
-                  default: ".",
-                },
-              },
-            },
-          },
-          {
-            name: "identify_entry_points",
-            description:
-              "Identify main entry points and application starting files",
-            inputSchema: {
-              type: "object",
-              properties: {
-                rootPath: {
-                  type: "string",
-                  description: "Root path of the project to analyze",
-                  default: ".",
-                },
-              },
-            },
-          },
-          {
-            name: "analyze_code_organization",
-            description: "Analyze how code is organized across the project",
-            inputSchema: {
-              type: "object",
-              properties: {
-                rootPath: {
-                  type: "string",
-                  description: "Root path of the project to analyze",
-                  default: ".",
-                },
-              },
-            },
-          },
-        ],
-      };
-    });
-
-    // Handle tool calls
-    this.server.setRequestHandler(CallToolRequestSchema, async (request) => {
-      const { name, arguments: args } = request.params;
-
-      try {
-        switch (name) {
-          case "analyze_project_structure":
-            return await this.analyzeProjectStructure(args);
-          case "analyze_dependencies":
-            return await this.analyzeDependencies(args);
-          case "identify_entry_points":
-            return await this.identifyEntryPoints(args);
-          case "analyze_code_organization":
-            return await this.analyzeCodeOrganization(args);
-          default:
-            throw new Error(`Unknown tool: ${name}`);
-        }
-      } catch (error) {
+import { Server } from "@modelcontextprotocol/sdk/server/index.js";
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { CallToolRequestSchema, ListToolsRequestSchema, } from "@modelcontextprotocol/sdk/types.js";
+import * as fs from "fs";
+import * as path from "path";
+class StrRayProjectAnalysisServer {
+    server;
+    constructor() {
+        this.server = new Server({
+            name: "strray-project-analysis",
+            version: "1.0.0",
+        });
+        this.setupToolHandlers();
+        console.log("StrRay Project Analysis MCP Server initialized");
+    }
+    setupToolHandlers() {
+        // List available tools
+        this.server.setRequestHandler(ListToolsRequestSchema, async () => {
+            return {
+                tools: [
+                    {
+                        name: "analyze-project-structure",
+                        description: "Analyze complete project structure including file organization, directory hierarchy, and module distribution",
+                        inputSchema: {
+                            type: "object",
+                            properties: {
+                                projectRoot: {
+                                    type: "string",
+                                    description: "Root directory of the project to analyze",
+                                },
+                                includeMetrics: {
+                                    type: "boolean",
+                                    default: true,
+                                    description: "Include detailed metrics in analysis",
+                                },
+                                maxDepth: {
+                                    type: "number",
+                                    default: 10,
+                                    description: "Maximum directory depth to analyze",
+                                },
+                            },
+                            required: ["projectRoot"],
+                        },
+                    },
+                    {
+                        name: "assess-project-complexity",
+                        description: "Assess overall project complexity including code metrics, maintainability, and technical debt indicators",
+                        inputSchema: {
+                            type: "object",
+                            properties: {
+                                projectRoot: {
+                                    type: "string",
+                                    description: "Root directory of the project",
+                                },
+                                includeBreakdown: {
+                                    type: "boolean",
+                                    default: true,
+                                    description: "Include per-file complexity breakdown",
+                                },
+                                focusAreas: {
+                                    type: "array",
+                                    items: {
+                                        type: "string",
+                                        enum: ["functions", "classes", "imports", "dependencies"],
+                                    },
+                                    description: "Specific areas to focus complexity analysis on",
+                                },
+                            },
+                            required: ["projectRoot"],
+                        },
+                    },
+                    {
+                        name: "identify-project-patterns",
+                        description: "Identify architectural patterns, code patterns, and structural patterns in the project",
+                        inputSchema: {
+                            type: "object",
+                            properties: {
+                                projectRoot: {
+                                    type: "string",
+                                    description: "Root directory of the project",
+                                },
+                                patternTypes: {
+                                    type: "array",
+                                    items: {
+                                        type: "string",
+                                        enum: [
+                                            "architectural",
+                                            "code",
+                                            "structural",
+                                            "anti-patterns",
+                                        ],
+                                    },
+                                    description: "Types of patterns to identify",
+                                },
+                                confidenceThreshold: {
+                                    type: "number",
+                                    default: 0.7,
+                                    description: "Minimum confidence for pattern detection",
+                                },
+                            },
+                            required: ["projectRoot"],
+                        },
+                    },
+                    {
+                        name: "analyze-project-health",
+                        description: "Provide comprehensive project health assessment including quality metrics and improvement recommendations",
+                        inputSchema: {
+                            type: "object",
+                            properties: {
+                                projectRoot: {
+                                    type: "string",
+                                    description: "Root directory of the project",
+                                },
+                                includeTrends: {
+                                    type: "boolean",
+                                    default: false,
+                                    description: "Include historical trend analysis",
+                                },
+                                focusMetrics: {
+                                    type: "array",
+                                    items: {
+                                        type: "string",
+                                        enum: [
+                                            "complexity",
+                                            "coverage",
+                                            "maintainability",
+                                            "dependencies",
+                                            "patterns",
+                                        ],
+                                    },
+                                    description: "Specific health metrics to focus on",
+                                },
+                            },
+                            required: ["projectRoot"],
+                        },
+                    },
+                ],
+            };
+        });
+        // Handle tool calls
+        this.server.setRequestHandler(CallToolRequestSchema, async (request) => {
+            const { name, arguments: args } = request.params;
+            try {
+                switch (name) {
+                    case "analyze-project-structure":
+                        return await this.analyzeProjectStructure(args);
+                    case "assess-project-complexity":
+                        return await this.assessProjectComplexity(args);
+                    case "identify-project-patterns":
+                        return await this.identifyProjectPatterns(args);
+                    case "analyze-project-health":
+                        return await this.analyzeProjectHealth(args);
+                    default:
+                        throw new Error(`Unknown tool: ${name}`);
+                }
+            }
+            catch (error) {
+                console.error(`Error in project analysis tool ${name}:`, error);
+                throw error;
+            }
+        });
+    }
+    async analyzeProjectStructure(args) {
+        const { projectRoot, includeMetrics = true, maxDepth = 10 } = args;
+        console.log(`🔍 Analyzing project structure: ${projectRoot}`);
+        const structure = this.analyzeDirectoryStructure(projectRoot, maxDepth);
+        const metrics = includeMetrics
+            ? this.calculateProjectMetrics(projectRoot, structure)
+            : null;
         return {
-          content: [{ type: "text", text: `Error: ${error.message}` }],
-          isError: true,
+            content: [
+                {
+                    type: "text",
+                    text: JSON.stringify({
+                        projectRoot,
+                        structure,
+                        metrics,
+                        analyzedAt: new Date().toISOString(),
+                    }, null, 2),
+                },
+            ],
         };
-      }
-    });
-  }
-
-  async analyzeProjectStructure(args = {}) {
-    const rootPath = args.rootPath || ".";
-    const includePatterns = args.includePatterns || ["**/*"];
-    const excludePatterns = args.excludePatterns || [
-      "node_modules/**",
-      ".git/**",
-      "dist/**",
-      "build/**",
-    ];
-
-    try {
-      const structure = await this.getDirectoryStructure(
-        rootPath,
-        includePatterns,
-        excludePatterns,
-      );
-
-      return {
-        content: [
-          {
-            type: "text",
-            text: `## Project Structure Analysis
-
-**Root Directory:** ${rootPath}
-
-### Directory Structure:
-${structure.tree}
-
-### Key Findings:
-- **Total Files:** ${structure.stats.totalFiles}
-- **Total Directories:** ${structure.stats.totalDirs}
-- **Largest Directories:** ${structure.stats.largestDirs.join(", ")}
-- **File Types:** ${Object.entries(structure.stats.fileTypes)
-              .map(([ext, count]) => `${ext}: ${count}`)
-              .join(", ")}
-
-### Notable Patterns:
-${structure.patterns.map((pattern) => `- ${pattern}`).join("\n")}`,
-          },
-        ],
-      };
-    } catch (error) {
-      throw new Error(`Failed to analyze project structure: ${error.message}`);
     }
-  }
-
-  async analyzeDependencies(args = {}) {
-    const rootPath = args.rootPath || ".";
-
-    try {
-      const deps = await this.getDependencyAnalysis(rootPath);
-
-      return {
-        content: [
-          {
-            type: "text",
-            text: `## Dependency Analysis
-
-**Package Manager:** ${deps.packageManager}
-
-### Dependencies Summary:
-- **Total Dependencies:** ${deps.totalDeps}
-- **Dev Dependencies:** ${deps.devDeps}
-- **Peer Dependencies:** ${deps.peerDeps}
-
-### Key Dependencies:
-${deps.keyDeps.map((dep) => `- **${dep.name}**: ${dep.version} (${dep.type})`).join("\n")}
-
-### Dependency Health:
-- **Outdated Packages:** ${deps.outdatedCount}
-- **Vulnerabilities:** ${deps.vulnerabilities}
-
-### Recommendations:
-${deps.recommendations.map((rec) => `- ${rec}`).join("\n")}`,
-          },
-        ],
-      };
-    } catch (error) {
-      throw new Error(`Failed to analyze dependencies: ${error.message}`);
-    }
-  }
-
-  async identifyEntryPoints(args = {}) {
-    const rootPath = args.rootPath || ".";
-
-    try {
-      const entryPoints = await this.findEntryPoints(rootPath);
-
-      return {
-        content: [
-          {
-            type: "text",
-            text: `## Entry Points Analysis
-
-### Main Entry Points:
-${entryPoints.main.map((ep) => `- **${ep.file}**: ${ep.type} (${ep.confidence}% confidence)`).join("\n")}
-
-### Secondary Entry Points:
-${entryPoints.secondary.map((ep) => `- ${ep.file}: ${ep.type}`).join("\n")}
-
-### Build Configuration:
-${entryPoints.build.map((config) => `- **${config.type}**: ${config.file}`).join("\n")}
-
-### Recommendations:
-${entryPoints.recommendations.map((rec) => `- ${rec}`).join("\n")}`,
-          },
-        ],
-      };
-    } catch (error) {
-      throw new Error(`Failed to identify entry points: ${error.message}`);
-    }
-  }
-
-  async analyzeCodeOrganization(args = {}) {
-    const rootPath = args.rootPath || ".";
-
-    try {
-      const organization = await this.getCodeOrganization(rootPath);
-
-      return {
-        content: [
-          {
-            type: "text",
-            text: `## Code Organization Analysis
-
-### Architecture Pattern:
-**${organization.pattern}** - ${organization.patternDescription}
-
-### Directory Structure Quality:
-- **Separation of Concerns:** ${organization.separationOfConcerns}/10
-- **Modularity:** ${organization.modularity}/10
-- **Scalability:** ${organization.scalability}/10
-
-### Key Directories:
-${organization.keyDirs.map((dir) => `- **${dir.name}**: ${dir.purpose} (${dir.quality})`).join("\n")}
-
-### Code Organization Issues:
-${organization.issues.map((issue) => `- ${issue.severity}: ${issue.description}`).join("\n")}
-
-### Recommendations:
-${organization.recommendations.map((rec) => `- ${rec}`).join("\n")}`,
-          },
-        ],
-      };
-    } catch (error) {
-      throw new Error(`Failed to analyze code organization: ${error.message}`);
-    }
-  }
-
-  async getDirectoryStructure(rootPath, includePatterns, excludePatterns) {
-    // Implementation for directory structure analysis
-    const stats = {
-      totalFiles: 0,
-      totalDirs: 0,
-      largestDirs: [],
-      fileTypes: {},
-    };
-
-    const tree = await this.buildDirectoryTree(rootPath, excludePatterns);
-    const patterns = await this.identifyPatterns(rootPath);
-
-    return { tree, stats, patterns };
-  }
-
-  async buildDirectoryTree(dirPath, excludePatterns, prefix = "") {
-    // Simplified tree building - in real implementation would be more sophisticated
-    return `
-${prefix}📁 ${path.basename(dirPath)}/
-${prefix}├── 📁 src/
-${prefix}├── 📁 tests/
-${prefix}├── 📁 docs/
-${prefix}└── 📄 package.json
-    `;
-  }
-
-  async identifyPatterns(rootPath) {
-    // Identify common project patterns
-    return [
-      "Standard src/ directory structure",
-      "Test files co-located with source files",
-      "Configuration files in root directory",
-    ];
-  }
-
-  async getDependencyAnalysis(rootPath) {
-    try {
-      const packageJsonPath = path.join(rootPath, "package.json");
-      const packageJson = JSON.parse(
-        await fs.readFile(packageJsonPath, "utf8"),
-      );
-
-      const deps = Object.keys(packageJson.dependencies || {});
-      const devDeps = Object.keys(packageJson.devDependencies || {});
-      const peerDeps = Object.keys(packageJson.peerDependencies || {});
-
-      return {
-        packageManager: this.detectPackageManager(rootPath),
-        totalDeps: deps.length + devDeps.length + peerDeps.length,
-        devDeps: devDeps.length,
-        peerDeps: peerDeps.length,
-        keyDeps: this.getKeyDependencies(packageJson),
-        outdatedCount: 0, // Would need npm outdated check
-        vulnerabilities: 0, // Would need npm audit check
-        recommendations: [
-          "Consider updating major versions quarterly",
-          "Review unused dependencies regularly",
-        ],
-      };
-    } catch (error) {
-      throw new Error(`Could not read package.json: ${error.message}`);
-    }
-  }
-
-  detectPackageManager(rootPath) {
-    if (fs.existsSync(path.join(rootPath, "yarn.lock"))) return "Yarn";
-    if (fs.existsSync(path.join(rootPath, "pnpm-lock.yaml"))) return "pnpm";
-    if (fs.existsSync(path.join(rootPath, "package-lock.json"))) return "npm";
-    return "Unknown";
-  }
-
-  getKeyDependencies(packageJson) {
-    const keyDeps = [];
-    const importantDeps = [
-      "react",
-      "typescript",
-      "webpack",
-      "vite",
-      "jest",
-      "eslint",
-    ];
-
-    for (const dep of importantDeps) {
-      if (packageJson.dependencies?.[dep]) {
-        keyDeps.push({
-          name: dep,
-          version: packageJson.dependencies[dep],
-          type: "runtime",
-        });
-      }
-      if (packageJson.devDependencies?.[dep]) {
-        keyDeps.push({
-          name: dep,
-          version: packageJson.devDependencies[dep],
-          type: "dev",
-        });
-      }
-    }
-
-    return keyDeps;
-  }
-
-  async findEntryPoints(rootPath) {
-    const entryPoints = {
-      main: [],
-      secondary: [],
-      build: [],
-      recommendations: [],
-    };
-
-    try {
-      const packageJson = JSON.parse(
-        await fs.readFile(path.join(rootPath, "package.json"), "utf8"),
-      );
-
-      // Main entry point
-      if (packageJson.main) {
-        entryPoints.main.push({
-          file: packageJson.main,
-          type: "Main Entry Point",
-          confidence: 100,
-        });
-      }
-
-      // Scripts analysis
-      if (packageJson.scripts) {
-        if (packageJson.scripts.start) {
-          entryPoints.secondary.push({
-            file: this.extractEntryFromScript(packageJson.scripts.start),
-            type: "Start Script",
-          });
+    async assessProjectComplexity(args) {
+        const { projectRoot, includeBreakdown = true, focusAreas } = args;
+        console.log(`🧠 Assessing project complexity: ${projectRoot}`);
+        const files = this.getProjectFiles(projectRoot);
+        const complexityAnalysis = this.analyzeComplexity(files, focusAreas);
+        if (includeBreakdown) {
+            complexityAnalysis.fileBreakdown = files.map((file) => ({
+                file: path.relative(projectRoot, file),
+                complexity: this.calculateFileComplexity(file),
+                size: fs.statSync(file).size,
+            }));
         }
-        if (packageJson.scripts.dev) {
-          entryPoints.secondary.push({
-            file: this.extractEntryFromScript(packageJson.scripts.dev),
-            type: "Dev Script",
-          });
+        return {
+            content: [
+                {
+                    type: "text",
+                    text: JSON.stringify({
+                        projectRoot,
+                        overallComplexity: complexityAnalysis,
+                        analyzedAt: new Date().toISOString(),
+                    }, null, 2),
+                },
+            ],
+        };
+    }
+    async identifyProjectPatterns(args) {
+        const { projectRoot, patternTypes = ["architectural", "code"], confidenceThreshold = 0.7, } = args;
+        console.log(`🔍 Identifying project patterns: ${projectRoot}`);
+        const patterns = await this.detectPatterns(projectRoot, patternTypes, confidenceThreshold);
+        return {
+            content: [
+                {
+                    type: "text",
+                    text: JSON.stringify({
+                        projectRoot,
+                        patterns,
+                        patternTypes,
+                        confidenceThreshold,
+                        analyzedAt: new Date().toISOString(),
+                    }, null, 2),
+                },
+            ],
+        };
+    }
+    async analyzeProjectHealth(args) {
+        const { projectRoot, includeTrends = false, focusMetrics } = args;
+        console.log(`🏥 Analyzing project health: ${projectRoot}`);
+        const healthAssessment = await this.assessProjectHealth(projectRoot, focusMetrics);
+        if (includeTrends) {
+            healthAssessment.trends = this.calculateHealthTrends(projectRoot);
         }
-      }
-
-      // Build config detection
-      const buildConfigs = [
-        "vite.config.ts",
-        "vite.config.js",
-        "webpack.config.js",
-        "next.config.js",
-      ];
-      for (const config of buildConfigs) {
-        if (await this.fileExists(path.join(rootPath, config))) {
-          entryPoints.build.push({
-            file: config,
-            type: config.includes("vite")
-              ? "Vite"
-              : config.includes("webpack")
-                ? "Webpack"
-                : "Next.js",
-          });
+        return {
+            content: [
+                {
+                    type: "text",
+                    text: JSON.stringify({
+                        projectRoot,
+                        healthAssessment,
+                        recommendations: this.generateHealthRecommendations(healthAssessment),
+                        analyzedAt: new Date().toISOString(),
+                    }, null, 2),
+                },
+            ],
+        };
+    }
+    // Helper methods
+    analyzeDirectoryStructure(dirPath, maxDepth, currentDepth = 0) {
+        if (currentDepth >= maxDepth)
+            return { type: "directory", truncated: true };
+        try {
+            const entries = fs.readdirSync(dirPath, { withFileTypes: true });
+            const structure = {
+                type: "directory",
+                path: path.relative(process.cwd(), dirPath),
+                children: [],
+            };
+            for (const entry of entries) {
+                const entryPath = path.join(dirPath, entry.name);
+                // Skip common ignore patterns
+                if (this.shouldIgnorePath(entryPath))
+                    continue;
+                if (entry.isDirectory()) {
+                    structure.children.push(this.analyzeDirectoryStructure(entryPath, maxDepth, currentDepth + 1));
+                }
+                else if (entry.isFile()) {
+                    structure.children.push({
+                        type: "file",
+                        name: entry.name,
+                        extension: path.extname(entry.name),
+                        size: fs.statSync(entryPath).size,
+                    });
+                }
+            }
+            return structure;
         }
-      }
-
-      entryPoints.recommendations = [
-        "Ensure main entry point exists and is properly configured",
-        "Consider using explicit entry points in build configuration",
-      ];
-    } catch (error) {
-      // Fallback analysis
-      entryPoints.recommendations.push(
-        "Could not read package.json for entry point analysis",
-      );
+        catch (error) {
+            return {
+                type: "directory",
+                error: error instanceof Error ? error.message : String(error),
+            };
+        }
     }
-
-    return entryPoints;
-  }
-
-  extractEntryFromScript(script) {
-    // Simple extraction - would need more sophisticated parsing for complex scripts
-    const matches = script.match(/--?\w+\s+([^\s]+\.(js|ts|tsx|jsx))/);
-    return matches ? matches[1] : "Could not determine from script";
-  }
-
-  async fileExists(filePath) {
-    try {
-      await fs.access(filePath);
-      return true;
-    } catch {
-      return false;
+    calculateProjectMetrics(projectRoot, structure) {
+        const metrics = {
+            totalFiles: 0,
+            totalLinesOfCode: 0,
+            languages: {},
+            fileTypes: {},
+            directoryDepth: 0,
+            largestFile: { path: "", size: 0 },
+            mostComplexFile: { path: "", complexity: 0 },
+        };
+        this.traverseStructure(structure, (item, depth) => {
+            if (item.type === "file") {
+                metrics.totalFiles++;
+                metrics.directoryDepth = Math.max(metrics.directoryDepth, depth);
+                const ext = item.extension || path.extname(item.name);
+                metrics.fileTypes[ext] = (metrics.fileTypes[ext] || 0) + 1;
+                // Estimate lines of code
+                metrics.totalLinesOfCode += Math.max(1, Math.floor(item.size / 50));
+                // Track largest file
+                if (item.size > metrics.largestFile.size) {
+                    metrics.largestFile = { path: item.name, size: item.size };
+                }
+                // Estimate complexity
+                const complexity = Math.floor(item.size / 200) + 1;
+                if (complexity > metrics.mostComplexFile.complexity) {
+                    metrics.mostComplexFile = { path: item.name, complexity };
+                }
+                // Detect language
+                const language = this.detectLanguage(ext);
+                if (language) {
+                    metrics.languages[language] = (metrics.languages[language] || 0) + 1;
+                }
+            }
+        });
+        return metrics;
     }
-  }
-
-  async getCodeOrganization(rootPath) {
-    // Analyze code organization patterns
-    const organization = {
-      pattern: "Unknown",
-      patternDescription: "Could not determine architecture pattern",
-      separationOfConcerns: 5,
-      modularity: 5,
-      scalability: 5,
-      keyDirs: [],
-      issues: [],
-      recommendations: [],
-    };
-
-    try {
-      // Check for common patterns
-      const hasSrc = await this.fileExists(path.join(rootPath, "src"));
-      const hasLib = await this.fileExists(path.join(rootPath, "lib"));
-      const hasComponents = await this.fileExists(
-        path.join(rootPath, "src/components"),
-      );
-      const hasHooks = await this.fileExists(path.join(rootPath, "src/hooks"));
-      const hasUtils = await this.fileExists(path.join(rootPath, "src/utils"));
-
-      if (hasSrc && hasComponents && hasHooks && hasUtils) {
-        organization.pattern = "Component-Based Architecture";
-        organization.patternDescription =
-          "React/Frontend application with clear component separation";
-        organization.separationOfConcerns = 8;
-        organization.modularity = 8;
-        organization.scalability = 7;
-      } else if (hasLib) {
-        organization.pattern = "Library Architecture";
-        organization.patternDescription =
-          "Code library with utilities and core functionality";
-        organization.separationOfConcerns = 7;
-        organization.modularity = 9;
-        organization.scalability = 6;
-      }
-
-      // Identify key directories
-      organization.keyDirs = [
-        {
-          name: "src",
-          purpose: "Source code",
-          quality: hasSrc ? "Good" : "Missing",
-        },
-        { name: "tests", purpose: "Test files", quality: "Present" },
-        { name: "docs", purpose: "Documentation", quality: "Present" },
-      ];
-
-      organization.recommendations = [
-        "Consider adding more specific directories for better organization",
-        "Implement consistent file naming conventions",
-      ];
-    } catch (error) {
-      organization.issues.push({
-        severity: "Error",
-        description: `Could not analyze code organization: ${error.message}`,
-      });
+    getProjectFiles(projectRoot) {
+        const files = [];
+        const traverse = (dir) => {
+            try {
+                const entries = fs.readdirSync(dir, { withFileTypes: true });
+                for (const entry of entries) {
+                    const entryPath = path.join(dir, entry.name);
+                    if (this.shouldIgnorePath(entryPath))
+                        continue;
+                    if (entry.isFile()) {
+                        files.push(entryPath);
+                    }
+                    else if (entry.isDirectory()) {
+                        traverse(entryPath);
+                    }
+                }
+            }
+            catch (error) {
+                // Skip inaccessible directories
+            }
+        };
+        traverse(projectRoot);
+        return files;
     }
-
-    return organization;
-  }
-
-  async run() {
-    const transport = new StdioServerTransport();
-    await this.server.connect(transport);
-    console.error("Project Analysis MCP server running...");
-  }
+    analyzeComplexity(files, focusAreas) {
+        const analysis = {
+            averageComplexity: 0,
+            maxComplexity: 0,
+            totalFunctions: 0,
+            totalClasses: 0,
+            totalImports: 0,
+            maintainabilityIndex: 85, // Placeholder
+            technicalDebtRatio: 0.15, // Placeholder
+        };
+        let totalComplexity = 0;
+        let processedFiles = 0;
+        for (const file of files.slice(0, 50)) {
+            // Limit for performance
+            try {
+                const fileComplexity = this.calculateFileComplexity(file);
+                totalComplexity += fileComplexity.complexity;
+                analysis.totalFunctions += fileComplexity.functions;
+                analysis.totalClasses += fileComplexity.classes;
+                analysis.totalImports += fileComplexity.imports;
+                analysis.maxComplexity = Math.max(analysis.maxComplexity, fileComplexity.complexity);
+                processedFiles++;
+            }
+            catch (error) {
+                // Skip files that can't be analyzed
+            }
+        }
+        if (processedFiles > 0) {
+            analysis.averageComplexity = Math.round(totalComplexity / processedFiles);
+        }
+        return analysis;
+    }
+    calculateFileComplexity(filePath) {
+        try {
+            const content = fs.readFileSync(filePath, "utf8");
+            const lines = content.split("\n");
+            return {
+                complexity: Math.max(1, Math.floor(lines.length / 20) + Math.floor(content.length / 1000)),
+                functions: (content.match(/function\s+\w+|const\s+\w+\s*=\s*\([^)]*\)\s*=>/g) ||
+                    []).length,
+                classes: (content.match(/class\s+\w+/g) || []).length,
+                imports: (content.match(/import\s+.*?\s+from\s+['"]/g) || []).length,
+            };
+        }
+        catch (error) {
+            return { complexity: 1, functions: 0, classes: 0, imports: 0 };
+        }
+    }
+    async detectPatterns(projectRoot, patternTypes, confidenceThreshold) {
+        const patterns = [];
+        if (patternTypes.includes("architectural")) {
+            patterns.push(...this.detectArchitecturalPatterns(projectRoot, confidenceThreshold));
+        }
+        if (patternTypes.includes("code")) {
+            patterns.push(...this.detectCodePatterns(projectRoot, confidenceThreshold));
+        }
+        if (patternTypes.includes("anti-patterns")) {
+            patterns.push(...this.detectAntiPatterns(projectRoot, confidenceThreshold));
+        }
+        return patterns;
+    }
+    detectArchitecturalPatterns(projectRoot, threshold) {
+        const patterns = [];
+        const files = this.getProjectFiles(projectRoot);
+        // MVC Pattern
+        const hasControllers = files.some((f) => f.includes("controller"));
+        const hasModels = files.some((f) => f.includes("model"));
+        const hasViews = files.some((f) => f.includes("view") || f.includes("component"));
+        if (hasControllers && hasModels && hasViews) {
+            patterns.push({
+                type: "architectural",
+                pattern: "MVC",
+                confidence: 0.85,
+                description: "Model-View-Controller architectural pattern detected",
+            });
+        }
+        // Repository Pattern
+        const hasRepositories = files.some((f) => f.includes("repository"));
+        if (hasRepositories) {
+            patterns.push({
+                type: "architectural",
+                pattern: "Repository",
+                confidence: 0.9,
+                description: "Repository pattern for data access detected",
+            });
+        }
+        return patterns.filter((p) => p.confidence >= threshold);
+    }
+    detectCodePatterns(projectRoot, threshold) {
+        const patterns = [];
+        const files = this.getProjectFiles(projectRoot);
+        // Check for common patterns in a sample of files
+        const sampleFiles = files.slice(0, 10);
+        let asyncUsage = 0;
+        let errorHandling = 0;
+        let typeUsage = 0;
+        for (const file of sampleFiles) {
+            try {
+                const content = fs.readFileSync(file, "utf8");
+                if (content.includes("async") || content.includes("await"))
+                    asyncUsage++;
+                if (content.includes("try") && content.includes("catch"))
+                    errorHandling++;
+                if (content.includes(": ") ||
+                    content.includes("<") ||
+                    content.includes("interface"))
+                    typeUsage++;
+            }
+            catch (error) {
+                // Skip
+            }
+        }
+        const sampleSize = sampleFiles.length;
+        if (sampleSize > 0) {
+            if (asyncUsage / sampleSize > 0.5) {
+                patterns.push({
+                    type: "code",
+                    pattern: "Async/Await Usage",
+                    confidence: Math.min(0.95, asyncUsage / sampleSize),
+                    description: "Heavy usage of async/await patterns",
+                });
+            }
+            if (errorHandling / sampleSize > 0.3) {
+                patterns.push({
+                    type: "code",
+                    pattern: "Error Handling",
+                    confidence: Math.min(0.9, errorHandling / sampleSize),
+                    description: "Good error handling practices detected",
+                });
+            }
+            if (typeUsage / sampleSize > 0.4) {
+                patterns.push({
+                    type: "code",
+                    pattern: "Type Safety",
+                    confidence: Math.min(0.95, typeUsage / sampleSize),
+                    description: "Strong typing patterns detected",
+                });
+            }
+        }
+        return patterns.filter((p) => p.confidence >= threshold);
+    }
+    detectAntiPatterns(projectRoot, threshold) {
+        const patterns = [];
+        const files = this.getProjectFiles(projectRoot);
+        // Check for anti-patterns in sample files
+        const sampleFiles = files.slice(0, 20);
+        let longFunctions = 0;
+        let deepNesting = 0;
+        let globalVariables = 0;
+        for (const file of sampleFiles) {
+            try {
+                const content = fs.readFileSync(file, "utf8");
+                const lines = content.split("\n");
+                // Check for long functions
+                let currentFunctionLines = 0;
+                let inFunction = false;
+                for (const line of lines) {
+                    if (line.includes("function") ||
+                        line.includes("=>") ||
+                        (line.includes("const") && line.includes("="))) {
+                        if (inFunction && currentFunctionLines > 30)
+                            longFunctions++;
+                        inFunction = true;
+                        currentFunctionLines = 0;
+                    }
+                    else if (inFunction) {
+                        currentFunctionLines++;
+                        if (line.includes("}") && currentFunctionLines > 30)
+                            longFunctions++;
+                    }
+                }
+                // Check for deep nesting
+                const maxNesting = this.calculateMaxNesting(content);
+                if (maxNesting > 4)
+                    deepNesting++;
+                // Check for global variables (simplified)
+                if (content.includes("global.") || content.includes("window."))
+                    globalVariables++;
+            }
+            catch (error) {
+                // Skip
+            }
+        }
+        if (longFunctions > 0) {
+            patterns.push({
+                type: "anti-pattern",
+                pattern: "Long Functions",
+                confidence: Math.min(0.9, longFunctions / sampleFiles.length),
+                description: "Functions exceeding recommended length",
+                severity: "medium",
+            });
+        }
+        if (deepNesting > 0) {
+            patterns.push({
+                type: "anti-pattern",
+                pattern: "Deep Nesting",
+                confidence: Math.min(0.85, deepNesting / sampleFiles.length),
+                description: "Excessive nesting levels detected",
+                severity: "high",
+            });
+        }
+        if (globalVariables > 0) {
+            patterns.push({
+                type: "anti-pattern",
+                pattern: "Global Variables",
+                confidence: Math.min(0.95, globalVariables / sampleFiles.length),
+                description: "Usage of global variables detected",
+                severity: "medium",
+            });
+        }
+        return patterns.filter((p) => p.confidence >= threshold);
+    }
+    async assessProjectHealth(projectRoot, focusMetrics) {
+        const health = {
+            overall: "good",
+            scores: {
+                complexity: 75,
+                maintainability: 80,
+                testability: 70,
+                reliability: 85,
+                security: 75,
+            },
+            issues: [],
+            metrics: {},
+        };
+        const files = this.getProjectFiles(projectRoot);
+        const metrics = this.analyzeComplexity(files);
+        health.metrics = metrics;
+        // Calculate health scores based on metrics
+        if (metrics.averageComplexity > 10) {
+            health.scores.complexity -= 20;
+            health.issues.push({
+                type: "complexity",
+                severity: "high",
+                description: "High average complexity detected",
+            });
+        }
+        if (metrics.maintainabilityIndex < 50) {
+            health.scores.maintainability -= 30;
+            health.issues.push({
+                type: "maintainability",
+                severity: "critical",
+                description: "Low maintainability index",
+            });
+        }
+        // Calculate overall health
+        const avgScore = Object.values(health.scores).reduce((a, b) => a + b, 0) /
+            Object.values(health.scores).length;
+        if (avgScore >= 80)
+            health.overall = "excellent";
+        else if (avgScore >= 70)
+            health.overall = "good";
+        else if (avgScore >= 60)
+            health.overall = "fair";
+        else if (avgScore >= 50)
+            health.overall = "poor";
+        else
+            health.overall = "critical";
+        return health;
+    }
+    calculateHealthTrends(projectRoot) {
+        // Placeholder for trend analysis
+        return {
+            complexity: { trend: "stable", change: 0 },
+            maintainability: { trend: "improving", change: 5 },
+            issues: { trend: "decreasing", change: -2 },
+        };
+    }
+    generateHealthRecommendations(health) {
+        const recommendations = [];
+        if (health.scores.complexity < 70) {
+            recommendations.push("Refactor complex functions into smaller, focused units");
+        }
+        if (health.scores.maintainability < 70) {
+            recommendations.push("Improve code documentation and naming conventions");
+        }
+        if (health.issues.some((i) => i.severity === "critical")) {
+            recommendations.push("Address critical health issues immediately");
+        }
+        return recommendations;
+    }
+    traverseStructure(structure, callback, depth = 0) {
+        callback(structure, depth);
+        if (structure.children) {
+            for (const child of structure.children) {
+                this.traverseStructure(child, callback, depth + 1);
+            }
+        }
+    }
+    shouldIgnorePath(filePath) {
+        const ignorePatterns = [
+            /node_modules/,
+            /\.git/,
+            /dist/,
+            /build/,
+            /\.next/,
+            /\.nuxt/,
+            /\.cache/,
+            /\.temp/,
+            /coverage/,
+            /\.nyc_output/,
+            /logs/,
+            /\.DS_Store/,
+            /Thumbs\.db/,
+        ];
+        return ignorePatterns.some((pattern) => pattern.test(filePath));
+    }
+    detectLanguage(extension) {
+        const languageMap = {
+            ".ts": "typescript",
+            ".tsx": "typescript",
+            ".js": "javascript",
+            ".jsx": "javascript",
+            ".py": "python",
+            ".java": "java",
+            ".cpp": "cpp",
+            ".c": "c",
+            ".cs": "csharp",
+            ".php": "php",
+            ".rb": "ruby",
+            ".go": "go",
+            ".rs": "rust",
+            ".swift": "swift",
+            ".kt": "kotlin",
+            ".scala": "scala",
+        };
+        return languageMap[extension] || null;
+    }
+    calculateMaxNesting(content) {
+        let maxNesting = 0;
+        let currentNesting = 0;
+        for (const char of content) {
+            if (char === "{" || char === "(" || char === "[") {
+                currentNesting++;
+                maxNesting = Math.max(maxNesting, currentNesting);
+            }
+            else if (char === "}" || char === ")" || char === "]") {
+                currentNesting = Math.max(0, currentNesting - 1);
+            }
+        }
+        return maxNesting;
+    }
+    async run() {
+        const transport = new StdioServerTransport();
+        await this.server.connect(transport);
+        console.log("StrRay Project Analysis MCP Server started");
+    }
 }
-
-// Run the server
-const server = new ProjectAnalysisServer();
-server.run().catch(console.error);
+// Start the server if run directly
+if (import.meta.url === `file://${process.argv[1]}`) {
+    const server = new StrRayProjectAnalysisServer();
+    server.run().catch(console.error);
+}
+export default StrRayProjectAnalysisServer;
+//# sourceMappingURL=project-analysis.server.js.map

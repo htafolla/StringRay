@@ -409,6 +409,9 @@ export class ProcessorManager {
         case "stateValidation":
           result = await this.executeStateValidation(context);
           break;
+        case "refactoringLogging":
+          result = await this.executeRefactoringLogging(context);
+          break;
         default:
           throw new Error(`Unknown processor: ${name}`);
       }
@@ -636,5 +639,39 @@ export class ProcessorManager {
     // Validate state post-operation
     const currentState = this.stateManager.get("session:active");
     return { stateValid: !!currentState };
+  }
+
+  private async executeRefactoringLogging(context: any): Promise<any> {
+    try {
+      // Import the refactoring logging processor dynamically
+      const { RefactoringLoggingProcessor } = await import("./refactoring-logging-processor.js");
+
+      const processor = new RefactoringLoggingProcessor();
+
+      // Check if context is agent task completion context
+      if (context.agentName && context.task && typeof context.startTime === "number") {
+        const result = await processor.execute(context);
+
+        return {
+          logged: result.logged || false,
+          success: true,
+          message: result.logged ? "Agent completion logged" : "No logging needed",
+        };
+      }
+
+      return {
+        logged: false,
+        success: true,
+        message: "Not an agent task completion context",
+      };
+
+    } catch (error) {
+      console.error("Refactoring logging failed:", error);
+      return {
+        logged: false,
+        success: false,
+        error: error instanceof Error ? error.message : String(error),
+      };
+    }
   }
 }

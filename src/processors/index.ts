@@ -9,3 +9,4 @@
 
 export * from "./processor-manager";
 export * from "./processor-types";
+export * from "./refactoring-logging-processor";

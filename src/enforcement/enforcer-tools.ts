@@ -61,6 +61,22 @@ export async function ruleValidation(
     result.fixes = generateFixes(report, context);
   }
 
+  // INTEGRATION POINT: Check for reporting rules and trigger report generation
+  // This integrates reporting triggers into the existing rule validation pipeline
+  if (!report.passed) {
+    // Trigger report generation for rule violations
+    await frameworkLogger.log('enforcer-tools', 'reporting-triggered', 'info', {
+      operation,
+      hasViolations: report.errors.length > 0,
+      hasWarnings: report.warnings.length > 0,
+      context: {
+        files: context.files?.length,
+        operation,
+        timestamp: new Date().toISOString()
+      }
+    });
+  }
+
   await frameworkLogger.log(
     "enforcer-tools",
     "rule-validation-complete",

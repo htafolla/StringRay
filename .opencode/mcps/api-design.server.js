@@ -1,85 +1,116 @@
-const { Server } = require("@modelcontextprotocol/sdk/server/index.js");
-const {
-  StdioServerTransport,
-} = require("@modelcontextprotocol/sdk/server/stdio.js");
-
-class ApiDesignServer {
-  constructor() {
-    this.server = new Server(
-      {
-        name: "strray-api-design",
-        version: "1.0.0",
-      },
-      {
-        capabilities: {
-          tools: {},
-        },
-      },
-    );
-
-    this.setupToolHandlers();
-  }
-
-  setupToolHandlers() {
-    // Design and validate API architectures
-    this.server.setRequestHandler("tools/call", async (request) => {
-      const { name, arguments: args } = request.params;
-
-      switch (name) {
-        case "design_api":
-          return this.designApi(args);
-        case "validate_api":
-          return this.validateApi(args);
-        case "optimize_api":
-          return this.optimizeApi(args);
-        default:
-          throw new Error(`Unknown tool: ${name}`);
-      }
-    });
-  }
-
-  async designApi(args) {
-    // Implement API design logic
-    return {
-      content: [
-        {
-          type: "text",
-          text: "API design completed. REST/GraphQL architecture recommended.",
-        },
-      ],
-    };
-  }
-
-  async validateApi(args) {
-    // Implement API validation logic
-    return {
-      content: [
-        {
-          type: "text",
-          text: "API validation completed. Design standards verified.",
-        },
-      ],
-    };
-  }
-
-  async optimizeApi(args) {
-    // Implement API optimization logic
-    return {
-      content: [
-        {
-          type: "text",
-          text: "API optimization completed. Performance and usability improved.",
-        },
-      ],
-    };
-  }
-
-  async run() {
-    const transport = new StdioServerTransport();
-    await this.server.connect(transport);
-    console.error("StrRay API Design MCP server running on stdio");
-  }
+/**
+ * StrRay API Design MCP Server
+ *
+ * Knowledge skill for API design patterns, RESTful conventions,
+ * GraphQL schema design, and API documentation standards
+ */
+import { Server } from "@modelcontextprotocol/sdk/server/index.js";
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { CallToolRequestSchema, ListToolsRequestSchema, } from "@modelcontextprotocol/sdk/types.js";
+class StrRayApiDesignServer {
+    server;
+    constructor() {
+        this.server = new Server({
+            name: "strray-api-design",
+            version: "1.0.0",
+        });
+        this.setupToolHandlers();
+        console.log("StrRay API Design MCP Server initialized");
+    }
+    setupToolHandlers() {
+        this.server.setRequestHandler(ListToolsRequestSchema, async () => {
+            return {
+                tools: [
+                    {
+                        name: "design-api-endpoints",
+                        description: "Design RESTful API endpoints with proper resource modeling",
+                        inputSchema: {
+                            type: "object",
+                            properties: {
+                                resource: { type: "string" },
+                                operations: { type: "array", items: { type: "string" } },
+                                relationships: { type: "array", items: { type: "string" } },
+                            },
+                            required: ["resource"],
+                        },
+                    },
+                    {
+                        name: "validate-api-design",
+                        description: "Validate API design against RESTful principles and best practices",
+                        inputSchema: {
+                            type: "object",
+                            properties: {
+                                endpoints: { type: "array", items: { type: "string" } },
+                                standards: { type: "array", items: { type: "string" } },
+                            },
+                            required: ["endpoints"],
+                        },
+                    },
+                ],
+            };
+        });
+        this.server.setRequestHandler(CallToolRequestSchema, async (request) => {
+            const { name, arguments: args } = request.params;
+            switch (name) {
+                case "design-api-endpoints":
+                    return await this.designApiEndpoints(args);
+                case "validate-api-design":
+                    return await this.validateApiDesign(args);
+                default:
+                    throw new Error(`Unknown tool: ${name}`);
+            }
+        });
+    }
+    async designApiEndpoints(args) {
+        const { resource, operations, relationships } = args;
+        const design = {
+            resource: resource.toLowerCase(),
+            endpoints: [
+                `GET /api/${resource}s`,
+                `POST /api/${resource}s`,
+                `GET /api/${resource}s/{id}`,
+                `PUT /api/${resource}s/{id}`,
+                `DELETE /api/${resource}s/{id}`,
+            ],
+            relationships: relationships || [],
+        };
+        return {
+            content: [
+                {
+                    type: "text",
+                    text: JSON.stringify({ resource, design }, null, 2),
+                },
+            ],
+        };
+    }
+    async validateApiDesign(args) {
+        const { endpoints, standards } = args;
+        const validation = {
+            score: 85,
+            issues: ["Consider using plural resource names"],
+            recommendations: [
+                "Add HATEOAS links",
+                "Implement proper HTTP status codes",
+            ],
+        };
+        return {
+            content: [
+                {
+                    type: "text",
+                    text: JSON.stringify({ endpoints, validation }, null, 2),
+                },
+            ],
+        };
+    }
+    async run() {
+        const transport = new StdioServerTransport();
+        await this.server.connect(transport);
+        console.log("StrRay API Design MCP Server started");
+    }
 }
-
-const server = new ApiDesignServer();
-server.run().catch(console.error);
+if (import.meta.url === `file://${process.argv[1]}`) {
+    const server = new StrRayApiDesignServer();
+    server.run().catch(console.error);
+}
+export default StrRayApiDesignServer;
+//# sourceMappingURL=api-design.server.js.map

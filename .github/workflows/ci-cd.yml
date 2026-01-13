@@ -75,3 +75,29 @@ jobs:
         path: |
           dist/
           docs/
+
+  performance-test:
+    needs: build
+    runs-on: ubuntu-latest
+    continue-on-error: true
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Use Node.js 18.x
+      uses: actions/setup-node@v4
+      with:
+        node-version: 18.x
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Run performance tests
+      run: npm run test:performance
+
+    - name: Generate performance report
+      run: npm run performance:report
+
+    - name: Run performance gates
+      run: npm run performance:gates

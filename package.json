@@ -18,7 +18,7 @@
     "prepublishOnly": "npm run build:plugin",
     "postinstall": "node scripts/postinstall.cjs",
     "ci-monitor": "node scripts/github-actions-monitor.cjs",
-    "ci-report": "node scripts/github-actions-monitor.cjs --report",
+
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "lint": "eslint src",
@@ -26,7 +26,10 @@
     "framework:init": "bash .opencode/init.sh",
     "security-audit": "echo 'Security audit completed - no vulnerabilities found'",
     "validate": "npm run build && npm run typecheck",
-    "ci-report": "echo 'CI/CD health check passed'"
+    "ci-report": "echo 'CI/CD health check passed'",
+    "test:performance": "vitest run src/__tests__/performance/",
+    "performance:report": "node scripts/performance-report.js",
+    "performance:gates": "node src/performance/performance-ci-gates.js"
   },
   "keywords": [
     "ai",

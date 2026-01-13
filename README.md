@@ -18,6 +18,8 @@ StrRay provides intelligent multi-agent coordination, codex-based code quality e
 
 **Delivers clean architecture, predictive analytics, secure plugin ecosystem, and sub-millisecond performance — enterprise-grade, every time.**
 
+**Latest: Enhanced git hook validation with lightweight post-commit checks and comprehensive post-push CI/CD validation.**
+
 ## 🚀 Features
 
 - **🤖 Intelligent Agent Orchestration**: 8 specialized agents with automatic task delegation

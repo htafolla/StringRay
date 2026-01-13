@@ -1,0 +1,1 @@
+npm run build:plugin 2>&1 | tail -10

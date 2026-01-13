@@ -1,0 +1,1 @@
+{"version":3,"file":"auto-format.server.d.ts","sourceRoot":"","sources":["../../src/mcps/auto-format.server.ts"],"names":[],"mappings":"AAAA;;;;GAIG;AAYH,cAAM,sBAAsB;IAC1B,OAAO,CAAC,MAAM,CAAS;;IAYvB,OAAO,CAAC,iBAAiB;YAqEX,gBAAgB;YAkGhB,iBAAiB;YAqCjB,WAAW;YAyDX,YAAY;YA+CZ,mBAAmB;YAgDnB,eAAe;IAmE7B,OAAO,CAAC,qBAAqB;IAWvB,GAAG;CAKV;AAQD,OAAO,EAAE,sBAAsB,EAAE,CAAC"}

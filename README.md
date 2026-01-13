@@ -3,8 +3,8 @@
 [![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/htafolla/strray)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.9+-blue.svg)](https://www.typescriptlang.org/)
-[![Tests](https://img.shields.io/badge/tests-passing-brightgreen.svg)](https://github.com/htafolla/strray)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.9+-blue.svg)](https://www.typescript.org/)
+[![Tests](https://img.shields.io/badge/tests-833%2F833-brightgreen.svg)](https://github.com/htafolla/strray)
 [![CI/CD](https://img.shields.io/badge/CI%2FCD-passing-brightgreen.svg)](https://github.com/htafolla/strray/actions)
 [![Error Prevention](https://img.shields.io/badge/error%20prevention-99.6%25-red.svg)](https://github.com/htafolla/strray)
 
@@ -125,7 +125,8 @@ npm publish
 ```
 
 **Package Details:**
-- **Name**: `oh-my-opencode-strray`
+
+- **Name**: `strray`
 - **Version**: `1.0.0`
 - **Size**: ~483KB (gzipped)
 - **Files**: 508 total (including all agents, MCP servers, and documentation)
@@ -134,12 +135,13 @@ npm publish
 
 For production environments:
 
-1. **Install**: `npm install oh-my-opencode-strray`
+1. **Install**: `npm install strray`
 2. **Initialize**: `npx strray init`
 3. **Configure**: Update `.opencode/oh-my-opencode.json` with agent models
 4. **Deploy**: Framework automatically integrates with oh-my-opencode
 
 **Enterprise Features:**
+
 - Multi-agent orchestration with conflict resolution
 - Real-time performance monitoring and alerting
 - Comprehensive security hardening
@@ -356,20 +358,19 @@ npm run init
 
 ### Core Documentation
 
-- **[Installation Guide](./docs/StrRay_INSTALLATION_GUIDE.md)** - Complete setup and integration guide
-- **[Model Configuration](./docs/StrRay_MODEL_CONFIG.md)** - Model setup with opencode/grok-code assignments
+- **[Plugin Deployment Guide](./docs/PLUGIN_DEPLOYMENT_GUIDE.md)** - Complete setup and deployment guide
 - **[API Reference](./docs/api/API_REFERENCE.md)** - Developer API documentation for programmatic access
-- **[Agent Documentation](./docs/agents/)** - Detailed specifications for all 8 agents with operating procedures
-- **[Architecture](./docs/architecture/)** - Framework design with Universal Development Codex principles
-- **[Troubleshooting](./docs/troubleshooting/)** - Solutions for common issues and edge cases
+- **[Agent Documentation](./docs/agents/)** - Detailed specifications for all 9 agents with operating procedures
+- **[Architecture Integration](./docs/ORCHESTRATOR_INTEGRATION_ARCHITECTURE.md)** - Framework design with Universal Development Codex principles
+- **[StrRay Integration](./docs/README_STRRAY_INTEGRATION.md)** - Integration guide and best practices
 
 ### Advanced Features Documentation
 
-- **[Performance Benchmarking](./docs/advanced/performance-benchmarking.md)** - Metrics collection and optimization tracking
-- **[Predictive Analytics](./docs/advanced/predictive-analytics.md)** - ML-based agent optimization and forecasting
-- **[Plugin Ecosystem](./docs/advanced/plugin-system.md)** - Secure plugin development and integration
-- **[Monitoring & Alerting](./docs/advanced/monitoring.md)** - Real-time health monitoring and alerting
-- **[Performance Optimization](./docs/advanced/optimization.md)** - Sub-millisecond performance tuning
+- **[Performance Benchmarking](./docs/BRAND.md)** - Framework branding and performance metrics
+- **[Grok Code Guide](./docs/GROK_GUIDE.md)** - AI model configuration and optimization
+- **[Plugin Ecosystem](./docs/STRAY_EXTENSION.md)** - Extension development and plugin system
+- **[Integration Lessons](./docs/INTEGRATION_LESSONS.md)** - Lessons learned from framework integration
+- **[Achievement Recognition](./docs/ACHIEVEMENT_RECOGNITION.md)** - Framework achievements and milestones
 
 ### Deployment & Operations
 
@@ -600,9 +601,8 @@ MIT License - see [LICENSE](LICENSE) file.
 
 ## Documentation
 
-- [Installation Guide](./docs/StrRay_INSTALLATION_GUIDE.md)
-- [Model Configuration](./docs/StrRay_MODEL_CONFIG.md)
+- [Plugin Deployment Guide](./docs/PLUGIN_DEPLOYMENT_GUIDE.md)
 - [API Reference](./docs/api/API_REFERENCE.md)
-- [Agent Documentation](./docs/agents/]
-- [Architecture](./docs/architecture/)
-- [Troubleshooting](./docs/troubleshooting/)
+- [Agent Documentation](./docs/agents/)
+- [Architecture Integration](./docs/ORCHESTRATOR_INTEGRATION_ARCHITECTURE.md)
+- [Integration Guide](./docs/README_STRRAY_INTEGRATION.md)

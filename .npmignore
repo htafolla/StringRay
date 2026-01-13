@@ -1,0 +1,10 @@
+src/
+test-install/
+*.tgz
+*.log
+.env
+.DS_Store
+node_modules/
+.git/
+.github/
+!test-examples/**

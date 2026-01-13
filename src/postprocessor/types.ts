@@ -150,6 +150,29 @@ export interface EventTimeline {
   details: string;
 }
 
+export interface RedeployResult {
+  success: boolean;
+  deploymentId: string;
+  commitSha: string;
+  environment: string;
+  duration: number;
+  error?: string;
+  rollbackPerformed?: boolean;
+  canaryResults?: CanaryResult[];
+}
+
+export interface CanaryResult {
+  phase: number;
+  trafficPercentage: number;
+  success: boolean;
+  metrics: {
+    responseTime: number;
+    errorRate: number;
+    throughput: number;
+  };
+  duration: number;
+}
+
 export type PostProcessorEvent =
   | { type: "initialized"; config: PostProcessorConfig }
   | { type: "loop-started"; context: PostProcessorContext }

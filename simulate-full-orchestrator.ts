@@ -3,10 +3,20 @@
  * Demonstrates the full pipeline from user request to agent execution
  */
 
-import { StrRayOrchestrator } from "./dist/orchestrator.js";
-import { enhancedMultiAgentOrchestrator } from "./dist/orchestrator/enhanced-multi-agent-orchestrator.js";
-import { createAgentDelegator } from "./dist/delegation/agent-delegator.js";
-import { StrRayStateManager } from "./dist/state/state-manager.js";
+// Path configuration for cross-environment compatibility
+const ORCHESTRATOR_PATH = process.env.STRRAY_ORCHESTRATOR_PATH || "./dist/orchestrator";
+const DELEGATION_PATH = process.env.STRRAY_DELEGATION_PATH || "./dist/delegation";
+const STATE_PATH = process.env.STRRAY_STATE_PATH || "./dist/state";
+
+// Dynamic imports for cross-environment compatibility
+export {}; // Make this a module to allow top-level await
+
+const [{ StrRayOrchestrator }, { enhancedMultiAgentOrchestrator }] = await Promise.all([
+  import(ORCHESTRATOR_PATH + ".js"),
+  import(ORCHESTRATOR_PATH + "/enhanced-multi-agent-orchestrator.js")
+]);
+const { createAgentDelegator } = await import(DELEGATION_PATH + "/agent-delegator.js");
+const { StrRayStateManager } = await import(STATE_PATH + "/state-manager.js");
 
 async function simulateCompleteOrchestratorPipeline() {
   console.log("🚀 COMPLETE ORCHESTRATOR INTEGRATION SIMULATION\n");

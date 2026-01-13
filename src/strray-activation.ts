@@ -6,6 +6,7 @@
  */
 
 import { frameworkLogger } from "./framework-logger.js";
+import { ensureCriticalComponents } from "./architectural-integrity.js";
 
 export interface StrRayActivationConfig {
   enableOrchestrator: boolean;
@@ -14,6 +15,7 @@ export interface StrRayActivationConfig {
   enableHooks: boolean;
   enableCodexInjection: boolean;
   enableProcessors: boolean;
+  enablePostProcessor: boolean;
 }
 
 export const defaultStrRayConfig: StrRayActivationConfig = {
@@ -23,6 +25,7 @@ export const defaultStrRayConfig: StrRayActivationConfig = {
   enableHooks: true,
   enableCodexInjection: true,
   enableProcessors: true,
+  enablePostProcessor: true,
 };
 
 export async function activateStrRayFramework(
@@ -64,6 +67,13 @@ export async function activateStrRayFramework(
     if (activationConfig.enableProcessors) {
       await activateProcessors();
     }
+
+    if (activationConfig.enablePostProcessor) {
+      await activatePostProcessor();
+    }
+
+    // Ensure architectural integrity - critical components must always be active
+    await ensureCriticalComponents();
 
     // Loading display moved to init.sh for dramatic line-by-line presentation
 
@@ -185,6 +195,35 @@ async function activateProcessors(): Promise<void> {
   frameworkLogger.log(
     "strray-activation",
     "processor pipeline activated",
+    "success",
+  );
+}
+
+async function activatePostProcessor(): Promise<void> {
+  frameworkLogger.log(
+    "strray-activation",
+    "activating post-processor system",
+    "info",
+  );
+
+  const { PostProcessor } = await import("./postprocessor/PostProcessor.js");
+
+  // Get existing state manager (should be initialized by boot orchestrator)
+  const stateManager = (globalThis as any).strRayStateManager as any;
+  if (!stateManager) {
+    throw new Error("State manager not initialized - boot orchestrator must run first");
+  }
+
+  // Create post-processor with optional session monitor
+  // Session monitor may not be available in plugin context
+  const postProcessor = new PostProcessor(stateManager, null, {});
+
+  // Store the post-processor instance globally for framework use
+  (globalThis as any).strRayPostProcessor = postProcessor;
+
+  frameworkLogger.log(
+    "strray-activation",
+    "post-processor system activated",
     "success",
   );
 }

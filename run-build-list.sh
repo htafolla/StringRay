@@ -1,0 +1,1 @@
+npx tsc --project tsconfig.plugin.json --listFiles 2>&1 | head -20

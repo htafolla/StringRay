@@ -5,7 +5,10 @@
  * Tests codex enforcement in production build
  */
 
-import { ruleEnforcer } from '../src/enforcement/rule-enforcer.js';
+// Path configuration for cross-environment compatibility
+const ENFORCEMENT_PATH = process.env.STRRAY_ENFORCEMENT_PATH || '../dist/enforcement';
+
+import { ruleEnforcer } from `${ENFORCEMENT_PATH}/rule-enforcer.js`;
 
 async function testOverEngineeringEnforcement() {
   console.log('🚀 Testing Over-Engineering Enforcement E2E\n');

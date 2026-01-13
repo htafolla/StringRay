@@ -6,14 +6,19 @@
  * Tests the complete boot sequence and Phase 1 implementations.
  */
 
-import { BootOrchestrator } from "../dist/boot-orchestrator.js";
+// Path configuration for cross-environment compatibility
+const BOOT_PATH = process.env.STRRAY_BOOT_PATH || "../dist/boot-orchestrator";
+const DELEGATION_PATH = process.env.STRRAY_DELEGATION_PATH || "../dist/delegation";
+const SESSION_PATH = process.env.STRRAY_SESSION_PATH || "../dist/session";
+
+import { BootOrchestrator } from `${BOOT_PATH}.js`;
 import {
   createAgentDelegator,
   createSessionCoordinator,
-} from "../dist/delegation/index.js";
-import { createSessionCleanupManager } from "../dist/session/session-cleanup-manager.js";
-import { createSessionMonitor } from "../dist/session/session-monitor.js";
-import { createSessionStateManager } from "../dist/session/session-state-manager.js";
+} from `${DELEGATION_PATH}/index.js`;
+import { createSessionCleanupManager } from `${SESSION_PATH}/session-cleanup-manager.js`;
+import { createSessionMonitor } from `${SESSION_PATH}/session-monitor.js`;
+import { createSessionStateManager } from `${SESSION_PATH}/session-state-manager.js`;
 
 async function testBootSequence() {
   console.log("🚀 StrRay Phase 1 Verification: Boot Sequence Test");

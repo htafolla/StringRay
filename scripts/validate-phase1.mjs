@@ -5,9 +5,20 @@
  * Validates that StrRay Framework Phase 1 fixes work correctly
  */
 
-import { ProcessorManager } from '../src/processors/processor-manager.js';
-import { StrRayStateManager } from '../src/state/state-manager.js';
-import { ruleEnforcer } from '../src/enforcement/rule-enforcer.js';
+// Make this a module to allow top-level await
+export {};
+
+// Path configuration for cross-environment compatibility
+const PROCESSORS_PATH = process.env.STRRAY_PROCESSORS_PATH || '../dist/processors';
+const STATE_PATH = process.env.STRRAY_STATE_PATH || '../dist/state';
+const ENFORCEMENT_PATH = process.env.STRRAY_ENFORCEMENT_PATH || '../dist/enforcement';
+
+// Dynamic imports for cross-environment compatibility
+const [{ ProcessorManager }, { StrRayStateManager }, { ruleEnforcer }] = await Promise.all([
+  import(PROCESSORS_PATH + '/processor-manager.js'),
+  import(STATE_PATH + '/state-manager.js'),
+  import(ENFORCEMENT_PATH + '/rule-enforcer.js')
+]);
 
 async function validatePhase1() {
   console.log('🚀 StrRay Framework - Phase 1 Validation\n');

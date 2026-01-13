@@ -3,7 +3,7 @@
 # StrRay Framework - Session Initialization
 # Loads framework templates and automation hooks on StrRay startup
 
-echo "🎯 StrRay Framework v1.0.0"
+echo "🎯 StrRay Framework v1.0.3"
 echo "Initializing session with Codex compliance..."
 
 # Load framework configuration

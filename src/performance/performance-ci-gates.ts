@@ -514,89 +514,9 @@ pipeline {
                     def result = sh(
                         script: '''
                         node -e "
-                        import('./dist/performance/performance-ci-gates.js').then(({ performanceCIGates }) => {
-                          return performanceCIGates.runPerformanceGates().then(result => {
-                            if (!result.success) {
-                              console.error('Performance gates failed');
-                              process.exit(1);
-                            }
-                            console.log('Performance gates passed');
-                          });
-                        }).catch(err => {
-                          console.error(err);
-                          process.exit(1);
-                        });
-                        "
-                        ''',
-                        returnStatus: true
-                    )
-
-                    if (result != 0) {
-                        error('Performance gates failed')
-                    }
-                }
-            }
-        }
-    }
-
-    post {
-        always {
-            archiveArtifacts artifacts: 'performance-reports/**', allowEmptyArchive: true
-            publishHTML([
-                allowMissing: true,
-                alwaysLinkToLastBuild: true,
-                keepAll: true,
-                reportDir: 'performance-reports',
-                reportFiles: 'performance-summary-*.json',
-                reportName: 'Performance Report'
-            ])
-        }
-
-        failure {
-            script {
-                // Send notifications on failure
-                echo 'Performance gates failed - check reports for details'
-            }
-        }
-    }
-}`;
-  }
-
-  /**
-   * Create Azure DevOps pipeline for performance gates
-   */
-  createAzurePipeline(): string {
-    return `# StrRay Performance Gates Azure Pipeline
-trigger:
-- main
-- develop
-
-pr:
-- main
-
-pool:
-  vmImage: 'ubuntu-latest'
-
-steps:
-- task: NodeTool@0
-  inputs:
-    versionSpec: '18.x'
-  displayName: 'Setup Node.js'
-
-- task: npmAuthenticate@0
-  inputs:
-    workingFile: .npmrc
-  displayName: 'npm Authenticate'
-
-- script: npm ci
-  displayName: 'Install dependencies'
-
-- script: npm run build
-  displayName: 'Build application'
-
-- script: |
-    node -e "
-    import('./dist/performance/performance-ci-gates.js').then(({ performanceCIGates }) => {
+        // In production: import { performanceCIGates } from 'strray/performance';
+        // For CI usage: dynamically import from built package
+        import('./dist/performance/performance-ci-gates.js').then(({ performanceCIGates }) => {
       return performanceCIGates.runPerformanceGates().then(result => {
         if (!result.success) {
           console.error('Performance gates failed');

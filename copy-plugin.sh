@@ -1,0 +1,1 @@
+cp .opencode/plugin/strray-codex-injection.ts src/plugins/strray-codex-injection.ts

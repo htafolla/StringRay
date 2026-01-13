@@ -2,8 +2,8 @@
  * Fix Validation and Rollback for Post-Processor
  */
 
-import { FixResult, FailureAnalysis, PostProcessorContext } from '../types.js';
-import { execSync } from 'child_process';
+import { FixResult, FailureAnalysis, PostProcessorContext } from "../types.js";
+import { execSync } from "child_process";
 
 export class FixValidator {
   /**
@@ -12,28 +12,32 @@ export class FixValidator {
   async validateFixes(
     fixes: any[],
     originalFailure: FailureAnalysis,
-    context: PostProcessorContext
+    context: PostProcessorContext,
   ): Promise<boolean> {
-    console.log('✅ Validating applied fixes...');
+    console.log("✅ Validating applied fixes...");
 
     if (fixes.length === 0) {
-      console.log('⚠️  No fixes to validate');
+      console.log("⚠️  No fixes to validate");
       return false;
     }
 
     try {
       // Run validation tests based on the original failure type
-      const validationPassed = await this.runValidationTests(originalFailure.category);
+      const validationPassed = await this.runValidationTests(
+        originalFailure.category,
+      );
 
       if (validationPassed) {
-        console.log('✅ Fix validation passed - original issue appears resolved');
+        console.log(
+          "✅ Fix validation passed - original issue appears resolved",
+        );
         return true;
       } else {
-        console.log('❌ Fix validation failed - issue still exists');
+        console.log("❌ Fix validation failed - issue still exists");
         return false;
       }
     } catch (error) {
-      console.error('❌ Fix validation error:', error);
+      console.error("❌ Fix validation error:", error);
       return false;
     }
   }
@@ -44,58 +48,58 @@ export class FixValidator {
   private async runValidationTests(category: string): Promise<boolean> {
     try {
       switch (category) {
-        case 'test-failure':
-          console.log('🧪 Running test validation...');
-          execSync('npm test', {
-            stdio: 'pipe',
-            timeout: 120000 // 2 minutes
+        case "test-failure":
+          console.log("🧪 Running test validation...");
+          execSync("npm test", {
+            stdio: "pipe",
+            timeout: 120000, // 2 minutes
           });
           return true;
 
-        case 'build-failure':
-          console.log('🔨 Running build validation...');
-          execSync('npm run build', {
-            stdio: 'pipe',
-            timeout: 120000 // 2 minutes
+        case "build-failure":
+          console.log("🔨 Running build validation...");
+          execSync("npm run build", {
+            stdio: "pipe",
+            timeout: 120000, // 2 minutes
           });
           return true;
 
-        case 'code-quality-failure':
-          console.log('🎨 Running code quality validation...');
-          execSync('npm run lint', {
-            stdio: 'pipe',
-            timeout: 60000 // 1 minute
+        case "code-quality-failure":
+          console.log("🎨 Running code quality validation...");
+          execSync("npm run lint", {
+            stdio: "pipe",
+            timeout: 60000, // 1 minute
           });
           return true;
 
-        case 'security-failure':
-          console.log('🛡️ Running security validation...');
-          execSync('npm run security-audit', {
-            stdio: 'pipe',
-            timeout: 60000 // 1 minute
+        case "security-failure":
+          console.log("🛡️ Running security validation...");
+          execSync("npm run security-audit", {
+            stdio: "pipe",
+            timeout: 60000, // 1 minute
           });
           return true;
 
-        case 'performance-regression':
-          console.log('⚡ Running performance validation...');
-          execSync('npm run test:performance', {
-            stdio: 'pipe',
-            timeout: 120000 // 2 minutes
+        case "performance-regression":
+          console.log("⚡ Running performance validation...");
+          execSync("npm run test:performance", {
+            stdio: "pipe",
+            timeout: 120000, // 2 minutes
           });
           return true;
 
-        case 'ci-pipeline-failure':
+        case "ci-pipeline-failure":
         default:
-          console.log('🔍 Running general validation...');
+          console.log("🔍 Running general validation...");
           // Run type checking as basic validation
-          execSync('npm run typecheck', {
-            stdio: 'pipe',
-            timeout: 60000 // 1 minute
+          execSync("npm run typecheck", {
+            stdio: "pipe",
+            timeout: 60000, // 1 minute
           });
           return true;
       }
     } catch (error) {
-      console.log(`❌ Validation failed for ${category}:`, error.message);
+      console.log(`❌ Validation failed for ${category}:`, error instanceof Error ? error.message : String(error));
       return false;
     }
   }
@@ -104,30 +108,29 @@ export class FixValidator {
    * Rollback applied fixes if validation fails
    */
   async rollbackFixes(fixes: any[]): Promise<void> {
-    console.log('🔄 Rolling back applied fixes...');
+    console.log("🔄 Rolling back applied fixes...");
 
     if (fixes.length === 0) {
-      console.log('⚠️  No fixes to rollback');
+      console.log("⚠️  No fixes to rollback");
       return;
     }
 
     try {
       // Create a backup branch before rollback
       const backupBranch = `backup-fix-${Date.now()}`;
-      execSync(`git branch ${backupBranch}`, { stdio: 'pipe' });
+      execSync(`git branch ${backupBranch}`, { stdio: "pipe" });
       console.log(`💾 Created backup branch: ${backupBranch}`);
 
       // Reset to the commit before fixes were applied
-      execSync('git reset --hard HEAD~1', { stdio: 'inherit' });
-      console.log('✅ Fixes rolled back to previous commit');
+      execSync("git reset --hard HEAD~1", { stdio: "inherit" });
+      console.log("✅ Fixes rolled back to previous commit");
 
       // Restore working directory state if needed
       // This is a simplified rollback - in production, we'd track exact changes
-      console.log('🔄 Rollback completed successfully');
-
+      console.log("🔄 Rollback completed successfully");
     } catch (error) {
-      console.error('❌ Rollback failed:', error);
-      throw new Error(`Rollback failed: ${error.message}`);
+      console.error("❌ Rollback failed:", error);
+      throw new Error(`Rollback failed: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 
@@ -137,24 +140,24 @@ export class FixValidator {
   async generateValidationReport(
     fixes: any[],
     validationResult: boolean,
-    originalFailure: FailureAnalysis
+    originalFailure: FailureAnalysis,
   ): Promise<any> {
     return {
       timestamp: new Date().toISOString(),
       originalFailure: {
         category: originalFailure.category,
         severity: originalFailure.severity,
-        confidence: originalFailure.confidence
+        confidence: originalFailure.confidence,
       },
-      appliedFixes: fixes.map(fix => ({
+      appliedFixes: fixes.map((fix) => ({
         type: fix.type,
         description: fix.description,
-        files: fix.files
+        files: fix.files,
       })),
       validationResult,
       summary: validationResult
-        ? 'Fixes validated successfully - issue resolved'
-        : 'Fixes did not resolve the issue - manual intervention required'
+        ? "Fixes validated successfully - issue resolved"
+        : "Fixes did not resolve the issue - manual intervention required",
     };
   }
 
@@ -164,7 +167,7 @@ export class FixValidator {
   isRollbackRecommended(
     fixes: any[],
     validationResult: boolean,
-    originalFailure: FailureAnalysis
+    originalFailure: FailureAnalysis,
   ): boolean {
     // Don't rollback if fixes were applied and validation passed
     if (validationResult) {
@@ -172,7 +175,10 @@ export class FixValidator {
     }
 
     // Rollback if high-severity failures couldn't be fixed
-    if (originalFailure.severity === 'critical' || originalFailure.severity === 'high') {
+    if (
+      originalFailure.severity === "critical" ||
+      originalFailure.severity === "high"
+    ) {
       return true;
     }
 
@@ -182,6 +188,8 @@ export class FixValidator {
     }
 
     // For low-risk changes, rollback is safer
-    return fixes.some(fix => fix.type === 'dependency-update' || fix.type === 'code-fix');
+    return fixes.some(
+      (fix) => fix.type === "dependency-update" || fix.type === "code-fix",
+    );
   }
 }

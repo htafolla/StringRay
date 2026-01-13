@@ -13,7 +13,10 @@
 import { execSync, spawn } from 'child_process';
 import fs from 'fs';
 import path from 'path';
-import { StrRayOrchestrator } from '../../dist/orchestrator.js';
+// Path configuration for cross-environment compatibility
+const ORCHESTRATOR_PATH = process.env.STRRAY_ORCHESTRATOR_PATH || '../../dist/orchestrator';
+
+import { StrRayOrchestrator } from `${ORCHESTRATOR_PATH}.js`;
 
 const MAX_OUTPUT_SIZE = 100000; // Increased buffer for large test outputs
 const MAX_FILES_THRESHOLD = 15; // Run individually if more than 15 test files (AGGRESSIVE)

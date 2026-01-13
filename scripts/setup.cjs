@@ -68,7 +68,7 @@ function configureStrRayPlugin() {
     config.plugin = [];
   }
 
-  const pluginPath = "oh-my-opencode-strray/dist/plugin/strray-codex-injection.js";
+  const pluginPath = "strray/dist/plugin/strray-codex-injection.js";
 
   if (!config.plugin.includes(pluginPath)) {
     config.plugin.push(pluginPath);
@@ -123,6 +123,6 @@ try {
   console.error('❌ StrRay plugin setup failed:', error.message);
   console.log('\n🔧 Manual Configuration:');
   console.log('Add the following to your .opencode/oh-my-opencode.json:');
-  console.log(`"plugin": ["oh-my-opencode-strray/dist/plugin/strray-codex-injection.js"]`);
+  console.log(`"plugin": ["strray/dist/plugin/strray-codex-injection.js"]`);
   process.exit(1);
 }

@@ -17,6 +17,10 @@ import { PostProcessorMonitoringEngine } from "./monitoring/MonitoringEngine.js"
 import { FailureAnalysisEngine } from "./analysis/FailureAnalysisEngine.js";
 import { AutoFixEngine } from "./autofix/AutoFixEngine.js";
 import { FixValidator } from "./autofix/FixValidator.js";
+import { RedeployCoordinator } from "./redeploy/RedeployCoordinator.js";
+import { RetryHandler } from "./redeploy/RetryHandler.js";
+import { EscalationEngine } from "./escalation/EscalationEngine.js";
+import { SuccessHandler } from "./success/SuccessHandler.js";
 import {
   PostProcessorConfig,
   PostProcessorResult,
@@ -30,6 +34,9 @@ export class PostProcessor {
   private failureAnalysisEngine: FailureAnalysisEngine;
   private autoFixEngine: AutoFixEngine;
   private fixValidator: FixValidator;
+  private redeployCoordinator: RedeployCoordinator;
+  private escalationEngine: EscalationEngine;
+  private successHandler: SuccessHandler;
   private triggers: {
     gitHook: GitHookTrigger;
     webhook: WebhookTrigger;
@@ -38,27 +45,36 @@ export class PostProcessor {
 
   constructor(
     private stateManager: StrRayStateManager,
-    private sessionMonitor: SessionMonitor,
-    config: Partial<PostProcessorConfig> = {}
+    private sessionMonitor: SessionMonitor | null = null,
+    config: Partial<PostProcessorConfig> = {},
   ) {
     this.config = { ...defaultConfig, ...config };
 
     // Initialize monitoring engine
     this.monitoringEngine = new PostProcessorMonitoringEngine(
       this.stateManager,
-      this.sessionMonitor
+      this.sessionMonitor || undefined,
     );
 
     // Initialize failure analysis and auto-fix engines
     this.failureAnalysisEngine = new FailureAnalysisEngine();
-    this.autoFixEngine = new AutoFixEngine(this.config.autoFix.confidenceThreshold);
+    this.autoFixEngine = new AutoFixEngine(
+      this.config.autoFix.confidenceThreshold,
+    );
     this.fixValidator = new FixValidator();
+
+    // Initialize redeploy coordinator
+    this.redeployCoordinator = new RedeployCoordinator();
+
+    // Initialize escalation and success handlers
+    this.escalationEngine = new EscalationEngine();
+    this.successHandler = new SuccessHandler();
 
     // Initialize trigger mechanisms
     this.triggers = {
       gitHook: new GitHookTrigger(this),
       webhook: new WebhookTrigger(this),
-      api: new APITrigger(this)
+      api: new APITrigger(this),
     };
   }
 
@@ -155,87 +171,148 @@ export class PostProcessor {
   /**
    * Execute the monitoring loop until success or max attempts
    */
-  private async executeMonitoringLoop(
-    context: PostProcessorContext,
-    sessionId: string,
-  ): Promise<PostProcessorResult> {
-    let attempts = 0;
-    const maxAttempts = this.config.maxAttempts || 3;
+   private async executeMonitoringLoop(
+     context: PostProcessorContext,
+     sessionId: string,
+   ): Promise<PostProcessorResult> {
+     let attempts = 0;
+     const maxAttempts = this.config.maxAttempts || 3;
+     const monitoringResults: any[] = [];
 
-    while (attempts < maxAttempts) {
+     while (attempts < maxAttempts) {
       attempts++;
 
       console.log(
         `🔍 Monitoring attempt ${attempts}/${maxAttempts} for ${context.commitSha}`,
       );
 
-      // Monitor CI/CD status
-      const monitoringResult = await this.monitoringEngine.monitorDeployment(
-        context.commitSha,
-      );
+       // Monitor CI/CD status
+       const monitoringResult = await this.monitoringEngine.monitorDeployment(
+         context.commitSha,
+       );
 
-      if (monitoringResult.overallStatus === "success") {
-        console.log("✅ CI/CD pipeline successful - post-processor complete");
-        return {
-          success: true,
-          commitSha: context.commitSha,
-          sessionId,
-          attempts,
-          monitoringResults: [monitoringResult],
-        };
-      }
+       monitoringResults.push(monitoringResult);
+
+       if (monitoringResult.overallStatus === "success") {
+         console.log("✅ CI/CD pipeline successful - post-processor complete");
+
+         const result = {
+           success: true,
+           commitSha: context.commitSha,
+           sessionId,
+           attempts,
+           monitoringResults,
+         };
+
+         // Handle successful completion
+         await this.successHandler.handleSuccess(context, result, monitoringResults);
+
+         return result;
+       }
 
       // Pipeline failed - analyze and attempt fixes
-      console.log('❌ CI/CD pipeline failed - analyzing issues...');
+      console.log("❌ CI/CD pipeline failed - analyzing issues...");
 
-      const analysis = await this.failureAnalysisEngine.analyzeFailure(monitoringResult);
-      console.log(`🔍 Analysis complete: ${analysis.category} (${analysis.severity}) - ${analysis.rootCause}`);
+      const analysis =
+        await this.failureAnalysisEngine.analyzeFailure(monitoringResult);
+      console.log(
+        `🔍 Analysis complete: ${analysis.category} (${analysis.severity}) - ${analysis.rootCause}`,
+      );
 
       const fixResult = await this.autoFixEngine.applyFixes(analysis, context);
 
       if (fixResult.success && fixResult.appliedFixes.length > 0) {
-        console.log(`🔧 ${fixResult.appliedFixes.length} fix(es) applied successfully`);
+        console.log(
+          `🔧 ${fixResult.appliedFixes.length} fix(es) applied successfully`,
+        );
 
         // Validate that fixes resolve the issue
         const validationPassed = await this.fixValidator.validateFixes(
           fixResult.appliedFixes,
           analysis,
-          context
+          context,
         );
 
         if (validationPassed) {
-          console.log('✅ Fix validation passed - redeploying...');
+          console.log("✅ Fix validation passed - redeploying...");
           await this.redeployWithFixes(context, fixResult);
           // Continue monitoring with next attempt
           continue;
         } else {
-          console.log('❌ Fix validation failed - rolling back...');
+          console.log("❌ Fix validation failed - rolling back...");
           await this.fixValidator.rollbackFixes(fixResult.appliedFixes);
         }
       }
 
-      // Wait before retry
+      // Check if escalation is needed before retry
+      const escalationResult = await this.escalationEngine.evaluateEscalation(
+        context,
+        attempts,
+        "CI/CD pipeline failure",
+        monitoringResults
+      );
+
+      if (escalationResult) {
+        console.log(`🚨 Escalation triggered: ${escalationResult.level}`);
+        console.log(`   Reason: ${escalationResult.reason}`);
+
+        // For emergency/rollback levels, stop the loop
+        if (escalationResult.level === 'emergency' || escalationResult.level === 'rollback') {
+          return {
+            success: false,
+            commitSha: context.commitSha,
+            sessionId,
+            attempts,
+            monitoringResults,
+            fixesApplied: fixResult?.appliedFixes || [],
+            error: `Escalation triggered: ${escalationResult.reason}`,
+          };
+        }
+      }
+
+      // Wait before retry (only if not escalated to emergency/rollback)
       await this.waitBeforeRetry(attempts);
     }
+
+    // Max attempts exceeded - final escalation
+    const finalEscalation = await this.escalationEngine.evaluateEscalation(
+      context,
+      attempts,
+      "Max attempts exceeded - deployment failed",
+      monitoringResults
+    );
 
     return {
       success: false,
       commitSha: context.commitSha,
       sessionId,
       attempts,
-      monitoringResults: [],
+      monitoringResults,
       fixesApplied: [],
       error: "Max attempts exceeded",
     };
   }
 
   /**
-   * Redeploy after applying fixes
+   * Redeploy after applying fixes using the RedeployCoordinator
    */
-  private async redeployWithFixes(context: PostProcessorContext, fixResult: any): Promise<void> {
-    // For now, trigger a new CI/CD run by pushing (this would be more sophisticated in production)
-    console.log('🔄 Triggering redeployment by pushing changes...');
-    // In a real implementation, this would integrate with deployment APIs
+  private async redeployWithFixes(
+    context: PostProcessorContext,
+    fixResult: any,
+  ): Promise<void> {
+    console.log("🔄 Executing redeployment with fixes...");
+
+    const redeployResult = await this.redeployCoordinator.executeRedeploy(
+      context,
+      fixResult
+    );
+
+    if (redeployResult.success) {
+      console.log(`✅ Redeployment successful: ${redeployResult.deploymentId}`);
+    } else {
+      console.log(`❌ Redeployment failed: ${redeployResult.error}`);
+      throw new Error(`Redeployment failed: ${redeployResult.error}`);
+    }
   }
 
   /**
@@ -249,16 +326,7 @@ export class PostProcessor {
     return { success: false, requiresManualIntervention: true };
   }
 
-  /**
-   * Redeploy after applying fixes
-   */
-  private async redeployWithFixes(
-    context: PostProcessorContext,
-    fixResult: any,
-  ): Promise<void> {
-    // Placeholder for redeployment
-    console.log("🔄 Redeployment would be initiated here");
-  }
+
 
   /**
    * Escalate to manual intervention

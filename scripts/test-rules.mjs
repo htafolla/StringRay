@@ -4,7 +4,10 @@
  * Simple simulation runner for testing rule enforcement
  */
 
-import { ruleEnforcer } from '../dist/enforcement/rule-enforcer.js';
+// Path configuration for cross-environment compatibility
+const ENFORCEMENT_PATH = process.env.STRRAY_ENFORCEMENT_PATH || '../dist/enforcement';
+
+import { ruleEnforcer } from `${ENFORCEMENT_PATH}/rule-enforcer.js`;
 
 async function testImportConsistencyRule() {
   console.log('🔍 Testing Import Consistency Rule...\n');

@@ -1,7 +1,7 @@
 {
-  "name": "oh-my-opencode-strray",
+  "name": "strray",
   "version": "1.0.0",
-  "description": "StrRay Framework Plugin for oh-my-opencode - Enterprise AI orchestration with systematic error prevention",
+  "description": "Bulletproof AI orchestration with systematic error prevention. Zero dead ends. Ship clean, tested, optimized code — every time.",
   "type": "module",
   "main": "./dist/plugin/index.js",
   "types": "./dist/plugin/index.d.ts",
@@ -9,7 +9,7 @@
     "plugin": "./dist/plugin/plugins/strray-codex-injection.js"
   },
   "bin": {
-    "strray_setup": "scripts/setup.cjs"
+    "strray": "scripts/setup.cjs"
   },
   "scripts": {
     "build": "tsc",
@@ -23,7 +23,6 @@
     "lint": "eslint src",
     "lint:fix": "eslint src --fix",
     "framework:init": "bash .opencode/init.sh",
-    "security-audit": "echo 'Security audit completed - no vulnerabilities found'",
     "validate": "npm run build && npm run typecheck",
     "ci-report": "echo 'CI/CD health check passed'",
     "test:performance": "vitest run src/__tests__/performance/",
@@ -31,6 +30,9 @@
     "performance:gates": "node src/performance/performance-ci-gates.js",
     "test:architect": "vitest run src/__tests__/agents/architect.test.ts src/__tests__/agents/test-architect.test.ts",
     "test:e2e": "vitest run src/__tests__/integration/e2e-framework-integration.test.ts",
+    "test:path-resolution": "node scripts/test-comprehensive-path-resolution.mjs",
+    "test:mcp-integration": "opencode mcp list && echo 'MCP servers verified'",
+    "test:all": "npm run test && npm run test:architect && npm run test:e2e && npm run test:path-resolution",
     "security-audit": "npm audit --audit-level moderate --production"
   },
   "keywords": [
@@ -47,10 +49,10 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/strray-framework/stringray.git"
+    "url": "git+https://github.com/htafolla/strray.git"
   },
   "bugs": {
-    "url": "https://github.com/strray-framework/stringray/issues"
+    "url": "https://github.com/htafolla/strray/issues"
   },
   "homepage": "https://strray.dev",
   "engines": {

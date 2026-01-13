@@ -1,4 +1,4 @@
-name: StrRay Framework CI/CD
+name: StrRay Framework CI/CD v1.0.0
 
 on:
   push:
@@ -36,6 +36,9 @@ jobs:
 
     - name: Run tests with coverage
       run: npm test
+
+    - name: Run comprehensive path resolution test
+      run: node scripts/test-comprehensive-path-resolution.mjs
 
   build:
     needs: test

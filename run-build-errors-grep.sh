@@ -1,0 +1,1 @@
+npm run build:plugin 2>&1 | grep -A5 -B5 "error"

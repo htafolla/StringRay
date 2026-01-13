@@ -1,0 +1,45 @@
+{
+  "timestamp": "2026-01-13T03:03:27.547Z",
+  "framework": "StrRay v1.0.0",
+  "totalTests": 4,
+  "baselines": {
+    "bundle-size-analysis": {
+      "testName": "bundle-size-analysis",
+      "averageDuration": 49.136486333333266,
+      "standardDeviation": 1.587775657285186,
+      "sampleCount": 3,
+      "lastUpdated": 1767848028627,
+      "tolerance": 10
+    },
+    "memory-usage-check": {
+      "testName": "memory-usage-check",
+      "averageDuration": 0.03668212500000578,
+      "standardDeviation": 0.002016041835239299,
+      "sampleCount": 8,
+      "lastUpdated": 1768269091656,
+      "tolerance": 10
+    },
+    "module-import-performance": {
+      "testName": "module-import-performance",
+      "averageDuration": 2.7306250000000034,
+      "standardDeviation": 0,
+      "sampleCount": 1,
+      "lastUpdated": 1767841054820,
+      "tolerance": 10
+    },
+    "test-execution-performance": {
+      "testName": "test-execution-performance",
+      "averageDuration": 0.1496339999999903,
+      "standardDeviation": 0.03472580995503595,
+      "sampleCount": 37,
+      "lastUpdated": 1768269091656,
+      "tolerance": 10
+    }
+  },
+  "status": "generated",
+  "recommendations": [
+    "Monitor performance regressions against baselines",
+    "Run performance tests regularly",
+    "Update baselines when performance improves"
+  ]
+}

@@ -1,0 +1,1 @@
+npx tsc --version && echo "TypeScript version OK"

@@ -1,0 +1,1 @@
+npx tsc src/plugins/strray-codex-injection.ts --outDir dist/plugin --target ES2022 --module ES2022 --moduleResolution bundler --declaration --strict --skipLibCheck 2>&1

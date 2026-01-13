@@ -1,0 +1,1 @@
+npm run build:plugin 2>&1 | head -20

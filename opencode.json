@@ -1,0 +1,83 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    // Disable problematic default MCP servers
+    "context7": { "enabled": false },
+    "global-everything": { "enabled": false },
+    "global-filesystem": { "enabled": false },
+    "global-git": { "enabled": false },
+    "global-sqlite": { "enabled": false },
+    "grep_app": { "enabled": false },
+    // Enable our custom StrRay MCP servers
+    "orchestrator": {
+      "type": "local",
+      "command": ["node", "dist/mcps/orchestrator.server.js"],
+      "enabled": true
+    },
+    "enhanced-orchestrator": {
+      "type": "local",
+      "command": ["node", "dist/mcps/enhanced-orchestrator.server.js"],
+      "enabled": true
+    },
+    "enforcer": {
+      "type": "local",
+      "command": ["node", "dist/mcps/enforcer-tools.server.js"],
+      "enabled": true
+    },
+    "api-design": {
+      "type": "local",
+      "command": ["node", "dist/mcps/knowledge-skills/api-design.server.js"],
+      "enabled": true
+    },
+    "architecture-patterns": {
+      "type": "local",
+      "command": ["node", "dist/mcps/knowledge-skills/architecture-patterns.server.js"],
+      "enabled": true
+    },
+    "git-workflow": {
+      "type": "local",
+      "command": ["node", "dist/mcps/knowledge-skills/git-workflow.server.js"],
+      "enabled": true
+    },
+    "performance-optimization": {
+      "type": "local",
+      "command": ["node", "dist/mcps/knowledge-skills/performance-optimization.server.js"],
+      "enabled": true
+    },
+    "project-analysis": {
+      "type": "local",
+      "command": ["node", "dist/mcps/knowledge-skills/project-analysis.server.js"],
+      "enabled": true
+    },
+    "testing-strategy": {
+      "type": "local",
+      "command": ["node", "dist/mcps/knowledge-skills/testing-strategy.server.js"],
+      "enabled": true
+    },
+    "code-review": {
+      "type": "local",
+      "command": ["node", "dist/mcps/knowledge-skills/code-review.server.js"],
+      "enabled": true
+    },
+    "security-audit": {
+      "type": "local",
+      "command": ["node", "dist/mcps/knowledge-skills/security-audit.server.js"],
+      "enabled": true
+    },
+    "ui-ux-design": {
+      "type": "local",
+      "command": ["node", "dist/mcps/knowledge-skills/ui-ux-design.server.js"],
+      "enabled": true
+    },
+    "refactoring-strategies": {
+      "type": "local",
+      "command": ["node", "dist/mcps/knowledge-skills/refactoring-strategies.server.js"],
+      "enabled": true
+    },
+    "testing-best-practices": {
+      "type": "local",
+      "command": ["node", "dist/mcps/knowledge-skills/testing-best-practices.server.js"],
+      "enabled": true
+    }
+  }
+}

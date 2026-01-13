@@ -11,6 +11,9 @@
 import { StrRayContextLoader } from "./context-loader.js";
 import { StrRayStateManager } from "./state/state-manager.js";
 import { ProcessorManager } from "./processors/processor-manager.js";
+import { pathResolver } from "./utils/path-resolver.js";
+// Path configuration - can be overridden by environment or use path resolver
+const AGENTS_BASE_PATH = process.env.STRRAY_AGENTS_PATH || '../agents';
 import {
   createAgentDelegator,
   createSessionCoordinator,
@@ -360,8 +363,10 @@ export class BootOrchestrator {
 
     for (const agentName of agents) {
       try {
-        // Dynamic import of agent modules
-        const agentModule = await import(`./agents/${agentName}.js`);
+        // Dynamic import of agent modules using path resolver
+        const agentPath = pathResolver.resolveAgentPath(agentName);
+        console.log(`🔗 Loading agent ${agentName} from: ${agentPath}`);
+        const agentModule = await import(agentPath);
         const agentClass =
           agentModule[
             `StrRay${agentName.charAt(0).toUpperCase() + agentName.slice(1)}Agent`
@@ -479,7 +484,8 @@ export class BootOrchestrator {
 
   private async runInitialSecurityAudit(): Promise<any> {
     try {
-      const { SecurityAuditor } = await import("./security/security-auditor");
+      const securityAuditorPath = pathResolver.resolveModulePath("security/security-auditor");
+      const { SecurityAuditor } = await import(securityAuditorPath);
       const auditor = new SecurityAuditor();
 
       const result = await auditor.auditProject(process.cwd());

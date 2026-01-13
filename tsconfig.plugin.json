@@ -12,6 +12,7 @@
     "src/orchestrator/**/*.ts",
     "src/state/**/*.ts",
     "src/processors/**/*.ts",
+    "src/enforcement/**/*.ts",
     "src/utils/**/*.ts",
     "src/agents/**/*.ts",
     "src/mcps/**/*.ts"

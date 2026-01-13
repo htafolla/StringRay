@@ -2,10 +2,15 @@
  * Auto-Fix Engine for Post-Processor
  */
 
-import { SuggestedFix, FixResult, FailureAnalysis, PostProcessorContext } from '../types.js';
-import { execSync } from 'child_process';
-import * as fs from 'fs';
-import * as path from 'path';
+import {
+  SuggestedFix,
+  FixResult,
+  FailureAnalysis,
+  PostProcessorContext,
+} from "../types.js";
+import { execSync } from "child_process";
+import * as fs from "fs";
+import * as path from "path";
 
 export class AutoFixEngine {
   private appliedFixes: AppliedFixRecord[] = [];
@@ -17,24 +22,29 @@ export class AutoFixEngine {
    */
   async applyFixes(
     analysis: FailureAnalysis,
-    context: PostProcessorContext
+    context: PostProcessorContext,
   ): Promise<FixResult> {
-    console.log('🔧 Attempting auto-fixes for failure analysis...');
+    console.log("🔧 Attempting auto-fixes for failure analysis...");
 
     if (analysis.confidence < this.confidenceThreshold) {
-      console.log(`⚠️  Confidence too low (${analysis.confidence}) for auto-fixes`);
+      console.log(
+        `⚠️  Confidence too low (${analysis.confidence}) for auto-fixes`,
+      );
       return {
         success: false,
         appliedFixes: [],
         requiresManualIntervention: true,
-        confidence: analysis.confidence
+        confidence: analysis.confidence,
+        rollbackAvailable: false,
       };
     }
 
     const appliedFixes: any[] = [];
 
     // Apply fixes in order of confidence
-    const sortedFixes = analysis.suggestedFixes.sort((a, b) => b.confidence - a.confidence);
+    const sortedFixes = analysis.suggestedFixes.sort(
+      (a, b) => b.confidence - a.confidence,
+    );
 
     for (const fix of sortedFixes) {
       try {
@@ -48,7 +58,7 @@ export class AutoFixEngine {
             files: fix.files,
             description: fix.description,
             timestamp: new Date(),
-            appliedChanges: result.changes
+            appliedChanges: result.changes,
           });
 
           console.log(`✅ Fix applied successfully: ${fix.description}`);
@@ -61,13 +71,15 @@ export class AutoFixEngine {
     }
 
     const success = appliedFixes.length > 0;
-    const requiresManualIntervention = !success || appliedFixes.length < sortedFixes.length;
+    const requiresManualIntervention =
+      !success || appliedFixes.length < sortedFixes.length;
 
     return {
       success,
       appliedFixes,
       requiresManualIntervention,
-      confidence: analysis.confidence
+      confidence: analysis.confidence,
+      rollbackAvailable: appliedFixes.length > 0,
     };
   }
 
@@ -76,22 +88,22 @@ export class AutoFixEngine {
    */
   private async applySingleFix(
     fix: SuggestedFix,
-    context: PostProcessorContext
+    context: PostProcessorContext,
   ): Promise<{ success: boolean; changes?: string[]; error?: string }> {
     switch (fix.type) {
-      case 'dependency-update':
+      case "dependency-update":
         return this.applyDependencyUpdate(fix);
 
-      case 'code-fix':
+      case "code-fix":
         return this.applyCodeFix(fix);
 
-      case 'test-regeneration':
+      case "test-regeneration":
         return this.applyTestRegeneration(fix);
 
       default:
         return {
           success: false,
-          error: `Unsupported fix type: ${fix.type}`
+          error: `Unsupported fix type: ${fix.type}`,
         };
     }
   }
@@ -99,32 +111,34 @@ export class AutoFixEngine {
   /**
    * Apply dependency updates
    */
-  private async applyDependencyUpdate(fix: SuggestedFix): Promise<{ success: boolean; changes?: string[]; error?: string }> {
+  private async applyDependencyUpdate(
+    fix: SuggestedFix,
+  ): Promise<{ success: boolean; changes?: string[]; error?: string }> {
     try {
-      console.log('📦 Updating dependencies...');
+      console.log("📦 Updating dependencies...");
 
       // Run npm audit fix
-      execSync('npm audit fix', {
-        stdio: 'inherit',
-        timeout: 300000 // 5 minutes
+      execSync("npm audit fix", {
+        stdio: "inherit",
+        timeout: 300000, // 5 minutes
       });
 
       // Check if package.json was modified
-      const packageJsonPath = path.join(process.cwd(), 'package.json');
-      const packageLockPath = path.join(process.cwd(), 'package-lock.json');
+      const packageJsonPath = path.join(process.cwd(), "package.json");
+      const packageLockPath = path.join(process.cwd(), "package-lock.json");
 
       const changes = [];
-      if (fs.existsSync(packageJsonPath)) changes.push('package.json');
-      if (fs.existsSync(packageLockPath)) changes.push('package-lock.json');
+      if (fs.existsSync(packageJsonPath)) changes.push("package.json");
+      if (fs.existsSync(packageLockPath)) changes.push("package-lock.json");
 
       return {
         success: true,
-        changes
+        changes,
       };
     } catch (error) {
       return {
         success: false,
-        error: `Dependency update failed: ${error}`
+        error: `Dependency update failed: ${error}`,
       };
     }
   }
@@ -132,36 +146,40 @@ export class AutoFixEngine {
   /**
    * Apply automatic code fixes
    */
-  private async applyCodeFix(fix: SuggestedFix): Promise<{ success: boolean; changes?: string[]; error?: string }> {
+  private async applyCodeFix(
+    fix: SuggestedFix,
+  ): Promise<{ success: boolean; changes?: string[]; error?: string }> {
     try {
-      console.log('🛠️  Applying automatic code fixes...');
+      console.log("🛠️  Applying automatic code fixes...");
 
       // Run ESLint auto-fix
-      execSync('npm run lint:fix', {
-        stdio: 'inherit',
-        timeout: 120000 // 2 minutes
+      execSync("npm run lint:fix", {
+        stdio: "inherit",
+        timeout: 120000, // 2 minutes
       });
 
       // Check for modified files
-      const gitStatus = execSync('git status --porcelain', {
-        encoding: 'utf8',
-        timeout: 30000
+      const gitStatus = execSync("git status --porcelain", {
+        encoding: "utf8",
+        timeout: 30000,
       });
 
       const changes = gitStatus
-        .split('\n')
-        .filter(line => line.trim())
-        .map(line => line.split(' ').pop() || '')
-        .filter(file => file && (file.endsWith('.ts') || file.endsWith('.js')));
+        .split("\n")
+        .filter((line) => line.trim())
+        .map((line) => line.split(" ").pop() || "")
+        .filter(
+          (file) => file && (file.endsWith(".ts") || file.endsWith(".js")),
+        );
 
       return {
         success: true,
-        changes
+        changes,
       };
     } catch (error) {
       return {
         success: false,
-        error: `Code fix failed: ${error}`
+        error: `Code fix failed: ${error}`,
       };
     }
   }
@@ -169,17 +187,19 @@ export class AutoFixEngine {
   /**
    * Apply test regeneration fixes
    */
-  private async applyTestRegeneration(fix: SuggestedFix): Promise<{ success: boolean; changes?: string[]; error?: string }> {
+  private async applyTestRegeneration(
+    fix: SuggestedFix,
+  ): Promise<{ success: boolean; changes?: string[]; error?: string }> {
     try {
-      console.log('🧪 Applying test regeneration fixes...');
+      console.log("🧪 Applying test regeneration fixes...");
 
       // This would be more sophisticated in a real implementation
       // For now, we'll skip flaky tests that are commonly failing
 
       const testFiles = [
-        'src/__tests__/integration/orchestrator/concurrent-execution.test.ts',
-        'src/__tests__/integration/orchestrator/basic-orchestrator.test.ts',
-        'src/__tests__/integration/codex-enforcement-e2e.test.ts'
+        "src/__tests__/integration/orchestrator/concurrent-execution.test.ts",
+        "src/__tests__/integration/orchestrator/basic-orchestrator.test.ts",
+        "src/__tests__/integration/codex-enforcement-e2e.test.ts",
       ];
 
       const changes = [];
@@ -187,13 +207,14 @@ export class AutoFixEngine {
       for (const testFile of testFiles) {
         if (fs.existsSync(testFile)) {
           // Check if file contains common failure patterns
-          const content = fs.readFileSync(testFile, 'utf8');
+          const content = fs.readFileSync(testFile, "utf8");
 
           // Skip tests that are likely to fail based on patterns
-          if (content.includes('toBeLessThan(3000)') ||
-              content.includes('toBe("design")') ||
-              content.includes('toBe(false)')) {
-
+          if (
+            content.includes("toBeLessThan(3000)") ||
+            content.includes('toBe("design")') ||
+            content.includes("toBe(false)")
+          ) {
             // Add skip to the test (this is a simplified approach)
             // In practice, this would be more sophisticated
             console.log(`⏭️  Skipping problematic test in ${testFile}`);
@@ -204,12 +225,12 @@ export class AutoFixEngine {
 
       return {
         success: true,
-        changes
+        changes,
       };
     } catch (error) {
       return {
         success: false,
-        error: `Test regeneration failed: ${error}`
+        error: `Test regeneration failed: ${error}`,
       };
     }
   }
@@ -220,42 +241,45 @@ export class AutoFixEngine {
   async validateFixes(
     fixes: any[],
     originalFailure: FailureAnalysis,
-    context: PostProcessorContext
+    context: PostProcessorContext,
   ): Promise<boolean> {
-    console.log('✅ Validating applied fixes...');
+    console.log("✅ Validating applied fixes...");
 
     try {
       // Run relevant tests based on failure type
       switch (originalFailure.category) {
-        case 'test-failure':
-          execSync('npm test', { stdio: 'pipe', timeout: 120000 });
+        case "test-failure":
+          execSync("npm test", { stdio: "pipe", timeout: 120000 });
           break;
 
-        case 'build-failure':
-          execSync('npm run build', { stdio: 'pipe', timeout: 120000 });
+        case "build-failure":
+          execSync("npm run build", { stdio: "pipe", timeout: 120000 });
           break;
 
-        case 'code-quality-failure':
-          execSync('npm run lint', { stdio: 'pipe', timeout: 60000 });
+        case "code-quality-failure":
+          execSync("npm run lint", { stdio: "pipe", timeout: 60000 });
           break;
 
-        case 'security-failure':
-          execSync('npm run security-audit', { stdio: 'pipe', timeout: 60000 });
+        case "security-failure":
+          execSync("npm run security-audit", { stdio: "pipe", timeout: 60000 });
           break;
 
-        case 'performance-regression':
-          execSync('npm run test:performance', { stdio: 'pipe', timeout: 120000 });
+        case "performance-regression":
+          execSync("npm run test:performance", {
+            stdio: "pipe",
+            timeout: 120000,
+          });
           break;
 
         default:
           // Run a basic validation
-          execSync('npm run typecheck', { stdio: 'pipe', timeout: 60000 });
+          execSync("npm run typecheck", { stdio: "pipe", timeout: 60000 });
       }
 
-      console.log('✅ Fix validation passed');
+      console.log("✅ Fix validation passed");
       return true;
     } catch (error) {
-      console.log('❌ Fix validation failed');
+      console.log("❌ Fix validation failed");
       return false;
     }
   }
@@ -264,14 +288,14 @@ export class AutoFixEngine {
    * Rollback applied fixes if validation fails
    */
   async rollbackFixes(fixes: any[]): Promise<void> {
-    console.log('🔄 Rolling back applied fixes...');
+    console.log("🔄 Rolling back applied fixes...");
 
     try {
       // Simple git reset for now
-      execSync('git reset --hard HEAD~1', { stdio: 'inherit' });
-      console.log('✅ Fixes rolled back');
+      execSync("git reset --hard HEAD~1", { stdio: "inherit" });
+      console.log("✅ Fixes rolled back");
     } catch (error) {
-      console.error('❌ Rollback failed:', error);
+      console.error("❌ Rollback failed:", error);
       throw error;
     }
   }

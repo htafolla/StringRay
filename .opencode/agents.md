@@ -819,6 +819,52 @@ The project uses 8 specialized oh-my-opencode agents:
 - **refactorer**: Code refactoring and optimization
 - **test-architect**: Test strategy and coverage planning
 
+### MCP Server Tools
+
+The framework provides 14 MCP (Model Context Protocol) servers that extend agent capabilities. Use these specialized tools by referencing them in prompts:
+
+#### Core MCP Servers:
+- **orchestrator**: Complex task coordination and delegation
+- **enhanced-orchestrator**: Multi-agent orchestration with monitoring
+- **enforcer**: Rule enforcement and quality validation
+
+#### Knowledge Skills (11 specialized servers):
+- **code-review**: Automated code analysis and best practices (`use code-review`)
+- **api-design**: RESTful API design and validation (`use api-design`)
+- **testing-strategy**: Test planning and coverage optimization (`use testing-strategy`)
+- **performance-optimization**: Bottleneck detection and fixes (`use performance-optimization`)
+- **security-audit**: Vulnerability scanning and compliance (`use security-audit`)
+- **architecture-patterns**: Design pattern recognition (`use architecture-patterns`)
+- **git-workflow**: Branching strategy optimization (`use git-workflow`)
+- **project-analysis**: Codebase complexity analysis (`use project-analysis`)
+- **ui-ux-design**: Interface design validation (`use ui-ux-design`)
+- **refactoring-strategies**: Code improvement recommendations (`use refactoring-strategies`)
+- **testing-best-practices**: Testing methodology guidance (`use testing-best-practices`)
+
+#### Usage Examples:
+```
+Analyze this codebase for security vulnerabilities. use security-audit
+Design a REST API for user management. use api-design
+Review this code for best practices. use code-review
+Optimize this function for performance. use performance-optimization
+```
+
+### Agent Communication
+
+- Agents communicate through MCP (Model Context Protocol) servers
+- Shared context maintained via session management
+- Background agent execution for parallel processing
+- Real-time validation and feedback loops
+
+- **enforcer**: Code quality enforcement and security checks
+- **architect**: System design and architectural decisions
+- **orchestrator**: Multi-agent coordination and task management
+- **bug-triage-specialist**: Issue classification and prioritization
+- **code-reviewer**: Code review and improvement suggestions
+- **security-auditor**: Security vulnerability detection
+- **refactorer**: Code refactoring and optimization
+- **test-architect**: Test strategy and coverage planning
+
 ### Agent Communication
 
 - Agents communicate through MCP (Model Context Protocol) servers

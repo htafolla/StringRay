@@ -417,14 +417,21 @@ export class RuleEnforcer {
     totalRules: number;
     enabledRules: number;
     disabledRules: number;
+    ruleCategories: Record<string, number>;
   } {
     const totalRules = this.rules.size;
-    const enabledRules = Array.from(this.rules.values()).filter(
-      (rule) => rule.enabled,
-    ).length;
+    const rulesValues = Array.from(this.rules.values());
+
+    const enabledRules = rulesValues.filter((rule) => rule.enabled).length;
     const disabledRules = totalRules - enabledRules;
 
-    return { totalRules, enabledRules, disabledRules };
+    // Count rules by category
+    const ruleCategories: Record<string, number> = {};
+    rulesValues.forEach((rule) => {
+      ruleCategories[rule.category] = (ruleCategories[rule.category] || 0) + 1;
+    });
+
+    return { totalRules, enabledRules, disabledRules, ruleCategories };
   }
 
   /**

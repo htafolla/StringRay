@@ -9,7 +9,7 @@ import { MonitoringResult } from "../types.js";
 export class PostProcessorMonitoringEngine {
   constructor(
     private stateManager: StrRayStateManager,
-    private sessionMonitor: SessionMonitor,
+    private sessionMonitor?: SessionMonitor,
   ) {}
 
   async initialize(): Promise<void> {
@@ -74,7 +74,7 @@ export class PostProcessorMonitoringEngine {
       return {
         status: "failure",
         failedJobs: ["ci-pipeline"],
-        error: error.message,
+        error: error instanceof Error ? error.message : String(error),
       };
     }
   }

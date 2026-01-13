@@ -5,12 +5,14 @@
  * Validates all rule enforcements through comprehensive test cases
  */
 
-import { codexSimulationRunner } from '../dist/simulation/codex-rule-simulations.js';
+// Path configuration for cross-environment compatibility
+const SIMULATION_PATH = process.env.STRRAY_SIMULATION_PATH || '../dist/simulation';
 
 async function main() {
   console.log('🚀 Starting Codex Rule Simulations...\n');
 
   try {
+    const { codexSimulationRunner } = await import(`${SIMULATION_PATH}/codex-rule-simulations.js`);
     const results = await codexSimulationRunner.runAllSimulations();
     codexSimulationRunner.generateReport(results);
 

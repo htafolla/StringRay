@@ -60,6 +60,8 @@ export class GitHookTrigger {
   }
 
   private generateHookScript(hookType: string): string {
+    const isPushHook = hookType === "post-push";
+
     return `#!/bin/bash
 # StrRay Post-Processor ${hookType} Hook
 # Automatically triggers post-processor after ${hookType}
@@ -69,8 +71,11 @@ HOOK_NAME=$(basename "$0")
 COMMIT_SHA=""
 
 if [ "$HOOK_NAME" = "post-commit" ]; then
+  # Light monitoring for local commits - just basic validation
   COMMIT_SHA=$(git rev-parse HEAD)
+  MONITORING_LEVEL="basic"
 elif [ "$HOOK_NAME" = "post-push" ]; then
+  # Full monitoring for pushes - comprehensive validation
   # For push hooks, we need to parse the pushed refs from stdin
   while read local_ref local_sha remote_ref remote_sha; do
     if [ "$local_sha" != "0000000000000000000000000000000000000000" ]; then
@@ -78,8 +83,10 @@ elif [ "$HOOK_NAME" = "post-push" ]; then
       break
     fi
   done
+  MONITORING_LEVEL="full"
 else
   COMMIT_SHA=$(git rev-parse HEAD)
+  MONITORING_LEVEL="basic"
 fi
 
 if [ -z "$COMMIT_SHA" ]; then
@@ -92,8 +99,12 @@ REPO="strray-framework/stringray"  # Placeholder for now
 BRANCH=$(git rev-parse --abbrev-ref HEAD)
 AUTHOR=$(git log -1 --pretty=format:'%an <%ae>')
 
-# Get changed files
-FILES=$(git diff --name-only HEAD~1 2>/dev/null || git diff --name-only --cached)
+# Get changed files (different logic for commit vs push)
+if [ "$HOOK_NAME" = "post-commit" ]; then
+  FILES=$(git diff --name-only HEAD~1 2>/dev/null || git diff --name-only --cached)
+else
+  FILES=$(git log --name-only --oneline -1 $COMMIT_SHA | tail -n +2)
+fi
 
 # Trigger post-processor asynchronously (don't block git operations)
 (
@@ -119,12 +130,25 @@ FILES=$(git diff --name-only HEAD~1 2>/dev/null || git diff --name-only --cached
     export BRANCH="$BRANCH"
     export AUTHOR="$AUTHOR"
     export STRRAY_PLUGIN="$STRRAY_PLUGIN"
+    export MONITORING_LEVEL="$MONITORING_LEVEL"
+    export IS_FULL_MONITORING="$([ "$MONITORING_LEVEL" = "full" ] && echo "true" || echo "false")"
 
-    # Run the post-processor script
+    # Run the post-processor script asynchronously
     node -e "
     (async () => {
       try {
+        const { execSync } = await import('child_process');
         const plugin = process.env.STRRAY_PLUGIN;
+
+        // Get files changed in this commit (inside Node.js context)
+        let files = [];
+        try {
+          const output = execSync('git diff --name-only HEAD~1 2>/dev/null || git diff --name-only --cached', { encoding: 'utf8' });
+          files = output.trim() ? output.trim().split(String.fromCharCode(10)).filter(f => f.trim()) : [];
+        } catch (error) {
+          files = [];
+        }
+
         const { PostProcessor } = await import('./' + plugin + '/dist/postprocessor/PostProcessor.js');
         const { StrRayStateManager } = await import('./' + plugin + '/dist/state/state-manager.js');
         const { createSessionCoordinator } = await import('./' + plugin + '/dist/delegation/session-coordinator.js');
@@ -150,19 +174,47 @@ FILES=$(git diff --name-only HEAD~1 2>/dev/null || git diff --name-only --cached
           repository: process.env.REPO,
           branch: process.env.BRANCH,
           author: process.env.AUTHOR,
-          files: [],
+          files: files,
           trigger: 'git-hook'
         };
 
-        console.log('🚀 Post-processor triggered for commit:', context.commitSha);
+        console.log('🚀 Post-processor triggered (' + (process.env.MONITORING_LEVEL || 'unknown') + ') for commit:', context.commitSha);
+
+        const isFullMonitoring = process.env.IS_FULL_MONITORING === 'true';
 
         const pp = new PostProcessor(stateManager, sessionMonitor, {
           triggers: { gitHooks: false, webhooks: false, api: false },
-          monitoring: { enabled: true, interval: 30000, timeout: 3600000 },
-          autoFix: { enabled: false, confidenceThreshold: 0.8, maxAttempts: 3 },
-          escalation: { manualInterventionThreshold: 2, rollbackThreshold: 3, emergencyThreshold: 5 },
-          redeploy: { maxRetries: 3, retryDelay: 30000, backoffStrategy: 'exponential', canaryEnabled: true, canaryPhases: 3, canaryTrafficIncrement: 25, healthCheckTimeout: 60000, rollbackOnFailure: true },
-          success: { successConfirmation: true, cleanupEnabled: true, notificationEnabled: true, metricsCollection: true }
+          monitoring: {
+            enabled: true,
+            interval: isFullMonitoring ? 15000 : 60000, // More frequent for push monitoring
+            timeout: isFullMonitoring ? 7200000 : 1800000  // Longer timeout for full monitoring
+          },
+          autoFix: {
+            enabled: isFullMonitoring, // Only enable auto-fix for push monitoring
+            confidenceThreshold: 0.8,
+            maxAttempts: isFullMonitoring ? 5 : 1
+          },
+          escalation: {
+            manualInterventionThreshold: isFullMonitoring ? 1 : 3, // More sensitive for pushes
+            rollbackThreshold: isFullMonitoring ? 2 : 5,
+            emergencyThreshold: isFullMonitoring ? 3 : 7
+          },
+          redeploy: isFullMonitoring ? { // Only full redeploy logic for pushes
+            maxRetries: 3,
+            retryDelay: 30000,
+            backoffStrategy: 'exponential',
+            canaryEnabled: true,
+            canaryPhases: 3,
+            canaryTrafficIncrement: 25,
+            healthCheckTimeout: 60000,
+            rollbackOnFailure: true
+          } : undefined,
+          success: {
+            successConfirmation: true,
+            cleanupEnabled: true,
+            notificationEnabled: isFullMonitoring, // More notifications for pushes
+            metricsCollection: true
+          }
         });
 
         await pp.initialize();

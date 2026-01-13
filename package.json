@@ -30,7 +30,8 @@
     "performance:report": "node scripts/performance-report.js",
     "performance:gates": "node src/performance/performance-ci-gates.js",
     "test:architect": "vitest run src/__tests__/agents/architect.test.ts src/__tests__/agents/test-architect.test.ts",
-    "test:e2e": "vitest run src/__tests__/integration/e2e-framework-integration.test.ts"
+    "test:e2e": "vitest run src/__tests__/integration/e2e-framework-integration.test.ts",
+    "security-audit": "npm audit --audit-level moderate --production"
   },
   "keywords": [
     "ai",

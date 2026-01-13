@@ -3,8 +3,8 @@
  * Resolves import paths that work across development, build, and installed environments
  */
 
-import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
+import { fileURLToPath } from "url";
+import { dirname, join } from "path";
 
 export class PathResolver {
   private static instance: PathResolver;
@@ -46,39 +46,45 @@ export class PathResolver {
    * Detect if we're running in development environment (src/ directory)
    */
   private detectDevelopment(): boolean {
-    return this.currentDir.includes('/src/') ||
-           this.currentDir.includes('\\src\\') ||
-           process.env.NODE_ENV === 'development';
+    return (
+      this.currentDir.includes("/src/") ||
+      this.currentDir.includes("\\src\\") ||
+      process.env.NODE_ENV === "development"
+    );
   }
 
   /**
    * Detect if we're running in built environment (dist/ directory)
    */
   private detectBuilt(): boolean {
-    return this.currentDir.includes('/dist/') ||
-           this.currentDir.includes('\\dist\\') ||
-           (this.currentDir.includes('strray') && !this.detectDevelopment());
+    return (
+      this.currentDir.includes("/dist/") ||
+      this.currentDir.includes("\\dist\\") ||
+      (this.currentDir.includes("strray") && !this.detectDevelopment())
+    );
   }
 
   /**
    * Detect if we're running in installed package environment
    */
   private detectInstalled(): boolean {
-    return this.currentDir.includes('/node_modules/') ||
-           this.currentDir.includes('\\node_modules\\') ||
-           (this.currentDir.includes('strray') && this.detectBuilt());
+    return (
+      this.currentDir.includes("/node_modules/") ||
+      this.currentDir.includes("\\node_modules\\") ||
+      (this.currentDir.includes("strray") && this.detectBuilt())
+    );
   }
 
   /**
    * Resolve agent import path for current environment
    */
   resolveAgentPath(agentName: string): string {
-    console.log('🔍 PathResolver diagnostics:', {
+    console.log("🔍 PathResolver diagnostics:", {
       currentDir: this.currentDir,
       isDevelopment: this.isDevelopment,
       isBuilt: this.isBuilt,
       isInstalled: this.isInstalled,
-      agentName
+      agentName,
     });
 
     if (this.isDevelopment) {
@@ -89,7 +95,9 @@ export class PathResolver {
       return `../agents/${agentName}.js`;
     } else {
       // Fallback - assume built environment
-      console.warn('⚠️ PathResolver: Unknown environment, using built path fallback');
+      console.warn(
+        "⚠️ PathResolver: Unknown environment, using built path fallback",
+      );
       return `../agents/${agentName}.js`;
     }
   }
@@ -99,7 +107,9 @@ export class PathResolver {
    */
   resolveModulePath(modulePath: string): string {
     // Remove leading ./ if present
-    const cleanPath = modulePath.startsWith('./') ? modulePath.slice(2) : modulePath;
+    const cleanPath = modulePath.startsWith("./")
+      ? modulePath.slice(2)
+      : modulePath;
 
     if (this.isDevelopment) {
       // In src/, modules are at ./
@@ -109,7 +119,9 @@ export class PathResolver {
       return `./${cleanPath}`;
     } else {
       // Fallback
-      console.warn('⚠️ PathResolver: Unknown environment for module path, using as-is');
+      console.warn(
+        "⚠️ PathResolver: Unknown environment for module path, using as-is",
+      );
       return modulePath;
     }
   }
@@ -129,7 +141,7 @@ export class PathResolver {
       isDevelopment: this.isDevelopment,
       isBuilt: this.isBuilt,
       isInstalled: this.isInstalled,
-      nodeEnv: process.env.NODE_ENV
+      nodeEnv: process.env.NODE_ENV,
     };
   }
 }

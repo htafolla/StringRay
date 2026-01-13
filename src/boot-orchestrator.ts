@@ -13,7 +13,7 @@ import { StrRayStateManager } from "./state/state-manager.js";
 import { ProcessorManager } from "./processors/processor-manager.js";
 import { pathResolver } from "./utils/path-resolver.js";
 // Path configuration - can be overridden by environment or use path resolver
-const AGENTS_BASE_PATH = process.env.STRRAY_AGENTS_PATH || '../agents';
+const AGENTS_BASE_PATH = process.env.STRRAY_AGENTS_PATH || "../agents";
 import {
   createAgentDelegator,
   createSessionCoordinator,
@@ -484,7 +484,9 @@ export class BootOrchestrator {
 
   private async runInitialSecurityAudit(): Promise<any> {
     try {
-      const securityAuditorPath = pathResolver.resolveModulePath("security/security-auditor");
+      const securityAuditorPath = pathResolver.resolveModulePath(
+        "security/security-auditor",
+      );
       const { SecurityAuditor } = await import(securityAuditorPath);
       const auditor = new SecurityAuditor();
 

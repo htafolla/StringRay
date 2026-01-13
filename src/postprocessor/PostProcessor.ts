@@ -171,44 +171,48 @@ export class PostProcessor {
   /**
    * Execute the monitoring loop until success or max attempts
    */
-   private async executeMonitoringLoop(
-     context: PostProcessorContext,
-     sessionId: string,
-   ): Promise<PostProcessorResult> {
-     let attempts = 0;
-     const maxAttempts = this.config.maxAttempts || 3;
-     const monitoringResults: any[] = [];
+  private async executeMonitoringLoop(
+    context: PostProcessorContext,
+    sessionId: string,
+  ): Promise<PostProcessorResult> {
+    let attempts = 0;
+    const maxAttempts = this.config.maxAttempts || 3;
+    const monitoringResults: any[] = [];
 
-     while (attempts < maxAttempts) {
+    while (attempts < maxAttempts) {
       attempts++;
 
       console.log(
         `🔍 Monitoring attempt ${attempts}/${maxAttempts} for ${context.commitSha}`,
       );
 
-       // Monitor CI/CD status
-       const monitoringResult = await this.monitoringEngine.monitorDeployment(
-         context.commitSha,
-       );
+      // Monitor CI/CD status
+      const monitoringResult = await this.monitoringEngine.monitorDeployment(
+        context.commitSha,
+      );
 
-       monitoringResults.push(monitoringResult);
+      monitoringResults.push(monitoringResult);
 
-       if (monitoringResult.overallStatus === "success") {
-         console.log("✅ CI/CD pipeline successful - post-processor complete");
+      if (monitoringResult.overallStatus === "success") {
+        console.log("✅ CI/CD pipeline successful - post-processor complete");
 
-         const result = {
-           success: true,
-           commitSha: context.commitSha,
-           sessionId,
-           attempts,
-           monitoringResults,
-         };
+        const result = {
+          success: true,
+          commitSha: context.commitSha,
+          sessionId,
+          attempts,
+          monitoringResults,
+        };
 
-         // Handle successful completion
-         await this.successHandler.handleSuccess(context, result, monitoringResults);
+        // Handle successful completion
+        await this.successHandler.handleSuccess(
+          context,
+          result,
+          monitoringResults,
+        );
 
-         return result;
-       }
+        return result;
+      }
 
       // Pipeline failed - analyze and attempt fixes
       console.log("❌ CI/CD pipeline failed - analyzing issues...");
@@ -249,7 +253,7 @@ export class PostProcessor {
         context,
         attempts,
         "CI/CD pipeline failure",
-        monitoringResults
+        monitoringResults,
       );
 
       if (escalationResult) {
@@ -257,7 +261,10 @@ export class PostProcessor {
         console.log(`   Reason: ${escalationResult.reason}`);
 
         // For emergency/rollback levels, stop the loop
-        if (escalationResult.level === 'emergency' || escalationResult.level === 'rollback') {
+        if (
+          escalationResult.level === "emergency" ||
+          escalationResult.level === "rollback"
+        ) {
           return {
             success: false,
             commitSha: context.commitSha,
@@ -279,7 +286,7 @@ export class PostProcessor {
       context,
       attempts,
       "Max attempts exceeded - deployment failed",
-      monitoringResults
+      monitoringResults,
     );
 
     return {
@@ -304,7 +311,7 @@ export class PostProcessor {
 
     const redeployResult = await this.redeployCoordinator.executeRedeploy(
       context,
-      fixResult
+      fixResult,
     );
 
     if (redeployResult.success) {
@@ -325,8 +332,6 @@ export class PostProcessor {
     // Placeholder for auto-fix - disabled for now
     return { success: false, requiresManualIntervention: true };
   }
-
-
 
   /**
    * Escalate to manual intervention

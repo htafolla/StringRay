@@ -10,10 +10,10 @@ import { frameworkLogger } from "./framework-logger.js";
 
 // Critical components that must always be active
 const CRITICAL_COMPONENTS = [
-  'stateManager',
-  'postProcessor',
-  'rulesEngine',
-  'codexInjector'
+  "stateManager",
+  "postProcessor",
+  "rulesEngine",
+  "codexInjector",
 ] as const;
 
 /**
@@ -31,14 +31,18 @@ export async function verifyArchitecturalIntegrity(): Promise<{
   const stateManager = (globalThis as any).strRayStateManager;
   if (!stateManager) {
     issues.push("State manager not initialized");
-    recommendations.push("Ensure boot orchestrator runs before framework activation");
+    recommendations.push(
+      "Ensure boot orchestrator runs before framework activation",
+    );
   }
 
   // Check post-processor
   const postProcessor = (globalThis as any).strRayPostProcessor;
   if (!postProcessor) {
     issues.push("Post-processor not activated");
-    recommendations.push("Add post-processor activation to strray-activation.ts");
+    recommendations.push(
+      "Add post-processor activation to strray-activation.ts",
+    );
   }
 
   // Check codex injector
@@ -51,7 +55,9 @@ export async function verifyArchitecturalIntegrity(): Promise<{
   // Check rules engine enforcement
   if (stateManager && !stateManager.get("enforcement:active")) {
     issues.push("Rules engine not actively enforcing codex");
-    recommendations.push("Ensure codex rules are enforced during tool execution");
+    recommendations.push(
+      "Ensure codex rules are enforced during tool execution",
+    );
   }
 
   const allActive = issues.length === 0;
@@ -61,13 +67,13 @@ export async function verifyArchitecturalIntegrity(): Promise<{
       "architectural-integrity",
       `Integrity check failed: ${issues.length} issues found`,
       "error",
-      { issues, recommendations }
+      { issues, recommendations },
     );
   } else {
     frameworkLogger.log(
       "architectural-integrity",
       "All critical components active and integrated",
-      "success"
+      "success",
     );
   }
 
@@ -85,7 +91,7 @@ export async function ensureCriticalComponents(): Promise<void> {
     frameworkLogger.log(
       "architectural-integrity",
       "Activating missing critical components",
-      "info"
+      "info",
     );
 
     // Force activation of missing components

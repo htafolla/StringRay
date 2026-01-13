@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "librarian": {
+      "command": "node",
+      "args": ["dist/plugin/mcps/knowledge-skills/project-analysis.server.js"]
+    }
+  }
+}

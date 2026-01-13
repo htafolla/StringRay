@@ -3,18 +3,24 @@
  */
 
 export class RetryHandler {
-  constructor(private config: { maxRetries: number; baseDelay: number; backoffStrategy: 'linear' | 'exponential' } = {
-    maxRetries: 3,
-    baseDelay: 30000,
-    backoffStrategy: 'exponential'
-  }) {}
+  constructor(
+    private config: {
+      maxRetries: number;
+      baseDelay: number;
+      backoffStrategy: "linear" | "exponential";
+    } = {
+      maxRetries: 3,
+      baseDelay: 30000,
+      backoffStrategy: "exponential",
+    },
+  ) {}
 
   /**
    * Execute an operation with retry logic
    */
   async executeWithRetry<T>(
     operation: () => Promise<T>,
-    shouldRetry?: (error: any, attempt: number) => boolean
+    shouldRetry?: (error: any, attempt: number) => boolean,
   ): Promise<T> {
     let lastError: any;
 
@@ -36,7 +42,9 @@ export class RetryHandler {
 
         // Calculate delay and wait
         const delay = this.calculateDelay(attempt);
-        console.log(`⏳ Operation failed (attempt ${attempt + 1}), retrying in ${delay}ms...`);
+        console.log(
+          `⏳ Operation failed (attempt ${attempt + 1}), retrying in ${delay}ms...`,
+        );
         await this.wait(delay);
       }
     }
@@ -51,10 +59,10 @@ export class RetryHandler {
     const { baseDelay, backoffStrategy } = this.config;
 
     switch (backoffStrategy) {
-      case 'exponential':
+      case "exponential":
         return baseDelay * Math.pow(2, attempt);
 
-      case 'linear':
+      case "linear":
         return baseDelay * (attempt + 1);
 
       default:
@@ -66,7 +74,7 @@ export class RetryHandler {
    * Wait for the specified duration
    */
   private async wait(duration: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, duration));
+    return new Promise((resolve) => setTimeout(resolve, duration));
   }
 
   /**
@@ -75,23 +83,27 @@ export class RetryHandler {
   static shouldRetryDeployment(error: any, attempt: number): boolean {
     // Don't retry certain types of errors
     const nonRetryableErrors = [
-      'authentication_failed',
-      'authorization_failed',
-      'invalid_configuration',
-      'quota_exceeded'
+      "authentication_failed",
+      "authorization_failed",
+      "invalid_configuration",
+      "quota_exceeded",
     ];
 
-    if (nonRetryableErrors.some(type => error.type?.includes(type))) {
+    if (nonRetryableErrors.some((type) => error.type?.includes(type))) {
       return false;
     }
 
     // Don't retry after too many attempts for transient errors
-    if (attempt >= 2 && error.type === 'transient') {
+    if (attempt >= 2 && error.type === "transient") {
       return false;
     }
 
     // Retry network and timeout errors
-    if (error.code === 'ECONNRESET' || error.code === 'ETIMEDOUT' || error.code === 'ENOTFOUND') {
+    if (
+      error.code === "ECONNRESET" ||
+      error.code === "ETIMEDOUT" ||
+      error.code === "ENOTFOUND"
+    ) {
       return true;
     }
 
@@ -108,35 +120,36 @@ export class RetryHandler {
    * Specialized retry handler for deployment operations
    */
   async executeDeploymentWithRetry<T>(
-    deploymentOperation: () => Promise<T>
+    deploymentOperation: () => Promise<T>,
   ): Promise<T> {
     return this.executeWithRetry(
       deploymentOperation,
-      RetryHandler.shouldRetryDeployment
+      RetryHandler.shouldRetryDeployment,
     );
   }
 
   /**
    * Specialized retry handler for API calls
    */
-  async executeApiCallWithRetry<T>(
-    apiCall: () => Promise<T>
-  ): Promise<T> {
-    return this.executeWithRetry(
-      apiCall,
-      (error, attempt) => {
-        // Retry on network errors and 5xx status codes
-        return error.code === 'ECONNRESET' ||
-               error.code === 'ETIMEDOUT' ||
-               (error.statusCode >= 500 && error.statusCode < 600);
-      }
-    );
+  async executeApiCallWithRetry<T>(apiCall: () => Promise<T>): Promise<T> {
+    return this.executeWithRetry(apiCall, (error, attempt) => {
+      // Retry on network errors and 5xx status codes
+      return (
+        error.code === "ECONNRESET" ||
+        error.code === "ETIMEDOUT" ||
+        (error.statusCode >= 500 && error.statusCode < 600)
+      );
+    });
   }
 
   /**
    * Get retry statistics
    */
-  getStats(): { maxRetries: number; baseDelay: number; backoffStrategy: string } {
+  getStats(): {
+    maxRetries: number;
+    baseDelay: number;
+    backoffStrategy: string;
+  } {
     return { ...this.config };
   }
 }

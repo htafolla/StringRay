@@ -3,7 +3,7 @@
  * Handles successful completion, cleanup, and success confirmation
  */
 
-import { PostProcessorContext, PostProcessorResult } from '../types.js';
+import { PostProcessorContext, PostProcessorResult } from "../types.js";
 
 export interface SuccessConfig {
   successConfirmation: boolean;
@@ -30,7 +30,7 @@ export class SuccessHandler {
       cleanupEnabled: true,
       notificationEnabled: true,
       metricsCollection: true,
-      ...config
+      ...config,
     };
   }
 
@@ -40,9 +40,11 @@ export class SuccessHandler {
   async handleSuccess(
     context: PostProcessorContext,
     result: PostProcessorResult,
-    monitoringResults: any[]
+    monitoringResults: any[],
   ): Promise<SuccessMetrics> {
-    console.log(`🎉 Post-processor completed successfully for commit ${context.commitSha}`);
+    console.log(
+      `🎉 Post-processor completed successfully for commit ${context.commitSha}`,
+    );
 
     const metrics = this.collectSuccessMetrics(result, monitoringResults);
 
@@ -74,9 +76,9 @@ export class SuccessHandler {
    */
   private async confirmSuccess(
     context: PostProcessorContext,
-    result: PostProcessorResult
+    result: PostProcessorResult,
   ): Promise<void> {
-    console.log('🔍 Confirming deployment success...');
+    console.log("🔍 Confirming deployment success...");
 
     // In a real system, this would perform additional health checks
     // - API endpoint availability
@@ -85,9 +87,9 @@ export class SuccessHandler {
     // - User acceptance testing
 
     // For now, simulate confirmation
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
-    console.log('✅ Deployment success confirmed');
+    console.log("✅ Deployment success confirmed");
   }
 
   /**
@@ -96,18 +98,18 @@ export class SuccessHandler {
   private async sendSuccessNotifications(
     context: PostProcessorContext,
     result: PostProcessorResult,
-    metrics: SuccessMetrics
+    metrics: SuccessMetrics,
   ): Promise<void> {
     const message = {
-      title: 'CI/CD Pipeline Success',
+      title: "CI/CD Pipeline Success",
       commit: context.commitSha,
       attempts: result.attempts,
       duration: metrics.totalDuration,
       fixesApplied: metrics.fixesApplied,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
 
-    console.log('📢 Success Notification:', JSON.stringify(message, null, 2));
+    console.log("📢 Success Notification:", JSON.stringify(message, null, 2));
 
     // In a real system, this would send notifications to:
     // - Slack/Teams channels
@@ -120,7 +122,7 @@ export class SuccessHandler {
    * Perform cleanup after successful completion
    */
   private async performCleanup(context: PostProcessorContext): Promise<void> {
-    console.log('🧹 Performing post-success cleanup...');
+    console.log("🧹 Performing post-success cleanup...");
 
     // In a real system, this would:
     // - Clean up temporary files
@@ -129,7 +131,7 @@ export class SuccessHandler {
     // - Update deployment records
     // - Notify downstream systems
 
-    console.log('✅ Cleanup completed');
+    console.log("✅ Cleanup completed");
   }
 
   /**
@@ -137,7 +139,7 @@ export class SuccessHandler {
    */
   private collectSuccessMetrics(
     result: PostProcessorResult,
-    monitoringResults: any[]
+    monitoringResults: any[],
   ): SuccessMetrics {
     const fixesApplied = result.fixesApplied?.length || 0;
     const monitoringChecks = monitoringResults.length;
@@ -149,7 +151,7 @@ export class SuccessHandler {
       fixesApplied,
       monitoringChecks,
       redeployments: Math.max(0, redeployments),
-      timestamp: new Date()
+      timestamp: new Date(),
     };
   }
 
@@ -157,7 +159,7 @@ export class SuccessHandler {
    * Log success metrics for analysis
    */
   private logSuccessMetrics(metrics: SuccessMetrics): void {
-    console.log('📊 Success Metrics:');
+    console.log("📊 Success Metrics:");
     console.log(`   Total Duration: ${metrics.totalDuration}ms`);
     console.log(`   Attempts: ${metrics.attempts}`);
     console.log(`   Fixes Applied: ${metrics.fixesApplied}`);
@@ -176,7 +178,7 @@ export class SuccessHandler {
   generateSuccessReport(
     context: PostProcessorContext,
     result: PostProcessorResult,
-    metrics: SuccessMetrics
+    metrics: SuccessMetrics,
   ): string {
     return `
 Post-Processor Success Report

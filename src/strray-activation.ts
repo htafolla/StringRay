@@ -211,7 +211,9 @@ async function activatePostProcessor(): Promise<void> {
   // Get existing state manager (should be initialized by boot orchestrator)
   const stateManager = (globalThis as any).strRayStateManager as any;
   if (!stateManager) {
-    throw new Error("State manager not initialized - boot orchestrator must run first");
+    throw new Error(
+      "State manager not initialized - boot orchestrator must run first",
+    );
   }
 
   // Create post-processor with optional session monitor

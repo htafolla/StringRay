@@ -2,8 +2,8 @@
  * Redeploy Coordinator for Post-Processor
  */
 
-import { FixResult, PostProcessorContext } from '../types.js';
-import { execSync } from 'child_process';
+import { FixResult, PostProcessorContext } from "../types.js";
+import { execSync } from "child_process";
 
 export interface RedeployResult {
   success: boolean;
@@ -31,7 +31,7 @@ export interface CanaryResult {
 export interface RedeployConfig {
   maxRetries: number;
   retryDelay: number;
-  backoffStrategy: 'linear' | 'exponential';
+  backoffStrategy: "linear" | "exponential";
   canaryEnabled: boolean;
   canaryPhases: number;
   canaryTrafficIncrement: number;
@@ -46,13 +46,13 @@ export class RedeployCoordinator {
     this.config = {
       maxRetries: 3,
       retryDelay: 30000,
-      backoffStrategy: 'exponential',
+      backoffStrategy: "exponential",
       canaryEnabled: true,
       canaryPhases: 3,
       canaryTrafficIncrement: 25,
       healthCheckTimeout: 60000,
       rollbackOnFailure: true,
-      ...config
+      ...config,
     };
   }
 
@@ -61,12 +61,14 @@ export class RedeployCoordinator {
    */
   async executeRedeploy(
     context: PostProcessorContext,
-    fixResult: FixResult
+    fixResult: FixResult,
   ): Promise<RedeployResult> {
     const deploymentId = `deploy-${context.commitSha}-${Date.now()}`;
     const startTime = Date.now();
 
-    console.log(`🚀 Starting redeployment ${deploymentId} for commit ${context.commitSha}`);
+    console.log(
+      `🚀 Starting redeployment ${deploymentId} for commit ${context.commitSha}`,
+    );
 
     try {
       // Pre-deployment validation
@@ -84,48 +86,48 @@ export class RedeployCoordinator {
           success: true,
           deploymentId,
           commitSha: context.commitSha,
-          environment: 'production', // Could be configurable
-          duration: Date.now() - startTime
+          environment: "production", // Could be configurable
+          duration: Date.now() - startTime,
         };
         if (deployResult.canaryResults) {
           result.canaryResults = deployResult.canaryResults;
         }
         return result;
-       } else {
-         // Deployment validation failed - rollback if enabled
-         if (this.config.rollbackOnFailure) {
-           console.log('❌ Deployment validation failed - initiating rollback');
-           await this.rollbackDeployment(deploymentId, context);
-           const result: RedeployResult = {
-             success: false,
-             deploymentId,
-             commitSha: context.commitSha,
-             environment: 'production',
-             duration: Date.now() - startTime,
-             error: validationResult.error || 'Deployment validation failed',
-             rollbackPerformed: true
-           };
-           return result;
-         } else {
-           return {
-             success: false,
-             deploymentId,
-             commitSha: context.commitSha,
-             environment: 'production',
-             duration: Date.now() - startTime,
-             error: validationResult.error
-           };
-         }
-       }
+      } else {
+        // Deployment validation failed - rollback if enabled
+        if (this.config.rollbackOnFailure) {
+          console.log("❌ Deployment validation failed - initiating rollback");
+          await this.rollbackDeployment(deploymentId, context);
+          const result: RedeployResult = {
+            success: false,
+            deploymentId,
+            commitSha: context.commitSha,
+            environment: "production",
+            duration: Date.now() - startTime,
+            error: validationResult.error || "Deployment validation failed",
+            rollbackPerformed: true,
+          };
+          return result;
+        } else {
+          return {
+            success: false,
+            deploymentId,
+            commitSha: context.commitSha,
+            environment: "production",
+            duration: Date.now() - startTime,
+            error: validationResult.error,
+          };
+        }
+      }
     } catch (error) {
       console.error(`❌ Redeployment ${deploymentId} failed:`, error);
       return {
         success: false,
         deploymentId,
         commitSha: context.commitSha,
-        environment: 'production',
+        environment: "production",
         duration: Date.now() - startTime,
-        error: error instanceof Error ? error.message : String(error)
+        error: error instanceof Error ? error.message : String(error),
       };
     }
   }
@@ -135,20 +137,20 @@ export class RedeployCoordinator {
    */
   private async validatePreDeployment(
     context: PostProcessorContext,
-    fixResult: FixResult
+    fixResult: FixResult,
   ): Promise<void> {
-    console.log('🔍 Validating pre-deployment requirements...');
+    console.log("🔍 Validating pre-deployment requirements...");
 
     // Ensure all fixes were successfully applied
     if (!fixResult.success) {
-      throw new Error('Cannot redeploy: fixes were not successfully applied');
+      throw new Error("Cannot redeploy: fixes were not successfully applied");
     }
 
     // Validate that the commit exists and is properly formatted
     try {
       execSync(`git rev-parse --verify ${context.commitSha}`, {
-        stdio: 'pipe',
-        timeout: 10000
+        stdio: "pipe",
+        timeout: 10000,
       });
     } catch (error) {
       throw new Error(`Invalid commit SHA: ${context.commitSha}`);
@@ -156,7 +158,7 @@ export class RedeployCoordinator {
 
     // Check if deployment environment is available
     // This would integrate with actual deployment infrastructure
-    console.log('✅ Pre-deployment validation passed');
+    console.log("✅ Pre-deployment validation passed");
   }
 
   /**
@@ -164,18 +166,23 @@ export class RedeployCoordinator {
    */
   private async deployWithRetry(
     context: PostProcessorContext,
-    deploymentId: string
+    deploymentId: string,
   ): Promise<{ canaryResults?: CanaryResult[] }> {
     let attempt = 0;
     const maxRetries = this.config.maxRetries;
 
     while (attempt < maxRetries) {
       try {
-        console.log(`🔄 Deployment attempt ${attempt + 1}/${maxRetries} for ${deploymentId}`);
+        console.log(
+          `🔄 Deployment attempt ${attempt + 1}/${maxRetries} for ${deploymentId}`,
+        );
 
         if (this.config.canaryEnabled) {
           // Execute canary deployment
-          const canaryResults = await this.executeCanaryDeployment(context, deploymentId);
+          const canaryResults = await this.executeCanaryDeployment(
+            context,
+            deploymentId,
+          );
           return { canaryResults };
         } else {
           // Execute direct deployment
@@ -203,7 +210,7 @@ export class RedeployCoordinator {
    */
   private async executeCanaryDeployment(
     context: PostProcessorContext,
-    deploymentId: string
+    deploymentId: string,
   ): Promise<CanaryResult[]> {
     const results: CanaryResult[] = [];
     const phases = this.config.canaryPhases;
@@ -211,25 +218,38 @@ export class RedeployCoordinator {
     console.log(`🎯 Executing canary deployment with ${phases} phases`);
 
     for (let phase = 1; phase <= phases; phase++) {
-      const trafficPercentage = Math.min(phase * this.config.canaryTrafficIncrement, 100);
+      const trafficPercentage = Math.min(
+        phase * this.config.canaryTrafficIncrement,
+        100,
+      );
 
-      console.log(`📊 Canary Phase ${phase}/${phases}: ${trafficPercentage}% traffic`);
+      console.log(
+        `📊 Canary Phase ${phase}/${phases}: ${trafficPercentage}% traffic`,
+      );
 
       const phaseStartTime = Date.now();
 
       try {
         // Deploy to canary subset
-        await this.deployToCanary(context, deploymentId, phase, trafficPercentage);
+        await this.deployToCanary(
+          context,
+          deploymentId,
+          phase,
+          trafficPercentage,
+        );
 
         // Monitor canary health
-        const metrics = await this.monitorCanaryHealth(phase, this.config.healthCheckTimeout);
+        const metrics = await this.monitorCanaryHealth(
+          phase,
+          this.config.healthCheckTimeout,
+        );
 
         const phaseResult: CanaryResult = {
           phase,
           trafficPercentage,
           success: this.isCanaryHealthy(metrics),
           metrics,
-          duration: Date.now() - phaseStartTime
+          duration: Date.now() - phaseStartTime,
         };
 
         results.push(phaseResult);
@@ -238,13 +258,14 @@ export class RedeployCoordinator {
           throw new Error(`Canary phase ${phase} failed health checks`);
         }
 
-        console.log(`✅ Canary Phase ${phase} successful (${phaseResult.duration}ms)`);
+        console.log(
+          `✅ Canary Phase ${phase} successful (${phaseResult.duration}ms)`,
+        );
 
         // Wait between phases for observation
         if (phase < phases) {
           await this.waitBetweenPhases();
         }
-
       } catch (error) {
         console.log(`❌ Canary Phase ${phase} failed:`, error);
         throw error;
@@ -253,7 +274,7 @@ export class RedeployCoordinator {
 
     // All phases successful - complete deployment
     await this.promoteToProduction(context, deploymentId);
-    console.log('🎉 Canary deployment completed - promoted to production');
+    console.log("🎉 Canary deployment completed - promoted to production");
 
     return results;
   }
@@ -263,7 +284,7 @@ export class RedeployCoordinator {
    */
   private async executeDirectDeployment(
     context: PostProcessorContext,
-    deploymentId: string
+    deploymentId: string,
   ): Promise<void> {
     console.log(`🚀 Executing direct deployment for ${deploymentId}`);
 
@@ -272,11 +293,11 @@ export class RedeployCoordinator {
 
     // Trigger a new CI/CD run to validate the fixes
     try {
-      execSync('git push origin master', {
-        stdio: 'pipe',
-        timeout: 30000
+      execSync("git push origin master", {
+        stdio: "pipe",
+        timeout: 30000,
       });
-      console.log('✅ Deployment triggered via git push');
+      console.log("✅ Deployment triggered via git push");
     } catch (error) {
       throw new Error(`Deployment trigger failed: ${error}`);
     }
@@ -289,38 +310,45 @@ export class RedeployCoordinator {
     context: PostProcessorContext,
     deploymentId: string,
     phase: number,
-    trafficPercentage: number
+    trafficPercentage: number,
   ): Promise<void> {
     // Placeholder for canary deployment logic
     // In a real system, this would integrate with load balancers, service meshes, etc.
-    console.log(`🚢 Deploying ${trafficPercentage}% traffic to canary for phase ${phase}`);
+    console.log(
+      `🚢 Deploying ${trafficPercentage}% traffic to canary for phase ${phase}`,
+    );
 
     // Simulate deployment time
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    await new Promise((resolve) => setTimeout(resolve, 2000));
   }
 
   /**
    * Monitor canary health during deployment
    */
-  private async monitorCanaryHealth(phase: number, timeout: number): Promise<CanaryResult['metrics']> {
-    console.log(`📊 Monitoring canary health for phase ${phase} (${timeout}ms timeout)`);
+  private async monitorCanaryHealth(
+    phase: number,
+    timeout: number,
+  ): Promise<CanaryResult["metrics"]> {
+    console.log(
+      `📊 Monitoring canary health for phase ${phase} (${timeout}ms timeout)`,
+    );
 
     // Placeholder for health monitoring
     // In a real system, this would check metrics from monitoring systems
-    await new Promise(resolve => setTimeout(resolve, 3000));
+    await new Promise((resolve) => setTimeout(resolve, 3000));
 
     // Simulate health metrics
     return {
       responseTime: 150 + Math.random() * 50, // 150-200ms
       errorRate: Math.random() * 0.01, // 0-1%
-      throughput: 1000 + Math.random() * 500 // 1000-1500 req/s
+      throughput: 1000 + Math.random() * 500, // 1000-1500 req/s
     };
   }
 
   /**
    * Check if canary metrics indicate healthy deployment
    */
-  private isCanaryHealthy(metrics: CanaryResult['metrics']): boolean {
+  private isCanaryHealthy(metrics: CanaryResult["metrics"]): boolean {
     const { responseTime, errorRate, throughput } = metrics;
 
     // Define health thresholds
@@ -328,9 +356,11 @@ export class RedeployCoordinator {
     const maxErrorRate = 0.05; // 5%
     const minThroughput = 800; // req/s
 
-    return responseTime <= maxResponseTime &&
-           errorRate <= maxErrorRate &&
-           throughput >= minThroughput;
+    return (
+      responseTime <= maxResponseTime &&
+      errorRate <= maxErrorRate &&
+      throughput >= minThroughput
+    );
   }
 
   /**
@@ -339,7 +369,7 @@ export class RedeployCoordinator {
   private async waitBetweenPhases(): Promise<void> {
     const waitTime = 10000; // 10 seconds
     console.log(`⏳ Waiting ${waitTime}ms between canary phases...`);
-    await new Promise(resolve => setTimeout(resolve, waitTime));
+    await new Promise((resolve) => setTimeout(resolve, waitTime));
   }
 
   /**
@@ -347,35 +377,37 @@ export class RedeployCoordinator {
    */
   private async promoteToProduction(
     context: PostProcessorContext,
-    deploymentId: string
+    deploymentId: string,
   ): Promise<void> {
-    console.log('🎯 Promoting canary deployment to production');
+    console.log("🎯 Promoting canary deployment to production");
 
     // Placeholder for production promotion
     // In a real system, this would route 100% traffic to the new version
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
   }
 
   /**
    * Validate post-deployment health
    */
-  private async validatePostDeployment(deployResult: any): Promise<{ success: boolean; error: string }> {
-    console.log('🔍 Validating post-deployment health...');
+  private async validatePostDeployment(
+    deployResult: any,
+  ): Promise<{ success: boolean; error: string }> {
+    console.log("🔍 Validating post-deployment health...");
 
     try {
       // Run post-deployment health checks
       // This could include API endpoint checks, database connectivity, etc.
 
       // For now, simulate a basic health check
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      await new Promise((resolve) => setTimeout(resolve, 2000));
 
-      console.log('✅ Post-deployment validation passed');
-      return { success: true, error: '' };
+      console.log("✅ Post-deployment validation passed");
+      return { success: true, error: "" };
     } catch (error) {
-      console.log('❌ Post-deployment validation failed');
+      console.log("❌ Post-deployment validation failed");
       return {
         success: false,
-        error: error instanceof Error ? error.message : String(error)
+        error: error instanceof Error ? error.message : String(error),
       };
     }
   }
@@ -385,7 +417,7 @@ export class RedeployCoordinator {
    */
   private async rollbackDeployment(
     deploymentId: string,
-    context: PostProcessorContext
+    context: PostProcessorContext,
   ): Promise<void> {
     console.log(`🔄 Rolling back deployment ${deploymentId}`);
 
@@ -394,14 +426,14 @@ export class RedeployCoordinator {
       // In a real system, this would revert to the previous version
 
       // For this implementation, we could revert the git commit
-      execSync('git reset --hard HEAD~1', {
-        stdio: 'pipe',
-        timeout: 10000
+      execSync("git reset --hard HEAD~1", {
+        stdio: "pipe",
+        timeout: 10000,
       });
 
-      console.log('✅ Deployment rolled back successfully');
+      console.log("✅ Deployment rolled back successfully");
     } catch (error) {
-      console.error('❌ Rollback failed:', error);
+      console.error("❌ Rollback failed:", error);
       throw new Error(`Rollback failed: ${error}`);
     }
   }
@@ -413,7 +445,7 @@ export class RedeployCoordinator {
     const baseDelay = this.config.retryDelay;
 
     let delay: number;
-    if (this.config.backoffStrategy === 'exponential') {
+    if (this.config.backoffStrategy === "exponential") {
       delay = baseDelay * Math.pow(2, attempt);
     } else {
       delay = baseDelay * (attempt + 1);
@@ -423,6 +455,6 @@ export class RedeployCoordinator {
     delay = Math.min(delay, 300000);
 
     console.log(`⏳ Waiting ${delay}ms before retry (attempt ${attempt + 1})`);
-    await new Promise(resolve => setTimeout(resolve, delay));
+    await new Promise((resolve) => setTimeout(resolve, delay));
   }
 }

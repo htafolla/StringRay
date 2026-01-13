@@ -824,11 +824,13 @@ The project uses 8 specialized oh-my-opencode agents:
 The framework provides 14 MCP (Model Context Protocol) servers that extend agent capabilities. Use these specialized tools by referencing them in prompts:
 
 #### Core MCP Servers:
+
 - **orchestrator**: Complex task coordination and delegation
 - **enhanced-orchestrator**: Multi-agent orchestration with monitoring
 - **enforcer**: Rule enforcement and quality validation
 
 #### Knowledge Skills (11 specialized servers):
+
 - **code-review**: Automated code analysis and best practices (`use code-review`)
 - **api-design**: RESTful API design and validation (`use api-design`)
 - **testing-strategy**: Test planning and coverage optimization (`use testing-strategy`)
@@ -842,6 +844,7 @@ The framework provides 14 MCP (Model Context Protocol) servers that extend agent
 - **testing-best-practices**: Testing methodology guidance (`use testing-best-practices`)
 
 #### Usage Examples:
+
 ```
 Analyze this codebase for security vulnerabilities. use security-audit
 Design a REST API for user management. use api-design

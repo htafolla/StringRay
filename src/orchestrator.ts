@@ -135,29 +135,32 @@ export class StrRayOrchestrator {
       );
 
       // Execute post-processors for agent task completion logging
-      console.log('🎯 Agent task completed successfully, checking post-processors');
-      console.log('📊 Result details:', {
+      console.log(
+        "🎯 Agent task completed successfully, checking post-processors",
+      );
+      console.log("📊 Result details:", {
         success: result.success,
         hasAgentName: !!result.agentName,
         hasTask: !!result.task,
         agentName: result.agentName,
-        taskLength: result.task?.length
+        taskLength: result.task?.length,
       });
 
       try {
         // Get processor manager from global state
         const globalStateManager = (globalThis as any).strRayStateManager;
-        console.log('🌐 Global state manager check:', {
+        console.log("🌐 Global state manager check:", {
           exists: !!globalStateManager,
           type: typeof globalStateManager,
-          hasGet: typeof globalStateManager?.get === 'function'
+          hasGet: typeof globalStateManager?.get === "function",
         });
 
         const processorManager = globalStateManager?.get("processor:manager");
-        console.log('🔍 Processor manager retrieval:', {
+        console.log("🔍 Processor manager retrieval:", {
           retrieved: !!processorManager,
           type: typeof processorManager,
-          hasExecutePostProcessors: typeof processorManager?.executePostProcessors === 'function'
+          hasExecutePostProcessors:
+            typeof processorManager?.executePostProcessors === "function",
         });
 
         if (processorManager) {

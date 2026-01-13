@@ -6,8 +6,8 @@
  * break between development, built, and deployed environments.
  */
 
-import { fileURLToPath } from 'url';
-import { dirname, join, resolve } from 'path';
+import { fileURLToPath } from "url";
+import { dirname, join, resolve } from "path";
 
 export class ImportResolver {
   private static instance: ImportResolver;
@@ -48,7 +48,7 @@ export class ImportResolver {
     const maxDepth = 10;
 
     for (let i = 0; i < maxDepth; i++) {
-      if (this.fileExists(join(dir, 'package.json'))) {
+      if (this.fileExists(join(dir, "package.json"))) {
         return dir;
       }
       const parent = dirname(dir);
@@ -69,36 +69,45 @@ export class ImportResolver {
   }
 
   private detectDevelopment(): boolean {
-    return this.currentDir.includes('/src/') ||
-           this.currentDir.includes('\\src\\') ||
-           process.env.NODE_ENV === 'development' ||
-           this.fileExists(join(this.projectRoot, 'tsconfig.json'));
+    return (
+      this.currentDir.includes("/src/") ||
+      this.currentDir.includes("\\src\\") ||
+      process.env.NODE_ENV === "development" ||
+      this.fileExists(join(this.projectRoot, "tsconfig.json"))
+    );
   }
 
   private detectBuilt(): boolean {
-    return this.currentDir.includes('/dist/') ||
-           this.currentDir.includes('\\dist\\') ||
-           this.currentDir.includes('node_modules') ||
-           !this.fileExists(join(this.projectRoot, 'src'));
+    return (
+      this.currentDir.includes("/dist/") ||
+      this.currentDir.includes("\\dist\\") ||
+      this.currentDir.includes("node_modules") ||
+      !this.fileExists(join(this.projectRoot, "src"))
+    );
   }
 
   private detectInstalled(): boolean {
-    return this.currentDir.includes('/node_modules/') ||
-           this.currentDir.includes('\\node_modules\\') ||
-           (this.currentDir.includes('strray') && !this.currentDir.includes(this.projectRoot));
+    return (
+      this.currentDir.includes("/node_modules/") ||
+      this.currentDir.includes("\\node_modules\\") ||
+      (this.currentDir.includes("strray") &&
+        !this.currentDir.includes(this.projectRoot))
+    );
   }
 
   private detectTesting(): boolean {
-    return process.env.NODE_ENV === 'test' ||
-           process.env.VITEST === 'true' ||
-           this.currentDir.includes('/__tests__/') ||
-           this.currentDir.includes('\\__tests__\\');
+    return (
+      process.env.NODE_ENV === "test" ||
+      process.env.VITEST === "true" ||
+      this.currentDir.includes("/__tests__/") ||
+      this.currentDir.includes("\\__tests__\\")
+    );
   }
 
   /**
    * Resolve module import path for any module
    */
-  resolveModulePath(moduleName: string, subPath: string = ''): string {
+  resolveModulePath(moduleName: string, subPath: string = ""): string {
     const fullModuleName = subPath ? `${subPath}/${moduleName}` : moduleName;
 
     if (this.isTesting) {
@@ -132,7 +141,7 @@ export class ImportResolver {
   /**
    * Dynamic import with comprehensive environment resolution
    */
-  async importModule(moduleName: string, subPath: string = ''): Promise<any> {
+  async importModule(moduleName: string, subPath: string = ""): Promise<any> {
     const primaryPath = this.resolveModulePath(moduleName, subPath);
 
     // Try primary path first
@@ -140,7 +149,9 @@ export class ImportResolver {
       console.log(`🔗 Importing ${moduleName} from: ${primaryPath}`);
       return await import(primaryPath);
     } catch (error) {
-      console.warn(`⚠️ Failed to import ${moduleName} from primary path: ${primaryPath}`);
+      console.warn(
+        `⚠️ Failed to import ${moduleName} from primary path: ${primaryPath}`,
+      );
 
       // Try alternative paths based on environment
       const altPaths = this.generateAlternativePaths(moduleName, subPath);
@@ -156,11 +167,18 @@ export class ImportResolver {
 
       // Final fallback - try to resolve from project root
       try {
-        const rootPath = join(this.projectRoot, 'dist/plugin', subPath, `${moduleName}.js`);
+        const rootPath = join(
+          this.projectRoot,
+          "dist/plugin",
+          subPath,
+          `${moduleName}.js`,
+        );
         console.log(`🏠 Trying project root path: ${rootPath}`);
         return await import(rootPath);
       } catch (rootError) {
-        throw new Error(`Cannot import module ${moduleName} from any path. Primary: ${primaryPath}, Alternatives tried: ${altPaths.length}`);
+        throw new Error(
+          `Cannot import module ${moduleName} from any path. Primary: ${primaryPath}, Alternatives tried: ${altPaths.length}`,
+        );
       }
     }
   }
@@ -168,7 +186,10 @@ export class ImportResolver {
   /**
    * Generate alternative import paths for fallback
    */
-  private generateAlternativePaths(moduleName: string, subPath: string): string[] {
+  private generateAlternativePaths(
+    moduleName: string,
+    subPath: string,
+  ): string[] {
     const fullModuleName = subPath ? `${subPath}/${moduleName}` : moduleName;
     const paths: string[] = [];
 
@@ -178,7 +199,7 @@ export class ImportResolver {
         `../dist/plugin/${fullModuleName}.js`,
         `../src/${fullModuleName}.ts`,
         `./${fullModuleName}.ts`,
-        `../dist/${fullModuleName}.js`
+        `../dist/${fullModuleName}.js`,
       );
     } else {
       // Built/deployed alternatives
@@ -186,13 +207,18 @@ export class ImportResolver {
         `../src/${fullModuleName}.ts`,
         `../dist/plugin/${fullModuleName}.js`,
         `./${fullModuleName}.js`,
-        `../dist/${fullModuleName}.js`
+        `../dist/${fullModuleName}.js`,
       );
     }
 
     // Add absolute paths as last resort
     try {
-      const absPath = resolve(this.projectRoot, 'dist/plugin', subPath, `${moduleName}.js`);
+      const absPath = resolve(
+        this.projectRoot,
+        "dist/plugin",
+        subPath,
+        `${moduleName}.js`,
+      );
       paths.push(absPath);
     } catch {
       // Ignore absolute path generation errors
@@ -220,7 +246,7 @@ export class ImportResolver {
       isBuilt: this.isBuilt,
       isInstalled: this.isInstalled,
       isTesting: this.isTesting,
-      nodeEnv: process.env.NODE_ENV
+      nodeEnv: process.env.NODE_ENV,
     };
   }
 }

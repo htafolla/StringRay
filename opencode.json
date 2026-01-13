@@ -31,7 +31,10 @@
     },
     "architecture-patterns": {
       "type": "local",
-      "command": ["node", "dist/mcps/knowledge-skills/architecture-patterns.server.js"],
+      "command": [
+        "node",
+        "dist/mcps/knowledge-skills/architecture-patterns.server.js"
+      ],
       "enabled": true
     },
     "git-workflow": {
@@ -41,17 +44,26 @@
     },
     "performance-optimization": {
       "type": "local",
-      "command": ["node", "dist/mcps/knowledge-skills/performance-optimization.server.js"],
+      "command": [
+        "node",
+        "dist/mcps/knowledge-skills/performance-optimization.server.js"
+      ],
       "enabled": true
     },
     "project-analysis": {
       "type": "local",
-      "command": ["node", "dist/mcps/knowledge-skills/project-analysis.server.js"],
+      "command": [
+        "node",
+        "dist/mcps/knowledge-skills/project-analysis.server.js"
+      ],
       "enabled": true
     },
     "testing-strategy": {
       "type": "local",
-      "command": ["node", "dist/mcps/knowledge-skills/testing-strategy.server.js"],
+      "command": [
+        "node",
+        "dist/mcps/knowledge-skills/testing-strategy.server.js"
+      ],
       "enabled": true
     },
     "code-review": {
@@ -61,7 +73,10 @@
     },
     "security-audit": {
       "type": "local",
-      "command": ["node", "dist/mcps/knowledge-skills/security-audit.server.js"],
+      "command": [
+        "node",
+        "dist/mcps/knowledge-skills/security-audit.server.js"
+      ],
       "enabled": true
     },
     "ui-ux-design": {
@@ -71,12 +86,23 @@
     },
     "refactoring-strategies": {
       "type": "local",
-      "command": ["node", "dist/mcps/knowledge-skills/refactoring-strategies.server.js"],
+      "command": [
+        "node",
+        "dist/mcps/knowledge-skills/refactoring-strategies.server.js"
+      ],
       "enabled": true
     },
     "testing-best-practices": {
       "type": "local",
-      "command": ["node", "dist/mcps/knowledge-skills/testing-best-practices.server.js"],
+      "command": [
+        "node",
+        "dist/mcps/knowledge-skills/testing-best-practices.server.js"
+      ],
+      "enabled": true
+    },
+    "librarian": {
+      "type": "local",
+      "command": ["node", "dist/plugin/mcps/knowledge-skills/project-analysis.server.js"],
       "enabled": true
     }
   }

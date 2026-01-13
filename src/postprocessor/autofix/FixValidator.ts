@@ -99,7 +99,10 @@ export class FixValidator {
           return true;
       }
     } catch (error) {
-      console.log(`❌ Validation failed for ${category}:`, error instanceof Error ? error.message : String(error));
+      console.log(
+        `❌ Validation failed for ${category}:`,
+        error instanceof Error ? error.message : String(error),
+      );
       return false;
     }
   }
@@ -130,7 +133,9 @@ export class FixValidator {
       console.log("🔄 Rollback completed successfully");
     } catch (error) {
       console.error("❌ Rollback failed:", error);
-      throw new Error(`Rollback failed: ${error instanceof Error ? error.message : String(error)}`);
+      throw new Error(
+        `Rollback failed: ${error instanceof Error ? error.message : String(error)}`,
+      );
     }
   }
 

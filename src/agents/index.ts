@@ -9,6 +9,7 @@ import { refactorer } from "./refactorer.js";
 import { testArchitect } from "./test-architect.js";
 import { sisyphusAgent } from "./sisyphus.js";
 import { logMonitorAgent } from "./log-monitor.js";
+import { librarian } from "./librarian.js";
 
 export const builtinAgents: Record<string, AgentConfig> = {
   sisyphus: sisyphusAgent,
@@ -21,6 +22,7 @@ export const builtinAgents: Record<string, AgentConfig> = {
   refactorer,
   "test-architect": testArchitect,
   "log-monitor": logMonitorAgent,
+  librarian,
 };
 
 export {
@@ -34,4 +36,5 @@ export {
   refactorer,
   testArchitect,
   logMonitorAgent,
+  librarian,
 };

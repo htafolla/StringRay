@@ -32,28 +32,33 @@ export class RefactoringLoggingProcessor implements ProcessorHook {
   name = "refactoring-logging";
   priority = 100; // High priority to ensure logging happens
   enabled = true;
-  debugEnabled = process.env.STRRAY_DEBUG_LOGGING === 'true' || false;
+  debugEnabled = process.env.STRRAY_DEBUG_LOGGING === "true" || false;
 
   async execute(context: any): Promise<any> {
     if (this.debugEnabled) {
-      console.log('🔍 RefactoringLoggingProcessor.execute called with context:', {
-        hasAgentName: !!context.agentName,
-        hasTask: !!context.task,
-        hasStartTime: typeof context.startTime === "number",
-        contextKeys: Object.keys(context)
-      });
+      console.log(
+        "🔍 RefactoringLoggingProcessor.execute called with context:",
+        {
+          hasAgentName: !!context.agentName,
+          hasTask: !!context.task,
+          hasStartTime: typeof context.startTime === "number",
+          contextKeys: Object.keys(context),
+        },
+      );
     }
 
     // Check if this is an agent task completion context
     if (!this.isAgentTaskContext(context)) {
       if (this.debugEnabled) {
-        console.log('❌ Not an agent task context, returning early');
+        console.log("❌ Not an agent task context, returning early");
       }
       return { logged: false, reason: "Not an agent task context" };
     }
 
     if (this.debugEnabled) {
-      console.log('✅ Valid agent task context detected, proceeding with logging');
+      console.log(
+        "✅ Valid agent task context detected, proceeding with logging",
+      );
     }
 
     const taskContext = context as AgentTaskContext;

@@ -13,16 +13,19 @@
 **StrRay Framework v1.0.0 - Enterprise CI/CD Automation Plugin**
 
 StrRay Framework is available as both:
+
 - **Standalone npm package** for direct installation
 - **Integrated plugin** within oh-my-opencode framework
 
 **✅ Install as standalone package:**
+
 ```bash
 npm install strray
 npx strray init
 ```
 
 **✅ Or install oh-my-opencode (includes StrRay Framework):**
+
 ```bash
 npm install -g oh-my-opencode
 # StrRay Framework is automatically included
@@ -93,6 +96,7 @@ bun install -g oh-my-opencode
 StrRay Framework automatically configures itself based on your installation method:
 
 #### Standalone Configuration
+
 - Loads the Universal Development Codex v1.2.20
 - Enables enterprise CI/CD automation with post-processor
 - Registers all 9 specialized agents
@@ -100,6 +104,7 @@ StrRay Framework automatically configures itself based on your installation meth
 - Configures automated deployment pipelines
 
 #### oh-my-opencode Integration
+
 - All above features plus oh-my-opencode integration
 - Enhanced multi-framework support
 - Cross-platform compatibility
@@ -107,6 +112,7 @@ StrRay Framework automatically configures itself based on your installation meth
 ### Usage
 
 #### Standalone Usage
+
 ```bash
 # Initialize StrRay in your project
 npx strray init
@@ -121,6 +127,7 @@ npx strray init
 ```
 
 #### oh-my-opencode Integration
+
 ```bash
 # Start oh-my-opencode (includes StrRay Framework)
 opencode

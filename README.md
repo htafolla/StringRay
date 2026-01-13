@@ -19,6 +19,7 @@ StrRay provides intelligent multi-agent coordination, codex-based code quality e
 **Delivers clean architecture, predictive analytics, secure plugin ecosystem, and sub-millisecond performance — enterprise-grade, every time.**
 
 **Latest: Enhanced git hook validation with lightweight post-commit checks (<2s) and comprehensive post-push CI/CD validation (<5min).**
+**Features: Real-time metrics collection and performance monitoring for all hook executions.**
 
 ## 🚀 Features
 

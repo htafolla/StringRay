@@ -416,7 +416,7 @@ jobs:
     - name: Run performance gates
       run: |
         node -e "
-        import('./dist/performance/performance-ci-gates.js').then(({ performanceCIGates }) => {
+        import('./performance/performance-ci-gates.js').then(({ performanceCIGates }) => {
           return performanceCIGates.runPerformanceGates().then(result => {
             if (!result.success) {
               console.error('Performance gates failed');
@@ -514,9 +514,10 @@ pipeline {
                     def result = sh(
                         script: '''
                         node -e "
-        // In production: import { performanceCIGates } from 'strray/performance';
-        // For CI usage: dynamically import from built package
-        import('./dist/performance/performance-ci-gates.js').then(({ performanceCIGates }) => {
+        // Use import resolver for environment-aware imports
+        const { importResolver } = await import('./utils/import-resolver.js');
+        const { performanceCIGates } = await importResolver.importModule('performance/performance-ci-gates');
+        performanceCIGates.runPerformanceGates().then(result => {
       return performanceCIGates.runPerformanceGates().then(result => {
         if (!result.success) {
           console.error('Performance gates failed');
@@ -575,7 +576,9 @@ steps:
 
 - script: |
     node -e "
-    import('./dist/performance/performance-ci-gates.js').then(({ performanceCIGates }) => {
+    (async () => {
+      const { importResolver } = await import('./utils/import-resolver.js');
+      const { performanceCIGates } = await importResolver.importModule('performance/performance-ci-gates');
       return performanceCIGates.runPerformanceGates().then(result => {
         if (!result.success) {
           console.error('Performance gates failed');
@@ -583,7 +586,7 @@ steps:
         }
         console.log('Performance gates passed');
       });
-    }).catch(console.error);
+    })().catch(console.error);
     "
   displayName: 'Run Performance Gates'
 

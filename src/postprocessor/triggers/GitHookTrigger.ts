@@ -136,64 +136,117 @@ fi
     # Run appropriate monitoring based on hook type
     if [ "$HOOK_NAME" = "post-commit" ]; then
       # LIGHT MONITORING: Quick validation, don't block git workflow
+      # Timeout: 2 seconds max, log metrics for monitoring
+      START_TIME=\$(date +%s%3N)
       timeout 2 node -e "
       (async () => {
         try {
-          const { LightweightValidator } = await import('./dist/postprocessor/validation/LightweightValidator.js');
+          // Use import resolver to avoid hardcoded dist paths
+          const { importResolver } = await import('./src/utils/import-resolver.js');
+          const { LightweightValidator } = await importResolver.importModule('postprocessor/validation/LightweightValidator');
+
           const validator = new LightweightValidator();
           const result = await validator.validate();
 
           if (result.warnings.length > 0) {
-            console.log(\`⚠️ \${result.warnings.length} warning(s) found:\`);
-            result.warnings.forEach(w => console.log(\`   \${w}\`));
+            console.log('⚠️ ' + result.warnings.length + ' warning(s) found:');
+            result.warnings.forEach(w => console.log('   ' + w));
           }
 
           if (!result.passed) {
-            console.log(\`❌ \${result.errors.length} error(s) found:\`);
-            result.errors.forEach(e => console.log(\`   \${e}\`));
+            console.log('❌ ' + result.errors.length + ' error(s) found:');
+            result.errors.forEach(e => console.log('   ' + e));
             process.exit(1);
           }
 
-          console.log(\`✅ Post-commit: Validation passed in \${result.duration}ms\`);
+          console.log('✅ Post-commit: Validation passed in ' + result.duration + 'ms');
         } catch (error) {
-          console.error('❌ Post-commit validation failed:', error.message || error);
+          console.error('❌ Post-commit validation failed:', error instanceof Error ? error.message : String(error));
           process.exit(1);
         }
       })();
-      " 2>/dev/null && exit 0 || exit 1
+      " 2>/dev/null
+      EXIT_CODE=\$?
+      END_TIME=\$(date +%s%3N)
+      DURATION=\$((END_TIME - START_TIME))
+
+      # Log metrics for monitoring
+      echo "HOOK_METRICS: post-commit duration=\${DURATION}ms exit_code=\${EXIT_CODE}" >&2
+
+      # Record metrics using metrics collector (environment-aware import)
+      node -e "
+      (async () => {
+        try {
+          const { importResolver } = await import('./src/utils/import-resolver.js');
+          const { HookMetricsCollector } = await importResolver.importModule('postprocessor/validation/HookMetricsCollector');
+          const collector = new HookMetricsCollector();
+          collector.recordMetrics('post-commit', \${DURATION}, \${EXIT_CODE});
+        } catch (error) {
+          // Silently fail if metrics collection fails
+        }
+      })();
+      " 2>/dev/null || true
+
+      [ \$EXIT_CODE -eq 0 ] && exit 0 || exit 1
     else
       # FULL MONITORING: Comprehensive analysis for post-push
+      # Timeout: 5 minutes max, comprehensive CI/CD validation
+      START_TIME=\$(date +%s%3N)
       timeout 300 node -e "
       (async () => {
         try {
           console.log('🚀 Post-push: Comprehensive validation initiated');
-          const { ComprehensiveValidator } = await import('./' + plugin + '/dist/postprocessor/validation/ComprehensiveValidator.js');
+          // Use import resolver for environment-aware imports
+          const { importResolver } = await import('./src/utils/import-resolver.js');
+          const { ComprehensiveValidator } = await importResolver.importModule('postprocessor/validation/ComprehensiveValidator');
 
           const validator = new ComprehensiveValidator();
           const result = await validator.validate();
 
           if (result.warnings.length > 0) {
-            console.log(\`⚠️ \${result.warnings.length} warning(s) found:\`);
-            result.warnings.forEach(w => console.log(\`   \${w}\`));
+            console.log('⚠️ ' + result.warnings.length + ' warning(s) found:');
+            result.warnings.forEach(w => console.log('   ' + w));
           }
 
           if (!result.passed) {
-            console.log(\`❌ \${result.errors.length} error(s) found:\`);
-            result.errors.forEach(e => console.log(\`   \${e}\`));
+            console.log('❌ ' + result.errors.length + ' error(s) found:');
+            result.errors.forEach(e => console.log('   ' + e));
             process.exit(1);
           }
 
           if (result.testResults) {
-            console.log(\`🧪 Tests: \${result.testResults.passed}/\${result.testResults.total} passed\`);
+            console.log('🧪 Tests: ' + result.testResults.passed + '/' + result.testResults.total + ' passed');
           }
 
-          console.log(\`✅ Post-push: Comprehensive validation passed in \${result.duration}ms\`);
+          console.log('✅ Post-push: Comprehensive validation passed in ' + result.duration + 'ms');
         } catch (error) {
           console.error('❌ Post-push validation failed:', error instanceof Error ? error.message : String(error));
           process.exit(1);
         }
       })();
-      " 2>/dev/null && exit 0 || exit 1
+      " 2>/dev/null
+      EXIT_CODE=\$?
+      END_TIME=\$(date +%s%3N)
+      DURATION=\$((END_TIME - START_TIME))
+
+      # Log comprehensive metrics for monitoring
+      echo "HOOK_METRICS: post-push duration=\${DURATION}ms exit_code=\${EXIT_CODE}" >&2
+
+      # Record metrics using metrics collector (environment-aware)
+      node -e "
+      (async () => {
+        try {
+          const { importResolver } = await import('./src/utils/import-resolver.js');
+          const { HookMetricsCollector } = await importResolver.importModule('postprocessor/validation/HookMetricsCollector');
+          const collector = new HookMetricsCollector();
+          collector.recordMetrics('post-push', \${DURATION}, \${EXIT_CODE});
+        } catch (error) {
+          // Silently fail if metrics collection fails
+        }
+      })();
+      " 2>/dev/null || true
+
+      [ \$EXIT_CODE -eq 0 ] && exit 0 || exit 1
     fi
   else
     echo "Warning: StrRay plugin not found or Node.js not available, skipping post-processor"

@@ -318,33 +318,33 @@ export class MCPClientManager {
       "code-review": {
         serverName: "code-review",
         command: "node",
-        args: ["dist/plugin/mcps/knowledge-skills/code-review.server.js"],
+        args: [`${process.env.STRRAY_MCP_PATH || "dist/plugin"}/mcps/knowledge-skills/code-review.server.js`],
         timeout: 30000,
       },
       "security-audit": {
         serverName: "security-audit",
         command: "node",
-        args: ["dist/plugin/mcps/knowledge-skills/security-audit.server.js"],
+        args: [`${process.env.STRRAY_MCP_PATH || "dist/plugin"}/mcps/knowledge-skills/security-audit.server.js`],
         timeout: 45000,
       },
       "performance-optimization": {
         serverName: "performance-optimization",
         command: "node",
         args: [
-          "dist/plugin/mcps/knowledge-skills/performance-optimization.server.js",
+          `${process.env.STRRAY_MCP_PATH || "dist/plugin"}/mcps/knowledge-skills/performance-optimization.server.js`,
         ],
         timeout: 30000,
       },
       "testing-strategy": {
         serverName: "testing-strategy",
         command: "node",
-        args: ["dist/plugin/mcps/knowledge-skills/testing-strategy.server.js"],
+        args: [`${process.env.STRRAY_MCP_PATH || "dist/plugin"}/mcps/knowledge-skills/testing-strategy.server.js`],
         timeout: 25000,
       },
       librarian: {
         serverName: "librarian",
         command: "node",
-        args: ["dist/plugin/mcps/knowledge-skills/project-analysis.server.js"],
+        args: [`${process.env.STRRAY_MCP_PATH || "dist/plugin"}/mcps/knowledge-skills/project-analysis.server.js`],
         timeout: 60000,
       },
     };
@@ -353,7 +353,7 @@ export class MCPClientManager {
       serverConfigs[serverName] || {
         serverName,
         command: "node",
-        args: [`dist/plugin/mcps/knowledge-skills/${serverName}.server.js`],
+        args: [`${process.env.STRRAY_MCP_PATH || "dist/plugin"}/mcps/knowledge-skills/${serverName}.server.js`],
         timeout: 30000,
       }
     );

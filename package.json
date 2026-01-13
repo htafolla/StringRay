@@ -18,7 +18,6 @@
     "prepublishOnly": "npm run build:plugin",
     "postinstall": "node scripts/postinstall.cjs",
     "ci-monitor": "node scripts/github-actions-monitor.cjs",
-
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "lint": "eslint src",
@@ -29,7 +28,9 @@
     "ci-report": "echo 'CI/CD health check passed'",
     "test:performance": "vitest run src/__tests__/performance/",
     "performance:report": "node scripts/performance-report.js",
-    "performance:gates": "node src/performance/performance-ci-gates.js"
+    "performance:gates": "node src/performance/performance-ci-gates.js",
+    "test:architect": "vitest run src/__tests__/agents/architect.test.ts src/__tests__/agents/test-architect.test.ts",
+    "test:e2e": "vitest run src/__tests__/integration/e2e-framework-integration.test.ts"
   },
   "keywords": [
     "ai",

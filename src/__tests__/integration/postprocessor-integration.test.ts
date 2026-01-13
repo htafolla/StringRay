@@ -18,7 +18,9 @@ describe("PostProcessor Integration", () => {
     setupStandardMocks();
 
     // Use proper state manager for integration testing
-    stateManager = new StrRayStateManager(`/test/postprocessor-${Date.now()}.json`);
+    stateManager = new StrRayStateManager(
+      `/test/postprocessor-${Date.now()}.json`,
+    );
     await new Promise((resolve) => setTimeout(resolve, 10)); // Wait for initialization
 
     sessionMonitor = {

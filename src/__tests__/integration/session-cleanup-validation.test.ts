@@ -1,7 +1,10 @@
 import { describe, test, expect, beforeEach, afterEach } from "vitest";
 import { StrRayStateManager } from "../../state/state-manager";
 import { SessionCoordinator } from "../../delegation/session-coordinator";
-import { SessionCleanupManager, CleanupConfig } from "../../session/session-cleanup-manager";
+import {
+  SessionCleanupManager,
+  CleanupConfig,
+} from "../../session/session-cleanup-manager";
 import { setupStandardMocks } from "../utils/test-utils";
 
 describe("Session Cleanup Mechanism Validation", () => {
@@ -476,7 +479,7 @@ describe("Session Cleanup Mechanism Validation", () => {
       cleanupManager.registerSession(sessionId);
 
       // Wait for debounced persistence to complete
-      await new Promise(resolve => setTimeout(resolve, 150));
+      await new Promise((resolve) => setTimeout(resolve, 150));
 
       const persistedData = stateManager.get("cleanup:session_metadata");
       expect(persistedData).toBeDefined();
@@ -502,7 +505,7 @@ describe("Session Cleanup Mechanism Validation", () => {
       stateManager.set("cleanup:session_metadata", mockMetadata);
 
       const newCleanupManager = new SessionCleanupManager(stateManager);
-      await new Promise(resolve => setTimeout(resolve, 10)); // Wait for initialization
+      await new Promise((resolve) => setTimeout(resolve, 10)); // Wait for initialization
 
       const loadedMetadata = newCleanupManager.getSessionMetadata(sessionId);
       expect(loadedMetadata).toBeDefined();
@@ -515,7 +518,7 @@ describe("Session Cleanup Mechanism Validation", () => {
       stateManager.set("cleanup:session_metadata", "invalid-data");
 
       const newCleanupManager = new SessionCleanupManager(stateManager);
-      await new Promise(resolve => setTimeout(resolve, 10)); // Wait for initialization
+      await new Promise((resolve) => setTimeout(resolve, 10)); // Wait for initialization
 
       expect(newCleanupManager).toBeDefined();
 

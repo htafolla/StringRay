@@ -7,7 +7,11 @@ export class SessionSecurityValidator {
   private stateManager: any;
   private securityScanner: any;
 
-  constructor(sessionCoordinator: any, stateManager: any, securityScanner: any) {
+  constructor(
+    sessionCoordinator: any,
+    stateManager: any,
+    securityScanner: any,
+  ) {
     this.sessionCoordinator = sessionCoordinator;
     this.stateManager = stateManager;
     this.securityScanner = securityScanner;
@@ -34,7 +38,7 @@ export class SessionSecurityValidator {
       return {
         valid: false,
         issues,
-        permissions: { readAccess: [], writeAccess: [], adminAccess: [] }
+        permissions: { readAccess: [], writeAccess: [], adminAccess: [] },
       };
     }
 
@@ -42,7 +46,7 @@ export class SessionSecurityValidator {
     const permissions = {
       readAccess: [] as string[],
       writeAccess: [] as string[],
-      adminAccess: [] as string[]
+      adminAccess: [] as string[],
     };
 
     // For now, assume standard agent permissions
@@ -69,16 +73,22 @@ export class SessionSecurityValidator {
 
     // Validate permission consistency
     const totalAgents = agents.length;
-    const hasAccess = permissions.readAccess.length + permissions.writeAccess.length + permissions.adminAccess.length;
+    const hasAccess =
+      permissions.readAccess.length +
+      permissions.writeAccess.length +
+      permissions.adminAccess.length;
 
-    if (hasAccess < totalAgents * 0.5) { // Less than 50% have any access
-      issues.push(`Insufficient access distribution: only ${(hasAccess / totalAgents * 100).toFixed(1)}% of agents have permissions`);
+    if (hasAccess < totalAgents * 0.5) {
+      // Less than 50% have any access
+      issues.push(
+        `Insufficient access distribution: only ${((hasAccess / totalAgents) * 100).toFixed(1)}% of agents have permissions`,
+      );
     }
 
     return {
       valid: issues.length === 0,
       issues,
-      permissions
+      permissions,
     };
   }
 
@@ -113,7 +123,10 @@ export class SessionSecurityValidator {
     }
 
     // Check context encryption
-    const sharedContext = this.sessionCoordinator.getSharedContext(sessionId, "*");
+    const sharedContext = this.sessionCoordinator.getSharedContext(
+      sessionId,
+      "*",
+    );
     if (sharedContext) {
       for (const [key, value] of Object.entries(sharedContext)) {
         if (this.containsSensitiveData(key, value)) {
@@ -130,7 +143,9 @@ export class SessionSecurityValidator {
     // Check communication encryption
     const communications = this.sessionCoordinator.getCommunications(sessionId);
     if (communications && communications.length > 0) {
-      const unencryptedCount = communications.filter((comm: any) => !comm.encrypted).length;
+      const unencryptedCount = communications.filter(
+        (comm: any) => !comm.encrypted,
+      ).length;
       if (unencryptedCount > 0) {
         issues.push(`${unencryptedCount} communications not encrypted`);
         integrityScore -= 0.15;
@@ -148,7 +163,7 @@ export class SessionSecurityValidator {
       valid: issues.length === 0 && integrityScore >= 0.8,
       issues,
       integrityScore,
-      encryptedFields
+      encryptedFields,
     };
   }
 
@@ -158,7 +173,7 @@ export class SessionSecurityValidator {
   async validateIsolation(sessionId: string): Promise<{
     valid: boolean;
     issues: string[];
-    isolationLevel: 'strong' | 'moderate' | 'weak';
+    isolationLevel: "strong" | "moderate" | "weak";
     boundaryViolations: string[];
   }> {
     const issues: string[] = [];
@@ -175,11 +190,17 @@ export class SessionSecurityValidator {
 
     // Check for unauthorized access attempts
     const accessAttempts = this.monitorAccessAttempts(sessionId);
-    const unauthorizedAttempts = accessAttempts.filter(attempt => !attempt.authorized);
+    const unauthorizedAttempts = accessAttempts.filter(
+      (attempt) => !attempt.authorized,
+    );
 
     if (unauthorizedAttempts.length > 0) {
-      issues.push(`${unauthorizedAttempts.length} unauthorized access attempts detected`);
-      boundaryViolations.push(`unauthorized-access-${unauthorizedAttempts.length}`);
+      issues.push(
+        `${unauthorizedAttempts.length} unauthorized access attempts detected`,
+      );
+      boundaryViolations.push(
+        `unauthorized-access-${unauthorizedAttempts.length}`,
+      );
     }
 
     // Check resource isolation
@@ -190,18 +211,18 @@ export class SessionSecurityValidator {
     }
 
     // Determine isolation level
-    let isolationLevel: 'strong' | 'moderate' | 'weak' = 'strong';
+    let isolationLevel: "strong" | "moderate" | "weak" = "strong";
     if (boundaryViolations.length > 5) {
-      isolationLevel = 'weak';
+      isolationLevel = "weak";
     } else if (boundaryViolations.length > 0) {
-      isolationLevel = 'moderate';
+      isolationLevel = "moderate";
     }
 
     return {
       valid: boundaryViolations.length === 0,
       issues,
       isolationLevel,
-      boundaryViolations
+      boundaryViolations,
     };
   }
 
@@ -222,12 +243,17 @@ export class SessionSecurityValidator {
     const totalEvents = events.length;
 
     // Check audit coverage for different event types
-    const eventTypes = ['access', 'modification', 'communication', 'state_change'];
+    const eventTypes = [
+      "access",
+      "modification",
+      "communication",
+      "state_change",
+    ];
     let auditedEvents = 0;
 
     for (const eventType of eventTypes) {
-      const typeEvents = events.filter(e => e.type === eventType);
-      const auditedTypeEvents = typeEvents.filter(e => e.audited);
+      const typeEvents = events.filter((e) => e.type === eventType);
+      const auditedTypeEvents = typeEvents.filter((e) => e.audited);
 
       if (auditedTypeEvents.length < typeEvents.length) {
         const gapCount = typeEvents.length - auditedTypeEvents.length;
@@ -240,8 +266,11 @@ export class SessionSecurityValidator {
 
     const auditCoverage = totalEvents > 0 ? auditedEvents / totalEvents : 1.0;
 
-    if (auditCoverage < 0.95) { // Less than 95% coverage
-      issues.push(`Insufficient audit coverage: ${(auditCoverage * 100).toFixed(1)}%`);
+    if (auditCoverage < 0.95) {
+      // Less than 95% coverage
+      issues.push(
+        `Insufficient audit coverage: ${(auditCoverage * 100).toFixed(1)}%`,
+      );
     }
 
     // Check for audit log tampering
@@ -255,27 +284,35 @@ export class SessionSecurityValidator {
       valid: issues.length === 0 && auditCoverage >= 0.95,
       issues,
       auditCoverage,
-      gaps
+      gaps,
     };
   }
 
-  private getAgentPermissions(sessionId: string, agentId: string): {
+  private getAgentPermissions(
+    sessionId: string,
+    agentId: string,
+  ): {
     read: boolean;
     write: boolean;
     admin: boolean;
   } {
     // Check state manager for agent permissions
-    const perms = this.stateManager.get(`session:${sessionId}:permissions:${agentId}`);
+    const perms = this.stateManager.get(
+      `session:${sessionId}:permissions:${agentId}`,
+    );
     return perms || { read: false, write: false, admin: false };
   }
 
   private isTrustedAgent(agentId: string): boolean {
     // Check if agent is in trusted list
-    const trustedAgents = this.stateManager.get('system:trusted-agents') || [];
+    const trustedAgents = this.stateManager.get("system:trusted-agents") || [];
     return trustedAgents.includes(agentId);
   }
 
-  private validateStateIntegrity(state: any): { valid: boolean; issues: string[] } {
+  private validateStateIntegrity(state: any): {
+    valid: boolean;
+    issues: string[];
+  } {
     const issues: string[] = [];
 
     // Check for required fields
@@ -292,15 +329,17 @@ export class SessionSecurityValidator {
 
   private isEncrypted(data: any): boolean {
     // Simple check for encrypted data (would use proper crypto validation)
-    if (typeof data === 'string' && data.startsWith('encrypted:')) {
+    if (typeof data === "string" && data.startsWith("encrypted:")) {
       return true;
     }
     return false;
   }
 
   private containsSensitiveData(key: string, value: any): boolean {
-    const sensitiveKeys = ['password', 'token', 'secret', 'key', 'credential'];
-    return sensitiveKeys.some(sensitive => key.toLowerCase().includes(sensitive));
+    const sensitiveKeys = ["password", "token", "secret", "key", "credential"];
+    return sensitiveKeys.some((sensitive) =>
+      key.toLowerCase().includes(sensitive),
+    );
   }
 
   private async validateChecksums(sessionId: string): Promise<boolean> {
@@ -319,7 +358,7 @@ export class SessionSecurityValidator {
     return {
       state: this.stateManager.get(`session:${sessionId}:state`),
       context: this.sessionCoordinator.getSharedContext(sessionId, "*"),
-      communications: this.sessionCoordinator.getCommunications(sessionId)
+      communications: this.sessionCoordinator.getCommunications(sessionId),
     };
   }
 
@@ -327,7 +366,9 @@ export class SessionSecurityValidator {
     const leaks: string[] = [];
 
     // Check for cross-session references
-    const otherSessions = this.getAllSessions().filter(id => id !== sessionId);
+    const otherSessions = this.getAllSessions().filter(
+      (id) => id !== sessionId,
+    );
 
     for (const otherSessionId of otherSessions) {
       if (this.containsReference(sessionData, otherSessionId)) {
@@ -343,17 +384,25 @@ export class SessionSecurityValidator {
     return this.stateManager.get(`session:${sessionId}:access-attempts`) || [];
   }
 
-  private checkResourceIsolation(sessionId: string): { isolated: boolean; issues?: string[] } {
+  private checkResourceIsolation(sessionId: string): {
+    isolated: boolean;
+    issues?: string[];
+  } {
     // Check if session resources are properly isolated
-    const sessionResources = this.stateManager.get(`session:${sessionId}:resources`);
-    const globalResources = this.stateManager.get('system:resources');
+    const sessionResources = this.stateManager.get(
+      `session:${sessionId}:resources`,
+    );
+    const globalResources = this.stateManager.get("system:resources");
 
     // Simple isolation check
-    const isolated = !this.hasResourceOverlap(sessionResources, globalResources);
+    const isolated = !this.hasResourceOverlap(
+      sessionResources,
+      globalResources,
+    );
 
     return {
       isolated,
-      issues: isolated ? [] : ["Resource overlap detected"]
+      issues: isolated ? [] : ["Resource overlap detected"],
     };
   }
 
@@ -364,7 +413,9 @@ export class SessionSecurityValidator {
   private detectAuditTampering(sessionId: string): boolean {
     // Check for audit log integrity
     const auditLog = this.getSessionEvents(sessionId);
-    const expectedHash = this.stateManager.get(`session:${sessionId}:audit-hash`);
+    const expectedHash = this.stateManager.get(
+      `session:${sessionId}:audit-hash`,
+    );
 
     if (!expectedHash) return false;
 
@@ -374,7 +425,7 @@ export class SessionSecurityValidator {
 
   private getAllSessions(): string[] {
     // Get list of all active sessions
-    return this.stateManager.get('system:active-sessions') || [];
+    return this.stateManager.get("system:active-sessions") || [];
   }
 
   private containsReference(data: any, sessionId: string): boolean {
@@ -382,21 +433,24 @@ export class SessionSecurityValidator {
     return dataStr.includes(sessionId);
   }
 
-  private hasResourceOverlap(sessionResources: any, globalResources: any): boolean {
+  private hasResourceOverlap(
+    sessionResources: any,
+    globalResources: any,
+  ): boolean {
     if (!sessionResources || !globalResources) return false;
 
     // Check for overlapping resource identifiers
     const sessionIds = Object.keys(sessionResources);
     const globalIds = Object.keys(globalResources);
 
-    return sessionIds.some(id => globalIds.includes(id));
+    return sessionIds.some((id) => globalIds.includes(id));
   }
 
   private calculateChecksum(data: any): string {
-    const crypto = require('crypto');
-    const hash = crypto.createHash('sha256');
+    const crypto = require("crypto");
+    const hash = crypto.createHash("sha256");
     hash.update(JSON.stringify(data));
-    return hash.digest('hex');
+    return hash.digest("hex");
   }
 
   private calculateHash(data: any): string {

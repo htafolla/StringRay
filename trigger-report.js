@@ -1,6 +1,8 @@
-import { StrRayOrchestrator } from './dist/orchestrator.js';
+import { StrRayOrchestrator } from "./dist/orchestrator.js";
 
-console.log('🚀 Starting StrRay Framework to trigger automated report generation...');
+console.log(
+  "🚀 Starting StrRay Framework to trigger automated report generation...",
+);
 
 // Initialize orchestrator - this will trigger the post-processor on completion
 const orchestrator = new StrRayOrchestrator({
@@ -8,4 +10,6 @@ const orchestrator = new StrRayOrchestrator({
   taskTimeout: 30000,
 });
 
-console.log('✅ Framework initialized - post-processor will auto-generate report when operations complete');
+console.log(
+  "✅ Framework initialized - post-processor will auto-generate report when operations complete",
+);

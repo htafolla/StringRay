@@ -84,13 +84,13 @@ export class SessionMonitor {
     this.config = {
       healthCheckIntervalMs: 30000,
       metricsCollectionIntervalMs: 60000,
-  alertThresholds: {
-    maxResponseTime: 5000,
-    maxErrorRate: 0.1,
-    maxMemoryUsage: 100 * 1024 * 1024,
-    minCoordinationEfficiency: 0.8,
-    maxConflicts: 10,
-  },
+      alertThresholds: {
+        maxResponseTime: 5000,
+        maxErrorRate: 0.1,
+        maxMemoryUsage: 100 * 1024 * 1024,
+        minCoordinationEfficiency: 0.8,
+        maxConflicts: 10,
+      },
       enableAlerts: true,
       enableMetrics: true,
       ...config,
@@ -206,7 +206,9 @@ export class SessionMonitor {
       // Check for coordination issues
       const conflictCount = this.countSessionConflicts(sessionId);
       if (conflictCount > this.config.alertThresholds.maxConflicts) {
-        issues.push(`High conflict rate: ${conflictCount} unresolved conflicts`);
+        issues.push(
+          `High conflict rate: ${conflictCount} unresolved conflicts`,
+        );
         status = "degraded";
       }
 
@@ -479,7 +481,7 @@ export class SessionMonitor {
     const perInteractionMemory = 8 * 1024; // 8KB per interaction
     const totalInteractions = metrics.totalInteractions;
 
-    return baseMemory + (totalInteractions * perInteractionMemory);
+    return baseMemory + totalInteractions * perInteractionMemory;
   }
 
   private countSessionConflicts(sessionId: string): number {
@@ -499,8 +501,12 @@ export class SessionMonitor {
     const totalResponseTime = history.reduce((sum, metric) => {
       // Estimate response time based on coordination efficiency
       // This is a simplified calculation
-      return sum + (metric.successfulInteractions > 0 ?
-        1000 / metric.successfulInteractions : 1000);
+      return (
+        sum +
+        (metric.successfulInteractions > 0
+          ? 1000 / metric.successfulInteractions
+          : 1000)
+      );
     }, 0);
 
     return totalResponseTime / history.length;

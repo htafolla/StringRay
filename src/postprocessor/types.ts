@@ -39,7 +39,7 @@ export interface PostProcessorConfig {
   redeploy: {
     maxRetries: number;
     retryDelay: number;
-    backoffStrategy: string;
+    backoffStrategy: "linear" | "exponential";
     canaryEnabled: boolean;
     canaryPhases: number;
     canaryTrafficIncrement: number;

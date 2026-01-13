@@ -23,7 +23,9 @@ export class SessionMigrationValidator {
     const warnings: string[] = [];
 
     // Validate session exists
-    const sessionStatus = this.sessionCoordinator.getSessionStatus(plan.sessionId);
+    const sessionStatus = this.sessionCoordinator.getSessionStatus(
+      plan.sessionId,
+    );
     if (!sessionStatus) {
       errors.push(`Session ${plan.sessionId} does not exist`);
       return { valid: false, errors, warnings };
@@ -41,7 +43,7 @@ export class SessionMigrationValidator {
       "transfer_dependencies",
       "transfer_context",
       "notify_agents",
-      "verify_migration"
+      "verify_migration",
     ];
 
     for (const requiredStep of requiredSteps) {
@@ -51,7 +53,10 @@ export class SessionMigrationValidator {
     }
 
     // Check for shared context that needs to be transferred
-    const sharedContext = this.sessionCoordinator.getSharedContext(plan.sessionId, "*");
+    const sharedContext = this.sessionCoordinator.getSharedContext(
+      plan.sessionId,
+      "*",
+    );
     if (sharedContext) {
       warnings.push(`Session has shared context that will be transferred`);
     }
@@ -59,21 +64,25 @@ export class SessionMigrationValidator {
     // Validate session activity
     const lastActivity = sessionStatus.lastActivity;
     const timeSinceActivity = Date.now() - lastActivity;
-    if (timeSinceActivity < 5000) { // Less than 5 seconds
+    if (timeSinceActivity < 5000) {
+      // Less than 5 seconds
       warnings.push("Session is very active - migration may cause disruption");
     }
 
     return {
       valid: errors.length === 0,
       errors,
-      warnings
+      warnings,
     };
   }
 
   /**
    * Validate migration execution results
    */
-  async validateMigrationResult(plan: any, success: boolean): Promise<{
+  async validateMigrationResult(
+    plan: any,
+    success: boolean,
+  ): Promise<{
     valid: boolean;
     issues: string[];
   }> {
@@ -85,13 +94,20 @@ export class SessionMigrationValidator {
     }
 
     // Verify coordinator update
-    const coordinatorData = this.stateManager.get(`session:${plan.sessionId}:coordinator`);
-    if (!coordinatorData || coordinatorData.coordinatorId !== plan.targetCoordinator) {
+    const coordinatorData = this.stateManager.get(
+      `session:${plan.sessionId}:coordinator`,
+    );
+    if (
+      !coordinatorData ||
+      coordinatorData.coordinatorId !== plan.targetCoordinator
+    ) {
       issues.push("Coordinator not properly updated after migration");
     }
 
     // Verify session is still active
-    const sessionStatus = this.sessionCoordinator.getSessionStatus(plan.sessionId);
+    const sessionStatus = this.sessionCoordinator.getSessionStatus(
+      plan.sessionId,
+    );
     if (!sessionStatus || sessionStatus.status !== "active") {
       issues.push("Session not properly maintained after migration");
     }
@@ -104,7 +120,7 @@ export class SessionMigrationValidator {
 
     return {
       valid: issues.length === 0,
-      issues
+      issues,
     };
   }
 
@@ -121,7 +137,7 @@ export class SessionMigrationValidator {
     if (rollbackSteps.length === 0) {
       return {
         canRollback: false,
-        reason: "No rollback steps defined"
+        reason: "No rollback steps defined",
       };
     }
 
@@ -130,7 +146,7 @@ export class SessionMigrationValidator {
     if (rollbackSteps.length !== migrationSteps.length) {
       return {
         canRollback: false,
-        reason: "Rollback steps don't match migration steps"
+        reason: "Rollback steps don't match migration steps",
       };
     }
 

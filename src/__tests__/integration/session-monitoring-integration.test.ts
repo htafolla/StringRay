@@ -35,7 +35,7 @@ describe("Session Monitoring Integration", () => {
         },
         enableAlerts: true,
         enableMetrics: true,
-      }
+      },
     );
   });
 
@@ -465,7 +465,7 @@ describe("Session Monitoring Integration", () => {
       await sessionMonitor.performHealthCheck(sessionId);
 
       // Wait for debounced persistence to complete
-      await new Promise(resolve => setTimeout(resolve, 150));
+      await new Promise((resolve) => setTimeout(resolve, 150));
 
       const persistedHealth = stateManager.get("monitor:health");
       expect(persistedHealth).toBeDefined();
@@ -482,7 +482,7 @@ describe("Session Monitoring Integration", () => {
       sessionMonitor.collectMetrics(sessionId);
 
       // Wait for debounced persistence to complete
-      await new Promise(resolve => setTimeout(resolve, 150));
+      await new Promise((resolve) => setTimeout(resolve, 150));
 
       const persistedMetrics = stateManager.get("monitor:metrics");
       expect(persistedMetrics).toBeDefined();

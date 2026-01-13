@@ -8,26 +8,29 @@ describe("SessionMigrationValidator", () => {
     // Mock dependencies
     const mockStateManager = {
       get: (key: string) => {
-        if (key.includes('coordinator')) {
-          return { coordinatorId: 'new-coordinator' };
+        if (key.includes("coordinator")) {
+          return { coordinatorId: "new-coordinator" };
         }
-        if (key.includes('shared')) {
+        if (key.includes("shared")) {
           return { transferred: true };
         }
         return null;
-      }
+      },
     };
     const mockSessionCoordinator = {
       getSessionStatus: (sessionId: string) => {
-        if (sessionId === 'non-existent-session') {
+        if (sessionId === "non-existent-session") {
           return null;
         }
-        return { active: true, agentCount: 3, status: 'active' };
+        return { active: true, agentCount: 3, status: "active" };
       },
-      getSharedContext: () => ({ someData: 'test' })
+      getSharedContext: () => ({ someData: "test" }),
     };
 
-    validator = new SessionMigrationValidator(mockStateManager, mockSessionCoordinator);
+    validator = new SessionMigrationValidator(
+      mockStateManager,
+      mockSessionCoordinator,
+    );
   });
 
   describe("validateMigrationPlan", () => {
@@ -41,21 +44,23 @@ describe("SessionMigrationValidator", () => {
           "transfer_dependencies",
           "transfer_context",
           "notify_agents",
-          "verify_migration"
-        ]
+          "verify_migration",
+        ],
       };
 
       const result = await validator.validateMigrationPlan(plan);
 
       expect(result.valid).toBe(true);
       expect(result.errors).toHaveLength(0);
-      expect(result.warnings).toContain("Session has shared context that will be transferred");
+      expect(result.warnings).toContain(
+        "Session has shared context that will be transferred",
+      );
     });
 
     it("should reject plan without target coordinator", async () => {
       const plan = {
         sessionId: "test-session",
-        migrationSteps: ["backup_current_state"]
+        migrationSteps: ["backup_current_state"],
       };
 
       const result = await validator.validateMigrationPlan(plan);
@@ -68,26 +73,30 @@ describe("SessionMigrationValidator", () => {
       const plan = {
         sessionId: "non-existent-session",
         targetCoordinator: "new-coordinator",
-        migrationSteps: ["backup_current_state"]
+        migrationSteps: ["backup_current_state"],
       };
 
       const result = await validator.validateMigrationPlan(plan);
 
       expect(result.valid).toBe(false);
-      expect(result.errors).toContain("Session non-existent-session does not exist");
+      expect(result.errors).toContain(
+        "Session non-existent-session does not exist",
+      );
     });
 
     it("should reject plan with missing migration steps", async () => {
       const plan = {
         sessionId: "test-session",
         targetCoordinator: "new-coordinator",
-        migrationSteps: ["backup_current_state"] // Missing required steps
+        migrationSteps: ["backup_current_state"], // Missing required steps
       };
 
       const result = await validator.validateMigrationPlan(plan);
 
       expect(result.valid).toBe(false);
-      expect(result.errors).toContain("Missing required migration step: update_coordinator");
+      expect(result.errors).toContain(
+        "Missing required migration step: update_coordinator",
+      );
     });
   });
 
@@ -96,7 +105,7 @@ describe("SessionMigrationValidator", () => {
       const plan = {
         sessionId: "test-session",
         targetCoordinator: "new-coordinator",
-        migrationSteps: ["backup_current_state"]
+        migrationSteps: ["backup_current_state"],
       };
 
       const result = await validator.validateMigrationResult(plan, true);
@@ -109,7 +118,7 @@ describe("SessionMigrationValidator", () => {
       const plan = {
         sessionId: "test-session",
         targetCoordinator: "new-coordinator",
-        migrationSteps: ["backup_current_state"]
+        migrationSteps: ["backup_current_state"],
       };
 
       const result = await validator.validateMigrationResult(plan, false);

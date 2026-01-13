@@ -40,15 +40,18 @@ describe("StrRayStateManager - Persistence Features", () => {
     stateManager = new StrRayStateManager("/test/state.json", true);
 
     // Wait for async initialization to complete
-    await new Promise(resolve => setTimeout(resolve, 10));
+    await new Promise((resolve) => setTimeout(resolve, 10));
   });
 
   describe("Persistence Initialization", () => {
     it("should handle persistence disabled", async () => {
-      const noPersistManager = new StrRayStateManager("/test/state.json", false);
+      const noPersistManager = new StrRayStateManager(
+        "/test/state.json",
+        false,
+      );
 
       // Wait for initialization
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
 
       expect(noPersistManager.isPersistenceEnabled()).toBe(false);
     });
@@ -61,18 +64,22 @@ describe("StrRayStateManager - Persistence Features", () => {
       vi.mocked(mockFs.existsSync).mockReturnValue(false);
 
       const newManager = new StrRayStateManager("/test/state.json", true);
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
 
-      expect(mockFs.mkdirSync).toHaveBeenCalledWith("/test/dir", { recursive: true });
+      expect(mockFs.mkdirSync).toHaveBeenCalledWith("/test/dir", {
+        recursive: true,
+      });
     });
 
     it("should load existing state from disk", async () => {
       const existingState = { "test-key": "test-value", "number-key": 42 };
       vi.mocked(mockFs.existsSync).mockReturnValue(true);
-      vi.mocked(mockFs.readFileSync).mockReturnValue(JSON.stringify(existingState));
+      vi.mocked(mockFs.readFileSync).mockReturnValue(
+        JSON.stringify(existingState),
+      );
 
       const newManager = new StrRayStateManager("/test/state.json", true);
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
 
       expect(newManager.get("test-key")).toBe("test-value");
       expect(newManager.get("number-key")).toBe(42);
@@ -83,7 +90,7 @@ describe("StrRayStateManager - Persistence Features", () => {
       vi.mocked(mockFs.readFileSync).mockReturnValue("{ invalid json");
 
       const newManager = new StrRayStateManager("/test/state.json", true);
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
 
       // Should disable persistence on corruption
       expect(newManager.isPersistenceEnabled()).toBe(false);
@@ -146,11 +153,11 @@ describe("StrRayStateManager - Persistence Features", () => {
       stateManager.set("test-key", "test-value");
 
       // Wait for debounced persistence
-      await new Promise(resolve => setTimeout(resolve, 150));
+      await new Promise((resolve) => setTimeout(resolve, 150));
 
       expect(mockFs.writeFileSync).toHaveBeenCalledWith(
         "/test/state.json",
-        expect.stringContaining("test-key")
+        expect.stringContaining("test-key"),
       );
     });
 
@@ -160,7 +167,7 @@ describe("StrRayStateManager - Persistence Features", () => {
 
       // Clear triggers immediate persistence (no debouncing)
       // Wait a bit for async persistence to complete
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
 
       expect(mockFs.writeFileSync).toHaveBeenCalled();
     });
@@ -171,7 +178,7 @@ describe("StrRayStateManager - Persistence Features", () => {
       stateManager.set("key3", "value3");
 
       // Wait for debouncing to complete
-      await new Promise(resolve => setTimeout(resolve, 150));
+      await new Promise((resolve) => setTimeout(resolve, 150));
 
       // Each key gets its own debounced write (no global debouncing)
       expect(mockFs.writeFileSync).toHaveBeenCalledTimes(3);
@@ -184,7 +191,7 @@ describe("StrRayStateManager - Persistence Features", () => {
       stateManager.set("circular", circular);
       stateManager.set("normal", "value");
 
-      await new Promise(resolve => setTimeout(resolve, 150));
+      await new Promise((resolve) => setTimeout(resolve, 150));
 
       const writtenData = JSON.parse(mockFs.writeFileSync.mock.calls[0][1]);
       expect(writtenData["normal"]).toBe("value");
@@ -214,7 +221,7 @@ describe("StrRayStateManager - Persistence Features", () => {
       expect(stats.pendingWrites).toBe(2); // Each key has its own pending write
 
       // Wait for persistence to complete
-      await new Promise(resolve => setTimeout(resolve, 150));
+      await new Promise((resolve) => setTimeout(resolve, 150));
 
       // Should have no pending writes after completion
       const finalStats = stateManager.getPersistenceStats();
@@ -222,8 +229,11 @@ describe("StrRayStateManager - Persistence Features", () => {
     });
 
     it("should report correct stats when persistence disabled", async () => {
-      const noPersistManager = new StrRayStateManager("/test/state.json", false);
-      await new Promise(resolve => setTimeout(resolve, 10));
+      const noPersistManager = new StrRayStateManager(
+        "/test/state.json",
+        false,
+      );
+      await new Promise((resolve) => setTimeout(resolve, 10));
 
       noPersistManager.set("test", "value");
 
@@ -245,7 +255,7 @@ describe("StrRayStateManager - Persistence Features", () => {
       expect(() => stateManager.set("test", "value")).not.toThrow();
 
       // Wait for persistence attempt
-      await new Promise(resolve => setTimeout(resolve, 150));
+      await new Promise((resolve) => setTimeout(resolve, 150));
 
       // Value should still be in memory
       expect(stateManager.get("test")).toBe("value");
@@ -257,7 +267,7 @@ describe("StrRayStateManager - Persistence Features", () => {
       });
 
       const failingManager = new StrRayStateManager("/test/state.json", true);
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
 
       expect(failingManager.isPersistenceEnabled()).toBe(false);
     });
@@ -279,10 +289,10 @@ describe("StrRayStateManager - Persistence Features", () => {
       earlyManager.set("early-key", "early-value");
 
       // Wait for initialization
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
 
       // Should eventually persist
-      await new Promise(resolve => setTimeout(resolve, 150));
+      await new Promise((resolve) => setTimeout(resolve, 150));
 
       expect(mockFs.writeFileSync).toHaveBeenCalled();
       expect(earlyManager.get("early-key")).toBe("early-value");

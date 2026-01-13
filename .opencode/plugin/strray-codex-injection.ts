@@ -13,9 +13,40 @@ import * as fs from "fs";
 import * as path from "path";
 import { spawn } from "child_process";
 
-// Import StrRay framework components from dist
-import { ProcessorManager } from "../../dist/processors/processor-manager.js";
-import { StrRayStateManager } from "../../dist/state/state-manager.js";
+// Dynamic import to handle npm deployment paths
+let ProcessorManager: any;
+let StrRayStateManager: any;
+
+async function loadStrRayComponents() {
+  if (ProcessorManager && StrRayStateManager) return;
+
+  try {
+    // Try relative import first (development)
+    ({ ProcessorManager } = await import("../../dist/processors/processor-manager.js"));
+    ({ StrRayStateManager } = await import("../../dist/state/state-manager.js"));
+  } catch (error) {
+    // Fallback for npm deployment - find plugin in node_modules
+    const pluginPaths = [
+      "strray-framework",
+      "@strray/strray-framework",
+      "oh-my-opencode/plugins/strray-framework"
+    ];
+
+    for (const pluginPath of pluginPaths) {
+      try {
+        ({ ProcessorManager } = await import(`../../../../../node_modules/${pluginPath}/dist/processors/processor-manager.js`));
+        ({ StrRayStateManager } = await import(`../../../../../node_modules/${pluginPath}/dist/state/state-manager.js`));
+        break;
+      } catch {
+        continue;
+      }
+    }
+
+    if (!ProcessorManager || !StrRayStateManager) {
+      throw new Error("StrRay Framework components not found. Ensure the plugin is properly installed.");
+    }
+  }
+}
 
 function spawnPromise(
   command: string,

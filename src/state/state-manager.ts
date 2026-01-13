@@ -56,14 +56,24 @@ export class StrRayStateManager implements StateManager {
           this.schedulePersistence(key);
         }
         this.earlyOperationsQueue = [];
-        frameworkLogger.log("state-manager", "processed queued early operations", "info", {
-          operationsProcessed: this.earlyOperationsQueue.length,
-        });
+        frameworkLogger.log(
+          "state-manager",
+          "processed queued early operations",
+          "info",
+          {
+            operationsProcessed: this.earlyOperationsQueue.length,
+          },
+        );
       }
     } catch (error) {
-      frameworkLogger.log("state-manager", "persistence initialization failed", "error", {
-        error: error instanceof Error ? error.message : String(error),
-      });
+      frameworkLogger.log(
+        "state-manager",
+        "persistence initialization failed",
+        "error",
+        {
+          error: error instanceof Error ? error.message : String(error),
+        },
+      );
       // Continue without persistence rather than failing
       this.persistenceEnabled = false;
       this.initialized = true;
@@ -138,7 +148,12 @@ export class StrRayStateManager implements StateManager {
       if (!this.earlyOperationsQueue.includes(key)) {
         this.earlyOperationsQueue.push(key);
       }
-      frameworkLogger.log("state-manager", "set called before initialization, queued for persistence", "debug", { key });
+      frameworkLogger.log(
+        "state-manager",
+        "set called before initialization, queued for persistence",
+        "debug",
+        { key },
+      );
     }
 
     frameworkLogger.log("state-manager", "set operation", "success", { key });
@@ -147,7 +162,12 @@ export class StrRayStateManager implements StateManager {
   clear(key: string): void {
     // Ensure persistence is initialized
     if (!this.initialized) {
-      frameworkLogger.log("state-manager", "clear called before initialization", "error", { key });
+      frameworkLogger.log(
+        "state-manager",
+        "clear called before initialization",
+        "error",
+        { key },
+      );
       return;
     }
 

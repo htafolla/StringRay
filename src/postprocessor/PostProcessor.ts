@@ -152,16 +152,15 @@ export class PostProcessor {
     score += Math.min(totalJobs * 2, 30);
 
     // Duration factor (0-20 points) - longer operations are more complex
-    const avgDuration = monitoringResults.reduce(
-      (sum, result) => sum + result.duration,
-      0,
-    ) / Math.max(monitoringResults.length, 1);
+    const avgDuration =
+      monitoringResults.reduce((sum, result) => sum + result.duration, 0) /
+      Math.max(monitoringResults.length, 1);
     score += Math.min(avgDuration / 60000, 20); // 1 point per minute
 
     // Success rate factor (0-30 points) - lower success rates indicate complexity
-    const successRate = monitoringResults.filter(
-      (r) => r.overallStatus === "success",
-    ).length / Math.max(monitoringResults.length, 1);
+    const successRate =
+      monitoringResults.filter((r) => r.overallStatus === "success").length /
+      Math.max(monitoringResults.length, 1);
     score += (1 - successRate) * 30; // More failures = higher complexity
 
     return Math.min(Math.max(score, 0), 100);
@@ -170,18 +169,26 @@ export class PostProcessor {
   /**
    * Validate generated reports for hidden issues
    */
-  private async validateGeneratedReport(reportPath: string, reportType: string): Promise<void> {
+  private async validateGeneratedReport(
+    reportPath: string,
+    reportType: string,
+  ): Promise<void> {
     try {
       if (this.reportValidator) {
-        const validation = await this.reportValidator.validateReportContent(reportPath, reportType as any);
+        const validation = await this.reportValidator.validateReportContent(
+          reportPath,
+          reportType as any,
+        );
 
         if (!validation.valid) {
           console.warn(`⚠️ Report validation failed for ${reportPath}:`);
-          validation.issues.forEach(issue => console.warn(`   • ${issue}`));
+          validation.issues.forEach((issue) => console.warn(`   • ${issue}`));
 
           if (validation.details.criticalErrors.length > 0) {
             console.error(`🚨 Critical errors found in report:`);
-            validation.details.criticalErrors.forEach(err => console.error(`   • ${err}`));
+            validation.details.criticalErrors.forEach((err) =>
+              console.error(`   • ${err}`),
+            );
           }
         } else {
           console.log(`✅ Report validation passed for ${reportPath}`);
@@ -271,7 +278,9 @@ export class PostProcessor {
       // Rule 47: Integration Testing Mandate
       const integrationCheck = await this.checkIntegrationTesting(context);
       if (!integrationCheck.passed) {
-        console.log(`❌ Integration testing violation: ${integrationCheck.message}`);
+        console.log(
+          `❌ Integration testing violation: ${integrationCheck.message}`,
+        );
         return false;
       }
 
@@ -285,19 +294,25 @@ export class PostProcessor {
       // Rule 49: Feature Completeness Validation
       const completenessCheck = await this.checkFeatureCompleteness(context);
       if (!completenessCheck.passed) {
-        console.log(`❌ Feature completeness violation: ${completenessCheck.message}`);
+        console.log(
+          `❌ Feature completeness violation: ${completenessCheck.message}`,
+        );
         return false;
       }
 
       console.log("✅ All architectural compliance checks passed");
       return true;
     } catch (error) {
-      console.log(`❌ Architectural compliance validation failed: ${error instanceof Error ? error.message : String(error)}`);
+      console.log(
+        `❌ Architectural compliance validation failed: ${error instanceof Error ? error.message : String(error)}`,
+      );
       return false;
     }
   }
 
-  private async checkSystemIntegrity(context: PostProcessorContext): Promise<{ passed: boolean; message: string }> {
+  private async checkSystemIntegrity(
+    context: PostProcessorContext,
+  ): Promise<{ passed: boolean; message: string }> {
     // Check if all critical framework components are active
     const stateManager = (globalThis as any).strRayStateManager;
     const postProcessor = (globalThis as any).strRayPostProcessor;
@@ -312,13 +327,20 @@ export class PostProcessor {
     return { passed: true, message: "System integrity verified" };
   }
 
-  private async checkIntegrationTesting(context: PostProcessorContext): Promise<{ passed: boolean; message: string }> {
+  private async checkIntegrationTesting(
+    context: PostProcessorContext,
+  ): Promise<{ passed: boolean; message: string }> {
     // For now, we assume integration testing has been run as part of the CI/CD process
     // In a full implementation, this would check actual test results
-    return { passed: true, message: "Integration testing assumed to be completed in CI/CD pipeline" };
+    return {
+      passed: true,
+      message: "Integration testing assumed to be completed in CI/CD pipeline",
+    };
   }
 
-  private async checkPathResolution(context: PostProcessorContext): Promise<{ passed: boolean; message: string }> {
+  private async checkPathResolution(
+    context: PostProcessorContext,
+  ): Promise<{ passed: boolean; message: string }> {
     // Check for path resolution issues in committed files
     // This would require reading the actual file contents from git
     // For now, we verify that the framework's path resolution is working
@@ -329,32 +351,47 @@ export class PostProcessor {
 
     // Test path resolution with a sample path
     try {
-      const resolvedPath = pathResolver.resolveAgentPath('test-agent');
-      if (resolvedPath.includes('../') || resolvedPath.includes('./dist')) {
-        return { passed: false, message: "Path resolution returning hardcoded paths" };
+      const resolvedPath = pathResolver.resolveAgentPath("test-agent");
+      if (resolvedPath.includes("../") || resolvedPath.includes("./dist")) {
+        return {
+          passed: false,
+          message: "Path resolution returning hardcoded paths",
+        };
       }
       return { passed: true, message: "Path resolution abstraction verified" };
     } catch (error) {
-      return { passed: false, message: `Path resolution failed: ${error instanceof Error ? error.message : String(error)}` };
+      return {
+        passed: false,
+        message: `Path resolution failed: ${error instanceof Error ? error.message : String(error)}`,
+      };
     }
   }
 
-  private async checkFeatureCompleteness(context: PostProcessorContext): Promise<{ passed: boolean; message: string }> {
+  private async checkFeatureCompleteness(
+    context: PostProcessorContext,
+  ): Promise<{ passed: boolean; message: string }> {
     // Check for incomplete features in the commit message
     const commitMessage = context.commitSha; // This should be expanded to include commit data
 
     // Look for indicators of incomplete work
     const incompleteIndicators = [
-      'TODO', 'FIXME', 'placeholder', 'incomplete', 'WIP'
+      "TODO",
+      "FIXME",
+      "placeholder",
+      "incomplete",
+      "WIP",
     ];
 
     // This is a simplified check - in practice, we'd analyze the commit and PR data
-    const hasIncompleteIndicators = incompleteIndicators.some(indicator =>
-      commitMessage.includes(indicator)
+    const hasIncompleteIndicators = incompleteIndicators.some((indicator) =>
+      commitMessage.includes(indicator),
     );
 
     if (hasIncompleteIndicators) {
-      return { passed: false, message: "Commit indicates incomplete features or work-in-progress" };
+      return {
+        passed: false,
+        message: "Commit indicates incomplete features or work-in-progress",
+      };
     }
 
     return { passed: true, message: "Feature completeness verified" };
@@ -374,9 +411,12 @@ export class PostProcessor {
     );
 
     // Validate architectural compliance before processing
-    const compliancePassed = await this.validateArchitecturalCompliance(context);
+    const compliancePassed =
+      await this.validateArchitecturalCompliance(context);
     if (!compliancePassed) {
-      console.log("❌ Architectural compliance validation failed - blocking post-processing");
+      console.log(
+        "❌ Architectural compliance validation failed - blocking post-processing",
+      );
       return {
         success: false,
         commitSha: context.commitSha,
@@ -476,12 +516,19 @@ export class PostProcessor {
         );
 
         // Generate automated framework report if threshold met
-        const complexityScore = this.calculateComplexityScore(monitoringResults, context);
-        const reportPath = await this.generateFrameworkReport(complexityScore, context, sessionId);
+        const complexityScore = this.calculateComplexityScore(
+          monitoringResults,
+          context,
+        );
+        const reportPath = await this.generateFrameworkReport(
+          complexityScore,
+          context,
+          sessionId,
+        );
 
         // Validate the generated report for hidden issues
         if (reportPath) {
-          await this.validateGeneratedReport(reportPath, 'framework');
+          await this.validateGeneratedReport(reportPath, "framework");
         }
 
         return result;

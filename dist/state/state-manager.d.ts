@@ -9,6 +9,7 @@ export declare class StrRayStateManager implements StateManager {
     private persistenceEnabled;
     private writeQueue;
     private initialized;
+    private earlyOperationsQueue;
     constructor(persistencePath?: string, persistenceEnabled?: boolean);
     private initializePersistence;
     private persistToDisk;

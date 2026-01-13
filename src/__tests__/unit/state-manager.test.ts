@@ -7,8 +7,10 @@ describe("StrRayStateManager", () => {
 
   beforeEach(async () => {
     setupStandardMocks();
-    stateManager = new StrRayStateManager(`/test/state-manager-${Date.now()}.json`);
-    await new Promise(resolve => setTimeout(resolve, 10)); // Wait for initialization
+    stateManager = new StrRayStateManager(
+      `/test/state-manager-${Date.now()}.json`,
+    );
+    await new Promise((resolve) => setTimeout(resolve, 10)); // Wait for initialization
   });
 
   describe("get method", () => {

@@ -5,6 +5,7 @@ export class StrRayStateManager {
     persistenceEnabled;
     writeQueue = new Map();
     initialized = false;
+    earlyOperationsQueue = []; // Queue keys that need persistence after init
     constructor(persistencePath = ".opencode/state", persistenceEnabled = true) {
         this.persistencePath = persistencePath;
         this.persistenceEnabled = persistenceEnabled;
@@ -35,6 +36,16 @@ export class StrRayStateManager {
                 });
             }
             this.initialized = true;
+            // Process any early operations that were queued
+            if (this.persistenceEnabled && this.earlyOperationsQueue.length > 0) {
+                for (const key of this.earlyOperationsQueue) {
+                    this.schedulePersistence(key);
+                }
+                this.earlyOperationsQueue = [];
+                frameworkLogger.log("state-manager", "processed queued early operations", "info", {
+                    operationsProcessed: this.earlyOperationsQueue.length,
+                });
+            }
         }
         catch (error) {
             frameworkLogger.log("state-manager", "persistence initialization failed", "error", {
@@ -88,13 +99,6 @@ export class StrRayStateManager {
         this.writeQueue.set(key, timeout);
     }
     get(key) {
-        // If not initialized, return undefined but don't log error for normal operation
-        // Initialization happens asynchronously, so early calls are expected
-        if (!this.initialized) {
-            // Only log as debug, not error, since this is expected during startup
-            frameworkLogger.log("state-manager", "get called before initialization", "debug", { key });
-            return undefined;
-        }
         const value = this.store.get(key);
         frameworkLogger.log("state-manager", "get operation", "info", {
             key,
@@ -111,6 +115,9 @@ export class StrRayStateManager {
         }
         else if (!this.initialized) {
             // Queue for persistence once initialized
+            if (!this.earlyOperationsQueue.includes(key)) {
+                this.earlyOperationsQueue.push(key);
+            }
             frameworkLogger.log("state-manager", "set called before initialization, queued for persistence", "debug", { key });
         }
         frameworkLogger.log("state-manager", "set operation", "success", { key });

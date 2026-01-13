@@ -14,7 +14,10 @@ describe("Cross-Session State Sharing", () => {
     stateManager = new StrRayStateManager();
     await new Promise((resolve) => setTimeout(resolve, 10)); // Wait for initialization
     sessionCoordinator = new SessionCoordinator(stateManager);
-    stateManagerInstance = new SessionStateManager(stateManager, sessionCoordinator);
+    stateManagerInstance = new SessionStateManager(
+      stateManager,
+      sessionCoordinator,
+    );
   });
 
   afterEach(() => {

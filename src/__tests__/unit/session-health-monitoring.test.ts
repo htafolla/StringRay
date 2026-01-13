@@ -8,41 +8,41 @@ describe("Session Health Monitoring - Real Metrics", () => {
 
   beforeEach(async () => {
     stateManager = new StrRayStateManager();
-    await new Promise(resolve => setTimeout(resolve, 10)); // Wait for initialization
+    await new Promise((resolve) => setTimeout(resolve, 10)); // Wait for initialization
 
     // Mock session coordinator with realistic data
     const mockCoordinator = {
       getSessionStatus: (sessionId: string) => {
-        if (sessionId === 'non-existent-session') {
+        if (sessionId === "non-existent-session") {
           return null;
         }
         return {
-          active: sessionId === 'healthy-session',
-          agentCount: sessionId === 'healthy-session' ? 3 : 1
+          active: sessionId === "healthy-session",
+          agentCount: sessionId === "healthy-session" ? 3 : 1,
         };
       },
       getCommunications: (sessionId: string) => {
-        if (sessionId === 'high-conflict-session') {
+        if (sessionId === "high-conflict-session") {
           return Array.from({ length: 20 }, (_, i) => ({
             from: `agent-${i % 3}`,
             to: `agent-${(i + 1) % 3}`,
-            timestamp: Date.now() - (i * 1000),
-            encrypted: true
+            timestamp: Date.now() - i * 1000,
+            encrypted: true,
           }));
         }
         return Array.from({ length: 10 }, (_, i) => ({
           from: `agent-${i % 2}`,
           to: `agent-${(i + 1) % 2}`,
-          timestamp: Date.now() - (i * 2000),
-          encrypted: true
+          timestamp: Date.now() - i * 2000,
+          encrypted: true,
         }));
       },
-      getSharedContext: () => ({})
+      getSharedContext: () => ({}),
     };
 
     // Mock cleanup manager
     const mockCleanupManager = {
-      getSessionMetadata: () => null
+      getSessionMetadata: () => null,
     };
 
     sessionMonitor = new SessionMonitor(
@@ -57,17 +57,17 @@ describe("Session Health Monitoring - Real Metrics", () => {
           maxErrorRate: 0.1,
           maxMemoryUsage: 100 * 1024 * 1024,
           minCoordinationEfficiency: 0.8,
-          maxConflicts: 10
+          maxConflicts: 10,
         },
         enableAlerts: true,
-        enableMetrics: true
-      }
+        enableMetrics: true,
+      },
     );
   });
 
   describe("Memory Usage Calculation", () => {
     it("should calculate realistic memory usage for active sessions", async () => {
-      const metrics = sessionMonitor.collectMetrics('healthy-session');
+      const metrics = sessionMonitor.collectMetrics("healthy-session");
 
       // Verify collectMetrics returns data for existing session
       expect(metrics).not.toBeNull();
@@ -76,7 +76,7 @@ describe("Session Health Monitoring - Real Metrics", () => {
     });
 
     it("should return null for non-existent sessions", async () => {
-      const metrics = sessionMonitor.collectMetrics('non-existent-session');
+      const metrics = sessionMonitor.collectMetrics("non-existent-session");
 
       expect(metrics).toBeNull();
     });
@@ -84,7 +84,9 @@ describe("Session Health Monitoring - Real Metrics", () => {
 
   describe("Conflict Detection", () => {
     it("should detect conflict resolution rates", async () => {
-      const conflictMetrics = sessionMonitor.collectMetrics('high-conflict-session');
+      const conflictMetrics = sessionMonitor.collectMetrics(
+        "high-conflict-session",
+      );
 
       // Session metrics should be available
       expect(conflictMetrics).not.toBeNull();
@@ -93,7 +95,7 @@ describe("Session Health Monitoring - Real Metrics", () => {
     });
 
     it("should calculate conflict resolution rates from communication patterns", async () => {
-      const metrics = sessionMonitor.collectMetrics('healthy-session');
+      const metrics = sessionMonitor.collectMetrics("healthy-session");
 
       // Should have conflict resolution data
       expect(metrics).not.toBeNull();
@@ -104,7 +106,7 @@ describe("Session Health Monitoring - Real Metrics", () => {
 
   describe("Response Time Analysis", () => {
     it("should calculate average response times", async () => {
-      const metrics = sessionMonitor.collectMetrics('healthy-session');
+      const metrics = sessionMonitor.collectMetrics("healthy-session");
 
       // Response time should be reasonable
       expect(metrics).not.toBeNull();
@@ -115,7 +117,7 @@ describe("Session Health Monitoring - Real Metrics", () => {
 
   describe("Coordination Efficiency", () => {
     it("should measure coordination efficiency", async () => {
-      const metrics = sessionMonitor.collectMetrics('healthy-session');
+      const metrics = sessionMonitor.collectMetrics("healthy-session");
 
       expect(metrics).not.toBeNull();
       expect(metrics!.coordinationEfficiency).toBeGreaterThanOrEqual(0);
@@ -126,17 +128,19 @@ describe("Session Health Monitoring - Real Metrics", () => {
   describe("Health Status Access", () => {
     it("should provide health status for existing sessions", async () => {
       // Register the session first
-      sessionMonitor.registerSession('healthy-session');
+      sessionMonitor.registerSession("healthy-session");
 
-      const health = sessionMonitor.getHealthStatus('healthy-session');
+      const health = sessionMonitor.getHealthStatus("healthy-session");
 
       expect(health).not.toBeNull();
       expect(health!.memoryUsage).toBeGreaterThanOrEqual(0);
-      expect(['healthy', 'degraded', 'critical', 'unknown']).toContain(health!.status);
+      expect(["healthy", "degraded", "critical", "unknown"]).toContain(
+        health!.status,
+      );
     });
 
     it("should return null for non-existent sessions", async () => {
-      const health = sessionMonitor.getHealthStatus('non-existent-session');
+      const health = sessionMonitor.getHealthStatus("non-existent-session");
 
       expect(health).toBeNull();
     });
@@ -145,13 +149,13 @@ describe("Session Health Monitoring - Real Metrics", () => {
   describe("Metrics History", () => {
     it("should maintain metrics history", async () => {
       // Collect metrics multiple times
-      sessionMonitor.collectMetrics('healthy-session');
-      sessionMonitor.collectMetrics('healthy-session');
+      sessionMonitor.collectMetrics("healthy-session");
+      sessionMonitor.collectMetrics("healthy-session");
 
-      const history = sessionMonitor.getMetricsHistory('healthy-session');
+      const history = sessionMonitor.getMetricsHistory("healthy-session");
 
       expect(history.length).toBeGreaterThanOrEqual(2);
-      expect(history[0].sessionId).toBe('healthy-session');
+      expect(history[0].sessionId).toBe("healthy-session");
     });
   });
 });

@@ -1,0 +1,59 @@
+#!/bin/bash
+# StrRay Post-Processor post-commit Hook
+# Automatically triggers post-processor after post-commit
+
+# Get commit SHA
+if [ "$hookType" = "post-commit" ]; then
+  COMMIT_SHA=$(git rev-parse HEAD)
+elif [ "$hookType" = "post-push" ]; then
+  # For push hooks, we need to parse the pushed refs
+  while read local_ref local_sha remote_ref remote_sha; do
+    if [ "$local_sha" != "0000000000000000000000000000000000000000" ]; then
+      COMMIT_SHA=$local_sha
+      break
+    fi
+  done
+else
+  COMMIT_SHA=$(git rev-parse HEAD)
+fi
+
+if [ -z "$COMMIT_SHA" ]; then
+  echo "Warning: Could not determine commit SHA for post-processor"
+  exit 0
+fi
+
+# Get repository info
+REPO="strray-framework/stringray"  # Placeholder for now
+BRANCH=$(git rev-parse --abbrev-ref HEAD)
+AUTHOR=$(git log -1 --pretty=format:'%an <%ae>')
+
+# Get changed files
+FILES=$(git diff --name-only HEAD~1 2>/dev/null || git diff --name-only --cached)
+
+# Trigger post-processor asynchronously (don't block git operations)
+(
+  cd "$(dirname "$0")/../.." # Navigate to project root
+  if command -v node >/dev/null 2>&1; then
+    node -e "
+      const { PostProcessor } = require('./src/postprocessor/PostProcessor.js');
+      const context = {
+        commitSha: '$COMMIT_SHA',
+        repository: '$REPO',
+        branch: '$BRANCH',
+        author: '$AUTHOR',
+        files: '$FILES'.split('
+').filter(f => f.trim()),
+        trigger: 'git-hook'
+      };
+      console.log('🚀 Post-processor triggered for commit:', context.commitSha);
+      // Initialize and run post-processor
+      const pp = new PostProcessor();
+      pp.executePostProcessorLoop(context).catch(console.error);
+    " &
+  else
+    echo "Warning: Node.js not found, skipping post-processor"
+  fi
+) >/dev/null 2>&1 &
+
+# Don't wait for background process
+exit 0

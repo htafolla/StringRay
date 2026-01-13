@@ -26,10 +26,12 @@ export interface RecoverySimulationResult {
  * Simulate complex session failure recovery scenarios
  */
 export async function simulateSessionRecovery(
-  config: RecoveryConfig
+  config: RecoveryConfig,
 ): Promise<RecoverySimulationResult> {
   console.log("🔄 Starting Session Recovery Simulation");
-  console.log(`Sessions: ${config.sessionCount}, Scenarios: ${config.failureScenarios.join(", ")}`);
+  console.log(
+    `Sessions: ${config.sessionCount}, Scenarios: ${config.failureScenarios.join(", ")}`,
+  );
 
   const issues: string[] = [];
   const sessions: Map<string, any> = new Map();
@@ -45,10 +47,10 @@ export async function simulateSessionRecovery(
     sessions.set(sessionId, {
       id: sessionId,
       dependencies: sessionGraph.get(sessionId),
-      state: 'active',
+      state: "active",
       failureMode: null,
       recoveryAttempts: 0,
-      lastActivity: Date.now()
+      lastActivity: Date.now(),
     });
   }
 
@@ -61,7 +63,7 @@ export async function simulateSessionRecovery(
     config,
     failedSessions,
     cascadeFailures,
-    issues
+    issues,
   );
 
   // Test recovery strategies
@@ -71,7 +73,7 @@ export async function simulateSessionRecovery(
     config,
     recoveredSessions,
     recoveryTimes,
-    issues
+    issues,
   );
 
   // Calculate metrics
@@ -80,7 +82,7 @@ export async function simulateSessionRecovery(
     failedSessions,
     recoveredSessions,
     cascadeFailures,
-    recoveryTimes
+    recoveryTimes,
   );
 
   const result: RecoverySimulationResult = {
@@ -91,17 +93,23 @@ export async function simulateSessionRecovery(
     cascadeFailures: cascadeFailures.length,
     averageRecoveryTime: metrics.averageRecoveryTime,
     recoveryEfficiency: metrics.recoveryEfficiency,
-    issues
+    issues,
   };
 
   console.log("✅ Session Recovery Simulation Complete");
-  console.log(`Failed: ${result.failedSessions}, Recovered: ${result.recoveredSessions}/${result.failedSessions}`);
-  console.log(`Cascade Failures: ${result.cascadeFailures}, Recovery Efficiency: ${(result.recoveryEfficiency * 100).toFixed(1)}%`);
+  console.log(
+    `Failed: ${result.failedSessions}, Recovered: ${result.recoveredSessions}/${result.failedSessions}`,
+  );
+  console.log(
+    `Cascade Failures: ${result.cascadeFailures}, Recovery Efficiency: ${(result.recoveryEfficiency * 100).toFixed(1)}%`,
+  );
 
   return result;
 }
 
-function createSessionDependencyGraph(sessionCount: number): Map<string, string[]> {
+function createSessionDependencyGraph(
+  sessionCount: number,
+): Map<string, string[]> {
   const graph = new Map<string, string[]>();
 
   for (let i = 0; i < sessionCount; i++) {
@@ -126,28 +134,48 @@ async function simulateFailureScenarios(
   config: RecoveryConfig,
   failedSessions: string[],
   cascadeFailures: string[],
-  issues: string[]
+  issues: string[],
 ): Promise<void> {
   console.log("💥 Simulating failure scenarios...");
 
   for (const failureScenario of config.failureScenarios) {
     switch (failureScenario) {
-      case 'coordinator_failure':
-        await simulateCoordinatorFailure(sessions, sessionGraph, config, failedSessions, cascadeFailures);
+      case "coordinator_failure":
+        await simulateCoordinatorFailure(
+          sessions,
+          sessionGraph,
+          config,
+          failedSessions,
+          cascadeFailures,
+        );
         break;
-      case 'network_partition':
-        await simulateNetworkPartition(sessions, sessionGraph, config, failedSessions, cascadeFailures);
+      case "network_partition":
+        await simulateNetworkPartition(
+          sessions,
+          sessionGraph,
+          config,
+          failedSessions,
+          cascadeFailures,
+        );
         break;
-      case 'resource_exhaustion':
-        await simulateResourceExhaustion(sessions, sessionGraph, config, failedSessions, cascadeFailures);
+      case "resource_exhaustion":
+        await simulateResourceExhaustion(
+          sessions,
+          sessionGraph,
+          config,
+          failedSessions,
+          cascadeFailures,
+        );
         break;
-      case 'data_corruption':
+      case "data_corruption":
         await simulateDataCorruption(sessions, config, failedSessions);
         break;
     }
   }
 
-  console.log(`❌ Induced ${failedSessions.length} failures, ${cascadeFailures.length} cascade failures`);
+  console.log(
+    `❌ Induced ${failedSessions.length} failures, ${cascadeFailures.length} cascade failures`,
+  );
 }
 
 async function simulateCoordinatorFailure(
@@ -155,19 +183,25 @@ async function simulateCoordinatorFailure(
   sessionGraph: Map<string, string[]>,
   config: RecoveryConfig,
   failedSessions: string[],
-  cascadeFailures: string[]
+  cascadeFailures: string[],
 ): Promise<void> {
   // Fail sessions that lose their coordinator
   const coordinatorFailureRate = 0.3; // 30% of coordinators fail
 
   for (const [sessionId, session] of sessions) {
     if (Math.random() < coordinatorFailureRate) {
-      session.state = 'failed';
-      session.failureMode = 'coordinator_failure';
+      session.state = "failed";
+      session.failureMode = "coordinator_failure";
       failedSessions.push(sessionId);
 
       // Check for cascade failures
-      await checkCascadeFailures(sessionId, sessions, sessionGraph, config, cascadeFailures);
+      await checkCascadeFailures(
+        sessionId,
+        sessions,
+        sessionGraph,
+        config,
+        cascadeFailures,
+      );
     }
   }
 }
@@ -177,19 +211,24 @@ async function simulateNetworkPartition(
   sessionGraph: Map<string, string[]>,
   config: RecoveryConfig,
   failedSessions: string[],
-  cascadeFailures: string[]
+  cascadeFailures: string[],
 ): Promise<void> {
   // Create network partitions that isolate groups of sessions
   const partitionSize = Math.max(2, Math.floor(config.sessionCount * 0.2));
 
   for (let i = 0; i < config.sessionCount; i += partitionSize) {
-    if (Math.random() < 0.4) { // 40% chance of partition
-      for (let j = i; j < Math.min(i + partitionSize, config.sessionCount); j++) {
+    if (Math.random() < 0.4) {
+      // 40% chance of partition
+      for (
+        let j = i;
+        j < Math.min(i + partitionSize, config.sessionCount);
+        j++
+      ) {
         const sessionId = `session-${j}`;
         const session = sessions.get(sessionId);
-        if (session && session.state === 'active') {
-          session.state = 'failed';
-          session.failureMode = 'network_partition';
+        if (session && session.state === "active") {
+          session.state = "failed";
+          session.failureMode = "network_partition";
           failedSessions.push(sessionId);
         }
       }
@@ -202,16 +241,23 @@ async function simulateResourceExhaustion(
   sessionGraph: Map<string, string[]>,
   config: RecoveryConfig,
   failedSessions: string[],
-  cascadeFailures: string[]
+  cascadeFailures: string[],
 ): Promise<void> {
   // Fail sessions that exhaust resources
   for (const [sessionId, session] of sessions) {
-    if (Math.random() < 0.2) { // 20% resource exhaustion rate
-      session.state = 'failed';
-      session.failureMode = 'resource_exhaustion';
+    if (Math.random() < 0.2) {
+      // 20% resource exhaustion rate
+      session.state = "failed";
+      session.failureMode = "resource_exhaustion";
       failedSessions.push(sessionId);
 
-      await checkCascadeFailures(sessionId, sessions, sessionGraph, config, cascadeFailures);
+      await checkCascadeFailures(
+        sessionId,
+        sessions,
+        sessionGraph,
+        config,
+        cascadeFailures,
+      );
     }
   }
 }
@@ -219,13 +265,14 @@ async function simulateResourceExhaustion(
 async function simulateDataCorruption(
   sessions: Map<string, any>,
   config: RecoveryConfig,
-  failedSessions: string[]
+  failedSessions: string[],
 ): Promise<void> {
   // Corrupt session data
   for (const [sessionId, session] of sessions) {
-    if (Math.random() < 0.15) { // 15% corruption rate
-      session.state = 'failed';
-      session.failureMode = 'data_corruption';
+    if (Math.random() < 0.15) {
+      // 15% corruption rate
+      session.state = "failed";
+      session.failureMode = "data_corruption";
       session.corruptedData = true;
       failedSessions.push(sessionId);
     }
@@ -237,15 +284,18 @@ async function checkCascadeFailures(
   sessions: Map<string, any>,
   sessionGraph: Map<string, string[]>,
   config: RecoveryConfig,
-  cascadeFailures: string[]
+  cascadeFailures: string[],
 ): Promise<void> {
   // Check if dependent sessions fail due to cascade
   for (const [sessionId, dependencies] of sessionGraph) {
-    if (dependencies.includes(failedSessionId) && Math.random() < config.cascadeFailureRate) {
+    if (
+      dependencies.includes(failedSessionId) &&
+      Math.random() < config.cascadeFailureRate
+    ) {
       const session = sessions.get(sessionId);
-      if (session && session.state === 'active') {
-        session.state = 'failed';
-        session.failureMode = 'cascade_failure';
+      if (session && session.state === "active") {
+        session.state = "failed";
+        session.failureMode = "cascade_failure";
         cascadeFailures.push(sessionId);
       }
     }
@@ -258,7 +308,7 @@ async function simulateRecoveryStrategies(
   config: RecoveryConfig,
   recoveredSessions: string[],
   recoveryTimes: number[],
-  issues: string[]
+  issues: string[],
 ): Promise<void> {
   console.log("🔄 Testing recovery strategies...");
 
@@ -282,7 +332,7 @@ async function simulateRecoveryStrategies(
     recoveryTimes.push(recoveryTime);
 
     if (recovered) {
-      session.state = 'active';
+      session.state = "active";
       session.recoveryAttempts++;
     } else {
       issues.push(`Failed to recover session: ${sessionId}`);
@@ -290,7 +340,9 @@ async function simulateRecoveryStrategies(
 
     // Check recovery time limit
     if (recoveryTime > config.maxRecoveryTime) {
-      issues.push(`Recovery timeout for session: ${sessionId} (${recoveryTime}ms)`);
+      issues.push(
+        `Recovery timeout for session: ${sessionId} (${recoveryTime}ms)`,
+      );
     }
   }
 }
@@ -298,21 +350,21 @@ async function simulateRecoveryStrategies(
 async function tryRecoveryStrategy(
   session: any,
   strategy: string,
-  config: RecoveryConfig
+  config: RecoveryConfig,
 ): Promise<boolean> {
   await simulateRecoveryDelay();
 
   switch (strategy) {
-    case 'failover':
+    case "failover":
       return Math.random() > 0.2; // 80% success rate
 
-    case 'reconstruction':
+    case "reconstruction":
       return !session.corruptedData && Math.random() > 0.4; // 60% success if not corrupted
 
-    case 'backup_restore':
+    case "backup_restore":
       return Math.random() > 0.1; // 90% success rate
 
-    case 'reinitialization':
+    case "reinitialization":
       return Math.random() > 0.3; // 70% success rate
 
     default:
@@ -325,29 +377,32 @@ function calculateRecoveryMetrics(
   failedSessions: string[],
   recoveredSessions: string[],
   cascadeFailures: string[],
-  recoveryTimes: number[]
+  recoveryTimes: number[],
 ): {
   averageRecoveryTime: number;
   recoveryEfficiency: number;
 } {
-  const averageRecoveryTime = recoveryTimes.length > 0
-    ? recoveryTimes.reduce((sum, time) => sum + time, 0) / recoveryTimes.length
-    : 0;
+  const averageRecoveryTime =
+    recoveryTimes.length > 0
+      ? recoveryTimes.reduce((sum, time) => sum + time, 0) /
+        recoveryTimes.length
+      : 0;
 
-  const recoveryEfficiency = failedSessions.length > 0
-    ? recoveredSessions.length / failedSessions.length
-    : 1;
+  const recoveryEfficiency =
+    failedSessions.length > 0
+      ? recoveredSessions.length / failedSessions.length
+      : 1;
 
   return {
     averageRecoveryTime,
-    recoveryEfficiency
+    recoveryEfficiency,
   };
 }
 
 async function simulateRecoveryDelay(): Promise<void> {
   // Simulate recovery operation latency (100-1000ms)
   const latency = Math.random() * 900 + 100;
-  return new Promise(resolve => setTimeout(resolve, latency));
+  return new Promise((resolve) => setTimeout(resolve, latency));
 }
 
 /**
@@ -356,10 +411,20 @@ async function simulateRecoveryDelay(): Promise<void> {
 export async function runSessionRecoverySimulation(): Promise<RecoverySimulationResult> {
   const config: RecoveryConfig = {
     sessionCount: 15,
-    failureScenarios: ['coordinator_failure', 'network_partition', 'resource_exhaustion', 'data_corruption'],
-    recoveryStrategies: ['failover', 'backup_restore', 'reconstruction', 'reinitialization'],
+    failureScenarios: [
+      "coordinator_failure",
+      "network_partition",
+      "resource_exhaustion",
+      "data_corruption",
+    ],
+    recoveryStrategies: [
+      "failover",
+      "backup_restore",
+      "reconstruction",
+      "reinitialization",
+    ],
     maxRecoveryTime: 5000, // 5 seconds
-    cascadeFailureRate: 0.3 // 30% chance of cascade
+    cascadeFailureRate: 0.3, // 30% chance of cascade
   };
 
   return simulateSessionRecovery(config);

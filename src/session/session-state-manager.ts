@@ -375,7 +375,9 @@ export class SessionStateManager {
     const warnings: string[] = [];
 
     // Validate session exists
-    const sessionStatus = this.sessionCoordinator.getSessionStatus(plan.sessionId);
+    const sessionStatus = this.sessionCoordinator.getSessionStatus(
+      plan.sessionId,
+    );
     if (!sessionStatus) {
       errors.push(`Session ${plan.sessionId} does not exist`);
       return { valid: false, errors, warnings };
@@ -393,7 +395,7 @@ export class SessionStateManager {
       "transfer_pending_communications",
       "transfer_shared_context",
       "update_dependencies",
-      "cleanup_source"
+      "cleanup_source",
     ];
 
     for (const requiredStep of requiredSteps) {
@@ -403,7 +405,10 @@ export class SessionStateManager {
     }
 
     // Check for shared context that needs to be transferred
-    const sharedContext = this.sessionCoordinator.getSharedContext(plan.sessionId, "*");
+    const sharedContext = this.sessionCoordinator.getSharedContext(
+      plan.sessionId,
+      "*",
+    );
     if (sharedContext) {
       warnings.push(`Session has shared context that will be transferred`);
     }
@@ -411,7 +416,7 @@ export class SessionStateManager {
     return {
       valid: errors.length === 0,
       errors,
-      warnings
+      warnings,
     };
   }
 
@@ -427,7 +432,7 @@ export class SessionStateManager {
     if (rollbackSteps.length === 0) {
       return {
         canRollback: false,
-        reason: "No rollback steps defined"
+        reason: "No rollback steps defined",
       };
     }
 
@@ -435,7 +440,7 @@ export class SessionStateManager {
     if (rollbackSteps.length !== migrationSteps.length) {
       return {
         canRollback: false,
-        reason: "Rollback steps don't match migration steps"
+        reason: "Rollback steps don't match migration steps",
       };
     }
 
@@ -455,7 +460,7 @@ export class SessionStateManager {
       }
     }
 
-    return allAgents.filter(agent => !agentsWithDeps.has(agent));
+    return allAgents.filter((agent) => !agentsWithDeps.has(agent));
   }
 
   /**
@@ -474,10 +479,12 @@ export class SessionStateManager {
 
         switch (step) {
           case "backup_current_state": {
-            const sessionState = this.sessionCoordinator.getSessionStatus(plan.sessionId);
+            const sessionState = this.sessionCoordinator.getSessionStatus(
+              plan.sessionId,
+            );
             const dependencies = this.dependencies.get(plan.sessionId);
-            const group = Array.from(this.sessionGroups.values()).find(g =>
-              g.sessionIds.includes(plan.sessionId)
+            const group = Array.from(this.sessionGroups.values()).find((g) =>
+              g.sessionIds.includes(plan.sessionId),
             );
 
             rollbackData.push({
@@ -490,10 +497,10 @@ export class SessionStateManager {
           }
 
           case "update_coordinator": {
-            this.stateManager.set(
-              `session:${plan.sessionId}:coordinator`,
-              { coordinatorId: plan.targetCoordinator, migratedAt: new Date() }
-            );
+            this.stateManager.set(`session:${plan.sessionId}:coordinator`, {
+              coordinatorId: plan.targetCoordinator,
+              migratedAt: new Date(),
+            });
             break;
           }
 
@@ -502,18 +509,20 @@ export class SessionStateManager {
             if (deps) {
               this.stateManager.set(
                 `session:${plan.sessionId}:dependencies`,
-                deps
+                deps,
               );
             }
             break;
           }
 
           case "transfer_communications": {
-            const sessionStatus = this.sessionCoordinator.getSessionStatus(plan.sessionId);
+            const sessionStatus = this.sessionCoordinator.getSessionStatus(
+              plan.sessionId,
+            );
             if (sessionStatus) {
               this.stateManager.set(
                 `session:${plan.sessionId}:status`,
-                sessionStatus
+                sessionStatus,
               );
             }
             break;
@@ -522,12 +531,16 @@ export class SessionStateManager {
           case "transfer_context": {
             // Transfer all shared context keys for this session
             // Note: This is a simplified implementation
-            const session = this.sessionCoordinator["sessions"].get(plan.sessionId);
+            const session = this.sessionCoordinator["sessions"].get(
+              plan.sessionId,
+            );
             if (session) {
-              const contextMap = Object.fromEntries(session.coordinationState.sharedContext);
+              const contextMap = Object.fromEntries(
+                session.coordinationState.sharedContext,
+              );
               this.stateManager.set(
                 `session:${plan.sessionId}:shared`,
-                contextMap
+                contextMap,
               );
             }
             break;
@@ -554,15 +567,22 @@ export class SessionStateManager {
               "system",
               "orchestrator",
               `Session migrated to coordinator: ${plan.targetCoordinator}`,
-              "high"
+              "high",
             );
             break;
           }
 
           case "verify_migration": {
-            const coordinatorData = this.stateManager.get(`session:${plan.sessionId}:coordinator`);
-            if (!coordinatorData || (coordinatorData as any).coordinatorId !== plan.targetCoordinator) {
-              throw new Error(`Migration verification failed: coordinator not updated properly`);
+            const coordinatorData = this.stateManager.get(
+              `session:${plan.sessionId}:coordinator`,
+            );
+            if (
+              !coordinatorData ||
+              (coordinatorData as any).coordinatorId !== plan.targetCoordinator
+            ) {
+              throw new Error(
+                `Migration verification failed: coordinator not updated properly`,
+              );
             }
             break;
           }
@@ -693,7 +713,10 @@ export class SessionStateManager {
     }
   }
 
-  private async rollbackMigration(plan: MigrationPlan, rollbackData: any[] = []): Promise<void> {
+  private async rollbackMigration(
+    plan: MigrationPlan,
+    rollbackData: any[] = [],
+  ): Promise<void> {
     console.log(
       `↩️ Session State Manager: Rolling back migration for ${plan.sessionId}`,
     );
@@ -704,7 +727,10 @@ export class SessionStateManager {
         switch (backup.step) {
           case "backup_current_state":
             if (backup.sessionState) {
-              this.stateManager.set(`session:${plan.sessionId}:status`, backup.sessionState);
+              this.stateManager.set(
+                `session:${plan.sessionId}:status`,
+                backup.sessionState,
+              );
             }
             if (backup.dependencies) {
               this.dependencies.set(plan.sessionId, backup.dependencies);

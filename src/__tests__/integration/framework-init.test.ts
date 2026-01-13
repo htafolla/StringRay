@@ -36,14 +36,21 @@ const checkLogActivity = (logFile: string, component: string): boolean => {
   try {
     if (!checkFile(logFile)) return false;
     const content = fs.readFileSync(logFile, "utf8");
-    return content.includes(`${component}.*SUCCESS`) || content.includes(`${component}.*success`);
+    return (
+      content.includes(`${component}.*SUCCESS`) ||
+      content.includes(`${component}.*success`)
+    );
   } catch {
     return false;
   }
 };
 
 // Mock shell command execution for safe testing
-const mockSpawnPromise = (command: string, args: string[], cwd: string): Promise<{ stdout: string; stderr: string }> => {
+const mockSpawnPromise = (
+  command: string,
+  args: string[],
+  cwd: string,
+): Promise<{ stdout: string; stderr: string }> => {
   return new Promise((resolve) => {
     // Mock successful execution for testing
     resolve({ stdout: "", stderr: "" });
@@ -81,10 +88,18 @@ describe("StrRay Framework Initialization Integration", () => {
       expect(agentFiles.length).toBeGreaterThanOrEqual(8); // At least 8 agents
 
       // Check for required agents
-      const requiredAgents = ["enforcer", "architect", "orchestrator", "bug-triage-specialist",
-                             "code-reviewer", "security-auditor", "refactorer", "test-architect"];
-      const agentNames = agentFiles.map(f => f.replace('.md', ''));
-      requiredAgents.forEach(agent => {
+      const requiredAgents = [
+        "enforcer",
+        "architect",
+        "orchestrator",
+        "bug-triage-specialist",
+        "code-reviewer",
+        "security-auditor",
+        "refactorer",
+        "test-architect",
+      ];
+      const agentNames = agentFiles.map((f) => f.replace(".md", ""));
+      requiredAgents.forEach((agent) => {
         expect(agentNames).toContain(agent);
       });
     });
@@ -143,13 +158,13 @@ describe("StrRay Framework Initialization Integration", () => {
       const testData = { test: "data" };
 
       // Wait a bit for state manager initialization
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
 
       await stateManager.set(testKey, testData);
       expect(await stateManager.get(testKey)).toEqual(testData);
 
       // Wait for any pending operations
-      await new Promise(resolve => setTimeout(resolve, 150));
+      await new Promise((resolve) => setTimeout(resolve, 150));
 
       await stateManager.clear(testKey);
       expect(await stateManager.get(testKey)).toBeUndefined();
@@ -169,7 +184,9 @@ describe("StrRay Framework Initialization Integration", () => {
     });
 
     test("should validate codex term structure", () => {
-      const codexContent = JSON.parse(fs.readFileSync(".strray/codex.json", "utf8"));
+      const codexContent = JSON.parse(
+        fs.readFileSync(".strray/codex.json", "utf8"),
+      );
       const terms = codexContent.terms;
 
       // Check a few key terms exist
@@ -181,7 +198,13 @@ describe("StrRay Framework Initialization Integration", () => {
       Object.values(terms).forEach((term: any) => {
         expect(term).toHaveProperty("description");
         expect(term).toHaveProperty("category");
-        expect(["core", "extended", "architecture", "architectural", "advanced"]).toContain(term.category);
+        expect([
+          "core",
+          "extended",
+          "architecture",
+          "architectural",
+          "advanced",
+        ]).toContain(term.category);
       });
     });
   });
@@ -192,7 +215,11 @@ describe("StrRay Framework Initialization Integration", () => {
       expect(checkFile(".opencode/init.sh")).toBe(true);
 
       // Test basic initialization (mocked)
-      const result = await mockSpawnPromise("bash", [".opencode/init.sh"], process.cwd());
+      const result = await mockSpawnPromise(
+        "bash",
+        [".opencode/init.sh"],
+        process.cwd(),
+      );
       expect(result).toBeDefined();
     });
 
@@ -202,7 +229,9 @@ describe("StrRay Framework Initialization Integration", () => {
 
       // Test logging doesn't throw errors
       expect(() => {
-        frameworkLogger.log("test-component", "test-action", "success", { test: "data" });
+        frameworkLogger.log("test-component", "test-action", "success", {
+          test: "data",
+        });
       }).not.toThrow();
     });
   });
@@ -212,12 +241,14 @@ describe("StrRay Framework Initialization Integration", () => {
       expect(checkDir(".opencode/mcps")).toBe(true);
 
       const mcpFiles = fs.readdirSync(".opencode/mcps");
-      const jsonFiles = mcpFiles.filter(f => f.endsWith('.mcp.json'));
+      const jsonFiles = mcpFiles.filter((f) => f.endsWith(".mcp.json"));
       expect(jsonFiles.length).toBeGreaterThanOrEqual(11); // At least 11 MCP configs
 
       // Validate MCP config structure
-      jsonFiles.forEach(file => {
-        const config = JSON.parse(fs.readFileSync(path.join(".opencode/mcps", file), "utf8"));
+      jsonFiles.forEach((file) => {
+        const config = JSON.parse(
+          fs.readFileSync(path.join(".opencode/mcps", file), "utf8"),
+        );
         expect(config).toHaveProperty("mcpServers");
         expect(typeof config.mcpServers).toBe("object");
         // At least one MCP server should be defined
@@ -227,7 +258,7 @@ describe("StrRay Framework Initialization Integration", () => {
 
     test("should validate compiled MCP servers", () => {
       const mcpFiles = fs.readdirSync(".opencode/mcps");
-      const serverFiles = mcpFiles.filter(f => f.endsWith('.server.js'));
+      const serverFiles = mcpFiles.filter((f) => f.endsWith(".server.js"));
       expect(serverFiles.length).toBeGreaterThanOrEqual(11); // At least 11 MCP servers
     });
   });
@@ -243,7 +274,7 @@ describe("StrRay Framework Initialization Integration", () => {
       const workflowData = {
         initialized: true,
         timestamp: Date.now(),
-        components: ["state-manager", "framework-logger", "codex-system"]
+        components: ["state-manager", "framework-logger", "codex-system"],
       };
 
       await stateManager.set(workflowKey, workflowData);
@@ -254,7 +285,7 @@ describe("StrRay Framework Initialization Integration", () => {
       expect(() => {
         frameworkLogger.log("framework-init", "workflow-test", "success", {
           sessionId: testSessionId,
-          components: workflowData.components.length
+          components: workflowData.components.length,
         });
       }).not.toThrow();
 
@@ -272,20 +303,20 @@ describe("StrRay Framework Initialization Integration", () => {
         ".opencode/mcps",
         ".opencode/logs",
         ".strray",
-        "src"
+        "src",
       ];
 
-      requiredDirs.forEach(dir => {
+      requiredDirs.forEach((dir) => {
         expect(checkDir(dir)).toBe(true);
       });
 
       // Test that all required config files exist
       const requiredFiles = [
         ".opencode/oh-my-opencode.json",
-        ".strray/codex.json"
+        ".strray/codex.json",
       ];
 
-      requiredFiles.forEach(file => {
+      requiredFiles.forEach((file) => {
         expect(checkFile(file)).toBe(true);
         expect(checkJson(file)).toBe(true);
       });

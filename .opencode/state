@@ -1,11 +1,4 @@
 {
-  "memory:baseline": {
-    "heapUsed": 15.21,
-    "heapTotal": 19.84,
-    "external": 3.18,
-    "rss": 245.66,
-    "timestamp": 1768307075061
-  },
   "agent:enforcer": {},
   "agent:architect": {},
   "agent:code-reviewer": {},
@@ -20,6 +13,13 @@
     },
     "activeTasks": {},
     "taskToAgentMap": {}
+  },
+  "memory:baseline": {
+    "heapUsed": 15.21,
+    "heapTotal": 19.84,
+    "external": 3.18,
+    "rss": 245.66,
+    "timestamp": 1768307075061
   },
   "session:expired-test:coordinator": {
     "sessionId": "expired-test",
@@ -45,8 +45,8 @@
   "cleanup:session_metadata": {
     "default": {
       "sessionId": "default",
-      "createdAt": 1768314932891,
-      "lastActivity": 1768314932891,
+      "createdAt": 1768315076973,
+      "lastActivity": 1768315076973,
       "ttlMs": 86400000,
       "isActive": true,
       "agentCount": 0,
@@ -458,7 +458,7 @@
   },
   "session:default:coordinator": {
     "sessionId": "default",
-    "startTime": 1768314932891,
+    "startTime": 1768315076973,
     "activeDelegations": {},
     "agentInteractions": {},
     "conflictHistory": [],
@@ -479,12 +479,12 @@
   },
   "delegation:default_session": {
     "sessionId": "default",
-    "createdAt": "2026-01-13T14:35:32.891Z",
+    "createdAt": "2026-01-13T14:37:56.973Z",
     "active": true,
     "agentCount": 8
   },
   "session:active": true,
-  "session:boot_time": 1768314932891,
+  "session:boot_time": 1768315076973,
   "session:agents": [],
   "session:state_manager": {
     "stateManager": {
@@ -927,9 +927,9 @@
       "enforcementLevel": "blocking"
     }
   ],
-  "enforcement:enabled_at": 1768314932892,
+  "enforcement:enabled_at": 1768315076973,
   "security:initial_audit": {
-    "totalFiles": 1428,
+    "totalFiles": 1440,
     "issues": [
       {
         "severity": "critical",

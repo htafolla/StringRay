@@ -1,5 +1,5 @@
-import { spawn } from 'child_process';
-import { frameworkLogger } from './framework-logger.js';
+import { spawn } from "child_process";
+import { frameworkLogger } from "./framework-logger.js";
 
 export interface MCPTool {
   name: string;
@@ -43,7 +43,7 @@ export class MCPClient {
       frameworkLogger.log(
         "mcp-client",
         `initializing MCP client for ${this.config.serverName}`,
-        "info"
+        "info",
       );
 
       // For now, we'll simulate tool discovery
@@ -54,13 +54,13 @@ export class MCPClient {
       frameworkLogger.log(
         "mcp-client",
         `MCP client initialized with ${this.tools.size} tools`,
-        "success"
+        "success",
       );
     } catch (error) {
       frameworkLogger.log(
         "mcp-client",
         `failed to initialize MCP client: ${error instanceof Error ? error.message : String(error)}`,
-        "error"
+        "error",
       );
       throw error;
     }
@@ -75,7 +75,7 @@ export class MCPClient {
         "mcp-client",
         `calling tool ${toolName} on ${this.config.serverName}`,
         "info",
-        { args }
+        { args },
       );
 
       // For now, we'll simulate tool execution
@@ -88,7 +88,7 @@ export class MCPClient {
       frameworkLogger.log(
         "mcp-client",
         `tool ${toolName} executed successfully`,
-        "success"
+        "success",
       );
 
       return result;
@@ -96,7 +96,7 @@ export class MCPClient {
       frameworkLogger.log(
         "mcp-client",
         `tool ${toolName} execution failed: ${error instanceof Error ? error.message : String(error)}`,
-        "error"
+        "error",
       );
       throw error;
     }
@@ -116,82 +116,88 @@ export class MCPClient {
   private async discoverTools(): Promise<void> {
     // Simulate tool discovery based on server name
     const serverTools: Record<string, MCPTool[]> = {
-      'code-review': [
+      "code-review": [
         {
-          name: 'analyze_code_quality',
-          description: 'Analyze code for quality, patterns, and best practices',
+          name: "analyze_code_quality",
+          description: "Analyze code for quality, patterns, and best practices",
           inputSchema: {
-            type: 'object',
+            type: "object",
             properties: {
-              code: { type: 'string' },
-              language: { type: 'string' },
-              context: { type: 'object' }
+              code: { type: "string" },
+              language: { type: "string" },
+              context: { type: "object" },
             },
-            required: ['code']
-          }
-        }
+            required: ["code"],
+          },
+        },
       ],
-      'security-audit': [
+      "security-audit": [
         {
-          name: 'scan_vulnerabilities',
-          description: 'Scan code for security vulnerabilities and compliance issues',
+          name: "scan_vulnerabilities",
+          description:
+            "Scan code for security vulnerabilities and compliance issues",
           inputSchema: {
-            type: 'object',
+            type: "object",
             properties: {
-              files: { type: 'array', items: { type: 'string' } },
-              severity: { type: 'string', enum: ['low', 'medium', 'high', 'critical'] }
+              files: { type: "array", items: { type: "string" } },
+              severity: {
+                type: "string",
+                enum: ["low", "medium", "high", "critical"],
+              },
             },
-            required: ['files']
-          }
-        }
+            required: ["files"],
+          },
+        },
       ],
-      'performance-optimization': [
+      "performance-optimization": [
         {
-          name: 'analyze_performance',
-          description: 'Analyze code for performance bottlenecks and optimization opportunities',
+          name: "analyze_performance",
+          description:
+            "Analyze code for performance bottlenecks and optimization opportunities",
           inputSchema: {
-            type: 'object',
+            type: "object",
             properties: {
-              code: { type: 'string' },
-              language: { type: 'string' },
-              metrics: { type: 'array', items: { type: 'string' } }
+              code: { type: "string" },
+              language: { type: "string" },
+              metrics: { type: "array", items: { type: "string" } },
             },
-            required: ['code']
-          }
-        }
+            required: ["code"],
+          },
+        },
       ],
-      'testing-strategy': [
+      "testing-strategy": [
         {
-          name: 'analyze_test_coverage',
-          description: 'Analyze test coverage and suggest testing strategies',
+          name: "analyze_test_coverage",
+          description: "Analyze test coverage and suggest testing strategies",
           inputSchema: {
-            type: 'object',
+            type: "object",
             properties: {
-              code: { type: 'string' },
-              existingTests: { type: 'array', items: { type: 'string' } },
-              requirements: { type: 'object' }
+              code: { type: "string" },
+              existingTests: { type: "array", items: { type: "string" } },
+              requirements: { type: "object" },
             },
-            required: ['code']
-          }
-        }
+            required: ["code"],
+          },
+        },
       ],
-      'librarian': [
+      librarian: [
         {
-          name: 'analyze_codebase',
-          description: 'Analyze complete codebase structure and provide insights',
+          name: "analyze_codebase",
+          description:
+            "Analyze complete codebase structure and provide insights",
           inputSchema: {
-            type: 'object',
+            type: "object",
             properties: {
-              scope: { type: 'string', enum: ['full', 'directory', 'file'] },
-              analysis: { type: 'array', items: { type: 'string' } }
-            }
-          }
-        }
-      ]
+              scope: { type: "string", enum: ["full", "directory", "file"] },
+              analysis: { type: "array", items: { type: "string" } },
+            },
+          },
+        },
+      ],
     };
 
     const tools = serverTools[this.config.serverName] || [];
-    tools.forEach(tool => {
+    tools.forEach((tool) => {
       this.tools.set(tool.name, tool);
     });
   }
@@ -199,55 +205,70 @@ export class MCPClient {
   /**
    * Simulate tool execution (placeholder for real MCP protocol implementation)
    */
-  private async simulateToolCall(toolName: string, args: any): Promise<MCPToolResult> {
+  private async simulateToolCall(
+    toolName: string,
+    args: any,
+  ): Promise<MCPToolResult> {
     // Simulate different tool responses based on server and tool
     switch (this.config.serverName) {
-      case 'code-review':
+      case "code-review":
         return {
-          content: [{
-            type: 'text',
-            text: `Code Review Analysis Complete:\n- Quality Score: 84/100\n- Issues Found: ${Math.floor(Math.random() * 5)}\n- Recommendations: ${Math.floor(Math.random() * 3) + 1} improvements suggested`
-          }]
+          content: [
+            {
+              type: "text",
+              text: `Code Review Analysis Complete:\n- Quality Score: 84/100\n- Issues Found: ${Math.floor(Math.random() * 5)}\n- Recommendations: ${Math.floor(Math.random() * 3) + 1} improvements suggested`,
+            },
+          ],
         };
 
-      case 'security-audit':
+      case "security-audit":
         return {
-          content: [{
-            type: 'text',
-            text: `Security Audit Complete:\n- Vulnerabilities Found: ${Math.floor(Math.random() * 3)}\n- Severity: ${['Low', 'Medium', 'High'][Math.floor(Math.random() * 3)]}\n- Compliance: ${Math.random() > 0.3 ? 'Passed' : 'Failed'}`
-          }]
+          content: [
+            {
+              type: "text",
+              text: `Security Audit Complete:\n- Vulnerabilities Found: ${Math.floor(Math.random() * 3)}\n- Severity: ${["Low", "Medium", "High"][Math.floor(Math.random() * 3)]}\n- Compliance: ${Math.random() > 0.3 ? "Passed" : "Failed"}`,
+            },
+          ],
         };
 
-      case 'performance-optimization':
+      case "performance-optimization":
         return {
-          content: [{
-            type: 'text',
-            text: `Performance Analysis Complete:\n- Bottlenecks Identified: ${Math.floor(Math.random() * 3)}\n- Optimization Potential: ${Math.floor(Math.random() * 30) + 10}%\n- Recommendations: ${Math.floor(Math.random() * 4) + 2} improvements`
-          }]
+          content: [
+            {
+              type: "text",
+              text: `Performance Analysis Complete:\n- Bottlenecks Identified: ${Math.floor(Math.random() * 3)}\n- Optimization Potential: ${Math.floor(Math.random() * 30) + 10}%\n- Recommendations: ${Math.floor(Math.random() * 4) + 2} improvements`,
+            },
+          ],
         };
 
-      case 'testing-strategy':
+      case "testing-strategy":
         return {
-          content: [{
-            type: 'text',
-            text: `Testing Strategy Analysis:\n- Coverage: ${Math.floor(Math.random() * 40) + 60}%\n- Gaps Identified: ${Math.floor(Math.random() * 5)}\n- Test Cases Recommended: ${Math.floor(Math.random() * 10) + 5}`
-          }]
+          content: [
+            {
+              type: "text",
+              text: `Testing Strategy Analysis:\n- Coverage: ${Math.floor(Math.random() * 40) + 60}%\n- Gaps Identified: ${Math.floor(Math.random() * 5)}\n- Test Cases Recommended: ${Math.floor(Math.random() * 10) + 5}`,
+            },
+          ],
         };
 
-      case 'librarian':
+      case "librarian":
         return {
-          content: [{
-            type: 'text',
-            text: `Codebase Analysis Complete:\n- Files Analyzed: ${Math.floor(Math.random() * 500) + 100}\n- Languages Detected: ${Math.floor(Math.random() * 3) + 2}\n- Complexity Score: ${Math.floor(Math.random() * 50) + 50}/100\n- Architecture Patterns: ${Math.floor(Math.random() * 5) + 3} identified`
-          }]
+          content: [
+            {
+              type: "text",
+              text: `Codebase Analysis Complete:\n- Files Analyzed: ${Math.floor(Math.random() * 500) + 100}\n- Languages Detected: ${Math.floor(Math.random() * 3) + 2}\n- Complexity Score: ${Math.floor(Math.random() * 50) + 50}/100\n- Architecture Patterns: ${Math.floor(Math.random() * 5) + 3} identified`,
+            },
+          ],
         };
 
       default:
         return {
-          content: [{
-            type: 'text',
-            text: `Tool ${toolName} executed on ${this.config.serverName} server`
-          }]
+          content: [
+            {
+              type: "text",
+              text: `Tool ${toolName} executed on ${this.config.serverName} server`,
+            },
+          ],
         };
     }
   }
@@ -294,50 +315,58 @@ export class MCPClientManager {
     // Get server configuration from opencode.json or .mcp.json
     // For now, use default configurations
     const serverConfigs: Record<string, MCPClientConfig> = {
-      'code-review': {
-        serverName: 'code-review',
-        command: 'node',
-        args: ['dist/plugin/mcps/knowledge-skills/code-review.server.js'],
-        timeout: 30000
+      "code-review": {
+        serverName: "code-review",
+        command: "node",
+        args: ["dist/plugin/mcps/knowledge-skills/code-review.server.js"],
+        timeout: 30000,
       },
-      'security-audit': {
-        serverName: 'security-audit',
-        command: 'node',
-        args: ['dist/plugin/mcps/knowledge-skills/security-audit.server.js'],
-        timeout: 45000
+      "security-audit": {
+        serverName: "security-audit",
+        command: "node",
+        args: ["dist/plugin/mcps/knowledge-skills/security-audit.server.js"],
+        timeout: 45000,
       },
-      'performance-optimization': {
-        serverName: 'performance-optimization',
-        command: 'node',
-        args: ['dist/plugin/mcps/knowledge-skills/performance-optimization.server.js'],
-        timeout: 30000
+      "performance-optimization": {
+        serverName: "performance-optimization",
+        command: "node",
+        args: [
+          "dist/plugin/mcps/knowledge-skills/performance-optimization.server.js",
+        ],
+        timeout: 30000,
       },
-      'testing-strategy': {
-        serverName: 'testing-strategy',
-        command: 'node',
-        args: ['dist/plugin/mcps/knowledge-skills/testing-strategy.server.js'],
-        timeout: 25000
+      "testing-strategy": {
+        serverName: "testing-strategy",
+        command: "node",
+        args: ["dist/plugin/mcps/knowledge-skills/testing-strategy.server.js"],
+        timeout: 25000,
       },
-      'librarian': {
-        serverName: 'librarian',
-        command: 'node',
-        args: ['dist/plugin/mcps/knowledge-skills/project-analysis.server.js'],
-        timeout: 60000
-      }
+      librarian: {
+        serverName: "librarian",
+        command: "node",
+        args: ["dist/plugin/mcps/knowledge-skills/project-analysis.server.js"],
+        timeout: 60000,
+      },
     };
 
-    return serverConfigs[serverName] || {
-      serverName,
-      command: 'node',
-      args: [`dist/plugin/mcps/knowledge-skills/${serverName}.server.js`],
-      timeout: 30000
-    };
+    return (
+      serverConfigs[serverName] || {
+        serverName,
+        command: "node",
+        args: [`dist/plugin/mcps/knowledge-skills/${serverName}.server.js`],
+        timeout: 30000,
+      }
+    );
   }
 
   /**
    * Call MCP server tool
    */
-  async callServerTool(serverName: string, toolName: string, args: any = {}): Promise<MCPToolResult> {
+  async callServerTool(
+    serverName: string,
+    toolName: string,
+    args: any = {},
+  ): Promise<MCPToolResult> {
     const client = await this.getClient(serverName);
     return client.callTool(toolName, args);
   }
@@ -348,7 +377,13 @@ export class MCPClientManager {
   async getAllAvailableTools(): Promise<Record<string, MCPTool[]>> {
     const result: Record<string, MCPTool[]> = {};
 
-    for (const serverName of ['code-review', 'security-audit', 'performance-optimization', 'testing-strategy', 'librarian']) {
+    for (const serverName of [
+      "code-review",
+      "security-audit",
+      "performance-optimization",
+      "testing-strategy",
+      "librarian",
+    ]) {
       try {
         const client = await this.getClient(serverName);
         result[serverName] = client.getAvailableTools();
@@ -356,7 +391,7 @@ export class MCPClientManager {
         frameworkLogger.log(
           "mcp-client-manager",
           `failed to get tools for ${serverName}: ${error instanceof Error ? error.message : String(error)}`,
-          "info"
+          "info",
         );
       }
     }

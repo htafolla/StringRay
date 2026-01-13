@@ -31,7 +31,7 @@ export class SessionCoordinationValidator {
     const metrics = this.sessionMonitor.collectMetrics(sessionId);
 
     // Validate session exists and is active
-    if (!sessionStatus || sessionStatus.status !== 'active') {
+    if (!sessionStatus || sessionStatus.status !== "active") {
       issues.push("Session not found or not active");
       return {
         valid: false,
@@ -40,21 +40,27 @@ export class SessionCoordinationValidator {
           totalMessages: 0,
           averageResponseTime: 0,
           coordinationEfficiency: 0,
-          conflictRate: 0
-        }
+          conflictRate: 0,
+        },
       };
     }
 
     // Check for excessive conflicts based on session metrics
-    const conflictRate = metrics.failedInteractions / Math.max(metrics.totalInteractions, 1);
-    if (conflictRate > 0.1) { // More than 10% conflicts
+    const conflictRate =
+      metrics.failedInteractions / Math.max(metrics.totalInteractions, 1);
+    if (conflictRate > 0.1) {
+      // More than 10% conflicts
       issues.push(`High conflict rate: ${(conflictRate * 100).toFixed(1)}%`);
     }
 
     // Check coordination efficiency
-    const coordinationEfficiency = metrics.successfulInteractions / Math.max(metrics.totalInteractions, 1);
-    if (coordinationEfficiency < 0.8) { // Less than 80% efficiency
-      issues.push(`Low coordination efficiency: ${(coordinationEfficiency * 100).toFixed(1)}%`);
+    const coordinationEfficiency =
+      metrics.successfulInteractions / Math.max(metrics.totalInteractions, 1);
+    if (coordinationEfficiency < 0.8) {
+      // Less than 80% efficiency
+      issues.push(
+        `Low coordination efficiency: ${(coordinationEfficiency * 100).toFixed(1)}%`,
+      );
     }
 
     // Check for agent count consistency
@@ -75,8 +81,8 @@ export class SessionCoordinationValidator {
         totalMessages: sessionStatus.agentCount * 10, // Estimate based on agent count
         averageResponseTime: 1000, // Estimate - would need real communication tracking
         coordinationEfficiency,
-        conflictRate
-      }
+        conflictRate,
+      },
     };
   }
 
@@ -99,7 +105,7 @@ export class SessionCoordinationValidator {
         valid: false,
         issues,
         cycles: [],
-        orphanedAgents: []
+        orphanedAgents: [],
       };
     }
 
@@ -119,7 +125,7 @@ export class SessionCoordinationValidator {
       valid: issues.length === 0,
       issues,
       cycles,
-      orphanedAgents
+      orphanedAgents,
     };
   }
 
@@ -140,7 +146,7 @@ export class SessionCoordinationValidator {
         valid: true,
         issues: [],
         sharedKeys: [],
-        consistencyScore: 1.0
+        consistencyScore: 1.0,
       };
     }
 
@@ -151,27 +157,36 @@ export class SessionCoordinationValidator {
     let consistencyScore = 1.0;
 
     for (const agent of agents) {
-      const agentContext = this.sessionCoordinator.getSharedContext(sessionId, agent);
+      const agentContext = this.sessionCoordinator.getSharedContext(
+        sessionId,
+        agent,
+      );
       if (agentContext) {
         const agentKeys = Object.keys(agentContext);
-        const missingKeys = sharedKeys.filter(key => !agentKeys.includes(key));
+        const missingKeys = sharedKeys.filter(
+          (key) => !agentKeys.includes(key),
+        );
 
         if (missingKeys.length > 0) {
           consistencyScore -= 0.1;
-          issues.push(`Agent ${agent} missing shared keys: ${missingKeys.join(", ")}`);
+          issues.push(
+            `Agent ${agent} missing shared keys: ${missingKeys.join(", ")}`,
+          );
         }
       }
     }
 
     if (consistencyScore < 0.8) {
-      issues.push(`Low context consistency: ${(consistencyScore * 100).toFixed(1)}%`);
+      issues.push(
+        `Low context consistency: ${(consistencyScore * 100).toFixed(1)}%`,
+      );
     }
 
     return {
       valid: issues.length === 0,
       issues,
       sharedKeys,
-      consistencyScore
+      consistencyScore,
     };
   }
 
@@ -179,17 +194,22 @@ export class SessionCoordinationValidator {
     if (communications.length === 0) return 0;
 
     const responseTimes = communications
-      .filter(comm => comm.responseTime)
-      .map(comm => comm.responseTime);
+      .filter((comm) => comm.responseTime)
+      .map((comm) => comm.responseTime);
 
-    return responseTimes.reduce((sum, time) => sum + time, 0) / responseTimes.length;
+    return (
+      responseTimes.reduce((sum, time) => sum + time, 0) / responseTimes.length
+    );
   }
 
-  private findIsolatedAgents(sessionId: string, communications: any[]): string[] {
+  private findIsolatedAgents(
+    sessionId: string,
+    communications: any[],
+  ): string[] {
     const agents = this.sessionCoordinator.getSessionAgents(sessionId);
     const activeAgents = new Set();
 
-    communications.forEach(comm => {
+    communications.forEach((comm) => {
       activeAgents.add(comm.from);
       activeAgents.add(comm.to);
     });
@@ -241,6 +261,6 @@ export class SessionCoordinationValidator {
       }
     }
 
-    return allAgents.filter(agent => !agentsWithDeps.has(agent));
+    return allAgents.filter((agent) => !agentsWithDeps.has(agent));
   }
 }

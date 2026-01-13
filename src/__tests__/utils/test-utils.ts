@@ -69,7 +69,7 @@ export function setupStandardMocks() {
 
 // Utility to wait for debounced operations
 export async function waitForDebounce(delay = 150) {
-  await new Promise(resolve => setTimeout(resolve, delay));
+  await new Promise((resolve) => setTimeout(resolve, delay));
 }
 
 // Utility to create mock StateManager for testing
@@ -124,7 +124,10 @@ export function createMockSessionCoordinator() {
 }
 
 // Utility to create mock cleanup manager
-export function createMockCleanupManager(stateManager?: any, sessionCoordinator?: any) {
+export function createMockCleanupManager(
+  stateManager?: any,
+  sessionCoordinator?: any,
+) {
   const metadata = new Map<string, any>();
 
   return {
@@ -160,7 +163,11 @@ export function createMockCleanupManager(stateManager?: any, sessionCoordinator?
 }
 
 // Utility to create mock session monitor
-export function createMockSessionMonitor(stateManager?: any, sessionCoordinator?: any, cleanupManager?: any) {
+export function createMockSessionMonitor(
+  stateManager?: any,
+  sessionCoordinator?: any,
+  cleanupManager?: any,
+) {
   const healthData = new Map<string, any>();
   const metricsData = new Map<string, any>();
 

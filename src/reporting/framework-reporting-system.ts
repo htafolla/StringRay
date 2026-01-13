@@ -275,15 +275,19 @@ const report = await reportingSystem.generateCustomReport('${template.name}');
         const rotatedLogs = await this.readRotatedLogFiles(config.timeRange);
         allLogs = [...allLogs, ...rotatedLogs];
       } catch (error) {
-        console.warn(
-          "Could not read rotated log files:",
-          error,
-        );
+        console.warn("Could not read rotated log files:", error);
       }
     }
 
-    const uniqueLogs = allLogs.filter((log, index, self) =>
-      index === self.findIndex(l => l.timestamp === log.timestamp && l.component === log.component && l.action === log.action)
+    const uniqueLogs = allLogs.filter(
+      (log, index, self) =>
+        index ===
+        self.findIndex(
+          (l) =>
+            l.timestamp === log.timestamp &&
+            l.component === log.component &&
+            l.action === log.action,
+        ),
     );
 
     return uniqueLogs.sort((a, b) => a.timestamp - b.timestamp);
@@ -399,7 +403,9 @@ const report = await reportingSystem.generateCustomReport('${template.name}');
   /**
    * Read and parse the current log file
    */
-  private async readCurrentLogFile(timeRange?: ReportConfig["timeRange"]): Promise<any[]> {
+  private async readCurrentLogFile(
+    timeRange?: ReportConfig["timeRange"],
+  ): Promise<any[]> {
     const logs: any[] = [];
     const logDir = path.join(process.cwd(), ".opencode", "logs");
     const logFile = path.join(logDir, "framework-activity.log");
@@ -425,7 +431,11 @@ const report = await reportingSystem.generateCustomReport('${template.name}');
         if (line.trim()) {
           try {
             const logEntry = this.parseLogLine(line);
-            if (logEntry && logEntry.timestamp >= startTime && logEntry.timestamp <= endTime) {
+            if (
+              logEntry &&
+              logEntry.timestamp >= startTime &&
+              logEntry.timestamp <= endTime
+            ) {
               logs.push(logEntry);
             }
           } catch (error) {

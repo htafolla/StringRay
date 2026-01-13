@@ -25,7 +25,9 @@ describe("Processor Activation", () => {
 
   beforeEach(() => {
     setupStandardMocks();
-    stateManager = new StrRayStateManager(`/test/state-processor-${Date.now()}.json`);
+    stateManager = new StrRayStateManager(
+      `/test/state-processor-${Date.now()}.json`,
+    );
     processorManager = new ProcessorManager(stateManager);
   });
 

@@ -102,7 +102,10 @@
     },
     "librarian": {
       "type": "local",
-      "command": ["node", "dist/plugin/mcps/knowledge-skills/project-analysis.server.js"],
+      "command": [
+        "node",
+        "dist/plugin/mcps/knowledge-skills/project-analysis.server.js"
+      ],
       "enabled": true
     }
   }

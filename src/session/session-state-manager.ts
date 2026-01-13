@@ -352,6 +352,8 @@ export class SessionStateManager {
         "restore_communications",
         "restore_context",
         "revert_dependencies",
+        "revert_cleanup",
+        "restore_coordinator",
       ],
     };
 
@@ -362,9 +364,106 @@ export class SessionStateManager {
   }
 
   /**
+   * Validate migration plan before execution
+   */
+  async validateMigrationPlan(plan: MigrationPlan): Promise<{
+    valid: boolean;
+    errors: string[];
+    warnings: string[];
+  }> {
+    const errors: string[] = [];
+    const warnings: string[] = [];
+
+    // Validate session exists
+    const sessionStatus = this.sessionCoordinator.getSessionStatus(plan.sessionId);
+    if (!sessionStatus) {
+      errors.push(`Session ${plan.sessionId} does not exist`);
+      return { valid: false, errors, warnings };
+    }
+
+    // Validate target coordinator
+    if (!plan.targetCoordinator) {
+      errors.push("Target coordinator not specified");
+    }
+
+    // Validate migration steps - match the steps created by planMigration
+    const requiredSteps = [
+      "validate_target_coordinator",
+      "transfer_active_delegations",
+      "transfer_pending_communications",
+      "transfer_shared_context",
+      "update_dependencies",
+      "cleanup_source"
+    ];
+
+    for (const requiredStep of requiredSteps) {
+      if (!plan.migrationSteps.includes(requiredStep)) {
+        errors.push(`Missing required migration step: ${requiredStep}`);
+      }
+    }
+
+    // Check for shared context that needs to be transferred
+    const sharedContext = this.sessionCoordinator.getSharedContext(plan.sessionId, "*");
+    if (sharedContext) {
+      warnings.push(`Session has shared context that will be transferred`);
+    }
+
+    return {
+      valid: errors.length === 0,
+      errors,
+      warnings
+    };
+  }
+
+  /**
+   * Validate rollback capability for a migration plan
+   */
+  validateRollbackCapability(plan: MigrationPlan): {
+    canRollback: boolean;
+    reason?: string;
+  } {
+    const rollbackSteps = plan.rollbackSteps || [];
+
+    if (rollbackSteps.length === 0) {
+      return {
+        canRollback: false,
+        reason: "No rollback steps defined"
+      };
+    }
+
+    const migrationSteps = plan.migrationSteps || [];
+    if (rollbackSteps.length !== migrationSteps.length) {
+      return {
+        canRollback: false,
+        reason: "Rollback steps don't match migration steps"
+      };
+    }
+
+    return { canRollback: true };
+  }
+
+  /**
+   * Find orphaned agents in dependency graph
+   */
+  findOrphanedAgents(allAgents: string[], dependencies: any): string[] {
+    const agentsWithDeps = new Set(Object.keys(dependencies));
+
+    // Add agents that are dependencies of others
+    for (const deps of Object.values(dependencies)) {
+      for (const dep of deps as string[]) {
+        agentsWithDeps.add(dep);
+      }
+    }
+
+    return allAgents.filter(agent => !agentsWithDeps.has(agent));
+  }
+
+  /**
    * Execute session migration
    */
   async executeMigration(plan: MigrationPlan): Promise<boolean> {
+    const rollbackData: any[] = [];
+
     try {
       console.log(
         `🚀 Session State Manager: Executing migration for ${plan.sessionId}`,
@@ -372,6 +471,102 @@ export class SessionStateManager {
 
       for (const step of plan.migrationSteps) {
         console.log(`  → Executing step: ${step}`);
+
+        switch (step) {
+          case "backup_current_state": {
+            const sessionState = this.sessionCoordinator.getSessionStatus(plan.sessionId);
+            const dependencies = this.dependencies.get(plan.sessionId);
+            const group = Array.from(this.sessionGroups.values()).find(g =>
+              g.sessionIds.includes(plan.sessionId)
+            );
+
+            rollbackData.push({
+              step,
+              sessionState,
+              dependencies,
+              group,
+            });
+            break;
+          }
+
+          case "update_coordinator": {
+            this.stateManager.set(
+              `session:${plan.sessionId}:coordinator`,
+              { coordinatorId: plan.targetCoordinator, migratedAt: new Date() }
+            );
+            break;
+          }
+
+          case "transfer_dependencies": {
+            const deps = this.dependencies.get(plan.sessionId);
+            if (deps) {
+              this.stateManager.set(
+                `session:${plan.sessionId}:dependencies`,
+                deps
+              );
+            }
+            break;
+          }
+
+          case "transfer_communications": {
+            const sessionStatus = this.sessionCoordinator.getSessionStatus(plan.sessionId);
+            if (sessionStatus) {
+              this.stateManager.set(
+                `session:${plan.sessionId}:status`,
+                sessionStatus
+              );
+            }
+            break;
+          }
+
+          case "transfer_context": {
+            // Transfer all shared context keys for this session
+            // Note: This is a simplified implementation
+            const session = this.sessionCoordinator["sessions"].get(plan.sessionId);
+            if (session) {
+              const contextMap = Object.fromEntries(session.coordinationState.sharedContext);
+              this.stateManager.set(
+                `session:${plan.sessionId}:shared`,
+                contextMap
+              );
+            }
+            break;
+          }
+
+          case "update_session_groups": {
+            for (const [groupId, group] of this.sessionGroups) {
+              if (group.sessionIds.includes(plan.sessionId)) {
+                const updatedGroup = {
+                  ...group,
+                  coordinatorId: plan.targetCoordinator,
+                };
+                this.sessionGroups.set(groupId, updatedGroup);
+                this.persistSessionGroups();
+                break;
+              }
+            }
+            break;
+          }
+
+          case "notify_agents": {
+            await this.sessionCoordinator.sendMessage(
+              plan.sessionId,
+              "system",
+              "orchestrator",
+              `Session migrated to coordinator: ${plan.targetCoordinator}`,
+              "high"
+            );
+            break;
+          }
+
+          case "verify_migration": {
+            const coordinatorData = this.stateManager.get(`session:${plan.sessionId}:coordinator`);
+            if (!coordinatorData || (coordinatorData as any).coordinatorId !== plan.targetCoordinator) {
+              throw new Error(`Migration verification failed: coordinator not updated properly`);
+            }
+            break;
+          }
+        }
       }
 
       console.log(
@@ -383,7 +578,7 @@ export class SessionStateManager {
         `❌ Session State Manager: Migration failed for ${plan.sessionId}:`,
         error,
       );
-      await this.rollbackMigration(plan);
+      await this.rollbackMigration(plan, rollbackData);
       return false;
     }
   }
@@ -498,11 +693,36 @@ export class SessionStateManager {
     }
   }
 
-  private async rollbackMigration(plan: MigrationPlan): Promise<void> {
+  private async rollbackMigration(plan: MigrationPlan, rollbackData: any[] = []): Promise<void> {
     console.log(
       `↩️ Session State Manager: Rolling back migration for ${plan.sessionId}`,
     );
 
+    // Restore from backup data if available
+    for (const backup of rollbackData.reverse()) {
+      try {
+        switch (backup.step) {
+          case "backup_current_state":
+            if (backup.sessionState) {
+              this.stateManager.set(`session:${plan.sessionId}:status`, backup.sessionState);
+            }
+            if (backup.dependencies) {
+              this.dependencies.set(plan.sessionId, backup.dependencies);
+              this.persistDependencies();
+            }
+            if (backup.group) {
+              this.sessionGroups.set(backup.group.id, backup.group);
+              this.persistSessionGroups();
+            }
+            break;
+        }
+        console.log(`  ← Restored ${backup.step}`);
+      } catch (error) {
+        console.warn(`  ⚠️ Failed to restore ${backup.step}:`, error);
+      }
+    }
+
+    // Execute rollback steps
     for (const step of plan.rollbackSteps.reverse()) {
       console.log(`  ← Rolling back step: ${step}`);
     }

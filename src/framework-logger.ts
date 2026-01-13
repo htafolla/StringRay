@@ -9,6 +9,7 @@ export interface FrameworkLogEntry {
   component: string;
   action: string;
   agent: string;
+  sessionId?: string | undefined;
   status: "success" | "error" | "info" | "debug";
   details?: any;
 }
@@ -22,6 +23,7 @@ export class FrameworkUsageLogger {
     action: string,
     status: "success" | "error" | "info" | "debug" = "info",
     details?: any,
+    sessionId?: string,
   ) {
     // Check if logging is enabled globally
     if (!isLoggingEnabled()) {
@@ -38,6 +40,7 @@ export class FrameworkUsageLogger {
       component,
       action,
       agent: "sisyphus",
+      sessionId,
       status,
       details,
     };

@@ -4,7 +4,8 @@ import { createCodebaseContextAnalyzer } from "../delegation/codebase-context-an
 export const librarian: AgentConfig = {
   name: "librarian",
   model: "opencode/grok-code",
-  description: "Codebase and documentation search specialist. Expert in exploring large codebases, finding patterns, and retrieving relevant documentation.",
+  description:
+    "Codebase and documentation search specialist. Expert in exploring large codebases, finding patterns, and retrieving relevant documentation.",
   mode: "subagent",
   system: `You are the Librarian subagent for the StrRay Framework v1.0.0.
 

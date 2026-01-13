@@ -1,20 +1,20 @@
 import { describe, test, expect, beforeEach, afterEach } from "vitest";
 import { StrRayStateManager } from "../../state/state-manager";
-import { createSessionCoordinator } from "../../delegation/session-coordinator";
-import { createSessionStateManager } from "../../session/session-state-manager";
+import { SessionCoordinator } from "../../delegation/session-coordinator";
+import { SessionStateManager } from "../../session/session-state-manager";
+import { setupStandardMocks, waitForDebounce } from "../utils/test-utils";
 
 describe("Cross-Session State Sharing", () => {
   let stateManager: StrRayStateManager;
   let sessionCoordinator: any;
   let stateManagerInstance: any;
 
-  beforeEach(() => {
+  beforeEach(async () => {
+    setupStandardMocks();
     stateManager = new StrRayStateManager();
-    sessionCoordinator = createSessionCoordinator(stateManager);
-    stateManagerInstance = createSessionStateManager(
-      stateManager,
-      sessionCoordinator,
-    );
+    await new Promise((resolve) => setTimeout(resolve, 10)); // Wait for initialization
+    sessionCoordinator = new SessionCoordinator(stateManager);
+    stateManagerInstance = new SessionStateManager(stateManager, sessionCoordinator);
   });
 
   afterEach(() => {
@@ -305,7 +305,7 @@ describe("Cross-Session State Sharing", () => {
       expect(plan.sessionId).toBe(sessionId);
       expect(plan.targetCoordinator).toBe(targetCoordinator);
       expect(plan.migrationSteps).toHaveLength(6);
-      expect(plan.rollbackSteps).toHaveLength(4);
+      expect(plan.rollbackSteps).toHaveLength(6);
     });
 
     test("should handle migration planning for non-existent session", () => {

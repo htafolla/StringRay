@@ -1,11 +1,14 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { StrRayStateManager, StateManager } from "../../state/state-manager";
+import { setupStandardMocks, waitForDebounce } from "../utils/test-utils";
 
 describe("StrRayStateManager", () => {
   let stateManager: StateManager;
 
-  beforeEach(() => {
-    stateManager = new StrRayStateManager();
+  beforeEach(async () => {
+    setupStandardMocks();
+    stateManager = new StrRayStateManager(`/test/state-manager-${Date.now()}.json`);
+    await new Promise(resolve => setTimeout(resolve, 10)); // Wait for initialization
   });
 
   describe("get method", () => {

@@ -1,27 +1,41 @@
 import { describe, test, expect, beforeEach, afterEach } from "vitest";
-import { vi } from "vitest";
 import { StrRayStateManager } from "../../state/state-manager";
-import { createSessionCoordinator } from "../../delegation/session-coordinator";
-import { createSessionCleanupManager } from "../../session/session-cleanup-manager";
-import {
-  createSessionMonitor,
-  MonitorConfig,
-} from "../../session/session-monitor";
+import { SessionCoordinator } from "../../delegation/session-coordinator";
+import { SessionCleanupManager } from "../../session/session-cleanup-manager";
+import { SessionMonitor } from "../../session/session-monitor";
+import { setupStandardMocks, waitForDebounce } from "../utils/test-utils";
 
 describe("Session Monitoring Integration", () => {
   let stateManager: StrRayStateManager;
-  let sessionCoordinator: any;
-  let cleanupManager: any;
-  let sessionMonitor: any;
+  let sessionCoordinator: SessionCoordinator;
+  let cleanupManager: SessionCleanupManager;
+  let sessionMonitor: SessionMonitor;
 
-  beforeEach(() => {
+  beforeEach(async () => {
+    // Use standardized mock setup
+    setupStandardMocks();
+
     stateManager = new StrRayStateManager();
-    sessionCoordinator = createSessionCoordinator(stateManager);
-    cleanupManager = createSessionCleanupManager(stateManager);
-    sessionMonitor = createSessionMonitor(
+    await new Promise((resolve) => setTimeout(resolve, 10)); // Wait for initialization
+    sessionCoordinator = new SessionCoordinator(stateManager);
+    cleanupManager = new SessionCleanupManager(stateManager);
+    sessionMonitor = new SessionMonitor(
       stateManager,
       sessionCoordinator,
       cleanupManager,
+      {
+        healthCheckIntervalMs: 30000,
+        metricsCollectionIntervalMs: 60000,
+        alertThresholds: {
+          maxResponseTime: 5000,
+          maxErrorRate: 0.1,
+          maxMemoryUsage: 100 * 1024 * 1024,
+          minCoordinationEfficiency: 0.8,
+          maxConflicts: 10,
+        },
+        enableAlerts: true,
+        enableMetrics: true,
+      }
     );
   });
 
@@ -388,7 +402,7 @@ describe("Session Monitoring Integration", () => {
 
   describe("Automatic Monitoring", () => {
     test("should start health checks automatically", () => {
-      const customMonitor = createSessionMonitor(
+      const customMonitor = new SessionMonitor(
         stateManager,
         sessionCoordinator,
         cleanupManager,
@@ -401,7 +415,7 @@ describe("Session Monitoring Integration", () => {
     });
 
     test("should start metrics collection automatically", () => {
-      const customMonitor = createSessionMonitor(
+      const customMonitor = new SessionMonitor(
         stateManager,
         sessionCoordinator,
         cleanupManager,
@@ -427,7 +441,7 @@ describe("Session Monitoring Integration", () => {
         enableMetrics: false,
       };
 
-      const customMonitor = createSessionMonitor(
+      const customMonitor = new SessionMonitor(
         stateManager,
         sessionCoordinator,
         cleanupManager,
@@ -450,12 +464,15 @@ describe("Session Monitoring Integration", () => {
 
       await sessionMonitor.performHealthCheck(sessionId);
 
+      // Wait for debounced persistence to complete
+      await new Promise(resolve => setTimeout(resolve, 150));
+
       const persistedHealth = stateManager.get("monitor:health");
       expect(persistedHealth).toBeDefined();
       expect(persistedHealth).toHaveProperty(sessionId);
     });
 
-    test("should persist metrics data to state manager", () => {
+    test("should persist metrics data to state manager", async () => {
       const sessionId = "persist-metrics";
 
       sessionCoordinator.initializeSession(sessionId);
@@ -463,6 +480,9 @@ describe("Session Monitoring Integration", () => {
       sessionMonitor.registerSession(sessionId);
 
       sessionMonitor.collectMetrics(sessionId);
+
+      // Wait for debounced persistence to complete
+      await new Promise(resolve => setTimeout(resolve, 150));
 
       const persistedMetrics = stateManager.get("monitor:metrics");
       expect(persistedMetrics).toBeDefined();
@@ -522,7 +542,7 @@ describe("Session Monitoring Integration", () => {
       stateManager.set("monitor:health", mockHealth);
       stateManager.set("monitor:metrics", mockMetrics);
 
-      const newMonitor = createSessionMonitor(
+      const newMonitor = new SessionMonitor(
         stateManager,
         sessionCoordinator,
         cleanupManager,

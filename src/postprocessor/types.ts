@@ -34,6 +34,35 @@ export interface PostProcessorConfig {
     rollbackThreshold: number;
     emergencyThreshold: number;
   };
+
+  // Redeploy configuration
+  redeploy: {
+    maxRetries: number;
+    retryDelay: number;
+    backoffStrategy: string;
+    canaryEnabled: boolean;
+    canaryPhases: number;
+    canaryTrafficIncrement: number;
+    healthCheckTimeout: number;
+    rollbackOnFailure: boolean;
+  };
+
+  // Success handling configuration
+  success: {
+    successConfirmation: boolean;
+    cleanupEnabled: boolean;
+    notificationEnabled: boolean;
+    metricsCollection: boolean;
+  };
+
+  // Reporting configuration
+  reporting: {
+    enabled: boolean;
+    autoGenerate: boolean;
+    reportThreshold: number; // Minimum complexity score to trigger auto-report
+    reportDir: string;
+    retentionDays: number;
+  };
 }
 
 export interface PostProcessorContext {

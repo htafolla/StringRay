@@ -545,6 +545,63 @@ pipeline {
     testRunTitle: 'Performance Regression Tests'
   displayName: 'Publish Test Results'`;
   }
+
+  /**
+   * Create Azure DevOps pipeline for performance gates
+   */
+  createAzurePipeline(): string {
+    return `# StrRay Performance Gates Azure Pipeline
+trigger:
+- main
+- develop
+
+pr:
+- main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+- task: NodeTool@0
+  inputs:
+    versionSpec: '18.x'
+  displayName: 'Setup Node.js'
+
+- script: npm ci
+  displayName: 'Install dependencies'
+
+- script: npm run build
+  displayName: 'Build application'
+
+- script: |
+    node -e "
+    import('./dist/performance/performance-ci-gates.js').then(({ performanceCIGates }) => {
+      return performanceCIGates.runPerformanceGates().then(result => {
+        if (!result.success) {
+          console.error('Performance gates failed');
+          process.exit(1);
+        }
+        console.log('Performance gates passed');
+      });
+    }).catch(console.error);
+    "
+  displayName: 'Run Performance Gates'
+
+- task: PublishBuildArtifacts@1
+  condition: always()
+  inputs:
+    pathToPublish: 'performance-reports'
+    artifactName: 'performance-reports'
+  displayName: 'Publish Performance Reports'
+
+- task: PublishTestResults@2
+  condition: always()
+  inputs:
+    testResultsFiles: 'performance-reports/regression-report-*.json'
+    testRunTitle: 'Performance Regression Tests'
+    testResultsFormat: 'JUnit'
+  displayName: 'Publish Test Results'`;
+  }
 }
 
 // Export singleton instance

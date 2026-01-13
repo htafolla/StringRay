@@ -17,13 +17,15 @@ import {
   ProcessorResult,
 } from "../../processors/processor-manager";
 import { StrRayStateManager } from "../../state/state-manager";
+import { setupStandardMocks } from "../utils/test-utils";
 
 describe("Processor Activation", () => {
   let processorManager: ProcessorManager;
   let stateManager: StrRayStateManager;
 
   beforeEach(() => {
-    stateManager = new StrRayStateManager();
+    setupStandardMocks();
+    stateManager = new StrRayStateManager(`/test/state-processor-${Date.now()}.json`);
     processorManager = new ProcessorManager(stateManager);
   });
 

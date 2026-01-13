@@ -48,15 +48,15 @@ describe("Architect Agent Configuration", () => {
   describe("Key Facilities", () => {
     it("should specify architectural facilities", () => {
       const system = architect.system;
-      expect(system).toContain("Global state coordinator");
-      expect(system).toContain("Complexity analysis engine");
-      expect(system).toContain("Delegation system");
-      expect(system).toContain("State synchronization");
+      expect(system).toContain("Global State Coordinator");
+      expect(system).toContain("Complexity Analysis Engine");
+      expect(system).toContain("Delegation System");
+      expect(system).toContain("state synchronization");
     });
 
     it("should define processor pipeline", () => {
       const system = architect.system;
-      expect(system).toContain("Processor pipeline");
+      expect(system).toContain("Processor Pipeline");
       expect(system).toContain("stateValidation");
       expect(system).toContain("dependencyMapping");
       expect(system).toContain("architectureReview");
@@ -79,7 +79,7 @@ describe("Architect Agent Configuration", () => {
 
     it("should reference Universal Development Codex", () => {
       const system = architect.system;
-      expect(system).toContain("Universal Development Codex v1.2.20");
+      expect(system).toContain("Universal Development Codex v1.2.24");
     });
   });
 
@@ -99,10 +99,10 @@ describe("Architect Agent Configuration", () => {
     it("should define architectural integration points", () => {
       const system = architect.system;
       expect(system).toContain("Integration Points");
-      expect(system).toContain("State manager");
-      expect(system).toContain("Delegation system");
-      expect(system).toContain("Boot orchestrator");
-      expect(system).toContain("Monitoring system");
+      expect(system).toContain("State Manager");
+      expect(system).toContain("Delegation System");
+      expect(system).toContain("Boot Orchestrator");
+      expect(system).toContain("Monitoring System");
     });
   });
 });

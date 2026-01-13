@@ -44,6 +44,7 @@ export interface MonitorConfig {
     maxErrorRate: number;
     maxMemoryUsage: number;
     minCoordinationEfficiency: number;
+    maxConflicts: number;
   };
   enableAlerts: boolean;
   enableMetrics: boolean;
@@ -83,12 +84,13 @@ export class SessionMonitor {
     this.config = {
       healthCheckIntervalMs: 30000,
       metricsCollectionIntervalMs: 60000,
-      alertThresholds: {
-        maxResponseTime: 5000,
-        maxErrorRate: 0.1,
-        maxMemoryUsage: 100 * 1024 * 1024,
-        minCoordinationEfficiency: 0.8,
-      },
+  alertThresholds: {
+    maxResponseTime: 5000,
+    maxErrorRate: 0.1,
+    maxMemoryUsage: 100 * 1024 * 1024,
+    minCoordinationEfficiency: 0.8,
+    maxConflicts: 10,
+  },
       enableAlerts: true,
       enableMetrics: true,
       ...config,
@@ -196,7 +198,23 @@ export class SessionMonitor {
           status = "degraded";
         }
       } else {
-        health.memoryUsage = Math.random() * 50 * 1024 * 1024;
+        // Calculate real session metrics when metadata not available
+        health.memoryUsage = this.calculateSessionMemoryUsage(sessionId);
+        health.activeAgents = sessionStatus.agentCount;
+      }
+
+      // Check for coordination issues
+      const conflictCount = this.countSessionConflicts(sessionId);
+      if (conflictCount > this.config.alertThresholds.maxConflicts) {
+        issues.push(`High conflict rate: ${conflictCount} unresolved conflicts`);
+        status = "degraded";
+      }
+
+      // Check for communication delays
+      const avgResponseTime = this.calculateAverageResponseTime(sessionId);
+      if (avgResponseTime > this.config.alertThresholds.maxResponseTime) {
+        issues.push(`Slow response time: ${avgResponseTime}ms average`);
+        status = "degraded";
       }
     } catch (error) {
       issues.push(`Health check failed: ${error}`);
@@ -449,6 +467,43 @@ export class SessionMonitor {
     }
 
     console.log("🛑 Session Monitor: Shutdown complete");
+  }
+
+  private calculateSessionMemoryUsage(sessionId: string): number {
+    // Estimate memory usage based on session activity
+    const metrics = this.collectMetrics(sessionId);
+    if (!metrics) return 0;
+
+    // Base memory + per-interaction overhead
+    const baseMemory = 1024 * 1024; // 1MB base
+    const perInteractionMemory = 8 * 1024; // 8KB per interaction
+    const totalInteractions = metrics.totalInteractions;
+
+    return baseMemory + (totalInteractions * perInteractionMemory);
+  }
+
+  private countSessionConflicts(sessionId: string): number {
+    // Estimate conflicts based on failed interactions
+    const metrics = this.collectMetrics(sessionId);
+    if (!metrics) return 0;
+
+    // Conflicts are estimated as failed interactions that might indicate coordination issues
+    return Math.floor(metrics.failedInteractions * 0.1); // Assume 10% of failures are conflicts
+  }
+
+  private calculateAverageResponseTime(sessionId: string): number {
+    // Calculate average response time from recent metrics
+    const history = this.getMetricsHistory(sessionId, 10); // Last 10 metrics
+    if (history.length === 0) return 0;
+
+    const totalResponseTime = history.reduce((sum, metric) => {
+      // Estimate response time based on coordination efficiency
+      // This is a simplified calculation
+      return sum + (metric.successfulInteractions > 0 ?
+        1000 / metric.successfulInteractions : 1000);
+    }, 0);
+
+    return totalResponseTime / history.length;
   }
 }
 

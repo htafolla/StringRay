@@ -31,6 +31,32 @@ export const defaultConfig: PostProcessorConfig = {
     rollbackThreshold: 3,
     emergencyThreshold: 5,
   },
+
+  redeploy: {
+    maxRetries: 3,
+    retryDelay: 30000,
+    backoffStrategy: "exponential" as const,
+    canaryEnabled: true,
+    canaryPhases: 3,
+    canaryTrafficIncrement: 25,
+    healthCheckTimeout: 60000,
+    rollbackOnFailure: true,
+  },
+
+  success: {
+    successConfirmation: true,
+    cleanupEnabled: true,
+    notificationEnabled: true,
+    metricsCollection: true,
+  },
+
+  reporting: {
+    enabled: true,
+    autoGenerate: true,
+    reportThreshold: 50, // Auto-generate reports for complexity scores >= 50
+    reportDir: ".opencode/reports",
+    retentionDays: 30,
+  },
 };
 
 export function validateConfig(

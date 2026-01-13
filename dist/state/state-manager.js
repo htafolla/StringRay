@@ -1,7 +1,100 @@
 import { frameworkLogger } from "../framework-logger.js";
 export class StrRayStateManager {
     store = new Map();
+    persistencePath;
+    persistenceEnabled;
+    writeQueue = new Map();
+    initialized = false;
+    constructor(persistencePath = ".opencode/state", persistenceEnabled = true) {
+        this.persistencePath = persistencePath;
+        this.persistenceEnabled = persistenceEnabled;
+        this.initializePersistence();
+    }
+    async initializePersistence() {
+        if (!this.persistenceEnabled) {
+            this.initialized = true;
+            return;
+        }
+        try {
+            const fs = await import("fs");
+            const path = await import("path");
+            // Ensure persistence directory exists
+            const dir = path.dirname(this.persistencePath);
+            if (!fs.existsSync(dir)) {
+                fs.mkdirSync(dir, { recursive: true });
+            }
+            // Load existing state from disk
+            if (fs.existsSync(this.persistencePath)) {
+                const data = fs.readFileSync(this.persistencePath, "utf8");
+                const parsed = JSON.parse(data);
+                for (const [key, value] of Object.entries(parsed)) {
+                    this.store.set(key, value);
+                }
+                frameworkLogger.log("state-manager", "persistence loaded", "success", {
+                    keysLoaded: Object.keys(parsed).length,
+                });
+            }
+            this.initialized = true;
+        }
+        catch (error) {
+            frameworkLogger.log("state-manager", "persistence initialization failed", "error", {
+                error: error instanceof Error ? error.message : String(error),
+            });
+            // Continue without persistence rather than failing
+            this.persistenceEnabled = false;
+            this.initialized = true;
+        }
+    }
+    async persistToDisk() {
+        if (!this.persistenceEnabled || !this.initialized)
+            return;
+        try {
+            const fs = await import("fs");
+            // Convert Map to object for JSON serialization
+            const data = {};
+            for (const [key, value] of this.store.entries()) {
+                // Only persist serializable data
+                if (this.isSerializable(value)) {
+                    data[key] = value;
+                }
+            }
+            fs.writeFileSync(this.persistencePath, JSON.stringify(data, null, 2));
+        }
+        catch (error) {
+            frameworkLogger.log("state-manager", "disk persistence failed", "error", {
+                error: error instanceof Error ? error.message : String(error),
+            });
+        }
+    }
+    isSerializable(value) {
+        try {
+            JSON.stringify(value);
+            return true;
+        }
+        catch {
+            return false;
+        }
+    }
+    schedulePersistence(key) {
+        // Debounce writes to disk (100ms delay)
+        const existingTimeout = this.writeQueue.get(key);
+        if (existingTimeout) {
+            clearTimeout(existingTimeout);
+        }
+        const timeout = setTimeout(() => {
+            this.persistToDisk();
+            this.writeQueue.delete(key);
+        }, 100);
+        this.writeQueue.set(key, timeout);
+    }
     get(key) {
+        // If not initialized, return undefined but don't log error for normal operation
+        // Initialization happens asynchronously, so early calls are expected
+        if (!this.initialized) {
+            // Only log as debug, not error, since this is expected during startup
+            frameworkLogger.log("state-manager", "get called before initialization", "debug", { key });
+            return undefined;
+        }
         const value = this.store.get(key);
         frameworkLogger.log("state-manager", "get operation", "info", {
             key,
@@ -10,13 +103,44 @@ export class StrRayStateManager {
         return value;
     }
     set(key, value) {
+        // Store in memory immediately, even if persistence isn't ready yet
         this.store.set(key, value);
+        // If initialized, schedule persistence
+        if (this.initialized && this.persistenceEnabled) {
+            this.schedulePersistence(key);
+        }
+        else if (!this.initialized) {
+            // Queue for persistence once initialized
+            frameworkLogger.log("state-manager", "set called before initialization, queued for persistence", "debug", { key });
+        }
         frameworkLogger.log("state-manager", "set operation", "success", { key });
     }
     clear(key) {
+        // Ensure persistence is initialized
+        if (!this.initialized) {
+            frameworkLogger.log("state-manager", "clear called before initialization", "error", { key });
+            return;
+        }
         const existed = this.store.has(key);
         this.store.delete(key);
+        // Immediately persist the deletion
+        if (this.persistenceEnabled && existed) {
+            this.persistToDisk();
+        }
         frameworkLogger.log("state-manager", "clear operation", existed ? "success" : "info", { key, existed });
+    }
+    // New method to check if persistence is enabled
+    isPersistenceEnabled() {
+        return this.persistenceEnabled;
+    }
+    // New method to get persistence stats
+    getPersistenceStats() {
+        return {
+            enabled: this.persistenceEnabled,
+            initialized: this.initialized,
+            keysInMemory: this.store.size,
+            pendingWrites: this.writeQueue.size,
+        };
     }
 }
 //# sourceMappingURL=state-manager.js.map

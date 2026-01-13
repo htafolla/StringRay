@@ -2,8 +2,8 @@
  * Webhook Trigger for Post-Processor
  */
 
-import { PostProcessor } from '../PostProcessor.js';
-import { PostProcessorContext } from '../types.js';
+import { PostProcessor } from "../PostProcessor.js";
+import { PostProcessorContext } from "../types.js";
 
 export class WebhookTrigger {
   private initialized = false;

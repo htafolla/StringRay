@@ -42,7 +42,7 @@ export interface PostProcessorContext {
   branch: string;
   author: string;
   files: string[];
-  trigger: 'git-hook' | 'webhook' | 'api' | 'manual';
+  trigger: "git-hook" | "webhook" | "api" | "manual";
 }
 
 export interface PostProcessorResult {
@@ -58,7 +58,7 @@ export interface PostProcessorResult {
 
 export interface MonitoringResult {
   commitSha: string;
-  overallStatus: 'success' | 'failure' | 'running';
+  overallStatus: "success" | "failure" | "running";
   timestamp: Date;
   ciStatus?: CIStatus;
   performanceStatus?: PerformanceStatus;
@@ -68,21 +68,21 @@ export interface MonitoringResult {
 }
 
 export interface CIStatus {
-  status: 'success' | 'failure' | 'running';
+  status: "success" | "failure" | "running";
   failedJobs: string[];
   totalJobs: number;
   duration: number;
 }
 
 export interface PerformanceStatus {
-  status: 'passed' | 'failed' | 'warning';
+  status: "passed" | "failed" | "warning";
   score: number;
   regressions: string[];
   duration: number;
 }
 
 export interface SecurityStatus {
-  status: 'passed' | 'failed' | 'warning';
+  status: "passed" | "failed" | "warning";
   vulnerabilities: number;
   criticalVulnerabilities: number;
   scanDuration: number;
@@ -90,7 +90,7 @@ export interface SecurityStatus {
 
 export interface FailureAnalysis {
   category: string;
-  severity: 'low' | 'medium' | 'high' | 'critical';
+  severity: "low" | "medium" | "high" | "critical";
   confidence: number;
   rootCause: string;
   recommendedActions: string[];
@@ -98,7 +98,11 @@ export interface FailureAnalysis {
 }
 
 export interface SuggestedFix {
-  type: 'dependency-update' | 'code-fix' | 'config-change' | 'test-regeneration';
+  type:
+    | "dependency-update"
+    | "code-fix"
+    | "config-change"
+    | "test-regeneration";
   confidence: number;
   description: string;
   files: string[];
@@ -122,7 +126,7 @@ export interface AppliedFix {
 }
 
 export interface EscalationResult {
-  level: 'manual-intervention' | 'rollback' | 'emergency';
+  level: "manual-intervention" | "rollback" | "emergency";
   reason: string;
   recommendations: string[];
   incidentReport: IncidentReport;
@@ -147,12 +151,12 @@ export interface EventTimeline {
 }
 
 export type PostProcessorEvent =
-  | { type: 'initialized'; config: PostProcessorConfig }
-  | { type: 'loop-started'; context: PostProcessorContext }
-  | { type: 'monitoring-completed'; result: MonitoringResult }
-  | { type: 'failure-detected'; analysis: FailureAnalysis }
-  | { type: 'fix-applied'; result: FixResult }
-  | { type: 'redeployment-initiated'; commitSha: string }
-  | { type: 'loop-completed'; result: PostProcessorResult }
-  | { type: 'escalation-triggered'; result: EscalationResult }
-  | { type: 'error'; error: Error; context: PostProcessorContext };
+  | { type: "initialized"; config: PostProcessorConfig }
+  | { type: "loop-started"; context: PostProcessorContext }
+  | { type: "monitoring-completed"; result: MonitoringResult }
+  | { type: "failure-detected"; analysis: FailureAnalysis }
+  | { type: "fix-applied"; result: FixResult }
+  | { type: "redeployment-initiated"; commitSha: string }
+  | { type: "loop-completed"; result: PostProcessorResult }
+  | { type: "escalation-triggered"; result: EscalationResult }
+  | { type: "error"; error: Error; context: PostProcessorContext };

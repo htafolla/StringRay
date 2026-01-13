@@ -2,11 +2,11 @@
  * Git Hook Trigger for Post-Processor
  */
 
-import { PostProcessor } from '../PostProcessor.js';
-import { PostProcessorContext } from '../types.js';
-import * as fs from 'fs';
-import * as path from 'path';
-import { execSync } from 'child_process';
+import { PostProcessor } from "../PostProcessor.js";
+import { PostProcessorContext } from "../types.js";
+import * as fs from "fs";
+import * as path from "path";
+import { execSync } from "child_process";
 
 export class GitHookTrigger {
   private initialized = false;
@@ -16,9 +16,9 @@ export class GitHookTrigger {
   async initialize(): Promise<void> {
     if (this.initialized) return;
 
-    const hooksDir = path.join(process.cwd(), '.opencode', 'hooks');
-    const postCommitHook = path.join(hooksDir, 'post-commit');
-    const postPushHook = path.join(hooksDir, 'post-push');
+    const hooksDir = path.join(process.cwd(), ".opencode", "hooks");
+    const postCommitHook = path.join(hooksDir, "post-commit");
+    const postPushHook = path.join(hooksDir, "post-push");
 
     // Ensure hooks directory exists
     if (!fs.existsSync(hooksDir)) {
@@ -26,8 +26,8 @@ export class GitHookTrigger {
     }
 
     // Install post-commit hook
-    this.installHook(postCommitHook, 'post-commit');
-    this.installHook(postPushHook, 'post-push');
+    this.installHook(postCommitHook, "post-commit");
+    this.installHook(postPushHook, "post-push");
 
     this.initialized = true;
   }
@@ -37,8 +37,8 @@ export class GitHookTrigger {
 
     // Check if hook already exists and has our content
     if (fs.existsSync(hookPath)) {
-      const existing = fs.readFileSync(hookPath, 'utf8');
-      if (existing.includes('postprocessor-trigger')) {
+      const existing = fs.readFileSync(hookPath, "utf8");
+      if (existing.includes("postprocessor-trigger")) {
         return; // Already installed
       }
       // Backup existing hook
@@ -46,7 +46,7 @@ export class GitHookTrigger {
     }
 
     fs.writeFileSync(hookPath, hookContent);
-    fs.chmodSync(hookPath, '755');
+    fs.chmodSync(hookPath, "755");
   }
 
   private generateHookScript(hookType: string): string {

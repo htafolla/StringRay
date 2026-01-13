@@ -8,18 +8,28 @@
  * @since 2026-01-13
  */
 
-import { StrRayStateManager } from '../state/state-manager.js';
-import { SessionMonitor } from '../session/session-monitor.js';
-import { GitHookTrigger } from './triggers/GitHookTrigger.js';
-import { WebhookTrigger } from './triggers/WebhookTrigger.js';
-import { APITrigger } from './triggers/APITrigger.js';
-import { PostProcessorMonitoringEngine } from './monitoring/MonitoringEngine.js';
-import { PostProcessorConfig, PostProcessorResult, PostProcessorContext } from './types.js';
-import { defaultConfig } from './config.js';
+import { StrRayStateManager } from "../state/state-manager.js";
+import { SessionMonitor } from "../session/session-monitor.js";
+import { GitHookTrigger } from "./triggers/GitHookTrigger.js";
+import { WebhookTrigger } from "./triggers/WebhookTrigger.js";
+import { APITrigger } from "./triggers/APITrigger.js";
+import { PostProcessorMonitoringEngine } from "./monitoring/MonitoringEngine.js";
+import { FailureAnalysisEngine } from "./analysis/FailureAnalysisEngine.js";
+import { AutoFixEngine } from "./autofix/AutoFixEngine.js";
+import { FixValidator } from "./autofix/FixValidator.js";
+import {
+  PostProcessorConfig,
+  PostProcessorResult,
+  PostProcessorContext,
+} from "./types.js";
+import { defaultConfig } from "./config.js";
 
 export class PostProcessor {
   private config: PostProcessorConfig;
   private monitoringEngine: PostProcessorMonitoringEngine;
+  private failureAnalysisEngine: FailureAnalysisEngine;
+  private autoFixEngine: AutoFixEngine;
+  private fixValidator: FixValidator;
   private triggers: {
     gitHook: GitHookTrigger;
     webhook: WebhookTrigger;
@@ -39,6 +49,11 @@ export class PostProcessor {
       this.sessionMonitor
     );
 
+    // Initialize failure analysis and auto-fix engines
+    this.failureAnalysisEngine = new FailureAnalysisEngine();
+    this.autoFixEngine = new AutoFixEngine(this.config.autoFix.confidenceThreshold);
+    this.fixValidator = new FixValidator();
+
     // Initialize trigger mechanisms
     this.triggers = {
       gitHook: new GitHookTrigger(this),
@@ -51,51 +66,53 @@ export class PostProcessor {
    * Initialize the post-processor system
    */
   async initialize(): Promise<void> {
-    console.log('🚀 Initializing StrRay Post-Processor...');
+    console.log("🚀 Initializing StrRay Post-Processor...");
 
     // Initialize monitoring
     if (this.config.monitoring.enabled) {
       await this.monitoringEngine.initialize();
-      console.log('✅ Monitoring engine initialized');
+      console.log("✅ Monitoring engine initialized");
     }
 
     // Initialize triggers
     if (this.config.triggers.gitHooks) {
       await this.triggers.gitHook.initialize();
-      console.log('✅ Git hook triggers initialized');
+      console.log("✅ Git hook triggers initialized");
     }
 
     if (this.config.triggers.webhooks) {
       await this.triggers.webhook.initialize();
-      console.log('✅ Webhook triggers initialized');
+      console.log("✅ Webhook triggers initialized");
     }
 
     if (this.config.triggers.api) {
       await this.triggers.api.initialize();
-      console.log('✅ API triggers initialized');
+      console.log("✅ API triggers initialized");
     }
 
-    console.log('🎯 Post-Processor initialization complete');
+    console.log("🎯 Post-Processor initialization complete");
   }
 
   /**
    * Execute the complete post-processor loop
    */
   async executePostProcessorLoop(
-    context: PostProcessorContext
+    context: PostProcessorContext,
   ): Promise<PostProcessorResult> {
     const startTime = Date.now();
     const sessionId = `postprocessor-${context.commitSha}-${Date.now()}`;
 
-    console.log(`🔄 Starting post-processor loop for commit: ${context.commitSha}`);
+    console.log(
+      `🔄 Starting post-processor loop for commit: ${context.commitSha}`,
+    );
 
     try {
       // Initialize session tracking
       await this.stateManager.set(`postprocessor:${sessionId}`, {
-        status: 'running',
+        status: "running",
         startTime,
         context,
-        attempts: 0
+        attempts: 0,
       });
 
       // Execute the monitoring → analysis → fix → redeploy loop
@@ -105,14 +122,15 @@ export class PostProcessor {
       await this.stateManager.set(`postprocessor:${sessionId}`, {
         ...result,
         endTime: Date.now(),
-        duration: Date.now() - startTime
+        duration: Date.now() - startTime,
       });
 
-      console.log(`✅ Post-processor loop completed: ${result.success ? 'SUCCESS' : 'FAILED'}`);
+      console.log(
+        `✅ Post-processor loop completed: ${result.success ? "SUCCESS" : "FAILED"}`,
+      );
       return result;
-
     } catch (error) {
-      console.error('❌ Post-processor loop failed:', error);
+      console.error("❌ Post-processor loop failed:", error);
 
       const failureResult: PostProcessorResult = {
         success: false,
@@ -121,13 +139,13 @@ export class PostProcessor {
         error: error instanceof Error ? error.message : String(error),
         attempts: 1,
         monitoringResults: [],
-        fixesApplied: []
+        fixesApplied: [],
       };
 
       await this.stateManager.set(`postprocessor:${sessionId}`, {
         ...failureResult,
         endTime: Date.now(),
-        duration: Date.now() - startTime
+        duration: Date.now() - startTime,
       });
 
       return failureResult;
@@ -139,7 +157,7 @@ export class PostProcessor {
    */
   private async executeMonitoringLoop(
     context: PostProcessorContext,
-    sessionId: string
+    sessionId: string,
   ): Promise<PostProcessorResult> {
     let attempts = 0;
     const maxAttempts = this.config.maxAttempts || 3;
@@ -147,35 +165,53 @@ export class PostProcessor {
     while (attempts < maxAttempts) {
       attempts++;
 
-      console.log(`🔍 Monitoring attempt ${attempts}/${maxAttempts} for ${context.commitSha}`);
+      console.log(
+        `🔍 Monitoring attempt ${attempts}/${maxAttempts} for ${context.commitSha}`,
+      );
 
       // Monitor CI/CD status
-      const monitoringResult = await this.monitoringEngine.monitorDeployment(context.commitSha);
+      const monitoringResult = await this.monitoringEngine.monitorDeployment(
+        context.commitSha,
+      );
 
-      if (monitoringResult.overallStatus === 'success') {
-        console.log('✅ CI/CD pipeline successful - post-processor complete');
+      if (monitoringResult.overallStatus === "success") {
+        console.log("✅ CI/CD pipeline successful - post-processor complete");
         return {
           success: true,
           commitSha: context.commitSha,
           sessionId,
           attempts,
-          monitoringResults: [monitoringResult]
+          monitoringResults: [monitoringResult],
         };
       }
 
       // Pipeline failed - analyze and attempt fixes
       console.log('❌ CI/CD pipeline failed - analyzing issues...');
 
-      // For now, skip auto-fix and escalate to manual intervention
-      console.log('❌ CI/CD failure detected - escalating to manual intervention');
-      await this.escalateToManualIntervention(context, monitoringResult, attempts);
-      break;
+      const analysis = await this.failureAnalysisEngine.analyzeFailure(monitoringResult);
+      console.log(`🔍 Analysis complete: ${analysis.category} (${analysis.severity}) - ${analysis.rootCause}`);
 
-      // Fix failed or not attempted
-      if (attempts >= maxAttempts) {
-        console.log('🚫 Max attempts reached - escalating to manual intervention');
-        await this.escalateToManualIntervention(context, monitoringResult, attempts);
-        break;
+      const fixResult = await this.autoFixEngine.applyFixes(analysis, context);
+
+      if (fixResult.success && fixResult.appliedFixes.length > 0) {
+        console.log(`🔧 ${fixResult.appliedFixes.length} fix(es) applied successfully`);
+
+        // Validate that fixes resolve the issue
+        const validationPassed = await this.fixValidator.validateFixes(
+          fixResult.appliedFixes,
+          analysis,
+          context
+        );
+
+        if (validationPassed) {
+          console.log('✅ Fix validation passed - redeploying...');
+          await this.redeployWithFixes(context, fixResult);
+          // Continue monitoring with next attempt
+          continue;
+        } else {
+          console.log('❌ Fix validation failed - rolling back...');
+          await this.fixValidator.rollbackFixes(fixResult.appliedFixes);
+        }
       }
 
       // Wait before retry
@@ -189,27 +225,26 @@ export class PostProcessor {
       attempts,
       monitoringResults: [],
       fixesApplied: [],
-      error: 'Max attempts exceeded'
+      error: "Max attempts exceeded",
     };
   }
 
   /**
-   * Analyze CI/CD failure
+   * Redeploy after applying fixes
    */
-  private async analyzeFailure(monitoringResult: any): Promise<any> {
-    // Placeholder for failure analysis
-    return {
-      category: 'unknown',
-      confidence: 0.5,
-      rootCause: 'CI/CD pipeline failure',
-      recommendedActions: ['Review CI/CD logs', 'Check recent changes']
-    };
+  private async redeployWithFixes(context: PostProcessorContext, fixResult: any): Promise<void> {
+    // For now, trigger a new CI/CD run by pushing (this would be more sophisticated in production)
+    console.log('🔄 Triggering redeployment by pushing changes...');
+    // In a real implementation, this would integrate with deployment APIs
   }
 
   /**
    * Attempt to apply automatic fixes
    */
-  private async attemptAutoFix(analysis: any, context: PostProcessorContext): Promise<any> {
+  private async attemptAutoFix(
+    analysis: any,
+    context: PostProcessorContext,
+  ): Promise<any> {
     // Placeholder for auto-fix - disabled for now
     return { success: false, requiresManualIntervention: true };
   }
@@ -217,9 +252,12 @@ export class PostProcessor {
   /**
    * Redeploy after applying fixes
    */
-  private async redeployWithFixes(context: PostProcessorContext, fixResult: any): Promise<void> {
+  private async redeployWithFixes(
+    context: PostProcessorContext,
+    fixResult: any,
+  ): Promise<void> {
     // Placeholder for redeployment
-    console.log('🔄 Redeployment would be initiated here');
+    console.log("🔄 Redeployment would be initiated here");
   }
 
   /**
@@ -228,9 +266,9 @@ export class PostProcessor {
   private async escalateToManualIntervention(
     context: PostProcessorContext,
     monitoringResult: any,
-    attempts: number
+    attempts: number,
   ): Promise<void> {
-    console.log('🚨 Escalating to manual intervention');
+    console.log("🚨 Escalating to manual intervention");
 
     // Create detailed incident report
     const report = {
@@ -239,18 +277,18 @@ export class PostProcessor {
       monitoringResult,
       timestamp: new Date().toISOString(),
       recommendations: [
-        'Review CI/CD pipeline logs for detailed error information',
-        'Check failed test outputs and error messages',
-        'Verify recent code changes for potential issues',
-        'Consider manual fixes or rollback if necessary'
-      ]
+        "Review CI/CD pipeline logs for detailed error information",
+        "Check failed test outputs and error messages",
+        "Verify recent code changes for potential issues",
+        "Consider manual fixes or rollback if necessary",
+      ],
     };
 
     // Store escalation details
     await this.stateManager.set(`escalation:${context.commitSha}`, report);
 
     // TODO: Send notifications to development team
-    console.log('📋 Escalation report created:', report);
+    console.log("📋 Escalation report created:", report);
   }
 
   /**
@@ -261,7 +299,7 @@ export class PostProcessor {
     const delay = baseDelay * Math.pow(2, attempt - 1);
 
     console.log(`⏳ Waiting ${delay}ms before retry attempt ${attempt + 1}`);
-    await new Promise(resolve => setTimeout(resolve, delay));
+    await new Promise((resolve) => setTimeout(resolve, delay));
   }
 
   /**
@@ -271,7 +309,7 @@ export class PostProcessor {
     return {
       activeSessions: 0, // Placeholder
       config: this.config,
-      monitoringStatus: await this.monitoringEngine.getStatus()
+      monitoringStatus: await this.monitoringEngine.getStatus(),
     };
   }
 }

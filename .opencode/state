@@ -42,17 +42,7 @@
     },
     "isActive": true
   },
-  "cleanup:session_metadata": {
-    "default": {
-      "sessionId": "default",
-      "createdAt": 1768315076973,
-      "lastActivity": 1768315076973,
-      "ttlMs": 86400000,
-      "isActive": true,
-      "agentCount": 0,
-      "memoryUsage": 0
-    }
-  },
+  "cleanup:session_metadata": {},
   "session:emergency-1:coordinator": {
     "sessionId": "emergency-1",
     "startTime": 1768311321624,

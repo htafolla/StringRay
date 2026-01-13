@@ -133,98 +133,68 @@ fi
     export MONITORING_LEVEL="$MONITORING_LEVEL"
     export IS_FULL_MONITORING="$([ "$MONITORING_LEVEL" = "full" ] && echo "true" || echo "false")"
 
-    # Run the post-processor script asynchronously
-    node -e "
-    (async () => {
-      try {
-        const { execSync } = await import('child_process');
-        const plugin = process.env.STRRAY_PLUGIN;
-
-        // Get files changed in this commit (inside Node.js context)
-        let files = [];
+    # Run appropriate monitoring based on hook type
+    if [ "$HOOK_NAME" = "post-commit" ]; then
+      # LIGHT MONITORING: Quick validation, don't block git workflow
+      timeout 2 node -e "
+      (async () => {
         try {
-          const output = execSync('git diff --name-only HEAD~1 2>/dev/null || git diff --name-only --cached', { encoding: 'utf8' });
-          files = output.trim() ? output.trim().split(String.fromCharCode(10)).filter(f => f.trim()) : [];
-        } catch (error) {
-          files = [];
-        }
+          const { LightweightValidator } = await import('./dist/postprocessor/validation/LightweightValidator.js');
+          const validator = new LightweightValidator();
+          const result = await validator.validate();
 
-        const { PostProcessor } = await import('./' + plugin + '/dist/postprocessor/PostProcessor.js');
-        const { StrRayStateManager } = await import('./' + plugin + '/dist/state/state-manager.js');
-        const { createSessionCoordinator } = await import('./' + plugin + '/dist/delegation/session-coordinator.js');
-        const { createSessionCleanupManager } = await import('./' + plugin + '/dist/session/session-cleanup-manager.js');
-        const { createSessionMonitor } = await import('./' + plugin + '/dist/session/session-monitor.js');
-
-        const stateManager = new StrRayStateManager();
-        const sessionCoordinator = createSessionCoordinator(stateManager);
-        const cleanupManager = createSessionCleanupManager(
-          stateManager,
-          { defaultTtlMs: 86400000, cleanupIntervalMs: 300000 },
-          null
-        );
-        const sessionMonitor = createSessionMonitor(
-          stateManager,
-          sessionCoordinator,
-          cleanupManager,
-          {}
-        );
-
-        const context = {
-          commitSha: process.env.COMMIT_SHA,
-          repository: process.env.REPO,
-          branch: process.env.BRANCH,
-          author: process.env.AUTHOR,
-          files: files,
-          trigger: 'git-hook'
-        };
-
-        console.log('🚀 Post-processor triggered (' + (process.env.MONITORING_LEVEL || 'unknown') + ') for commit:', context.commitSha);
-
-        const isFullMonitoring = process.env.IS_FULL_MONITORING === 'true';
-
-        const pp = new PostProcessor(stateManager, sessionMonitor, {
-          triggers: { gitHooks: false, webhooks: false, api: false },
-          monitoring: {
-            enabled: true,
-            interval: isFullMonitoring ? 15000 : 60000, // More frequent for push monitoring
-            timeout: isFullMonitoring ? 7200000 : 1800000  // Longer timeout for full monitoring
-          },
-          autoFix: {
-            enabled: isFullMonitoring, // Only enable auto-fix for push monitoring
-            confidenceThreshold: 0.8,
-            maxAttempts: isFullMonitoring ? 5 : 1
-          },
-          escalation: {
-            manualInterventionThreshold: isFullMonitoring ? 1 : 3, // More sensitive for pushes
-            rollbackThreshold: isFullMonitoring ? 2 : 5,
-            emergencyThreshold: isFullMonitoring ? 3 : 7
-          },
-          redeploy: isFullMonitoring ? { // Only full redeploy logic for pushes
-            maxRetries: 3,
-            retryDelay: 30000,
-            backoffStrategy: 'exponential',
-            canaryEnabled: true,
-            canaryPhases: 3,
-            canaryTrafficIncrement: 25,
-            healthCheckTimeout: 60000,
-            rollbackOnFailure: true
-          } : undefined,
-          success: {
-            successConfirmation: true,
-            cleanupEnabled: true,
-            notificationEnabled: isFullMonitoring, // More notifications for pushes
-            metricsCollection: true
+          if (result.warnings.length > 0) {
+            console.log(\`⚠️ \${result.warnings.length} warning(s) found:\`);
+            result.warnings.forEach(w => console.log(\`   \${w}\`));
           }
-        });
 
-        await pp.initialize();
-        await pp.executePostProcessorLoop(context);
-        console.log('✅ Post-processor completed successfully');
-      } catch (error) {
-        console.error('❌ Post-processor failed:', error.message);
-      }
-    })();
-    "
+          if (!result.passed) {
+            console.log(\`❌ \${result.errors.length} error(s) found:\`);
+            result.errors.forEach(e => console.log(\`   \${e}\`));
+            process.exit(1);
+          }
+
+          console.log(\`✅ Post-commit: Validation passed in \${result.duration}ms\`);
+        } catch (error) {
+          console.error('❌ Post-commit validation failed:', error.message || error);
+          process.exit(1);
+        }
+      })();
+      " 2>/dev/null && exit 0 || exit 1
+    else
+      # FULL MONITORING: Comprehensive analysis for post-push
+      timeout 300 node -e "
+      (async () => {
+        try {
+          console.log('🚀 Post-push: Comprehensive validation initiated');
+          const { ComprehensiveValidator } = await import('./' + plugin + '/dist/postprocessor/validation/ComprehensiveValidator.js');
+
+          const validator = new ComprehensiveValidator();
+          const result = await validator.validate();
+
+          if (result.warnings.length > 0) {
+            console.log(\`⚠️ \${result.warnings.length} warning(s) found:\`);
+            result.warnings.forEach(w => console.log(\`   \${w}\`));
+          }
+
+          if (!result.passed) {
+            console.log(\`❌ \${result.errors.length} error(s) found:\`);
+            result.errors.forEach(e => console.log(\`   \${e}\`));
+            process.exit(1);
+          }
+
+          if (result.testResults) {
+            console.log(\`🧪 Tests: \${result.testResults.passed}/\${result.testResults.total} passed\`);
+          }
+
+          console.log(\`✅ Post-push: Comprehensive validation passed in \${result.duration}ms\`);
+        } catch (error) {
+          console.error('❌ Post-push validation failed:', error instanceof Error ? error.message : String(error));
+          process.exit(1);
+        }
+      })();
+      " 2>/dev/null && exit 0 || exit 1
+    fi
   else
     echo "Warning: StrRay plugin not found or Node.js not available, skipping post-processor"
   fi

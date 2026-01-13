@@ -73,12 +73,12 @@ fi
     if [ "$HOOK_NAME" = "post-commit" ]; then
       # LIGHT MONITORING: Quick validation, don't block git workflow
       # Timeout: 2 seconds max, log metrics for monitoring
-      START_TIME=$(date +%s%3N)
+      START_TIME=$(date +%s)
       timeout 2 node -e "
       (async () => {
         try {
           // Use import resolver to avoid hardcoded dist paths
-          const { importResolver } = await import('./src/utils/import-resolver.js');
+          const { importResolver } = await import('./utils/import-resolver.js');
           const { LightweightValidator } = await importResolver.importModule('postprocessor/validation/LightweightValidator');
 
           const validator = new LightweightValidator();
@@ -103,20 +103,20 @@ fi
       })();
       " 2>/dev/null
       EXIT_CODE=$?
-      END_TIME=$(date +%s%3N)
+      END_TIME=$(date +%s)
       DURATION=$((END_TIME - START_TIME))
 
-      # Log metrics for monitoring
-      echo "HOOK_METRICS: post-commit duration=${DURATION}ms exit_code=${EXIT_CODE}" >&2
+      # Log metrics for monitoring (convert to milliseconds)
+      DURATION_MS=$((DURATION * 1000))
+      echo "HOOK_METRICS: post-commit duration=${DURATION_MS}ms exit_code=${EXIT_CODE}" >&2
 
-      # Record metrics using metrics collector (environment-aware import)
+      # Record metrics using metrics collector (direct import for reliability)
       node -e "
       (async () => {
         try {
-          const { importResolver } = await import('./src/utils/import-resolver.js');
-          const { HookMetricsCollector } = await importResolver.importModule('postprocessor/validation/HookMetricsCollector');
+          const { HookMetricsCollector } = await import('./dist/postprocessor/validation/HookMetricsCollector.js');
           const collector = new HookMetricsCollector();
-          collector.recordMetrics('post-commit', ${DURATION}, ${EXIT_CODE});
+          collector.recordMetrics('post-commit', ${DURATION_MS}, ${EXIT_CODE});
         } catch (error) {
           // Silently fail if metrics collection fails
         }
@@ -127,13 +127,13 @@ fi
     else
       # FULL MONITORING: Comprehensive analysis for post-push
       # Timeout: 5 minutes max, comprehensive CI/CD validation
-      START_TIME=$(date +%s%3N)
+      START_TIME=$(date +%s)
       timeout 300 node -e "
       (async () => {
         try {
           console.log('🚀 Post-push: Comprehensive validation initiated');
           // Use import resolver for environment-aware imports
-          const { importResolver } = await import('./src/utils/import-resolver.js');
+          const { importResolver } = await import('./utils/import-resolver.js');
           const { ComprehensiveValidator } = await importResolver.importModule('postprocessor/validation/ComprehensiveValidator');
 
           const validator = new ComprehensiveValidator();
@@ -162,20 +162,20 @@ fi
       })();
       " 2>/dev/null
       EXIT_CODE=$?
-      END_TIME=$(date +%s%3N)
+      END_TIME=$(date +%s)
       DURATION=$((END_TIME - START_TIME))
 
-      # Log comprehensive metrics for monitoring
-      echo "HOOK_METRICS: post-push duration=${DURATION}ms exit_code=${EXIT_CODE}" >&2
+      # Log comprehensive metrics for monitoring (convert to milliseconds)
+      DURATION_MS=$((DURATION * 1000))
+      echo "HOOK_METRICS: post-push duration=${DURATION_MS}ms exit_code=${EXIT_CODE}" >&2
 
-      # Record metrics using metrics collector (environment-aware)
+      # Record metrics using metrics collector (direct import for reliability)
       node -e "
       (async () => {
         try {
-          const { importResolver } = await import('./src/utils/import-resolver.js');
-          const { HookMetricsCollector } = await importResolver.importModule('postprocessor/validation/HookMetricsCollector');
+          const { HookMetricsCollector } = await import('./dist/postprocessor/validation/HookMetricsCollector.js');
           const collector = new HookMetricsCollector();
-          collector.recordMetrics('post-push', ${DURATION}, ${EXIT_CODE});
+          collector.recordMetrics('post-push', ${DURATION_MS}, ${EXIT_CODE});
         } catch (error) {
           // Silently fail if metrics collection fails
         }

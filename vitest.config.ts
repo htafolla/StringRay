@@ -13,6 +13,8 @@ export default defineConfig({
       "coverage",
       "src/__tests__/plugins/marketplace-service.test.ts",
     ],
+    silent: true, // Reduce console output in CI
+    reporters: process.env.CI ? ["verbose"] : ["default"],
     coverage: {
       provider: "v8",
       reporter: ["text", "json", "html", "lcov"],

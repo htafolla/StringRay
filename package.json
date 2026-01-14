@@ -1,6 +1,6 @@
 {
   "name": "stringray-ai",
-  "version": "1.0.30",
+  "version": "1.0.53",
   "description": "⚡ StringRay ⚡: Bulletproof AI orchestration with systematic error prevention. Zero dead ends. Ship clean, tested, optimized code — every time.",
   "type": "module",
   "main": "./dist/plugin/index.js",
@@ -95,6 +95,9 @@
   },
   "files": [
     ".mcp.json",
+    "opencode.json",
+    ".opencode/oh-my-opencode.json",
+    ".opencode/package.json",
     "dist/cli",
     "dist/plugin",
     "dist/mcps",
@@ -109,13 +112,15 @@
     "scripts/validate-codex.js",
     "scripts/test-comprehensive-path-resolution.mjs",
     "scripts/test-full-plugin-no-timeout.sh",
+    "scripts/test-simple-prompt.mjs",
+    "scripts/test-complex-orchestration.mjs",
     "README.md",
     "LICENSE"
   ],
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "types": "./dist/plugin/index.d.ts",
+      "import": "./dist/plugin/index.js"
     },
     "./agents": {
       "types": "./dist/agents/index.d.ts",

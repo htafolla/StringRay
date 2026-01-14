@@ -8,6 +8,8 @@
     "sourceMap": true
   },
   "include": [
+    "src/index.ts",
+    "src/cli/**/*.ts",
     "src/plugins/**/*.ts",
     "src/orchestrator/**/*.ts",
     "src/state/**/*.ts",
@@ -15,7 +17,10 @@
     "src/enforcement/**/*.ts",
     "src/utils/**/*.ts",
     "src/agents/**/*.ts",
-    "src/mcps/**/*.ts"
+    "src/mcps/**/*.ts",
+    "src/strray-activation.ts",
+    "src/context-loader.ts",
+    "src/codex-injector.ts"
   ],
   "exclude": [
     "src/cli/**/*",

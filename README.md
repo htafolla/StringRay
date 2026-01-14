@@ -270,6 +270,49 @@ Create `.stringray/config.json` in your project root:
 }
 ```
 
+### Environment Variables
+
+StringRay supports several environment variables for advanced configuration:
+
+#### Logging & Debugging
+```bash
+# Disable all logging (default: enabled)
+export STRRAY_LOGGING_ENABLED=false
+
+# Set log level: debug, info, warn, error (default: info)
+export STRRAY_LOG_LEVEL=debug
+
+# Enable performance mode logging (default: false)
+export STRRAY_PERFORMANCE_MODE=true
+
+# Enable debug logging for specific components (default: false)
+export STRRAY_DEBUG_LOGGING=true
+```
+
+#### Path Overrides (Advanced)
+```bash
+# Override default paths for development/testing
+export STRRAY_AGENTS_PATH="../custom/agents"
+export STRRAY_PROCESSORS_PATH="../custom/processors"
+export STRRAY_STATE_PATH="../custom/state"
+export STRRAY_ENFORCEMENT_PATH="../custom/enforcement"
+export STRRAY_ORCHESTRATOR_PATH="../custom/orchestrator"
+export STRRAY_MCP_PATH="../custom/mcp"
+```
+
+#### Enterprise & Clustering
+```bash
+# Instance identification for monitoring
+export STRRAY_INSTANCE_ID="production-instance-1"
+
+# Cluster configuration
+export STRRAY_CLUSTER_SIZE="5"
+export STRRAY_CLUSTER_NAME="production-cluster"
+
+# Test mode (enables additional validation)
+export STRRAY_TEST_MODE=true
+```
+
 ### oh-my-opencode Configuration
 
 The plugin automatically configures:

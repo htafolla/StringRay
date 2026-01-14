@@ -116,6 +116,16 @@ async function runComprehensiveTests() {
       name: 'Process Communication Test',
       command: `node ${__dirname}/test-comprehensive-path-resolution.mjs`,
       description: 'Tests path resolution and process communication'
+    },
+    {
+      name: 'Simple Prompt Orchestration Test',
+      command: `node ${__dirname}/test-simple-prompt.mjs`,
+      description: 'Tests basic prompt orchestration with simple task'
+    },
+    {
+      name: 'Complex Multi-Agent Orchestration Test',
+      command: `node ${__dirname}/test-complex-orchestration.mjs`,
+      description: 'Tests complex multi-agent orchestration with interdependent tasks'
     }
   ];
 

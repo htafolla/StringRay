@@ -8,35 +8,57 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 
-// Copy .mcp.json to project root if it doesn't exist
+// Configuration files to copy during installation
+const configFiles = [
+  { source: '.mcp.json', dest: '.mcp.json' },
+  { source: 'opencode.json', dest: 'opencode.json' },
+  { source: '.opencode/oh-my-opencode.json', dest: '.opencode/oh-my-opencode.json' },
+  { source: '.opencode/package.json', dest: '.opencode/package.json' }
+];
+
 // Find the package root relative to this script
 const packageRoot = path.join(__dirname, '..');
-const mcpConfigSource = path.join(packageRoot, '.mcp.json');
-const mcpConfigDest = path.join(process.cwd(), '.mcp.json');
 
 console.log('Postinstall running...');
 console.log('Script dir:', __dirname);
 console.log('Package root:', packageRoot);
-console.log('Source:', mcpConfigSource);
-console.log('Destination:', mcpConfigDest);
-console.log('Source exists:', fs.existsSync(mcpConfigSource));
 
-try {
-  if (fs.existsSync(mcpConfigSource)) {
-    fs.copyFileSync(mcpConfigSource, mcpConfigDest);
-    console.log('✅ StrRay MCP configuration installed');
-  } else {
-    console.warn('Warning: MCP config not found at', mcpConfigSource);
-    // Try alternative locations
-    const altSource = path.join(packageRoot, 'node_modules', 'stringray-ai', '.mcp.json');
-    if (fs.existsSync(altSource)) {
-      fs.copyFileSync(altSource, mcpConfigDest);
-      console.log('✅ StrRay MCP configuration installed (alt location)');
+// Copy all configuration files
+configFiles.forEach(({ source: sourcePath, dest: destPath }) => {
+  const source = path.join(packageRoot, sourcePath);
+  const dest = path.join(process.cwd(), destPath);
+
+  console.log(`Copying ${sourcePath} -> ${destPath}`);
+  console.log('Source exists:', fs.existsSync(source));
+
+  try {
+    if (fs.existsSync(source)) {
+      // Ensure destination directory exists
+      const destDir = path.dirname(dest);
+      if (!fs.existsSync(destDir)) {
+        fs.mkdirSync(destDir, { recursive: true });
+        console.log(`Created directory: ${destDir}`);
+      }
+
+      fs.copyFileSync(source, dest);
+      console.log(`✅ ${sourcePath} installed`);
+    } else {
+      console.warn(`Warning: ${sourcePath} not found at ${source}`);
+      // Try alternative locations for installed package
+      const altSource = path.join(packageRoot, 'node_modules', 'stringray-ai', sourcePath);
+      if (fs.existsSync(altSource)) {
+        const destDir = path.dirname(dest);
+        if (!fs.existsSync(destDir)) {
+          fs.mkdirSync(destDir, { recursive: true });
+        }
+        fs.copyFileSync(altSource, dest);
+        console.log(`✅ ${sourcePath} installed (alt location)`);
+      }
     }
+  } catch (error) {
+    console.warn(`Warning: Could not copy ${sourcePath}:`, error.message);
   }
-} catch (error) {
-  console.warn('Warning: Could not copy MCP config:', error.message);
-}
+});
 
 // Create a marker file to prove the script ran
 const markerPath = path.join(os.tmpdir(), 'stringray-postinstall-ran');

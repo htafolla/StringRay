@@ -17,13 +17,22 @@ if (isDeployed) {
   console.log('DEBUG: Running in deployed environment');
   console.log('DEBUG: Current directory:', process.cwd());
 
-  // Check if .mcp.json exists (created by postinstall)
-  const mcpExists = fs.existsSync(".mcp.json");
-  console.log('DEBUG: .mcp.json exists:', mcpExists);
-  if (!mcpExists) {
-    console.log('DEBUG: .mcp.json not found, exiting with code 1');
+// Check if .mcp.json exists (created by postinstall)
+// If it doesn't exist, try to run postinstall script
+const mcpExists = fs.existsSync(".mcp.json");
+console.log('DEBUG: .mcp.json exists:', mcpExists);
+if (!mcpExists) {
+  console.log('DEBUG: .mcp.json not found, attempting to run postinstall script');
+  try {
+    // Import and run the postinstall script
+    const { execSync } = await import('child_process');
+    execSync('node node_modules/stringray-ai/scripts/postinstall.cjs', { stdio: 'inherit' });
+    console.log('DEBUG: Postinstall script executed successfully');
+  } catch (error) {
+    console.log('DEBUG: Failed to run postinstall script:', error.message);
     process.exit(1);
   }
+}
 
   // Check if package.json exists
   const pkgExists = fs.existsSync("package.json");

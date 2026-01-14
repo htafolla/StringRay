@@ -976,7 +976,7 @@
   },
   "processor:active": true,
   "security:initial_audit": {
-    "totalFiles": 1521,
+    "totalFiles": 1534,
     "issues": [
       {
         "severity": "critical",
@@ -1753,6 +1753,33 @@
         "description": "Potentially dangerous import detected: fs",
         "recommendation": "Review usage and ensure proper sandboxing/validation",
         "cwe": "CWE-350"
+      },
+      {
+        "severity": "high",
+        "category": "path-traversal",
+        "file": "/Users/blaze/dev/stringray/deployed-test/package-lock.json",
+        "line": 11,
+        "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
+        "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
+        "cwe": "CWE-22"
+      },
+      {
+        "severity": "high",
+        "category": "path-traversal",
+        "file": "/Users/blaze/dev/stringray/deployed-test/package-lock.json",
+        "line": 1640,
+        "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
+        "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
+        "cwe": "CWE-22"
+      },
+      {
+        "severity": "high",
+        "category": "path-traversal",
+        "file": "/Users/blaze/dev/stringray/deployed-test/package.json",
+        "line": 6,
+        "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
+        "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
+        "cwe": "CWE-22"
       },
       {
         "severity": "high",
@@ -4547,6 +4574,23 @@
         "cwe": "CWE-350"
       },
       {
+        "severity": "high",
+        "category": "command-injection",
+        "file": "/Users/blaze/dev/stringray/scripts/validate-codex.js",
+        "line": 29,
+        "description": "Potentially dangerous pattern detected: /execSync\\s*\\(/g",
+        "recommendation": "Validate and sanitize all user inputs, use parameterized commands",
+        "cwe": "CWE-78"
+      },
+      {
+        "severity": "medium",
+        "category": "dangerous-imports",
+        "file": "/Users/blaze/dev/stringray/scripts/validate-codex.js",
+        "description": "Potentially dangerous import detected: child_process",
+        "recommendation": "Review usage and ensure proper sandboxing/validation",
+        "cwe": "CWE-350"
+      },
+      {
         "severity": "medium",
         "category": "dangerous-imports",
         "file": "/Users/blaze/dev/stringray/scripts/validate-codex.js",
@@ -4946,10 +4990,18 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/src/cli/index.ts",
-        "line": 108,
+        "line": 178,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
+      },
+      {
+        "severity": "medium",
+        "category": "dangerous-imports",
+        "file": "/Users/blaze/dev/stringray/src/cli/index.ts",
+        "description": "Potentially dangerous import detected: fs",
+        "recommendation": "Review usage and ensure proper sandboxing/validation",
+        "cwe": "CWE-350"
       },
       {
         "severity": "medium",
@@ -8773,8 +8825,8 @@
     ],
     "summary": {
       "critical": 69,
-      "high": 463,
-      "medium": 309,
+      "high": 467,
+      "medium": 311,
       "low": 41,
       "info": 0
     },

@@ -1,27 +1,26 @@
-# ⚡ StringRay (StringRay) v1.0.0 – Bulletproof AI Orchestration for Production-Grade Development
+# ⚡ StringRay AI v1.0.26 – Bulletproof AI Orchestration for Production-Grade Development
 
-[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/htafolla/stringray)
+[![Version](https://img.shields.io/badge/version-1.0.1-blue.svg)](https://github.com/htafolla/stringray)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9+-blue.svg)](https://www.typescript.org/)
 [![Tests](https://img.shields.io/badge/tests-833%2F833-brightgreen.svg)](https://github.com/htafolla/stringray)
 [![CI/CD](https://img.shields.io/badge/CI%2FCD-passing-brightgreen.svg)](https://github.com/htafolla/stringray/actions)
 [![Error Prevention](https://img.shields.io/badge/error%20prevention-99.6%25-red.svg)](https://github.com/htafolla/stringray)
-
-# ⚡ StringRay ⚡ v1.0.0 – Bulletproof AI Orchestration for Production-Grade Development
+[![oh-my-opencode](https://img.shields.io/badge/oh--my--opencode-plugin-blue.svg)](https://opencode.ai/oh-my-opencode)
 
 **Enterprise AI agent coordination with systematic error prevention. Zero dead ends. Ship clean, tested, optimized code — every time.**
 
-⚡ StringRay ⚡ provides intelligent multi-agent coordination, codex-based code quality enforcement, and enterprise-grade development practices. Eliminate spaghetti code, hallucinations, and code rot through systematic validation and intelligent agent delegation.
+⚡ StringRay ⚡ provides intelligent multi-agent coordination, codex-based code quality enforcement, and enterprise-grade development practices through oh-my-opencode integration. Eliminate spaghetti code, hallucinations, and code rot through systematic validation and intelligent agent delegation.
 
 ---
 
 **⚡ Enterprise-Grade AI Agent Coordination. Production-Ready Code. Zero Dead Ends. ⚡**
 
-**Delivers clean architecture, predictive analytics, secure plugin ecosystem, and sub-millisecond performance — enterprise-grade, every time.**
+**Delivers clean architecture, predictive analytics, secure oh-my-opencode plugin ecosystem, and sub-millisecond performance — enterprise-grade, every time.**
 
 **Latest: Enhanced git hook validation with lightweight post-commit checks (<2s) and comprehensive post-push CI/CD validation (<5min).**
-**Features: Real-time metrics collection and performance monitoring for all hook executions.**
+**Features: Real-time metrics collection and performance monitoring for all hook executions through oh-my-opencode integration.**
 
 ## 🚀 Features
 
@@ -50,7 +49,7 @@
 ### Prerequisites
 
 - Node.js 18+ / Bun (recommended)
-- OpenCode installed & running
+- oh-my-opencode installed & running (StringRay AI integrates as an oh-my-opencode plugin)
 
 ## 📚 Documentation
 
@@ -62,8 +61,14 @@
 
 ### Installation
 
+First, ensure you have a `package.json` file in your project:
+
 ```bash
-npm install stringray
+# If you don't have package.json yet
+npm init -y
+
+# Then install StringRay AI
+npm install stringray-ai
 ```
 
 ### Setup
@@ -71,30 +76,71 @@ npm install stringray
 **Important:** After installation, you must run the setup command manually:
 
 ```bash
-npx stringray init
+npx stringray-ai install
 ```
 
-**Note:** npm does not run postinstall scripts automatically for local package installations (file paths or tar.gz files) for security reasons. The setup must be run manually.
+**Note:** The setup command is required because npm's postinstall scripts have security restrictions and may not run automatically in all environments. Running the install command manually ensures proper configuration.
 
 This will automatically:
 
-- ✅ Configure all 9 StringRay agents
+- ✅ Configure all 8 StringRay agents
 - ✅ Enable multi-agent orchestration settings
 - ✅ Set up configuration for AI development workflows
+
+### Validation & Testing
+
+After installation, validate that StringRay is working correctly:
+
+```bash
+# Test CLI functionality
+npx stringray-ai --help
+npx stringray-ai doctor
+
+# Run comprehensive plugin validation
+node node_modules/stringray-ai/scripts/test-stringray-plugin.mjs
+
+# Check system status
+npx stringray-ai status
+
+# Use StringRay AI features
+npx stringray-ai run "Your prompt here"
+npx stringray-ai auth
+```
+
+## Available Commands
+
+**Core Commands:**
+- `npx stringray-ai --help` - Show help and available commands
+- `npx stringray-ai doctor` - Run health checks and diagnostics
+- `npx stringray-ai install` - Interactive setup wizard
+- `npx stringray-ai status` - Display system status
+
+**AI Features:**
+- `npx stringray-ai run "prompt"` - Execute StringRay session with agent orchestration
+- `npx stringray-ai auth` - Manage authentication for AI providers
+
+**Validation:**
+- `node node_modules/stringray-ai/scripts/test-stringray-plugin.mjs` - Comprehensive plugin validation
+
+The plugin test will verify:
+- ✅ Plugin loads successfully
+- ✅ Codex injection works
+- ✅ System hooks are functional
+- ✅ Framework is ready for oh-my-opencode integration
 
 ### Manual Installation
 
 If automatic setup fails:
 
 ```bash
-npm install stringray
+npm install stringray-ai
 ```
 
 Then manually add to your development configuration (example for oh-my-opencode):
 
 ```json
 {
-  "plugin": ["stringray/dist/plugin/stringray-codex-injection.js"],
+  "plugin": ["stringray-ai/dist/plugin/stringray-codex-injection.js"],
   "agent": {
     "orchestrator": { "model": "opencode/grok-code" },
     "enforcer": { "model": "opencode/grok-code" },

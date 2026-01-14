@@ -1,6 +1,6 @@
 {
-  "name": "stringray",
-  "version": "1.0.0",
+  "name": "stringray-ai",
+  "version": "1.0.30",
   "description": "⚡ StringRay ⚡: Bulletproof AI orchestration with systematic error prevention. Zero dead ends. Ship clean, tested, optimized code — every time.",
   "type": "module",
   "main": "./dist/plugin/index.js",
@@ -9,7 +9,7 @@
     "plugin": "./dist/plugin/plugins/stringray-codex-injection.js"
   },
   "bin": {
-    "stringray": "scripts/setup.cjs",
+    "stringray-ai": "dist/cli/index.js",
     "stringray-test": "scripts/test-stringray-plugin.mjs"
   },
   "scripts": {
@@ -73,6 +73,7 @@
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.25.2",
     "@opencode-ai/sdk": "^1.0.0",
+    "stringray-ai": "^1.0.22",
     "structlog": "^1.0.0",
     "zod": "^3.23.0"
   },
@@ -94,6 +95,7 @@
   },
   "files": [
     ".mcp.json",
+    "dist/cli",
     "dist/plugin",
     "dist/mcps",
     "dist/agents",
@@ -101,7 +103,12 @@
     "dist/processors",
     "dist/state",
     "dist/utils",
-    "scripts",
+    "scripts/postinstall.cjs",
+    "scripts/test-stringray-plugin.mjs",
+    "scripts/test-path-resolver.mjs",
+    "scripts/validate-codex.js",
+    "scripts/test-comprehensive-path-resolution.mjs",
+    "scripts/test-full-plugin-no-timeout.sh",
     "README.md",
     "LICENSE"
   ],

@@ -23,7 +23,7 @@ NC='\033[0m' # No Color
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 TEST_ENV_NAME="${1:-test-install}"
-PACKAGE_NAME="stringray-1.0.0.tgz"
+PACKAGE_NAME="stringray-ai-1.0.9.tgz"
 
 # Logging functions
 log_info() {

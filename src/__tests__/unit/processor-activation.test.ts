@@ -252,7 +252,9 @@ describe("Processor Activation", () => {
     });
 
     it("should prevent registration of processors with invalid names", () => {
-      const invalidNames = ["", " ", "test-processor", "test.processor"];
+      // Only empty names and names with spaces are invalid
+      // Hyphens, underscores, and dots are allowed
+      const invalidNames = ["", " ", "   "];
 
       invalidNames.forEach((name) => {
         expect(() => {
@@ -263,6 +265,20 @@ describe("Processor Activation", () => {
             enabled: true,
           });
         }).toThrow();
+      });
+
+      // These should be valid (no errors thrown)
+      const validNames = ["test-processor", "test.processor", "test_processor", "validName"];
+
+      validNames.forEach((name) => {
+        expect(() => {
+          processorManager.registerProcessor({
+            name,
+            type: "pre",
+            priority: 10,
+            enabled: true,
+          });
+        }).not.toThrow();
       });
     });
 

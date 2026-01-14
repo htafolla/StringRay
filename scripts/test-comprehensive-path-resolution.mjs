@@ -36,13 +36,36 @@ try {
 // Test 3: Import Resolver Functionality
 console.log('\n=== TEST 3: Import Resolver Functionality ===');
 try {
-  // Use absolute path resolution for reliability
-  const path = await import('path');
-  const { fileURLToPath } = await import('url');
-  const __dirname = path.dirname(fileURLToPath(import.meta.url));
-  const importResolverPath = path.resolve(__dirname, '../dist/plugin/utils/import-resolver.js');
+  // Try multiple import strategies for compatibility
+  let importResolver;
 
-  const { importResolver } = await import(importResolverPath);
+  try {
+    // First try: relative import (works in development)
+    ({ importResolver } = await import('../dist/plugin/utils/import-resolver.js'));
+  } catch (e) {
+    try {
+      // Second try: absolute path resolution (works in CI)
+      const path = await import('path');
+      const { fileURLToPath } = await import('url');
+      const __dirname = path.dirname(fileURLToPath(import.meta.url));
+      const importResolverPath = path.resolve(__dirname, '../dist/plugin/utils/import-resolver.js');
+      ({ importResolver } = await import(importResolverPath));
+    } catch (e2) {
+      // Third try: check if file exists and provide detailed error
+      const fs = await import('fs');
+      const path = await import('path');
+      const { fileURLToPath } = await import('url');
+      const __dirname = path.dirname(fileURLToPath(import.meta.url));
+      const importResolverPath = path.resolve(__dirname, '../dist/plugin/utils/import-resolver.js');
+
+      if (fs.existsSync(importResolverPath)) {
+        throw new Error(`File exists at ${importResolverPath} but import failed: ${e2.message}`);
+      } else {
+        throw new Error(`Import resolver file not found at ${importResolverPath}. Build may have failed.`);
+      }
+    }
+  }
+
   const envInfo = importResolver.getEnvironmentInfo();
   console.log(`✅ Import Resolver loaded: ${envInfo.isDevelopment ? 'development' : 'production'} environment`);
 

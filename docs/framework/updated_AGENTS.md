@@ -153,7 +153,7 @@ All agents operate in `subagent` mode with full tool access and automatic delega
 
 #### Plugin Architecture
 
-- **StrRay Plugin**: `stringray-framework.js` - Registers 8 specialized agents
+- **StrRay Plugin**: `stringray-ai.js` - Registers 8 specialized agents
 - **Codex Plugin**: `plugin/strray-codex-injection.ts` - Automatic codex injection and delegation triggering
 
 #### oh-my-opencode Integration Points

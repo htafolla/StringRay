@@ -25870,7 +25870,7 @@ The configuration includes custom StrRay Framework properties that extend the ba
   // StrRay Framework extensions  
   google_auth: false,
   preemptive_compaction: true,
-  plugins: [stringray-framework],
+  plugins: [stringray-ai],
   multi_agent_orchestration: {...},
   sisyphus_orchestrator: {...},
   logging: {...},
@@ -26287,7 +26287,7 @@ Successfully implemented Option 1: Full Integration - StrRay now integrates seam
 1. ✅ Plugin Registration Fixed
 - OpenCode Config: ~/.config/opencode/opencode.json now registers both plugins:
     {
-    plugin: [oh-my-opencode, stringray-framework]
+    plugin: [oh-my-opencode, stringray-ai]
   }
   
 2. ✅ Configuration Separation
@@ -26336,7 +26336,7 @@ Successfully implemented Option 1: Full Integration - StrRay now integrates seam
 1. ✅ Plugin Registration Fixed
 - OpenCode Config: ~/.config/opencode/opencode.json now registers both plugins:
     {
-    plugin: [oh-my-opencode, stringray-framework]
+    plugin: [oh-my-opencode, stringray-ai]
   }
   
 2. ✅ Configuration Separation
@@ -26395,7 +26395,7 @@ Yes, I updated the main ./AGENTS.md file to reflect the integrated architecture.
 4. Plugin Integration
 - ✅ Registration: Added proper OpenCode config with both plugins
 - ✅ Configuration: Explained separate config files for each system
-- ✅ Dual Plugins: stringray-framework.js + strray-codex-injection.ts
+- ✅ Dual Plugins: stringray-ai.js + strray-codex-injection.ts
 5. MCP Server Count
 - ✅ Updated: "9 MCP servers" → "11 MCP servers (7 agent-specific + 4 knowledge skills)"
 6. Framework Alignment
@@ -26743,7 +26743,7 @@ opencode
 🔍 Why the Error Occurred
 The error happened because:
 1. StrRay is not a standalone npm package - it's embedded within oh-my-opencode
-2. The package name "stringray-framework" doesn't exist on npm - it's only the local development name
+2. The package name "stringray-ai" doesn't exist on npm - it's only the local development name
 3. Installation should be through oh-my-opencode only
 📋 Framework Status
 - ✅ Fully Operational: StrRay Framework v1.0.0 is production-ready
@@ -26785,7 +26785,7 @@ What You Need:
 What You Should NOT Have:
 ❌ Remove from ~/.config/opencode/opencode.json:
 {
-  plugin: [oh-my-opencode, stringray-framework]  // ← REMOVE THIS
+  plugin: [oh-my-opencode, stringray-ai]  // ← REMOVE THIS
 }
 🎯 Framework Status
 - ✅ StrRay is integrated within oh-my-opencode - no separate installation needed
@@ -27835,7 +27835,7 @@ You were absolutely right! We've successfully migrated StrRay from the plugin ap
 What We Accomplished
 🔄 Migration Complete
 Before (Plugin Approach):
-- ❌ .opencode/stringray-framework.js - Custom plugin
+- ❌ .opencode/stringray-ai.js - Custom plugin
 - ❌ Separate .opencode/agents/ directory
 - ❌ Manual plugin loading and registration
 - ❌ Limited to basic agent definitions
@@ -31027,7 +31027,7 @@ Deep Analysis: How dist Plays into oh-my-opencode Plugin System
 The dist folder is critical to StrRay's integration with oh-my-opencode. It contains the compiled MCP server executables that oh-my-opencode loads and runs.
 🔧 Plugin Loading Mechanism
 1. StrRay Plugin Declaration:
-      plugins: [stringray-framework]
+      plugins: [stringray-ai]
       This tells oh-my-opencode to load the StrRay plugin system.
 2. MCP Server Compilation:
    - Source: src/mcps/*.server.ts (TypeScript MCP server implementations)

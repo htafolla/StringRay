@@ -17,7 +17,7 @@ This guide explains how to configure and update AI models in the StrRay framewor
   "$schema": "https://raw.githubusercontent.com/code-yeongyu/oh-my-opencode/master/assets/oh-my-opencode.schema.json",
   "google_auth": false,
   "preemptive_compaction": true,
-  "plugins": ["stringray-framework"],
+  "plugins": ["stringray-ai"],
   "model_routing": {
     "enforcer": "opencode/grok-code",
     "architect": "opencode/grok-code",

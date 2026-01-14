@@ -9,7 +9,8 @@
     "plugin": "./dist/plugin/plugins/stringray-codex-injection.js"
   },
   "bin": {
-    "stringray": "scripts/setup.cjs"
+    "stringray": "scripts/setup.cjs",
+    "stringray-test": "scripts/test-stringray-plugin.mjs"
   },
   "scripts": {
     "build": "tsc",
@@ -92,6 +93,7 @@
     "vitest": "^2.0.0"
   },
   "files": [
+    ".mcp.json",
     "dist/plugin",
     "dist/mcps",
     "dist/agents",

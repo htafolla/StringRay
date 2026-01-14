@@ -11,12 +11,12 @@
  */
 
 // Path configuration for cross-environment compatibility
-// Check if we're running from a test environment (directory name contains 'stringray-')
+// Check if we're running from a test environment (directory name contains 'stringray-' or 'test-')
 const cwd = process.cwd();
 const dirName = cwd.split('/').pop() || '';
-const isTestEnvironment = dirName.includes('stringray-') || dirName.includes('final-stringray');
+const isTestEnvironment = dirName.includes('stringray-') || dirName.includes('final-stringray') || dirName.includes('test-');
 const PLUGIN_PATH = process.env.STRINGRAY_PLUGIN_PATH ||
-  (isTestEnvironment ? '../dist/plugin/plugins' : '../dist/plugin/plugins');
+  (isTestEnvironment ? 'node_modules/stringray/dist/plugin/plugins' : 'dist/plugin/plugins');
 
 console.log('🧪 Testing StringRay Plugin Loading...');
 console.log('=====================================\n');

@@ -11,7 +11,14 @@ import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
-import { enhancedMultiAgentOrchestrator } from "../orchestrator/enhanced-multi-agent-orchestrator.js";
+// Environment-aware path configuration for cross-environment compatibility
+// From dist/mcps/ (built): ../../orchestrator/
+// From src/mcps/ (source): ../orchestrator/
+const ORCHESTRATOR_BASE_PATH = process.env.STRRAY_ORCHESTRATOR_PATH ||
+  (process.cwd().includes('/dist/') ? "../../orchestrator" : "../orchestrator");
+
+// Dynamic imports for cross-environment compatibility
+const { enhancedMultiAgentOrchestrator } = await import(`${ORCHESTRATOR_BASE_PATH}/enhanced-multi-agent-orchestrator.js`);
 
 class EnhancedMultiAgentOrchestratorServer {
   private server: Server;

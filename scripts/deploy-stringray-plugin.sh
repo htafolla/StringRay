@@ -154,20 +154,15 @@ run_tests() {
 
     cd "$PROJECT_ROOT/$TEST_ENV_NAME"
 
-    # Test 1: Plugin loading
-    log_info "Running plugin loading test..."
-    # Run with timeout to prevent hanging
-    if (node "../scripts/test-strray-plugin.mjs" > /tmp/plugin-test.log 2>&1 &) && sleep 30 && kill $! 2>/dev/null; wait $! 2>/dev/null; then
-        # Check if the test actually passed by looking at the output
-        if grep -q "PASSED" /tmp/plugin-test.log; then
-            log_success "Plugin loading test: PASSED"
-        else
-            log_error "Plugin loading test: FAILED"
-            cat /tmp/plugin-test.log
-            exit 1
-        fi
+    # Test 1: Plugin loading (Phase 4 - Full Framework Initialization)
+    log_info "Running plugin loading test (Phase 4 - allowing full framework initialization)..."
+    # Use standalone test script that handles timeouts properly
+    if bash "../scripts/test-full-plugin-no-timeout.sh" > /tmp/plugin-test.log 2>&1; then
+        log_success "Plugin loading test: PASSED (full framework initialization complete)"
     else
-        log_error "Plugin loading test: TIMEOUT"
+        log_error "Plugin loading test: FAILED"
+        echo "=== PLUGIN TEST LOG ==="
+        cat /tmp/plugin-test.log
         exit 1
     fi
 

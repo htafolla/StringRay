@@ -43,6 +43,7 @@ export interface AgentOrchestrationState {
   agentDependencies: Map<string, string[]>;
   monitoringEnabled: boolean;
   cleanupInterval: number;
+  isMainOrchestrator: boolean; // Flag to indicate if this is the main orchestrator
 }
 
 export class EnhancedMultiAgentOrchestrator {
@@ -50,17 +51,11 @@ export class EnhancedMultiAgentOrchestrator {
   private stateManager: StringRayStateManager;
   private complexityAnalyzer: ComplexityAnalyzer;
   private agentDelegator: any;
-  private cleanupTimer: NodeJS.Timeout | null = null;
+  private executionContext: any;
+  private cleanupTimer: any;
 
-  // 🚨 SECURITY: Track execution context to prevent subagent spawning
-  private executionContext: {
-    isExecutingAsSubagent: boolean;
-    currentAgentId: string | null;
-    spawnStack: string[];
-  };
-
-  constructor() {
-    this.stateManager = new StringRayStateManager();
+  constructor(stateManager?: StringRayStateManager, isMainOrchestrator: boolean = false) {
+    this.stateManager = stateManager || new StringRayStateManager();
     this.complexityAnalyzer = new ComplexityAnalyzer();
     this.agentDelegator = createAgentDelegator(this.stateManager);
 
@@ -71,7 +66,8 @@ export class EnhancedMultiAgentOrchestrator {
       failedAgents: new Map(),
       agentDependencies: new Map(),
       monitoringEnabled: true,
-      cleanupInterval: 30000, // 30 seconds
+      cleanupInterval: stateManager ? 300000 : 30000, // 5 minutes for main, 30 seconds for sub
+      isMainOrchestrator,
     };
 
     // Initialize execution context for security tracking
@@ -89,8 +85,8 @@ export class EnhancedMultiAgentOrchestrator {
    * Prevents subagents from spawning other subagents (infinite loops, resource exhaustion)
    */
   private isCurrentlyExecutingAsSubagent(): boolean {
-    // Check if we have any active agents (indicates we're in subagent execution)
-    return this.state.activeAgents.size > 0;
+    // Main orchestrator can spawn agents, subagents cannot
+    return !this.state.isMainOrchestrator;
   }
 
   /**
@@ -277,6 +273,7 @@ export class EnhancedMultiAgentOrchestrator {
       );
 
       return {
+        success: true,
         agentType: request.agentType,
         task: request.task,
         executionTime: result.executionTime || 0,
@@ -319,6 +316,7 @@ export class EnhancedMultiAgentOrchestrator {
     await new Promise((resolve) => setTimeout(resolve, executionTime));
 
     return {
+      success: true,
       agentType: request.agentType,
       task: request.task,
       executionTime,
@@ -510,4 +508,4 @@ export class EnhancedMultiAgentOrchestrator {
 
 // Export singleton instance
 export const enhancedMultiAgentOrchestrator =
-  new EnhancedMultiAgentOrchestrator();
+  new EnhancedMultiAgentOrchestrator(undefined, true); // Main orchestrator

@@ -62,7 +62,7 @@ class OhMyOpenCodeIntegrationValidator {
     try {
       const ohMyOpencodeConfig = JSON.parse(fs.readFileSync('.opencode/oh-my-opencode.json', 'utf8'));
 
-      if (ohMyOpencodeConfig.plugin && ohMyOpencodeConfig.plugin.includes('stringray-codex-injection.js')) {
+      if (ohMyOpencodeConfig.plugin && ohMyOpencodeConfig.plugin.some(p => p.includes('stringray-codex-injection.js'))) {
         console.log('  ✅ StringRay plugin registered in oh-my-opencode');
         this.results.passed.push('Plugin Registration');
       } else {
@@ -197,5 +197,4 @@ validator.validateIntegration().then(success => {
 }).catch(error => {
   console.error('Integration validation failed:', error);
   process.exit(1);
-});</content>
-<parameter name="filePath">scripts/validation/validate-oh-my-opencode-integration.js
+});

@@ -1,8 +1,8 @@
 {
-  "name": "stringray-test-env",
-  "version": "1.0.0",
-  "description": "StringRay Plugin Test Environment",
-  "dependencies": {
-    "stringray": "file:../stringray-1.0.0.tgz"
-  }
+      "name": "stringray-test-env",
+      "version": "1.0.0",
+      "description": "StringRay Plugin Test Environment",
+      "dependencies": {
+            "stringray": "file:../stringray-1.0.0.tgz"
+      }
 }

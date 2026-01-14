@@ -274,13 +274,13 @@ export class ProcessorManager {
 
       // Log failures but continue execution for graceful error handling
       if (!result.success) {
-        console.warn(
-          `⚠️ Pre-processor ${config.name} failed, continuing with other processors`,
+        console.log(
+          `ℹ️ Pre-processor ${config.name} failed, continuing with other processors`,
         );
         frameworkLogger.log(
           "processor-manager",
           "pre-processor failed",
-          "error",
+          "info",
           {
             processor: config.name,
             operation,

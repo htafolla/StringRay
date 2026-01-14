@@ -8,6 +8,31 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 
+// Copy .mcp.json to project root if it doesn't exist
+// In packaged modules, we need to find the module root differently
+const moduleRoot = path.join(__dirname, '..');
+const mcpConfigSource = path.join(moduleRoot, '.mcp.json');
+const mcpConfigDest = path.join(process.cwd(), '.mcp.json');
+
+// Debug paths
+console.log('Postinstall running from module root:', moduleRoot);
+console.log('Looking for .mcp.json at:', mcpConfigSource);
+console.log('Will copy to:', mcpConfigDest);
+
+try {
+  console.log('Source exists:', fs.existsSync(mcpConfigSource));
+  console.log('Dest exists:', fs.existsSync(mcpConfigDest));
+  if (fs.existsSync(mcpConfigSource) && !fs.existsSync(mcpConfigDest)) {
+    fs.copyFileSync(mcpConfigSource, mcpConfigDest);
+    console.log('✅ StrRay MCP configuration installed');
+    console.log('File copied successfully to:', mcpConfigDest);
+  } else {
+    console.log('Skipping copy - source missing or dest exists');
+  }
+} catch (error) {
+  console.warn('Warning: Could not copy MCP config:', error.message);
+}
+
 // Create a marker file to prove the script ran
 const markerPath = path.join(os.tmpdir(), 'stringray-postinstall-ran');
 try {

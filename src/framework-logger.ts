@@ -69,7 +69,12 @@ export class FrameworkUsageLogger {
     try {
       const fs = await import("fs");
       const path = await import("path");
-      const logDir = path.join(process.cwd(), ".opencode", "logs");
+      const cwd = process.cwd();
+      if (!cwd) {
+        // Skip logging if cwd is not available (e.g., in test environments)
+        return;
+      }
+      const logDir = path.join(cwd, ".opencode", "logs");
       const logFile = path.join(logDir, "framework-activity.log");
 
       // Ensure log directory exists

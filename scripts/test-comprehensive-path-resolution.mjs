@@ -36,33 +36,67 @@ try {
 // Test 3: Import Resolver Functionality
 console.log('\n=== TEST 3: Import Resolver Functionality ===');
 try {
-  // Try multiple import strategies for compatibility
+  // Try multiple import strategies for maximum compatibility
   let importResolver;
 
-  try {
-    // First try: relative import (works in development)
-    ({ importResolver } = await import('../dist/plugin/utils/import-resolver.js'));
-  } catch (e) {
-    try {
-      // Second try: absolute path resolution (works in CI)
-      const path = await import('path');
-      const { fileURLToPath } = await import('url');
-      const __dirname = path.dirname(fileURLToPath(import.meta.url));
-      const importResolverPath = path.resolve(__dirname, '../dist/plugin/utils/import-resolver.js');
-      ({ importResolver } = await import(importResolverPath));
-    } catch (e2) {
-      // Third try: check if file exists and provide detailed error
-      const fs = await import('fs');
-      const path = await import('path');
-      const { fileURLToPath } = await import('url');
-      const __dirname = path.dirname(fileURLToPath(import.meta.url));
-      const importResolverPath = path.resolve(__dirname, '../dist/plugin/utils/import-resolver.js');
+  // Possible paths to try (in order of preference)
+  const possiblePaths = [
+    '../dist/plugin/utils/import-resolver.js',  // Relative from scripts/
+    './dist/plugin/utils/import-resolver.js',   // Relative from project root
+    'dist/plugin/utils/import-resolver.js',     // From anywhere in project
+  ];
 
-      if (fs.existsSync(importResolverPath)) {
-        throw new Error(`File exists at ${importResolverPath} but import failed: ${e2.message}`);
-      } else {
-        throw new Error(`Import resolver file not found at ${importResolverPath}. Build may have failed.`);
+  let lastError;
+  let foundPath = null;
+
+  for (const relativePath of possiblePaths) {
+    try {
+      // Try importing with each path
+      ({ importResolver } = await import(relativePath));
+      foundPath = relativePath;
+      break;
+    } catch (e) {
+      lastError = e;
+
+      // Also try absolute path resolution for this relative path
+      try {
+        const path = await import('path');
+        const { fileURLToPath } = await import('url');
+        const __dirname = path.dirname(fileURLToPath(import.meta.url));
+        const absPath = path.resolve(__dirname, relativePath);
+        ({ importResolver } = await import(absPath));
+        foundPath = absPath;
+        break;
+      } catch (e2) {
+        // Continue to next path
       }
+    }
+  }
+
+  if (!importResolver) {
+    // Last resort: check multiple possible locations and provide detailed error
+    const fs = await import('fs');
+    const path = await import('path');
+    const { fileURLToPath } = await import('url');
+    const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+    const checkPaths = [
+      path.resolve(__dirname, '../dist/plugin/utils/import-resolver.js'),
+      path.resolve(__dirname, './dist/plugin/utils/import-resolver.js'),
+      path.resolve(process.cwd(), 'dist/plugin/utils/import-resolver.js'),
+    ];
+
+    let existingPaths = [];
+    for (const checkPath of checkPaths) {
+      if (fs.existsSync(checkPath)) {
+        existingPaths.push(checkPath);
+      }
+    }
+
+    if (existingPaths.length > 0) {
+      throw new Error(`File exists at ${existingPaths.join(', ')} but import failed: ${lastError.message}`);
+    } else {
+      throw new Error(`Import resolver file not found. Searched: ${checkPaths.join(', ')}. Build may have failed. CWD: ${process.cwd()}`);
     }
   }
 

@@ -1,6 +1,6 @@
 # ⚡ StringRay AI v1.0.26 – Bulletproof AI Orchestration for Production-Grade Development
 
-[![Version](https://img.shields.io/badge/version-1.0.1-blue.svg)](https://github.com/htafolla/stringray)
+[![Version](https://img.shields.io/badge/version-1.0.53-blue.svg)](https://github.com/htafolla/stringray)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9+-blue.svg)](https://www.typescript.org/)
@@ -12,6 +12,8 @@
 **Enterprise AI agent coordination with systematic error prevention. Zero dead ends. Ship clean, tested, optimized code — every time.**
 
 ⚡ StringRay ⚡ provides intelligent multi-agent coordination, codex-based code quality enforcement, and enterprise-grade development practices through oh-my-opencode integration. Eliminate spaghetti code, hallucinations, and code rot through systematic validation and intelligent agent delegation.
+
+> **📦 Current Version: 1.0.53** - All intermediate versions (1.0.30-1.0.52) have been deprecated. Use `npm install stringray-ai@latest` for the most stable release.
 
 ---
 

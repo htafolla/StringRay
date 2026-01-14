@@ -1,5 +1,5 @@
 /**
- * StrRay Framework v1.0.0 - Plugin Ecosystem
+ * StringRay Framework v1.0.0 - Plugin Ecosystem
  *
  * Secure plugin system for third-party agent extensions.
  * Provides sandboxed execution, validation, and lifecycle management.
@@ -179,7 +179,7 @@ export class PluginValidator {
     }
 
     if (!packageJson.engines?.strray) {
-      errors.push("Missing StrRay engine requirement");
+      errors.push("Missing StringRay engine requirement");
     }
 
     const suspiciousKeywords = [
@@ -206,9 +206,9 @@ export class PluginValidator {
     const errors: string[] = [];
     const warnings: string[] = [];
 
-    const capabilities = packageJson.strrayCapabilities;
+    const capabilities = packageJson.stringrayCapabilities;
     if (!capabilities) {
-      errors.push("Missing strrayCapabilities in package.json");
+      errors.push("Missing stringrayCapabilities in package.json");
       return { errors, warnings };
     }
 

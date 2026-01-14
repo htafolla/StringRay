@@ -1,11 +1,11 @@
 /**
  * COMPLETE END-TO-END SIMULATION
  *
- * Unified simulation covering the entire StrRay pipeline from user prompt to final result
+ * Unified simulation covering the entire StringRay pipeline from user prompt to final result
  * Addresses the missing 5% coverage for complete pipeline validation
  */
 
-import { StrRayOrchestrator } from "../orchestrator.js";
+import { StringRayOrchestrator } from "../orchestrator.js";
 import { frameworkLogger } from "../framework-logger.js";
 
 export interface PipelineResult {
@@ -21,7 +21,7 @@ export interface PipelineResult {
 }
 
 /**
- * Execute complete end-to-end simulation of StrRay pipeline
+ * Execute complete end-to-end simulation of StringRay pipeline
  */
 export async function executeCompleteE2ESimulation(
   userPrompt: string,
@@ -55,7 +55,7 @@ export async function executeCompleteE2ESimulation(
     console.log("📋 Phase 2: Orchestration Setup");
     console.log("- Initializing orchestrator and session management");
 
-    const orchestrator = new StrRayOrchestrator({
+    const orchestrator = new StringRayOrchestrator({
       maxConcurrentTasks: 3,
       taskTimeout: 300000,
       conflictResolutionStrategy: "expert_priority",

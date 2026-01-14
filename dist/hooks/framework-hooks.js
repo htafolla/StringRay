@@ -2,11 +2,11 @@ export const useFrameworkInitialization = () => {
     return {
         onInit: () => {
             // Framework initialization logic
-            console.log("StrRay framework initialized");
+            console.log("StringRay framework initialized");
         },
         onDestroy: () => {
             // Framework cleanup logic
-            console.log("StrRay framework destroyed");
+            console.log("StringRay framework destroyed");
         },
     };
 };

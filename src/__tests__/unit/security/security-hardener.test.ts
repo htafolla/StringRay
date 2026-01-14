@@ -1,5 +1,5 @@
 /**
- * StrRay Framework v1.0.0 - SecurityHardener Unit Tests
+ * StringRay Framework v1.0.0 - SecurityHardener Unit Tests
  *
  * Tests for SecurityHardener including:
  * - Security hardening rule application

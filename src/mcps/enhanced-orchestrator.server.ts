@@ -17,10 +17,17 @@ class EnhancedMultiAgentOrchestratorServer {
   private server: Server;
 
   constructor() {
-    this.server = new Server({
-      name: "enhanced-multi-agent-orchestrator",
-      version: "1.0.0",
-    });
+        this.server = new Server(
+      {
+        name: "enhanced-multi-agent-orchestrator",
+        version: "1.0.0",
+      },
+      {
+        capabilities: {
+          tools: {},
+        },
+      }
+    );
 
     this.setupToolHandlers();
     console.log("Enhanced Multi-Agent Orchestrator MCP Server initialized");
@@ -222,9 +229,9 @@ class EnhancedMultiAgentOrchestratorServer {
 
           case "execute-complex-task":
             // Import the main orchestrator for complex task execution
-            const { StrRayOrchestrator } = await import("../orchestrator.js");
+            const { StringRayOrchestrator } = await import("../orchestrator.js");
 
-            const orchestrator = new StrRayOrchestrator({
+            const orchestrator = new StringRayOrchestrator({
               maxConcurrentTasks: 5,
               conflictResolutionStrategy: "expert_priority",
             });

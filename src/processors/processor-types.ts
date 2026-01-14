@@ -1,5 +1,5 @@
 /**
- * StrRay Framework v1.0.0 - Processor Types
+ * StringRay Framework v1.0.0 - Processor Types
  *
  * Type definitions for the processor activation system.
  *

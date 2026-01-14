@@ -1,12 +1,12 @@
 import { describe, test, expect, beforeEach, afterEach } from "vitest";
-import { StrRayStateManager } from "../../state/state-manager";
+import { StringRayStateManager } from "../../state/state-manager";
 import { SessionCoordinator } from "../../delegation/session-coordinator";
 import { SessionCleanupManager } from "../../session/session-cleanup-manager";
 import { SessionMonitor } from "../../session/session-monitor";
 import { setupStandardMocks, waitForDebounce } from "../utils/test-utils";
 
 describe("Session Monitoring Integration", () => {
-  let stateManager: StrRayStateManager;
+  let stateManager: StringRayStateManager;
   let sessionCoordinator: SessionCoordinator;
   let cleanupManager: SessionCleanupManager;
   let sessionMonitor: SessionMonitor;
@@ -15,7 +15,7 @@ describe("Session Monitoring Integration", () => {
     // Use standardized mock setup
     setupStandardMocks();
 
-    stateManager = new StrRayStateManager();
+    stateManager = new StringRayStateManager();
     await new Promise((resolve) => setTimeout(resolve, 10)); // Wait for initialization
     sessionCoordinator = new SessionCoordinator(stateManager);
     cleanupManager = new SessionCleanupManager(stateManager);

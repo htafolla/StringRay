@@ -1,8 +1,8 @@
 /**
- * StrRay Framework v1.0.0 - Secure Plugin Marketplace Architecture
+ * StringRay Framework v1.0.0 - Secure Plugin Marketplace Architecture
  *
  * Enterprise-grade plugin ecosystem with marketplace, version management,
- * and third-party integrations for StrRay Phase 3.
+ * and third-party integrations for StringRay Phase 3.
  *
  * @version 1.0.0
  * @since 2026-01-08
@@ -39,8 +39,8 @@ export interface PluginVersion {
   downloadUrl: string;
   checksum: string;
   size: number;
-  minStrRayVersion: string;
-  maxStrRayVersion?: string;
+  minStringRayVersion: string;
+  maxStringRayVersion?: string;
   deprecated: boolean;
   securityPatches: string[];
   breakingChanges: boolean;

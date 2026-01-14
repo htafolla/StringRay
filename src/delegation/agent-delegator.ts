@@ -1,5 +1,5 @@
 /**
- * StrRay Framework v1.0.0 - Agent Delegator
+ * StringRay Framework v1.0.0 - Agent Delegator
  *
  * Intelligent agent delegation system that uses complexity analysis to determine
  * optimal task distribution strategies and conflict resolution.
@@ -17,7 +17,7 @@ import {
   strRayConfigLoader,
   type MultiAgentOrchestrationConfig,
 } from "../config-loader.js";
-import { StrRayStateManager } from "../state/state-manager";
+import { StringRayStateManager } from "../state/state-manager";
 import { frameworkLogger } from "../framework-logger.js";
 
 export interface DelegationContext {
@@ -87,7 +87,7 @@ export interface DelegationMetrics {
 
 export class AgentDelegator {
   private complexityAnalyzer: ComplexityAnalyzer;
-  private stateManager: StrRayStateManager;
+  private stateManager: StringRayStateManager;
   private agentCapabilities = new Map<string, AgentCapability>();
   private delegationMetrics: DelegationMetrics = {
     totalDelegations: 0,
@@ -98,7 +98,7 @@ export class AgentDelegator {
     strategyUsage: {},
   };
 
-  constructor(stateManager: StrRayStateManager) {
+  constructor(stateManager: StringRayStateManager) {
     this.complexityAnalyzer = new ComplexityAnalyzer();
     this.stateManager = stateManager;
     this.initializeAgentCapabilities();
@@ -1348,7 +1348,7 @@ Please analyze this request and provide your specialized assistance as a ${agent
 
 // Export singleton instance factory
 export const createAgentDelegator = (
-  stateManager: StrRayStateManager,
+  stateManager: StringRayStateManager,
 ): AgentDelegator => {
   return new AgentDelegator(stateManager);
 };

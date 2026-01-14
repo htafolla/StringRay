@@ -1,5 +1,5 @@
 /**
- * StrRay Framework v1.0.0 - Phase 2 Automated Performance Benchmarking Suite
+ * StringRay Framework v1.0.0 - Phase 2 Automated Performance Benchmarking Suite
  *
  * Enterprise-grade automated performance benchmarking system for continuous optimization
  * and Universal Development Codex v1.2.20 compliance validation.

@@ -1,7 +1,7 @@
 /**
- * StrRay Framework v1.0.0
+ * StringRay Framework v1.0.0
  *
- * Main entry point for StrRay Framework.
+ * Main entry point for StringRay Framework.
  * Provides access to core codex injection and context loading functionality.
  *
  * @version 1.0.0
@@ -20,15 +20,15 @@ export * from "./hooks/index.js";
 
 // Core exports only
 export {
-  createStrRayCodexInjectorHook,
+  createStringRayCodexInjectorHook,
   getCodexStats,
   clearCodexCache,
 } from "./codex-injector.js";
-export { StrRayContextLoader, strRayContextLoader } from "./context-loader.js";
+export { StringRayContextLoader, strRayContextLoader } from "./context-loader.js";
 
-// StrRay Framework Direct Integration
+// StringRay Framework Direct Integration
 export {
-  activateStrRayFramework,
-  defaultStrRayConfig,
+  activateStringRayFramework,
+  defaultStringRayConfig,
 } from "./strray-activation.js";
-// export { initializeStrRay } from "./strray-init.js";
+// export { initializeStringRay } from "./strray-init.js";

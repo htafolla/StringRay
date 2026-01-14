@@ -1,5 +1,5 @@
 /**
- * StrRay Framework v1.0.0 - Boot Orchestrator Unit Tests
+ * StringRay Framework v1.0.0 - Boot Orchestrator Unit Tests
  *
  * Tests the boot sequence orchestration and component initialization.
  *
@@ -13,13 +13,13 @@ import {
   BootSequenceConfig,
   BootResult,
 } from "../../boot-orchestrator";
-import { StrRayContextLoader } from "../../context-loader";
-import { StrRayStateManager } from "../../state/state-manager";
+import { StringRayContextLoader } from "../../context-loader";
+import { StringRayStateManager } from "../../state/state-manager";
 
 describe("BootOrchestrator", () => {
   let orchestrator: BootOrchestrator;
-  let mockContextLoader: StrRayContextLoader;
-  let mockStateManager: StrRayStateManager;
+  let mockContextLoader: StringRayContextLoader;
+  let mockStateManager: StringRayStateManager;
 
   beforeEach(() => {
     // Mock dependencies
@@ -31,7 +31,7 @@ describe("BootOrchestrator", () => {
       }),
     } as any;
 
-    mockStateManager = new StrRayStateManager();
+    mockStateManager = new StringRayStateManager();
 
     // Create orchestrator with mocked dependencies
     orchestrator = new BootOrchestrator({

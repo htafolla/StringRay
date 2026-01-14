@@ -1,5 +1,5 @@
 /**
- * StrRay Framework v1.0.0 - Refactoring Logging Processor
+ * StringRay Framework v1.0.0 - Refactoring Logging Processor
  *
  * Post-processor that automatically logs agent task completions to REFACTORING_LOG.md
  * for pattern analysis and continuous improvement.
@@ -32,7 +32,7 @@ export class RefactoringLoggingProcessor implements ProcessorHook {
   name = "refactoring-logging";
   priority = 100; // High priority to ensure logging happens
   enabled = true;
-  debugEnabled = process.env.STRRAY_DEBUG_LOGGING === "true" || false;
+  debugEnabled = process.env.STRRAY_DEBUG_LOGGING === "true" || process.env.NODE_ENV === "development" || false;
 
   async execute(context: any): Promise<any> {
     if (this.debugEnabled) {
@@ -133,7 +133,7 @@ export class RefactoringLoggingProcessor implements ProcessorHook {
 ### Agent Context
 - Agent Type: TypeScript Agent
 - Session ID: ${context.sessionId || "unknown"}
-- Framework Version: StrRay v1.0.0
+- Framework Version: StringRay v1.0.0
 - Auto-logged: True
 
 ### Performance Metrics
@@ -237,7 +237,7 @@ ${this.summarizeResult(context.result)}
     }
 
     // Format entry with separators
-    const entry = `\n\n---\n\n${content}\n\n---\n\n_This entry was automatically logged by the StrRay Framework refactoring logging processor._`;
+    const entry = `\n\n---\n\n${content}\n\n---\n\n_This entry was automatically logged by the StringRay Framework refactoring logging processor._`;
 
     // Append to file
     await fs.promises.appendFile(logPath, entry, "utf-8");
@@ -278,4 +278,57 @@ export function createAgentTaskContext(
     capabilities,
     sessionId,
   };
+}
+
+/**
+ * Manual test function to verify refactoring logging works
+ */
+export async function testRefactoringLogging(): Promise<void> {
+  console.log("🧪 Testing Refactoring Logging Processor...");
+
+  const processor = new RefactoringLoggingProcessor();
+  processor.setDebugEnabled(true);
+
+  // Create test context
+  const testContext = createAgentTaskContext(
+    "test-agent",
+    "Test task for REFACTORING_LOG.md verification",
+    Date.now() - 5000, // 5 seconds ago
+    true, // success
+    "This is a test result that should be logged verbatim to REFACTORING_LOG.md",
+    ["testing", "logging", "verification"],
+    "test-session-123"
+  );
+
+  console.log("📝 Test context created:", {
+    agentName: testContext.agentName,
+    task: testContext.task.substring(0, 50) + "...",
+    duration: testContext.endTime - testContext.startTime,
+    success: testContext.success
+  });
+
+  try {
+    const result = await processor.execute(testContext);
+    console.log("✅ Refactoring logging test result:", result);
+
+    // Check if file was written
+    const fs = await import("fs");
+    const path = await import("path");
+    const logPath = path.join(process.cwd(), ".opencode", "REFACTORING_LOG.md");
+
+    if (fs.existsSync(logPath)) {
+      const content = fs.readFileSync(logPath, "utf-8");
+      const hasTestEntry = content.includes("test-agent");
+      console.log("📄 REFACTORING_LOG.md exists:", hasTestEntry ? "✅ Contains test entry" : "❌ Missing test entry");
+
+      if (hasTestEntry) {
+        console.log("🎯 SUCCESS: Agent summary was written to REFACTORING_LOG.md");
+      }
+    } else {
+      console.log("❌ REFACTORING_LOG.md file not found");
+    }
+
+  } catch (error) {
+    console.error("❌ Refactoring logging test failed:", error);
+  }
 }

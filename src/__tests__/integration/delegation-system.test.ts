@@ -1,5 +1,5 @@
 /**
- * StrRay Framework v1.0.0 - Delegation System Integration Tests
+ * StringRay Framework v1.0.0 - Delegation System Integration Tests
  *
  * Tests the complete automatic multi-agent delegation system.
  *
@@ -8,20 +8,20 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { StrRayStateManager } from "../../state/state-manager.js";
+import { StringRayStateManager } from "../../state/state-manager.js";
 import {
   createAgentDelegator,
   createSessionCoordinator,
 } from "../../delegation/index.js";
 
-describe("StrRay Delegation System Integration", () => {
-  let stateManager: StrRayStateManager;
+describe("StringRay Delegation System Integration", () => {
+  let stateManager: StringRayStateManager;
   let agentDelegator: any;
   let sessionCoordinator: any;
 
   beforeEach(() => {
     vi.clearAllMocks();
-    stateManager = new StrRayStateManager();
+    stateManager = new StringRayStateManager();
     agentDelegator = createAgentDelegator(stateManager);
     sessionCoordinator = createSessionCoordinator(stateManager);
 

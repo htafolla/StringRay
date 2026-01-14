@@ -1,5 +1,5 @@
 /**
- * StrRay Framework v1.0.0 - Plugin Marketplace Service
+ * StringRay Framework v1.0.0 - Plugin Marketplace Service
  *
  * Core marketplace service implementing plugin discovery, search, and curation
  * with enterprise-grade security and performance optimizations.

@@ -1,5 +1,5 @@
 /**
- * StrRay Framework - Application Metrics Endpoint
+ * StringRay Framework - Application Metrics Endpoint
  *
  * Production-ready metrics endpoint for Prometheus monitoring
  * Exposes key performance and health metrics
@@ -21,25 +21,25 @@ export class MetricsEndpoint {
    */
   private initializeMetrics(): void {
     // Framework health metrics
-    this.metrics.set("strray_up", 1);
-    this.metrics.set("strray_start_time", Date.now());
+    this.metrics.set("stringray_up", 1);
+    this.metrics.set("stringray_start_time", Date.now());
 
     // Performance metrics
-    this.metrics.set("strray_memory_heap_used_bytes", 0);
-    this.metrics.set("strray_memory_heap_total_bytes", 0);
-    this.metrics.set("strray_memory_external_bytes", 0);
+    this.metrics.set("stringray_memory_heap_used_bytes", 0);
+    this.metrics.set("stringray_memory_heap_total_bytes", 0);
+    this.metrics.set("stringray_memory_external_bytes", 0);
 
     // Orchestrator metrics
-    this.metrics.set("strray_orchestrator_active_tasks", 0);
-    this.metrics.set("strray_orchestrator_completed_tasks_total", 0);
+    this.metrics.set("stringray_orchestrator_active_tasks", 0);
+    this.metrics.set("stringray_orchestrator_completed_tasks_total", 0);
 
     // Codex compliance metrics
-    this.metrics.set("strray_codex_terms_loaded", 0);
-    this.metrics.set("strray_codex_violations_total", 0);
+    this.metrics.set("stringray_codex_terms_loaded", 0);
+    this.metrics.set("stringray_codex_violations_total", 0);
 
     // Performance budget metrics
-    this.metrics.set("strray_performance_budget_violations_total", 0);
-    this.metrics.set("strray_bundle_size_bytes", 0);
+    this.metrics.set("stringray_performance_budget_violations_total", 0);
+    this.metrics.set("stringray_bundle_size_bytes", 0);
   }
 
   /**
@@ -58,14 +58,14 @@ export class MetricsEndpoint {
     try {
       // Memory metrics
       const memUsage = process.memoryUsage();
-      this.metrics.set("strray_memory_heap_used_bytes", memUsage.heapUsed);
-      this.metrics.set("strray_memory_heap_total_bytes", memUsage.heapTotal);
-      this.metrics.set("strray_memory_external_bytes", memUsage.external);
+      this.metrics.set("stringray_memory_heap_used_bytes", memUsage.heapUsed);
+      this.metrics.set("stringray_memory_heap_total_bytes", memUsage.heapTotal);
+      this.metrics.set("stringray_memory_external_bytes", memUsage.external);
 
       // Orchestrator metrics
       const orchestratorStatus = strRayOrchestrator.getStatus();
       this.metrics.set(
-        "strray_orchestrator_active_tasks",
+        "stringray_orchestrator_active_tasks",
         orchestratorStatus.activeTasks,
       );
 
@@ -75,7 +75,7 @@ export class MetricsEndpoint {
           const perfStatus = await performanceSystem.getStatus();
           if (perfStatus) {
             this.metrics.set(
-              "strray_performance_budget_violations_total",
+              "stringray_performance_budget_violations_total",
               perfStatus.recentViolations,
             );
           }
@@ -86,10 +86,10 @@ export class MetricsEndpoint {
 
       // Framework uptime
       const uptime = process.uptime();
-      this.metrics.set("strray_uptime_seconds", uptime);
+      this.metrics.set("stringray_uptime_seconds", uptime);
     } catch (error) {
       console.error("Metrics collection error:", error);
-      this.metrics.set("strray_up", 0);
+      this.metrics.set("stringray_up", 0);
     }
   }
 
@@ -100,38 +100,38 @@ export class MetricsEndpoint {
     const lines: string[] = [];
 
     // Help and type definitions
-    lines.push("# HELP strray_up Framework health status (1=up, 0=down)");
-    lines.push("# TYPE strray_up gauge");
-    lines.push(`strray_up ${this.metrics.get("strray_up") || 0}`);
+    lines.push("# HELP stringray_up Framework health status (1=up, 0=down)");
+    lines.push("# TYPE stringray_up gauge");
+    lines.push(`stringray_up ${this.metrics.get("stringray_up") || 0}`);
 
-    lines.push("# HELP strray_uptime_seconds Time since framework started");
-    lines.push("# TYPE strray_uptime_seconds counter");
+    lines.push("# HELP stringray_uptime_seconds Time since framework started");
+    lines.push("# TYPE stringray_uptime_seconds counter");
     lines.push(
-      `strray_uptime_seconds ${this.metrics.get("strray_uptime_seconds") || 0}`,
-    );
-
-    lines.push(
-      "# HELP strray_memory_heap_used_bytes Memory heap used in bytes",
-    );
-    lines.push("# TYPE strray_memory_heap_used_bytes gauge");
-    lines.push(
-      `strray_memory_heap_used_bytes ${this.metrics.get("strray_memory_heap_used_bytes") || 0}`,
+      `stringray_uptime_seconds ${this.metrics.get("stringray_uptime_seconds") || 0}`,
     );
 
     lines.push(
-      "# HELP strray_orchestrator_active_tasks Number of active orchestrator tasks",
+      "# HELP stringray_memory_heap_used_bytes Memory heap used in bytes",
     );
-    lines.push("# TYPE strray_orchestrator_active_tasks gauge");
+    lines.push("# TYPE stringray_memory_heap_used_bytes gauge");
     lines.push(
-      `strray_orchestrator_active_tasks ${this.metrics.get("strray_orchestrator_active_tasks") || 0}`,
+      `stringray_memory_heap_used_bytes ${this.metrics.get("stringray_memory_heap_used_bytes") || 0}`,
     );
 
     lines.push(
-      "# HELP strray_performance_budget_violations_total Total performance budget violations",
+      "# HELP stringray_orchestrator_active_tasks Number of active orchestrator tasks",
     );
-    lines.push("# TYPE strray_performance_budget_violations_total counter");
+    lines.push("# TYPE stringray_orchestrator_active_tasks gauge");
     lines.push(
-      `strray_performance_budget_violations_total ${this.metrics.get("strray_performance_budget_violations_total") || 0}`,
+      `stringray_orchestrator_active_tasks ${this.metrics.get("stringray_orchestrator_active_tasks") || 0}`,
+    );
+
+    lines.push(
+      "# HELP stringray_performance_budget_violations_total Total performance budget violations",
+    );
+    lines.push("# TYPE stringray_performance_budget_violations_total counter");
+    lines.push(
+      `stringray_performance_budget_violations_total ${this.metrics.get("stringray_performance_budget_violations_total") || 0}`,
     );
 
     return lines.join("\n") + "\n";

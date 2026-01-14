@@ -18,10 +18,17 @@ class StrRaySecurityScanServer {
   private server: Server;
 
   constructor() {
-    this.server = new Server({
-      name: "strray-security-scan",
-      version: "1.0.0",
-    });
+        this.server = new Server(
+      {
+        name: "strray-security-scan",
+        version: "1.0.0",
+      },
+      {
+        capabilities: {
+          tools: {},
+        },
+      }
+    );
 
     this.setupToolHandlers();
     console.log("StrRay Security Scan MCP Server initialized");

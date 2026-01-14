@@ -36,10 +36,17 @@ class StrRayTestingStrategyServer {
   private server: Server;
 
   constructor() {
-    this.server = new Server({
-      name: "strray-testing-strategy",
-      version: "1.0.0",
-    });
+        this.server = new Server(
+      {
+        name: "strray-testing-strategy",
+        version: "1.0.0",
+      },
+      {
+        capabilities: {
+          tools: {},
+        },
+      }
+    );
 
     this.setupToolHandlers();
     console.log("StrRay Testing Strategy MCP Server initialized");

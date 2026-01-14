@@ -1,5 +1,5 @@
 import { describe, test, expect, beforeEach, afterEach } from "vitest";
-import { StrRayStateManager } from "../../state/state-manager";
+import { StringRayStateManager } from "../../state/state-manager";
 import { SessionCoordinator } from "../../delegation/session-coordinator";
 import {
   SessionCleanupManager,
@@ -8,7 +8,7 @@ import {
 import { setupStandardMocks } from "../utils/test-utils";
 
 describe("Session Cleanup Mechanism Validation", () => {
-  let stateManager: StrRayStateManager;
+  let stateManager: StringRayStateManager;
   let sessionCoordinator: any;
   let cleanupManager: any;
 
@@ -17,7 +17,7 @@ describe("Session Cleanup Mechanism Validation", () => {
     setupStandardMocks();
 
     // Create unique state manager instance for each test to ensure isolation
-    stateManager = new StrRayStateManager(`/test/state-${Date.now()}.json`);
+    stateManager = new StringRayStateManager(`/test/state-${Date.now()}.json`);
     await new Promise((resolve) => setTimeout(resolve, 10)); // Wait for initialization
     sessionCoordinator = new SessionCoordinator(stateManager);
     cleanupManager = new SessionCleanupManager(stateManager);

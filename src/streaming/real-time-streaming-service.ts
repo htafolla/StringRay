@@ -1,5 +1,5 @@
 /**
- * StrRay Framework v1.0.0 - Real-Time Data Streaming Service
+ * StringRay Framework v1.0.0 - Real-Time Data Streaming Service
  *
  * Enterprise-grade real-time data streaming with WebSocket support,
  * buffering, compression, and connection management for performance dashboards.

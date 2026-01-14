@@ -1,7 +1,7 @@
 /**
- * StrRay Framework v1.0.0 - Configuration Loader
+ * StringRay Framework v1.0.0 - Configuration Loader
  *
- * Loads and validates StrRay-specific configuration from oh-my-opencode.json
+ * Loads and validates StringRay-specific configuration from oh-my-opencode.json
  *
  * @version 1.0.0
  * @since 2026-01-09
@@ -32,15 +32,15 @@ export interface SisyphusOrchestratorConfig {
   progress_persistence: boolean;
 }
 
-export interface StrRayConfig {
+export interface StringRayConfig {
   multi_agent_orchestration: MultiAgentOrchestrationConfig;
   sisyphus_orchestrator: SisyphusOrchestratorConfig;
   disabled_agents: string[];
 }
 
-export class StrRayConfigLoader {
+export class StringRayConfigLoader {
   private configPath: string;
-  private cachedConfig: StrRayConfig | null = null;
+  private cachedConfig: StringRayConfig | null = null;
   private cacheExpiry: number = 30000; // 30 seconds
   private lastLoadTime: number = 0;
 
@@ -49,9 +49,9 @@ export class StrRayConfigLoader {
   }
 
   /**
-   * Load StrRay configuration from .strray/strray-config.json
+   * Load StringRay configuration from .strray/strray-config.json
    */
-  public loadConfig(): StrRayConfig {
+  public loadConfig(): StringRayConfig {
     const now = Date.now();
 
     // Return cached config if still valid
@@ -64,7 +64,7 @@ export class StrRayConfigLoader {
 
       if (!fs.existsSync(configPath)) {
         console.warn(
-          `⚠️  StrRay config not found at ${configPath}, using defaults`,
+          `⚠️  StringRay config not found at ${configPath}, using defaults`,
         );
         return this.getDefaultConfig();
       }
@@ -77,7 +77,7 @@ export class StrRayConfigLoader {
 
       return config;
     } catch (error) {
-      console.error(`❌ Failed to load StrRay config:`, error);
+      console.error(`❌ Failed to load StringRay config:`, error);
       return this.getDefaultConfig();
     }
   }
@@ -85,7 +85,7 @@ export class StrRayConfigLoader {
   /**
    * Parse configuration data with validation
    */
-  private parseConfig(configData: any): StrRayConfig {
+  private parseConfig(configData: any): StringRayConfig {
     return {
       multi_agent_orchestration: this.parseMultiAgentConfig(
         configData.multi_agent_orchestration,
@@ -150,7 +150,7 @@ export class StrRayConfigLoader {
   /**
    * Get default configuration
    */
-  private getDefaultConfig(): StrRayConfig {
+  private getDefaultConfig(): StringRayConfig {
     return {
       multi_agent_orchestration: {
         enabled: true,
@@ -190,4 +190,4 @@ export class StrRayConfigLoader {
 }
 
 // Export singleton instance
-export const strRayConfigLoader = new StrRayConfigLoader();
+export const strRayConfigLoader = new StringRayConfigLoader();

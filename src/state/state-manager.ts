@@ -6,7 +6,7 @@ export interface StateManager {
 
 import { frameworkLogger } from "../framework-logger.js";
 
-export class StrRayStateManager implements StateManager {
+export class StringRayStateManager implements StateManager {
   private store = new Map<string, unknown>();
   private persistencePath: string;
   private persistenceEnabled: boolean;

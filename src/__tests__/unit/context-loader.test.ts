@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
 import {
-  StrRayContextLoader,
+  StringRayContextLoader,
   strRayContextLoader,
   CodexContext,
   CodexTerm,
@@ -49,8 +49,8 @@ function dedent(strings: TemplateStringsArray, ...values: unknown[]): string {
   return dedented;
 }
 
-describe("StrRayContextLoader", () => {
-  let loader: StrRayContextLoader;
+describe("StringRayContextLoader", () => {
+  let loader: StringRayContextLoader;
   let mockFs: any;
   let mockPath: any;
 
@@ -131,8 +131,8 @@ describe("StrRayContextLoader", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     // Reset singleton instance for clean test state
-    (StrRayContextLoader as any).instance = null;
-    loader = StrRayContextLoader.getInstance();
+    (StringRayContextLoader as any).instance = null;
+    loader = StringRayContextLoader.getInstance();
     mockFs = vi.mocked(fs);
     mockPath = vi.mocked(path);
 
@@ -149,14 +149,14 @@ describe("StrRayContextLoader", () => {
 
   describe("singleton pattern", () => {
     it("should return the same instance", () => {
-      const instance1 = StrRayContextLoader.getInstance();
-      const instance2 = StrRayContextLoader.getInstance();
+      const instance1 = StringRayContextLoader.getInstance();
+      const instance2 = StringRayContextLoader.getInstance();
 
       expect(instance1).toBe(instance2);
     });
 
     it("should export singleton instance", () => {
-      const instance1 = StrRayContextLoader.getInstance();
+      const instance1 = StringRayContextLoader.getInstance();
       expect(strRayContextLoader).toStrictEqual(instance1);
     });
   });

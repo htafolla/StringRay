@@ -1,5 +1,5 @@
 /**
- * StrRay Framework v1.0.0 - WebSocket Gateway
+ * StringRay Framework v1.0.0 - WebSocket Gateway
  *
  * Enhanced WebSocket gateway for real-time performance dashboards.
  * Provides dashboard-specific WebSocket functionality with authentication,

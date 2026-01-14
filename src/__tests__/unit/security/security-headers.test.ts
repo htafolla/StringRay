@@ -1,5 +1,5 @@
 /**
- * StrRay Framework v1.0.0 - SecurityHeadersMiddleware Unit Tests
+ * StringRay Framework v1.0.0 - SecurityHeadersMiddleware Unit Tests
  *
  * Tests for SecurityHeadersMiddleware including:
  * - Header validation and application

@@ -70,10 +70,17 @@ class StrRayDevOpsDeploymentServer {
   private server: Server;
 
   constructor() {
-    this.server = new Server({
-      name: "strray-devops-deployment",
-      version: "1.0.0",
-    });
+        this.server = new Server(
+      {
+        name: "strray-devops-deployment",
+        version: "1.0.0",
+      },
+      {
+        capabilities: {
+          tools: {},
+        },
+      }
+    );
 
     this.setupToolHandlers();
     console.log("StrRay DevOps Deployment MCP Server initialized");

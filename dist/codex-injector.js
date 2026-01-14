@@ -1,5 +1,5 @@
 /**
- * StrRay Codex Context Injector Hook
+ * StringRay Codex Context Injector Hook
  *
  * Injects Universal Development Codex v1.2.20 context into agent operations.
  * Follows production-tested pattern from rules-injector.
@@ -12,7 +12,7 @@ import * as path from "path";
 import { frameworkLogger } from "./framework-logger.js";
 // Dynamic imports for cross-environment compatibility
 let extractCodexMetadata;
-let StrRayContextLoader;
+let StringRayContextLoader;
 let importsInitialized = false;
 async function initializeImports() {
     if (importsInitialized)
@@ -20,12 +20,12 @@ async function initializeImports() {
     try {
         // Try import with .js extension first (for Node.js/test environment)
         ({ extractCodexMetadata } = await import("./utils/codex-parser.js"));
-        ({ StrRayContextLoader } = await import("./context-loader.js"));
+        ({ StringRayContextLoader } = await import("./context-loader.js"));
     }
     catch (error) {
         // Fallback to import without .js extension (for oh-my-opencode plugin environment)
         ({ extractCodexMetadata } = await import("./utils/codex-parser"));
-        ({ StrRayContextLoader } = await import("./context-loader"));
+        ({ StringRayContextLoader } = await import("./context-loader"));
     }
     importsInitialized = true;
 }
@@ -52,7 +52,7 @@ function readFileContent(filePath) {
         }
     }
     catch (error) {
-        console.error(`StrRay Codex Hook Error:`, error);
+        console.error(`StringRay Codex Hook Error:`, error);
     }
     return null;
 }
@@ -92,7 +92,7 @@ async function loadCodexContext(sessionId) {
             }
         }
         catch (error) {
-            console.error(`StrRay Codex Hook Error:`, error);
+            console.error(`StringRay Codex Hook Error:`, error);
         }
     }
     codexCache.set(sessionId, codexContexts);
@@ -104,12 +104,12 @@ async function loadCodexContext(sessionId) {
 function formatCodexContext(contexts, sessionId) {
     const parts = [
         "═════════════════════════════════════════════════════════════",
-        "✨ StrRay Codex Context Loaded Successfully",
+        "✨ StringRay Codex Context Loaded Successfully",
         "═════════════════════════════════════════════════════════════",
         "",
     ];
     for (const context of contexts) {
-        parts.push(`✅ StrRay Codex loaded: ${context.source} (${context.metadata.termCount} terms)`);
+        parts.push(`✅ StringRay Codex loaded: ${context.source} (${context.metadata.termCount} terms)`);
     }
     const stats = getCodexStats(sessionId);
     parts.push(`📁 Sources: ${stats.fileCount} file(s)`, `🎯 Error Prevention Target: 90% runtime error prevention`, "═════════════════════════════════════════════════════════════", "");
@@ -122,7 +122,7 @@ function formatCodexContext(contexts, sessionId) {
  * a welcome message on agent startup, following the production-tested
  * pattern from oh-my-opencode's rules-injector.
  */
-export function createStrRayCodexInjectorHook() {
+export function createStringRayCodexInjectorHook() {
     return {
         name: "strray-codex-injector",
         hooks: {
@@ -133,7 +133,7 @@ export function createStrRayCodexInjectorHook() {
                     await loadCodexContext(sessionId);
                     const stats = getCodexStats(sessionId);
                     if (stats.loaded) {
-                        console.log(`✅ StrRay Codex loaded: ${stats.totalTerms} terms, ${stats.fileCount} sources`);
+                        console.log(`✅ StringRay Codex loaded: ${stats.totalTerms} terms, ${stats.fileCount} sources`);
                         await frameworkLogger.log("codex-injector", "codex context loaded successfully", "success", stats);
                     }
                     else {
@@ -143,7 +143,7 @@ export function createStrRayCodexInjectorHook() {
                 }
                 catch (error) {
                     await frameworkLogger.log("codex-injector", "agent.start hook failed", "error", error);
-                    console.error(`❌ StrRay: Error in agent.start hook:`, error);
+                    console.error(`❌ StringRay: Error in agent.start hook:`, error);
                     throw error;
                 }
             },
@@ -179,7 +179,7 @@ export function createStrRayCodexInjectorHook() {
                     await frameworkLogger.log("codex-injector", "codex context loaded for validation", "success", { contextCount: codexContexts.length });
                     // Use the initialized context loader
                     await initializeImports();
-                    const contextLoader = new StrRayContextLoader();
+                    const contextLoader = new StringRayContextLoader();
                     const loadResult = await contextLoader.loadCodexContext(sessionId);
                     if (!loadResult.success || !loadResult.context) {
                         console.log("⚠️  No codex context available - allowing action");
@@ -223,7 +223,7 @@ export function createStrRayCodexInjectorHook() {
                         error: error instanceof Error ? error.message : String(error),
                         tool: input.tool,
                     });
-                    console.error(`❌ StrRay: Error in tool.execute.before hook:`, error);
+                    console.error(`❌ StringRay: Error in tool.execute.before hook:`, error);
                     // For blocking violations, re-throw to prevent action
                     if (error instanceof Error &&
                         error.message.includes("Codex enforcement blocked action")) {
@@ -245,9 +245,9 @@ export function createStrRayCodexInjectorHook() {
                         frameworkLogger.log("codex-injector", "non-critical tool - no injection", "info", { tool: input.tool });
                         return output;
                     }
-                    console.log(`🔧 StrRay: Tool execution hook triggered for ${input.tool}`);
+                    console.log(`🔧 StringRay: Tool execution hook triggered for ${input.tool}`);
                     const codexContexts = await loadCodexContext(sessionId);
-                    console.log(`📚 StrRay: Loaded ${codexContexts.length} codex contexts`);
+                    console.log(`📚 StringRay: Loaded ${codexContexts.length} codex contexts`);
                     frameworkLogger.log("codex-injector", "codex contexts loaded for injection", "success", {
                         contextCount: codexContexts.length,
                         tool: input.tool,
@@ -271,7 +271,7 @@ export function createStrRayCodexInjectorHook() {
                         error: error instanceof Error ? error.message : String(error),
                         tool: input.tool,
                     });
-                    console.error(`❌ StrRay: Error in tool.execute.after hook:`, error);
+                    console.error(`❌ StringRay: Error in tool.execute.after hook:`, error);
                     // Return original output on error to not break the session
                     return output;
                 }

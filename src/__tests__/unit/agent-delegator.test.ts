@@ -1,5 +1,5 @@
 /**
- * StrRay Framework v1.0.0 - Agent Delegator Unit Tests
+ * StringRay Framework v1.0.0 - Agent Delegator Unit Tests
  *
  * Comprehensive unit tests for the AgentDelegator class to achieve 85%+ coverage.
  *
@@ -13,17 +13,17 @@ import {
   DelegationRequest,
   createAgentDelegator,
 } from "../../delegation/agent-delegator";
-import { StrRayStateManager } from "../../state/state-manager";
+import { StringRayStateManager } from "../../state/state-manager";
 import { strRayConfigLoader } from "../../config-loader";
 
 describe("AgentDelegator", () => {
-  let stateManager: StrRayStateManager;
+  let stateManager: StringRayStateManager;
   let agentDelegator: AgentDelegator;
 
   beforeEach(() => {
     // Note: Using default config which enables multi-agent orchestration
     vi.clearAllMocks();
-    stateManager = new StrRayStateManager();
+    stateManager = new StringRayStateManager();
     agentDelegator = createAgentDelegator(stateManager);
 
     // Set up default agents for all tests to avoid "agent not found" errors

@@ -1,5 +1,5 @@
 /**
- * StrRay Framework v1.0.0 - Comprehensive Orchestrator Integration Tests
+ * StringRay Framework v1.0.0 - Comprehensive Orchestrator Integration Tests
  *
  * Enterprise-grade integration testing for orchestrator and agent coordination functionality.
  * Validates framework components work together correctly in production scenarios.
@@ -9,9 +9,9 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi, beforeAll, afterAll } from 'vitest';
-import { StrRayOrchestrator, TaskDefinition, TaskResult } from '../../orchestrator.js';
+import { StringRayOrchestrator, TaskDefinition, TaskResult } from '../../orchestrator.js';
 import { SessionStateManager, createSessionStateManager } from '../../session/session-state-manager.js';
-import { StrRayStateManager } from '../../state/state-manager.js';
+import { StringRayStateManager } from '../../state/state-manager.js';
 import { SessionCoordinator, createSessionCoordinator } from '../../delegation/session-coordinator.js';
 import { ComplexityAnalyzer, complexityAnalyzer } from '../../delegation/complexity-analyzer.js';
 import { AgentDelegator, createAgentDelegator } from '../../delegation/agent-delegator.js';
@@ -34,9 +34,9 @@ vi.mock('path', () => ({
   dirname: vi.fn(),
 }));
 
-describe('StrRay Framework - Comprehensive Orchestrator Integration Tests', () => {
-  let orchestrator: StrRayOrchestrator;
-  let stateManager: StrRayStateManager;
+describe('StringRay Framework - Comprehensive Orchestrator Integration Tests', () => {
+  let orchestrator: StringRayOrchestrator;
+  let stateManager: StringRayStateManager;
   let sessionCoordinator: SessionCoordinator;
   let sessionStateManager: SessionStateManager;
   let agentDelegator: AgentDelegator;
@@ -87,14 +87,14 @@ describe('StrRay Framework - Comprehensive Orchestrator Integration Tests', () =
 
   beforeEach(() => {
     // Initialize core components
-    stateManager = new StrRayStateManager();
+    stateManager = new StringRayStateManager();
     sessionCoordinator = createSessionCoordinator(stateManager);
     sessionStateManager = createSessionStateManager(stateManager, sessionCoordinator);
     agentDelegator = createAgentDelegator(stateManager);
     pluginRegistryInstance = new PluginRegistry();
 
     // Initialize orchestrator with custom config for testing
-    orchestrator = new StrRayOrchestrator({
+    orchestrator = new StringRayOrchestrator({
       maxConcurrentTasks: 3,
       taskTimeout: 10000,
       conflictResolutionStrategy: 'majority_vote'
@@ -580,7 +580,7 @@ describe('StrRay Framework - Comprehensive Orchestrator Integration Tests', () =
 
       it('should handle timeout scenarios gracefully', async () => {
         // Create orchestrator with very short timeout
-        const fastOrchestrator = new StrRayOrchestrator({
+        const fastOrchestrator = new StringRayOrchestrator({
           maxConcurrentTasks: 1,
           taskTimeout: 100, // 100ms timeout
           conflictResolutionStrategy: 'majority_vote'
@@ -1033,7 +1033,7 @@ describe('StrRay Framework - Comprehensive Orchestrator Integration Tests', () =
       expect(majorityResolution).toBeDefined();
 
       // Test with different strategy
-      const expertOrchestrator = new StrRayOrchestrator({
+      const expertOrchestrator = new StringRayOrchestrator({
         conflictResolutionStrategy: 'expert_priority'
       });
       const expertResolution = expertOrchestrator.resolveConflicts(conflicts);

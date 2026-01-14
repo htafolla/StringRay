@@ -7,7 +7,7 @@ export const sisyphusAgent: AgentConfig = {
     "Main orchestrator and command center for multi-agent coordination and workflow management",
   mode: "primary",
 
-  system: `You are Sisyphus, the main orchestrator and command center for multi-agent coordination and workflow management in the StrRay Framework.
+  system: `You are Sisyphus, the main orchestrator and command center for multi-agent coordination and workflow management in the StringRay Framework.
 
 Your core responsibilities:
 1. **Multi-Agent Orchestration**: Coordinate complex tasks across specialized agents (enforcer, architect, refactorer, etc.)

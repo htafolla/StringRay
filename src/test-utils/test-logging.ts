@@ -4,7 +4,7 @@
 import { frameworkLogger } from "../framework-logger.js";
 
 async function runTest() {
-  console.log("🧪 Testing StrRay Framework Logging System");
+  console.log("🧪 Testing StringRay Framework Logging System");
   console.log("==========================================");
 
   // Simulate framework component activity

@@ -22,10 +22,17 @@ class StrRaySessionManagementServer {
   sessionCoordinator;
 
   constructor() {
-    this.server = new Server({
-      name: "strray-session-management",
-      version: "1.0.0",
-    });
+    this.server = new Server(
+      {
+        name: "strray-session-management",
+        version: "1.0.0",
+      },
+      {
+        capabilities: {
+          tools: {},
+        },
+      }
+    );
 
     // Initialize with mock state manager and session coordinator for demo
     // In production, these would be injected from the framework

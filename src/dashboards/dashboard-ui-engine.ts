@@ -1,5 +1,5 @@
 /**
- * StrRay Framework v1.0.0 - Dashboard UI Engine
+ * StringRay Framework v1.0.0 - Dashboard UI Engine
  *
  * Real-time dashboard UI engine for performance monitoring.
  * Handles UI rendering, updates, and user interactions with live data.

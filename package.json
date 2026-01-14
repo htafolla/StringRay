@@ -1,18 +1,19 @@
 {
-  "name": "strray",
+  "name": "stringray",
   "version": "1.0.0",
-  "description": "Bulletproof AI orchestration with systematic error prevention. Zero dead ends. Ship clean, tested, optimized code — every time.",
+  "description": "⚡ StringRay ⚡: Bulletproof AI orchestration with systematic error prevention. Zero dead ends. Ship clean, tested, optimized code — every time.",
   "type": "module",
   "main": "./dist/plugin/index.js",
   "types": "./dist/plugin/index.d.ts",
   "oh-my-opencode": {
-    "plugin": "./dist/plugin/plugins/strray-codex-injection.js"
+    "plugin": "./dist/plugin/plugins/stringray-codex-injection.js"
   },
   "bin": {
-    "strray": "scripts/setup.cjs"
+    "stringray": "scripts/setup.cjs"
   },
   "scripts": {
     "build": "tsc",
+    "build:all": "npm run build && npm run build:plugin",
     "build:plugin": "tsc --project tsconfig.plugin.json",
     "clean": "rm -rf dist",
     "prepublishOnly": "npm run build:plugin",
@@ -23,7 +24,7 @@
     "lint": "eslint src",
     "lint:fix": "eslint src --fix",
     "framework:init": "bash .opencode/init.sh",
-    "validate": "npm run build && npm run typecheck",
+    "validate": "npm run lint && npm run typecheck && npm run test:all && npm run build",
     "ci-report": "echo 'CI/CD health check passed'",
     "test:performance": "vitest run src/__tests__/performance/",
     "performance:report": "node scripts/performance-report.js",
@@ -31,8 +32,14 @@
     "test:architect": "vitest run src/__tests__/agents/architect.test.ts src/__tests__/agents/test-architect.test.ts",
     "test:e2e": "vitest run src/__tests__/integration/e2e-framework-integration.test.ts",
     "test:path-resolution": "node scripts/test-comprehensive-path-resolution.mjs",
+    "test:plugin": "node scripts/test-stringray-plugin.mjs",
+    "test:orchestration": "vitest run src/__tests__/unit/orchestrator.test.ts src/__tests__/integration/orchestrator/",
     "test:mcp-integration": "opencode mcp list && echo 'MCP servers verified'",
-    "test:all": "npm run test && npm run test:architect && npm run test:e2e && npm run test:path-resolution",
+    "test:mcp-connectivity": "node scripts/validation/validate-mcp-connectivity.js",
+    "test:oh-my-opencode-integration": "node scripts/validation/validate-oh-my-opencode-integration.js",
+    "test:external-processes": "node scripts/validation/validate-external-processes.js",
+    "test:comprehensive": "npm run test:mcp-connectivity && npm run test:oh-my-opencode-integration && npm run test:external-processes",
+    "test:all": "npm run test && npm run test:architect && npm run test:e2e && npm run test:path-resolution && npm run test:comprehensive",
     "security-audit": "npm audit --audit-level moderate --production"
   },
   "keywords": [
@@ -49,12 +56,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/htafolla/strray.git"
+    "url": "git+https://github.com/htafolla/stringray.git"
   },
   "bugs": {
-    "url": "https://github.com/htafolla/strray/issues"
+    "url": "https://github.com/htafolla/stringray/issues"
   },
-  "homepage": "https://strray.dev",
+  "homepage": "https://stringray.dev",
   "engines": {
     "node": ">=18.0.0",
     "npm": ">=8.0.0"
@@ -63,22 +70,26 @@
     "oh-my-opencode": "^2.12.0"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^0.4.0",
+    "@modelcontextprotocol/sdk": "^1.25.2",
     "@opencode-ai/sdk": "^1.0.0",
     "structlog": "^1.0.0",
-    "zod": "^3.22.4"
+    "zod": "^3.23.0"
   },
   "devDependencies": {
     "@types/express": "^5.0.6",
     "@types/node": "^20.0.0",
     "@types/yaml": "^1.9.6",
-    "@typescript-eslint/eslint-plugin": "^6.0.0",
-    "@typescript-eslint/parser": "^6.0.0",
-    "@vitest/coverage-v8": "^1.0.0",
-    "eslint": "^8.0.0",
-    "jsdom": "^22.0.0",
-    "typescript": "^5.0.0",
-    "vitest": "^1.0.0"
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "@vitejs/plugin-react": "^4.7.0",
+    "@vitest/coverage-v8": "^2.0.0",
+    "eslint": "^9.0.0",
+    "jsdom": "^25.0.0",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3",
+    "vite": "^6.4.1",
+    "vitest": "^2.0.0"
   },
   "files": [
     "dist/plugin",

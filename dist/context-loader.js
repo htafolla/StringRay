@@ -1,5 +1,5 @@
 /**
- * StrRay Context Loader
+ * StringRay Context Loader
  *
  * Loads Universal Development Codex v1.2.20 context for agent initialization.
  * Provides structured access to 30+ codex terms, interweaves, lenses, and anti-patterns.
@@ -17,11 +17,11 @@ function isValidMatch(match, index) {
     return match !== null && match[index] !== undefined;
 }
 /**
- * StrRay Context Loader
+ * StringRay Context Loader
  *
  * Loads and parses the Universal Development Codex v1.2.20 from codex.json
  */
-export class StrRayContextLoader {
+export class StringRayContextLoader {
     static instance;
     cachedContext = null;
     codexFilePaths = [];
@@ -32,10 +32,10 @@ export class StrRayContextLoader {
      * Get singleton instance
      */
     static getInstance() {
-        if (!StrRayContextLoader.instance) {
-            StrRayContextLoader.instance = new StrRayContextLoader();
+        if (!StringRayContextLoader.instance) {
+            StringRayContextLoader.instance = new StringRayContextLoader();
         }
-        return StrRayContextLoader.instance;
+        return StringRayContextLoader.instance;
     }
     /**
      * Load codex context
@@ -105,7 +105,7 @@ export class StrRayContextLoader {
             throw new Error(`Unable to detect content format for ${sourcePath}. Content appears to be neither valid JSON nor Markdown.`);
         }
         // Log format detection for debugging
-        console.log(`StrRay: Detected ${formatResult.format} format for ${sourcePath} (confidence: ${formatResult.confidence})`);
+        console.log(`StringRay: Detected ${formatResult.format} format for ${sourcePath} (confidence: ${formatResult.confidence})`);
         const result = parseCodexContent(content, sourcePath);
         if (!result.success) {
             throw new Error(result.error || "Failed to parse codex content");
@@ -269,5 +269,5 @@ export class StrRayContextLoader {
 /**
  * Export singleton instance
  */
-export const strRayContextLoader = StrRayContextLoader.getInstance();
+export const strRayContextLoader = StringRayContextLoader.getInstance();
 //# sourceMappingURL=context-loader.js.map

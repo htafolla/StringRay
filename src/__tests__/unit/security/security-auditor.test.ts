@@ -1,5 +1,5 @@
 /**
- * StrRay Framework v1.0.0 - SecurityAuditor Unit Tests
+ * StringRay Framework v1.0.0 - SecurityAuditor Unit Tests
  *
  * Comprehensive tests for the SecurityAuditor class including:
  * - Vulnerability detection patterns
@@ -176,7 +176,7 @@ describe("SecurityAuditor", () => {
 
       const report = auditor.generateReport(mockResult);
 
-      expect(report).toContain("StrRay Framework Security Audit Report");
+      expect(report).toContain("StringRay Framework Security Audit Report");
       expect(report).toContain("CRITICAL SEVERITY");
       expect(report).toContain("80/100");
       expect(report).toContain("Eval usage detected");

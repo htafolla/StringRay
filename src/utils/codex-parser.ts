@@ -1,5 +1,5 @@
 /**
- * StrRay Codex Parser Utility
+ * StringRay Codex Parser Utility
  *
  * Unified parsing utility for codex content in both JSON and Markdown formats.
  * Provides consistent parsing across all components with format detection and validation.

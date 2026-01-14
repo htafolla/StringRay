@@ -1,5 +1,5 @@
 /**
- * StrRay Framework v1.0.0 - Predictive Analytics Unit Tests
+ * StringRay Framework v1.0.0 - Predictive Analytics Unit Tests
  *
  * Tests the agent performance analysis and task prediction functionality.
  *

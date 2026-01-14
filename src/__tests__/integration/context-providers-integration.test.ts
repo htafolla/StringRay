@@ -5,7 +5,7 @@
 
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { AgentDelegator } from "../../delegation/agent-delegator.js";
-import { StrRayStateManager } from "../../state/state-manager.js";
+import { StringRayStateManager } from "../../state/state-manager.js";
 import { frameworkLogger } from "../../framework-logger.js";
 
 // Mock external dependencies
@@ -13,11 +13,11 @@ vi.mock("../../framework-logger.js");
 
 describe("Context Providers Integration", () => {
   let agentDelegator: AgentDelegator;
-  let stateManager: StrRayStateManager;
+  let stateManager: StringRayStateManager;
 
   beforeEach(() => {
     vi.clearAllMocks();
-    stateManager = new StrRayStateManager();
+    stateManager = new StringRayStateManager();
     agentDelegator = new AgentDelegator(stateManager);
   });
 

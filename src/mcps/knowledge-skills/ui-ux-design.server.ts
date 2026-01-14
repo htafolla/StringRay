@@ -95,10 +95,17 @@ class StrRayUIUXDesignServer {
   private server: Server;
 
   constructor() {
-    this.server = new Server({
-      name: "strray-ui-ux-design",
-      version: "1.0.0",
-    });
+        this.server = new Server(
+      {
+        name: "strray-ui-ux-design",
+        version: "1.0.0",
+      },
+      {
+        capabilities: {
+          tools: {},
+        },
+      }
+    );
 
     this.setupToolHandlers();
     console.log("StrRay UI/UX Design MCP Server initialized");

@@ -1,5 +1,5 @@
 /**
- * StrRay Framework v1.0.0 - Processors Module
+ * StringRay Framework v1.0.0 - Processors Module
  *
  * Exports all processor-related functionality.
  *

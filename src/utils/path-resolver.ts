@@ -1,5 +1,5 @@
 /**
- * Path Resolution Utility for StrRay Framework
+ * Path Resolution Utility for StringRay Framework
  * Resolves import paths that work across development, build, and installed environments
  */
 

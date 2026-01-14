@@ -1,5 +1,5 @@
 /**
- * StrRay Framework v1.0.0 - Plugin Marketplace Service Unit Tests
+ * StringRay Framework v1.0.0 - Plugin Marketplace Service Unit Tests
  *
  * Comprehensive unit tests for the plugin marketplace service ensuring >85% coverage
  * with edge cases, error scenarios, and Universal Development Codex v1.2.20 compliance.
@@ -173,7 +173,7 @@ function generateMockVersion(
     downloadUrl: faker.internet.url(),
     checksum: faker.string.alphanumeric(64),
     size: faker.number.int({ min: 1000, max: 1000000 }),
-    minStrRayVersion: "1.0.0",
+    minStringRayVersion: "1.0.0",
     deprecated: false,
     securityPatches: [],
     breakingChanges: false,

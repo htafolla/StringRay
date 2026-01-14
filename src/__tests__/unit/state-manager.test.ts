@@ -1,13 +1,13 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { StrRayStateManager, StateManager } from "../../state/state-manager";
+import { StringRayStateManager, StateManager } from "../../state/state-manager";
 import { setupStandardMocks, waitForDebounce } from "../utils/test-utils";
 
-describe("StrRayStateManager", () => {
+describe("StringRayStateManager", () => {
   let stateManager: StateManager;
 
   beforeEach(async () => {
     setupStandardMocks();
-    stateManager = new StrRayStateManager(
+    stateManager = new StringRayStateManager(
       `/test/state-manager-${Date.now()}.json`,
     );
     await new Promise((resolve) => setTimeout(resolve, 10)); // Wait for initialization
@@ -122,8 +122,8 @@ describe("StrRayStateManager", () => {
 
   describe("isolation between instances", () => {
     it("should maintain separate state between instances", () => {
-      const manager1 = new StrRayStateManager();
-      const manager2 = new StrRayStateManager();
+      const manager1 = new StringRayStateManager();
+      const manager2 = new StringRayStateManager();
 
       manager1.set("shared", "manager1");
       manager2.set("shared", "manager2");

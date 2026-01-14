@@ -393,7 +393,7 @@ class BaseAgent(ABC):
 ### Agent Context
 - Agent Type: {self.__class__.__name__}
 - Session ID: {getattr(self.context, 'session_id', 'unknown') if self.context else 'unknown'}
-- Framework Version: StrRay v1.1.0
+- Framework Version: StringRay v1.1.0
 - Auto-logged: True
 
 ### Performance Metrics
@@ -490,7 +490,7 @@ class BaseAgent(ABC):
             )
 
             # Format the entry with proper separators
-            entry = f"\n\n---\n\n{content}\n\n---\n\n_This entry was automatically logged by the StrRay Framework agent system._"
+            entry = f"\n\n---\n\n{content}\n\n---\n\n_This entry was automatically logged by the StringRay Framework agent system._"
 
             # Append to the log file
             with open(log_file, "a", encoding="utf-8") as f:

@@ -117,10 +117,17 @@ class StrRayDocumentationGenerationServer {
   private server: Server;
 
   constructor() {
-    this.server = new Server({
-      name: "strray-documentation-generation",
-      version: "1.0.0",
-    });
+        this.server = new Server(
+      {
+        name: "strray-documentation-generation",
+        version: "1.0.0",
+      },
+      {
+        capabilities: {
+          tools: {},
+        },
+      }
+    );
 
     this.setupToolHandlers();
     console.log("StrRay Documentation Generation MCP Server initialized");

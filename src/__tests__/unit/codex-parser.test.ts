@@ -11,7 +11,7 @@ import {
 // Mock console.log to avoid test output pollution
 vi.spyOn(console, "log").mockImplementation(() => {});
 
-describe("StrRay Codex Parser", () => {
+describe("StringRay Codex Parser", () => {
   describe("detectContentFormat", () => {
     it("should detect JSON format with high confidence", () => {
       const jsonContent = '{"version": "1.2.20", "terms": {}}';

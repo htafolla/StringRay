@@ -1,5 +1,5 @@
 /**
- * StrRay Framework v1.0.0 - Enterprise Monitoring & Health Check System
+ * StringRay Framework v1.0.0 - Enterprise Monitoring & Health Check System
  *
  * Comprehensive enterprise-scale monitoring system supporting:
  * - Multi-instance coordination and distributed deployments
@@ -509,7 +509,7 @@ class LoadBalancerIntegration extends EventEmitter {
         `${endpoint.url}${endpoint.healthCheckPath}`,
         {
           signal: controller.signal,
-          headers: { "User-Agent": "StrRay-Health-Check/1.0" },
+          headers: { "User-Agent": "StringRay-Health-Check/1.0" },
         },
       );
 
@@ -1017,7 +1017,7 @@ class PrometheusIntegration {
   private initializeMetrics(): void {
     this.registry.registerGauge(
       "strray_instances_total",
-      "Total number of StrRay instances",
+      "Total number of StringRay instances",
     );
     this.registry.registerGauge(
       "strray_sessions_active",
@@ -1639,7 +1639,7 @@ class EnterpriseMonitoringOrchestrator extends EventEmitter {
   }
 
   private async initializeEnterpriseMonitoring(): Promise<void> {
-    console.log("🚀 Initializing StrRay Enterprise Monitoring System");
+    console.log("🚀 Initializing StringRay Enterprise Monitoring System");
 
     try {
       if (this.config.distributed.enabled) {

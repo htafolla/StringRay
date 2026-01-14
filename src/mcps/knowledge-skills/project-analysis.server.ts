@@ -39,10 +39,17 @@ class StrRayProjectAnalysisServer {
   private server: Server;
 
   constructor() {
-    this.server = new Server({
-      name: "strray-project-analysis",
-      version: "1.0.0",
-    });
+        this.server = new Server(
+      {
+        name: "strray-project-analysis",
+        version: "1.0.0",
+      },
+      {
+        capabilities: {
+          tools: {},
+        },
+      }
+    );
 
     this.setupToolHandlers();
     console.log("StrRay Project Analysis MCP Server initialized");

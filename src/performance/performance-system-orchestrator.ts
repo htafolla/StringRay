@@ -1,5 +1,5 @@
 /**
- * StrRay Framework v1.0.0 - Performance System Orchestrator
+ * StringRay Framework v1.0.0 - Performance System Orchestrator
  *
  * Unified performance monitoring, testing, and enforcement system
  * that integrates all performance components into a cohesive framework.
@@ -131,7 +131,7 @@ export class PerformanceSystemOrchestrator extends EventEmitter {
       return;
     }
 
-    console.log("🚀 Initializing StrRay Performance System");
+    console.log("🚀 Initializing StringRay Performance System");
 
     try {
       // Initialize budget enforcer

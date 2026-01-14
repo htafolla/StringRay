@@ -55,10 +55,17 @@ class StrRayTestingBestPracticesServer {
   private server: Server;
 
   constructor() {
-    this.server = new Server({
-      name: "strray-testing-best-practices",
-      version: "1.0.0",
-    });
+        this.server = new Server(
+      {
+        name: "strray-testing-best-practices",
+        version: "1.0.0",
+      },
+      {
+        capabilities: {
+          tools: {},
+        },
+      }
+    );
 
     this.setupToolHandlers();
     console.log("StrRay Testing Best Practices MCP Server initialized");

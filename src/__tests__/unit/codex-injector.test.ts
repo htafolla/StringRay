@@ -1,5 +1,5 @@
 /**
- * StrRay Framework - Codex Injector Plugin Tests (Mock-Based)
+ * StringRay Framework - Codex Injector Plugin Tests (Mock-Based)
  *
  * Tests the codex injection plugin behavior using mocks instead of real imports
  * to avoid ES6 module conflicts when running directly with Node.js.
@@ -8,13 +8,13 @@
 import { describe, test, expect, beforeEach, afterEach, vi } from "vitest";
 
 // Mock the codex injection plugin behavior
-const createMockStrRayCodexInjectorHook = () => {
+const createMockStringRayCodexInjectorHook = () => {
   return {
     name: "strray-codex-injector",
     hooks: {
       "agent.start": async (sessionId: string) => {
         // Mock implementation of codex loading and startup message
-        console.log("✅ StrRay Codex loaded: 3 terms, 1 sources");
+        console.log("✅ StringRay Codex loaded: 3 terms, 1 sources");
       },
       "tool.execute.before": async (input: any, sessionId: string) => {
         // Mock codex enforcement logic
@@ -71,7 +71,7 @@ const clearMockCodexCache = (sessionId?: string) => {
   return true;
 };
 
-describe("StrRay Codex Injector (Mock-Based)", () => {
+describe("StringRay Codex Injector (Mock-Based)", () => {
   let consoleLogSpy: any;
   let consoleErrorSpy: any;
 
@@ -87,7 +87,7 @@ describe("StrRay Codex Injector (Mock-Based)", () => {
 
   describe("Plugin Structure", () => {
     test("should return a valid hook object", () => {
-      const hook = createMockStrRayCodexInjectorHook();
+      const hook = createMockStringRayCodexInjectorHook();
 
       expect(hook).toHaveProperty("name", "strray-codex-injector");
       expect(hook).toHaveProperty("hooks");
@@ -97,7 +97,7 @@ describe("StrRay Codex Injector (Mock-Based)", () => {
     });
 
     test("should have all required hook functions", () => {
-      const hook = createMockStrRayCodexInjectorHook();
+      const hook = createMockStringRayCodexInjectorHook();
 
       expect(typeof hook.hooks["agent.start"]).toBe("function");
       expect(typeof hook.hooks["tool.execute.before"]).toBe("function");
@@ -107,17 +107,17 @@ describe("StrRay Codex Injector (Mock-Based)", () => {
 
   describe("agent.start hook", () => {
     test("should load codex context and display startup message", async () => {
-      const hook = createMockStrRayCodexInjectorHook();
+      const hook = createMockStringRayCodexInjectorHook();
 
       await hook.hooks["agent.start"]("session-123");
 
       expect(consoleLogSpy).toHaveBeenCalledWith(
-        "✅ StrRay Codex loaded: 3 terms, 1 sources",
+        "✅ StringRay Codex loaded: 3 terms, 1 sources",
       );
     });
 
     test("should handle startup errors gracefully", async () => {
-      const hook = createMockStrRayCodexInjectorHook();
+      const hook = createMockStringRayCodexInjectorHook();
 
       // Mock a failure scenario
       const originalLog = console.log;
@@ -133,7 +133,7 @@ describe("StrRay Codex Injector (Mock-Based)", () => {
 
   describe("tool.execute.before hook", () => {
     test("should allow valid tool execution", async () => {
-      const hook = createMockStrRayCodexInjectorHook();
+      const hook = createMockStringRayCodexInjectorHook();
       const input = {
         tool: "read",
         args: { path: "/valid/path" },
@@ -146,7 +146,7 @@ describe("StrRay Codex Injector (Mock-Based)", () => {
     });
 
     test("should block TODO comments (codex violation)", async () => {
-      const hook = createMockStrRayCodexInjectorHook();
+      const hook = createMockStringRayCodexInjectorHook();
       const input = {
         tool: "edit",
         args: {
@@ -163,7 +163,7 @@ describe("StrRay Codex Injector (Mock-Based)", () => {
     });
 
     test("should block FIXME comments (codex violation)", async () => {
-      const hook = createMockStrRayCodexInjectorHook();
+      const hook = createMockStringRayCodexInjectorHook();
       const input = {
         tool: "edit",
         args: {
@@ -180,7 +180,7 @@ describe("StrRay Codex Injector (Mock-Based)", () => {
     });
 
     test("should block 'any' types (codex violation)", async () => {
-      const hook = createMockStrRayCodexInjectorHook();
+      const hook = createMockStringRayCodexInjectorHook();
       const input = {
         tool: "edit",
         args: {
@@ -199,7 +199,7 @@ describe("StrRay Codex Injector (Mock-Based)", () => {
 
   describe("tool.execute.after hook", () => {
     test("should inject codex context for file operations", async () => {
-      const hook = createMockStrRayCodexInjectorHook();
+      const hook = createMockStringRayCodexInjectorHook();
       const input = {
         tool: "read",
         args: { path: "/test/file.ts" },
@@ -215,7 +215,7 @@ describe("StrRay Codex Injector (Mock-Based)", () => {
     });
 
     test("should not inject for non-file operations", async () => {
-      const hook = createMockStrRayCodexInjectorHook();
+      const hook = createMockStringRayCodexInjectorHook();
       const input = {
         tool: "list",
         args: {},
@@ -231,7 +231,7 @@ describe("StrRay Codex Injector (Mock-Based)", () => {
     });
 
     test("should handle injection errors gracefully", async () => {
-      const hook = createMockStrRayCodexInjectorHook();
+      const hook = createMockStringRayCodexInjectorHook();
       const input = {
         tool: "read",
         args: { path: "/test/file.ts" },

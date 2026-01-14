@@ -61,10 +61,17 @@ class StrRaySecurityAuditServer {
   private server: Server;
 
   constructor() {
-    this.server = new Server({
-      name: "strray-security-audit",
-      version: "1.0.0",
-    });
+        this.server = new Server(
+      {
+        name: "strray-security-audit",
+        version: "1.0.0",
+      },
+      {
+        capabilities: {
+          tools: {},
+        },
+      }
+    );
 
     this.setupToolHandlers();
     console.log("StrRay Security Audit MCP Server initialized");

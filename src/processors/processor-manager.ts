@@ -1,5 +1,5 @@
 /**
- * StrRay Framework v1.0.0 - Processor Manager
+ * StringRay Framework v1.0.0 - Processor Manager
  *
  * Centralized processor management for pre/post processing operations.
  * Implements lifecycle management, performance monitoring, and conflict resolution.
@@ -8,8 +8,9 @@
  * @since 2026-01-07
  */
 
-import { StrRayStateManager } from "../state/state-manager";
+import { StringRayStateManager } from "../state/state-manager";
 import { frameworkLogger } from "../framework-logger.js";
+import { ProcessorRegistration } from "./processor-types.js";
 
 export interface ProcessorConfig {
   name: string;
@@ -18,6 +19,7 @@ export interface ProcessorConfig {
   enabled: boolean;
   timeout?: number;
   retryAttempts?: number;
+  hook?: any; // Optional hook for processors registered with hooks
 }
 
 export interface ProcessorResult {
@@ -49,31 +51,48 @@ export interface ProcessorMetrics {
 export class ProcessorManager {
   private processors = new Map<string, ProcessorConfig>();
   private metrics = new Map<string, ProcessorMetrics>();
-  private stateManager: StrRayStateManager;
+  private stateManager: StringRayStateManager;
   private activeProcessors = new Set<string>();
 
-  constructor(stateManager: StrRayStateManager) {
+  constructor(stateManager: StringRayStateManager) {
     this.stateManager = stateManager;
   }
 
   /**
    * Register a processor with the manager
    */
+  registerProcessorWithHook(registration: ProcessorRegistration): void {
+    const config: ProcessorConfig = {
+      name: registration.name,
+      type: registration.type,
+      priority: registration.hook.priority,
+      enabled: registration.hook.enabled,
+    };
+
+    // Register the config
+    this.registerProcessor(config);
+
+    // Store the hook for later execution
+    this.processors.set(registration.name, {
+      ...config,
+      hook: registration.hook,
+    });
+  }
+
   registerProcessor(config: ProcessorConfig): void {
     // Validate processor name
     if (!config.name || config.name.trim().length === 0) {
       throw new Error("Processor name cannot be empty");
     }
 
-    if (
-      config.name.includes(" ") ||
-      config.name.includes("-") ||
-      config.name.includes(".")
-    ) {
+    if (config.name.includes(" ")) {
       throw new Error(
-        "Processor name must be a valid identifier (no spaces, hyphens, or dots)",
+        "Processor name must be a valid identifier (no spaces)",
       );
     }
+
+    // Allow hyphens, underscores, and dots as they are commonly used in processor names
+    // Only reject spaces which are definitely invalid
 
     // Validate processor type
     if (config.type !== "pre" && config.type !== "post") {

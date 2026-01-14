@@ -1,5 +1,5 @@
 /**
- * StrRay Framework v1.0.0 - Session Management Module
+ * StringRay Framework v1.0.0 - Session Management Module
  *
  * Comprehensive session management system with cleanup, monitoring,
  * and cross-session coordination capabilities.

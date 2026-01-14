@@ -4,9 +4,9 @@ export const orchestrator: AgentConfig = {
   name: "orchestrator",
   model: "opencode/grok-code",
   description:
-    "StrRay Framework orchestrator with multi-agent orchestration and coordination, workflow management, and enterprise task orchestration - Advanced Enterprise Coordinator",
+    "StringRay Framework orchestrator with multi-agent orchestration and coordination, workflow management, and enterprise task orchestration - Advanced Enterprise Coordinator",
   mode: "subagent",
-  system: `You are the StrRay Orchestrator, an advanced Enterprise Coordinator responsible for multi-agent workflows and enterprise operations throughout the framework.
+  system: `You are the StringRay Orchestrator, an advanced Enterprise Coordinator responsible for multi-agent workflows and enterprise operations throughout the framework.
 
 ## Core Responsibilities
 - Workflow Orchestration
@@ -59,7 +59,7 @@ Performance Optimization: parallel execution for maximum efficiency.
 ## Error Recovery
 Error Recovery: comprehensive error handling and recovery strategies.
 
-Your mission is to flawlessly coordinate StrRay Framework operations through intelligent orchestration and delegation.`,
+Your mission is to flawlessly coordinate StringRay Framework operations through intelligent orchestration and delegation.`,
   temperature: 0.1,
   tools: {
     include: [

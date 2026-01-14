@@ -1,5 +1,5 @@
 /**
- * StrRay Framework v1.0.0 - Session Cleanup Manager
+ * StringRay Framework v1.0.0 - Session Cleanup Manager
  *
  * Manages automatic cleanup of sessions with TTL-based expiration,
  * idle session detection, and manual cleanup utilities.
@@ -8,7 +8,7 @@
  * @since 2026-01-07
  */
 
-import { StrRayStateManager } from "../state/state-manager";
+import { StringRayStateManager } from "../state/state-manager";
 import { SessionCoordinator } from "../delegation/session-coordinator";
 import { SessionMonitor } from "./session-monitor";
 
@@ -39,7 +39,7 @@ export interface CleanupResult {
 }
 
 export class SessionCleanupManager {
-  private stateManager: StrRayStateManager;
+  private stateManager: StringRayStateManager;
   private config: CleanupConfig;
   private cleanupInterval?: NodeJS.Timeout | undefined;
   private _sessionMetadata?: Map<string, SessionMetadata>;
@@ -47,7 +47,7 @@ export class SessionCleanupManager {
   private sessionMonitor: SessionMonitor | undefined;
 
   constructor(
-    stateManager: StrRayStateManager,
+    stateManager: StringRayStateManager,
     config: Partial<CleanupConfig> = {},
     sessionMonitor?: SessionMonitor,
   ) {
@@ -434,7 +434,7 @@ export class SessionCleanupManager {
 }
 
 export const createSessionCleanupManager = (
-  stateManager: StrRayStateManager,
+  stateManager: StringRayStateManager,
   config?: Partial<CleanupConfig>,
   sessionMonitor?: SessionMonitor,
 ): SessionCleanupManager => {

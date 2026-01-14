@@ -1,19 +1,19 @@
 import { describe, test, expect, beforeEach, afterEach } from "vitest";
-import { StrRayStateManager } from "../../state/state-manager";
+import { StringRayStateManager } from "../../state/state-manager";
 import { createSessionCoordinator } from "../../delegation/session-coordinator";
 import { createSessionCleanupManager } from "../../session/session-cleanup-manager";
 import { createSessionMonitor } from "../../session/session-monitor";
 import { createSessionStateManager } from "../../session/session-state-manager";
 
 describe("Session Lifecycle Management", () => {
-  let stateManager: StrRayStateManager;
+  let stateManager: StringRayStateManager;
   let sessionCoordinator: any;
   let cleanupManager: any;
   let sessionMonitor: any;
   let stateManagerInstance: any;
 
   beforeEach(() => {
-    stateManager = new StrRayStateManager();
+    stateManager = new StringRayStateManager();
     sessionCoordinator = createSessionCoordinator(stateManager);
 
     // Create session monitor first (without cleanup manager initially)

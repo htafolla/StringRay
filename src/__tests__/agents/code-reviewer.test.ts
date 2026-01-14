@@ -26,7 +26,7 @@ describe("Code Reviewer Agent Configuration", () => {
   describe("Description and System Prompt", () => {
     it("should have appropriate code review description", () => {
       expect(codeReviewer.description).toContain(
-        "StrRay Framework code reviewer",
+        "StringRay Framework code reviewer",
       );
       expect(codeReviewer.description).toContain("monitoring");
       expect(codeReviewer.description).toContain("analytics");
@@ -35,7 +35,7 @@ describe("Code Reviewer Agent Configuration", () => {
 
     it("should have comprehensive code reviewer system prompt", () => {
       const system = codeReviewer.system;
-      expect(system).toContain("StrRay Code Reviewer");
+      expect(system).toContain("StringRay Code Reviewer");
       expect(system).toContain("code quality assurance");
       expect(system).toContain("monitoring");
       expect(system).toContain("comprehensive analysis");

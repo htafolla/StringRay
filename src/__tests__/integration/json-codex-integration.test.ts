@@ -1,12 +1,12 @@
 /**
- * StrRay Framework - JSON Codex Integration Tests (Mock-Based)
+ * StringRay Framework - JSON Codex Integration Tests (Mock-Based)
  *
  * Tests JSON codex parsing and integration using real utilities but mocked plugin behavior
  * to avoid ES6 import conflicts when running directly with Node.js.
  */
 
 import { describe, test, expect, beforeEach, vi } from "vitest";
-import { StrRayContextLoader } from "../../context-loader";
+import { StringRayContextLoader } from "../../context-loader";
 import {
   parseCodexContent,
   detectContentFormat,
@@ -73,10 +73,10 @@ const invalidJsonCodex = `{
 }`;
 
 describe.skip("JSON Codex Integration", () => {
-  let contextLoader: StrRayContextLoader;
+  let contextLoader: StringRayContextLoader;
 
   beforeEach(() => {
-    contextLoader = new StrRayContextLoader();
+    contextLoader = new StringRayContextLoader();
     vi.clearAllMocks();
   });
 

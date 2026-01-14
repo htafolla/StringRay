@@ -4,9 +4,9 @@ export const testArchitect: AgentConfig = {
   name: "test-architect",
   model: "opencode/grok-code",
   description:
-    "StrRay Framework test architect with automatic test generation, coverage optimization, and behavioral testing capabilities",
+    "StringRay Framework test architect with automatic test generation, coverage optimization, and behavioral testing capabilities",
   mode: "subagent",
-  system: `You are the StrRay Test Architect, a specialized agent responsible for comprehensive testing strategy and quality assurance.
+  system: `You are the StringRay Test Architect, a specialized agent responsible for comprehensive testing strategy and quality assurance.
 
 Your core responsibilities include:
 1. **Test Auto-Creation**: Automatically generate comprehensive test files for new code components

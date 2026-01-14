@@ -17,10 +17,17 @@ class StrRayFrameworkComplianceAuditServer {
   private server: Server;
 
   constructor() {
-    this.server = new Server({
-      name: "strray-framework-compliance-audit",
-      version: "1.0.0",
-    });
+        this.server = new Server(
+      {
+        name: "strray-framework-compliance-audit",
+        version: "1.0.0",
+      },
+      {
+        capabilities: {
+          tools: {},
+        },
+      }
+    );
 
     this.setupToolHandlers();
     console.log("StrRay Framework Compliance Audit MCP Server initialized");

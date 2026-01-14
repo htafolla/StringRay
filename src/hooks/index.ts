@@ -1,4 +1,4 @@
-// StrRay Framework Hooks
+// StringRay Framework Hooks
 // Export all hook utilities and types
 
 export * from "./hook-types.js";

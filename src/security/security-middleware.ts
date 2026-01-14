@@ -1,5 +1,5 @@
 /**
- * StrRay Framework - Security Middleware
+ * StringRay Framework - Security Middleware
  *
  * Production-ready security middleware with comprehensive protection
  * Implements OWASP security headers, input validation, and attack prevention
@@ -80,7 +80,7 @@ export class SecurityMiddleware {
 
       // API-specific security headers
       res.setHeader("X-API-Version", "1.0.0");
-      res.setHeader("X-Framework", "StrRay");
+      res.setHeader("X-Framework", "StringRay");
 
       next();
     };

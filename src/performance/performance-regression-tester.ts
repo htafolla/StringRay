@@ -1,5 +1,5 @@
 /**
- * StrRay Framework v1.0.0 - Performance Regression Testing
+ * StringRay Framework v1.0.0 - Performance Regression Testing
  *
  * Automated testing system that detects performance regressions and
  * enforces performance budget compliance in CI/CD pipelines.
@@ -459,9 +459,9 @@ export class PerformanceRegressionTester {
     ];
 
     return {
-      name: "StrRay Performance Regression Suite",
+      name: "StringRay Performance Regression Suite",
       description:
-        "Comprehensive performance regression tests for StrRay Framework",
+        "Comprehensive performance regression tests for StringRay Framework",
       tests,
       baselineFile: "./performance-baselines.json",
       failOnRegression: true,

@@ -1,5 +1,5 @@
 /**
- * StrRay Framework v1.0.0 - CI/CD Performance Gates
+ * StringRay Framework v1.0.0 - CI/CD Performance Gates
  *
  * Automated performance gates for CI/CD pipelines that enforce
  * performance budgets and prevent performance regressions.
@@ -92,7 +92,7 @@ export class PerformanceCIGates {
     testSuite?: RegressionTestSuite,
   ): Promise<CIGateResult> {
     const startTime = Date.now();
-    console.log("🚀 Running StrRay Performance Gates");
+    console.log("🚀 Running StringRay Performance Gates");
     console.log("=====================================");
 
     const result: CIGateResult = {
@@ -385,7 +385,7 @@ export class PerformanceCIGates {
    * Create GitHub Actions workflow for performance gates
    */
   createGitHubWorkflow(): string {
-    return `# StrRay Performance Gates Workflow
+    return `# StringRay Performance Gates Workflow
 name: Performance Gates
 
 on:
@@ -485,7 +485,7 @@ jobs:
    * Create Jenkins pipeline for performance gates
    */
   createJenkinsPipeline(): string {
-    return `// StrRay Performance Gates Jenkins Pipeline
+    return `// StringRay Performance Gates Jenkins Pipeline
 pipeline {
     agent any
 
@@ -551,7 +551,7 @@ pipeline {
    * Create Azure DevOps pipeline for performance gates
    */
   createAzurePipeline(): string {
-    return `# StrRay Performance Gates Azure Pipeline
+    return `# StringRay Performance Gates Azure Pipeline
 trigger:
 - main
 - develop

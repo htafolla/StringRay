@@ -34,7 +34,7 @@
     "datadog": false
   },
 
-  "plugin": ["oh-my-opencode", "dist/plugin/plugins/strray-codex-injection.js"],
+  "plugin": ["oh-my-opencode", "dist/plugin/plugins/stringray-codex-injection.js"],
   "claude_code": {
     "mcp": true,
     "commands": true,

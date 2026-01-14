@@ -1,5 +1,5 @@
 /**
- * StrRay Framework Test Utilities
+ * StringRay Framework Test Utilities
  * Standardized mocking and test setup utilities
  */
 

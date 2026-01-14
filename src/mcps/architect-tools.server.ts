@@ -18,10 +18,17 @@ class StrRayArchitectToolsServer {
   private server: Server;
 
   constructor() {
-    this.server = new Server({
-      name: "strray-architect-tools",
-      version: "1.0.0",
-    });
+        this.server = new Server(
+      {
+        name: "strray-architect-tools",
+        version: "1.0.0",
+      },
+      {
+        capabilities: {
+          tools: {},
+        },
+      }
+    );
 
     this.setupToolHandlers();
     console.log("StrRay Architect Tools MCP Server initialized");

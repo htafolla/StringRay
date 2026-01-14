@@ -1,5 +1,5 @@
 /**
- * StrRay Framework v1.0.0 - Session Monitor
+ * StringRay Framework v1.0.0 - Session Monitor
  *
  * Provides real-time monitoring of sessions with health checks,
  * performance tracking, and alerting capabilities.
@@ -8,7 +8,7 @@
  * @since 2026-01-07
  */
 
-import { StrRayStateManager } from "../state/state-manager";
+import { StringRayStateManager } from "../state/state-manager";
 import { SessionCoordinator } from "../delegation/session-coordinator";
 import { SessionCleanupManager } from "./session-cleanup-manager";
 
@@ -62,7 +62,7 @@ export interface Alert {
 }
 
 export class SessionMonitor {
-  private stateManager: StrRayStateManager;
+  private stateManager: StringRayStateManager;
   private sessionCoordinator: SessionCoordinator;
   private cleanupManager: SessionCleanupManager | undefined;
   private config: MonitorConfig;
@@ -73,7 +73,7 @@ export class SessionMonitor {
   private metricsInterval?: NodeJS.Timeout | undefined;
 
   constructor(
-    stateManager: StrRayStateManager,
+    stateManager: StringRayStateManager,
     sessionCoordinator: SessionCoordinator,
     cleanupManager: SessionCleanupManager,
     config: Partial<MonitorConfig> = {},
@@ -514,7 +514,7 @@ export class SessionMonitor {
 }
 
 export const createSessionMonitor = (
-  stateManager: StrRayStateManager,
+  stateManager: StringRayStateManager,
   sessionCoordinator: SessionCoordinator,
   cleanupManager: SessionCleanupManager,
   config?: Partial<MonitorConfig>,

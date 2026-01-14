@@ -1,20 +1,22 @@
-# ⚡ StringRay (StrRay) v1.0.0 – Bulletproof AI Orchestration for Production-Grade Development
+# ⚡ StringRay (StringRay) v1.0.0 – Bulletproof AI Orchestration for Production-Grade Development
 
-[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/htafolla/strray)
+[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/htafolla/stringray)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9+-blue.svg)](https://www.typescript.org/)
-[![Tests](https://img.shields.io/badge/tests-833%2F833-brightgreen.svg)](https://github.com/htafolla/strray)
-[![CI/CD](https://img.shields.io/badge/CI%2FCD-passing-brightgreen.svg)](https://github.com/htafolla/strray/actions)
-[![Error Prevention](https://img.shields.io/badge/error%20prevention-99.6%25-red.svg)](https://github.com/htafolla/strray)
+[![Tests](https://img.shields.io/badge/tests-833%2F833-brightgreen.svg)](https://github.com/htafolla/stringray)
+[![CI/CD](https://img.shields.io/badge/CI%2FCD-passing-brightgreen.svg)](https://github.com/htafolla/stringray/actions)
+[![Error Prevention](https://img.shields.io/badge/error%20prevention-99.6%25-red.svg)](https://github.com/htafolla/stringray)
+
+# ⚡ StringRay ⚡ v1.0.0 – Bulletproof AI Orchestration for Production-Grade Development
 
 **Enterprise AI agent coordination with systematic error prevention. Zero dead ends. Ship clean, tested, optimized code — every time.**
 
-StrRay provides intelligent multi-agent coordination, codex-based code quality enforcement, and enterprise-grade development practices. Eliminate spaghetti code, hallucinations, and code rot through systematic validation and intelligent agent delegation.
+⚡ StringRay ⚡ provides intelligent multi-agent coordination, codex-based code quality enforcement, and enterprise-grade development practices. Eliminate spaghetti code, hallucinations, and code rot through systematic validation and intelligent agent delegation.
 
 ---
 
-**Enterprise-Grade AI Agent Coordination. Production-Ready Code. Zero Dead Ends.**
+**⚡ Enterprise-Grade AI Agent Coordination. Production-Ready Code. Zero Dead Ends. ⚡**
 
 **Delivers clean architecture, predictive analytics, secure plugin ecosystem, and sub-millisecond performance — enterprise-grade, every time.**
 
@@ -26,7 +28,7 @@ StrRay provides intelligent multi-agent coordination, codex-based code quality e
 - **🤖 Intelligent Agent Orchestration**: 8 specialized agents with automatic task delegation
 - **📏 Codex Compliance**: 99.6% systematic error prevention and code quality enforcement
 - **🔄 Multi-Agent Coordination**: Complexity-based routing and conflict resolution
-- **⚡ Performance Optimization**: 87% faster test execution with smart optimizations
+- **⚡⚡ Performance Optimization**: 87% faster test execution with smart optimizations
 - **🛡️ Enterprise Security**: Comprehensive validation and security scanning
 - **📊 Real-time Monitoring**: Performance tracking and health monitoring
 
@@ -50,12 +52,18 @@ StrRay provides intelligent multi-agent coordination, codex-based code quality e
 - Node.js 18+ / Bun (recommended)
 - OpenCode installed & running
 
+## 📚 Documentation
+
+**📖 Complete Documentation**: For comprehensive documentation including architecture details, API references, troubleshooting guides, and advanced configuration options, visit the [StringRay Documentation](https://github.com/htafolla/stringray/tree/main/docs) in the GitHub repository.
+
+**📋 Quick Reference**: This README contains essential installation and usage information. For advanced features and detailed guides, see the full documentation.
+
 ## 📦 Installation
 
 ### Installation
 
 ```bash
-npm install strray
+npm install stringray
 ```
 
 ### Setup
@@ -63,14 +71,14 @@ npm install strray
 **Important:** After installation, you must run the setup command manually:
 
 ```bash
-npx strray init
+npx stringray init
 ```
 
 **Note:** npm does not run postinstall scripts automatically for local package installations (file paths or tar.gz files) for security reasons. The setup must be run manually.
 
 This will automatically:
 
-- ✅ Configure all 9 StrRay agents
+- ✅ Configure all 9 StringRay agents
 - ✅ Enable multi-agent orchestration settings
 - ✅ Set up configuration for AI development workflows
 
@@ -79,14 +87,14 @@ This will automatically:
 If automatic setup fails:
 
 ```bash
-npm install strray
+npm install stringray
 ```
 
 Then manually add to your development configuration (example for oh-my-opencode):
 
 ```json
 {
-  "plugin": ["strray/dist/plugin/strray-codex-injection.js"],
+  "plugin": ["stringray/dist/plugin/stringray-codex-injection.js"],
   "agent": {
     "orchestrator": { "model": "opencode/grok-code" },
     "enforcer": { "model": "opencode/grok-code" },
@@ -104,7 +112,7 @@ Then manually add to your development configuration (example for oh-my-opencode)
 
 ### CI/CD Pipeline
 
-StrRay includes a fully functional CI/CD pipeline with automated testing, building, and validation:
+StringRay includes a fully functional CI/CD pipeline with automated testing, building, and validation:
 
 - ✅ **Automated Testing**: Unit, integration, and E2E tests across Node.js 18.x and 20.x
 - ✅ **TypeScript Compilation**: Strict type checking and error prevention
@@ -129,7 +137,7 @@ npm publish
 
 **Package Details:**
 
-- **Name**: `strray`
+- **Name**: `stringray`
 - **Version**: `1.0.0`
 - **Size**: ~483KB (gzipped)
 - **Files**: 508 total (including all agents, MCP servers, and documentation)
@@ -138,8 +146,8 @@ npm publish
 
 For production environments:
 
-1. **Install**: `npm install strray`
-2. **Initialize**: `npx strray init`
+1. **Install**: `npm install stringray`
+2. **Initialize**: `npx stringray init`
 3. **Configure**: Update `.opencode/oh-my-opencode.json` with agent models
 4. **Deploy**: Framework automatically integrates with oh-my-opencode
 
@@ -154,7 +162,7 @@ For production environments:
 
 ### Basic Usage
 
-Once installed, StrRay agents are available via `@` commands:
+Once installed, StringRay agents are available via `@` commands:
 
 ```bash
 # Intelligent task orchestration
@@ -183,7 +191,7 @@ Once installed, StrRay agents are available via `@` commands:
 
 #### Multi-Agent Orchestration
 
-StrRay automatically analyzes task complexity and delegates to appropriate agents:
+StringRay automatically analyzes task complexity and delegates to appropriate agents:
 
 ```bash
 # Complex task - automatically uses multiple agents
@@ -205,7 +213,7 @@ All code changes are automatically validated against the Universal Development C
 
 ### Plugin Configuration
 
-Create `.strray/config.json` in your project root:
+Create `.stringray/config.json` in your project root:
 
 ```json
 {
@@ -273,7 +281,7 @@ opencode --version
 cat .opencode/oh-my-opencode.json
 
 # Check for errors
-npm ls strray
+npm ls stringray
 ```
 
 ### Agent Commands Not Working
@@ -290,7 +298,7 @@ grep -A5 '"agent"' .opencode/oh-my-opencode.json
 
 ```bash
 # Check codex configuration
-cat .strray/config.json
+cat .stringray/config.json
 
 # Disable codex enforcement if needed
 {
@@ -305,12 +313,12 @@ cat .strray/config.json
 - **`experimental.chat.system.transform`**: Injects codex context into AI interactions
 - **`tool.execute.before`**: Pre-validates code changes
 - **`tool.execute.after`**: Post-processes code changes
-- **`config`**: Initializes StrRay components
+- **`config`**: Initializes StringRay components
 
 ### Configuration Schema
 
 ```typescript
-interface StrRayConfig {
+interface StringRayConfig {
   enabled: boolean; // Enable/disable plugin
   maxConcurrentAgents: number; // Agent concurrency limit
   codexEnforcement: boolean; // Enable codex validation
@@ -338,13 +346,13 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 ## 📞 Support
 
-- **Issues**: [GitHub Issues](https://github.com/htafolla/strray/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/htafolla/strray/discussions)
-- **Documentation**: [StrRay Docs](https://strray.dev)
+- **Issues**: [GitHub Issues](https://github.com/htafolla/stringray/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/htafolla/stringray/discussions)
+- **Documentation**: [StringRay Docs](https://stringray.dev)
 
 ---
 
-**StrRay: Enterprise AI orchestration for systematic error prevention** 🚀✨
+**⚡ StringRay ⚡: Enterprise AI orchestration for systematic error prevention** 🚀✨
 
 _Built on the Universal Development Codex v1.2.20_
 
@@ -365,7 +373,7 @@ npm run init
 - **[API Reference](./docs/api/API_REFERENCE.md)** - Developer API documentation for programmatic access
 - **[Agent Documentation](./docs/agents/)** - Detailed specifications for all 9 agents with operating procedures
 - **[Architecture Integration](./docs/ORCHESTRATOR_INTEGRATION_ARCHITECTURE.md)** - Framework design with Universal Development Codex principles
-- **[StrRay Integration](./docs/README_STRRAY_INTEGRATION.md)** - Integration guide and best practices
+- **[StringRay Integration](./docs/README_STRRAY_INTEGRATION.md)** - Integration guide and best practices
 
 ### Advanced Features Documentation
 
@@ -443,12 +451,12 @@ npm run test:e2e         # End-to-end tests through oh-my-opencode runtime
 
 ### 🧪 Testing Approach
 
-**StrRay Framework uses mock-based testing** due to its oh-my-opencode plugin architecture:
+**StringRay Framework uses mock-based testing** due to its oh-my-opencode plugin architecture:
 
 **❌ Direct Plugin Testing (Not Supported):**
 ```typescript
 // This fails due to ES6 import conflicts
-import { createStrRayCodexInjectorHook } from "./codex-injector";
+import { createStringRayCodexInjectorHook } from "./codex-injector";
 ````
 
 **✅ Mock-Based Plugin Testing (Recommended):**
@@ -504,7 +512,7 @@ Update your `.opencode/oh-my-opencode.json` for enterprise deployment:
     "test-architect": "opencode/grok-code"
   },
   "framework": {
-    "name": "strray",
+    "name": "stringray",
     "version": "1.0.0",
     "performance_mode": "optimized",
     "monitoring_enabled": true,

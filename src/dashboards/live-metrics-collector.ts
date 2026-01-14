@@ -1,5 +1,5 @@
 /**
- * StrRay Framework v1.0.0 - Live Metrics Collector
+ * StringRay Framework v1.0.0 - Live Metrics Collector
  *
  * Real-time metrics collection engine for performance dashboards.
  * Collects, aggregates, and streams metrics from multiple sources.

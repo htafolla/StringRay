@@ -1,5 +1,5 @@
 /**
- * StrRay Framework v1.0.0 - Security Module Integration Tests
+ * StringRay Framework v1.0.0 - Security Module Integration Tests
  *
  * End-to-end security workflow testing.
  *
@@ -89,7 +89,7 @@ describe("Security Module Integration", () => {
       expect(hardenResult.remainingIssues).toBeDefined();
 
       const report = auditor.generateReport(auditResult);
-      expect(report).toContain("StrRay Framework Security Audit Report");
+      expect(report).toContain("StringRay Framework Security Audit Report");
     });
 
     it("should handle secure codebase with no issues", async () => {
@@ -104,7 +104,7 @@ describe("Security Module Integration", () => {
       expect(auditResult.issues.length).toBeLessThanOrEqual(5); // Allow for test environment issues
 
       const report = auditor.generateReport(auditResult);
-      expect(report).toContain("StrRay Framework Security Audit Report");
+      expect(report).toContain("StringRay Framework Security Audit Report");
       expect(report).toContain("Security Score:");
       expect(report).toContain("/100");
     });

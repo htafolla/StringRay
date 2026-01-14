@@ -18,10 +18,17 @@ class StrRayArchitecturePatternsServer {
   private server: Server;
 
   constructor() {
-    this.server = new Server({
-      name: "strray-architecture-patterns",
-      version: "1.0.0",
-    });
+        this.server = new Server(
+      {
+        name: "strray-architecture-patterns",
+        version: "1.0.0",
+      },
+      {
+        capabilities: {
+          tools: {},
+        },
+      }
+    );
 
     this.setupToolHandlers();
     console.log("StrRay Architecture Patterns MCP Server initialized");

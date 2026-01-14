@@ -1,7 +1,7 @@
 /**
- * StrRay Framework CLI - Status Command
+ * StringRay Framework CLI - Status Command
  *
- * System status display for StrRay Framework.
+ * System status display for StringRay Framework.
  * Shows current framework health, agents, and configuration.
  *
  * @version 1.0.0
@@ -24,7 +24,7 @@ export async function statusCommand(options: StatusOptions): Promise<void> {
     return;
   }
 
-  console.log("📊 StrRay Framework Status");
+  console.log("📊 StringRay Framework Status");
   console.log("==========================");
 
   // Framework info
@@ -84,7 +84,7 @@ export async function statusCommand(options: StatusOptions): Promise<void> {
 async function gatherSystemStatus(): Promise<any> {
   const status = {
     framework: {
-      name: "StrRay",
+      name: "StringRay",
       version: "1.0.0",
       uptime: "Unknown",
       environment: process.env.NODE_ENV || "development",

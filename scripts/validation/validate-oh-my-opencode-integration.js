@@ -1,0 +1,201 @@
+#!/usr/bin/env node
+
+/**
+ * oh-my-opencode Integration Validator
+ *
+ * Tests the complete integration between StringRay framework and oh-my-opencode
+ * Validates MCP server registration, plugin loading, and tool availability
+ */
+
+import { spawn } from 'child_process';
+import fs from 'fs';
+import path from 'path';
+
+class OhMyOpenCodeIntegrationValidator {
+  constructor() {
+    this.results = { passed: [], failed: [] };
+  }
+
+  async validateIntegration() {
+    console.log('🔗 OH-MY-OPENCODE INTEGRATION VALIDATOR');
+    console.log('=========================================');
+
+    const tests = [
+      this.validateMCPConfig.bind(this),
+      this.validatePluginRegistration.bind(this),
+      this.validateCodexInjection.bind(this),
+      this.validateToolAvailability.bind(this)
+    ];
+
+    for (const test of tests) {
+      await test();
+    }
+
+    this.printSummary();
+    return this.results.failed.length === 0;
+  }
+
+  async validateMCPConfig() {
+    console.log('\n🔧 Testing MCP Configuration...');
+
+    try {
+      // Check .mcp.json exists and is valid
+      const mcpConfig = JSON.parse(fs.readFileSync('.mcp.json', 'utf8'));
+      const serverCount = Object.keys(mcpConfig.mcpServers || {}).length;
+
+      if (serverCount >= 15) {
+        console.log(`  ✅ MCP config valid (${serverCount} servers configured)`);
+        this.results.passed.push('MCP Configuration');
+      } else {
+        console.log(`  ❌ Insufficient MCP servers (${serverCount} configured, need 15+)`);
+        this.results.failed.push({ test: 'MCP Configuration', error: `Only ${serverCount} servers configured` });
+      }
+    } catch (error) {
+      console.log(`  ❌ MCP config error: ${error.message}`);
+      this.results.failed.push({ test: 'MCP Configuration', error: error.message });
+    }
+  }
+
+  async validatePluginRegistration() {
+    console.log('\n🔌 Testing Plugin Registration...');
+
+    try {
+      const ohMyOpencodeConfig = JSON.parse(fs.readFileSync('.opencode/oh-my-opencode.json', 'utf8'));
+
+      if (ohMyOpencodeConfig.plugin && ohMyOpencodeConfig.plugin.includes('stringray-codex-injection.js')) {
+        console.log('  ✅ StringRay plugin registered in oh-my-opencode');
+        this.results.passed.push('Plugin Registration');
+      } else {
+        console.log('  ❌ StringRay plugin not registered in oh-my-opencode');
+        this.results.failed.push({ test: 'Plugin Registration', error: 'Plugin not found in config' });
+      }
+    } catch (error) {
+      console.log(`  ❌ Plugin config error: ${error.message}`);
+      this.results.failed.push({ test: 'Plugin Registration', error: error.message });
+    }
+  }
+
+  async validateCodexInjection() {
+    console.log('\n📚 Testing Codex Injection...');
+
+    return new Promise((resolve) => {
+      const testScript = spawn('node', ['scripts/test-stringray-plugin.mjs'], {
+        stdio: ['pipe', 'pipe', 'pipe'],
+        timeout: 15000
+      });
+
+      let output = '';
+      let codexFound = false;
+      let termsFound = false;
+
+      testScript.stdout.on('data', (data) => {
+        const chunk = data.toString();
+        output += chunk;
+
+        if (chunk.includes('StringRay Framework Codex v1.2.20')) {
+          codexFound = true;
+        }
+        if (chunk.includes('Progressive Prod-Ready Code')) {
+          termsFound = true;
+        }
+      });
+
+      testScript.on('close', (code) => {
+        if (code === 0 && codexFound && termsFound) {
+          console.log('  ✅ Codex injection working correctly');
+          this.results.passed.push('Codex Injection');
+        } else if (output.includes('PASSED')) {
+          console.log('  ✅ Codex injection test passed');
+          this.results.passed.push('Codex Injection');
+        } else {
+          console.log('  ❌ Codex injection failed');
+          this.results.failed.push({ test: 'Codex Injection', error: 'Codex not injected properly' });
+        }
+        resolve();
+      });
+
+      testScript.on('error', (error) => {
+        console.log(`  ❌ Codex injection test error: ${error.message}`);
+        this.results.failed.push({ test: 'Codex Injection', error: error.message });
+        resolve();
+      });
+    });
+  }
+
+  async validateToolAvailability() {
+    console.log('\n🛠️  Testing Tool Availability...');
+
+    return new Promise((resolve) => {
+      const doctor = spawn('npx', ['oh-my-opencode', 'doctor', '--verbose'], {
+        stdio: ['pipe', 'pipe', 'pipe'],
+        timeout: 10000
+      });
+
+      let output = '';
+      let mcpServersFound = false;
+      let toolCount = 0;
+
+      doctor.stdout.on('data', (data) => {
+        const chunk = data.toString();
+        output += chunk;
+
+        if (chunk.includes('User MCP Configuration') && chunk.includes('server(s) configured')) {
+          mcpServersFound = true;
+          const match = chunk.match(/(\d+) user server/);
+          if (match) {
+            toolCount = parseInt(match[1]);
+          }
+        }
+      });
+
+      doctor.on('close', (code) => {
+        if (code === 0 && mcpServersFound && toolCount >= 15) {
+          console.log(`  ✅ ${toolCount} MCP tools available`);
+          this.results.passed.push('Tool Availability');
+        } else {
+          console.log(`  ❌ Insufficient tools available (${toolCount} found, need 15+)`);
+          this.results.failed.push({ test: 'Tool Availability', error: `Only ${toolCount} tools available` });
+        }
+        resolve();
+      });
+
+      doctor.on('error', (error) => {
+        console.log(`  ❌ Tool availability check error: ${error.message}`);
+        this.results.failed.push({ test: 'Tool Availability', error: error.message });
+        resolve();
+      });
+    });
+  }
+
+  printSummary() {
+    console.log('\n📊 OH-MY-OPENCODE INTEGRATION SUMMARY');
+    console.log('======================================');
+
+    console.log(`✅ Passed: ${this.results.passed.length}`);
+    console.log(`❌ Failed: ${this.results.failed.length}`);
+
+    if (this.results.failed.length > 0) {
+      console.log('\n❌ FAILED TESTS:');
+      this.results.failed.forEach(failure => {
+        console.log(`  • ${failure.test}: ${failure.error}`);
+      });
+    }
+
+    if (this.results.passed.length > 0) {
+      console.log('\n✅ PASSED TESTS:');
+      this.results.passed.forEach(test => {
+        console.log(`  • ${test}`);
+      });
+    }
+  }
+}
+
+// Run integration validation
+const validator = new OhMyOpenCodeIntegrationValidator();
+validator.validateIntegration().then(success => {
+  process.exit(success ? 0 : 1);
+}).catch(error => {
+  console.error('Integration validation failed:', error);
+  process.exit(1);
+});</content>
+<parameter name="filePath">scripts/validation/validate-oh-my-opencode-integration.js

@@ -1,5 +1,5 @@
 /**
- * StrRay Framework v1.0.0 - Session Coordinator
+ * StringRay Framework v1.0.0 - Session Coordinator
  *
  * Manages cross-agent communication and coordination within sessions.
  * Tracks delegation state, agent interactions, and conflict resolution.
@@ -8,7 +8,7 @@
  * @since 2026-01-07
  */
 
-import { StrRayStateManager } from "../state/state-manager";
+import { StringRayStateManager } from "../state/state-manager";
 import { DelegationResult } from "./agent-delegator.js";
 
 export interface SessionContext {
@@ -64,10 +64,10 @@ export interface SessionMetrics {
 }
 
 export class SessionCoordinator {
-  private stateManager: StrRayStateManager;
+  private stateManager: StringRayStateManager;
   private sessions = new Map<string, SessionContext>();
 
-  constructor(stateManager: StrRayStateManager) {
+  constructor(stateManager: StringRayStateManager) {
     this.stateManager = stateManager;
   }
 
@@ -549,7 +549,7 @@ export class SessionCoordinator {
 
 // Export singleton instance factory
 export const createSessionCoordinator = (
-  stateManager: StrRayStateManager,
+  stateManager: StringRayStateManager,
 ): SessionCoordinator => {
   return new SessionCoordinator(stateManager);
 };

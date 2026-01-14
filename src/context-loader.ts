@@ -1,5 +1,5 @@
 /**
- * StrRay Context Loader
+ * StringRay Context Loader
  *
  * Loads Universal Development Codex v1.2.20 context for agent initialization.
  * Provides structured access to 30+ codex terms, interweaves, lenses, and anti-patterns.
@@ -67,12 +67,12 @@ function isValidMatch(
 }
 
 /**
- * StrRay Context Loader
+ * StringRay Context Loader
  *
  * Loads and parses the Universal Development Codex v1.2.20 from codex.json
  */
-export class StrRayContextLoader {
-  private static instance: StrRayContextLoader;
+export class StringRayContextLoader {
+  private static instance: StringRayContextLoader;
   private cachedContext: CodexContext | null = null;
   private codexFilePaths: string[] = [];
 
@@ -83,11 +83,11 @@ export class StrRayContextLoader {
   /**
    * Get singleton instance
    */
-  public static getInstance(): StrRayContextLoader {
-    if (!StrRayContextLoader.instance) {
-      StrRayContextLoader.instance = new StrRayContextLoader();
+  public static getInstance(): StringRayContextLoader {
+    if (!StringRayContextLoader.instance) {
+      StringRayContextLoader.instance = new StringRayContextLoader();
     }
-    return StrRayContextLoader.instance;
+    return StringRayContextLoader.instance;
   }
 
   /**
@@ -173,7 +173,7 @@ export class StrRayContextLoader {
 
     // Log format detection for debugging
     console.log(
-      `StrRay: Detected ${formatResult.format} format for ${sourcePath} (confidence: ${formatResult.confidence})`,
+      `StringRay: Detected ${formatResult.format} format for ${sourcePath} (confidence: ${formatResult.confidence})`,
     );
 
     const result = parseCodexContent(content, sourcePath);
@@ -399,4 +399,4 @@ export class StrRayContextLoader {
 /**
  * Export singleton instance
  */
-export const strRayContextLoader = StrRayContextLoader.getInstance();
+export const strRayContextLoader = StringRayContextLoader.getInstance();

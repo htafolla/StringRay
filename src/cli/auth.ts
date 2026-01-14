@@ -1,5 +1,5 @@
 /**
- * StrRay Framework CLI - Auth Command
+ * StringRay Framework CLI - Auth Command
  *
  * Authentication management for AI providers.
  * Currently supports configuration display and basic setup.
@@ -21,7 +21,7 @@ export interface AuthLogoutOptions {
  */
 export const authCommand = {
   async login(options: AuthLoginOptions): Promise<void> {
-    console.log("🔐 StrRay Authentication - Login");
+    console.log("🔐 StringRay Authentication - Login");
     console.log("=================================");
 
     const provider = options.provider || "claude";
@@ -34,7 +34,7 @@ export const authCommand = {
     console.log("2. Generate an API key");
     console.log("3. Set the environment variable:");
     console.log(`   export ${getEnvVarName(provider)}=your_api_key_here`);
-    console.log("4. Restart StrRay");
+    console.log("4. Restart StringRay");
 
     console.log(
       "\n✅ Once configured, your API key will be automatically used.",
@@ -42,7 +42,7 @@ export const authCommand = {
   },
 
   async logout(options: AuthLogoutOptions): Promise<void> {
-    console.log("🔐 StrRay Authentication - Logout");
+    console.log("🔐 StringRay Authentication - Logout");
     console.log("==================================");
 
     const provider = options.provider || "all";
@@ -59,7 +59,7 @@ export const authCommand = {
   },
 
   async status(): Promise<void> {
-    console.log("🔐 StrRay Authentication - Status");
+    console.log("🔐 StringRay Authentication - Status");
     console.log("==================================");
 
     const providers = ["claude", "openai", "gemini"];

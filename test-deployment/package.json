@@ -1,8 +1,8 @@
 {
-  "name": "strray-test-env",
+  "name": "stringray-test-env",
   "version": "1.0.0",
-  "description": "StrRay Plugin Test Environment",
+  "description": "StringRay Plugin Test Environment",
   "dependencies": {
-    "oh-my-opencode-strray": "file:../oh-my-opencode-strray-1.0.0.tgz"
+    "oh-my-opencode-stringray": "file:../oh-my-opencode-stringray-1.0.0.tgz"
   }
 }

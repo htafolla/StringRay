@@ -55,10 +55,17 @@ class StrRayRefactoringStrategiesServer {
   private server: Server;
 
   constructor() {
-    this.server = new Server({
-      name: "strray-refactoring-strategies",
-      version: "1.0.0",
-    });
+        this.server = new Server(
+      {
+        name: "strray-refactoring-strategies",
+        version: "1.0.0",
+      },
+      {
+        capabilities: {
+          tools: {},
+        },
+      }
+    );
 
     this.setupToolHandlers();
     console.log("StrRay Refactoring Strategies MCP Server initialized");

@@ -1,5 +1,5 @@
 /**
- * StrRay Framework v1.0.0 - Advanced Monitoring System
+ * StringRay Framework v1.0.0 - Advanced Monitoring System
  *
  * Real-time monitoring with anomaly detection and alerting.
  * Provides comprehensive framework health tracking and automated responses.

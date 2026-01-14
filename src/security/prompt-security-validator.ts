@@ -1,5 +1,5 @@
 /**
- * StrRay Framework - AI Prompt Security Validator
+ * StringRay Framework - AI Prompt Security Validator
  *
  * Specialized security validation for AI agent prompts and responses
  * Prevents prompt injection, system prompt override, and malicious inputs

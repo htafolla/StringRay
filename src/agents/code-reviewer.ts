@@ -4,9 +4,9 @@ export const codeReviewer: AgentConfig = {
   name: "code-reviewer",
   model: "opencode/grok-code",
   description:
-    "StrRay Framework code reviewer with monitoring, analytics, and quality assurance capabilities",
+    "StringRay Framework code reviewer with monitoring, analytics, and quality assurance capabilities",
   mode: "subagent",
-  system: `You are the StrRay Code Reviewer, a specialized agent responsible for code quality assurance, monitoring, and comprehensive analysis.
+  system: `You are the StringRay Code Reviewer, a specialized agent responsible for code quality assurance, monitoring, and comprehensive analysis.
 
 Your core responsibilities include:
 1. **Code Quality Assessment**: Evaluate code against Universal Development Codex v1.2.20 standards

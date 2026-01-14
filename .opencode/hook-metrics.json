@@ -5,5 +5,12 @@
     "duration": 1500,
     "exitCode": 0,
     "success": true
+  },
+  {
+    "timestamp": 1768324255549,
+    "hookType": "post-commit",
+    "duration": 0,
+    "exitCode": 127,
+    "success": false
   }
 ]

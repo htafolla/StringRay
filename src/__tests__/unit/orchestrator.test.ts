@@ -1,5 +1,5 @@
 /**
- * StrRay Framework v1.0.0 - Orchestrator Unit Tests
+ * StringRay Framework v1.0.0 - Orchestrator Unit Tests
  *
  * Tests the multi-agent orchestration and task delegation functionality.
  *
@@ -9,17 +9,17 @@
 
 import { describe, test, expect, beforeEach, vi } from "vitest";
 import {
-  StrRayOrchestrator,
+  StringRayOrchestrator,
   OrchestratorConfig,
   TaskDefinition,
   TaskResult,
 } from "../../orchestrator";
 
-describe("StrRayOrchestrator", () => {
-  let orchestrator: StrRayOrchestrator;
+describe("StringRayOrchestrator", () => {
+  let orchestrator: StringRayOrchestrator;
 
   beforeEach(() => {
-    orchestrator = new StrRayOrchestrator({
+    orchestrator = new StringRayOrchestrator({
       maxConcurrentTasks: 3,
       taskTimeout: 60000,
       conflictResolutionStrategy: "majority_vote",
@@ -27,7 +27,7 @@ describe("StrRayOrchestrator", () => {
   });
 
   test("should initialize with default configuration", () => {
-    const defaultOrchestrator = new StrRayOrchestrator();
+    const defaultOrchestrator = new StringRayOrchestrator();
     expect(defaultOrchestrator).toBeDefined();
   });
 
@@ -36,7 +36,7 @@ describe("StrRayOrchestrator", () => {
       maxConcurrentTasks: 5,
       conflictResolutionStrategy: "expert_priority",
     };
-    const customOrchestrator = new StrRayOrchestrator(config);
+    const customOrchestrator = new StringRayOrchestrator(config);
     expect(customOrchestrator).toBeDefined();
   });
 

@@ -3,10 +3,10 @@
  * Validates the complete end-to-end orchestration pipeline
  */
 
-import { StrRayOrchestrator } from "../orchestrator.js";
+import { StringRayOrchestrator } from "../orchestrator.js";
 import { enhancedMultiAgentOrchestrator } from "../orchestrator/enhanced-multi-agent-orchestrator.js";
 import { createAgentDelegator } from "../delegation/agent-delegator.js";
-import { StrRayStateManager } from "../state/state-manager.js";
+import { StringRayStateManager } from "../state/state-manager.js";
 import { frameworkLogger } from "../framework-logger.js";
 
 interface TestResult {
@@ -32,15 +32,15 @@ interface ValidationStep {
 }
 
 class OrchestrationFlowValidator {
-  private orchestrator: StrRayOrchestrator;
-  private stateManager: StrRayStateManager;
+  private orchestrator: StringRayOrchestrator;
+  private stateManager: StringRayStateManager;
   private agentDelegator: any;
   private testResults: Map<string, TestResult> = new Map();
 
   constructor() {
-    this.stateManager = new StrRayStateManager();
+    this.stateManager = new StringRayStateManager();
     this.agentDelegator = createAgentDelegator(this.stateManager);
-    this.orchestrator = new StrRayOrchestrator({
+    this.orchestrator = new StringRayOrchestrator({
       maxConcurrentTasks: 5,
       conflictResolutionStrategy: "expert_priority",
     });
@@ -61,7 +61,7 @@ class OrchestrationFlowValidator {
         step: "Orchestrator Initialization",
         success: true,
         timestamp: Date.now(),
-        details: "StrRayOrchestrator created successfully",
+        details: "StringRayOrchestrator created successfully",
       });
 
       // Step 2: Define simple task

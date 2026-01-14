@@ -1,5 +1,5 @@
 import { frameworkLogger } from "../framework-logger.js";
-export class StrRayStateManager {
+export class StringRayStateManager {
     store = new Map();
     persistencePath;
     persistenceEnabled;

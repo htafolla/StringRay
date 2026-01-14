@@ -5,7 +5,7 @@ from pathlib import Path
 
 
 class ModelRouter:
-    """Dynamic model routing service for StrRay agents."""
+    """Dynamic model routing service for StringRay agents."""
 
     def __init__(self, config_path: str = None):
         self.config_path = config_path or os.path.join(

@@ -1,5 +1,5 @@
 /**
- * StrRay Framework v1.0.0 - Performance Benchmarking System
+ * StringRay Framework v1.0.0 - Performance Benchmarking System
  *
  * Comprehensive performance measurement and analysis system for framework operations.
  * Measures boot sequence, orchestrator tasks, session management, and agent operations.
@@ -69,7 +69,7 @@ export interface SessionBenchmarkResult {
   concurrentSessionOperations: number;
 }
 
-export class StrRayPerformanceBenchmark {
+export class StringRayPerformanceBenchmark {
   private results: BenchmarkResult[] = [];
   private activeBenchmarks = new Map<
     string,
@@ -549,4 +549,4 @@ export class StrRayPerformanceBenchmark {
 }
 
 // Export singleton instance
-export const performanceBenchmark = new StrRayPerformanceBenchmark();
+export const performanceBenchmark = new StringRayPerformanceBenchmark();

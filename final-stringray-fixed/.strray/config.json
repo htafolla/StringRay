@@ -1,0 +1,69 @@
+{
+  "sisyphus_orchestrator": {
+    "enabled": true,
+    "relentless_execution": true,
+    "progress_tracking": true,
+    "error_recovery": true
+  },
+  "multi_agent_orchestration": {
+    "enabled": true,
+    "max_concurrent_agents": 5,
+    "coordination_model": "async-multi-agent",
+    "task_distribution_strategy": "capability-based",
+    "conflict_resolution_strategy": "consensus"
+  },
+  "codex_terms": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 24, 29, 32, 38, 42, 43],
+  "session_initialization": {
+    "auto_format": true,
+    "security_scan": true,
+    "compliance_check": true,
+    "threshold_monitoring": true
+  },
+  "agents": {
+    "sisyphus": {
+      "enabled": true,
+      "mode": "primary",
+      "capabilities": ["orchestration", "coordination", "delegation"]
+    },
+    "enforcer": {
+      "enabled": true,
+      "mode": "subagent",
+      "capabilities": ["compliance", "validation", "enforcement"]
+    },
+    "architect": {
+      "enabled": true,
+      "mode": "subagent",
+      "capabilities": ["design", "architecture", "planning"]
+    },
+    "orchestrator": {
+      "enabled": true,
+      "mode": "subagent",
+      "capabilities": ["coordination", "workflow", "task-management"]
+    },
+    "bug-triage-specialist": {
+      "enabled": true,
+      "mode": "subagent",
+      "capabilities": ["debugging", "error-analysis", "fixes"]
+    },
+    "code-reviewer": {
+      "enabled": true,
+      "mode": "subagent",
+      "capabilities": ["review", "quality", "best-practices"]
+    },
+    "security-auditor": {
+      "enabled": true,
+      "mode": "subagent",
+      "capabilities": ["security", "vulnerability-detection", "compliance"]
+    },
+    "refactorer": {
+      "enabled": true,
+      "mode": "subagent",
+      "capabilities": ["refactoring", "optimization", "maintenance"]
+    },
+    "test-architect": {
+      "enabled": true,
+      "mode": "subagent",
+      "capabilities": ["testing", "coverage", "validation"]
+    }
+  }
+}

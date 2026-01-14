@@ -1,4 +1,4 @@
-# ⚡ StringRay (StrRay) Framework v1.0.0 – Enterprise AI Agent Coordination Platform
+# ⚡ StringRay (StringRay) Framework v1.0.0 – Enterprise AI Agent Coordination Platform
 
 [![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/htafolla/strray)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -10,9 +10,9 @@
 
 ## ⚠️ Important Notice
 
-**StrRay Framework v1.0.0 - Enterprise CI/CD Automation Plugin**
+**StringRay Framework v1.0.0 - Enterprise CI/CD Automation Plugin**
 
-StrRay Framework is available as both:
+StringRay Framework is available as both:
 
 - **Standalone npm package** for direct installation
 - **Integrated plugin** within oh-my-opencode framework
@@ -24,14 +24,14 @@ npm install strray
 npx strray init
 ```
 
-**✅ Or install oh-my-opencode (includes StrRay Framework):**
+**✅ Or install oh-my-opencode (includes StringRay Framework):**
 
 ```bash
 npm install -g oh-my-opencode
-# StrRay Framework is automatically included
+# StringRay Framework is automatically included
 ```
 
-This repository contains the complete StrRay Framework source code with enterprise CI/CD automation capabilities.
+This repository contains the complete StringRay Framework source code with enterprise CI/CD automation capabilities.
 
 ---
 
@@ -71,7 +71,7 @@ This repository contains the complete StrRay Framework source code with enterpri
 #### Option 1: Standalone Installation (Recommended)
 
 ```bash
-# Install StrRay Framework directly
+# Install StringRay Framework directly
 npm install strray
 # or
 bun install strray
@@ -83,17 +83,17 @@ npx strray init
 #### Option 2: oh-my-opencode Integration
 
 ```bash
-# Install oh-my-opencode globally (includes StrRay Framework)
+# Install oh-my-opencode globally (includes StringRay Framework)
 npm install -g oh-my-opencode
 # or
 bun install -g oh-my-opencode
 
-# StrRay Framework is automatically included as a plugin
+# StringRay Framework is automatically included as a plugin
 ```
 
 ### Configuration
 
-StrRay Framework automatically configures itself based on your installation method:
+StringRay Framework automatically configures itself based on your installation method:
 
 #### Standalone Configuration
 
@@ -114,10 +114,10 @@ StrRay Framework automatically configures itself based on your installation meth
 #### Standalone Usage
 
 ```bash
-# Initialize StrRay in your project
+# Initialize StringRay in your project
 npx strray init
 
-# StrRay will automatically:
+# StringRay will automatically:
 # - Set up CI/CD post-processor for automated remediation
 # - Load codex terms into agent system prompts
 # - Enable multi-agent orchestration for complex tasks
@@ -129,10 +129,10 @@ npx strray init
 #### oh-my-opencode Integration
 
 ```bash
-# Start oh-my-opencode (includes StrRay Framework)
+# Start oh-my-opencode (includes StringRay Framework)
 opencode
 
-# All StrRay features are automatically available
+# All StringRay features are automatically available
 ```
 
 ### oh-my-opencode Documentation
@@ -143,7 +143,7 @@ For complete oh-my-opencode setup and usage instructions, see the [official oh-m
 
 Update your `.opencode/oh-my-opencode.json`:
 
-**First, update to your preferred AI model.** Check [OpenCode](https://opencode.ai) for free models and update the `model_routing` section in your config. See [Model Configuration Guide](./docs/StrRay_MODEL_CONFIG.md) for detailed instructions.
+**First, update to your preferred AI model.** Check [OpenCode](https://opencode.ai) for free models and update the `model_routing` section in your config. See [Model Configuration Guide](./docs/StringRay_MODEL_CONFIG.md) for detailed instructions.
 
 ```json
 {
@@ -245,8 +245,8 @@ npm run init
 
 ### Core Documentation
 
-- **[Installation Guide](./docs/StrRay_INSTALLATION_GUIDE.md)** - Complete setup for oh-my-opencode integration
-- **[Model Configuration](./docs/StrRay_MODEL_CONFIG.md)** - Model setup with opencode/grok-code assignments
+- **[Installation Guide](./docs/StringRay_INSTALLATION_GUIDE.md)** - Complete setup for oh-my-opencode integration
+- **[Model Configuration](./docs/StringRay_MODEL_CONFIG.md)** - Model setup with opencode/grok-code assignments
 - **[API Reference](./docs/api/API_REFERENCE.md)** - Developer API documentation for programmatic access
 - **[Agent Documentation](./docs/agents/)** - Detailed specifications for all 9 agents with operating procedures
 - **[Architecture](./docs/architecture/)** - Framework design with Universal Development Codex principles
@@ -262,8 +262,7 @@ npm run init
 
 ### Deployment & Operations
 
-- **[Docker Deployment](./docs/deployment/docker.md)** - Containerized deployment guide
-- **[Kubernetes Deployment](./docs/deployment/kubernetes.md)** - Orchestrated deployment with auto-scaling
+- **[Installation Guide](./docs/installation/INSTALLATION.md)** - Complete installation and setup guide
 - **[Cloud Deployment](./docs/deployment/cloud.md)** - AWS, GCP, and Azure integration guides
 - **[Monitoring Setup](./docs/operations/monitoring.md)** - Production monitoring and alerting configuration
 - **[Security Hardening](./docs/operations/security.md)** - Enterprise security configuration and auditing
@@ -330,12 +329,12 @@ npm run test:e2e         # End-to-end tests through oh-my-opencode runtime
 
 ### 🧪 Testing Approach
 
-**StrRay Framework uses mock-based testing** due to its oh-my-opencode plugin architecture:
+**StringRay Framework uses mock-based testing** due to its oh-my-opencode plugin architecture:
 
 **❌ Direct Plugin Testing (Not Supported):**
 ```typescript
 // This fails due to ES6 import conflicts
-import { createStrRayCodexInjectorHook } from "./codex-injector";
+import { createStringRayCodexInjectorHook } from "./codex-injector";
 ````
 
 **✅ Mock-Based Plugin Testing (Recommended):**
@@ -456,7 +455,7 @@ STRRAY_LOG_LEVEL=info
 - [x] CI/CD automation system implementation
 - [x] Package publishing and distribution
 - [ ] API documentation generation and publishing
-- [ ] Docker and Kubernetes deployment guides
+- [ ] Advanced deployment strategies (future consideration)
 - [ ] Production monitoring setup guides
 
 #### Phase 2: Enterprise Hardening (Next)
@@ -494,8 +493,8 @@ MIT License - see [LICENSE](LICENSE) file.
 
 ## Documentation
 
-- [Installation Guide](./docs/StrRay_INSTALLATION_GUIDE.md)
-- [Model Configuration](./docs/StrRay_MODEL_CONFIG.md)
+- [Installation Guide](./docs/StringRay_INSTALLATION_GUIDE.md)
+- [Model Configuration](./docs/StringRay_MODEL_CONFIG.md)
 - [API Reference](./docs/api/API_REFERENCE.md)
 - [Agent Documentation](./docs/agents/]
 - [Architecture](./docs/architecture/)

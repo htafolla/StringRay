@@ -63,7 +63,7 @@ export class GitHookTrigger {
     const isPushHook = hookType === "post-push";
 
     return `#!/bin/bash
-# StrRay Post-Processor ${hookType} Hook
+# StringRay Post-Processor ${hookType} Hook
 # Automatically triggers post-processor after ${hookType}
 
 # Get hook type from script name
@@ -110,7 +110,7 @@ fi
 (
   cd "$(dirname "$0")/../.." # Navigate to project root
 
-  # Find the StrRay plugin in node_modules or current project (development)
+  # Find the StringRay plugin in node_modules or current project (development)
   STRRAY_PLUGIN=""
   if [ -d "node_modules/strray-framework" ]; then
     STRRAY_PLUGIN="node_modules/strray-framework"
@@ -249,7 +249,7 @@ fi
       [ \$EXIT_CODE -eq 0 ] && exit 0 || exit 1
     fi
   else
-    echo "Warning: StrRay plugin not found or Node.js not available, skipping post-processor"
+    echo "Warning: StringRay plugin not found or Node.js not available, skipping post-processor"
   fi
 )
 

@@ -1,5 +1,5 @@
 /**
- * StrRay Framework v1.0.0 - Distributed Load Balancer
+ * StringRay Framework v1.0.0 - Distributed Load Balancer
  *
  * Enterprise-grade load balancer with session affinity, health checks,
  * and auto-scaling capabilities for multi-instance deployments.
@@ -55,7 +55,7 @@ export interface LoadBalancerStats {
 }
 
 /**
- * Distributed Load Balancer - Routes traffic across StrRay instances
+ * Distributed Load Balancer - Routes traffic across StringRay instances
  */
 export class DistributedLoadBalancer extends EventEmitter {
   private config: LoadBalancerConfig;
@@ -415,7 +415,7 @@ export class DistributedLoadBalancer extends EventEmitter {
           const instance: BackendInstance = {
             id: health.instanceId,
             host: this.extractHostFromInstanceId(health.instanceId),
-            port: 3000, // Default StrRay port
+            port: 3000, // Default StringRay port
             weight: 1,
             healthy: health.status === "healthy",
             connections: 0,

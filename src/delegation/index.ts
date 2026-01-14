@@ -1,5 +1,5 @@
 /**
- * StrRay Framework v1.0.0 - Delegation System
+ * StringRay Framework v1.0.0 - Delegation System
  *
  * Complete automatic multi-agent delegation system with complexity assessment
  * and session-based coordination.

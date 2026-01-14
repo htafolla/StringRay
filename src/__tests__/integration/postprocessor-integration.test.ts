@@ -4,13 +4,13 @@
 
 import { describe, it, expect, beforeEach } from "vitest";
 import { PostProcessor } from "../../postprocessor/PostProcessor";
-import { StrRayStateManager } from "../../state/state-manager";
+import { StringRayStateManager } from "../../state/state-manager";
 import { SessionMonitor } from "../../session/session-monitor";
 import { setupStandardMocks } from "../utils/test-utils";
 
 describe("PostProcessor Integration", () => {
   let postProcessor: PostProcessor;
-  let stateManager: StrRayStateManager;
+  let stateManager: StringRayStateManager;
   let sessionMonitor: SessionMonitor;
 
   beforeEach(async () => {
@@ -18,7 +18,7 @@ describe("PostProcessor Integration", () => {
     setupStandardMocks();
 
     // Use proper state manager for integration testing
-    stateManager = new StrRayStateManager(
+    stateManager = new StringRayStateManager(
       `/test/postprocessor-${Date.now()}.json`,
     );
     await new Promise((resolve) => setTimeout(resolve, 10)); // Wait for initialization

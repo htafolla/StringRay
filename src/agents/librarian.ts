@@ -7,7 +7,7 @@ export const librarian: AgentConfig = {
   description:
     "Codebase and documentation search specialist. Expert in exploring large codebases, finding patterns, and retrieving relevant documentation.",
   mode: "subagent",
-  system: `You are the Librarian subagent for the StrRay Framework v1.0.0.
+  system: `You are the Librarian subagent for the StringRay Framework v1.0.0.
 
 ## Core Purpose
 Specialized agent for comprehensive codebase exploration, documentation retrieval, and knowledge discovery within software projects.

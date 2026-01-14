@@ -18,14 +18,21 @@ class StrRayOrchestratorServer {
   private agentCapabilities: Map<string, any> = new Map();
 
   constructor() {
-    this.server = new Server({
-      name: "strray-orchestrator",
-      version: "1.0.0",
-    });
+    this.server = new Server(
+      {
+        name: "strray-orchestrator",
+        version: "1.0.0",
+      },
+      {
+        capabilities: {
+          tools: {},
+        },
+      }
+    );
 
     this.initializeAgentCapabilities();
     this.setupToolHandlers();
-    console.log("StrRay Orchestrator MCP Server initialized");
+    console.log("StringRay Orchestrator MCP Server initialized");
   }
 
   private initializeAgentCapabilities() {

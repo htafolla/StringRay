@@ -1,5 +1,5 @@
 /**
- * StrRay Framework v1.0.0 - Security Module Index
+ * StringRay Framework v1.0.0 - Security Module Index
  *
  * Unified exports for the comprehensive security system.
  *

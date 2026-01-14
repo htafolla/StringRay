@@ -1,5 +1,5 @@
 /**
- * StrRay Framework v1.0.0 - Session State Manager
+ * StringRay Framework v1.0.0 - Session State Manager
  *
  * Manages cross-session state sharing, dependency tracking,
  * and coordination for complex workflows.
@@ -8,7 +8,7 @@
  * @since 2026-01-07
  */
 
-import { StrRayStateManager } from "../state/state-manager";
+import { StringRayStateManager } from "../state/state-manager";
 import { SessionCoordinator } from "../delegation/session-coordinator";
 
 export interface SessionDependency {
@@ -46,14 +46,14 @@ export interface FailoverConfig {
 }
 
 export class SessionStateManager {
-  private stateManager: StrRayStateManager;
+  private stateManager: StringRayStateManager;
   private sessionCoordinator: SessionCoordinator;
   private dependencies = new Map<string, SessionDependency>();
   private sessionGroups = new Map<string, SessionGroup>();
   private failoverConfigs = new Map<string, FailoverConfig>();
 
   constructor(
-    stateManager: StrRayStateManager,
+    stateManager: StringRayStateManager,
     sessionCoordinator: SessionCoordinator,
   ) {
     this.stateManager = stateManager;
@@ -775,7 +775,7 @@ export class SessionStateManager {
 }
 
 export const createSessionStateManager = (
-  stateManager: StrRayStateManager,
+  stateManager: StringRayStateManager,
   sessionCoordinator: SessionCoordinator,
 ): SessionStateManager => {
   return new SessionStateManager(stateManager, sessionCoordinator);

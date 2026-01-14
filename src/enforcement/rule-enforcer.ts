@@ -1,5 +1,5 @@
 /**
- * Rule Enforcement System for StrRay Framework
+ * Rule Enforcement System for StringRay Framework
  * Enforces development rules and validates component creation
  */
 

@@ -1,4 +1,4 @@
-# StrRay Framework v1.0.0 - Performance Testing & Monitoring System
+# StringRay Framework v1.0.0 - Performance Testing & Monitoring System
 
 [![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/strray-framework/stringray)
 [![Performance Budget](https://img.shields.io/badge/bundle-%3C2MB-brightgreen.svg)](https://github.com/strray-framework/stringray)
@@ -62,7 +62,7 @@ The system enforces the Universal Development Codex performance budget:
 
 ### Installation
 
-The performance system is included with StrRay Framework v1.0.0. No additional installation required.
+The performance system is included with StringRay Framework v1.0.0. No additional installation required.
 
 ### Basic Usage
 
@@ -655,7 +655,7 @@ MIT License - see [LICENSE](LICENSE) file.
 
 ## 🔗 Related Documentation
 
-- [StrRay Framework Documentation](./README.md)
+- [StringRay Framework Documentation](./README.md)
 - [Universal Development Codex](./CODEX.md)
 - [CI/CD Integration Guide](./docs/ci-cd-integration.md)
 - [Performance Optimization Guide](./docs/performance-optimization.md)

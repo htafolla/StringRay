@@ -1,5 +1,5 @@
 /**
- * StrRay Framework v1.0.0 - Performance Optimization System
+ * StringRay Framework v1.0.0 - Performance Optimization System
  *
  * Sub-millisecond optimization techniques for minimal overhead operations.
  * Implements advanced caching, memory optimization, and computational efficiency.

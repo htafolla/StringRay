@@ -1,1 +1,0 @@
-node -c src/plugins/strray-codex-injection.ts 2>&1 || echo "Syntax check failed"

@@ -1,5 +1,5 @@
 /**
- * StrRay Framework v1.0.0 - Security Hardening Module
+ * StringRay Framework v1.0.0 - Security Hardening Module
  *
  * Implements additional security measures and hardening for the framework.
  * Addresses vulnerabilities identified during security audit.

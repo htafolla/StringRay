@@ -1,5 +1,5 @@
 /**
- * StrRay Framework - Framework Initialization Integration Tests
+ * StringRay Framework - Framework Initialization Integration Tests
  *
  * Comprehensive integration tests for framework initialization using real validation logic
  * from shell scripts and framework components. Tests the complete boot sequence and
@@ -7,7 +7,7 @@
  */
 
 import { describe, test, expect, beforeEach, vi } from "vitest";
-import { StrRayStateManager } from "../../state/state-manager";
+import { StringRayStateManager } from "../../state/state-manager";
 import { frameworkLogger } from "../../framework-logger";
 import { spawn } from "child_process";
 import * as fs from "fs";
@@ -57,13 +57,13 @@ const mockSpawnPromise = (
   });
 };
 
-describe("StrRay Framework Initialization Integration", () => {
-  let stateManager: StrRayStateManager;
+describe("StringRay Framework Initialization Integration", () => {
+  let stateManager: StringRayStateManager;
   const testSessionId = "test-framework-init-session";
 
   beforeEach(() => {
     // Reset state for each test
-    stateManager = new StrRayStateManager(".opencode/state", true);
+    stateManager = new StringRayStateManager(".opencode/state", true);
     vi.clearAllMocks();
     vi.restoreAllMocks();
   });

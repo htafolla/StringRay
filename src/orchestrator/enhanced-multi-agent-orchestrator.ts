@@ -3,7 +3,7 @@
  * Integrates subagent spawning visibility and lifecycle management
  */
 
-import { StrRayStateManager } from "../state/state-manager.js";
+import { StringRayStateManager } from "../state/state-manager.js";
 import { frameworkLogger } from "../framework-logger.js";
 import {
   ComplexityAnalyzer,
@@ -47,13 +47,20 @@ export interface AgentOrchestrationState {
 
 export class EnhancedMultiAgentOrchestrator {
   private state: AgentOrchestrationState;
-  private stateManager: StrRayStateManager;
+  private stateManager: StringRayStateManager;
   private complexityAnalyzer: ComplexityAnalyzer;
   private agentDelegator: any;
   private cleanupTimer: NodeJS.Timeout | null = null;
 
+  // 🚨 SECURITY: Track execution context to prevent subagent spawning
+  private executionContext: {
+    isExecutingAsSubagent: boolean;
+    currentAgentId: string | null;
+    spawnStack: string[];
+  };
+
   constructor() {
-    this.stateManager = new StrRayStateManager();
+    this.stateManager = new StringRayStateManager();
     this.complexityAnalyzer = new ComplexityAnalyzer();
     this.agentDelegator = createAgentDelegator(this.stateManager);
 
@@ -67,13 +74,41 @@ export class EnhancedMultiAgentOrchestrator {
       cleanupInterval: 30000, // 30 seconds
     };
 
+    // Initialize execution context for security tracking
+    this.executionContext = {
+      isExecutingAsSubagent: false,
+      currentAgentId: null,
+      spawnStack: []
+    };
+
     this.initializeCleanupSystem();
+  }
+
+  /**
+   * 🚨 SECURITY: Check if currently executing as a subagent
+   * Prevents subagents from spawning other subagents (infinite loops, resource exhaustion)
+   */
+  private isCurrentlyExecutingAsSubagent(): boolean {
+    // Check if we have any active agents (indicates we're in subagent execution)
+    return this.state.activeAgents.size > 0;
   }
 
   /**
    * Enhanced agent spawning with clickable monitoring integration
    */
   async spawnAgent(request: AgentSpawnRequest): Promise<SpawnedAgent> {
+    // 🚨 SECURITY: Prevent subagents from spawning other subagents
+    // This prevents infinite loops, resource exhaustion, and uncontrolled agent spawning
+    if (this.isCurrentlyExecutingAsSubagent()) {
+      const error = new Error(
+        `SECURITY VIOLATION: Subagent attempted to spawn another agent. ` +
+        `Only the main orchestrator may spawn agents. ` +
+        `Subagent spawning is strictly prohibited to prevent infinite loops and resource exhaustion.`
+      );
+      console.error(`🚨 ${error.message}`);
+      throw error;
+    }
+
     const agentId = `agent_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
     const spawnedAgent: SpawnedAgent = {

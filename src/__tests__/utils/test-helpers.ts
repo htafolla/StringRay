@@ -1,4 +1,4 @@
-// Test utilities and mocks for StrRay Framework testing
+// Test utilities and mocks for StringRay Framework testing
 
 import * as fs from "fs";
 import * as path from "path";
@@ -415,7 +415,7 @@ export class MockContextFactory {
       },
       frameworkAlignment: {
         "oh-my-opencode": "v2.12.0",
-        "StrRay Framework": "v1.0.0",
+        "StringRay Framework": "v1.0.0",
       },
       errorPreventionTarget: 0.996,
     };

@@ -1,5 +1,5 @@
 /**
- * StrRay Framework v1.0.0 - Boot Orchestrator
+ * StringRay Framework v1.0.0 - Boot Orchestrator
  *
  * Implements orchestrator-first boot sequence with automatic enforcement activation.
  * Coordinates the initialization of all framework components in the correct order.
@@ -8,8 +8,8 @@
  * @since 2026-01-07
  */
 
-import { StrRayContextLoader } from "./context-loader.js";
-import { StrRayStateManager } from "./state/state-manager.js";
+import { StringRayContextLoader } from "./context-loader.js";
+import { StringRayStateManager } from "./state/state-manager.js";
 import { ProcessorManager } from "./processors/processor-manager.js";
 import { pathResolver } from "./utils/path-resolver.js";
 // Path configuration - can be overridden by environment or use path resolver
@@ -103,21 +103,21 @@ export interface BootResult {
 }
 
 export class BootOrchestrator {
-  private contextLoader: StrRayContextLoader;
-  private stateManager: StrRayStateManager;
+  private contextLoader: StringRayContextLoader;
+  private stateManager: StringRayStateManager;
   private processorManager: ProcessorManager;
   private config: BootSequenceConfig;
 
   constructor(
     config: Partial<BootSequenceConfig> = {},
-    stateManager?: StrRayStateManager,
+    stateManager?: StringRayStateManager,
   ) {
     // Set up graceful shutdown handling first
     setupGracefulShutdown();
 
     // Initialize components first for state management
-    this.contextLoader = StrRayContextLoader.getInstance();
-    this.stateManager = stateManager || new StrRayStateManager();
+    this.contextLoader = StringRayContextLoader.getInstance();
+    this.stateManager = stateManager || new StringRayStateManager();
     this.processorManager = new ProcessorManager(this.stateManager);
 
     // Initialize memory monitoring with alerts
@@ -296,15 +296,12 @@ export class BootOrchestrator {
         "success",
       );
 
-      this.processorManager.registerProcessor({
-        name: "refactoringLogging",
-        type: "post",
-        priority: 140,
-        enabled: true,
-      });
+      // Register the refactoring logging processor with its hook
+      const { refactoringLoggingProcessor } = await import("./processors/refactoring-logging-processor.js");
+      this.processorManager.registerProcessorWithHook(refactoringLoggingProcessor);
       frameworkLogger.log(
         "boot-orchestrator",
-        "registered refactoringLogging processor",
+        "registered refactoringLogging processor with hook",
         "success",
       );
 
@@ -369,7 +366,7 @@ export class BootOrchestrator {
         const agentModule = await import(agentPath);
         const agentClass =
           agentModule[
-            `StrRay${agentName.charAt(0).toUpperCase() + agentName.slice(1)}Agent`
+            `StringRay${agentName.charAt(0).toUpperCase() + agentName.slice(1)}Agent`
           ];
 
         if (agentClass) {
@@ -686,14 +683,14 @@ export class BootOrchestrator {
     try {
       frameworkLogger.log(
         "boot-orchestrator",
-        "loading StrRay configuration",
+        "loading StringRay configuration",
         "info",
       );
-      // Phase 0: Load StrRay configuration from Python ConfigManager
-      await this.loadStrRayConfiguration();
+      // Phase 0: Load StringRay configuration from Python ConfigManager
+      await this.loadStringRayConfiguration();
       frameworkLogger.log(
         "boot-orchestrator",
-        "StrRay configuration loaded",
+        "StringRay configuration loaded",
         "success",
       );
       // Phase 1: Initialize core systems
@@ -823,93 +820,54 @@ export class BootOrchestrator {
   }
 
   /**
-   * Load StrRay configuration from Python ConfigManager
+   * Load StringRay configuration from Python ConfigManager
    */
-  private async loadStrRayConfiguration(): Promise<void> {
+  private async loadStringRayConfiguration(): Promise<void> {
     try {
-      // Import Python ConfigManager via dynamic import
-      const { spawn } = await import("child_process");
-      const { promisify } = await import("util");
+      // Load StringRay configuration directly (no Python dependency)
+      const stringRayConfig = {
+        version: "1.0.0",
+        codex_enabled: true,
+        codex_version: "v1.2.20",
+        codex_terms: [
+          1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+          21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
+          41, 42, 43
+        ],
+        monitoring_metrics: [
+          "bundle-size", "test-coverage", "code-duplication", "build-time", "error-rate"
+        ],
+        monitoring_alerts: [
+          "threshold-violations", "security-issues", "performance-degradation", "test-failures"
+        ],
+        agent_capabilities: {
+          enforcer: ["compliance-monitoring", "threshold-enforcement", "automation-orchestration"],
+          architect: ["design-review", "architecture-validation", "dependency-analysis"],
+          orchestrator: ["task-coordination", "multi-agent-orchestration", "workflow-management"],
+          "bug-triage-specialist": ["error-analysis", "root-cause-identification", "fix-suggestions"],
+          "code-reviewer": ["code-quality-assessment", "best-practice-validation", "security-review"],
+          "security-auditor": ["vulnerability-detection", "threat-analysis", "security-validation"],
+          refactorer: ["code-modernization", "debt-reduction", "consolidation"],
+          "test-architect": ["test-strategy-design", "coverage-optimization", "behavioral-testing"]
+        }
+      };
 
-      // Execute Python script to get configuration
-      const pythonScript = `
-import sys
-import json
-sys.path.insert(0, 'src')
-from strray.config.manager import ConfigManager
+      // Store configuration in state manager for use by other components
+      this.stateManager.set("strray:config", stringRayConfig);
+      this.stateManager.set("strray:version", stringRayConfig.version);
+      this.stateManager.set("strray:codex_enabled", stringRayConfig.codex_enabled);
+      this.stateManager.set("strray:codex_terms", stringRayConfig.codex_terms);
+      this.stateManager.set("strray:monitoring_metrics", stringRayConfig.monitoring_metrics);
+      this.stateManager.set("strray:monitoring_alerts", stringRayConfig.monitoring_alerts);
+      this.stateManager.set("strray:agent_capabilities", stringRayConfig.agent_capabilities);
 
-config_manager = ConfigManager()
-strray_config = {
-    'version': config_manager.get_value('strray_version'),
-    'codex_enabled': config_manager.get_value('codex_enabled'),
-    'codex_version': config_manager.get_value('codex_version'),
-    'codex_terms': config_manager.get_value('codex_terms'),
-    'monitoring_metrics': config_manager.get_value('monitoring_metrics'),
-    'monitoring_alerts': config_manager.get_value('monitoring_alerts'),
-    'agent_capabilities': config_manager.get_value('agent_capabilities')
-}
-print(json.dumps(strray_config))
-`;
-
-      const child = spawn("python3", ["-c", pythonScript], {
-        cwd: process.cwd(),
-        stdio: ["ignore", "pipe", "pipe"],
-      });
-
-      let stdout = "";
-      let stderr = "";
-
-      child.stdout?.on("data", (data) => {
-        stdout += data.toString();
-      });
-
-      child.stderr?.on("data", (data) => {
-        stderr += data.toString();
-      });
-
-      await new Promise((resolve, reject) => {
-        child.on("close", (code) => {
-          if (code === 0) {
-            resolve(undefined);
-          } else {
-            reject(new Error(`Python config loading failed: ${stderr}`));
-          }
-        });
-        child.on("error", reject);
-      });
-
-      if (stdout.trim()) {
-        const strrayConfig = JSON.parse(stdout.trim());
-
-        // Store configuration in state manager for use by other components
-        this.stateManager.set("strray:config", strrayConfig);
-        this.stateManager.set("strray:version", strrayConfig.version);
-        this.stateManager.set(
-          "strray:codex_enabled",
-          strrayConfig.codex_enabled,
-        );
-        this.stateManager.set("strray:codex_terms", strrayConfig.codex_terms);
-        this.stateManager.set(
-          "strray:monitoring_metrics",
-          strrayConfig.monitoring_metrics,
-        );
-        this.stateManager.set(
-          "strray:monitoring_alerts",
-          strrayConfig.monitoring_alerts,
-        );
-        this.stateManager.set(
-          "strray:agent_capabilities",
-          strrayConfig.agent_capabilities,
-        );
-
-        console.log("✅ StrRay configuration loaded from Python ConfigManager");
-      }
+      console.log("✅ StringRay configuration loaded successfully");
     } catch (error) {
       console.warn(
-        "⚠️ Failed to load StrRay configuration from Python ConfigManager:",
+        "⚠️ Failed to load StringRay configuration:",
         error,
       );
-      // Continue with defaults if Python loading fails
+      // Continue with defaults if loading fails
     }
   }
 }

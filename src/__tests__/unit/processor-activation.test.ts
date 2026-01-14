@@ -1,5 +1,5 @@
 /**
- * StrRay Framework v1.0.0 - Processor Activation Tests
+ * StringRay Framework v1.0.0 - Processor Activation Tests
  *
  * Comprehensive tests for the processor activation system including:
  * - Registration/deregistration
@@ -16,16 +16,16 @@ import {
   ProcessorManager,
   ProcessorResult,
 } from "../../processors/processor-manager";
-import { StrRayStateManager } from "../../state/state-manager";
+import { StringRayStateManager } from "../../state/state-manager";
 import { setupStandardMocks } from "../utils/test-utils";
 
 describe("Processor Activation", () => {
   let processorManager: ProcessorManager;
-  let stateManager: StrRayStateManager;
+  let stateManager: StringRayStateManager;
 
   beforeEach(() => {
     setupStandardMocks();
-    stateManager = new StrRayStateManager(
+    stateManager = new StringRayStateManager(
       `/test/state-processor-${Date.now()}.json`,
     );
     processorManager = new ProcessorManager(stateManager);

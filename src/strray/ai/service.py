@@ -1,4 +1,4 @@
-"""AI service integration for StrRay agents."""
+"""AI service integration for StringRay agents."""
 
 import asyncio
 from typing import Dict, Any, Optional

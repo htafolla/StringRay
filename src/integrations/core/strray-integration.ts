@@ -1,7 +1,7 @@
 /**
- * StrRay Framework v1.0.0 - Cross-Framework Integration Core
+ * StringRay Framework v1.0.0 - Cross-Framework Integration Core
  *
- * Framework-agnostic integration layer enabling StrRay Framework adoption
+ * Framework-agnostic integration layer enabling StringRay Framework adoption
  * across React, Vue, Angular, Svelte, and other frontend frameworks.
  *
  * @version 1.0.0
@@ -9,7 +9,7 @@
  */
 
 import { EventEmitter } from "events";
-import { StrRayOrchestrator, TaskDefinition } from "../../orchestrator";
+import { StringRayOrchestrator, TaskDefinition } from "../../orchestrator";
 import { securityHardeningSystem } from "../../security/security-hardening-system";
 import { enterpriseMonitoringSystem } from "../../monitoring/enterprise-monitoring-system";
 import { performanceSystem } from "../../performance/performance-system-orchestrator";
@@ -161,13 +161,13 @@ export interface MonitoringIntegrationData {
 }
 
 /**
- * Core StrRay Framework integration orchestrator
+ * Core StringRay Framework integration orchestrator
  */
-export class StrRayIntegration extends EventEmitter {
+export class StringRayIntegration extends EventEmitter {
   private adapter: FrameworkAdapter | null = null;
   private config: IntegrationConfig;
   private initialized = false;
-  private orchestrator: StrRayOrchestrator | null = null;
+  private orchestrator: StringRayOrchestrator | null = null;
   private agents: Map<string, any> = new Map();
   private codex: any = null;
 
@@ -200,7 +200,7 @@ export class StrRayIntegration extends EventEmitter {
 
     try {
       console.log(
-        `🚀 Initializing StrRay Framework integration for ${this.config.framework}`,
+        `🚀 Initializing StringRay Framework integration for ${this.config.framework}`,
       );
 
       // Detect and create framework adapter
@@ -209,7 +209,7 @@ export class StrRayIntegration extends EventEmitter {
       // Initialize framework adapter
       await this.adapter.initialize(this.config);
 
-      // Initialize core StrRay components
+      // Initialize core StringRay components
       await this.initializeCoreComponents();
 
       // Setup framework-specific integrations
@@ -224,11 +224,11 @@ export class StrRayIntegration extends EventEmitter {
       });
 
       console.log(
-        `✅ StrRay Framework integration initialized for ${this.config.framework} v${this.config.version}`,
+        `✅ StringRay Framework integration initialized for ${this.config.framework} v${this.config.version}`,
       );
     } catch (error) {
       console.error(
-        "❌ Failed to initialize StrRay Framework integration:",
+        "❌ Failed to initialize StringRay Framework integration:",
         error,
       );
       throw error;
@@ -245,7 +245,7 @@ export class StrRayIntegration extends EventEmitter {
 
     try {
       console.log(
-        `🛑 Destroying StrRay Framework integration for ${this.config.framework}`,
+        `🛑 Destroying StringRay Framework integration for ${this.config.framework}`,
       );
 
       // Destroy framework adapter
@@ -264,11 +264,11 @@ export class StrRayIntegration extends EventEmitter {
       });
 
       console.log(
-        `✅ StrRay Framework integration destroyed for ${this.config.framework}`,
+        `✅ StringRay Framework integration destroyed for ${this.config.framework}`,
       );
     } catch (error) {
       console.error(
-        "❌ Failed to destroy StrRay Framework integration:",
+        "❌ Failed to destroy StringRay Framework integration:",
         error,
       );
       throw error;
@@ -506,11 +506,11 @@ export class StrRayIntegration extends EventEmitter {
   }
 
   /**
-   * Initialize core StrRay components
+   * Initialize core StringRay components
    */
   private async initializeCoreComponents(): Promise<void> {
     // Initialize orchestrator
-    this.orchestrator = new StrRayOrchestrator({
+    this.orchestrator = new StringRayOrchestrator({
       maxConcurrentTasks: 5,
       taskTimeout: 300000,
       conflictResolutionStrategy: "majority_vote",
@@ -529,7 +529,7 @@ export class StrRayIntegration extends EventEmitter {
   }
 
   /**
-   * Destroy core StrRay components
+   * Destroy core StringRay components
    */
   private async destroyCoreComponents(): Promise<void> {
     // Destroy orchestrator
@@ -583,7 +583,7 @@ export class StrRayIntegration extends EventEmitter {
   private ensureInitialized(): void {
     if (!this.initialized) {
       throw new Error(
-        "StrRay Framework integration not initialized. Call initialize() first.",
+        "StringRay Framework integration not initialized. Call initialize() first.",
       );
     }
   }
@@ -650,15 +650,15 @@ export class StrRayIntegration extends EventEmitter {
 }
 
 // Export singleton factory function
-export const createStrRayIntegration = (
+export const createStringRayIntegration = (
   config: IntegrationConfig,
-): StrRayIntegration => {
-  return new StrRayIntegration(config);
+): StringRayIntegration => {
+  return new StringRayIntegration(config);
 };
 
 // Export default integration for auto-detection
-export const strRayIntegration = new StrRayIntegration({
-  framework: StrRayIntegration.detectFramework(),
+export const strRayIntegration = new StringRayIntegration({
+  framework: StringRayIntegration.detectFramework(),
   version: "1.0.0",
   features: {
     agents: true,

@@ -1,5 +1,5 @@
 /**
- * StrRay Context Loader
+ * StringRay Context Loader
  *
  * Loads Universal Development Codex v1.2.20 context for agent initialization.
  * Provides structured access to 30+ codex terms, interweaves, lenses, and anti-patterns.
@@ -42,11 +42,11 @@ export interface ContextLoadResult {
     warnings: string[];
 }
 /**
- * StrRay Context Loader
+ * StringRay Context Loader
  *
  * Loads and parses the Universal Development Codex v1.2.20 from codex.json
  */
-export declare class StrRayContextLoader {
+export declare class StringRayContextLoader {
     private static instance;
     private cachedContext;
     private codexFilePaths;
@@ -54,7 +54,7 @@ export declare class StrRayContextLoader {
     /**
      * Get singleton instance
      */
-    static getInstance(): StrRayContextLoader;
+    static getInstance(): StringRayContextLoader;
     /**
      * Load codex context
      *
@@ -118,5 +118,5 @@ export declare class StrRayContextLoader {
 /**
  * Export singleton instance
  */
-export declare const strRayContextLoader: StrRayContextLoader;
+export declare const strRayContextLoader: StringRayContextLoader;
 //# sourceMappingURL=context-loader.d.ts.map

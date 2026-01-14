@@ -1,5 +1,5 @@
 /**
- * StrRay Framework v1.0.0 - Orchestrator Agent
+ * StringRay Framework v1.0.0 - Orchestrator Agent
  *
  * Coordinates multi-step tasks and delegates to specialized subagents.
  * Implements Sisyphus integration for relentless execution.
@@ -41,7 +41,7 @@ export interface TestFailureContext {
   sessionId?: string;
 }
 
-export class StrRayOrchestrator {
+export class StringRayOrchestrator {
   private config: OrchestratorConfig;
   private activeTasks: Map<string, Promise<TaskResult>> = new Map();
   private taskToAgentMap: Map<string, string> = new Map(); // taskId -> agentId
@@ -637,4 +637,4 @@ export class StrRayOrchestrator {
 }
 
 // Export singleton instance
-export const strRayOrchestrator = new StrRayOrchestrator();
+export const strRayOrchestrator = new StringRayOrchestrator();

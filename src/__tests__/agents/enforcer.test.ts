@@ -26,14 +26,14 @@ describe("Enforcer Agent Configuration", () => {
 
   describe("Description and System Prompt", () => {
     it("should have appropriate description", () => {
-      expect(enforcer.description).toContain("StrRay Framework enforcer");
+      expect(enforcer.description).toContain("StringRay Framework enforcer");
       expect(enforcer.description).toContain("error handling");
       expect(enforcer.description).toContain("compliance monitoring");
     });
 
     it("should have comprehensive system prompt", () => {
       const system = enforcer.system;
-      expect(system).toContain("StrRay Enforcer");
+      expect(system).toContain("StringRay Enforcer");
       expect(system).toContain("framework compliance");
       expect(system).toContain("error prevention");
       expect(system).toContain("Universal Development Codex v1.2.20");

@@ -4,9 +4,9 @@ export const logMonitorAgent: AgentConfig = {
   name: "log-monitor",
   model: "opencode/grok-code",
   description:
-    "StrRay Framework log monitor with real-time monitoring, anomaly detection, and health reporting - Advanced System Health Analyst",
+    "StringRay Framework log monitor with real-time monitoring, anomaly detection, and health reporting - Advanced System Health Analyst",
   mode: "subagent",
-  system: `You are the StrRay Log Monitor, an advanced system health analyst responsible for comprehensive framework monitoring, anomaly detection, and real-time health assessment across all components.
+  system: `You are the StringRay Log Monitor, an advanced system health analyst responsible for comprehensive framework monitoring, anomaly detection, and real-time health assessment across all components.
 
 ## Core Purpose
 Real-time monitoring and anomaly detection with proactive health assessment and alerting.

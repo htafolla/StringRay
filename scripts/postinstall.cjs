@@ -9,7 +9,7 @@ const path = require('path');
 const os = require('os');
 
 // Create a marker file to prove the script ran
-const markerPath = path.join(os.tmpdir(), 'strray-postinstall-ran');
+const markerPath = path.join(os.tmpdir(), 'stringray-postinstall-ran');
 try {
   fs.writeFileSync(markerPath, new Date().toISOString());
   console.log('✅ StrRay Plugin postinstall executed successfully');
@@ -78,7 +78,7 @@ function configureStrRayPlugin() {
     config.plugin = [];
   }
 
-  const pluginPath = "strray/dist/plugin/strray-codex-injection.js";
+  const pluginPath = "stringray/dist/plugin/stringray-codex-injection.js";
 
   if (!config.plugin.includes(pluginPath)) {
     config.plugin.push(pluginPath);
@@ -93,7 +93,7 @@ function configureStrRayPlugin() {
   }
 
   // Add StrRay-specific agents (only valid opencode agent config)
-  const strrayAgents = {
+  const stringrayAgents = {
     "orchestrator": { "model": "opencode/grok-code" },
     "enhanced-orchestrator": { "model": "opencode/grok-code" },
     "enforcer": { "model": "opencode/grok-code" },
@@ -106,7 +106,7 @@ function configureStrRayPlugin() {
   };
 
   let agentsAdded = 0;
-  for (const [agentName, agentConfig] of Object.entries(strrayAgents)) {
+  for (const [agentName, agentConfig] of Object.entries(stringrayAgents)) {
     if (!config.agent[agentName]) {
       config.agent[agentName] = agentConfig;
       agentsAdded++;
@@ -168,14 +168,14 @@ function configureStrRayPlugin() {
 
 function createStrRayConfig() {
   // Create StrRay-specific configuration in a separate file
-  const strrayConfigPath = path.join(os.homedir(), ".strray", "config.json");
-  const strrayDir = path.dirname(strrayConfigPath);
+  const stringrayConfigPath = path.join(os.homedir(), ".strray", "config.json");
+  const stringrayDir = path.dirname(stringrayConfigPath);
 
-  if (!fs.existsSync(strrayDir)) {
-    fs.mkdirSync(strrayDir, { recursive: true });
+  if (!fs.existsSync(stringrayDir)) {
+    fs.mkdirSync(stringrayDir, { recursive: true });
   }
 
-  const strrayConfig = {
+  const stringrayConfig = {
     enabled: true,
     maxConcurrentAgents: 5,
     codexEnforcement: true,
@@ -184,8 +184,8 @@ function createStrRayConfig() {
   };
 
   try {
-    fs.writeFileSync(strrayConfigPath, JSON.stringify(strrayConfig, null, 2));
-    console.log(`✅ Created StrRay configuration at ${strrayConfigPath}`);
+    fs.writeFileSync(stringrayConfigPath, JSON.stringify(stringrayConfig, null, 2));
+    console.log(`✅ Created StrRay configuration at ${stringrayConfigPath}`);
   } catch (error) {
     console.warn(`⚠️ Could not create StrRay config: ${error.message}`);
   }
@@ -210,6 +210,6 @@ try {
   console.error('❌ [StrRay Postinstall] Stack trace:', error.stack);
   console.log('\n🔧 [StrRay Postinstall] Manual Configuration:');
   console.log('Add the following to your .opencode/oh-my-opencode.json:');
-    console.log(`"plugin": ["strray/dist/plugin/strray-codex-injection.js"]`);
+    console.log(`"plugin": ["stringray/dist/plugin/stringray-codex-injection.js"]`);
   process.exit(1);
 }

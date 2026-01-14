@@ -1,17 +1,17 @@
 import { describe, test, expect, beforeEach, afterEach } from "vitest";
-import { StrRayStateManager } from "../../state/state-manager";
+import { StringRayStateManager } from "../../state/state-manager";
 import { SessionCoordinator } from "../../delegation/session-coordinator";
 import { SessionStateManager } from "../../session/session-state-manager";
 import { setupStandardMocks, waitForDebounce } from "../utils/test-utils";
 
 describe("Cross-Session State Sharing", () => {
-  let stateManager: StrRayStateManager;
+  let stateManager: StringRayStateManager;
   let sessionCoordinator: any;
   let stateManagerInstance: any;
 
   beforeEach(async () => {
     setupStandardMocks();
-    stateManager = new StrRayStateManager();
+    stateManager = new StringRayStateManager();
     await new Promise((resolve) => setTimeout(resolve, 10)); // Wait for initialization
     sessionCoordinator = new SessionCoordinator(stateManager);
     stateManagerInstance = new SessionStateManager(

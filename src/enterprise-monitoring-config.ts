@@ -1,5 +1,5 @@
 /**
- * StrRay Framework v1.0.0 - Enterprise Monitoring Configuration
+ * StringRay Framework v1.0.0 - Enterprise Monitoring Configuration
  *
  * Configuration templates and deployment guides for enterprise-scale monitoring.
  *
@@ -85,7 +85,7 @@ export const basicEnterpriseConfig: Partial<EnterpriseMonitoringConfig> = {
     newrelic: {
       enabled: false,
       licenseKey: "",
-      appName: "StrRay Framework",
+      appName: "StringRay Framework",
       distributedTracing: true,
       aiMonitoring: true,
     },
@@ -93,7 +93,7 @@ export const basicEnterpriseConfig: Partial<EnterpriseMonitoringConfig> = {
       enabled: false,
       webhookUrl: "",
       channel: "#alerts",
-      username: "StrRay Monitor",
+      username: "StringRay Monitor",
     },
     pagerduty: {
       enabled: false,
@@ -313,7 +313,7 @@ export const advancedEnterpriseConfig: EnterpriseMonitoringConfig = {
     newrelic: {
       enabled: true,
       licenseKey: process.env.NEW_RELIC_LICENSE_KEY || "",
-      appName: "StrRay Framework",
+      appName: "StringRay Framework",
       distributedTracing: true,
       aiMonitoring: true,
     },
@@ -321,7 +321,7 @@ export const advancedEnterpriseConfig: EnterpriseMonitoringConfig = {
       enabled: true,
       webhookUrl: process.env.SLACK_WEBHOOK_URL || "",
       channel: process.env.SLACK_ALERT_CHANNEL || "#strray-alerts",
-      username: "StrRay Enterprise Monitor",
+      username: "StringRay Enterprise Monitor",
     },
     pagerduty: {
       enabled: true,
@@ -431,7 +431,7 @@ export const advancedEnterpriseConfig: EnterpriseMonitoringConfig = {
         config: {
           smtpHost: process.env.SMTP_HOST,
           recipients: process.env.ALERT_EMAIL_RECIPIENTS?.split(","),
-          subjectPrefix: "[StrRay Enterprise Alert]",
+          subjectPrefix: "[StringRay Enterprise Alert]",
         },
       },
       {
@@ -734,13 +734,13 @@ spec:
  */
 export const cloudFormationTemplate = `
 AWSTemplateFormatVersion: '2010-09-09'
-Description: 'StrRay Enterprise Monitoring Stack'
+Description: 'StringRay Enterprise Monitoring Stack'
 
 Parameters:
   InstanceType:
     Type: String
     Default: t3.medium
-    Description: EC2 instance type for StrRay instances
+    Description: EC2 instance type for StringRay instances
 
   MinInstances:
     Type: Number
@@ -753,22 +753,22 @@ Parameters:
     Description: Maximum number of instances
 
 Resources:
-  StrRayAutoScalingGroup:
+  StringRayAutoScalingGroup:
     Type: AWS::AutoScaling::AutoScalingGroup
     Properties:
       AutoScalingGroupName: strray-enterprise-asg
       LaunchTemplate:
-        LaunchTemplateId: !Ref StrRayLaunchTemplate
-        Version: !GetAtt StrRayLaunchTemplate.LatestVersionNumber
+        LaunchTemplateId: !Ref StringRayLaunchTemplate
+        Version: !GetAtt StringRayLaunchTemplate.LatestVersionNumber
       MinSize: !Ref MinInstances
       MaxSize: !Ref MaxInstances
       DesiredCapacity: !Ref MinInstances
       TargetGroupARNs:
-        - !Ref StrRayTargetGroup
+        - !Ref StringRayTargetGroup
       HealthCheckType: ELB
       HealthCheckGracePeriod: 300
 
-  StrRayLaunchTemplate:
+  StringRayLaunchTemplate:
     Type: AWS::EC2::LaunchTemplate
     Properties:
       LaunchTemplateName: strray-enterprise-lt
@@ -776,24 +776,24 @@ Resources:
         ImageId: ami-12345678  # Replace with actual AMI
         InstanceType: !Ref InstanceType
         SecurityGroupIds:
-          - !Ref StrRaySecurityGroup
+          - !Ref StringRaySecurityGroup
         UserData:
           Fn::Base64: |
             #!/bin/bash
             yum update -y
-            # Install Docker, StrRay, monitoring agents
+            # Install Docker, StringRay, monitoring agents
             systemctl start docker
             docker run -d --name strray strray/strray:v1.0.0
 
-  StrRayLoadBalancer:
+  StringRayLoadBalancer:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
       Name: strray-enterprise-alb
       Type: application
       SecurityGroups:
-        - !Ref StrRaySecurityGroup
+        - !Ref StringRaySecurityGroup
 
-  StrRayTargetGroup:
+  StringRayTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
       Name: strray-enterprise-tg
@@ -805,20 +805,20 @@ Resources:
       HealthyThresholdCount: 2
       UnhealthyThresholdCount: 2
 
-  StrRayScalingPolicy:
+  StringRayScalingPolicy:
     Type: AWS::AutoScaling::ScalingPolicy
     Properties:
-      AutoScalingGroupName: !Ref StrRayAutoScalingGroup
+      AutoScalingGroupName: !Ref StringRayAutoScalingGroup
       PolicyType: TargetTrackingScaling
       TargetTrackingConfiguration:
         PredefinedMetricSpecification:
           PredefinedMetricType: ASGAverageCPUUtilization
         TargetValue: 75.0
 
-  StrRaySecurityGroup:
+  StringRaySecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Security group for StrRay instances
+      GroupDescription: Security group for StringRay instances
       VpcId: !Ref VPC
       SecurityGroupIngress:
         - IpProtocol: tcp
@@ -836,12 +836,12 @@ Resources:
 // =============================================================================
 
 /**
- * Grafana dashboard configuration for StrRay enterprise monitoring
+ * Grafana dashboard configuration for StringRay enterprise monitoring
  */
 export const grafanaDashboardConfig = `
 {
   "dashboard": {
-    "title": "StrRay Enterprise Monitoring",
+    "title": "StringRay Enterprise Monitoring",
     "tags": ["strray", "enterprise", "monitoring"],
     "timezone": "browser",
     "panels": [
@@ -935,22 +935,22 @@ export const grafanaDashboardConfig = `
 // =============================================================================
 
 /**
- * Prometheus alerting rules for StrRay enterprise monitoring
+ * Prometheus alerting rules for StringRay enterprise monitoring
  */
 export const prometheusAlertingRules = `
 groups:
   - name: strray-enterprise
     rules:
-      - alert: StrRayInstanceDown
+      - alert: StringRayInstanceDown
         expr: up{job="strray"} == 0
         for: 5m
         labels:
           severity: critical
         annotations:
-          summary: "StrRay instance {{ $labels.instance }} is down"
-          description: "StrRay instance {{ $labels.instance }} has been down for more than 5 minutes."
+          summary: "StringRay instance {{ $labels.instance }} is down"
+          description: "StringRay instance {{ $labels.instance }} has been down for more than 5 minutes."
 
-      - alert: StrRayHighCPUUsage
+      - alert: StringRayHighCPUUsage
         expr: rate(process_cpu_user_seconds_total{job="strray"}[5m]) * 100 > 85
         for: 10m
         labels:
@@ -959,7 +959,7 @@ groups:
           summary: "High CPU usage on {{ $labels.instance }}"
           description: "CPU usage is {{ $value }}% for more than 10 minutes."
 
-      - alert: StrRayHighMemoryUsage
+      - alert: StringRayHighMemoryUsage
         expr: process_resident_memory_bytes{job="strray"} / process_virtual_memory_max_bytes > 0.9
         for: 5m
         labels:
@@ -968,7 +968,7 @@ groups:
           summary: "High memory usage on {{ $labels.instance }}"
           description: "Memory usage is above 90% for more than 5 minutes."
 
-      - alert: StrRayHighErrorRate
+      - alert: StringRayHighErrorRate
         expr: rate(strray_errors_total[5m]) / rate(strray_requests_total[5m]) > 0.05
         for: 5m
         labels:
@@ -977,7 +977,7 @@ groups:
           summary: "High error rate on {{ $labels.instance }}"
           description: "Error rate is {{ $value }}% for more than 5 minutes."
 
-      - alert: StrRaySlowResponseTime
+      - alert: StringRaySlowResponseTime
         expr: histogram_quantile(0.95, rate(strray_request_duration_seconds_bucket[5m])) > 5
         for: 10m
         labels:
@@ -986,7 +986,7 @@ groups:
           summary: "Slow response time on {{ $labels.instance }}"
           description: "95th percentile response time is {{ $value }}s for more than 10 minutes."
 
-      - alert: StrRayAgentFailures
+      - alert: StringRayAgentFailures
         expr: increase(strray_agent_task_failures_total[10m]) > 10
         for: 5m
         labels:
@@ -995,13 +995,13 @@ groups:
           summary: "High agent task failure rate"
           description: "Agent task failures increased by {{ $value }} in the last 10 minutes."
 
-      - alert: StrRayClusterUnhealthy
+      - alert: StringRayClusterUnhealthy
         expr: count(up{job="strray"} == 1) / count(up{job="strray"}) < 0.5
         for: 5m
         labels:
           severity: critical
         annotations:
-          summary: "StrRay cluster is unhealthy"
+          summary: "StringRay cluster is unhealthy"
           description: "Less than 50% of cluster instances are healthy."
 `;
 

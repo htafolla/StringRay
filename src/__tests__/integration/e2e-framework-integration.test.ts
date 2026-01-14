@@ -9,7 +9,7 @@ import {
   afterAll,
 } from "vitest";
 import { BootOrchestrator } from "../../boot-orchestrator";
-import { StrRayOrchestrator } from "../../orchestrator";
+import { StringRayOrchestrator } from "../../orchestrator";
 import {
   createSessionCoordinator,
   SessionCoordinator,
@@ -19,7 +19,7 @@ import {
   AgentDelegator,
 } from "../../delegation/agent-delegator";
 import { ProcessorManager } from "../../processors/processor-manager";
-import { StrRayStateManager } from "../../state/state-manager";
+import { StringRayStateManager } from "../../state/state-manager";
 import { SecurityAuditor } from "../../security/security-auditor";
 import { createSessionMonitor } from "../../session/session-monitor";
 import { createSessionCleanupManager } from "../../session/session-cleanup-manager";
@@ -35,6 +35,11 @@ vi.mock("fs", () => ({
   readFileSync: vi.fn(),
   readdirSync: vi.fn(),
   statSync: vi.fn(),
+  mkdirSync: vi.fn(),
+  writeFileSync: vi.fn(),
+  appendFileSync: vi.fn(),
+  unlinkSync: vi.fn(),
+  rmdirSync: vi.fn(),
 }));
 
 vi.mock("path", () => ({
@@ -51,8 +56,8 @@ vi.mock("crypto", () => ({
   randomBytes: vi.fn(() => Buffer.from("mock-random")),
 }));
 
-describe("StrRay Framework End-to-End Integration Tests", () => {
-  let stateManager: StrRayStateManager;
+describe("StringRay Framework End-to-End Integration Tests", () => {
+  let stateManager: StringRayStateManager;
   let bootOrchestrator: BootOrchestrator;
   let sessionCoordinator: SessionCoordinator;
   let agentDelegator: AgentDelegator;
@@ -126,7 +131,7 @@ describe("StrRay Framework End-to-End Integration Tests", () => {
     vi.clearAllMocks();
 
     // Reset state manager
-    stateManager = new StrRayStateManager();
+    stateManager = new StringRayStateManager();
 
     // Initialize core components
     sessionCoordinator = createSessionCoordinator(stateManager);
@@ -171,7 +176,7 @@ describe("StrRay Framework End-to-End Integration Tests", () => {
         expect(bootResult.errors).toHaveLength(0);
 
         // Verify orchestrator is loaded and accessible
-        const orchestrator = new StrRayOrchestrator();
+        const orchestrator = new StringRayOrchestrator();
         expect(orchestrator).toBeDefined();
         expect(typeof orchestrator.executeComplexTask).toBe("function");
 
@@ -212,7 +217,7 @@ describe("StrRay Framework End-to-End Integration Tests", () => {
       expect(sessionResult.sessionId).toBe("test-session-1");
 
       // Get orchestrator instance
-      const orchestrator = new StrRayOrchestrator();
+      const orchestrator = new StringRayOrchestrator();
 
       // Define test tasks
       const testTasks = [
@@ -276,7 +281,7 @@ describe("StrRay Framework End-to-End Integration Tests", () => {
         // Phase 3: Initialize session and orchestrator task execution
         sessionCoordinator.initializeSession("boot-session");
 
-        const orchestrator = new StrRayOrchestrator();
+        const orchestrator = new StringRayOrchestrator();
         const sessionTasks = [
           {
             id: "session-init",
@@ -315,11 +320,11 @@ describe("StrRay Framework End-to-End Integration Tests", () => {
       expect(typeof bootResult.success).toBe("boolean");
 
       // But core components should still be accessible for recovery
-      const recoveryStateManager = new StrRayStateManager();
+      const recoveryStateManager = new StringRayStateManager();
       expect(recoveryStateManager).toBeDefined();
 
       // Core components should be recoverable independently
-      const recoveryOrchestrator = new StrRayOrchestrator();
+      const recoveryOrchestrator = new StringRayOrchestrator();
       expect(recoveryOrchestrator).toBeDefined();
 
       // Session coordinator should be recoverable
@@ -786,7 +791,7 @@ describe("StrRay Framework End-to-End Integration Tests", () => {
         );
 
         // Phase 5: Orchestrator Task Execution
-        const orchestrator = new StrRayOrchestrator();
+        const orchestrator = new StringRayOrchestrator();
         const workflowTasks = [
           {
             id: "security-validation",
@@ -935,7 +940,7 @@ describe("StrRay Framework End-to-End Integration Tests", () => {
       ];
 
       // Create complex task requiring multiple agents
-      const orchestrator = new StrRayOrchestrator();
+      const orchestrator = new StringRayOrchestrator();
       const complexTasks = [
         {
           id: "design-phase",
@@ -986,7 +991,7 @@ describe("StrRay Framework End-to-End Integration Tests", () => {
         sessionCoordinator.initializeSession("resilience-session");
 
       // Simulate various failure scenarios
-      const orchestrator = new StrRayOrchestrator();
+      const orchestrator = new StringRayOrchestrator();
 
       // Test 1: Partial task failure
       const failingTasks = [
@@ -1054,7 +1059,7 @@ describe("StrRay Framework End-to-End Integration Tests", () => {
 
     it("should validate performance under concurrent workflow load", async () => {
       const sessionCoordinator = createSessionCoordinator(stateManager);
-      const orchestrator = new StrRayOrchestrator();
+      const orchestrator = new StringRayOrchestrator();
 
       // Create multiple concurrent sessions
       const sessionCount = 5;
@@ -1137,7 +1142,7 @@ describe("StrRay Framework End-to-End Integration Tests", () => {
       expect(bootResult.success).toBe(true); // Boot succeeds with warnings for missing agents
 
       // Verify partial recovery is possible
-      const recoveryStateManager = new StrRayStateManager();
+      const recoveryStateManager = new StringRayStateManager();
       expect(recoveryStateManager).toBeDefined();
 
       // Core components should still be instantiable
@@ -1267,7 +1272,7 @@ describe("StrRay Framework End-to-End Integration Tests", () => {
   describe("Performance and Load Testing", () => {
     it("should maintain performance under high concurrent load", async () => {
       const sessionCoordinator = createSessionCoordinator(stateManager);
-      const orchestrator = new StrRayOrchestrator();
+      const orchestrator = new StringRayOrchestrator();
 
       const concurrentSessions = 10;
       const tasksPerSession = 5;
@@ -1337,7 +1342,7 @@ describe("StrRay Framework End-to-End Integration Tests", () => {
 
     it.skip("should validate system stability under prolonged operation", async () => {
       const sessionCoordinator = createSessionCoordinator(stateManager);
-      const orchestrator = new StrRayOrchestrator();
+      const orchestrator = new StringRayOrchestrator();
 
       const testDuration = 5000; // 5 seconds
       const startTime = Date.now();
@@ -1385,7 +1390,7 @@ describe("StrRay Framework End-to-End Integration Tests", () => {
     });
 
     it("should benchmark orchestrator performance across different task complexities", async () => {
-      const orchestrator = new StrRayOrchestrator();
+      const orchestrator = new StringRayOrchestrator();
 
       const testCases = [
         {

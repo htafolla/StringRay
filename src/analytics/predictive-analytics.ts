@@ -1,5 +1,5 @@
 /**
- * StrRay Framework v1.0.0 - Predictive Analytics System
+ * StringRay Framework v1.0.0 - Predictive Analytics System
  *
  * Analyzes agent performance patterns and predicts optimal delegation strategies.
  * Uses historical data to optimize task assignment and improve framework efficiency.
@@ -55,7 +55,7 @@ export interface AnalyticsReport {
   underutilizedAgents: string[];
 }
 
-export class StrRayPredictiveAnalytics {
+export class StringRayPredictiveAnalytics {
   private agentMetrics = new Map<string, AgentPerformanceMetrics>();
   private taskHistory: Array<{
     taskId: string;
@@ -555,4 +555,4 @@ export class StrRayPredictiveAnalytics {
   }
 }
 
-export const predictiveAnalytics = new StrRayPredictiveAnalytics();
+export const predictiveAnalytics = new StringRayPredictiveAnalytics();

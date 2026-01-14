@@ -1,5 +1,5 @@
 /**
- * Test Auto-Healing System for StrRay Framework
+ * Test Auto-Healing System for StringRay Framework
  *
  * Automatically detects slow/failing tests and orchestrates fixes using specialized agents
  * Implements intelligent test optimization and refactoring for enterprise reliability

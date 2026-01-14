@@ -1,11 +1,11 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { StrRayOrchestrator, TaskDefinition } from "../../../orchestrator.js";
+import { StringRayOrchestrator, TaskDefinition } from "../../../orchestrator.js";
 
 describe("Orchestrator Dependency Handling", () => {
-  let orchestrator: StrRayOrchestrator;
+  let orchestrator: StringRayOrchestrator;
 
   beforeEach(() => {
-    orchestrator = new StrRayOrchestrator({
+    orchestrator = new StringRayOrchestrator({
       maxConcurrentTasks: 2,
       taskTimeout: 15000,
     });

@@ -14,7 +14,7 @@ const STATE_PATH = process.env.STRRAY_STATE_PATH || '../dist/state';
 const ENFORCEMENT_PATH = process.env.STRRAY_ENFORCEMENT_PATH || '../dist/enforcement';
 
 // Dynamic imports for cross-environment compatibility
-const [{ ProcessorManager }, { StrRayStateManager }, { ruleEnforcer }] = await Promise.all([
+const [{ ProcessorManager }, { StringRayStateManager }, { ruleEnforcer }] = await Promise.all([
   import(PROCESSORS_PATH + '/processor-manager.js'),
   import(STATE_PATH + '/state-manager.js'),
   import(ENFORCEMENT_PATH + '/rule-enforcer.js')
@@ -104,7 +104,7 @@ async function validatePhase1() {
   totalTests++;
 
   try {
-    const stateManager = new StrRayStateManager();
+    const stateManager = new StringRayStateManager();
     const processorManager = new ProcessorManager(stateManager);
 
     // Test processor execution
@@ -135,7 +135,7 @@ async function validatePhase1() {
   totalTests++;
 
   try {
-    const stateManager = new StrRayStateManager();
+    const stateManager = new StringRayStateManager();
     const processorManager = new ProcessorManager(stateManager);
 
     const complianceContext = {

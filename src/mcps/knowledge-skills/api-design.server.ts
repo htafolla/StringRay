@@ -16,10 +16,17 @@ class StrRayApiDesignServer {
   private server: Server;
 
   constructor() {
-    this.server = new Server({
-      name: "strray-api-design",
-      version: "1.0.0",
-    });
+        this.server = new Server(
+      {
+        name: "strray-api-design",
+        version: "1.0.0",
+      },
+      {
+        capabilities: {
+          tools: {},
+        },
+      }
+    );
 
     this.setupToolHandlers();
     console.log("StrRay API Design MCP Server initialized");

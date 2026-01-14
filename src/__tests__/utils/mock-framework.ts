@@ -1,4 +1,4 @@
-// Mock implementations for StrRay Framework components
+// Mock implementations for StringRay Framework components
 
 import { vi } from "vitest";
 import { StateManager } from "../../state/state-manager";

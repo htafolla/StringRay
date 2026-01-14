@@ -3,7 +3,7 @@ export interface StateManager {
     set: <T>(key: string, value: T) => void;
     clear: (key: string) => void;
 }
-export declare class StrRayStateManager implements StateManager {
+export declare class StringRayStateManager implements StateManager {
     private store;
     private persistencePath;
     private persistenceEnabled;

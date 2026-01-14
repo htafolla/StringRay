@@ -1,1 +1,0 @@
-bash test-deployment.sh 2>&1 | head -100

@@ -1,4 +1,4 @@
-"""Configuration management for StrRay framework."""
+"""Configuration management for StringRay framework."""
 
 import os
 import json
@@ -7,7 +7,7 @@ from typing import Any, Dict, Optional, List
 
 
 class ConfigManager:
-    """Manages configuration for StrRay agents and services."""
+    """Manages configuration for StringRay agents and services."""
 
     def __init__(self, config_paths: Optional[List[Path]] = None):
         """Initialize config manager with search paths."""
@@ -50,7 +50,7 @@ class ConfigManager:
             "state_dir": ".strray/state",
             "max_concurrent_tasks": 10,
             "timeout_default": 300,
-            # StrRay Framework Configuration
+            # StringRay Framework Configuration
             "strray_version": "1.0.0",
             "codex_enabled": True,
             "codex_version": "v1.2.20",

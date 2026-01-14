@@ -2,13 +2,13 @@
  * Post-Processor Monitoring Engine
  */
 
-import { StrRayStateManager } from "../../state/state-manager.js";
+import { StringRayStateManager } from "../../state/state-manager.js";
 import { SessionMonitor } from "../../session/session-monitor.js";
 import { MonitoringResult } from "../types.js";
 
 export class PostProcessorMonitoringEngine {
   constructor(
-    private stateManager: StrRayStateManager,
+    private stateManager: StringRayStateManager,
     private sessionMonitor?: SessionMonitor,
   ) {}
 

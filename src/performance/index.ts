@@ -1,5 +1,5 @@
 /**
- * StrRay Framework v1.0.0 - Performance Module Index
+ * StringRay Framework v1.0.0 - Performance Module Index
  *
  * Unified exports for the comprehensive performance testing and monitoring system.
  *

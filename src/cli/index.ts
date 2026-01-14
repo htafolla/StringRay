@@ -8,20 +8,20 @@ const program = new Command();
 program
   .name("strray")
   .description(
-    "StrRay Framework - Ship Production-Ready Code & Eliminate Common Dead Ends",
+    "StringRay Framework - Ship Production-Ready Code & Eliminate Common Dead Ends",
   )
   .version("1.0.0");
 
 // Status Command - Basic implementation
 program
   .command("status")
-  .description("Display StrRay Framework system status")
+  .description("Display StringRay Framework system status")
   .option("--detailed", "show detailed system information")
   .option("--json", "output status in JSON format")
   .action(async (options) => {
-    console.log("📊 StrRay Framework Status");
+    console.log("📊 StringRay Framework Status");
     console.log("==========================");
-    console.log("Framework: StrRay v1.0.0");
+    console.log("Framework: StringRay v1.0.0");
     console.log("Environment: development");
     console.log("Status: ✅ Healthy");
     console.log("\n✅ Status check complete.");
@@ -30,10 +30,10 @@ program
 // Install Command - Basic implementation
 program
   .command("install")
-  .description("Interactive setup wizard for StrRay Framework")
+  .description("Interactive setup wizard for StringRay Framework")
   .option("--no-tui", "run in non-interactive mode without TUI")
   .action(async (options) => {
-    console.log("🚀 StrRay Framework Setup Wizard");
+    console.log("🚀 StringRay Framework Setup Wizard");
     console.log("=================================");
 
     console.log("Checking system prerequisites...");
@@ -44,7 +44,7 @@ program
     console.log("✅ Required directories present");
     console.log("✅ Configuration files valid");
 
-    console.log("\n🎉 StrRay Framework installation completed successfully!");
+    console.log("\n🎉 StringRay Framework installation completed successfully!");
     console.log("\nNext steps:");
     console.log("  • Run 'strray doctor' to verify everything is working");
     console.log("  • Run 'strray status' to see system status");
@@ -56,7 +56,7 @@ program
   .description("Environment diagnostics and health checks")
   .option("--category <name>", "check specific category only")
   .action(async (options) => {
-    console.log("🔍 StrRay Framework Doctor");
+    console.log("🔍 StringRay Framework Doctor");
     console.log("==========================");
 
     console.log("Installation");
@@ -65,7 +65,7 @@ program
 
     console.log("Configuration");
     console.log("  ✅ oh-my-opencode.json valid");
-    console.log("  ✅ StrRay config present");
+    console.log("  ✅ StringRay config present");
 
     console.log("Dependencies");
     console.log("  ✅ Core dependencies installed");
@@ -76,7 +76,7 @@ program
 // Run Command - Full orchestrator integration
 program
   .command("run [prompt]")
-  .description("Execute StrRay session with agent orchestration")
+  .description("Execute StringRay session with agent orchestration")
   .option(
     "--enforce-completion",
     "keep session active until all tasks complete",
@@ -95,7 +95,7 @@ program
 
     const startTime = Date.now();
 
-    console.log("🚀 StrRay Session Runner");
+    console.log("🚀 StringRay Session Runner");
     console.log("=======================");
     console.log(`Prompt: "${prompt}"`);
     console.log(`Model: ${options.model}`);
@@ -104,11 +104,11 @@ program
     console.log("\n🔄 Starting orchestration...");
 
     try {
-      // Import StrRay orchestrator
-      const { StrRayOrchestrator } = await import("../orchestrator.js");
+      // Import StringRay orchestrator
+      const { StringRayOrchestrator } = await import("../orchestrator.js");
 
       // Initialize orchestrator with session config
-      const orchestrator = new StrRayOrchestrator({
+      const orchestrator = new StringRayOrchestrator({
         maxConcurrentTasks: parseInt(options.maxAgents),
       });
 
@@ -167,7 +167,7 @@ program
       .description("login to AI provider")
       .option("--provider <name>", "AI provider (claude, openai, gemini)")
       .action(async (options) => {
-        console.log("🔐 StrRay Authentication - Login");
+        console.log("🔐 StringRay Authentication - Login");
         console.log("=================================");
 
         const provider = options.provider || "claude";
@@ -178,7 +178,7 @@ program
         console.log("2. Generate an API key");
         console.log("3. Set the environment variable:");
         console.log(`   export ${getEnvVarName(provider)}=your_api_key_here`);
-        console.log("4. Restart StrRay");
+        console.log("4. Restart StringRay");
 
         console.log(
           "\n✅ Once configured, your API key will be automatically used.",
@@ -189,7 +189,7 @@ program
     new Command("status")
       .description("check authentication status")
       .action(async () => {
-        console.log("🔐 StrRay Authentication - Status");
+        console.log("🔐 StringRay Authentication - Status");
         console.log("==================================");
 
         const providers = ["claude", "openai", "gemini"];

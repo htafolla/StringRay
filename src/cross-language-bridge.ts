@@ -1,5 +1,5 @@
 /**
- * StrRay Cross-Language Bridge v1.0.0
+ * StringRay Cross-Language Bridge v1.0.0
  *
  * JSON-RPC/WebSocket bridge for TypeScript-Python communication.
  * Enables TypeScript agents to access Python BaseAgent capabilities.

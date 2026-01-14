@@ -1,5 +1,5 @@
 /**
- * StrRay Framework v1.0.0 - Session Management Integration Test
+ * StringRay Framework v1.0.0 - Session Management Integration Test
  *
  * Tests the complete session management system including cleanup,
  * monitoring, and cross-session coordination.
@@ -8,21 +8,21 @@
  * @since 2026-01-07
  */
 
-import { StrRayStateManager } from "../../state/state-manager";
+import { StringRayStateManager } from "../../state/state-manager";
 import { createSessionCoordinator } from "../../delegation/session-coordinator";
 import { createSessionCleanupManager } from "../../session/session-cleanup-manager";
 import { createSessionMonitor } from "../../session/session-monitor";
 import { createSessionStateManager } from "../../session/session-state-manager";
 
 describe("Session Management Integration", () => {
-  let stateManager: StrRayStateManager;
+  let stateManager: StringRayStateManager;
   let sessionCoordinator: any;
   let cleanupManager: any;
   let sessionMonitor: any;
   let stateManagerInstance: any;
 
   beforeEach(() => {
-    stateManager = new StrRayStateManager();
+    stateManager = new StringRayStateManager();
     sessionCoordinator = createSessionCoordinator(stateManager);
     cleanupManager = createSessionCleanupManager(stateManager);
     sessionMonitor = createSessionMonitor(

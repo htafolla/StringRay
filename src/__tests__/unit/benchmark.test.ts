@@ -1,5 +1,5 @@
 /**
- * StrRay Framework v1.0.0 - Performance Benchmark Unit Tests
+ * StringRay Framework v1.0.0 - Performance Benchmark Unit Tests
  *
  * Tests the performance benchmarking and metrics collection functionality.
  *

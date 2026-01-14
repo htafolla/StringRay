@@ -1,10 +1,10 @@
 import { AgentDelegator } from "../delegation/agent-delegator.js";
-import { StrRayStateManager } from "../state/state-manager.js";
+import { StringRayStateManager } from "../state/state-manager.js";
 
 async function testDelegationLogging() {
   console.log("🔄 Testing delegation logging integration...");
 
-  const stateManager = new StrRayStateManager();
+  const stateManager = new StringRayStateManager();
   const delegator = new AgentDelegator(stateManager);
 
   const result = await delegator.analyzeDelegation({

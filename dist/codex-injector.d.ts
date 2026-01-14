@@ -1,5 +1,5 @@
 /**
- * StrRay Codex Context Injector Hook
+ * StringRay Codex Context Injector Hook
  *
  * Injects Universal Development Codex v1.2.20 context into agent operations.
  * Follows production-tested pattern from rules-injector.
@@ -14,7 +14,7 @@
  * a welcome message on agent startup, following the production-tested
  * pattern from oh-my-opencode's rules-injector.
  */
-export declare function createStrRayCodexInjectorHook(): {
+export declare function createStringRayCodexInjectorHook(): {
     name: "strray-codex-injector";
     hooks: {
         "agent.start": (sessionId: string) => Promise<void>;

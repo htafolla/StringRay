@@ -76,10 +76,17 @@ class StrRayDatabaseDesignServer {
   private server: Server;
 
   constructor() {
-    this.server = new Server({
-      name: "strray-database-design",
-      version: "1.0.0",
-    });
+        this.server = new Server(
+      {
+        name: "strray-database-design",
+        version: "1.0.0",
+      },
+      {
+        capabilities: {
+          tools: {},
+        },
+      }
+    );
 
     this.setupToolHandlers();
     console.log("StrRay Database Design MCP Server initialized");

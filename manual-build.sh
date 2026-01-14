@@ -1,1 +1,0 @@
-mkdir -p dist/plugin && npx tsc src/plugins/strray-codex-injection.ts --outDir dist/plugin --target ES2022 --module ES2022 --moduleResolution bundler --esModuleInterop --allowSyntheticDefaultImports --strict --skipLibCheck --declaration 2>&1

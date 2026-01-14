@@ -1,5 +1,5 @@
 /**
- * StrRay Framework v1.0.0 - Codex Enforcement Integration Tests
+ * StringRay Framework v1.0.0 - Codex Enforcement Integration Tests
  *
  * Tests that the codex enforcement actually blocks violations as designed.
  *
@@ -8,7 +8,7 @@
  */
 
 import { describe, test, expect, beforeEach, vi } from "vitest";
-import { createStrRayCodexInjectorHook } from "../../codex-injector";
+import { createStringRayCodexInjectorHook } from "../../codex-injector";
 
 interface CodexInjectorHook {
   name: "strray-codex-injector";
@@ -32,7 +32,7 @@ describe("Codex Enforcement Integration", () => {
 
   beforeEach(() => {
     // Create a fresh hook instance for each test
-    hook = createStrRayCodexInjectorHook();
+    hook = createStringRayCodexInjectorHook();
     mockSessionId = "test-session-enforcement";
 
     // Clear any cached contexts

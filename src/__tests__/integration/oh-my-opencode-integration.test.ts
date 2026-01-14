@@ -1,7 +1,7 @@
 /**
- * StrRay Framework - Oh-My-OpenCode Integration Tests
+ * StringRay Framework - Oh-My-OpenCode Integration Tests
  *
- * Tests StrRay enforcement working within the oh-my-opencode plugin ecosystem.
+ * Tests StringRay enforcement working within the oh-my-opencode plugin ecosystem.
  * Simulates MCP tool execution and plugin hook triggering.
  *
  * @version 1.0.0
@@ -19,11 +19,11 @@ const mockOhMyOpenCode = {
   // Simulate loading a plugin
   loadPlugin: async (pluginPath: string) => {
     // Always use mock plugin for testing to avoid import issues with TypeScript syntax in .js file
-    console.log("Loading mock StrRay plugin for testing");
+    console.log("Loading mock StringRay plugin for testing");
     const mockPlugin = {
       "experimental.chat.system.transform": async (input: any, output: any) => {
         output.system = output.system || [];
-        output.system.unshift("Mock StrRay Codex Context");
+        output.system.unshift("Mock StringRay Codex Context");
       },
       "tool.execute.before": async (input: any) => {
         // Mock enforcement - implement basic codex rules
@@ -80,7 +80,7 @@ const mockOhMyOpenCode = {
     const toolCall = { tool: toolName, args, timestamp: Date.now() };
     mockOhMyOpenCode.toolCalls.push(toolCall);
 
-    // Check if StrRay plugin has tool.execute.before hook
+    // Check if StringRay plugin has tool.execute.before hook
     const strrayPlugin = mockOhMyOpenCode.plugins.get("strray-codex-injector");
     if (strrayPlugin && strrayPlugin["tool.execute.before"]) {
       try {
@@ -103,11 +103,11 @@ const mockOhMyOpenCode = {
 
 describe("Oh-My-OpenCode Integration", () => {
   beforeAll(async () => {
-    // Load the StrRay plugin into mock oh-my-opencode environment
+    // Load the StringRay plugin into mock oh-my-opencode environment
     await mockOhMyOpenCode.loadPlugin("./.opencode/codex-injector.js");
   });
 
-  test("should load StrRay plugin successfully", () => {
+  test("should load StringRay plugin successfully", () => {
     const plugin = mockOhMyOpenCode.plugins.get("strray-codex-injector");
     expect(plugin).toBeDefined();
     expect(plugin["experimental.chat.system.transform"]).toBeDefined();
@@ -124,7 +124,7 @@ describe("Oh-My-OpenCode Integration", () => {
     expect(Array.isArray(output.system)).toBe(true);
     expect(output.system.length).toBeGreaterThan(0);
     expect(
-      output.system.some((item: string) => item.includes("StrRay Codex")),
+      output.system.some((item: string) => item.includes("StringRay Codex")),
     ).toBe(true);
   });
 

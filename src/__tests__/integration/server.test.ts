@@ -1,5 +1,5 @@
 /**
- * StrRay Framework v1.0.0 - Server Integration Tests
+ * StringRay Framework v1.0.0 - Server Integration Tests
  *
  * Tests server setup, middleware configuration, and basic functionality.
  *

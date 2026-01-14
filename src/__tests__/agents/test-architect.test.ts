@@ -26,7 +26,7 @@ describe("Test Architect Agent Configuration", () => {
   describe("Description and System Prompt", () => {
     it("should have appropriate test architect description", () => {
       expect(testArchitect.description).toContain(
-        "StrRay Framework test architect",
+        "StringRay Framework test architect",
       );
       expect(testArchitect.description).toContain("automatic test generation");
       expect(testArchitect.description).toContain("coverage optimization");
@@ -35,7 +35,7 @@ describe("Test Architect Agent Configuration", () => {
 
     it("should have comprehensive test architect system prompt", () => {
       const system = testArchitect.system;
-      expect(system).toContain("StrRay Test Architect");
+      expect(system).toContain("StringRay Test Architect");
       expect(system).toContain("comprehensive testing strategy");
       expect(system).toContain("quality assurance");
     });

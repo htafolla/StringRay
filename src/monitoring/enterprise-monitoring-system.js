@@ -1,5 +1,5 @@
 /**
- * StrRay Framework v1.0.0 - Enterprise Monitoring System
+ * StringRay Framework v1.0.0 - Enterprise Monitoring System
  *
  * Comprehensive enterprise-scale monitoring and health check system.
  * Supports distributed deployments, auto-scaling, and production monitoring.

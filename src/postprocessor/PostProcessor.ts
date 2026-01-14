@@ -1,5 +1,5 @@
 /**
- * StrRay Post-Processor - Core Infrastructure
+ * StringRay Post-Processor - Core Infrastructure
  *
  * Automated CI/CD loop orchestration: commit → push → monitor → fix → redeploy → monitor
  * Provides systematic error prevention and deployment automation.
@@ -9,7 +9,7 @@
  */
 
 import * as path from "path";
-import { StrRayStateManager } from "../state/state-manager.js";
+import { StringRayStateManager } from "../state/state-manager.js";
 import { SessionMonitor } from "../session/session-monitor.js";
 import { GitHookTrigger } from "./triggers/GitHookTrigger.js";
 import { WebhookTrigger } from "./triggers/WebhookTrigger.js";
@@ -47,7 +47,7 @@ export class PostProcessor {
   };
 
   constructor(
-    private stateManager: StrRayStateManager,
+    private stateManager: StringRayStateManager,
     private sessionMonitor: SessionMonitor | null = null,
     config: Partial<PostProcessorConfig> = {},
   ) {
@@ -232,7 +232,7 @@ export class PostProcessor {
    * Initialize the post-processor system
    */
   async initialize(): Promise<void> {
-    console.log("🚀 Initializing StrRay Post-Processor...");
+    console.log("🚀 Initializing StringRay Post-Processor...");
 
     // Initialize monitoring
     if (this.config.monitoring.enabled) {

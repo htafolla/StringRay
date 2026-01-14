@@ -1,5 +1,5 @@
 """
-StrRay Framework - Async Orchestration System
+StringRay Framework - Async Orchestration System
 
 Provides multi-agent workflow coordination with persistent state management,
 conflict resolution, and delegation capabilities.

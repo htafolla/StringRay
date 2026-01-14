@@ -1,14 +1,14 @@
 /**
- * StrRay Framework Activation Module
+ * StringRay Framework Activation Module
  *
- * This module handles activation of StrRay framework components
+ * This module handles activation of StringRay framework components
  * during oh-my-opencode initialization.
  */
 
 import { frameworkLogger } from "./framework-logger.js";
 import { ensureCriticalComponents } from "./architectural-integrity.js";
 
-export interface StrRayActivationConfig {
+export interface StringRayActivationConfig {
   enableOrchestrator: boolean;
   enableBootOrchestrator: boolean;
   enableStateManagement: boolean;
@@ -18,7 +18,7 @@ export interface StrRayActivationConfig {
   enablePostProcessor: boolean;
 }
 
-export const defaultStrRayConfig: StrRayActivationConfig = {
+export const defaultStringRayConfig: StringRayActivationConfig = {
   enableOrchestrator: true,
   enableBootOrchestrator: true,
   enableStateManagement: true,
@@ -28,17 +28,17 @@ export const defaultStrRayConfig: StrRayActivationConfig = {
   enablePostProcessor: true,
 };
 
-export async function activateStrRayFramework(
-  config: Partial<StrRayActivationConfig> = {},
+export async function activateStringRayFramework(
+  config: Partial<StringRayActivationConfig> = {},
 ): Promise<void> {
-  const activationConfig = { ...defaultStrRayConfig, ...config };
+  const activationConfig = { ...defaultStringRayConfig, ...config };
 
   // Banner display moved to init.sh execution in plugin
   // Framework activation proceeds quietly
 
   frameworkLogger.log(
-    "strray-activation",
-    "beginning StrRay framework activation",
+    "stringray-activation",
+    "beginning StringRay framework activation",
     "info",
     activationConfig,
   );
@@ -78,15 +78,15 @@ export async function activateStrRayFramework(
     // Loading display moved to init.sh for dramatic line-by-line presentation
 
     frameworkLogger.log(
-      "strray-activation",
-      "StrRay framework activation completed successfully",
+      "stringray-activation",
+      "StringRay framework activation completed successfully",
       "success",
     );
   } catch (error) {
-    console.error("❌ StrRay Framework activation failed:", error);
+    console.error("❌ StringRay Framework activation failed:", error);
     frameworkLogger.log(
-      "strray-activation",
-      "StrRay framework activation failed",
+      "stringray-activation",
+      "StringRay framework activation failed",
       "error",
       error,
     );
@@ -96,18 +96,18 @@ export async function activateStrRayFramework(
 
 async function activateCodexInjection(): Promise<void> {
   frameworkLogger.log(
-    "strray-activation",
+    "stringray-activation",
     "activating codex injection",
     "info",
   );
 
-  const { createStrRayCodexInjectorHook } = await import("./codex-injector.js");
-  const hook = createStrRayCodexInjectorHook();
+  const { createStringRayCodexInjectorHook } = await import("./codex-injector.js");
+  const hook = createStringRayCodexInjectorHook();
 
   (globalThis as any).strRayHooks = (globalThis as any).strRayHooks || [];
 
   frameworkLogger.log(
-    "strray-activation",
+    "stringray-activation",
     "codex injection activated",
     "success",
   );
@@ -115,15 +115,15 @@ async function activateCodexInjection(): Promise<void> {
 
 async function activateHooks(): Promise<void> {
   // Temporarily disabled hooks activation to prevent import errors
-  // frameworkLogger.log("strray-activation", "activating StrRay hooks", "info");
+  // frameworkLogger.log("stringray-activation", "activating StringRay hooks", "info");
   // const { loadHooks } = await import("./index.js");
   // await loadHooks();
-  // frameworkLogger.log("strray-activation", "StrRay hooks activated", "success");
+  // frameworkLogger.log("stringray-activation", "StringRay hooks activated", "success");
 }
 
 async function activateBootOrchestrator(): Promise<void> {
   frameworkLogger.log(
-    "strray-activation",
+    "stringray-activation",
     "activating boot orchestrator",
     "info",
   );
@@ -133,7 +133,7 @@ async function activateBootOrchestrator(): Promise<void> {
   await bootOrchestrator.executeBootSequence();
 
   frameworkLogger.log(
-    "strray-activation",
+    "stringray-activation",
     "boot orchestrator activated",
     "success",
   );
@@ -141,19 +141,19 @@ async function activateBootOrchestrator(): Promise<void> {
 
 async function activateStateManagement(): Promise<void> {
   frameworkLogger.log(
-    "strray-activation",
+    "stringray-activation",
     "activating state management",
     "info",
   );
 
-  const { StrRayStateManager } = await import("./state/state-manager.js");
-  const stateManager = new StrRayStateManager();
+  const { StringRayStateManager } = await import("./state/state-manager.js");
+  const stateManager = new StringRayStateManager();
 
   // Store the state manager instance globally for framework use
   (globalThis as any).strRayStateManager = stateManager;
 
   frameworkLogger.log(
-    "strray-activation",
+    "stringray-activation",
     "state management activated",
     "success",
   );
@@ -161,39 +161,39 @@ async function activateStateManagement(): Promise<void> {
 
 async function activateOrchestrator(): Promise<void> {
   frameworkLogger.log(
-    "strray-activation",
-    "activating StrRay orchestrator",
+    "stringray-activation",
+    "activating StringRay orchestrator",
     "info",
   );
 
   const { strRayOrchestrator } = await import("./orchestrator.js");
 
   frameworkLogger.log(
-    "strray-activation",
-    "StrRay orchestrator activated",
+    "stringray-activation",
+    "StringRay orchestrator activated",
     "success",
   );
 }
 
 async function activateProcessors(): Promise<void> {
   frameworkLogger.log(
-    "strray-activation",
+    "stringray-activation",
     "activating processor pipeline",
     "info",
   );
 
   const { ProcessorManager } =
     await import("./processors/processor-manager.js");
-  const { StrRayStateManager } = await import("./state/state-manager.js");
+  const { StringRayStateManager } = await import("./state/state-manager.js");
 
-  const stateManager = new StrRayStateManager();
+  const stateManager = new StringRayStateManager();
   const processorManager = new ProcessorManager(stateManager);
 
   // Store the processor manager instance globally for framework use
   (globalThis as any).strRayProcessorManager = processorManager;
 
   frameworkLogger.log(
-    "strray-activation",
+    "stringray-activation",
     "processor pipeline activated",
     "success",
   );
@@ -201,7 +201,7 @@ async function activateProcessors(): Promise<void> {
 
 async function activatePostProcessor(): Promise<void> {
   frameworkLogger.log(
-    "strray-activation",
+    "stringray-activation",
     "activating post-processor system",
     "info",
   );
@@ -224,7 +224,7 @@ async function activatePostProcessor(): Promise<void> {
   (globalThis as any).strRayPostProcessor = postProcessor;
 
   frameworkLogger.log(
-    "strray-activation",
+    "stringray-activation",
     "post-processor system activated",
     "success",
   );

@@ -1,4 +1,4 @@
-// Global test setup for StrRay Framework tests
+// Global test setup for StringRay Framework tests
 import { beforeAll, afterAll, beforeEach, afterEach, expect } from "vitest";
 
 // Global type declarations

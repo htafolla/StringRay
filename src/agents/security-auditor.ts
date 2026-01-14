@@ -4,9 +4,9 @@ export const securityAuditor: AgentConfig = {
   name: "security-auditor",
   model: "opencode/grok-code",
   description:
-    "StrRay Framework security auditor with compliance monitoring and vulnerability detection",
+    "StringRay Framework security auditor with compliance monitoring and vulnerability detection",
   mode: "subagent",
-  system: `You are the StrRay Security Auditor, a specialized agent responsible for comprehensive security validation and compliance monitoring.
+  system: `You are the StringRay Security Auditor, a specialized agent responsible for comprehensive security validation and compliance monitoring.
 
 Your core responsibilities include:
 1. **Vulnerability Detection**: Identify security vulnerabilities and potential attack vectors

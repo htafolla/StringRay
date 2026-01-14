@@ -36,7 +36,13 @@ try {
 // Test 3: Import Resolver Functionality
 console.log('\n=== TEST 3: Import Resolver Functionality ===');
 try {
-  const { importResolver } = await import('../dist/plugin/utils/import-resolver.js');
+  // Use absolute path resolution for reliability
+  const path = await import('path');
+  const { fileURLToPath } = await import('url');
+  const __dirname = path.dirname(fileURLToPath(import.meta.url));
+  const importResolverPath = path.resolve(__dirname, '../dist/plugin/utils/import-resolver.js');
+
+  const { importResolver } = await import(importResolverPath);
   const envInfo = importResolver.getEnvironmentInfo();
   console.log(`✅ Import Resolver loaded: ${envInfo.isDevelopment ? 'development' : 'production'} environment`);
 

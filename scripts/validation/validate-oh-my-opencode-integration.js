@@ -185,27 +185,6 @@ class OhMyOpenCodeIntegrationValidator {
       });
     });
   }
-        }
-      });
-
-      doctor.on('close', (code) => {
-        if (code === 0 && mcpServersFound && toolCount >= 15) {
-          console.log(`  ✅ ${toolCount} MCP tools available`);
-          this.results.passed.push('Tool Availability');
-        } else {
-          console.log(`  ❌ Insufficient tools available (${toolCount} found, need 15+)`);
-          this.results.failed.push({ test: 'Tool Availability', error: `Only ${toolCount} tools available` });
-        }
-        resolve();
-      });
-
-      doctor.on('error', (error) => {
-        console.log(`  ❌ Tool availability check error: ${error.message}`);
-        this.results.failed.push({ test: 'Tool Availability', error: error.message });
-        resolve();
-      });
-    });
-  }
 
   printSummary() {
     console.log('\n📊 OH-MY-OPENCODE INTEGRATION SUMMARY');

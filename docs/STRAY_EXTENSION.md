@@ -274,4 +274,4 @@ Modify the agents configuration in `.opencode/oh-my-opencode.json`:
 
 ---
 
-_StrRay Extension v1.0.0 - Enhancing oh-my-opencode with systematic AI-assisted development capabilities._
+_StrRay AI v1.0.4 - Enhancing oh-my-opencode with systematic AI-assisted development capabilities._

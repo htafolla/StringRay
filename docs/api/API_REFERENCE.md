@@ -1,6 +1,6 @@
 #  API Reference
 
-**Version**: **Last Updated**: 2026-01-07 | **Framework**: StrRay v1.0.0
+**Version**: v1.0.4 | **Last Updated**: 2026-01-15 | **Framework**: StrRay AI v1.0.4
 
 ## Overview
 
@@ -625,7 +625,7 @@ await orchestrator.configureSecurity({
 
 #### Version Compatibility
 
-- **v1.0.0**: Current production version with all advanced features
+- **v1.0.4**: Current production version with all advanced features
 - **Migration Path**: Automatic migration from v0.x with backward compatibility
 - **Deprecation Policy**: 6-month deprecation notice for breaking changes
 - **Support**: Enterprise support for production deployments

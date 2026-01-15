@@ -123,9 +123,9 @@ universal-development-framework/
 # StringRay 1.0.0 - Open-Source Extraction
 
 TARGET_REPO=$1
-FRAMEWORK_VERSION="2.4.0"
+FRAMEWORK_VERSION="1.0.4"
 
-echo "🚀 Extracting Universal Development Framework v${FRAMEWORK_VERSION}"
+echo "🚀 Extracting StringRay AI Framework v${FRAMEWORK_VERSION}"
 
 # Create framework structure
 mkdir -p "${TARGET_REPO}/.opencode"

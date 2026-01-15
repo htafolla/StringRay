@@ -78,7 +78,7 @@ npm install strray
 **Important:** After installation, you must run the setup command manually:
 
 ```bash
-npx stringray-ai install
+npx strray install
 ```
 
 **Note:** The setup command is required because npm's postinstall scripts have security restrictions and may not run automatically in all environments. Running the install command manually ensures proper configuration.
@@ -95,31 +95,31 @@ After installation, validate that StringRay is working correctly:
 
 ```bash
 # Test CLI functionality
-npx stringray-ai --help
-npx stringray-ai doctor
+npx strray --help
+npx strray doctor
 
 # Run comprehensive plugin validation
 node node_modules/stringray-ai/scripts/test-stringray-plugin.mjs
 
 # Check system status
-npx stringray-ai status
+npx strray status
 
 # Use StringRay AI features
-npx stringray-ai run "Your prompt here"
-npx stringray-ai auth
+npx strray run "Your prompt here"
+npx strray auth
 ```
 
 ## Available Commands
 
 **Core Commands:**
-- `npx stringray-ai --help` - Show help and available commands
-- `npx stringray-ai doctor` - Run health checks and diagnostics
-- `npx stringray-ai install` - Interactive setup wizard
-- `npx stringray-ai status` - Display system status
+- `npx strray --help` - Show help and available commands
+- `npx strray doctor` - Run health checks and diagnostics
+- `npx strray install` - Interactive setup wizard
+- `npx strray status` - Display system status
 
 **AI Features:**
-- `npx stringray-ai run "prompt"` - Execute StringRay session with agent orchestration
-- `npx stringray-ai auth` - Manage authentication for AI providers
+- `npx strray run "prompt"` - Execute StringRay session with agent orchestration
+- `npx strray auth` - Manage authentication for AI providers
 
 **Validation:**
 - `node node_modules/stringray-ai/scripts/test-stringray-plugin.mjs` - Comprehensive plugin validation

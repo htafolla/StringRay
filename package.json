@@ -9,8 +9,8 @@
     "plugin": "./dist/plugin/plugins/stringray-codex-injection.js"
   },
   "bin": {
-    "stringray-ai": "dist/cli/index.js",
-    "stringray-test": "scripts/test-stringray-plugin.mjs"
+    "strray": "dist/cli/index.js",
+    "strray-test": "scripts/test-stringray-plugin.mjs"
   },
   "scripts": {
     "build": "tsc",

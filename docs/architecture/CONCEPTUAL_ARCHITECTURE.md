@@ -2,7 +2,7 @@
 
 ## 📚 Framework Foundation
 
-StrRay is built on the **Universal Development Codex v1.2.20** framework, providing a modular, scalable architecture for agentic development workflows. The framework emphasizes progressive development, shared global state management, and single sources of truth.
+StrRay is built on the **Universal Development Codex v1.2.22** framework, providing a modular, scalable architecture for agentic development workflows. The framework emphasizes progressive development, shared global state management, and single sources of truth.
 
 ## 🏗️ Core Architectural Principles
 

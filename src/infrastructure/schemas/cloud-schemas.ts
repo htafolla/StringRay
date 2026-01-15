@@ -2,7 +2,7 @@
  * StringRay Framework v1.0.0 - Cloud Infrastructure Schemas
  *
  * Schema definitions for cloud provider configurations, ensuring
- * enterprise-grade validation and compliance with Universal Development Codex v1.2.20.
+ * enterprise-grade validation and compliance with Universal Development Codex v1.2.22.
  *
  * @version 1.0.0
  * @since 2026-01-08

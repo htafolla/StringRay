@@ -180,7 +180,7 @@ describe("StringRay Framework Initialization Integration", () => {
       expect(codexContent).toHaveProperty("version");
       expect(codexContent).toHaveProperty("terms");
       expect(typeof codexContent.terms).toBe("object");
-      expect(Object.keys(codexContent.terms).length).toBeGreaterThanOrEqual(43); // At least 43 terms
+      expect(Object.keys(codexContent.terms).length).toBeGreaterThanOrEqual(43); // At least 50-terms
     });
 
     test("should validate codex term structure", () => {

@@ -97,7 +97,7 @@ StringRay Framework automatically configures itself based on your installation m
 
 #### Standalone Configuration
 
-- Loads the Universal Development Codex v1.2.20
+- Loads the Universal Development Codex v1.2.22
 - Enables enterprise CI/CD automation with post-processor
 - Registers all 9 specialized agents
 - Sets up MCP servers for agent communication

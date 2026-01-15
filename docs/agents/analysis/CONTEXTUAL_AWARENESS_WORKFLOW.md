@@ -45,7 +45,7 @@ tools: {
     "lsp_code_actions",
     // Rule Enforcement Tools - Enforcer runs these
     "rule-validation", // Rule hierarchy validation
-    "codex-enforcement", // 43-term codex compliance
+    "codex-enforcement", // 50-term codex compliance
     "quality-gate-check", // Final quality validation
   ];
 }
@@ -258,7 +258,7 @@ const assessment = await architectTools.architectureAssessment(projectRoot);
 const validation = await enforcerTools.contextAnalysisValidation(files);
 // Ensures: proper AST parser usage, memory optimization, error handling
 
-// codex-enforcement tool - 43-term compliance
+// codex-enforcement tool - 50-term compliance
 const compliance = await enforcerTools.codexEnforcement(operation, files);
 // Validates: all codex terms, provides actionable remediation
 

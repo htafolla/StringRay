@@ -10,7 +10,7 @@ The platform protects both investors and founders through smart contract-enforce
 
 ## Development Principles (StrRay Framework Integration)
 
-This project integrates with **StrRay Framework v1.0.0**, which implements **Universal Development Codex v1.2.20** for systematic error prevention and code quality assurance.
+This project integrates with **StrRay Framework v1.0.0**, which implements **Universal Development Codex v1.2.22** for systematic error prevention and code quality assurance.
 
 ### Default AI Model
 
@@ -20,7 +20,7 @@ All AI agents and coding tasks should use `opencode/grok-code` by default for th
 
 ### Active Codex Terms
 
-The StrRay framework automatically loads and enforces **all 43 codex terms** from Universal Development Codex v1.2.20:
+The StrRay framework automatically loads and enforces **all 43 codex terms** from Universal Development Codex v1.2.22:
 
 **Core Principles (Terms 1-10)**: Progressive Prod-Ready Code, No Stubs/Patches, Minimal Complexity, Surgical Fixes, Batched Introspection, 90% Error Prevention, Infinite Loop Prevention, Shared Global State, Single Source of Truth
 

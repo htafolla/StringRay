@@ -46,7 +46,7 @@ Specialized agent for comprehensive codebase exploration, documentation retrieva
 
 ## Framework Alignment
 
-**Universal Development Codex v1.2.20 Research & Analysis Compliance:**
+**Universal Development Codex v1.2.22 Research & Analysis Compliance:**
 
 - **Term 6**: Batched Introspection Cycles (organized codebase exploration)
 - **Term 15**: Dig Deeper Analysis (comprehensive investigation)

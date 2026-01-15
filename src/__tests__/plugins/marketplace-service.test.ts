@@ -2,7 +2,7 @@
  * StringRay Framework v1.0.0 - Plugin Marketplace Service Unit Tests
  *
  * Comprehensive unit tests for the plugin marketplace service ensuring >85% coverage
- * with edge cases, error scenarios, and Universal Development Codex v1.2.20 compliance.
+ * with edge cases, error scenarios, and Universal Development Codex v1.2.22 compliance.
  *
  * @version 1.0.0
  * @since 2026-01-08

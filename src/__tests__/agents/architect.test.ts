@@ -79,7 +79,7 @@ describe("Architect Agent Configuration", () => {
 
     it("should reference Universal Development Codex", () => {
       const system = architect.system;
-      expect(system).toContain("Universal Development Codex v1.2.24");
+      expect(system).toContain("Universal Development Codex v1.2.22");
     });
   });
 

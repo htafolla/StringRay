@@ -67,7 +67,7 @@ class StrRayEnforcerToolsServer {
           {
             name: "codex-enforcement",
             description:
-              "Enforce all 43 Universal Development Codex terms with comprehensive compliance validation and actionable remediation",
+              "Enforce all 50 Universal Development Codex terms with comprehensive compliance validation and actionable remediation",
             inputSchema: {
               type: "object",
               properties: {

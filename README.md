@@ -70,7 +70,7 @@ First, ensure you have a `package.json` file in your project:
 npm init -y
 
 # Then install StringRay AI
-npm install strray
+npm install strray-ai
 ```
 
 ### Setup
@@ -78,7 +78,7 @@ npm install strray
 **Important:** After installation, you must run the setup command manually:
 
 ```bash
-npx strray install
+npx strray-ai install
 ```
 
 **Note:** The setup command is required because npm's postinstall scripts have security restrictions and may not run automatically in all environments. Running the install command manually ensures proper configuration.
@@ -95,31 +95,31 @@ After installation, validate that StringRay is working correctly:
 
 ```bash
 # Test CLI functionality
-npx strray --help
-npx strray doctor
+npx strray-ai --help
+npx strray-ai doctor
 
 # Run comprehensive plugin validation
 node node_modules/stringray-ai/scripts/test-stringray-plugin.mjs
 
 # Check system status
-npx strray status
+npx strray-ai status
 
 # Use StringRay AI features
-npx strray run "Your prompt here"
-npx strray auth
+npx strray-ai run "Your prompt here"
+npx strray-ai auth
 ```
 
 ## Available Commands
 
 **Core Commands:**
-- `npx strray --help` - Show help and available commands
-- `npx strray doctor` - Run health checks and diagnostics
-- `npx strray install` - Interactive setup wizard
-- `npx strray status` - Display system status
+- `npx strray-ai --help` - Show help and available commands
+- `npx strray-ai doctor` - Run health checks and diagnostics
+- `npx strray-ai install` - Interactive setup wizard
+- `npx strray-ai status` - Display system status
 
 **AI Features:**
-- `npx strray run "prompt"` - Execute StringRay session with agent orchestration
-- `npx strray auth` - Manage authentication for AI providers
+- `npx strray-ai run "prompt"` - Execute StringRay session with agent orchestration
+- `npx strray-ai auth` - Manage authentication for AI providers
 
 **Validation:**
 - `node node_modules/stringray-ai/scripts/test-stringray-plugin.mjs` - Comprehensive plugin validation
@@ -135,7 +135,7 @@ The plugin test will verify:
 If automatic setup fails:
 
 ```bash
-npm install strray
+npm install strray-ai
 ```
 
 Then manually add to your development configuration (example for oh-my-opencode):

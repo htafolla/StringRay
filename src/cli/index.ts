@@ -58,9 +58,9 @@ program
     const fs = await import('fs');
     const path = await import('path');
 
-    // Get the package root by finding the strray package directory
+    // Get the package root by finding the strray-ai package directory
     // Since this CLI is run via npx/npm, we can find it relative to node_modules
-    const packageRoot = path.join(process.cwd(), 'node_modules', 'strray');
+    const packageRoot = path.join(process.cwd(), 'node_modules', 'strray-ai');
 
     console.log('DEBUG: packageRoot =', packageRoot);
     console.log('DEBUG: process.cwd() =', process.cwd());

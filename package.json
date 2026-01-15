@@ -1,6 +1,6 @@
 {
-  "name": "strray",
-  "version": "1.0.0",
+  "name": "strray-ai",
+  "version": "1.0.2",
   "description": "⚡ StringRay ⚡: Bulletproof AI orchestration with systematic error prevention. Zero dead ends. Ship clean, tested, optimized code — every time.",
   "type": "module",
   "main": "./dist/plugin/index.js",
@@ -9,7 +9,7 @@
     "plugin": "./dist/plugin/plugins/stringray-codex-injection.js"
   },
   "bin": {
-    "strray": "dist/cli/index.js",
+    "strray-ai": "dist/cli/index.js",
     "strray-test": "scripts/test-stringray-plugin.mjs"
   },
   "scripts": {

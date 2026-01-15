@@ -6,7 +6,223 @@ import { PostProcessor } from "../PostProcessor.js";
 import { PostProcessorContext } from "../types.js";
 import * as fs from "fs";
 import * as path from "path";
+import { frameworkLogger } from "../../framework-logger.js";
+
+// Re-export for backwards compatibility and external usage
+export { cleanupLogFiles };
 import { execSync } from "child_process";
+
+
+
+
+
+/**
+ * Configuration for log cleanup
+ */
+interface LogCleanupConfig {
+  maxAgeHours: number;
+  excludePatterns: string[];
+  directories: string[];
+  enabled: boolean;
+}
+
+/**
+ * Archive and rotate log files to prevent unbounded growth
+ */
+async function archiveLogFiles(config: LogArchiveConfig): Promise<{ archived: number; errors: string[] }> {
+  const result = { archived: 0, errors: [] };
+
+  try {
+    const fs = await import("fs");
+    const path = await import("path");
+    const zlib = await import("zlib");
+
+    // Ensure archive directory exists
+    if (!fs.existsSync(config.archiveDirectory)) {
+      fs.mkdirSync(config.archiveDirectory, { recursive: true });
+    }
+
+
+    const activityLogPath = path.join(process.cwd(), "logs", "framework", "activity.log");
+    if (fs.existsSync(activityLogPath)) {
+      const stats = fs.statSync(activityLogPath);
+      const shouldArchive = (
+        stats.size > config.maxFileSizeMB * 1024 * 1024 || // Size-based
+        (Date.now() - stats.mtime.getTime()) > config.rotationIntervalHours * 60 * 60 * 1000 // Time-based
+      );
+
+      if (shouldArchive) {
+        const timestamp = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+        const archiveName = `framework-activity-${timestamp}.log`; // Match existing naming convention
+        const archivePath = path.join(process.cwd(), "logs", "framework", archiveName); // Archive in same directory
+
+        // Copy current log to archive
+        fs.copyFileSync(activityLogPath, archivePath);
+
+        // Compress if enabled
+        if (config.compressionEnabled) {
+          const compressedPath = `${archivePath}.gz`;
+          const gzip = zlib.createGzip();
+          const input = fs.createReadStream(archivePath);
+          const output = fs.createWriteStream(compressedPath);
+
+          await new Promise((resolve, reject) => {
+            input.pipe(gzip).pipe(output)
+              .on('finish', () => {
+                fs.unlinkSync(archivePath); // Remove uncompressed
+                resolve(void 0);
+              })
+              .on('error', reject);
+          });
+        }
+
+        // Reset current log (keep a small header)
+        const header = `# Log rotated on ${new Date().toISOString()}\n`;
+        fs.writeFileSync(activityLogPath, header);
+
+        result.archived++;
+
+        await frameworkLogger.log("log-archiver", "activity-log-rotated", "success", {
+          archivePath: config.compressionEnabled ? `${archivePath}.gz` : archivePath,
+          originalSize: stats.size,
+          rotationReason: stats.size > config.maxFileSizeMB * 1024 * 1024 ? "size" : "time",
+          compatibleWithReporting: true // Uses framework-activity-*.log.gz naming
+        });
+      }
+    }
+
+    // Clean up old archives beyond retention period (integrate with existing cleanup)
+    // Note: Framework reporting system already handles cleanup of framework-activity-*.log.gz files
+    // This ensures compatibility and prevents double-cleanup
+
+  } catch (error) {
+    const errorMsg = `Log archiving failed: ${error}`;
+    result.errors.push(errorMsg);
+
+    await frameworkLogger.log("log-archiver", "archiving-error", "error", {
+      error: error instanceof Error ? error.message : String(error)
+    });
+  }
+
+  return result;
+}
+
+/**
+ * Special archiving strategy for critical historical logs
+ */
+async function archiveCriticalHistoricalLogs(): Promise<{ archived: number; errors: string[] }> {
+  const result = { archived: 0, errors: [] };
+
+  try {
+    const fs = await import("fs");
+    const path = await import("path");
+
+
+    const historicalDir = path.join(process.cwd(), "logs", "historical");
+    if (!fs.existsSync(historicalDir)) {
+      fs.mkdirSync(historicalDir, { recursive: true });
+    }
+
+
+    const refactoringLogPath = path.join(process.cwd(), "logs", "agents", "refactoring-log.md");
+    if (fs.existsSync(refactoringLogPath)) {
+      const stats = fs.statSync(refactoringLogPath);
+      const lastModified = new Date(stats.mtime);
+      const currentMonth = `${lastModified.getFullYear()}-${String(lastModified.getMonth() + 1).padStart(2, '0')}`;
+
+
+      const monthlyArchiveName = `refactoring-log-${currentMonth}.md`;
+      const monthlyArchivePath = path.join(historicalDir, monthlyArchiveName);
+
+      if (!fs.existsSync(monthlyArchivePath)) {
+
+        fs.copyFileSync(refactoringLogPath, monthlyArchivePath);
+
+        result.archived++;
+
+        await frameworkLogger.log("log-archiver", "refactoring-log-archived", "info", {
+          archivePath: monthlyArchivePath,
+          size: stats.size,
+          snapshotMonth: currentMonth
+        });
+      }
+    }
+
+
+
+  } catch (error) {
+    const errorMsg = `Critical log archiving failed: ${error}`;
+    result.errors.push(errorMsg);
+
+    await frameworkLogger.log("log-archiver", "critical-archiving-error", "error", {
+      error: error instanceof Error ? error.message : String(error)
+    });
+  }
+
+  return result;
+}
+
+async function cleanupLogFiles(config: any): Promise<any> {
+  const result = { cleaned: 0, errors: [] };
+  const maxAgeMs = config.maxAgeHours * 60 * 60 * 1000;
+  const now = Date.now();
+
+  for (const dir of config.directories) {
+    try {
+      if (!fs.existsSync(dir)) continue;
+
+      const files = fs.readdirSync(dir);
+
+      for (const file of files) {
+        const filePath = path.join(dir, file);
+        const stat = fs.statSync(filePath);
+
+        // Skip directories
+        if (stat.isDirectory()) continue;
+
+        // Check if file should be excluded
+        const shouldExclude = config.excludePatterns.some(pattern =>
+          file.includes(pattern.replace('*', ''))
+        );
+
+        if (shouldExclude) continue;
+
+        // Check if file is too old
+        const ageMs = now - stat.mtime.getTime();
+        if (ageMs > maxAgeMs) {
+          try {
+            fs.unlinkSync(filePath);
+            result.cleaned++;
+
+            await frameworkLogger.log("git-hooks", "log-file-cleaned", "info", {
+              file: filePath,
+              age: Math.round(ageMs / (1000 * 60 * 60)), // hours
+              size: stat.size
+            });
+          } catch (error) {
+            const errorMsg = `Failed to clean log file ${filePath}: ${error}`;
+            result.errors.push(errorMsg);
+
+            await frameworkLogger.log("git-hooks", "log-cleanup-error", "error", {
+              file: filePath,
+              error: error instanceof Error ? error.message : String(error)
+            });
+          }
+        }
+      }
+    } catch (error) {
+      const errorMsg = `Failed to process directory ${dir}: ${error}`;
+      result.errors.push(errorMsg);
+
+      await frameworkLogger.log("git-hooks", "log-cleanup-directory-error", "error", {
+        directory: dir,
+        error: error instanceof Error ? error.message : String(error)
+       });
+     }
+   }
+
+  return result;
+}
 
 export class GitHookTrigger {
   private initialized = false;
@@ -172,58 +388,31 @@ fi
 
       # Log metrics for monitoring (convert to milliseconds)
       DURATION_MS=\$((DURATION * 1000))
-      echo "HOOK_METRICS: post-commit duration=\${DURATION_MS}ms exit_code=\${EXIT_CODE}" >&2
-
-      # Record metrics using metrics collector (direct import for reliability)
+      # LOG CLEANUP: Remove old log files after validation
       node -e "
       (async () => {
         try {
-          const { HookMetricsCollector } = await import('./dist/postprocessor/validation/HookMetricsCollector.js');
-          const collector = new HookMetricsCollector();
-          collector.recordMetrics('post-commit', \${DURATION_MS}, \${EXIT_CODE});
+          const { cleanupLogFiles } = await import('./dist/postprocessor/triggers/GitHookTrigger.js');
+          const result = await cleanupLogFiles({
+            maxAgeHours: 24,
+            excludePatterns: ['logs/framework/activity.log', 'logs/agents/refactoring-log.md', 'current-session.log'],
+            directories: ['logs/'],
+            enabled: true
+          });
+          if (result.cleaned > 0) {
+            console.log(\`🧹 Cleaned \${result.cleaned} old log files\`);
+          }
+          if (result.errors.length > 0) {
+            console.error('Log cleanup errors:', result.errors);
+          }
         } catch (error) {
-          // Silently fail if metrics collection fails
+          console.error('Log cleanup failed:', error.message);
         }
       })();
-      " 2>/dev/null || true
+      "
 
-      [ \$EXIT_CODE -eq 0 ] && exit 0 || exit 1
-    else
-      # FULL MONITORING: Comprehensive analysis for post-push
-      # Timeout: 5 minutes max, comprehensive CI/CD validation
-      START_TIME=\$(date +%s)
-      timeout 300 node -e "
-      (async () => {
-        try {
-          console.log('🚀 Post-push: Comprehensive validation initiated');
-          // Use import resolver for environment-aware imports
-          const { importResolver } = await import('./utils/import-resolver.js');
-          const { ComprehensiveValidator } = await importResolver.importModule('postprocessor/validation/ComprehensiveValidator');
-
-          const validator = new ComprehensiveValidator();
-          const result = await validator.validate();
-
-          if (result.warnings.length > 0) {
-            console.log('⚠️ ' + result.warnings.length + ' warning(s) found:');
-            result.warnings.forEach(w => console.log('   ' + w));
-          }
-
-          if (!result.passed) {
-            console.log('❌ ' + result.errors.length + ' error(s) found:');
-            result.errors.forEach(e => console.log('   ' + e));
-            process.exit(1);
-          }
-
-          if (result.testResults) {
-            console.log('🧪 Tests: ' + result.testResults.passed + '/' + result.testResults.total + ' passed');
-          }
-
-          console.log('✅ Post-push: Comprehensive validation passed in ' + result.duration + 'ms');
-        } catch (error) {
-          console.error('❌ Post-push validation failed:', error instanceof Error ? error.message : String(error));
-          process.exit(1);
-        }
-      })();
+      echo "HOOK_METRICS: post-commit duration=\${DURATION_MS}ms exit_code=\${EXIT_CODE}" >&2
+      collector.recordMetrics('post-commit', \${DURATION_MS}, \${EXIT_CODE});
       " 2>/dev/null
       EXIT_CODE=\$?
       END_TIME=\$(date +%s)

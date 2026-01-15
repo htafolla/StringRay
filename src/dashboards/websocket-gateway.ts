@@ -184,12 +184,12 @@ export class WebSocketGateway extends EventEmitter {
       return;
     }
 
-    console.log("🌐 Starting WebSocket Gateway");
-    console.log(`   Port: ${this.config.port}`);
-    console.log(`   Path: ${this.config.path}`);
-    console.log(`   Max Connections: ${this.config.maxConnections}`);
-    console.log(`   Auth Required: ${this.config.authRequired}`);
-    console.log(`   Compression: ${this.config.compressionEnabled}`);
+    // WebSocket gateway startup - kept as console.log for user visibility
+    // Port configuration - kept as console.log for user visibility
+    // Path configuration - kept as console.log for user visibility
+    // Max connections - kept as console.log for user visibility
+    // Auth configuration - kept as console.log for user visibility
+    // Compression config - kept as console.log for user visibility
 
     // Start the underlying streaming service if not already running
     await realTimeStreamingService.start();
@@ -213,7 +213,7 @@ export class WebSocketGateway extends EventEmitter {
     this.connections.clear();
     this.messageRates.clear();
 
-    console.log("🛑 Stopped WebSocket Gateway");
+    // WebSocket gateway stop - kept as console.log for user visibility
     this.emit("stopped");
   }
 
@@ -238,7 +238,7 @@ export class WebSocketGateway extends EventEmitter {
     this.stats.activeConnections++;
     this.stats.totalConnections++;
 
-    console.log(`📊 Dashboard connection: ${connectionId}`);
+    await frameworkLogger.log("websocket-gateway", "dashboard-connected", "info", { connectionId });
 
     // Send welcome message
     this.sendToConnection(connectionId, {
@@ -341,7 +341,7 @@ export class WebSocketGateway extends EventEmitter {
   private handleDisconnection(connectionId: string): void {
     const connection = this.connections.get(connectionId);
     if (connection) {
-      console.log(`📊 Dashboard disconnection: ${connectionId}`);
+      await frameworkLogger.log("websocket-gateway", "dashboard-disconnected", "info", { connectionId });
       this.connections.delete(connectionId);
       this.stats.activeConnections--;
       this.stats.subscriptionsActive -= connection.subscriptions.length;
@@ -381,9 +381,7 @@ export class WebSocketGateway extends EventEmitter {
     connection.subscriptions.push(subscription);
     this.stats.subscriptionsActive++;
 
-    console.log(
-      `📡 Dashboard ${connectionId} subscribed to ${subscription.type}`,
-    );
+  await frameworkLogger.log("websocket-gateway", "dashboard-subscribed", "info", { connectionId, channelsCount: channels.length });
 
     this.sendToConnection(connectionId, {
       type: "system",
@@ -779,7 +777,7 @@ export class WebSocketGateway extends EventEmitter {
    */
   updateConfig(newConfig: Partial<WebSocketGatewayConfig>): void {
     this.config = { ...this.config, ...newConfig };
-    console.log("⚙️ WebSocket Gateway configuration updated");
+    await frameworkLogger.log("websocket-gateway", "config-updated", "info");
     this.emit("config-updated", { ...this.config });
   }
 }

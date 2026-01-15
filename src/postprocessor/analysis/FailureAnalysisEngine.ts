@@ -323,6 +323,6 @@ export class FailureAnalysisEngine {
   private initializeAnalysisPatterns(): void {
     // Initialize patterns for failure classification
     // This could be expanded with more sophisticated pattern matching
-    console.log("🔍 Failure analysis patterns initialized");
+    await frameworkLogger.log("failure-analysis", "patterns-initialized", "info");
   }
 }

@@ -79,7 +79,7 @@ app.use((req: any, res: any, next: any) => {
   res.on("finish", () => {
     const end = process.hrtime.bigint();
     const duration = Number(end - start) / 1e6; // Convert to milliseconds
-    console.log(`${req.method} ${req.url} - ${duration.toFixed(2)}ms`);
+    // HTTP request logging - operational, keep for monitoring
   });
   next();
 });
@@ -92,12 +92,7 @@ app.get("/", (req: any, res: any) => {
 // Add route for refactoring logs
 app.get("/logs", async (req: any, res: any) => {
   const logPath = join(__dirname, "..", ".opencode", "REFACTORING_LOG.md");
-  console.log("Server __dirname:", __dirname);
-  console.log("Resolved log path:", logPath);
-
-  try {
-    const fs = await import("fs");
-    console.log("File exists:", fs.existsSync(logPath));
+    // Server debug logging - remove for production
 
     if (fs.existsSync(logPath)) {
       const content = fs.readFileSync(logPath, "utf-8");
@@ -111,7 +106,7 @@ app.get("/logs", async (req: any, res: any) => {
         );
     }
   } catch (error) {
-    console.log("File read error:", error);
+    // File read error - remove debug logging
     res.status(500).send("Server error reading log file.");
   }
 });

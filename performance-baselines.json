@@ -17,18 +17,18 @@
   },
   "memory-usage-check": {
     "testName": "memory-usage-check",
-    "averageDuration": 0.03314120000000002,
-    "standardDeviation": 0.0019347556567093822,
-    "sampleCount": 5,
-    "lastUpdated": 1768358987495,
+    "averageDuration": 0.033041333333358125,
+    "standardDeviation": 0.0017830422455112445,
+    "sampleCount": 6,
+    "lastUpdated": 1768506869722,
     "tolerance": 10
   },
   "test-execution-performance": {
     "testName": "test-execution-performance",
-    "averageDuration": 0.09333849999998733,
-    "standardDeviation": 0.012121181781940375,
-    "sampleCount": 8,
-    "lastUpdated": 1768497558200,
+    "averageDuration": 0.09194989999996324,
+    "standardDeviation": 0.011536488438699794,
+    "sampleCount": 10,
+    "lastUpdated": 1768507192780,
     "tolerance": 10
   }
 }

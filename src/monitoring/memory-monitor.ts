@@ -331,7 +331,7 @@ export class MemoryMonitor extends EventEmitter {
     // Write to framework activity log instead of console
     try {
       const fs = require("fs");
-      const logDir = "./.opencode/logs";
+      const logDir = "./logs/monitoring";
       const logFile = `${logDir}/memory-monitor-${new Date().toISOString().split("T")[0]}.log`;
 
       if (!fs.existsSync(logDir)) {
@@ -356,8 +356,9 @@ export function getMemoryUsage(): MemoryStats {
 
 export function logMemoryUsage(): void {
   const stats = getMemoryUsage();
+  // Memory monitor logging - already handled by frameworkLogger
   console.log(
-    `🧠 Memory Usage: ${stats.heapUsed}MB heap, ${stats.heapTotal}MB total, ${stats.external}MB external`,
+    `🧠 Memory Usage: ${stats.heapUsed}MB heap, ${stats.heapTotal}MB total, ${stats.external}MB external`
   );
 }
 

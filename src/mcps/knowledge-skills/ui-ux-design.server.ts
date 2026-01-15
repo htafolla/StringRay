@@ -108,7 +108,7 @@ class StrRayUIUXDesignServer {
     );
 
     this.setupToolHandlers();
-    console.log("StrRay UI/UX Design MCP Server initialized");
+    // Server initialization - removed unnecessary startup logging
   }
 
   private setupToolHandlers() {

@@ -300,7 +300,7 @@ const report = await reportingSystem.generateCustomReport('${template.name}');
     timeRange?: ReportConfig["timeRange"],
   ): Promise<any[]> {
     const logs: any[] = [];
-    const logDir = path.join(process.cwd(), ".opencode", "logs");
+    const logDir = path.join(process.cwd(), "logs", "framework");
 
     if (!fs.existsSync(logDir)) return logs;
 
@@ -408,7 +408,7 @@ const report = await reportingSystem.generateCustomReport('${template.name}');
   ): Promise<any[]> {
     const logs: any[] = [];
     const logDir = path.join(process.cwd(), ".opencode", "logs");
-    const logFile = path.join(logDir, "framework-activity.log");
+    const logFile = path.join(logDir, "activity.log");
 
     try {
       const fs = await import("fs");

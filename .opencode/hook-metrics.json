@@ -124,5 +124,12 @@
     "duration": 0,
     "exitCode": 127,
     "success": false
+  },
+  {
+    "timestamp": 1768499138706,
+    "hookType": "post-commit",
+    "duration": 0,
+    "exitCode": 127,
+    "success": false
   }
 ]

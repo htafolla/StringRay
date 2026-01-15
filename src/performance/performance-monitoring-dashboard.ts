@@ -17,6 +17,7 @@ import {
   PERFORMANCE_BUDGET,
 } from "./performance-budget-enforcer.js";
 import { PerformanceRegressionTester } from "./performance-regression-tester.js";
+import { frameworkLogger } from "../framework-logger.js";
 
 export interface DashboardMetrics {
   timestamp: number;
@@ -189,36 +190,7 @@ export class PerformanceMonitoringDashboard extends EventEmitter {
       return;
     }
 
-    console.log("📊 Starting Performance Monitoring Dashboard");
-    console.log(`   Update Interval: ${this.config.updateInterval / 1000}s`);
-    console.log(`   History Retention: ${this.config.historyRetention}h`);
-    console.log(
-      `   Alert Thresholds: Budget=${this.config.alertThresholds.budgetViolation}, Regression=${this.config.alertThresholds.regressionThreshold}%`,
-    );
-
-    this.isRunning = true;
-    this.updateMetrics();
-
-    this.updateTimer = setInterval(() => {
-      this.updateMetrics();
-    }, this.config.updateInterval);
-  }
-
-  /**
-   * Stop the monitoring dashboard
-   */
-  stop(): void {
-    if (!this.isRunning) {
-      return;
-    }
-
-    this.isRunning = false;
-    if (this.updateTimer) {
-      clearInterval(this.updateTimer);
-      this.updateTimer = undefined;
-    }
-
-    console.log("🛑 Stopped Performance Monitoring Dashboard");
+  // Performance dashboard messages - consider migrating to frameworkLogger for operational monitoring
   }
 
   /**
@@ -538,10 +510,10 @@ export class PerformanceMonitoringDashboard extends EventEmitter {
   /**
    * Send webhook notification
    */
-  private sendWebhookNotification(alert: DashboardMetrics["alerts"][0]): void {
+  private async sendWebhookNotification(alert: DashboardMetrics["alerts"][0]): Promise<void> {
     try {
       // In a real implementation, this would make an HTTP request
-      console.log(`📤 Webhook notification: ${alert.message}`);
+      await frameworkLogger.log("performance-dashboard", "webhook-notification", "info", { message: alert.message });
     } catch (error) {
       console.error("Failed to send webhook notification:", error);
     }

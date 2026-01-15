@@ -1,7 +1,7 @@
 /**
  * StringRay Context Loader
  *
- * Loads Universal Development Codex v1.2.20 context for agent initialization.
+ * Loads Universal Development Codex v1.2.24 context for agent initialization.
  * Provides structured access to 30+ codex terms, interweaves, lenses, and anti-patterns.
  *
  * @version 1.0.0
@@ -19,7 +19,7 @@ function isValidMatch(match, index) {
 /**
  * StringRay Context Loader
  *
- * Loads and parses the Universal Development Codex v1.2.20 from codex.json
+ * Loads and parses the Universal Development Codex v1.2.24 from codex.json
  */
 export class StringRayContextLoader {
     static instance;

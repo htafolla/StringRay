@@ -18,8 +18,8 @@ const mockGetRecentLogs = frameworkLogger.getRecentLogs as any;
 const mockGetComponentUsage = frameworkLogger.getComponentUsage as any;
 
 describe("Framework Enforcement Integration", () => {
-  const logDir = path.join(process.cwd(), ".opencode", "logs");
-  const logFile = path.join(logDir, "framework-activity.log");
+  const logDir = path.join(process.cwd(), "logs", "framework");
+  const logFile = path.join(logDir, "activity.log");
 
   beforeEach(() => {
     vi.clearAllMocks();

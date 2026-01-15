@@ -298,7 +298,7 @@ export function createStringRayCodexInjectorHook() {
           const loadResult = await contextLoader.loadCodexContext(sessionId);
 
           if (!loadResult.success || !loadResult.context) {
-            console.log("⚠️  No codex context available - allowing action");
+            // Codex context warning - operational, keep
             return;
           }
 

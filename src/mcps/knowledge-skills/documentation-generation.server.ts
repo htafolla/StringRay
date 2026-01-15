@@ -130,7 +130,7 @@ class StrRayDocumentationGenerationServer {
     );
 
     this.setupToolHandlers();
-    console.log("StrRay Documentation Generation MCP Server initialized");
+    // Server initialization - removed unnecessary startup logging
   }
 
   private setupToolHandlers() {

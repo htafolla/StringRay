@@ -125,11 +125,11 @@ monitor_analysis_logs() {
     sleep 2
 
     echo "Recent Framework Activity:"
-    tail -10 .opencode/logs/framework-activity.log 2>/dev/null | grep -E "(analyzer|orchestrator|delegation)" | tail -5 || echo "   No recent analysis logs"
+    tail -10 logs/framework/activity.log 2>/dev/null | grep -E "(analyzer|orchestrator|delegation)" | tail -5 || echo "   No recent analysis logs"
 
     echo ""
     echo "Complexity Analysis Logs:"
-    grep -E "(complexity|reasoning|strategy)" .opencode/logs/framework-activity.log 2>/dev/null | tail -3 || echo "   No complexity logs found"
+    grep -E "(complexity|reasoning|strategy)" logs/framework/activity.log 2>/dev/null | tail -3 || echo "   No complexity logs found"
 }
 
 # Check refactoring log updates

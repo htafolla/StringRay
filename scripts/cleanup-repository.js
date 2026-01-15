@@ -43,8 +43,8 @@ const CLEANUP_TARGETS = [
   'dist/test-utils',
   'dist/testing',
 
-  // Log files (keep framework-activity.log as it may be needed)
-  '.opencode/logs/memory-monitor-*.log',
+  // Log files (keep activity.log as it may be needed)
+  'logs/monitoring/memory-monitor-*.log',
   '.opencode/logs/strray-plugin-*.log'
 ];
 

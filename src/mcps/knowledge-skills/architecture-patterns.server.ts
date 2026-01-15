@@ -31,7 +31,7 @@ class StrRayArchitecturePatternsServer {
     );
 
     this.setupToolHandlers();
-    console.log("StrRay Architecture Patterns MCP Server initialized");
+    // Server initialization - removed unnecessary startup logging
   }
 
   private setupToolHandlers() {
@@ -123,7 +123,7 @@ class StrRayArchitecturePatternsServer {
   async run(): Promise<void> {
     const transport = new StdioServerTransport();
     await this.server.connect(transport);
-    console.log("StrRay Architecture Patterns MCP Server started");
+    // Server startup - removed unnecessary startup logging
   }
 }
 

@@ -96,7 +96,7 @@ export async function simulateSessionRecovery(
     issues,
   };
 
-  console.log("✅ Session Recovery Simulation Complete");
+  await frameworkLogger.log("simulation-session-recovery", "simulation-complete", "success");
   console.log(
     `Failed: ${result.failedSessions}, Recovered: ${result.recoveredSessions}/${result.failedSessions}`,
   );

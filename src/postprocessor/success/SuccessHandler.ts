@@ -4,6 +4,7 @@
  */
 
 import { PostProcessorContext, PostProcessorResult } from "../types.js";
+import { frameworkLogger } from "../../framework-logger.js";
 
 export interface SuccessConfig {
   successConfirmation: boolean;
@@ -131,7 +132,7 @@ export class SuccessHandler {
     // - Update deployment records
     // - Notify downstream systems
 
-    console.log("✅ Cleanup completed");
+    await frameworkLogger.log("success-handler", "cleanup-completed", "success");
   }
 
   /**

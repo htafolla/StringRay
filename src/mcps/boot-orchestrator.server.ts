@@ -13,6 +13,7 @@ import {
 import { execSync } from "child_process";
 import fs from "fs";
 import path from "path";
+import { frameworkLogger } from "../framework-logger.js";
 
 class StrRayBootOrchestratorServer {
   private server: Server;
@@ -64,7 +65,7 @@ class StrRayBootOrchestratorServer {
     this.initializeDependencies();
 
     this.setupToolHandlers();
-    console.log("StrRay Boot Orchestrator MCP Server initialized");
+    frameworkLogger.log("mcps/boot-orchestrator", "initialize", "info");
   }
 
   private initializeDependencies() {
@@ -1011,7 +1012,7 @@ ${results.warnings.length > 0 ? `**Warnings:**\n${results.warnings.map((w: strin
   async run() {
     const transport = new StdioServerTransport();
     await this.server.connect(transport);
-    console.log("StrRay Boot Orchestrator MCP Server started");
+    frameworkLogger.log("mcps/boot-orchestrator", "start", "success");
   }
 }
 

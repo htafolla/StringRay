@@ -11,6 +11,7 @@
 import { StringRayStateManager } from "../state/state-manager";
 import { SessionCoordinator } from "../delegation/session-coordinator";
 import { SessionMonitor } from "./session-monitor";
+import { frameworkLogger } from "../framework-logger";
 
 export interface SessionMetadata {
   sessionId: string;
@@ -85,7 +86,12 @@ export class SessionCleanupManager {
    * Initialize cleanup manager and start auto-cleanup if enabled
    */
   private initialize(): void {
-    console.log("🧹 Session Cleanup Manager: Initializing...");
+    frameworkLogger.log("session-cleanup", "initialize", "info", {
+      enableAutoCleanup: this.config.enableAutoCleanup,
+      ttlMs: this.config.ttlMs,
+      idleTimeoutMs: this.config.idleTimeoutMs,
+      maxSessions: this.config.maxSessions,
+    });
 
     this.loadSessionMetadata();
 
@@ -93,7 +99,9 @@ export class SessionCleanupManager {
       this.startAutoCleanup();
     }
 
-    console.log("✅ Session Cleanup Manager: Initialized");
+    frameworkLogger.log("session-cleanup", "initialize", "success", {
+      autoCleanupEnabled: this.config.enableAutoCleanup,
+    });
   }
 
   /**
@@ -113,9 +121,10 @@ export class SessionCleanupManager {
     this.sessionMetadata.set(sessionId, metadata);
     this.persistSessionMetadata(sessionId, metadata);
 
-    console.log(
-      `📋 Session Cleanup Manager: Registered session ${sessionId} with TTL ${ttlMs || this.config.ttlMs}ms`,
-    );
+    frameworkLogger.log("session-cleanup", "register-session", "info", {
+      sessionId,
+      ttlMs: ttlMs || this.config.ttlMs,
+    });
   }
 
   updateActivity(sessionId: string): void {
@@ -205,9 +214,12 @@ export class SessionCleanupManager {
     }
 
     if (result.sessionsCleaned > 0) {
-      console.log(
-        `🧹 Session Cleanup Manager: Cleaned up ${result.sessionsCleaned} sessions (${result.sessionsExpired} expired, ${result.sessionsIdle} idle)`,
-      );
+      frameworkLogger.log("session-cleanup", "perform-cleanup", "info", {
+        sessionsCleaned: result.sessionsCleaned,
+        sessionsExpired: result.sessionsExpired,
+        sessionsIdle: result.sessionsIdle,
+        errors: result.errors.length,
+      });
     }
 
     return result;
@@ -225,9 +237,10 @@ export class SessionCleanupManager {
       }
 
       await this.cleanupSession(sessionId);
-      console.log(
-        `🧹 Session Cleanup Manager: Manual cleanup completed for session ${sessionId}`,
-      );
+      frameworkLogger.log("session-cleanup", "manual-cleanup", "success", {
+        sessionId,
+        reason: reason || "manual",
+      });
       return true;
     } catch (error) {
       console.error(
@@ -258,9 +271,10 @@ export class SessionCleanupManager {
       }
     }
 
-    console.log(
-      `🚨 Session Cleanup Manager: Emergency cleanup completed - ${result.sessionsCleaned} sessions cleaned`,
-    );
+    frameworkLogger.log("session-cleanup", "emergency-cleanup", "info", {
+      sessionsCleaned: result.sessionsCleaned,
+      errors: result.errors.length,
+    });
     return result;
   }
 
@@ -330,9 +344,9 @@ export class SessionCleanupManager {
       }
     }, this.config.cleanupIntervalMs);
 
-    console.log(
-      `⏰ Session Cleanup Manager: Auto-cleanup started (interval: ${this.config.cleanupIntervalMs}ms)`,
-    );
+    frameworkLogger.log("session-cleanup", "start-auto-cleanup", "info", {
+      cleanupIntervalMs: this.config.cleanupIntervalMs,
+    });
   }
 
   /**
@@ -342,7 +356,7 @@ export class SessionCleanupManager {
     if (this.cleanupInterval) {
       clearInterval(this.cleanupInterval);
       this.cleanupInterval = undefined;
-      console.log("⏹️ Session Cleanup Manager: Auto-cleanup stopped");
+      frameworkLogger.log("session-cleanup", "stop-auto-cleanup", "info");
     }
   }
 
@@ -366,9 +380,9 @@ export class SessionCleanupManager {
             this._sessionMetadata.set(sessionId, metadata as SessionMetadata);
           }
         }
-        console.log(
-          `📋 Session Cleanup Manager: Lazy-loaded metadata for ${this._sessionMetadata.size} sessions`,
-        );
+        frameworkLogger.log("session-cleanup", "load-metadata", "info", {
+          sessionsLoaded: this._sessionMetadata.size,
+        });
       } else if (storedMetadata) {
         console.warn(
           "⚠️ Session Cleanup Manager: Corrupted session metadata detected, skipping load",
@@ -421,7 +435,10 @@ export class SessionCleanupManager {
     this.sessionMetadata.delete(sessionId);
     this.persistSessionMetadata(sessionId, metadata);
 
-    console.log(`🧹 Session Cleanup Manager: Cleaned up session ${sessionId}`);
+    frameworkLogger.log("session-cleanup", "cleanup-session", "info", {
+      sessionId,
+      cleanupReason: metadata.cleanupReason,
+    });
   }
 
   /**
@@ -429,7 +446,7 @@ export class SessionCleanupManager {
    */
   shutdown(): void {
     this.stopAutoCleanup();
-    console.log("🛑 Session Cleanup Manager: Shutdown complete");
+    frameworkLogger.log("session-cleanup", "shutdown", "info");
   }
 }
 

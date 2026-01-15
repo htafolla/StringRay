@@ -58,7 +58,7 @@ class StrRayCodeReviewServer {
     );
 
     this.setupToolHandlers();
-    console.log("StrRay Code Review MCP Server initialized");
+    // Server initialization - removed unnecessary startup logging
   }
 
   private setupToolHandlers() {

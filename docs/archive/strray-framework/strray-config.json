@@ -1,0 +1,143 @@
+{
+  "$schema": "https://raw.githubusercontent.com/code-yeongyu/oh-my-opencode/master/assets/oh-my-opencode.schema.json",
+  "google_auth": false,
+  "preemptive_compaction": true,
+  "model_routing": {
+    "enforcer": "opencode/grok-code",
+    "architect": "opencode/grok-code",
+    "orchestrator": "opencode/grok-code",
+    "bug-triage-specialist": "opencode/grok-code",
+    "code-reviewer": "opencode/grok-code",
+    "security-auditor": "opencode/grok-code",
+    "refactorer": "opencode/grok-code",
+    "test-architect": "opencode/grok-code"
+  },
+  "framework_thresholds": {
+    "bundle_size": "2MB",
+    "test_coverage": 0.85,
+    "duplication_rate": 0.05,
+    "error_rate": 0.1
+  },
+  "strray_framework": {
+    "version": "1.0.0",
+    "codex_terms": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 24, 29, 32, 38, 42, 43],
+    "session_initialization": {
+      "auto_format": true,
+      "security_scan": true,
+      "compliance_check": true,
+      "threshold_monitoring": true
+    },
+    "automation_hooks": {
+      "pre_commit": ["pre-commit-introspection"],
+      "post_commit": ["auto-format"],
+      "daily": ["enforcer-daily-scan"],
+      "security": ["security-scan"],
+      "deployment": ["post-deployment-audit"],
+      "summary": ["summary-logger"],
+      "job_completion": ["job-summary-logger"]
+    },
+    "agent_capabilities": {
+      "enforcer": [
+        "compliance-monitoring",
+        "threshold-enforcement",
+        "automation-orchestration"
+      ],
+      "architect": [
+        "design-review",
+        "architecture-validation",
+        "dependency-analysis"
+      ],
+      "orchestrator": [
+        "task-coordination",
+        "multi-agent-orchestration",
+        "workflow-management"
+      ],
+      "bug-triage-specialist": [
+        "error-analysis",
+        "root-cause-identification",
+        "fix-suggestions"
+      ],
+      "code-reviewer": [
+        "code-quality-assessment",
+        "best-practice-validation",
+        "security-review"
+      ],
+      "security-auditor": [
+        "vulnerability-detection",
+        "threat-analysis",
+        "security-validation"
+      ],
+      "refactorer": ["code-modernization", "debt-reduction", "consolidation"],
+      "test-architect": [
+        "test-strategy-design",
+        "coverage-optimization",
+        "behavioral-testing"
+      ]
+    },
+    "mcp_knowledge_skills": [
+      "project-analysis",
+      "testing-strategy",
+      "architecture-patterns",
+      "performance-optimization",
+      "git-workflow",
+      "api-design"
+    ],
+    "sisyphus_orchestrator": {
+      "enabled": true,
+      "coordination_model": "async-multi-agent",
+      "max_concurrent_agents": 3,
+      "task_distribution": {
+        "enforcer": ["compliance", "thresholds", "automation"],
+        "architect": ["design", "architecture", "dependencies"],
+        "code-reviewer": ["quality", "best-practices", "security"],
+        "test-architect": ["testing", "coverage", "behavioral"],
+        "refactorer": ["modernization", "debt-reduction", "consolidation"],
+        "security-auditor": ["vulnerabilities", "threats", "validation"],
+        "bug-triage-specialist": ["errors", "root-cause", "fixes"]
+      },
+      "workflow_patterns": {
+        "complex-refactor": ["architect", "refactorer", "test-architect"],
+        "security-audit": ["security-auditor", "enforcer", "code-reviewer"],
+        "new-feature": ["architect", "code-reviewer", "test-architect"],
+        "bug-fix": ["bug-triage-specialist", "code-reviewer", "test-architect"]
+      }
+    },
+    "monitoring": {
+      "metrics": [
+        "bundle-size",
+        "test-coverage",
+        "code-duplication",
+        "build-time",
+        "error-rate"
+      ],
+      "alerts": [
+        "threshold-violations",
+        "security-issues",
+        "performance-degradation",
+        "test-failures"
+      ],
+      "reporting": {
+        "frequency": "daily",
+        "format": "json",
+        "destinations": ["console", "logs", "notifications"]
+      }
+    }
+  },
+  "agents": {
+    "librarian": {
+      "model": "opencode/grok-code"
+    },
+    "explore": {
+      "model": "opencode/grok-code"
+    },
+    "frontend-ui-ux-engineer": {
+      "model": "opencode/grok-code"
+    },
+    "document-writer": {
+      "model": "opencode/grok-code"
+    },
+    "multimodal-looker": {
+      "model": "opencode/grok-code"
+    }
+  }
+}

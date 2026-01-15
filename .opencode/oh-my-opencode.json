@@ -43,6 +43,28 @@
     "hooks": true,
     "plugins": true
   },
+
+  "sisyphus": {
+    "disableOrchestration": true
+  },
+  "agents": {
+    "Planner-Sisyphus": false,
+    "Builder-Sisyphus": false
+  },
+  "disabled_mcps": [
+    // StringRay MCP servers with frameworkLogger issues (disabled to avoid confusion)
+    "librarian",
+    "api-design",
+    "architecture-patterns",
+    "git-workflow",
+    "performance-optimization",
+    "project-analysis",
+    "testing-strategy"
+    // Note: global-everything, global-git, global-sqlite disabled in ~/.claude/.mcp.json
+  ],
+  "disabled_hooks": [
+    "startup-toast"
+  ],
   "agent": {
     "orchestrator": {
       "model": "opencode/grok-code"

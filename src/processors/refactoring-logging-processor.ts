@@ -228,7 +228,7 @@ ${this.summarizeResult(context.result)}
 
   private async appendToRefactoringLog(content: string): Promise<void> {
     const projectRoot = process.cwd();
-    const logPath = path.join(projectRoot, ".opencode", "REFACTORING_LOG.md");
+    const logPath = path.join(projectRoot, "logs", "agents", "refactoring-log.md");
 
     // Ensure directory exists
     const logDir = path.dirname(logPath);

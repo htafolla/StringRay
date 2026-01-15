@@ -18,17 +18,17 @@ node -e "
 
   memoryMonitor.stop();
   console.log('Memory monitor test complete');
-  console.log('Check .opencode/logs/memory-monitor-*.log for results');
+  console.log('Check logs/monitoring/memory-monitor-*.log for results');
 })();
 " 2>/dev/null
 
 echo ""
 echo "📊 Memory Monitor Test Results:"
-echo "Check the log file: .opencode/logs/memory-monitor-$(date +%Y-%m-%d).log"
+echo "Check the log file: logs/monitoring/memory-monitor-$(date +%Y-%m-%d).log"
 echo ""
 
 # Show a summary of the log file if it exists
-LOG_FILE=".opencode/logs/memory-monitor-$(date +%Y-%m-%d).log"
+LOG_FILE="logs/monitoring/memory-monitor-$(date +%Y-%m-%d).log"
 if [ -f "$LOG_FILE" ]; then
   echo "📝 Last few log entries:"
   tail -5 "$LOG_FILE" 2>/dev/null || echo "No log entries found"

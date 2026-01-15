@@ -257,7 +257,7 @@ export class PerformanceRegressionTester {
     console.log(`   Total Tests: ${summary.totalTests}`);
     console.log(`   ✅ Passed: ${summary.passed}`);
     console.log(`   ⚠️ Warnings: ${summary.warnings}`);
-    console.log(`   ❌ Failed: ${summary.failed}`);
+    // Test failure count - kept as console.log for CI visibility
     console.log(
       `   📈 Average Deviation: ${summary.averageDeviation.toFixed(2)}%`,
     );

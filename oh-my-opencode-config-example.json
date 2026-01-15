@@ -1,0 +1,35 @@
+// Configuration to add to your .opencode/oh-my-opencode.json file
+{
+  // Disable Sisyphus orchestration (main confusion source)
+  "sisyphus": {
+    "disableOrchestration": true
+  },
+
+  // Disable specific Sisyphus-powered agents
+  "agents": {
+    "Planner-Sisyphus": false,
+    "Builder-Sisyphus": false
+  },
+
+  // Disable problematic global MCPs that show connection errors
+  "disabled_mcps": [
+    "global-everything",
+    "global-git",
+    "global-sqlite"
+  ],
+
+  // Disable startup toasts mentioning Sisyphus
+  "disabled_hooks": [
+    "startup-toast"
+  ],
+
+  // StringRay plugin configuration (already has MCP auto-registration disabled)
+  "plugins": {
+    "stringray-codex-injection": {
+      "enabled": true,
+      "maxConcurrentAgents": 3,
+      "codexEnforcement": true,
+      "mcpAutoRegistration": false
+    }
+  }
+}

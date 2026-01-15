@@ -89,7 +89,7 @@ class StrRayDatabaseDesignServer {
     );
 
     this.setupToolHandlers();
-    console.log("StrRay Database Design MCP Server initialized");
+    // Server initialization - removed unnecessary startup logging
   }
 
   private setupToolHandlers() {

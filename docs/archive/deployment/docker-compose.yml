@@ -1,0 +1,94 @@
+version: '3.8'
+
+services:
+  strray-framework:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - STRRAY_LOGGING_ENABLED=true
+      - STRRAY_MULTI_AGENT_ENABLED=true
+      - STRRAY_CODEX_ENFORCEMENT=strict
+    volumes:
+      - ./logs:/app/logs
+      - ./.strray:/app/.strray:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('./dist/server.js').healthCheck()"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - strray-network
+
+  # Optional: Redis for caching (if needed)
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    networks:
+      - strray-network
+    command: redis-server --appendonly yes
+
+  # Optional: PostgreSQL for persistence (if needed)
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: strray
+      POSTGRES_USER: strray
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-strray_password}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - strray-network
+
+  # Monitoring stack (optional)
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+    restart: unless-stopped
+    networks:
+      - strray-network
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3001:3000"
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin}
+    volumes:
+      - grafana_data:/var/lib/grafana
+    restart: unless-stopped
+    networks:
+      - strray-network
+    depends_on:
+      - prometheus
+
+networks:
+  strray-network:
+    driver: bridge
+
+volumes:
+  redis_data:
+  postgres_data:
+  prometheus_data:
+  grafana_data:

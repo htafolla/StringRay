@@ -11,6 +11,7 @@
 import { readFileSync, readdirSync, statSync } from "fs";
 import { join, resolve } from "path";
 import { createHash } from "crypto";
+import { frameworkLogger } from "../framework-logger";
 
 export interface SecurityIssue {
   severity: "critical" | "high" | "medium" | "low" | "info";
@@ -206,7 +207,10 @@ export class SecurityAuditor {
     const issues: SecurityIssue[] = [];
     const files = this.getAllFiles(projectPath);
 
-    console.log(`🔍 Security Auditor: Scanning ${files.length} files...`);
+    frameworkLogger.log("security-auditor", "scan-start", "info", {
+      filesCount: files.length,
+      projectPath,
+    });
 
     for (const file of files) {
       if (this.shouldAuditFile(file)) {

@@ -53,7 +53,7 @@ export async function runSelfEvolutionSimulation(): Promise<SelfEvolutionSimulat
 
   try {
     // Phase 1: Meta-Analysis Engine Test
-    console.log('\n📊 Phase 1: Meta-Analysis Engine');
+    await frameworkLogger.log("simulation-self-evolution", "phase-started", "info", { phase: 1, description: "Meta-Analysis Engine" });
     componentsTested.push('meta-analysis');
 
     // Simulate rule executions to build analysis data
@@ -67,7 +67,7 @@ export async function runSelfEvolutionSimulation(): Promise<SelfEvolutionSimulat
     }
 
     const analysisReport = (metaAnalysisEngine as any).generateMetaAnalysisReport();
-    console.log(`✅ Meta-Analysis: ${analysisReport.ruleEffectiveness.length} rules analyzed`);
+    await frameworkLogger.log("simulation-self-evolution", "meta-analysis-complete", "success", { rulesAnalyzed: analysisReport.ruleEffectiveness.length });
     console.log(`   Health Score: ${(analysisReport.frameworkHealthScore * 100).toFixed(1)}%`);
 
     // Phase 2: Inference Engine Test

@@ -46,14 +46,14 @@ node -e "
 # Check recent agent activity
 echo ""
 echo "📊 Recent Agent Activity:"
-if [ -f ".opencode/logs/framework-activity.log" ]; then
+if [ -f "logs/framework/activity.log" ]; then
     # Look for recent delegation activity in last 100 lines
-    RECENT_ACTIVITY=$(tail -100 .opencode/logs/framework-activity.log | grep -c "agent-delegator\|delegation")
+    RECENT_ACTIVITY=$(tail -100 logs/framework/activity.log | grep -c "agent-delegator\|delegation")
 
     if [ "$RECENT_ACTIVITY" -gt 0 ]; then
         echo "✅ Recent delegation activity detected ($RECENT_ACTIVITY events)"
         # Show last delegation event
-        LAST_EVENT=$(tail -100 .opencode/logs/framework-activity.log | grep -E "agent-delegator|delegation" | tail -1)
+        LAST_EVENT=$(tail -100 logs/framework/activity.log | grep -E "agent-delegator|delegation" | tail -1)
         if [ ! -z "$LAST_EVENT" ]; then
             TIMESTAMP=$(echo "$LAST_EVENT" | cut -d' ' -f1)
             MESSAGE=$(echo "$LAST_EVENT" | cut -d' ' -f3-)
@@ -82,8 +82,8 @@ echo "Created test file: $TEST_FILE"
 sleep 2
 
 # Check if delegation occurred
-if [ -f ".opencode/logs/framework-activity.log" ]; then
-    DELEGATION_EVENTS=$(tail -50 .opencode/logs/framework-activity.log | grep -c "test-architect\|delegation\|handleFileCreation")
+if [ -f "logs/framework/activity.log" ]; then
+    DELEGATION_EVENTS=$(tail -50 logs/framework/activity.log | grep -c "test-architect\|delegation\|handleFileCreation")
 
     if [ "$DELEGATION_EVENTS" -gt 0 ]; then
         echo "✅ File creation delegation triggered ($DELEGATION_EVENTS events)"
@@ -104,10 +104,10 @@ echo ""
 echo "🏆 Orchestration Health Summary:"
 echo "- Agents configured: $(ls .opencode/agents/*.yml 2>/dev/null | wc -l)/8"
 echo "- Delegation system: $(node -e "(async()=>{try{const{d}=await import('./dist/delegation/agent-delegator.js');const s=new(await import('./dist/state/state-manager.js')).StrRayStateManager();d.createAgentDelegator(s);console.log('✅ Active')}catch(e){console.log('❌ Error')}})();" 2>/dev/null)"
-echo "- File operations: $([ -f ".opencode/logs/framework-activity.log" ] && echo "Monitored" || echo "Not monitored")"
+echo "- File operations: $([ -f "logs/framework/activity.log" ] && echo "Monitored" || echo "Not monitored")"
 
 echo ""
 echo "💡 Recommendations:"
 echo "- Run 'npm run framework:init' to ensure full system activation"
-echo "- Monitor .opencode/logs/framework-activity.log for delegation events"
+echo "- Monitor logs/framework/activity.log for delegation events"
 echo "- Use 'npm run memory:dashboard' for comprehensive system health"

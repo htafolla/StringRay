@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "testing-strategy": {
+      "command": "node",
+      "args": [
+        "-e",
+        "console.log('Testing strategy and coverage analysis tool')"
+      ],
+      "env": {}
+    }
+  }
+}

@@ -29,7 +29,7 @@ class StrRayPerformanceOptimizationServer {
     );
 
     this.setupToolHandlers();
-    console.log("StrRay Performance Optimization MCP Server initialized");
+    // Server initialization - removed unnecessary startup logging
   }
 
   private setupToolHandlers() {
@@ -117,7 +117,7 @@ class StrRayPerformanceOptimizationServer {
   async run(): Promise<void> {
     const transport = new StdioServerTransport();
     await this.server.connect(transport);
-    console.log("StrRay Performance Optimization MCP Server started");
+    // Server startup - removed unnecessary startup logging
   }
 }
 

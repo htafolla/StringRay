@@ -107,7 +107,7 @@ export async function simulateDistributedSessions(
     issues,
   };
 
-  console.log("✅ Distributed Session Simulation Complete");
+  await frameworkLogger.log("simulation-distributed-session", "simulation-complete", "success");
   console.log(
     `Success: ${result.success}, Failed Sessions: ${result.failedSessions}`,
   );

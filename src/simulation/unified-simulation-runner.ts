@@ -381,11 +381,11 @@ export class UnifiedSimulationRunner {
     if (overallSuccessRate >= 90) {
       console.log('🏆 STATUS: EXCELLENT - Framework fully validated');
     } else if (overallSuccessRate >= 75) {
-      console.log('✅ STATUS: GOOD - Framework mostly validated');
+      await frameworkLogger.log("simulation-runner", "validation-status", "success", { status: "good", description: "Framework mostly validated" });
     } else if (overallSuccessRate >= 50) {
-      console.log('⚠️ STATUS: FAIR - Framework needs attention');
+      await frameworkLogger.log("simulation-runner", "validation-status", "warning", { status: "fair", description: "Framework needs attention" });
     } else {
-      console.log('❌ STATUS: POOR - Framework requires significant fixes');
+      await frameworkLogger.log("simulation-runner", "validation-status", "error", { status: "poor", description: "Framework requires significant fixes" });
     }
   }
 

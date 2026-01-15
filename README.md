@@ -70,7 +70,7 @@ First, ensure you have a `package.json` file in your project:
 npm init -y
 
 # Then install StringRay AI
-npm install stringray-ai
+npm install @blaze0x1/stringray-ai
 ```
 
 ### Setup
@@ -135,7 +135,7 @@ The plugin test will verify:
 If automatic setup fails:
 
 ```bash
-npm install stringray-ai
+npm install @blaze0x1/stringray-ai
 ```
 
 Then manually add to your development configuration (example for oh-my-opencode):

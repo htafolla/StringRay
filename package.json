@@ -1,5 +1,5 @@
 {
-  "name": "stringray-ai",
+  "name": "@blaze0x1/stringray-ai",
   "version": "1.0.0",
   "description": "⚡ StringRay ⚡: Bulletproof AI orchestration with systematic error prevention. Zero dead ends. Ship clean, tested, optimized code — every time.",
   "type": "module",

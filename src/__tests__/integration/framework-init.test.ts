@@ -204,6 +204,7 @@ describe("StringRay Framework Initialization Integration", () => {
           "architecture",
           "architectural",
           "advanced",
+          "self-evolution",
         ]).toContain(term.category);
       });
     });

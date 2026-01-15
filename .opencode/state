@@ -5,6 +5,15 @@
   "agent:security-auditor": {},
   "agent:test-architect": {},
   "agent:refactorer": {},
+  "orchestrator": {
+    "config": {
+      "maxConcurrentTasks": 5,
+      "taskTimeout": 300000,
+      "conflictResolutionStrategy": "majority_vote"
+    },
+    "activeTasks": {},
+    "taskToAgentMap": {}
+  },
   "memory:baseline": {
     "heapUsed": 15.21,
     "heapTotal": 19.84,
@@ -166,15 +175,6 @@
       "coverage-optimization",
       "behavioral-testing"
     ]
-  },
-  "orchestrator": {
-    "config": {
-      "maxConcurrentTasks": 5,
-      "taskTimeout": 300000,
-      "conflictResolutionStrategy": "majority_vote"
-    },
-    "activeTasks": {},
-    "taskToAgentMap": {}
   },
   "delegation:agent_delegator": {
     "complexityAnalyzer": {
@@ -976,7 +976,7 @@
   },
   "processor:active": true,
   "security:initial_audit": {
-    "totalFiles": 1593,
+    "totalFiles": 1581,
     "issues": [
       {
         "severity": "critical",
@@ -3877,141 +3877,6 @@
         "description": "Potentially dangerous pattern detected: /new\\s+Function\\s*\\(/g",
         "recommendation": "Use static code analysis and avoid dynamic code execution",
         "cwe": "CWE-95"
-      },
-      {
-        "severity": "high",
-        "category": "path-traversal",
-        "file": "/Users/blaze/dev/stringray/final-complete/package-lock.json",
-        "line": 11,
-        "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
-        "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
-        "cwe": "CWE-22"
-      },
-      {
-        "severity": "high",
-        "category": "path-traversal",
-        "file": "/Users/blaze/dev/stringray/final-complete/package-lock.json",
-        "line": 1640,
-        "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
-        "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
-        "cwe": "CWE-22"
-      },
-      {
-        "severity": "high",
-        "category": "path-traversal",
-        "file": "/Users/blaze/dev/stringray/final-complete/package.json",
-        "line": 6,
-        "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
-        "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
-        "cwe": "CWE-22"
-      },
-      {
-        "severity": "high",
-        "category": "path-traversal",
-        "file": "/Users/blaze/dev/stringray/final-stringray/package-lock.json",
-        "line": 11,
-        "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
-        "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
-        "cwe": "CWE-22"
-      },
-      {
-        "severity": "high",
-        "category": "path-traversal",
-        "file": "/Users/blaze/dev/stringray/final-stringray/package-lock.json",
-        "line": 1640,
-        "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
-        "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
-        "cwe": "CWE-22"
-      },
-      {
-        "severity": "high",
-        "category": "path-traversal",
-        "file": "/Users/blaze/dev/stringray/final-stringray/package.json",
-        "line": 6,
-        "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
-        "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
-        "cwe": "CWE-22"
-      },
-      {
-        "severity": "high",
-        "category": "path-traversal",
-        "file": "/Users/blaze/dev/stringray/final-stringray-fixed/package-lock.json",
-        "line": 11,
-        "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
-        "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
-        "cwe": "CWE-22"
-      },
-      {
-        "severity": "high",
-        "category": "path-traversal",
-        "file": "/Users/blaze/dev/stringray/final-stringray-fixed/package-lock.json",
-        "line": 1640,
-        "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
-        "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
-        "cwe": "CWE-22"
-      },
-      {
-        "severity": "high",
-        "category": "path-traversal",
-        "file": "/Users/blaze/dev/stringray/final-stringray-fixed/package.json",
-        "line": 6,
-        "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
-        "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
-        "cwe": "CWE-22"
-      },
-      {
-        "severity": "high",
-        "category": "path-traversal",
-        "file": "/Users/blaze/dev/stringray/final-validation/package-lock.json",
-        "line": 11,
-        "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
-        "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
-        "cwe": "CWE-22"
-      },
-      {
-        "severity": "high",
-        "category": "path-traversal",
-        "file": "/Users/blaze/dev/stringray/final-validation/package-lock.json",
-        "line": 1640,
-        "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
-        "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
-        "cwe": "CWE-22"
-      },
-      {
-        "severity": "high",
-        "category": "path-traversal",
-        "file": "/Users/blaze/dev/stringray/final-validation/package.json",
-        "line": 6,
-        "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
-        "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
-        "cwe": "CWE-22"
-      },
-      {
-        "severity": "high",
-        "category": "path-traversal",
-        "file": "/Users/blaze/dev/stringray/final-verification/package-lock.json",
-        "line": 11,
-        "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
-        "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
-        "cwe": "CWE-22"
-      },
-      {
-        "severity": "high",
-        "category": "path-traversal",
-        "file": "/Users/blaze/dev/stringray/final-verification/package-lock.json",
-        "line": 1640,
-        "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
-        "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
-        "cwe": "CWE-22"
-      },
-      {
-        "severity": "high",
-        "category": "path-traversal",
-        "file": "/Users/blaze/dev/stringray/final-verification/package.json",
-        "line": 6,
-        "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
-        "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
-        "cwe": "CWE-22"
       },
       {
         "severity": "high",
@@ -8912,7 +8777,7 @@
     ],
     "summary": {
       "critical": 69,
-      "high": 455,
+      "high": 440,
       "medium": 329,
       "low": 45,
       "info": 0

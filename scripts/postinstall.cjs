@@ -70,9 +70,6 @@ try {
   console.log('✅ StrRay Plugin installed');
 }
 
-// Exit successfully to not break npm install
-process.exit(0);
-
 function getOhMyOpenCodeConfigPath() {
   // Try to find oh-my-opencode config in current project
   const projectConfig = path.join(process.cwd(), '.opencode', 'oh-my-opencode.json');
@@ -210,6 +207,9 @@ function configureStrRayPlugin() {
   // Create StrRay-specific configuration file separately
   createStrRayConfig();
 
+  // Configure Claude MCP exclusions to prevent connection errors
+  configureClaudeMCPExclusions();
+
   console.log(`🎉 StrRay plugin installation complete!`);
   console.log(`\n📋 Next Steps:`);
   console.log(`1. Restart oh-my-opencode to load the plugin`);
@@ -240,6 +240,51 @@ function createStrRayConfig() {
     console.log(`✅ Created StrRay configuration at ${stringrayConfigPath}`);
   } catch (error) {
     console.warn(`⚠️ Could not create StrRay config: ${error.message}`);
+  }
+}
+
+function configureClaudeMCPExclusions() {
+  // Configure Claude MCP exclusions to prevent connection errors
+  const claudeConfigPath = path.join(os.homedir(), '.claude', '.mcp.json');
+
+  console.log(`🔧 Checking Claude MCP configuration at: ${claudeConfigPath}`);
+
+  if (!fs.existsSync(claudeConfigPath)) {
+    console.log(`ℹ️ Claude MCP config not found at ${claudeConfigPath}, skipping exclusions`);
+    return;
+  }
+
+  try {
+    const configContent = fs.readFileSync(claudeConfigPath, 'utf-8');
+    let config = JSON.parse(configContent);
+
+    let exclusionsApplied = 0;
+
+    // MCP servers to disable (cause connection errors in OpenCode)
+    const serversToDisable = ['global-everything', 'global-git', 'global-sqlite'];
+
+    for (const serverName of serversToDisable) {
+      if (config.mcpServers && config.mcpServers[serverName]) {
+        if (!config.mcpServers[serverName].disabled) {
+          config.mcpServers[serverName].disabled = true;
+          exclusionsApplied++;
+          console.log(`✅ Disabled problematic MCP server: ${serverName}`);
+        } else {
+          console.log(`ℹ️ MCP server already disabled: ${serverName}`);
+        }
+      }
+    }
+
+    if (exclusionsApplied > 0) {
+      fs.writeFileSync(claudeConfigPath, JSON.stringify(config, null, 2));
+      console.log(`✅ Applied ${exclusionsApplied} MCP server exclusions to prevent connection errors`);
+    } else {
+      console.log(`ℹ️ All problematic MCP servers already disabled`);
+    }
+
+  } catch (error) {
+    console.warn(`⚠️ Could not configure Claude MCP exclusions: ${error.message}`);
+    console.log(`💡 You can manually disable global MCP servers by adding "disabled": true to each server in ~/.claude/.mcp.json`);
   }
 }
 

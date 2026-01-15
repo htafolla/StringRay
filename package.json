@@ -98,6 +98,7 @@
     "opencode.json",
     ".opencode/oh-my-opencode.json",
     ".opencode/package.json",
+    "scripts/postinstall.cjs",
     "dist/cli",
     "dist/plugin",
     "dist/mcps",

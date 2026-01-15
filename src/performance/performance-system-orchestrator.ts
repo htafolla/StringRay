@@ -132,9 +132,38 @@ export class PerformanceSystemOrchestrator extends EventEmitter {
       return;
     }
 
-  await frameworkLogger.log("performance-orchestrator", "system-initializing", "info");
-  // Initialization details kept as console.log for user feedback
-  console.log("   📊 Initializing performance components...");
+    try {
+      await frameworkLogger.log("performance-orchestrator", "system-initializing", "info");
+      // Initialization details kept as console.log for user feedback
+      console.log("   📊 Initializing performance components...");
+
+      // Initialize components
+      this.components = {
+        budgetEnforcer: this.config.budgetEnforcement?.enabled
+          ? new PerformanceBudgetEnforcer()
+          : undefined,
+        regressionTester: new PerformanceRegressionTester(),
+        dashboard: this.config.monitoring?.enabled
+          ? new PerformanceMonitoringDashboard()
+          : undefined,
+        ciGates: new PerformanceCIGates(),
+      } as any;
+
+      this.status = {
+        initialized: true,
+        monitoringActive: false,
+        lastUpdate: Date.now(),
+        components: {
+          budgetEnforcer: !!this.components.budgetEnforcer,
+          regressionTester: !!this.components.regressionTester,
+          dashboard: !!this.components.dashboard,
+          ciGates: !!this.components.ciGates,
+        },
+        activeAlerts: 0,
+        recentViolations: 0,
+      };
+
+      this.initialized = true;
     } catch (error) {
       console.error("❌ Failed to initialize performance system:", error);
       throw error;
@@ -167,9 +196,9 @@ export class PerformanceSystemOrchestrator extends EventEmitter {
     console.log("⏹️ Stopping performance monitoring");
 
     if (this.components.dashboard) {
-      this.components.dashboard.stop();
+      // Note: Dashboard doesn't have a stop method, just disable monitoring
       this.status.monitoringActive = false;
-      await frameworkLogger.log("performance-orchestrator", "dashboard-stopped", "info");
+      frameworkLogger.log("performance-orchestrator", "dashboard-stopped", "info");
     }
 
     this.emit("stopped");
@@ -269,7 +298,7 @@ export class PerformanceSystemOrchestrator extends EventEmitter {
   /**
    * Update configuration (hot-reload capable components)
    */
-  updateConfig(newConfig: Partial<PerformanceSystemConfig>): void {
+  async updateConfig(newConfig: Partial<PerformanceSystemConfig>): Promise<void> {
     this.config = { ...this.config, ...newConfig };
     await frameworkLogger.log("performance-orchestrator", "config-updated", "info");
   }

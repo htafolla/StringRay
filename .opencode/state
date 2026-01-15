@@ -1,19 +1,42 @@
 {
+  "session:expired-test:coordinator": {
+    "sessionId": "expired-test",
+    "startTime": 1768307064813,
+    "activeDelegations": {},
+    "agentInteractions": {},
+    "conflictHistory": [],
+    "coordinationState": {
+      "activeAgents": {},
+      "pendingCommunications": [],
+      "sharedContext": {},
+      "sessionMetrics": {
+        "totalInteractions": 0,
+        "successfulInteractions": 0,
+        "failedInteractions": 0,
+        "averageResponseTime": 0,
+        "conflictResolutionRate": 0,
+        "coordinationEfficiency": 0
+      }
+    },
+    "isActive": true
+  },
+  "cleanup:session_metadata": {
+    "default": {
+      "sessionId": "default",
+      "createdAt": 1768520392715,
+      "lastActivity": 1768520392715,
+      "ttlMs": 86400000,
+      "isActive": true,
+      "agentCount": 0,
+      "memoryUsage": 0
+    }
+  },
   "agent:enforcer": {},
   "agent:architect": {},
   "agent:code-reviewer": {},
   "agent:security-auditor": {},
   "agent:test-architect": {},
   "agent:refactorer": {},
-  "orchestrator": {
-    "config": {
-      "maxConcurrentTasks": 5,
-      "taskTimeout": 300000,
-      "conflictResolutionStrategy": "majority_vote"
-    },
-    "activeTasks": {},
-    "taskToAgentMap": {}
-  },
   "memory:baseline": {
     "heapUsed": 15.21,
     "heapTotal": 19.84,
@@ -176,6 +199,15 @@
       "behavioral-testing"
     ]
   },
+  "orchestrator": {
+    "config": {
+      "maxConcurrentTasks": 5,
+      "taskTimeout": 300000,
+      "conflictResolutionStrategy": "majority_vote"
+    },
+    "activeTasks": {},
+    "taskToAgentMap": {}
+  },
   "delegation:agent_delegator": {
     "complexityAnalyzer": {
       "thresholds": {
@@ -230,7 +262,7 @@
   },
   "session:default:coordinator": {
     "sessionId": "default",
-    "startTime": 1768336101439,
+    "startTime": 1768520392715,
     "activeDelegations": {},
     "agentInteractions": {},
     "conflictHistory": [],
@@ -251,12 +283,12 @@
   },
   "delegation:default_session": {
     "sessionId": "default",
-    "createdAt": "2026-01-13T20:28:21.439Z",
+    "createdAt": "2026-01-15T23:39:52.715Z",
     "active": true,
     "agentCount": 8
   },
   "session:active": true,
-  "session:boot_time": 1768336101439,
+  "session:boot_time": 1768520392715,
   "session:agents": [],
   "session:state_manager": {
     "stateManager": {
@@ -281,17 +313,6 @@
     "dependencies": {},
     "sessionGroups": {},
     "failoverConfigs": {}
-  },
-  "cleanup:session_metadata": {
-    "default": {
-      "sessionId": "default",
-      "createdAt": 1768336101439,
-      "lastActivity": 1768336101439,
-      "ttlMs": 86400000,
-      "isActive": true,
-      "agentCount": 0,
-      "memoryUsage": 0
-    }
   },
   "monitor:health": {
     "default": {
@@ -706,30 +727,17 @@
       "category": "architectural",
       "zeroTolerance": true,
       "enforcementLevel": "blocking"
+    },
+    {
+      "number": 51,
+      "title": "Self-Evolution Safety Framework",
+      "description": "Autonomous self-improvement systems must implement comprehensive safety mechanisms: Version consistency across all codex references, Learning rate limits to prevent destabilization, Human oversight gates for major changes, Causal inference confidence thresholds, Progressive escalation for trend monitoring, Automated remediation with rollback capabilities, Continuous validation of self-modification safety",
+      "category": "self-evolution",
+      "zeroTolerance": true,
+      "enforcementLevel": "blocking"
     }
   ],
-  "enforcement:enabled_at": 1768336101439,
-  "session:expired-test:coordinator": {
-    "sessionId": "expired-test",
-    "startTime": 1768307064813,
-    "activeDelegations": {},
-    "agentInteractions": {},
-    "conflictHistory": [],
-    "coordinationState": {
-      "activeAgents": {},
-      "pendingCommunications": [],
-      "sharedContext": {},
-      "sessionMetrics": {
-        "totalInteractions": 0,
-        "successfulInteractions": 0,
-        "failedInteractions": 0,
-        "averageResponseTime": 0,
-        "conflictResolutionRate": 0,
-        "coordinationEfficiency": 0
-      }
-    },
-    "isActive": true
-  },
+  "enforcement:enabled_at": 1768520392716,
   "session:validator-test-session:coordinator": {
     "sessionId": "validator-test-session",
     "startTime": 1768335491257,
@@ -781,6 +789,18 @@
     "healthy-session": [
       {
         "timestamp": 1768359349570,
+        "sessionId": "healthy-session",
+        "totalInteractions": 0,
+        "successfulInteractions": 0,
+        "failedInteractions": 0,
+        "averageResponseTime": 0,
+        "conflictResolutionRate": 1,
+        "coordinationEfficiency": 1,
+        "memoryUsage": 0,
+        "agentCount": 3
+      },
+      {
+        "timestamp": 1768520391748,
         "sessionId": "healthy-session",
         "totalInteractions": 0,
         "successfulInteractions": 0,
@@ -976,7 +996,7 @@
   },
   "processor:active": true,
   "security:initial_audit": {
-    "totalFiles": 1617,
+    "totalFiles": 1646,
     "issues": [
       {
         "severity": "high",
@@ -6608,16 +6628,7 @@
         "severity": "low",
         "category": "race-conditions",
         "file": "/Users/blaze/dev/stringray/src/boot-orchestrator.ts",
-        "line": 50,
-        "description": "Potentially dangerous pattern detected: /setTimeout.*0/g",
-        "recommendation": "Use proper synchronization primitives",
-        "cwe": "CWE-362"
-      },
-      {
-        "severity": "low",
-        "category": "race-conditions",
-        "file": "/Users/blaze/dev/stringray/src/boot-orchestrator.ts",
-        "line": 65,
+        "line": 60,
         "description": "Potentially dangerous pattern detected: /setTimeout.*0/g",
         "recommendation": "Use proper synchronization primitives",
         "cwe": "CWE-362"
@@ -7270,9 +7281,18 @@
       },
       {
         "severity": "high",
+        "category": "path-traversal",
+        "file": "/Users/blaze/dev/stringray/src/mcps/boot-orchestrator.server.ts",
+        "line": 16,
+        "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
+        "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
+        "cwe": "CWE-22"
+      },
+      {
+        "severity": "high",
         "category": "command-injection",
         "file": "/Users/blaze/dev/stringray/src/mcps/boot-orchestrator.server.ts",
-        "line": 450,
+        "line": 451,
         "description": "Potentially dangerous pattern detected: /execSync\\s*\\(/g",
         "recommendation": "Validate and sanitize all user inputs, use parameterized commands",
         "cwe": "CWE-78"
@@ -7281,7 +7301,7 @@
         "severity": "low",
         "category": "race-conditions",
         "file": "/Users/blaze/dev/stringray/src/mcps/boot-orchestrator.server.ts",
-        "line": 939,
+        "line": 940,
         "description": "Potentially dangerous pattern detected: /setTimeout.*0/g",
         "recommendation": "Use proper synchronization primitives",
         "cwe": "CWE-362"
@@ -7381,6 +7401,24 @@
         "cwe": "CWE-350"
       },
       {
+        "severity": "high",
+        "category": "path-traversal",
+        "file": "/Users/blaze/dev/stringray/src/mcps/knowledge-skills/api-design.server.ts",
+        "line": 14,
+        "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
+        "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
+        "cwe": "CWE-22"
+      },
+      {
+        "severity": "high",
+        "category": "path-traversal",
+        "file": "/Users/blaze/dev/stringray/src/mcps/knowledge-skills/architecture-patterns.server.ts",
+        "line": 16,
+        "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
+        "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
+        "cwe": "CWE-22"
+      },
+      {
         "severity": "medium",
         "category": "dangerous-imports",
         "file": "/Users/blaze/dev/stringray/src/mcps/knowledge-skills/architecture-patterns.server.ts",
@@ -7458,6 +7496,33 @@
         "cwe": "CWE-350"
       },
       {
+        "severity": "high",
+        "category": "path-traversal",
+        "file": "/Users/blaze/dev/stringray/src/mcps/knowledge-skills/git-workflow.server.ts",
+        "line": 14,
+        "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
+        "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
+        "cwe": "CWE-22"
+      },
+      {
+        "severity": "high",
+        "category": "path-traversal",
+        "file": "/Users/blaze/dev/stringray/src/mcps/knowledge-skills/performance-optimization.server.ts",
+        "line": 14,
+        "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
+        "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
+        "cwe": "CWE-22"
+      },
+      {
+        "severity": "high",
+        "category": "path-traversal",
+        "file": "/Users/blaze/dev/stringray/src/mcps/knowledge-skills/project-analysis.server.ts",
+        "line": 16,
+        "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
+        "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
+        "cwe": "CWE-22"
+      },
+      {
         "severity": "medium",
         "category": "dangerous-imports",
         "file": "/Users/blaze/dev/stringray/src/mcps/knowledge-skills/project-analysis.server.ts",
@@ -7489,6 +7554,15 @@
         "description": "Potentially dangerous import detected: fs",
         "recommendation": "Review usage and ensure proper sandboxing/validation",
         "cwe": "CWE-350"
+      },
+      {
+        "severity": "high",
+        "category": "path-traversal",
+        "file": "/Users/blaze/dev/stringray/src/mcps/knowledge-skills/testing-strategy.server.ts",
+        "line": 16,
+        "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
+        "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
+        "cwe": "CWE-22"
       },
       {
         "severity": "medium",
@@ -7716,6 +7790,15 @@
         "cwe": "CWE-350"
       },
       {
+        "severity": "high",
+        "category": "path-traversal",
+        "file": "/Users/blaze/dev/stringray/src/mcps/state-manager.server.ts",
+        "line": 15,
+        "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
+        "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
+        "cwe": "CWE-22"
+      },
+      {
         "severity": "medium",
         "category": "dangerous-imports",
         "file": "/Users/blaze/dev/stringray/src/mcps/state-manager.server.ts",
@@ -7748,49 +7831,13 @@
         "cwe": "CWE-350"
       },
       {
-        "severity": "medium",
-        "category": "weak-cryptography",
+        "severity": "high",
+        "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/src/monitoring/enterprise-monitoring-system.js",
-        "line": 216,
-        "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
-        "recommendation": "Use cryptographically secure random number generators",
-        "cwe": "CWE-338"
-      },
-      {
-        "severity": "medium",
-        "category": "weak-cryptography",
-        "file": "/Users/blaze/dev/stringray/src/monitoring/enterprise-monitoring-system.js",
-        "line": 217,
-        "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
-        "recommendation": "Use cryptographically secure random number generators",
-        "cwe": "CWE-338"
-      },
-      {
-        "severity": "medium",
-        "category": "weak-cryptography",
-        "file": "/Users/blaze/dev/stringray/src/monitoring/enterprise-monitoring-system.js",
-        "line": 218,
-        "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
-        "recommendation": "Use cryptographically secure random number generators",
-        "cwe": "CWE-338"
-      },
-      {
-        "severity": "medium",
-        "category": "weak-cryptography",
-        "file": "/Users/blaze/dev/stringray/src/monitoring/enterprise-monitoring-system.js",
-        "line": 219,
-        "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
-        "recommendation": "Use cryptographically secure random number generators",
-        "cwe": "CWE-338"
-      },
-      {
-        "severity": "medium",
-        "category": "weak-cryptography",
-        "file": "/Users/blaze/dev/stringray/src/monitoring/enterprise-monitoring-system.js",
-        "line": 220,
-        "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
-        "recommendation": "Use cryptographically secure random number generators",
-        "cwe": "CWE-338"
+        "line": 14,
+        "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
+        "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
+        "cwe": "CWE-22"
       },
       {
         "severity": "medium",
@@ -7823,7 +7870,7 @@
         "severity": "medium",
         "category": "weak-cryptography",
         "file": "/Users/blaze/dev/stringray/src/monitoring/enterprise-monitoring-system.js",
-        "line": 229,
+        "line": 227,
         "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
         "recommendation": "Use cryptographically secure random number generators",
         "cwe": "CWE-338"
@@ -7832,7 +7879,7 @@
         "severity": "medium",
         "category": "weak-cryptography",
         "file": "/Users/blaze/dev/stringray/src/monitoring/enterprise-monitoring-system.js",
-        "line": 230,
+        "line": 228,
         "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
         "recommendation": "Use cryptographically secure random number generators",
         "cwe": "CWE-338"
@@ -7841,7 +7888,16 @@
         "severity": "medium",
         "category": "weak-cryptography",
         "file": "/Users/blaze/dev/stringray/src/monitoring/enterprise-monitoring-system.js",
-        "line": 231,
+        "line": 232,
+        "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
+        "recommendation": "Use cryptographically secure random number generators",
+        "cwe": "CWE-338"
+      },
+      {
+        "severity": "medium",
+        "category": "weak-cryptography",
+        "file": "/Users/blaze/dev/stringray/src/monitoring/enterprise-monitoring-system.js",
+        "line": 233,
         "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
         "recommendation": "Use cryptographically secure random number generators",
         "cwe": "CWE-338"
@@ -7859,24 +7915,6 @@
         "severity": "medium",
         "category": "weak-cryptography",
         "file": "/Users/blaze/dev/stringray/src/monitoring/enterprise-monitoring-system.js",
-        "line": 235,
-        "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
-        "recommendation": "Use cryptographically secure random number generators",
-        "cwe": "CWE-338"
-      },
-      {
-        "severity": "medium",
-        "category": "weak-cryptography",
-        "file": "/Users/blaze/dev/stringray/src/monitoring/enterprise-monitoring-system.js",
-        "line": 236,
-        "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
-        "recommendation": "Use cryptographically secure random number generators",
-        "cwe": "CWE-338"
-      },
-      {
-        "severity": "medium",
-        "category": "weak-cryptography",
-        "file": "/Users/blaze/dev/stringray/src/monitoring/enterprise-monitoring-system.js",
         "line": 237,
         "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
         "recommendation": "Use cryptographically secure random number generators",
@@ -7886,7 +7924,61 @@
         "severity": "medium",
         "category": "weak-cryptography",
         "file": "/Users/blaze/dev/stringray/src/monitoring/enterprise-monitoring-system.js",
-        "line": 328,
+        "line": 238,
+        "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
+        "recommendation": "Use cryptographically secure random number generators",
+        "cwe": "CWE-338"
+      },
+      {
+        "severity": "medium",
+        "category": "weak-cryptography",
+        "file": "/Users/blaze/dev/stringray/src/monitoring/enterprise-monitoring-system.js",
+        "line": 239,
+        "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
+        "recommendation": "Use cryptographically secure random number generators",
+        "cwe": "CWE-338"
+      },
+      {
+        "severity": "medium",
+        "category": "weak-cryptography",
+        "file": "/Users/blaze/dev/stringray/src/monitoring/enterprise-monitoring-system.js",
+        "line": 242,
+        "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
+        "recommendation": "Use cryptographically secure random number generators",
+        "cwe": "CWE-338"
+      },
+      {
+        "severity": "medium",
+        "category": "weak-cryptography",
+        "file": "/Users/blaze/dev/stringray/src/monitoring/enterprise-monitoring-system.js",
+        "line": 243,
+        "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
+        "recommendation": "Use cryptographically secure random number generators",
+        "cwe": "CWE-338"
+      },
+      {
+        "severity": "medium",
+        "category": "weak-cryptography",
+        "file": "/Users/blaze/dev/stringray/src/monitoring/enterprise-monitoring-system.js",
+        "line": 244,
+        "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
+        "recommendation": "Use cryptographically secure random number generators",
+        "cwe": "CWE-338"
+      },
+      {
+        "severity": "medium",
+        "category": "weak-cryptography",
+        "file": "/Users/blaze/dev/stringray/src/monitoring/enterprise-monitoring-system.js",
+        "line": 245,
+        "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
+        "recommendation": "Use cryptographically secure random number generators",
+        "cwe": "CWE-338"
+      },
+      {
+        "severity": "medium",
+        "category": "weak-cryptography",
+        "file": "/Users/blaze/dev/stringray/src/monitoring/enterprise-monitoring-system.js",
+        "line": 336,
         "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
         "recommendation": "Use cryptographically secure random number generators",
         "cwe": "CWE-338"
@@ -7895,7 +7987,7 @@
         "severity": "low",
         "category": "race-conditions",
         "file": "/Users/blaze/dev/stringray/src/monitoring/enterprise-monitoring-system.js",
-        "line": 328,
+        "line": 336,
         "description": "Potentially dangerous pattern detected: /setTimeout.*0/g",
         "recommendation": "Use proper synchronization primitives",
         "cwe": "CWE-362"
@@ -7904,7 +7996,7 @@
         "severity": "medium",
         "category": "weak-cryptography",
         "file": "/Users/blaze/dev/stringray/src/monitoring/enterprise-monitoring-system.js",
-        "line": 331,
+        "line": 339,
         "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
         "recommendation": "Use cryptographically secure random number generators",
         "cwe": "CWE-338"
@@ -7913,7 +8005,7 @@
         "severity": "medium",
         "category": "weak-cryptography",
         "file": "/Users/blaze/dev/stringray/src/monitoring/enterprise-monitoring-system.js",
-        "line": 349,
+        "line": 357,
         "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
         "recommendation": "Use cryptographically secure random number generators",
         "cwe": "CWE-338"
@@ -7922,7 +8014,7 @@
         "severity": "low",
         "category": "race-conditions",
         "file": "/Users/blaze/dev/stringray/src/monitoring/enterprise-monitoring-system.js",
-        "line": 349,
+        "line": 357,
         "description": "Potentially dangerous pattern detected: /setTimeout.*0/g",
         "recommendation": "Use proper synchronization primitives",
         "cwe": "CWE-362"
@@ -7931,7 +8023,7 @@
         "severity": "medium",
         "category": "weak-cryptography",
         "file": "/Users/blaze/dev/stringray/src/monitoring/enterprise-monitoring-system.js",
-        "line": 351,
+        "line": 359,
         "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
         "recommendation": "Use cryptographically secure random number generators",
         "cwe": "CWE-338"
@@ -7940,7 +8032,7 @@
         "severity": "medium",
         "category": "weak-cryptography",
         "file": "/Users/blaze/dev/stringray/src/monitoring/enterprise-monitoring-system.js",
-        "line": 547,
+        "line": 568,
         "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
         "recommendation": "Use cryptographically secure random number generators",
         "cwe": "CWE-338"
@@ -7949,7 +8041,7 @@
         "severity": "medium",
         "category": "weak-cryptography",
         "file": "/Users/blaze/dev/stringray/src/monitoring/enterprise-monitoring-system.js",
-        "line": 563,
+        "line": 584,
         "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
         "recommendation": "Use cryptographically secure random number generators",
         "cwe": "CWE-338"
@@ -7958,7 +8050,7 @@
         "severity": "medium",
         "category": "weak-cryptography",
         "file": "/Users/blaze/dev/stringray/src/monitoring/enterprise-monitoring-system.js",
-        "line": 564,
+        "line": 585,
         "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
         "recommendation": "Use cryptographically secure random number generators",
         "cwe": "CWE-338"
@@ -7967,7 +8059,7 @@
         "severity": "medium",
         "category": "weak-cryptography",
         "file": "/Users/blaze/dev/stringray/src/monitoring/enterprise-monitoring-system.js",
-        "line": 565,
+        "line": 586,
         "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
         "recommendation": "Use cryptographically secure random number generators",
         "cwe": "CWE-338"
@@ -7976,7 +8068,7 @@
         "severity": "medium",
         "category": "weak-cryptography",
         "file": "/Users/blaze/dev/stringray/src/monitoring/enterprise-monitoring-system.js",
-        "line": 566,
+        "line": 587,
         "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
         "recommendation": "Use cryptographically secure random number generators",
         "cwe": "CWE-338"
@@ -8334,7 +8426,7 @@
         "severity": "low",
         "category": "race-conditions",
         "file": "/Users/blaze/dev/stringray/src/orchestrator.ts",
-        "line": 563,
+        "line": 562,
         "description": "Potentially dangerous pattern detected: /setTimeout.*0/g",
         "recommendation": "Use proper synchronization primitives",
         "cwe": "CWE-362"
@@ -8459,6 +8551,15 @@
         "cwe": "CWE-350"
       },
       {
+        "severity": "high",
+        "category": "path-traversal",
+        "file": "/Users/blaze/dev/stringray/src/performance/performance-monitoring-dashboard.ts",
+        "line": 20,
+        "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
+        "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
+        "cwe": "CWE-22"
+      },
+      {
         "severity": "medium",
         "category": "dangerous-imports",
         "file": "/Users/blaze/dev/stringray/src/performance/performance-monitoring-dashboard.ts",
@@ -8499,6 +8600,15 @@
         "description": "Potentially dangerous import detected: fs",
         "recommendation": "Review usage and ensure proper sandboxing/validation",
         "cwe": "CWE-350"
+      },
+      {
+        "severity": "high",
+        "category": "path-traversal",
+        "file": "/Users/blaze/dev/stringray/src/performance/performance-system-orchestrator.ts",
+        "line": 16,
+        "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
+        "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
+        "cwe": "CWE-22"
       },
       {
         "severity": "high",
@@ -8742,6 +8852,15 @@
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/src/postprocessor/analysis/FailureAnalysisEngine.ts",
         "line": 5,
+        "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
+        "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
+        "cwe": "CWE-22"
+      },
+      {
+        "severity": "high",
+        "category": "path-traversal",
+        "file": "/Users/blaze/dev/stringray/src/postprocessor/analysis/FailureAnalysisEngine.ts",
+        "line": 6,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -9138,10 +9257,19 @@
         "cwe": "CWE-22"
       },
       {
+        "severity": "high",
+        "category": "path-traversal",
+        "file": "/Users/blaze/dev/stringray/src/postprocessor/success/SuccessHandler.ts",
+        "line": 7,
+        "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
+        "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
+        "cwe": "CWE-22"
+      },
+      {
         "severity": "low",
         "category": "race-conditions",
         "file": "/Users/blaze/dev/stringray/src/postprocessor/success/SuccessHandler.ts",
-        "line": 90,
+        "line": 91,
         "description": "Potentially dangerous pattern detected: /setTimeout.*0/g",
         "recommendation": "Use proper synchronization primitives",
         "cwe": "CWE-362"
@@ -9186,7 +9314,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/src/postprocessor/triggers/GitHookTrigger.ts",
-        "line": 111,
+        "line": 9,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -9195,7 +9323,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/src/postprocessor/triggers/GitHookTrigger.ts",
-        "line": 286,
+        "line": 327,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -9204,7 +9332,16 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/src/postprocessor/triggers/GitHookTrigger.ts",
-        "line": 287,
+        "line": 475,
+        "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
+        "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
+        "cwe": "CWE-22"
+      },
+      {
+        "severity": "high",
+        "category": "path-traversal",
+        "file": "/Users/blaze/dev/stringray/src/postprocessor/triggers/GitHookTrigger.ts",
+        "line": 476,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -9296,24 +9433,6 @@
         "description": "Potentially dangerous pattern detected: /execSync\\s*\\(/g",
         "recommendation": "Validate and sanitize all user inputs, use parameterized commands",
         "cwe": "CWE-78"
-      },
-      {
-        "severity": "medium",
-        "category": "information-disclosure",
-        "file": "/Users/blaze/dev/stringray/src/postprocessor/validation/ComprehensiveValidator.ts",
-        "line": 197,
-        "description": "Potentially dangerous pattern detected: /console\\.log\\s*\\([^)]*secret[^)]*\\)/gi",
-        "recommendation": "Avoid logging sensitive information, use proper log levels",
-        "cwe": "CWE-532"
-      },
-      {
-        "severity": "medium",
-        "category": "information-disclosure",
-        "file": "/Users/blaze/dev/stringray/src/postprocessor/validation/ComprehensiveValidator.ts",
-        "line": 226,
-        "description": "Potentially dangerous pattern detected: /console\\.log\\s*\\([^)]*secret[^)]*\\)/gi",
-        "recommendation": "Avoid logging sensitive information, use proper log levels",
-        "cwe": "CWE-532"
       },
       {
         "severity": "high",
@@ -9453,9 +9572,18 @@
       },
       {
         "severity": "high",
+        "category": "path-traversal",
+        "file": "/Users/blaze/dev/stringray/src/security/security-auditor.ts",
+        "line": 14,
+        "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
+        "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
+        "cwe": "CWE-22"
+      },
+      {
+        "severity": "high",
         "category": "sql-injection",
         "file": "/Users/blaze/dev/stringray/src/security/security-auditor.ts",
-        "line": 82,
+        "line": 83,
         "description": "Potentially dangerous pattern detected: /SELECT.*\\+/g",
         "recommendation": "Use parameterized queries or ORM with built-in protection",
         "cwe": "CWE-89"
@@ -9464,7 +9592,7 @@
         "severity": "high",
         "category": "sql-injection",
         "file": "/Users/blaze/dev/stringray/src/security/security-auditor.ts",
-        "line": 88,
+        "line": 89,
         "description": "Potentially dangerous pattern detected: /INSERT.*\\+/g",
         "recommendation": "Use parameterized queries or ORM with built-in protection",
         "cwe": "CWE-89"
@@ -9473,7 +9601,7 @@
         "severity": "low",
         "category": "race-conditions",
         "file": "/Users/blaze/dev/stringray/src/security/security-auditor.ts",
-        "line": 174,
+        "line": 175,
         "description": "Potentially dangerous pattern detected: /setTimeout.*0/g",
         "recommendation": "Use proper synchronization primitives",
         "cwe": "CWE-362"
@@ -9749,14 +9877,6 @@
         "cwe": "CWE-350"
       },
       {
-        "severity": "medium",
-        "category": "dangerous-imports",
-        "file": "/Users/blaze/dev/stringray/src/server.ts",
-        "description": "Potentially dangerous import detected: fs",
-        "recommendation": "Review usage and ensure proper sandboxing/validation",
-        "cwe": "CWE-350"
-      },
-      {
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/src/session/session-cleanup-manager.ts",
@@ -9777,6 +9897,15 @@
       {
         "severity": "high",
         "category": "path-traversal",
+        "file": "/Users/blaze/dev/stringray/src/session/session-cleanup-manager.ts",
+        "line": 14,
+        "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
+        "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
+        "cwe": "CWE-22"
+      },
+      {
+        "severity": "high",
+        "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/src/session/session-monitor.ts",
         "line": 11,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
@@ -9788,6 +9917,15 @@
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/src/session/session-monitor.ts",
         "line": 12,
+        "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
+        "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
+        "cwe": "CWE-22"
+      },
+      {
+        "severity": "high",
+        "category": "path-traversal",
+        "file": "/Users/blaze/dev/stringray/src/session/session-monitor.ts",
+        "line": 14,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -9796,7 +9934,7 @@
         "severity": "medium",
         "category": "weak-cryptography",
         "file": "/Users/blaze/dev/stringray/src/session/session-monitor.ts",
-        "line": 399,
+        "line": 394,
         "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
         "recommendation": "Use cryptographically secure random number generators",
         "cwe": "CWE-338"
@@ -9815,6 +9953,15 @@
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/src/session/session-state-manager.ts",
         "line": 12,
+        "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
+        "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
+        "cwe": "CWE-22"
+      },
+      {
+        "severity": "high",
+        "category": "path-traversal",
+        "file": "/Users/blaze/dev/stringray/src/session/session-state-manager.ts",
+        "line": 13,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -9913,7 +10060,7 @@
         "severity": "medium",
         "category": "weak-cryptography",
         "file": "/Users/blaze/dev/stringray/src/simulation/complete-end-to-end-simulation.ts",
-        "line": 73,
+        "line": 66,
         "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
         "recommendation": "Use cryptographically secure random number generators",
         "cwe": "CWE-338"
@@ -9922,7 +10069,7 @@
         "severity": "medium",
         "category": "weak-cryptography",
         "file": "/Users/blaze/dev/stringray/src/simulation/complete-end-to-end-simulation.ts",
-        "line": 127,
+        "line": 116,
         "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
         "recommendation": "Use cryptographically secure random number generators",
         "cwe": "CWE-338"
@@ -9931,7 +10078,7 @@
         "severity": "medium",
         "category": "weak-cryptography",
         "file": "/Users/blaze/dev/stringray/src/simulation/complete-end-to-end-simulation.ts",
-        "line": 128,
+        "line": 117,
         "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
         "recommendation": "Use cryptographically secure random number generators",
         "cwe": "CWE-338"
@@ -9940,7 +10087,7 @@
         "severity": "medium",
         "category": "weak-cryptography",
         "file": "/Users/blaze/dev/stringray/src/simulation/complete-end-to-end-simulation.ts",
-        "line": 170,
+        "line": 155,
         "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
         "recommendation": "Use cryptographically secure random number generators",
         "cwe": "CWE-338"
@@ -10668,9 +10815,9 @@
     ],
     "summary": {
       "critical": 106,
-      "high": 583,
-      "medium": 352,
-      "low": 52,
+      "high": 601,
+      "medium": 349,
+      "low": 51,
       "info": 0
     },
     "score": 0

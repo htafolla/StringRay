@@ -13,6 +13,7 @@ import {
 } from "@modelcontextprotocol/sdk/types.js";
 import * as fs from "fs";
 import * as path from "path";
+import { frameworkLogger } from "../../framework-logger.js";
 
 class StrRayArchitecturePatternsServer {
   private server: Server;

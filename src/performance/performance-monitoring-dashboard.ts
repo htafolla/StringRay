@@ -190,7 +190,15 @@ export class PerformanceMonitoringDashboard extends EventEmitter {
       return;
     }
 
-  // Performance dashboard messages - consider migrating to frameworkLogger for operational monitoring
+    this.isRunning = true;
+    // Performance dashboard messages - consider migrating to frameworkLogger for operational monitoring
+  }
+
+  /**
+   * Stop the monitoring dashboard
+   */
+  stop(): void {
+    this.isRunning = false;
   }
 
   /**

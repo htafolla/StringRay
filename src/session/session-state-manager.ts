@@ -10,6 +10,7 @@
 
 import { StringRayStateManager } from "../state/state-manager";
 import { SessionCoordinator } from "../delegation/session-coordinator";
+import { frameworkLogger } from "../framework-logger";
 
 export interface SessionDependency {
   sessionId: string;

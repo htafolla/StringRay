@@ -36,9 +36,16 @@ const CLEANUP_TARGETS = [
 
   // Other potential artifacts
   'npm-debug.log*',
-  '*.log',
   '.DS_Store',
-  'Thumbs.db'
+  'Thumbs.db',
+
+  // Build artifacts in dist
+  'dist/test-utils',
+  'dist/testing',
+
+  // Log files (keep framework-activity.log as it may be needed)
+  '.opencode/logs/memory-monitor-*.log',
+  '.opencode/logs/strray-plugin-*.log'
 ];
 
 function cleanupRepository() {

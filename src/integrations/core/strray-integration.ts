@@ -1,5 +1,5 @@
 /**
- * StringRay Framework v1.0.0 - Cross-Framework Integration Core
+ * StringRay AI v1.0.4 - Cross-Framework Integration Core
  *
  * Framework-agnostic integration layer enabling StringRay Framework adoption
  * across React, Vue, Angular, Svelte, and other frontend frameworks.

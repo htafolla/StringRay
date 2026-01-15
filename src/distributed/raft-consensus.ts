@@ -1,5 +1,5 @@
 /**
- * StringRay Framework v1.0.0 - Raft Consensus Algorithm Implementation
+ * StringRay AI v1.0.4 - Raft Consensus Algorithm Implementation
  *
  * Enterprise-grade Raft consensus algorithm for leader election and coordination
  * in distributed systems with strong consistency guarantees.

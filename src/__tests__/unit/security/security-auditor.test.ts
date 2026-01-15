@@ -1,5 +1,5 @@
 /**
- * StringRay Framework v1.0.0 - SecurityAuditor Unit Tests
+ * StringRay AI v1.0.4 - SecurityAuditor Unit Tests
  *
  * Comprehensive tests for the SecurityAuditor class including:
  * - Vulnerability detection patterns

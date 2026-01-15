@@ -68,7 +68,7 @@ class StrRayFrameworkComplianceAuditServer {
           {
             name: "codex-validation",
             description:
-              "Validate compliance with Universal Development Codex v1.2.22",
+              "Validate compliance with Universal Development Codex v1.2.24",
             inputSchema: {
               type: "object",
               properties: {

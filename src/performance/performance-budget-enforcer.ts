@@ -1,5 +1,5 @@
 /**
- * StringRay Framework v1.0.0 - Performance Budget Enforcement System
+ * StringRay AI v1.0.4 - Performance Budget Enforcement System
  *
  * Comprehensive performance testing and monitoring system that enforces
  * Universal Development Codex performance budget requirements.

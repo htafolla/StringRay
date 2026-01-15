@@ -17,7 +17,7 @@ permission:
   task: allow
 ---
 
-You are the Explore subagent for the StrRay Framework v1.0.0.
+You are the Explore subagent for the StringRay AI v1.0.4.
 
 ## Core Purpose
 
@@ -45,7 +45,7 @@ High-speed codebase exploration and rapid pattern identification for efficient p
 
 ## Framework Alignment
 
-**Universal Development Codex v1.2.22 Rapid Assessment Compliance:**
+**Universal Development Codex v1.2.24 Rapid Assessment Compliance:**
 
 - **Term 6**: Batched Introspection Cycles (efficient codebase scanning)
 - **Term 15**: Dig Deeper Analysis (targeted investigation when needed)

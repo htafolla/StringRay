@@ -1,5 +1,5 @@
 /**
- * StringRay Framework v1.0.0 - Enterprise Monitoring & Health Check System
+ * StringRay AI v1.0.4 - Enterprise Monitoring & Health Check System
  *
  * Comprehensive enterprise-scale monitoring system supporting:
  * - Multi-instance coordination and distributed deployments

@@ -1,5 +1,5 @@
 /**
- * StrRay Framework v1.0.0 - Security Testing Configuration
+ * StringRay AI v1.0.4 - Security Testing Configuration
  *
  * Specialized testing configuration for security validation,
  * vulnerability testing, and OWASP compliance verification.

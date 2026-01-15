@@ -1,5 +1,5 @@
 /**
- * StringRay Framework v1.0.0 - Real-Time Performance Dashboards
+ * StringRay AI v1.0.4 - Real-Time Performance Dashboards
  *
  * Comprehensive real-time performance monitoring dashboard system
  * with live metrics collection, alert management, and WebSocket streaming.

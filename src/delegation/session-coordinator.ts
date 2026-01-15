@@ -1,5 +1,5 @@
 /**
- * StringRay Framework v1.0.0 - Session Coordinator
+ * StringRay AI v1.0.4 - Session Coordinator
  *
  * Manages cross-agent communication and coordination within sessions.
  * Tracks delegation state, agent interactions, and conflict resolution.

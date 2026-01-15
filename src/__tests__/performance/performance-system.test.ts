@@ -1,5 +1,5 @@
 /**
- * StringRay Framework v1.0.0 - Performance System Tests
+ * StringRay AI v1.0.4 - Performance System Tests
  *
  * Comprehensive tests for the performance testing and monitoring system.
  *

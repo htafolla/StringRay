@@ -1,5 +1,5 @@
 /**
- * StringRay Framework v1.0.0 - Session Cleanup Manager
+ * StringRay AI v1.0.4 - Session Cleanup Manager
  *
  * Manages automatic cleanup of sessions with TTL-based expiration,
  * idle session detection, and manual cleanup utilities.

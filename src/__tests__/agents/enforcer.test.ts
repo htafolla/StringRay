@@ -36,7 +36,7 @@ describe("Enforcer Agent Configuration", () => {
       expect(system).toContain("StringRay Enforcer");
       expect(system).toContain("framework compliance");
       expect(system).toContain("error prevention");
-      expect(system).toContain("Universal Development Codex v1.2.22");
+      expect(system).toContain("Universal Development Codex v1.2.24");
       expect(system).toContain("99.6% error prevention");
       expect(system).toContain("256MB memory");
     });
@@ -119,9 +119,9 @@ describe("Enforcer Agent Configuration", () => {
   });
 
   describe("Codex Compliance", () => {
-    it("should reference Universal Development Codex v1.2.22", () => {
+    it("should reference Universal Development Codex v1.2.24", () => {
       const system = enforcer.system;
-      expect(system).toContain("Universal Development Codex v1.2.22");
+      expect(system).toContain("Universal Development Codex v1.2.24");
     });
 
     it("should specify error prevention target", () => {

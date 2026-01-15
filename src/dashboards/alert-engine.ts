@@ -1,5 +1,5 @@
 /**
- * StringRay Framework v1.0.0 - Alert Engine
+ * StringRay AI v1.0.4 - Alert Engine
  *
  * Advanced alert management system for performance dashboards.
  * Handles alert generation, escalation, notification, and lifecycle management.

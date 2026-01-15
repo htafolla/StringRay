@@ -1,5 +1,5 @@
 /**
- * StringRay Framework v1.0.0 - Phase 2 Advanced Regression Testing System
+ * StringRay AI v1.0.4 - Phase 2 Advanced Regression Testing System
  *
  * Enhanced performance regression testing with statistical analysis, trend detection,
  * and intelligent baseline management for continuous optimization.

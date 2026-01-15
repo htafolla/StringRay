@@ -28,6 +28,11 @@ const CLEANUP_TARGETS = [
   'test-deployment',
   'deployment-final-test',
   'test-install',
+  'final-validation',
+  'final-stringray',
+  'final-stringray-fixed',
+  'final-complete',
+  'final-verification',
 
   // Other potential artifacts
   'npm-debug.log*',

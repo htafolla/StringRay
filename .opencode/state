@@ -5,15 +5,6 @@
   "agent:security-auditor": {},
   "agent:test-architect": {},
   "agent:refactorer": {},
-  "orchestrator": {
-    "config": {
-      "maxConcurrentTasks": 5,
-      "taskTimeout": 300000,
-      "conflictResolutionStrategy": "majority_vote"
-    },
-    "activeTasks": {},
-    "taskToAgentMap": {}
-  },
   "memory:baseline": {
     "heapUsed": 15.21,
     "heapTotal": 19.84,
@@ -175,6 +166,15 @@
       "coverage-optimization",
       "behavioral-testing"
     ]
+  },
+  "orchestrator": {
+    "config": {
+      "maxConcurrentTasks": 5,
+      "taskTimeout": 300000,
+      "conflictResolutionStrategy": "majority_vote"
+    },
+    "activeTasks": {},
+    "taskToAgentMap": {}
   },
   "delegation:agent_delegator": {
     "complexityAnalyzer": {
@@ -976,7 +976,7 @@
   },
   "processor:active": true,
   "security:initial_audit": {
-    "totalFiles": 1534,
+    "totalFiles": 1593,
     "issues": [
       {
         "severity": "critical",
@@ -1757,8 +1757,8 @@
       {
         "severity": "high",
         "category": "path-traversal",
-        "file": "/Users/blaze/dev/stringray/deployed-test/package-lock.json",
-        "line": 11,
+        "file": "/Users/blaze/dev/stringray/README.md",
+        "line": 297,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -1766,8 +1766,8 @@
       {
         "severity": "high",
         "category": "path-traversal",
-        "file": "/Users/blaze/dev/stringray/deployed-test/package-lock.json",
-        "line": 1640,
+        "file": "/Users/blaze/dev/stringray/README.md",
+        "line": 298,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -1775,8 +1775,8 @@
       {
         "severity": "high",
         "category": "path-traversal",
-        "file": "/Users/blaze/dev/stringray/deployed-test/package.json",
-        "line": 6,
+        "file": "/Users/blaze/dev/stringray/README.md",
+        "line": 299,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -1784,8 +1784,8 @@
       {
         "severity": "high",
         "category": "path-traversal",
-        "file": "/Users/blaze/dev/stringray/deployment-final-test/package-lock.json",
-        "line": 11,
+        "file": "/Users/blaze/dev/stringray/README.md",
+        "line": 300,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -1793,8 +1793,8 @@
       {
         "severity": "high",
         "category": "path-traversal",
-        "file": "/Users/blaze/dev/stringray/deployment-final-test/package-lock.json",
-        "line": 1711,
+        "file": "/Users/blaze/dev/stringray/README.md",
+        "line": 301,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -1802,35 +1802,8 @@
       {
         "severity": "high",
         "category": "path-traversal",
-        "file": "/Users/blaze/dev/stringray/deployment-final-test/package.json",
-        "line": 6,
-        "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
-        "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
-        "cwe": "CWE-22"
-      },
-      {
-        "severity": "high",
-        "category": "path-traversal",
-        "file": "/Users/blaze/dev/stringray/deployment-test/package-lock.json",
-        "line": 11,
-        "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
-        "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
-        "cwe": "CWE-22"
-      },
-      {
-        "severity": "high",
-        "category": "path-traversal",
-        "file": "/Users/blaze/dev/stringray/deployment-test/package-lock.json",
-        "line": 1711,
-        "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
-        "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
-        "cwe": "CWE-22"
-      },
-      {
-        "severity": "high",
-        "category": "path-traversal",
-        "file": "/Users/blaze/dev/stringray/deployment-test/package.json",
-        "line": 6,
+        "file": "/Users/blaze/dev/stringray/README.md",
+        "line": 302,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -1857,7 +1830,7 @@
         "severity": "critical",
         "category": "code-injection",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 3308,
+        "line": 2320,
         "description": "Potentially dangerous pattern detected: /eval\\s*\\(/g",
         "recommendation": "Use static code analysis and avoid dynamic code execution",
         "cwe": "CWE-95"
@@ -1866,7 +1839,7 @@
         "severity": "critical",
         "category": "code-injection",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 3339,
+        "line": 2351,
         "description": "Potentially dangerous pattern detected: /eval\\s*\\(/g",
         "recommendation": "Use static code analysis and avoid dynamic code execution",
         "cwe": "CWE-95"
@@ -1875,7 +1848,7 @@
         "severity": "critical",
         "category": "code-injection",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 3350,
+        "line": 2362,
         "description": "Potentially dangerous pattern detected: /eval\\s*\\(/g",
         "recommendation": "Use static code analysis and avoid dynamic code execution",
         "cwe": "CWE-95"
@@ -1884,7 +1857,7 @@
         "severity": "critical",
         "category": "code-injection",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 3392,
+        "line": 2404,
         "description": "Potentially dangerous pattern detected: /eval\\s*\\(/g",
         "recommendation": "Use static code analysis and avoid dynamic code execution",
         "cwe": "CWE-95"
@@ -1893,7 +1866,7 @@
         "severity": "critical",
         "category": "code-injection",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 3409,
+        "line": 2421,
         "description": "Potentially dangerous pattern detected: /eval\\s*\\(/g",
         "recommendation": "Use static code analysis and avoid dynamic code execution",
         "cwe": "CWE-95"
@@ -1902,7 +1875,7 @@
         "severity": "critical",
         "category": "code-injection",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 3461,
+        "line": 2473,
         "description": "Potentially dangerous pattern detected: /eval\\s*\\(/g",
         "recommendation": "Use static code analysis and avoid dynamic code execution",
         "cwe": "CWE-95"
@@ -1911,7 +1884,7 @@
         "severity": "critical",
         "category": "code-injection",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 3499,
+        "line": 2511,
         "description": "Potentially dangerous pattern detected: /eval\\s*\\(/g",
         "recommendation": "Use static code analysis and avoid dynamic code execution",
         "cwe": "CWE-95"
@@ -1920,7 +1893,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 4576,
+        "line": 3588,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -1929,7 +1902,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 4577,
+        "line": 3589,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -1938,7 +1911,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 4578,
+        "line": 3590,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -1947,7 +1920,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 4579,
+        "line": 3591,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -1956,7 +1929,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 4582,
+        "line": 3594,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -1965,7 +1938,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 4583,
+        "line": 3595,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -1974,7 +1947,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 4584,
+        "line": 3596,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -1983,7 +1956,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 4587,
+        "line": 3599,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -1992,7 +1965,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 4588,
+        "line": 3600,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -2001,7 +1974,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 4591,
+        "line": 3603,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -2010,7 +1983,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 4595,
+        "line": 3607,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -2019,7 +1992,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 4596,
+        "line": 3608,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -2028,7 +2001,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 4597,
+        "line": 3609,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -2037,7 +2010,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 4598,
+        "line": 3610,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -2046,7 +2019,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 4600,
+        "line": 3612,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -2055,7 +2028,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 4608,
+        "line": 3620,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -2064,7 +2037,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 4609,
+        "line": 3621,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -2073,7 +2046,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 4613,
+        "line": 3625,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -2082,7 +2055,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 4616,
+        "line": 3628,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -2091,7 +2064,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 4618,
+        "line": 3630,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -2100,7 +2073,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 4623,
+        "line": 3635,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -2109,7 +2082,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 4625,
+        "line": 3637,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -2118,7 +2091,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 4627,
+        "line": 3639,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -2127,7 +2100,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 4632,
+        "line": 3644,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -2136,7 +2109,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 4636,
+        "line": 3648,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -2145,7 +2118,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 4640,
+        "line": 3652,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -2154,7 +2127,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 4641,
+        "line": 3653,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -2163,7 +2136,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 4643,
+        "line": 3655,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -2172,7 +2145,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 4646,
+        "line": 3658,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -2181,7 +2154,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 4652,
+        "line": 3664,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -2190,7 +2163,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 4662,
+        "line": 3674,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -2199,7 +2172,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 4663,
+        "line": 3675,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -2208,7 +2181,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 4665,
+        "line": 3677,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -2217,7 +2190,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 5126,
+        "line": 3942,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -2226,7 +2199,7 @@
         "severity": "medium",
         "category": "weak-cryptography",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 8151,
+        "line": 6452,
         "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
         "recommendation": "Use cryptographically secure random number generators",
         "cwe": "CWE-338"
@@ -2235,7 +2208,7 @@
         "severity": "medium",
         "category": "weak-cryptography",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 8207,
+        "line": 6508,
         "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
         "recommendation": "Use cryptographically secure random number generators",
         "cwe": "CWE-338"
@@ -2244,7 +2217,7 @@
         "severity": "medium",
         "category": "weak-cryptography",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 8216,
+        "line": 6517,
         "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
         "recommendation": "Use cryptographically secure random number generators",
         "cwe": "CWE-338"
@@ -2253,7 +2226,7 @@
         "severity": "medium",
         "category": "weak-cryptography",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 8236,
+        "line": 6537,
         "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
         "recommendation": "Use cryptographically secure random number generators",
         "cwe": "CWE-338"
@@ -2262,7 +2235,7 @@
         "severity": "medium",
         "category": "weak-cryptography",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 8319,
+        "line": 6620,
         "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
         "recommendation": "Use cryptographically secure random number generators",
         "cwe": "CWE-338"
@@ -2271,7 +2244,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 9755,
+        "line": 8056,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -2280,7 +2253,7 @@
         "severity": "medium",
         "category": "weak-cryptography",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 14874,
+        "line": 12957,
         "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
         "recommendation": "Use cryptographically secure random number generators",
         "cwe": "CWE-338"
@@ -2289,7 +2262,7 @@
         "severity": "medium",
         "category": "weak-cryptography",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 14880,
+        "line": 12963,
         "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
         "recommendation": "Use cryptographically secure random number generators",
         "cwe": "CWE-338"
@@ -2298,7 +2271,7 @@
         "severity": "medium",
         "category": "weak-cryptography",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 14966,
+        "line": 13049,
         "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
         "recommendation": "Use cryptographically secure random number generators",
         "cwe": "CWE-338"
@@ -2307,7 +2280,7 @@
         "severity": "medium",
         "category": "weak-cryptography",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 14977,
+        "line": 13060,
         "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
         "recommendation": "Use cryptographically secure random number generators",
         "cwe": "CWE-338"
@@ -2316,7 +2289,7 @@
         "severity": "medium",
         "category": "weak-cryptography",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 15019,
+        "line": 13102,
         "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
         "recommendation": "Use cryptographically secure random number generators",
         "cwe": "CWE-338"
@@ -2325,79 +2298,7 @@
         "severity": "medium",
         "category": "weak-cryptography",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 15039,
-        "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
-        "recommendation": "Use cryptographically secure random number generators",
-        "cwe": "CWE-338"
-      },
-      {
-        "severity": "medium",
-        "category": "weak-cryptography",
-        "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 16042,
-        "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
-        "recommendation": "Use cryptographically secure random number generators",
-        "cwe": "CWE-338"
-      },
-      {
-        "severity": "medium",
-        "category": "weak-cryptography",
-        "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 16232,
-        "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
-        "recommendation": "Use cryptographically secure random number generators",
-        "cwe": "CWE-338"
-      },
-      {
-        "severity": "medium",
-        "category": "weak-cryptography",
-        "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 16717,
-        "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
-        "recommendation": "Use cryptographically secure random number generators",
-        "cwe": "CWE-338"
-      },
-      {
-        "severity": "medium",
-        "category": "weak-cryptography",
-        "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 16792,
-        "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
-        "recommendation": "Use cryptographically secure random number generators",
-        "cwe": "CWE-338"
-      },
-      {
-        "severity": "medium",
-        "category": "weak-cryptography",
-        "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 16873,
-        "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
-        "recommendation": "Use cryptographically secure random number generators",
-        "cwe": "CWE-338"
-      },
-      {
-        "severity": "medium",
-        "category": "weak-cryptography",
-        "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 16910,
-        "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
-        "recommendation": "Use cryptographically secure random number generators",
-        "cwe": "CWE-338"
-      },
-      {
-        "severity": "medium",
-        "category": "weak-cryptography",
-        "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 17004,
-        "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
-        "recommendation": "Use cryptographically secure random number generators",
-        "cwe": "CWE-338"
-      },
-      {
-        "severity": "medium",
-        "category": "weak-cryptography",
-        "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 17088,
+        "line": 13122,
         "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
         "recommendation": "Use cryptographically secure random number generators",
         "cwe": "CWE-338"
@@ -2406,7 +2307,7 @@
         "severity": "low",
         "category": "race-conditions",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 17779,
+        "line": 13795,
         "description": "Potentially dangerous pattern detected: /setTimeout.*0/g",
         "recommendation": "Use proper synchronization primitives",
         "cwe": "CWE-362"
@@ -2415,7 +2316,7 @@
         "severity": "low",
         "category": "race-conditions",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 17922,
+        "line": 13938,
         "description": "Potentially dangerous pattern detected: /setTimeout.*0/g",
         "recommendation": "Use proper synchronization primitives",
         "cwe": "CWE-362"
@@ -2424,7 +2325,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 18184,
+        "line": 14200,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -2433,7 +2334,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 19124,
+        "line": 15079,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -2442,7 +2343,7 @@
         "severity": "critical",
         "category": "code-injection",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 19299,
+        "line": 15154,
         "description": "Potentially dangerous pattern detected: /eval\\s*\\(/g",
         "recommendation": "Use static code analysis and avoid dynamic code execution",
         "cwe": "CWE-95"
@@ -2451,7 +2352,7 @@
         "severity": "medium",
         "category": "weak-cryptography",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 19324,
+        "line": 15179,
         "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
         "recommendation": "Use cryptographically secure random number generators",
         "cwe": "CWE-338"
@@ -2460,7 +2361,7 @@
         "severity": "critical",
         "category": "code-injection",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 22236,
+        "line": 17246,
         "description": "Potentially dangerous pattern detected: /eval\\s*\\(/g",
         "recommendation": "Use static code analysis and avoid dynamic code execution",
         "cwe": "CWE-95"
@@ -2469,7 +2370,7 @@
         "severity": "critical",
         "category": "code-injection",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 22253,
+        "line": 17263,
         "description": "Potentially dangerous pattern detected: /eval\\s*\\(/g",
         "recommendation": "Use static code analysis and avoid dynamic code execution",
         "cwe": "CWE-95"
@@ -2478,7 +2379,7 @@
         "severity": "medium",
         "category": "weak-cryptography",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 22309,
+        "line": 17319,
         "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
         "recommendation": "Use cryptographically secure random number generators",
         "cwe": "CWE-338"
@@ -2487,7 +2388,7 @@
         "severity": "medium",
         "category": "weak-cryptography",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 22334,
+        "line": 17344,
         "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
         "recommendation": "Use cryptographically secure random number generators",
         "cwe": "CWE-338"
@@ -2496,7 +2397,7 @@
         "severity": "critical",
         "category": "code-injection",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 22485,
+        "line": 17495,
         "description": "Potentially dangerous pattern detected: /eval\\s*\\(/g",
         "recommendation": "Use static code analysis and avoid dynamic code execution",
         "cwe": "CWE-95"
@@ -2505,7 +2406,7 @@
         "severity": "critical",
         "category": "code-injection",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 22968,
+        "line": 17978,
         "description": "Potentially dangerous pattern detected: /eval\\s*\\(/g",
         "recommendation": "Use static code analysis and avoid dynamic code execution",
         "cwe": "CWE-95"
@@ -2514,7 +2415,7 @@
         "severity": "medium",
         "category": "weak-cryptography",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 22969,
+        "line": 17979,
         "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
         "recommendation": "Use cryptographically secure random number generators",
         "cwe": "CWE-338"
@@ -2523,7 +2424,7 @@
         "severity": "high",
         "category": "command-injection",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 24876,
+        "line": 19542,
         "description": "Potentially dangerous pattern detected: /execSync\\s*\\(/g",
         "recommendation": "Validate and sanitize all user inputs, use parameterized commands",
         "cwe": "CWE-78"
@@ -2532,7 +2433,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 24951,
+        "line": 19617,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -2541,7 +2442,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 26115,
+        "line": 20781,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -2550,7 +2451,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 26240,
+        "line": 20906,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -2559,7 +2460,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 26241,
+        "line": 20907,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -2568,7 +2469,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 26242,
+        "line": 20908,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -2577,7 +2478,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 26243,
+        "line": 20909,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -2586,7 +2487,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 27969,
+        "line": 22635,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -2595,7 +2496,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 27971,
+        "line": 22637,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -2604,7 +2505,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 28190,
+        "line": 22856,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -2613,7 +2514,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 28191,
+        "line": 22857,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -2622,7 +2523,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 28308,
+        "line": 22974,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -2631,7 +2532,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 28310,
+        "line": 22976,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -2640,7 +2541,7 @@
         "severity": "medium",
         "category": "weak-cryptography",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 29516,
+        "line": 24021,
         "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
         "recommendation": "Use cryptographically secure random number generators",
         "cwe": "CWE-338"
@@ -2649,7 +2550,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 31924,
+        "line": 26406,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -2658,7 +2559,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 31925,
+        "line": 26407,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -2667,7 +2568,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 32979,
+        "line": 27461,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -2676,7 +2577,7 @@
         "severity": "medium",
         "category": "weak-cryptography",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 43633,
+        "line": 36381,
         "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
         "recommendation": "Use cryptographically secure random number generators",
         "cwe": "CWE-338"
@@ -2685,7 +2586,7 @@
         "severity": "low",
         "category": "race-conditions",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 43633,
+        "line": 36381,
         "description": "Potentially dangerous pattern detected: /setTimeout.*0/g",
         "recommendation": "Use proper synchronization primitives",
         "cwe": "CWE-362"
@@ -2694,7 +2595,7 @@
         "severity": "critical",
         "category": "code-injection",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 44600,
+        "line": 36928,
         "description": "Potentially dangerous pattern detected: /eval\\s*\\(/g",
         "recommendation": "Use static code analysis and avoid dynamic code execution",
         "cwe": "CWE-95"
@@ -2703,7 +2604,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 48633,
+        "line": 40961,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -2712,7 +2613,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 48634,
+        "line": 40962,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -2721,7 +2622,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 48646,
+        "line": 40974,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -2730,7 +2631,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 48674,
+        "line": 41002,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -2739,7 +2640,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 50451,
+        "line": 41973,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -2748,7 +2649,7 @@
         "severity": "critical",
         "category": "code-injection",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 50458,
+        "line": 41980,
         "description": "Potentially dangerous pattern detected: /eval\\s*\\(/g",
         "recommendation": "Use static code analysis and avoid dynamic code execution",
         "cwe": "CWE-95"
@@ -2757,7 +2658,7 @@
         "severity": "critical",
         "category": "code-injection",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 50497,
+        "line": 42019,
         "description": "Potentially dangerous pattern detected: /eval\\s*\\(/g",
         "recommendation": "Use static code analysis and avoid dynamic code execution",
         "cwe": "CWE-95"
@@ -2766,7 +2667,7 @@
         "severity": "critical",
         "category": "code-injection",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 50498,
+        "line": 42020,
         "description": "Potentially dangerous pattern detected: /eval\\s*\\(/g",
         "recommendation": "Use static code analysis and avoid dynamic code execution",
         "cwe": "CWE-95"
@@ -2775,7 +2676,7 @@
         "severity": "critical",
         "category": "code-injection",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 50520,
+        "line": 42042,
         "description": "Potentially dangerous pattern detected: /eval\\s*\\(/g",
         "recommendation": "Use static code analysis and avoid dynamic code execution",
         "cwe": "CWE-95"
@@ -2784,7 +2685,7 @@
         "severity": "critical",
         "category": "code-injection",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 50556,
+        "line": 42078,
         "description": "Potentially dangerous pattern detected: /eval\\s*\\(/g",
         "recommendation": "Use static code analysis and avoid dynamic code execution",
         "cwe": "CWE-95"
@@ -2793,7 +2694,7 @@
         "severity": "critical",
         "category": "code-injection",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 50557,
+        "line": 42079,
         "description": "Potentially dangerous pattern detected: /eval\\s*\\(/g",
         "recommendation": "Use static code analysis and avoid dynamic code execution",
         "cwe": "CWE-95"
@@ -2802,7 +2703,7 @@
         "severity": "critical",
         "category": "code-injection",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 50579,
+        "line": 42101,
         "description": "Potentially dangerous pattern detected: /eval\\s*\\(/g",
         "recommendation": "Use static code analysis and avoid dynamic code execution",
         "cwe": "CWE-95"
@@ -2811,7 +2712,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 50677,
+        "line": 42199,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -2820,7 +2721,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 50684,
+        "line": 42206,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -2829,7 +2730,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 50686,
+        "line": 42208,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -2838,7 +2739,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 50728,
+        "line": 42250,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -2847,7 +2748,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 50762,
+        "line": 42284,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -2856,7 +2757,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 50774,
+        "line": 42296,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -2865,7 +2766,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 50777,
+        "line": 42299,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -2874,7 +2775,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 50807,
+        "line": 42329,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -2883,7 +2784,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 50809,
+        "line": 42331,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -2892,7 +2793,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 50814,
+        "line": 42336,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -2901,7 +2802,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 50820,
+        "line": 42342,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -2910,7 +2811,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 50841,
+        "line": 42363,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -2919,7 +2820,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 50843,
+        "line": 42365,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -2928,7 +2829,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 50884,
+        "line": 42406,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -2937,7 +2838,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 50890,
+        "line": 42412,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -2946,7 +2847,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 50891,
+        "line": 42413,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -2955,7 +2856,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 50931,
+        "line": 42453,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -2964,7 +2865,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 50949,
+        "line": 42471,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -2973,7 +2874,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 50963,
+        "line": 42485,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -2982,7 +2883,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 50973,
+        "line": 42495,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -2991,7 +2892,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 50992,
+        "line": 42514,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -3000,7 +2901,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 50993,
+        "line": 42515,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -3009,7 +2910,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 50994,
+        "line": 42516,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -3018,7 +2919,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 50996,
+        "line": 42518,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -3027,7 +2928,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 50997,
+        "line": 42519,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -3036,7 +2937,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 50998,
+        "line": 42520,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -3045,7 +2946,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 51298,
+        "line": 42820,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -3054,7 +2955,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 51318,
+        "line": 42840,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -3063,7 +2964,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 51742,
+        "line": 43264,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -3072,7 +2973,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 51743,
+        "line": 43265,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -3081,7 +2982,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 51744,
+        "line": 43266,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -3090,7 +2991,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 51747,
+        "line": 43269,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -3099,7 +3000,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 51773,
+        "line": 43295,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -3108,7 +3009,7 @@
         "severity": "medium",
         "category": "weak-cryptography",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 52938,
+        "line": 43842,
         "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
         "recommendation": "Use cryptographically secure random number generators",
         "cwe": "CWE-338"
@@ -3117,7 +3018,7 @@
         "severity": "high",
         "category": "command-injection",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 54901,
+        "line": 45480,
         "description": "Potentially dangerous pattern detected: /execSync\\s*\\(/g",
         "recommendation": "Validate and sanitize all user inputs, use parameterized commands",
         "cwe": "CWE-78"
@@ -3126,7 +3027,7 @@
         "severity": "high",
         "category": "command-injection",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 54902,
+        "line": 45481,
         "description": "Potentially dangerous pattern detected: /execSync\\s*\\(/g",
         "recommendation": "Validate and sanitize all user inputs, use parameterized commands",
         "cwe": "CWE-78"
@@ -3135,7 +3036,7 @@
         "severity": "high",
         "category": "command-injection",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 54903,
+        "line": 45482,
         "description": "Potentially dangerous pattern detected: /execSync\\s*\\(/g",
         "recommendation": "Validate and sanitize all user inputs, use parameterized commands",
         "cwe": "CWE-78"
@@ -3144,7 +3045,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 54927,
+        "line": 45506,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -3153,7 +3054,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 54928,
+        "line": 45507,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -3162,7 +3063,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 54949,
+        "line": 45528,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -3171,7 +3072,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 54950,
+        "line": 45529,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -3180,7 +3081,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 54954,
+        "line": 45533,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -3189,7 +3090,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 54983,
+        "line": 45562,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -3198,7 +3099,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 54984,
+        "line": 45563,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -3207,7 +3108,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 54994,
+        "line": 45573,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -3216,7 +3117,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 54995,
+        "line": 45574,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -3225,7 +3126,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 55057,
+        "line": 45636,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -3234,7 +3135,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 55103,
+        "line": 45682,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -3243,7 +3144,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 55115,
+        "line": 45694,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -3252,7 +3153,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 55116,
+        "line": 45695,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -3261,7 +3162,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 55911,
+        "line": 46490,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -3270,7 +3171,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 55936,
+        "line": 46515,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -3279,7 +3180,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 56001,
+        "line": 46580,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -3288,7 +3189,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/docs/agents/strray_v2_log.md",
-        "line": 56018,
+        "line": 46597,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -4007,33 +3908,6 @@
       {
         "severity": "high",
         "category": "path-traversal",
-        "file": "/Users/blaze/dev/stringray/final-orchestration-test/package-lock.json",
-        "line": 11,
-        "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
-        "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
-        "cwe": "CWE-22"
-      },
-      {
-        "severity": "high",
-        "category": "path-traversal",
-        "file": "/Users/blaze/dev/stringray/final-orchestration-test/package-lock.json",
-        "line": 1640,
-        "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
-        "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
-        "cwe": "CWE-22"
-      },
-      {
-        "severity": "high",
-        "category": "path-traversal",
-        "file": "/Users/blaze/dev/stringray/final-orchestration-test/package.json",
-        "line": 6,
-        "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
-        "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
-        "cwe": "CWE-22"
-      },
-      {
-        "severity": "high",
-        "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/final-stringray/package-lock.json",
         "line": 11,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
@@ -4250,6 +4124,22 @@
         "severity": "medium",
         "category": "dangerous-imports",
         "file": "/Users/blaze/dev/stringray/scripts/analysis/analyzer-agent-runner.js",
+        "description": "Potentially dangerous import detected: fs",
+        "recommendation": "Review usage and ensure proper sandboxing/validation",
+        "cwe": "CWE-350"
+      },
+      {
+        "severity": "medium",
+        "category": "dangerous-imports",
+        "file": "/Users/blaze/dev/stringray/scripts/cleanup-doc-versions.js",
+        "description": "Potentially dangerous import detected: fs",
+        "recommendation": "Review usage and ensure proper sandboxing/validation",
+        "cwe": "CWE-350"
+      },
+      {
+        "severity": "medium",
+        "category": "dangerous-imports",
+        "file": "/Users/blaze/dev/stringray/scripts/cleanup-repository.js",
         "description": "Potentially dangerous import detected: fs",
         "recommendation": "Review usage and ensure proper sandboxing/validation",
         "cwe": "CWE-350"
@@ -4570,6 +4460,14 @@
         "category": "dangerous-imports",
         "file": "/Users/blaze/dev/stringray/scripts/test/test-session-management.js",
         "description": "Potentially dangerous import detected: child_process",
+        "recommendation": "Review usage and ensure proper sandboxing/validation",
+        "cwe": "CWE-350"
+      },
+      {
+        "severity": "medium",
+        "category": "dangerous-imports",
+        "file": "/Users/blaze/dev/stringray/scripts/universal-version-manager.js",
+        "description": "Potentially dangerous import detected: fs",
         "recommendation": "Review usage and ensure proper sandboxing/validation",
         "cwe": "CWE-350"
       },
@@ -4990,7 +4888,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/src/cli/index.ts",
-        "line": 178,
+        "line": 204,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -7943,6 +7841,159 @@
         "cwe": "CWE-350"
       },
       {
+        "severity": "high",
+        "category": "path-traversal",
+        "file": "/Users/blaze/dev/stringray/src/self-evolution/architectural-self-modification.ts",
+        "line": 10,
+        "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
+        "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
+        "cwe": "CWE-22"
+      },
+      {
+        "severity": "medium",
+        "category": "weak-cryptography",
+        "file": "/Users/blaze/dev/stringray/src/self-evolution/architectural-self-modification.ts",
+        "line": 96,
+        "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
+        "recommendation": "Use cryptographically secure random number generators",
+        "cwe": "CWE-338"
+      },
+      {
+        "severity": "low",
+        "category": "race-conditions",
+        "file": "/Users/blaze/dev/stringray/src/self-evolution/architectural-self-modification.ts",
+        "line": 532,
+        "description": "Potentially dangerous pattern detected: /setTimeout.*0/g",
+        "recommendation": "Use proper synchronization primitives",
+        "cwe": "CWE-362"
+      },
+      {
+        "severity": "medium",
+        "category": "weak-cryptography",
+        "file": "/Users/blaze/dev/stringray/src/self-evolution/continuous-learning-loops.ts",
+        "line": 359,
+        "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
+        "recommendation": "Use cryptographically secure random number generators",
+        "cwe": "CWE-338"
+      },
+      {
+        "severity": "medium",
+        "category": "weak-cryptography",
+        "file": "/Users/blaze/dev/stringray/src/self-evolution/continuous-learning-loops.ts",
+        "line": 454,
+        "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
+        "recommendation": "Use cryptographically secure random number generators",
+        "cwe": "CWE-338"
+      },
+      {
+        "severity": "medium",
+        "category": "weak-cryptography",
+        "file": "/Users/blaze/dev/stringray/src/self-evolution/continuous-learning-loops.ts",
+        "line": 640,
+        "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
+        "recommendation": "Use cryptographically secure random number generators",
+        "cwe": "CWE-338"
+      },
+      {
+        "severity": "medium",
+        "category": "weak-cryptography",
+        "file": "/Users/blaze/dev/stringray/src/self-evolution/continuous-learning-loops.ts",
+        "line": 666,
+        "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
+        "recommendation": "Use cryptographically secure random number generators",
+        "cwe": "CWE-338"
+      },
+      {
+        "severity": "medium",
+        "category": "weak-cryptography",
+        "file": "/Users/blaze/dev/stringray/src/self-evolution/continuous-learning-loops.ts",
+        "line": 667,
+        "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
+        "recommendation": "Use cryptographically secure random number generators",
+        "cwe": "CWE-338"
+      },
+      {
+        "severity": "low",
+        "category": "race-conditions",
+        "file": "/Users/blaze/dev/stringray/src/self-evolution/rule-evolution-system.ts",
+        "line": 48,
+        "description": "Potentially dangerous pattern detected: /setTimeout.*0/g",
+        "recommendation": "Use proper synchronization primitives",
+        "cwe": "CWE-362"
+      },
+      {
+        "severity": "medium",
+        "category": "weak-cryptography",
+        "file": "/Users/blaze/dev/stringray/src/self-evolution/rule-evolution-system.ts",
+        "line": 52,
+        "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
+        "recommendation": "Use cryptographically secure random number generators",
+        "cwe": "CWE-338"
+      },
+      {
+        "severity": "medium",
+        "category": "weak-cryptography",
+        "file": "/Users/blaze/dev/stringray/src/self-evolution/rule-evolution-system.ts",
+        "line": 54,
+        "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
+        "recommendation": "Use cryptographically secure random number generators",
+        "cwe": "CWE-338"
+      },
+      {
+        "severity": "low",
+        "category": "race-conditions",
+        "file": "/Users/blaze/dev/stringray/src/self-evolution/safe-rule-evolution.ts",
+        "line": 21,
+        "description": "Potentially dangerous pattern detected: /setTimeout.*0/g",
+        "recommendation": "Use proper synchronization primitives",
+        "cwe": "CWE-362"
+      },
+      {
+        "severity": "medium",
+        "category": "weak-cryptography",
+        "file": "/Users/blaze/dev/stringray/src/self-evolution/safe-rule-evolution.ts",
+        "line": 25,
+        "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
+        "recommendation": "Use cryptographically secure random number generators",
+        "cwe": "CWE-338"
+      },
+      {
+        "severity": "medium",
+        "category": "weak-cryptography",
+        "file": "/Users/blaze/dev/stringray/src/self-evolution/safe-rule-evolution.ts",
+        "line": 27,
+        "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
+        "recommendation": "Use cryptographically secure random number generators",
+        "cwe": "CWE-338"
+      },
+      {
+        "severity": "medium",
+        "category": "weak-cryptography",
+        "file": "/Users/blaze/dev/stringray/src/self-evolution/safe-rule-evolution.ts",
+        "line": 34,
+        "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
+        "recommendation": "Use cryptographically secure random number generators",
+        "cwe": "CWE-338"
+      },
+      {
+        "severity": "medium",
+        "category": "weak-cryptography",
+        "file": "/Users/blaze/dev/stringray/src/self-evolution/self-evolution-validation.ts",
+        "line": 356,
+        "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
+        "recommendation": "Use cryptographically secure random number generators",
+        "cwe": "CWE-338"
+      },
+      {
+        "severity": "medium",
+        "category": "weak-cryptography",
+        "file": "/Users/blaze/dev/stringray/src/self-evolution/self-reflection.ts",
+        "line": 133,
+        "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
+        "recommendation": "Use cryptographically secure random number generators",
+        "cwe": "CWE-338"
+      },
+      {
         "severity": "medium",
         "category": "dangerous-imports",
         "file": "/Users/blaze/dev/stringray/src/server.ts",
@@ -8179,6 +8230,123 @@
         "category": "weak-cryptography",
         "file": "/Users/blaze/dev/stringray/src/simulation/distributed-session-simulation.ts",
         "line": 294,
+        "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
+        "recommendation": "Use cryptographically secure random number generators",
+        "cwe": "CWE-338"
+      },
+      {
+        "severity": "high",
+        "category": "path-traversal",
+        "file": "/Users/blaze/dev/stringray/src/simulation/self-evolution-simulations.ts",
+        "line": 16,
+        "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
+        "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
+        "cwe": "CWE-22"
+      },
+      {
+        "severity": "high",
+        "category": "path-traversal",
+        "file": "/Users/blaze/dev/stringray/src/simulation/self-evolution-simulations.ts",
+        "line": 25,
+        "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
+        "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
+        "cwe": "CWE-22"
+      },
+      {
+        "severity": "medium",
+        "category": "weak-cryptography",
+        "file": "/Users/blaze/dev/stringray/src/simulation/self-evolution-simulations.ts",
+        "line": 62,
+        "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
+        "recommendation": "Use cryptographically secure random number generators",
+        "cwe": "CWE-338"
+      },
+      {
+        "severity": "medium",
+        "category": "weak-cryptography",
+        "file": "/Users/blaze/dev/stringray/src/simulation/self-evolution-simulations.ts",
+        "line": 63,
+        "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
+        "recommendation": "Use cryptographically secure random number generators",
+        "cwe": "CWE-338"
+      },
+      {
+        "severity": "medium",
+        "category": "weak-cryptography",
+        "file": "/Users/blaze/dev/stringray/src/simulation/self-evolution-simulations.ts",
+        "line": 64,
+        "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
+        "recommendation": "Use cryptographically secure random number generators",
+        "cwe": "CWE-338"
+      },
+      {
+        "severity": "medium",
+        "category": "weak-cryptography",
+        "file": "/Users/blaze/dev/stringray/src/simulation/self-evolution-simulations.ts",
+        "line": 85,
+        "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
+        "recommendation": "Use cryptographically secure random number generators",
+        "cwe": "CWE-338"
+      },
+      {
+        "severity": "medium",
+        "category": "weak-cryptography",
+        "file": "/Users/blaze/dev/stringray/src/simulation/self-evolution-simulations.ts",
+        "line": 86,
+        "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
+        "recommendation": "Use cryptographically secure random number generators",
+        "cwe": "CWE-338"
+      },
+      {
+        "severity": "medium",
+        "category": "weak-cryptography",
+        "file": "/Users/blaze/dev/stringray/src/simulation/self-evolution-simulations.ts",
+        "line": 169,
+        "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
+        "recommendation": "Use cryptographically secure random number generators",
+        "cwe": "CWE-338"
+      },
+      {
+        "severity": "medium",
+        "category": "weak-cryptography",
+        "file": "/Users/blaze/dev/stringray/src/simulation/self-evolution-simulations.ts",
+        "line": 170,
+        "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
+        "recommendation": "Use cryptographically secure random number generators",
+        "cwe": "CWE-338"
+      },
+      {
+        "severity": "medium",
+        "category": "weak-cryptography",
+        "file": "/Users/blaze/dev/stringray/src/simulation/self-evolution-simulations.ts",
+        "line": 171,
+        "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
+        "recommendation": "Use cryptographically secure random number generators",
+        "cwe": "CWE-338"
+      },
+      {
+        "severity": "low",
+        "category": "race-conditions",
+        "file": "/Users/blaze/dev/stringray/src/simulation/self-evolution-simulations.ts",
+        "line": 176,
+        "description": "Potentially dangerous pattern detected: /setTimeout.*0/g",
+        "recommendation": "Use proper synchronization primitives",
+        "cwe": "CWE-362"
+      },
+      {
+        "severity": "medium",
+        "category": "weak-cryptography",
+        "file": "/Users/blaze/dev/stringray/src/simulation/self-evolution-simulations.ts",
+        "line": 401,
+        "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
+        "recommendation": "Use cryptographically secure random number generators",
+        "cwe": "CWE-338"
+      },
+      {
+        "severity": "medium",
+        "category": "weak-cryptography",
+        "file": "/Users/blaze/dev/stringray/src/simulation/self-evolution-simulations.ts",
+        "line": 432,
         "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
         "recommendation": "Use cryptographically secure random number generators",
         "cwe": "CWE-338"
@@ -8718,87 +8886,6 @@
         "cwe": "CWE-350"
       },
       {
-        "severity": "high",
-        "category": "path-traversal",
-        "file": "/Users/blaze/dev/stringray/strray-final-test/package-lock.json",
-        "line": 11,
-        "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
-        "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
-        "cwe": "CWE-22"
-      },
-      {
-        "severity": "high",
-        "category": "path-traversal",
-        "file": "/Users/blaze/dev/stringray/strray-final-test/package-lock.json",
-        "line": 1640,
-        "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
-        "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
-        "cwe": "CWE-22"
-      },
-      {
-        "severity": "high",
-        "category": "path-traversal",
-        "file": "/Users/blaze/dev/stringray/strray-final-test/package.json",
-        "line": 6,
-        "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
-        "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
-        "cwe": "CWE-22"
-      },
-      {
-        "severity": "high",
-        "category": "path-traversal",
-        "file": "/Users/blaze/dev/stringray/test-deployment/package-lock.json",
-        "line": 11,
-        "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
-        "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
-        "cwe": "CWE-22"
-      },
-      {
-        "severity": "high",
-        "category": "path-traversal",
-        "file": "/Users/blaze/dev/stringray/test-deployment/package-lock.json",
-        "line": 1371,
-        "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
-        "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
-        "cwe": "CWE-22"
-      },
-      {
-        "severity": "high",
-        "category": "path-traversal",
-        "file": "/Users/blaze/dev/stringray/test-deployment/package.json",
-        "line": 6,
-        "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
-        "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
-        "cwe": "CWE-22"
-      },
-      {
-        "severity": "high",
-        "category": "path-traversal",
-        "file": "/Users/blaze/dev/stringray/test-install/package-lock.json",
-        "line": 11,
-        "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
-        "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
-        "cwe": "CWE-22"
-      },
-      {
-        "severity": "high",
-        "category": "path-traversal",
-        "file": "/Users/blaze/dev/stringray/test-install/package-lock.json",
-        "line": 1640,
-        "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
-        "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
-        "cwe": "CWE-22"
-      },
-      {
-        "severity": "high",
-        "category": "path-traversal",
-        "file": "/Users/blaze/dev/stringray/test-install/package.json",
-        "line": 6,
-        "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
-        "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
-        "cwe": "CWE-22"
-      },
-      {
         "severity": "medium",
         "category": "dangerous-imports",
         "file": "/Users/blaze/dev/stringray/tests/performance/load-test.js",
@@ -8825,9 +8912,9 @@
     ],
     "summary": {
       "critical": 69,
-      "high": 467,
-      "medium": 311,
-      "low": 41,
+      "high": 455,
+      "medium": 329,
+      "low": 45,
       "info": 0
     },
     "score": 0

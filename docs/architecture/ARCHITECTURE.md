@@ -2,7 +2,7 @@
 
 ## Overview
 
-StrRay Framework implements a comprehensive multi-agent AI system integrated with oh-my-opencode v2.12.0. The framework provides 8 specialized AI agents for systematic error prevention and enhanced development capabilities.
+StrRay Framework implements a comprehensive multi-agent AI system integrated with . The framework provides 8 specialized AI agents for systematic error prevention and enhanced development capabilities.
 
 ## Core Architecture Principles
 

@@ -69,7 +69,7 @@ graph TB
 │   ├── 🔍 Plugin Activation
 │   │   └── StrRay plugin (strray-codex-injection.ts) activates
 │   ├── 📚 Context Injection
-│   │   └── Universal Development Codex v1.2.22 loaded into prompt
+│   │   └── Universal Development Codex v1.2.24 loaded into prompt
 │   └── 🎯 Orchestration Trigger
 │       └── Complex task detected → Route to orchestrator
 │

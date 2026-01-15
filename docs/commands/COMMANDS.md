@@ -1,6 +1,6 @@
 # StrRay Framework - Command Reference and Usage Guide
 
-**Version**: v2.4.0 | **Last Updated**: 2026-01-05 | **Framework**: StrRay v2.4.0
+**Version**: **Last Updated**: 2026-01-05 | **Framework**: StrRay v2.4.0
 
 ## Overview
 

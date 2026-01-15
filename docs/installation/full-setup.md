@@ -47,7 +47,7 @@ npm run init
 oh-my-opencode status
 
 # Should show:
-# ✅ Framework: StrRay v1.0.0 loaded
+# ✅  loaded
 # ✅ Agents: 8 configured
 # ✅ MCP Skills: 6 loaded
 # ✅ Automation Hooks: 4 active

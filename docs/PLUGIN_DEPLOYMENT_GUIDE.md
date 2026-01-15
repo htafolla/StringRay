@@ -1,4 +1,4 @@
-# StrRay Framework v1.0.0 - Plugin Deployment & Testing Guide
+#  - Plugin Deployment & Testing Guide
 
 ## Overview
 
@@ -20,7 +20,7 @@ This guide documents the complete process for deploying and testing the StrRay F
 
 - Node.js v18.0.0 or higher
 - npm v8.0.0 or higher
-- oh-my-opencode v2.14.0 or higher
+-  or higher
 - TypeScript 5.x
 
 ## Build Process

@@ -23,6 +23,42 @@ beforeAll(() => {
   // Set up test environment
   process.env.NODE_ENV = "test";
   process.env.STRRAY_TEST_MODE = "true";
+
+  // Create required directories for tests
+  const fs = require("fs");
+  const path = require("path");
+
+  const requiredDirs = [
+    ".opencode",
+    ".opencode/agents",
+    ".opencode/mcps",
+    ".opencode/logs",
+    ".strray",
+    "src"
+  ];
+
+  requiredDirs.forEach(dir => {
+    const fullPath = path.resolve(dir);
+    if (!fs.existsSync(fullPath)) {
+      fs.mkdirSync(fullPath, { recursive: true });
+    }
+  });
+
+  // Create required config files for tests
+  const codexContent = global.testUtils.createMockCodexContent();
+  const codexPath = path.resolve(".strray/codex.json");
+  if (!fs.existsSync(codexPath)) {
+    fs.writeFileSync(codexPath, codexContent);
+  }
+
+  const ohMyOpencodeConfig = {
+    plugin: "./dist/plugin/plugins/stringray-codex-injection.js",
+    agents: ["enforcer", "architect", "orchestrator"]
+  };
+  const ohMyOpencodePath = path.resolve(".opencode/oh-my-opencode.json");
+  if (!fs.existsSync(ohMyOpencodePath)) {
+    fs.writeFileSync(ohMyOpencodePath, JSON.stringify(ohMyOpencodeConfig, null, 2));
+  }
 });
 
 afterAll(() => {

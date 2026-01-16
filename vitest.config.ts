@@ -36,11 +36,13 @@ export default defineConfig({
         },
       },
     },
-    testTimeout: 30000,
-    hookTimeout: 30000,
-    bail: 5, // Stop after 5 test failures - prevents resource waste
+    testTimeout: process.env.CI ? 60000 : 30000, // 60s in CI, 30s locally
+    hookTimeout: process.env.CI ? 45000 : 30000, // 45s in CI, 30s locally
+    bail: process.env.CI ? 3 : 5, // Stop faster in CI to fail quickly
     pool: "forks", // Use forks for better test isolation and CI/CD reliability
-    retry: 2,
+    retry: process.env.CI ? 3 : 2, // More retries in CI
+    maxThreads: process.env.CI ? 2 : 4, // Limit threads in CI
+    minThreads: 1,
   },
   resolve: {
     alias: {

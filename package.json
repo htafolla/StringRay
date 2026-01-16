@@ -31,7 +31,7 @@
     "ci-report": "echo 'CI/CD health check passed'",
     "test:performance": "vitest run src/__tests__/performance/",
     "performance:report": "node scripts/performance-report.js",
-    "performance:gates": "node src/performance/performance-ci-gates.js",
+    "performance:gates": "node scripts/run-performance-gates.mjs",
     "test:architect": "vitest run src/__tests__/agents/architect.test.ts src/__tests__/agents/test-architect.test.ts",
     "test:e2e": "vitest run src/__tests__/integration/e2e-framework-integration.test.ts",
     "test:path-resolution": "node scripts/test-comprehensive-path-resolution.mjs",

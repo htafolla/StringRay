@@ -32,7 +32,7 @@ jobs:
       run: npm run lint
 
     - name: Run tests
-      run: timeout 600 npm test -- --reporter=verbose --run
+      run: npm test
 
     - name: Run comprehensive path resolution test
       run: timeout 30 node scripts/test-comprehensive-path-resolution.mjs

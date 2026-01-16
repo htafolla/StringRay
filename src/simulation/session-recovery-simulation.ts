@@ -429,3 +429,4 @@ export async function runSessionRecoverySimulation(): Promise<RecoverySimulation
 
   return simulateSessionRecovery(config);
 }
+import { frameworkLogger } from "../framework-logger.js";

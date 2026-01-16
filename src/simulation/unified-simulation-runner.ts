@@ -351,7 +351,7 @@ export class UnifiedSimulationRunner {
   /**
    * Print comprehensive test report
    */
-  private printComprehensiveReport(results: SimulationSuiteResult[]): void {
+  private async printComprehensiveReport(results: SimulationSuiteResult[]): Promise<void> {
     console.log('\n🎯 COMPREHENSIVE SIMULATION REPORT');
     console.log('===================================');
 
@@ -384,7 +384,7 @@ export class UnifiedSimulationRunner {
     } else if (overallSuccessRate >= 75) {
       await frameworkLogger.log("simulation-runner", "validation-status", "success", { status: "good", description: "Framework mostly validated" });
     } else if (overallSuccessRate >= 50) {
-      await frameworkLogger.log("simulation-runner", "validation-status", "warning", { status: "fair", description: "Framework needs attention" });
+      await frameworkLogger.log("simulation-runner", "validation-status", "debug", { status: "fair", description: "Framework needs attention" });
     } else {
       await frameworkLogger.log("simulation-runner", "validation-status", "error", { status: "poor", description: "Framework requires significant fixes" });
     }

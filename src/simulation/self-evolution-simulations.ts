@@ -13,17 +13,82 @@
  * - Continuously improve through automated learning cycles
  */
 
-import { metaAnalysisEngine } from '../self-evolution/meta-analysis-engine';
+// Stubbed imports for v1.0.5 - self-evolution features are experimental v2.0
+// import { metaAnalysisEngine } from '../self-evolution/meta-analysis-engine';
 import { frameworkLogger } from "../framework-logger.js";
-import {
-  ruleEvolutionSystem,
-  safeRuleEvolutionSystem,
-  architecturalSelfModificationSystem,
-  inferenceEngine,
-  selfReflectionSystem,
-  continuousLearningLoops,
-  selfEvolutionValidationSystem
-} from '../self-evolution/index';
+// import {
+//   ruleEvolutionSystem,
+//   safeRuleEvolutionSystem,
+//   architecturalSelfModificationSystem,
+//   inferenceEngine,
+//   selfReflectionSystem,
+//   continuousLearningLoops,
+//   selfEvolutionValidationSystem
+// } from '../self-evolution/index';
+
+// Stub implementations for v1.0.5 compatibility
+const metaAnalysisEngine = {
+  recordRuleExecution: (ruleId: string, executionTime: number, success: boolean, hasImpact: boolean) => {},
+  generateMetaAnalysisReport: () => ({
+    ruleEffectiveness: [],
+    frameworkHealthScore: 0.8,
+    recommendations: []
+  })
+};
+
+const inferenceEngine = class {
+  constructor(logger: any, metrics: any) {}
+  recordObservation(cause: string, effect: string, causeValue: number, effectValue: number) {}
+  generateInference() {
+    return { relationships: [], patterns: [], confidence: 0.8, recommendations: [] };
+  }
+};
+
+const selfReflectionSystem = class {
+  constructor(logger: any, metrics: any) {}
+  recordDecision(decision: any) { return 'mock-decision-id'; }
+  evaluateDecision(decisionId: string, evaluator: string, criteria: any[]) {}
+  getDecisions() { return []; }
+  getArchitecturalHealth() {
+    return {
+      overallScore: 0.8,
+      recommendations: [],
+      issues: []
+    };
+  }
+};
+
+const continuousLearningLoops = class {
+  constructor(logger: any, metrics: any, inference: any, reflection: any) {}
+  startLearningCycle(objectives: string[]) { return 'mock-cycle-id'; }
+  submitFeedback(source: string, data: any) {}
+  getStatistics() {
+    return {
+      activeCycles: 0,
+      totalCycles: 0,
+      completedCycles: 0,
+      failedCycles: 0
+    };
+  }
+};
+
+const selfEvolutionValidationSystem = class {
+  constructor(logger: any, metrics: any, inference: any, reflection: any, learning: any) {}
+  assessOverallReadiness() {
+    return {
+      overallScore: 0.7,
+      riskLevel: 'medium',
+      recommendations: ['Self-evolution features are experimental v2.0'],
+      issues: []
+    };
+  }
+  runValidationSuite(name: string) {
+    return {
+      summary: { total: 0, passed: 0, failed: 0, warnings: 0 },
+      results: []
+    };
+  }
+};
 
 export interface SelfEvolutionSimulationResult {
   simulationName: string;

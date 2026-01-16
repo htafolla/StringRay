@@ -176,9 +176,21 @@
       "behavioral-testing"
     ]
   },
-  "session:expired-test:coordinator": {
-    "sessionId": "expired-test",
-    "startTime": 1768307064813,
+  "monitor:health": {
+    "default": {
+      "sessionId": "default",
+      "status": "unknown",
+      "lastCheck": 0,
+      "responseTime": 0,
+      "errorCount": 0,
+      "activeAgents": 0,
+      "memoryUsage": 0,
+      "issues": []
+    }
+  },
+  "session:cleanup-test-2:coordinator": {
+    "sessionId": "cleanup-test-2",
+    "startTime": 1768530947065,
     "activeDelegations": {},
     "agentInteractions": {},
     "conflictHistory": [],
@@ -200,13 +212,34 @@
   "cleanup:session_metadata": {
     "default": {
       "sessionId": "default",
-      "createdAt": 1768529998655,
-      "lastActivity": 1768529998655,
+      "createdAt": 1768530950706,
+      "lastActivity": 1768530950706,
       "ttlMs": 86400000,
       "isActive": true,
       "agentCount": 0,
       "memoryUsage": 0
     }
+  },
+  "session:expired-test:coordinator": {
+    "sessionId": "expired-test",
+    "startTime": 1768307064813,
+    "activeDelegations": {},
+    "agentInteractions": {},
+    "conflictHistory": [],
+    "coordinationState": {
+      "activeAgents": {},
+      "pendingCommunications": [],
+      "sharedContext": {},
+      "sessionMetrics": {
+        "totalInteractions": 0,
+        "successfulInteractions": 0,
+        "failedInteractions": 0,
+        "averageResponseTime": 0,
+        "conflictResolutionRate": 0,
+        "coordinationEfficiency": 0
+      }
+    },
+    "isActive": true
   },
   "delegation:agent_delegator": {
     "complexityAnalyzer": {
@@ -262,7 +295,7 @@
   },
   "session:default:coordinator": {
     "sessionId": "default",
-    "startTime": 1768529998654,
+    "startTime": 1768530950706,
     "activeDelegations": {},
     "agentInteractions": {},
     "conflictHistory": [],
@@ -283,12 +316,12 @@
   },
   "delegation:default_session": {
     "sessionId": "default",
-    "createdAt": "2026-01-16T02:19:58.654Z",
+    "createdAt": "2026-01-16T02:35:50.706Z",
     "active": true,
     "agentCount": 8
   },
   "session:active": true,
-  "session:boot_time": 1768529998654,
+  "session:boot_time": 1768530950706,
   "session:agents": [],
   "session:state_manager": {
     "stateManager": {
@@ -313,18 +346,6 @@
     "dependencies": {},
     "sessionGroups": {},
     "failoverConfigs": {}
-  },
-  "monitor:health": {
-    "default": {
-      "sessionId": "default",
-      "status": "unknown",
-      "lastCheck": 0,
-      "responseTime": 0,
-      "errorCount": 0,
-      "activeAgents": 0,
-      "memoryUsage": 0,
-      "issues": []
-    }
   },
   "enforcement:active": true,
   "enforcement:codex_terms": [
@@ -737,7 +758,7 @@
       "enforcementLevel": "blocking"
     }
   ],
-  "enforcement:enabled_at": 1768529998655,
+  "enforcement:enabled_at": 1768530950706,
   "session:validator-test-session:coordinator": {
     "sessionId": "validator-test-session",
     "startTime": 1768335491257,
@@ -801,6 +822,18 @@
       },
       {
         "timestamp": 1768520391748,
+        "sessionId": "healthy-session",
+        "totalInteractions": 0,
+        "successfulInteractions": 0,
+        "failedInteractions": 0,
+        "averageResponseTime": 0,
+        "conflictResolutionRate": 1,
+        "coordinationEfficiency": 1,
+        "memoryUsage": 0,
+        "agentCount": 3
+      },
+      {
+        "timestamp": 1768530949198,
         "sessionId": "healthy-session",
         "totalInteractions": 0,
         "successfulInteractions": 0,
@@ -996,7 +1029,7 @@
   },
   "processor:active": true,
   "security:initial_audit": {
-    "totalFiles": 1640,
+    "totalFiles": 1668,
     "issues": [
       {
         "severity": "high",
@@ -10076,8 +10109,8 @@
       {
         "severity": "high",
         "category": "path-traversal",
-        "file": "/Users/blaze/dev/stringray/src/simulation/self-evolution-simulations.ts",
-        "line": 16,
+        "file": "/Users/blaze/dev/stringray/src/simulation/distributed-session-simulation.ts",
+        "line": 318,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -10095,7 +10128,16 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/src/simulation/self-evolution-simulations.ts",
-        "line": 26,
+        "line": 18,
+        "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
+        "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
+        "cwe": "CWE-22"
+      },
+      {
+        "severity": "high",
+        "category": "path-traversal",
+        "file": "/Users/blaze/dev/stringray/src/simulation/self-evolution-simulations.ts",
+        "line": 27,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -10104,7 +10146,7 @@
         "severity": "medium",
         "category": "weak-cryptography",
         "file": "/Users/blaze/dev/stringray/src/simulation/self-evolution-simulations.ts",
-        "line": 63,
+        "line": 128,
         "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
         "recommendation": "Use cryptographically secure random number generators",
         "cwe": "CWE-338"
@@ -10113,7 +10155,7 @@
         "severity": "medium",
         "category": "weak-cryptography",
         "file": "/Users/blaze/dev/stringray/src/simulation/self-evolution-simulations.ts",
-        "line": 64,
+        "line": 129,
         "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
         "recommendation": "Use cryptographically secure random number generators",
         "cwe": "CWE-338"
@@ -10122,7 +10164,7 @@
         "severity": "medium",
         "category": "weak-cryptography",
         "file": "/Users/blaze/dev/stringray/src/simulation/self-evolution-simulations.ts",
-        "line": 65,
+        "line": 130,
         "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
         "recommendation": "Use cryptographically secure random number generators",
         "cwe": "CWE-338"
@@ -10131,7 +10173,7 @@
         "severity": "medium",
         "category": "weak-cryptography",
         "file": "/Users/blaze/dev/stringray/src/simulation/self-evolution-simulations.ts",
-        "line": 86,
+        "line": 151,
         "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
         "recommendation": "Use cryptographically secure random number generators",
         "cwe": "CWE-338"
@@ -10140,7 +10182,7 @@
         "severity": "medium",
         "category": "weak-cryptography",
         "file": "/Users/blaze/dev/stringray/src/simulation/self-evolution-simulations.ts",
-        "line": 87,
+        "line": 152,
         "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
         "recommendation": "Use cryptographically secure random number generators",
         "cwe": "CWE-338"
@@ -10149,7 +10191,7 @@
         "severity": "medium",
         "category": "weak-cryptography",
         "file": "/Users/blaze/dev/stringray/src/simulation/self-evolution-simulations.ts",
-        "line": 170,
+        "line": 235,
         "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
         "recommendation": "Use cryptographically secure random number generators",
         "cwe": "CWE-338"
@@ -10158,7 +10200,7 @@
         "severity": "medium",
         "category": "weak-cryptography",
         "file": "/Users/blaze/dev/stringray/src/simulation/self-evolution-simulations.ts",
-        "line": 171,
+        "line": 236,
         "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
         "recommendation": "Use cryptographically secure random number generators",
         "cwe": "CWE-338"
@@ -10167,7 +10209,7 @@
         "severity": "medium",
         "category": "weak-cryptography",
         "file": "/Users/blaze/dev/stringray/src/simulation/self-evolution-simulations.ts",
-        "line": 172,
+        "line": 237,
         "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
         "recommendation": "Use cryptographically secure random number generators",
         "cwe": "CWE-338"
@@ -10176,7 +10218,7 @@
         "severity": "low",
         "category": "race-conditions",
         "file": "/Users/blaze/dev/stringray/src/simulation/self-evolution-simulations.ts",
-        "line": 177,
+        "line": 242,
         "description": "Potentially dangerous pattern detected: /setTimeout.*0/g",
         "recommendation": "Use proper synchronization primitives",
         "cwe": "CWE-362"
@@ -10185,7 +10227,7 @@
         "severity": "medium",
         "category": "weak-cryptography",
         "file": "/Users/blaze/dev/stringray/src/simulation/self-evolution-simulations.ts",
-        "line": 402,
+        "line": 467,
         "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
         "recommendation": "Use cryptographically secure random number generators",
         "cwe": "CWE-338"
@@ -10194,7 +10236,7 @@
         "severity": "medium",
         "category": "weak-cryptography",
         "file": "/Users/blaze/dev/stringray/src/simulation/self-evolution-simulations.ts",
-        "line": 433,
+        "line": 498,
         "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
         "recommendation": "Use cryptographically secure random number generators",
         "cwe": "CWE-338"
@@ -10297,6 +10339,15 @@
         "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
         "recommendation": "Use cryptographically secure random number generators",
         "cwe": "CWE-338"
+      },
+      {
+        "severity": "high",
+        "category": "path-traversal",
+        "file": "/Users/blaze/dev/stringray/src/simulation/session-persistence-simulation.ts",
+        "line": 343,
+        "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
+        "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
+        "cwe": "CWE-22"
       },
       {
         "severity": "medium",
@@ -10405,6 +10456,15 @@
         "description": "Potentially dangerous pattern detected: /Math\\.random\\s*\\(\\)/g",
         "recommendation": "Use cryptographically secure random number generators",
         "cwe": "CWE-338"
+      },
+      {
+        "severity": "high",
+        "category": "path-traversal",
+        "file": "/Users/blaze/dev/stringray/src/simulation/session-recovery-simulation.ts",
+        "line": 432,
+        "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
+        "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
+        "cwe": "CWE-22"
       },
       {
         "severity": "high",
@@ -10778,7 +10838,7 @@
     ],
     "summary": {
       "critical": 106,
-      "high": 612,
+      "high": 615,
       "medium": 337,
       "low": 48,
       "info": 0

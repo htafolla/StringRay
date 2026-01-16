@@ -275,7 +275,15 @@ dynamodb/
 
 # Project specific
 # Keep .opencode/ and .strray/ structure but ignore generated content
-.opencode/logs/
+.opencode/logs/*
+!.opencode/logs/
+!.opencode/logs/.gitkeep
+.opencode/agents/*
+!.opencode/agents/
+!.opencode/agents/.gitkeep
+.opencode/mcps/*
+!.opencode/mcps/
+!.opencode/mcps/.gitkeep
 .opencode/.pytest_cache/
 .opencode/__pycache__/
 .strray/.pytest_cache/

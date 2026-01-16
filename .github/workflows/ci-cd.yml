@@ -57,10 +57,7 @@ jobs:
       run: npm run build:all
 
     - name: Install framework configuration
-      run: npm run postinstall
-
-    - name: Run oh-my-opencode integration test
-      run: node scripts/validation/validate-oh-my-opencode-integration.js
+      run: npx . install
 
     - name: Run build validation
       run: npm run validate

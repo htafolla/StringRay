@@ -102,6 +102,7 @@
     ".opencode/package.json",
     ".claude/.mcp.json",
     "scripts/postinstall.cjs",
+    "scripts/validation",
     "dist/cli",
     "dist/plugin",
     "dist/mcps",

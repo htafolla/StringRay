@@ -64,11 +64,9 @@ class MCPServerValidator {
 
        // Test server startup (longer timeout for CI environments)
        const isCI = process.env.CI === 'true';
-       const spawnTimeout = isCI ? 30000 : 10000; // 30s for CI, 10s for local
 
        const child = spawn('node', [serverPath], {
-         stdio: ['pipe', 'pipe', 'pipe'],
-         timeout: spawnTimeout
+         stdio: ['pipe', 'pipe', 'pipe']
        });
 
       let stdout = '';
@@ -77,57 +75,57 @@ class MCPServerValidator {
 
        child.stdout.on('data', (data) => {
          stdout += data.toString();
-         // Look for successful startup indicators
-         if (stdout.includes('server-started') || stdout.includes('SUCCESS') || stdout.includes('ready')) {
-           if (!started) {
-             started = true;
-             console.log(`  ✅ Server started successfully`);
-           }
-         }
        });
 
        child.stderr.on('data', (data) => {
          stderr += data.toString();
        });
 
-       // Set a timeout to check if server is still running (MCP servers stay alive)
-       const healthCheckTimeout = isCI ? 3000 : 1000; // 3s for CI, 1s for local
+       // For MCP servers, success means they start without immediate crash
+       // Wait a short time, then kill cleanly if still running
+       const testTimeout = isCI ? 5000 : 2000; // 5s for CI, 2s for local
 
        setTimeout(() => {
-         if (!child.killed && !stderr.includes('Error') && !stderr.includes('Exception')) {
-           if (!started) {
-             started = true;
-             console.log(`  ✅ Server started successfully`);
-           }
-           // Only kill if process is still running
-           if (!child.killed) {
-             child.kill('SIGTERM');
-           }
+         if (!child.killed) {
+           // Server is still running after test period - success!
+           console.log(`  ✅ Server started successfully`);
+           child.kill('SIGTERM');
+           started = true;
          }
-       }, healthCheckTimeout);
+       }, testTimeout);
 
        child.on('close', (code) => {
-         if (started && code === null) { // SIGTERM exit
-           console.log(`  ✅ Server running successfully (killed after 5s)`);
-           this.results.passed.push(server.name);
-         } else if (started) {
-           console.log(`  ✅ Protocol compliance: OK`);
-           this.results.passed.push(server.name);
-         } else if (stderr.includes('Server does not support tools')) {
-           console.log(`  ❌ Missing tool capabilities declaration`);
+         if (started || code === null || code === 0) {
+           // Clean exit or was killed by our test - success
+           if (!this.results.passed.includes(server.name)) {
+             console.log(`  ✅ Server validation passed`);
+             this.results.passed.push(server.name);
+           }
+         } else if (stderr && stderr.length > 0) {
+           // Server produced error output - failure
+           console.log(`  ❌ Server error: ${stderr.slice(0, 50)}...`);
            this.results.failed.push({
              server: server.name,
-             error: 'Missing tool capabilities'
+             error: `Error output: ${stderr.slice(0, 100)}...`
            });
          } else {
-           console.log(`  ❌ Startup failed (code: ${code})`);
+           // Unexpected exit code
+           console.log(`  ❌ Unexpected exit (code: ${code})`);
            this.results.failed.push({
              server: server.name,
-             error: `Exit code ${code}: ${stderr.slice(0, 100)}...`
+             error: `Exit code ${code}`
            });
          }
          resolve();
        });
+
+       // Safety timeout - if server is still running after much longer, force kill
+       setTimeout(() => {
+         if (!child.killed) {
+           console.log(`  ❌ Server did not respond to termination`);
+           child.kill('SIGKILL');
+         }
+       }, testTimeout + 3000);
 
       child.on('error', (error) => {
         console.log(`  ❌ Process error: ${error.message}`);

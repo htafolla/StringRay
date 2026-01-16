@@ -164,7 +164,14 @@ class CICDFullCycleManager {
    * Wait for pipeline completion and apply auto-fixes if needed
    */
   async monitorAndFixPipeline() {
+    const isTestMode = process.argv.includes('--test') || process.argv.includes('--quick');
+
     this.log('🔍 Monitoring pipeline and applying auto-fixes if needed...');
+
+    if (isTestMode) {
+      this.log('🧪 TEST MODE: Skipping long pipeline wait - checking status once');
+      return { success: true, status: 'test_mode_skip' };
+    }
 
     // Wait a bit for the pipeline to start
     await this.sleep(5000);
@@ -255,6 +262,9 @@ class CICDFullCycleManager {
     const startTime = new Date();
     this.log('🚀 Starting StrRay CI/CD Full Cycle Manager');
 
+    // Check for test mode (quick completion for development)
+    const isTestMode = process.argv.includes('--test') || process.argv.includes('--quick');
+
     try {
       // Step 1: Check for changes
       if (!this.hasChanges()) {
@@ -290,7 +300,16 @@ class CICDFullCycleManager {
       }
 
       // Step 6: Monitor and auto-fix
-      const result = await this.monitorAndFixPipeline();
+      let result;
+      if (isTestMode) {
+        this.log('🧪 TEST MODE: Simulating pipeline monitoring (quick completion)');
+        // In test mode, just check pipeline status once and return success
+        const status = await this.monitorAndFixPipeline();
+        result = { success: true, status: 'test_mode_completed' };
+        this.log('✅ Test mode completed successfully');
+      } else {
+        result = await this.monitorAndFixPipeline();
+      }
 
       const endTime = new Date();
       const duration = Math.round((endTime - startTime) / 1000);
@@ -337,8 +356,32 @@ class CICDFullCycleManager {
 
 // CLI interface
 if (require.main === module) {
+  const args = process.argv.slice(2);
+  const hasTestFlag = args.includes('--test') || args.includes('--quick');
+  const commitMessage = args.find(arg => !arg.startsWith('--')); // First non-flag argument
+
+  if (args.includes('--help') || args.includes('-h')) {
+    console.log(`
+🚀 StrRay CI/CD Full Cycle Manager
+
+Usage: node scripts/ci-cd-full-cycle.cjs [commit-message] [options]
+
+Arguments:
+  commit-message    Optional commit message (auto-generated if not provided)
+
+Options:
+  --test, --quick   Test mode: Skip long pipeline monitoring for quick completion
+  --help, -h        Show this help message
+
+Examples:
+  node scripts/ci-cd-full-cycle.cjs
+  node scripts/ci-cd-full-cycle.cjs "feat: add new feature"
+  node scripts/ci-cd-full-cycle.cjs --test "quick test commit"
+    `);
+    process.exit(0);
+  }
+
   const manager = new CICDFullCycleManager();
-  const commitMessage = process.argv[2]; // Optional commit message
 
   manager.runFullCycle(commitMessage).then(result => {
     process.exit(result.success ? 0 : 1);

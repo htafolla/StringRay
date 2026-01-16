@@ -1,6 +1,6 @@
 {
   "name": "strray-ai",
-  "version": "1.0.5",
+  "version": "1.0.7",
   "description": "⚡ StringRay ⚡: Bulletproof AI orchestration with systematic error prevention. Zero dead ends. Ship clean, tested, optimized code — every time.",
   "type": "module",
   "main": "./dist/plugin/index.js",
@@ -43,7 +43,8 @@
     "test:external-processes": "node scripts/validation/validate-external-processes.js",
     "test:comprehensive": "npm run test:mcp-connectivity && npm run test:oh-my-opencode-integration && npm run test:external-processes",
     "test:all": "npm run test && npm run test:architect && npm run test:e2e && npm run test:path-resolution && npm run test:comprehensive",
-    "security-audit": "npm audit --audit-level moderate --production"
+    "security-audit": "npm audit --audit-level moderate --production",
+    "test:ci": "CI=true npm test -- --run --reporter=json --no-coverage"
   },
   "keywords": [
     "ai",

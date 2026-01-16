@@ -48,6 +48,13 @@ jobs:
     - name: Check if auto-fix needed
       id: check-fix
       run: |
+        echo "🔍 Workflow trigger analysis:" >> $GITHUB_STEP_SUMMARY
+        echo "Event: ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
+        echo "Workflow: ${{ github.event.workflow_run.name || 'N/A' }}" >> $GITHUB_STEP_SUMMARY
+        echo "Conclusion: ${{ github.event.workflow_run.conclusion || 'N/A' }}" >> $GITHUB_STEP_SUMMARY
+        echo "Action: ${{ github.event.action || 'N/A' }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+
         if [ -f .opencode/logs/ci-cd-monitor-report.json ]; then
           STATUS=$(jq -r '.ci_status' .opencode/logs/ci-cd-monitor-report.json)
           HEALTH_SCORE=$(jq -r '.health_score' .opencode/logs/ci-cd-monitor-report.json)
@@ -60,18 +67,28 @@ jobs:
           # Determine if auto-fix should run
           FORCE_FIX="${{ inputs.force_fix || false }}"
           TRIGGER_TYPE="${{ github.event_name }}"
+          WORKFLOW_CONCLUSION="${{ github.event.workflow_run.conclusion }}"
 
-          if [ "$FORCE_FIX" = "true" ] || [ "$TRIGGER_TYPE" = "workflow_run" ]; then
-            if [ "$STATUS" = "critical" ] || [ "$STATUS" = "warning" ] || [ "$HEALTH_SCORE" -lt 80 ] || [ "$ISSUE_COUNT" -gt 0 ]; then
-              echo "needs_fix=true" >> $GITHUB_OUTPUT
-              echo "🔧 Auto-fix needed: Status=$STATUS, Health=$HEALTH_SCORE%, Issues=$ISSUE_COUNT" >> $GITHUB_STEP_SUMMARY
+          echo "Force fix: $FORCE_FIX" >> $GITHUB_STEP_SUMMARY
+          echo "Workflow conclusion: $WORKFLOW_CONCLUSION" >> $GITHUB_STEP_SUMMARY
+
+          # Only run auto-fix if workflow actually completed (not still running)
+          if [ "$WORKFLOW_CONCLUSION" = "success" ] || [ "$WORKFLOW_CONCLUSION" = "failure" ]; then
+            if [ "$FORCE_FIX" = "true" ] || [ "$TRIGGER_TYPE" = "workflow_run" ]; then
+              if [ "$STATUS" = "critical" ] || [ "$STATUS" = "warning" ] || [ "$HEALTH_SCORE" -lt 80 ] || [ "$ISSUE_COUNT" -gt 0 ]; then
+                echo "needs_fix=true" >> $GITHUB_OUTPUT
+                echo "🔧 Auto-fix needed: Status=$STATUS, Health=$HEALTH_SCORE%, Issues=$ISSUE_COUNT" >> $GITHUB_STEP_SUMMARY
+              else
+                echo "needs_fix=false" >> $GITHUB_OUTPUT
+                echo "✅ No auto-fix needed: Status=$STATUS, Health=$HEALTH_SCORE%, Issues=$ISSUE_COUNT" >> $GITHUB_STEP_SUMMARY
+              fi
             else
               echo "needs_fix=false" >> $GITHUB_OUTPUT
-              echo "✅ No auto-fix needed: Status=$STATUS, Health=$HEALTH_SCORE%, Issues=$ISSUE_COUNT" >> $GITHUB_STEP_SUMMARY
+              echo "⏭️ Skipping auto-fix: Manual trigger without force flag" >> $GITHUB_STEP_SUMMARY
             fi
           else
             echo "needs_fix=false" >> $GITHUB_OUTPUT
-            echo "⏭️ Skipping auto-fix: Manual trigger without force flag" >> $GITHUB_STEP_SUMMARY
+            echo "⏸️ Skipping auto-fix: Workflow not yet completed (conclusion: $WORKFLOW_CONCLUSION)" >> $GITHUB_STEP_SUMMARY
           fi
         else
           echo "needs_fix=false" >> $GITHUB_OUTPUT
@@ -85,7 +102,7 @@ jobs:
         path: .opencode/logs/ci-cd-monitor-report.json
 
     - name: Run CI/CD Auto-Fix
-      if: steps.check-fix.outputs.needs_fix == 'true'
+      if: steps.check-fix.outputs.needs_fix == 'true' && github.event.workflow_run.conclusion != 'in_progress'
       id: auto-fix
       run: node scripts/ci-cd-auto-fix.cjs
       env:

@@ -35,13 +35,67 @@ class CICDAutoFix {
     this.log('Checking CI/CD pipeline status...');
 
     try {
-      // If no runId provided, get latest run
+      // If no runId provided, find the most relevant recent run
       if (!runId) {
-        const runs = await this.getWorkflowRuns();
+        const runs = await this.getWorkflowRuns(20);
+
         if (runs.length === 0) {
           return { status: 'no_runs', conclusion: null };
         }
-        runId = runs[0].id;
+
+        // Look for recent CI/CD runs that might be relevant
+        const ciCdRuns = runs.filter(run =>
+          run.name === 'StrRay Framework CI/CD v1.0.0'
+        );
+
+        // Check for hung/stuck pipelines (running for too long)
+        const now = new Date();
+        const hungThreshold = 30 * 60 * 1000; // 30 minutes
+        const hungRuns = ciCdRuns.filter(run => {
+          if (run.status !== 'in_progress') return false;
+          const runStart = new Date(run.created_at);
+          const elapsed = now - runStart;
+          return elapsed > hungThreshold;
+        });
+
+        if (hungRuns.length > 0) {
+          this.log(`⚠️  Found ${hungRuns.length} potentially hung pipeline(s) running >30 minutes:`);
+          hungRuns.forEach(run => {
+            const elapsed = Math.round((now - new Date(run.created_at)) / (60 * 1000));
+            this.log(`   • Run ${run.id}: ${elapsed} minutes (${run.html_url})`);
+          });
+        }
+
+        // Prefer the most recent in-progress run, then failed runs, then latest
+        let targetRun;
+        const inProgressRuns = ciCdRuns.filter(r => r.status === 'in_progress');
+        const failedRuns = ciCdRuns.filter(r => r.conclusion === 'failure');
+
+        if (inProgressRuns.length > 0) {
+          // Sort by creation time, prefer most recent
+          inProgressRuns.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+          targetRun = inProgressRuns[0];
+          if (inProgressRuns.length > 1) {
+            this.log(`ℹ️  Monitoring most recent of ${inProgressRuns.length} in-progress pipelines`);
+          }
+        } else if (failedRuns.length > 0) {
+          // Sort by creation time, prefer most recent failed run
+          failedRuns.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+          targetRun = failedRuns[0];
+          this.log(`ℹ️  Found ${failedRuns.length} failed pipeline(s), focusing on most recent`);
+        } else {
+          targetRun = ciCdRuns[0] || runs[0]; // Fallback to latest run
+        }
+
+        runId = targetRun.id;
+
+        // Log summary of concurrent runs
+        const inProgressCount = runs.filter(r => r.status === 'in_progress').length;
+        const queuedCount = runs.filter(r => r.status === 'queued').length;
+
+        if (inProgressCount > 1 || queuedCount > 0) {
+          this.log(`ℹ️  Found ${inProgressCount} running, ${queuedCount} queued pipelines`);
+        }
       }
 
       const run = await this.getWorkflowRun(runId);
@@ -49,6 +103,7 @@ class CICDAutoFix {
 
       this.log(`Pipeline Status: ${status.toUpperCase()}`);
       this.log(`Run ID: ${runId}`);
+      this.log(`Workflow: ${run.name}`);
       this.log(`Commit: ${run.head_sha.substring(0, 7)}`);
 
       return {
@@ -56,7 +111,8 @@ class CICDAutoFix {
         conclusion: run.conclusion,
         runId: runId,
         commit: run.head_sha,
-        url: run.html_url
+        url: run.html_url,
+        workflowName: run.name
       };
 
     } catch (error) {
@@ -65,11 +121,11 @@ class CICDAutoFix {
     }
   }
 
-  async getWorkflowRuns() {
+  async getWorkflowRuns(limit = 20) {
     return new Promise((resolve, reject) => {
       const options = {
         hostname: 'api.github.com',
-        path: `/repos/${this.owner}/${this.repo}/actions/runs?per_page=10`,
+        path: `/repos/${this.owner}/${this.repo}/actions/runs?per_page=${limit}`,
         method: 'GET',
         headers: {
           'User-Agent': 'StrRay-CI-Auto-Fix/1.0.0',
@@ -275,7 +331,11 @@ class CICDAutoFix {
 
       while ((status.status === 'in_progress' || status.status === 'queued') && waitCount < maxWaits) {
         waitCount++;
-        this.log(`⏳ Waiting for pipeline completion (${waitCount}/${maxWaits})...`);
+        if (waitCount === 1) {
+          this.log(`⏳ Waiting for pipeline completion (will check up to ${maxWaits} times)...`);
+        } else if (waitCount % 10 === 0) { // Log progress every 10 checks
+          this.log(`⏳ Still waiting... (${Math.round(waitCount * 30 / 60)} minutes elapsed)`);
+        }
         await this.sleep(this.retryDelay);
         status = await this.checkPipelineStatus();
       }

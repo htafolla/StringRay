@@ -1,10 +1,11 @@
-name: StrRay Framework CI/CD v1.0.0
+name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ main, master, develop ]
+    branches: [ main, master ]
   pull_request:
     branches: [ main, master ]
+  workflow_dispatch:
 
 jobs:
   test:
@@ -12,169 +13,134 @@ jobs:
     strategy:
       matrix:
         node-version: [18.x, 20.x]
-
     steps:
-    - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
 
-    - name: Install dependencies
-      run: npm run ci-install
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
 
-    - name: Type check
-      run: npm run typecheck
+      - name: TypeScript type check
+        run: npm run typecheck
 
-    - name: Lint code
-      run: npm run lint
+      - name: Lint code
+        run: npm run lint
 
-    - name: Run tests
-      run: npm test
+      - name: Run unit tests
+        run: npm run test:unit
 
-    - name: Run comprehensive path resolution test
-      run: timeout 30 node scripts/test-comprehensive-path-resolution.mjs
+      - name: Run integration tests
+        run: npm run test:integration
+
+      - name: Run comprehensive validation
+        run: npm run test:comprehensive
+
+      - name: Run security audit
+        run: npm run security-audit
 
   build:
     needs: test
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Use Node.js 18.x
-      uses: actions/setup-node@v4
-      with:
-        node-version: 18.x
-        cache: 'npm'
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
 
-    - name: Install dependencies
-      run: npm run ci-install
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
 
-    - name: Build application
-      run: npm run build:all
+      - name: Build plugin
+        run: npm run build:plugin
 
-    - name: Install framework configuration
-      run: npx . install
+      - name: Build all
+        run: npm run build:all
 
-    - name: Run build validation
-      run: npm run validate
+      - name: Validate package
+        run: npm pack --dry-run
 
-    - name: CI/CD Health Check
-      run: npm run ci-report
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        GITHUB_REPOSITORY: ${{ github.repository }}
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: strray-ai-build
+          path: dist/
+          retention-days: 30
 
-    - name: Upload build artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: strray-build-${{ github.sha }}
-        path: |
-          dist/
-          docs/
-
-  performance-test:
+  publish:
     needs: build
     runs-on: ubuntu-latest
-    continue-on-error: true
-
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     steps:
-    - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Use Node.js 18.x
-      uses: actions/setup-node@v4
-      with:
-        node-version: 18.x
-        cache: 'npm'
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
 
-    - name: Install dependencies
-      run: npm run ci-install
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
 
-    - name: Run performance tests
-      run: npm run test:performance
+      - name: Build for publish
+        run: npm run build:plugin
 
-    - name: Generate performance report
-      run: npm run performance:report
-
-    - name: Run performance gates
-      run: npm run performance:gates
-      continue-on-error: true
-
-  architect-test:
-    needs: build
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v4
-
-    - name: Use Node.js 18.x
-      uses: actions/setup-node@v4
-      with:
-        node-version: 18.x
-        cache: 'npm'
-
-    - name: Install dependencies
-      run: npm run ci-install
-
-    - name: Run architect agent tests
-      run: npm run test:architect
+      - name: Publish to npm
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   e2e-test:
-    needs: build
+    needs: publish
     runs-on: ubuntu-latest
-
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     steps:
-    - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Use Node.js 18.x
-      uses: actions/setup-node@v4
-      with:
-        node-version: 18.x
-        cache: 'npm'
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
 
-    - name: Install dependencies
-      run: npm run ci-install
+      - name: Create test project
+        run: |
+          mkdir test-install
+          cd test-install
+          npm init -y
 
-    - name: Run E2E integration tests
-      run: npm run test:e2e
+      - name: Install published package
+        run: |
+          cd test-install
+          npm install strray-ai@latest
 
-  security-scan:
-    needs: build
-    runs-on: ubuntu-latest
-    continue-on-error: true
+      - name: Run postinstall script
+        run: |
+          cd test-install
+          node node_modules/strray-ai/scripts/postinstall.cjs
 
-    steps:
-    - uses: actions/checkout@v4
+      - name: Validate installation
+        run: |
+          cd test-install
+          ls -la .opencode/
+          cat .opencode/oh-my-opencode.json | grep -q "strray-ai"
+          echo "Installation validation passed"
 
-    - name: Use Node.js 18.x
-      uses: actions/setup-node@v4
-      with:
-        node-version: 18.x
-        cache: 'npm'
-
-    - name: Install dependencies
-      run: npm run ci-install
-
-    - name: Run npm audit for vulnerabilities
-      run: |
-        echo "🔍 Running security vulnerability scan..."
-        npm audit --audit-level moderate --production || true
-        echo "📊 Security scan completed - check output above for any issues"
-
-    - name: Generate security report
-      run: |
-        echo "## Security Audit Report" >> security-report.md
-        echo "" >> security-report.md
-        echo "### NPM Audit Results" >> security-report.md
-        echo "\`\`\`" >> security-report.md
-        npm audit --audit-level moderate --production --json | jq -r '.vulnerabilities | to_entries[] | "- \(.key): \(.value.severity) severity"' >> security-report.md || echo "No vulnerabilities found or audit failed" >> security-report.md
-        echo "\`\`\`" >> security-report.md
-        echo "" >> security-report.md
-        echo "### Recommendations" >> security-report.md
-        echo "- Run \`npm audit fix\` to fix available vulnerabilities" >> security-report.md
-        echo "- Review and update dependencies regularly" >> security-report.md
-        echo "- Consider security patches for production deployments" >> security-report.md
-        cat security-report.md
+      - name: Run comprehensive tests
+        run: |
+          cd test-install
+          node node_modules/strray-ai/scripts/test:mcp-connectivity
+          node node_modules/strray-ai/scripts/test:oh-my-opencode-integration
+          node node_modules/strray-ai/scripts/test:postinstall-config
+          node node_modules/strray-ai/scripts/test:external-processes

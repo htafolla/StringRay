@@ -1,0 +1,31 @@
+name: Security Audit
+
+on:
+  schedule:
+    - cron: '0 0 * * 1'  # Weekly on Mondays
+  workflow_dispatch:
+
+jobs:
+  security-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Run security audit
+        run: npm audit --audit-level moderate
+
+      - name: Run custom security checks
+        run: npm run test:security-audit
+
+      - name: Dependency scan
+        run: npm run test:dependency-scan

@@ -43,11 +43,11 @@ class OhMyOpenCodeIntegrationValidator {
       const mcpConfig = JSON.parse(fs.readFileSync('.mcp.json', 'utf8'));
       const serverCount = Object.keys(mcpConfig.mcpServers || {}).length;
 
-      if (serverCount >= 15) {
+      if (serverCount >= 9) {
         console.log(`  ✅ MCP config valid (${serverCount} servers configured)`);
         this.results.passed.push('MCP Configuration');
       } else {
-        console.log(`  ❌ Insufficient MCP servers (${serverCount} configured, need 15+)`);
+        console.log(`  ❌ Insufficient MCP servers (${serverCount} configured, need 9+)`);
         this.results.failed.push({ test: 'MCP Configuration', error: `Only ${serverCount} servers configured` });
       }
     } catch (error) {

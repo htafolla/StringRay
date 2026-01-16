@@ -278,6 +278,7 @@ dynamodb/
 .opencode/logs/*
 !.opencode/logs/
 !.opencode/logs/.gitkeep
+.opencode/hook-metrics.json
 .opencode/agents/*
 !.opencode/agents/
 !.opencode/agents/.gitkeep

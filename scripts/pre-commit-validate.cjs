@@ -1,13 +1,14 @@
 #!/usr/bin/env node
 
 /**
- * Quick CI/CD Cycle Test
- * Tests the validation, commit, and push phases without long monitoring
+ * Pre-Commit Validation & Push
+ * Validates critical blocking requirements before commit, then pushes to trigger full CI/CD pipeline
+ * Note: Only checks TypeScript compilation + unit tests - GitHub Actions does comprehensive validation
  */
 
 const { execSync } = require('child_process');
 
-class QuickCICDCycle {
+class PreCommitValidator {
   log(message, level = 'INFO') {
     const timestamp = new Date().toISOString();
     console.log(`[${timestamp}] [${level}] ${message}`);
@@ -73,7 +74,7 @@ class QuickCICDCycle {
     }
   }
 
-  async runQuickCycle(commitMessage = "test: quick CI/CD cycle") {
+  async runValidation(commitMessage = "feat: update codebase") {
     const startTime = new Date();
     this.log('🚀 Starting Quick CI/CD Cycle Test');
 
@@ -108,41 +109,41 @@ class QuickCICDCycle {
       const duration = Math.round((endTime - startTime) / 1000);
 
       console.log('\n' + '='.repeat(50));
-      console.log('🎯 QUICK CI/CD CYCLE TEST SUMMARY');
+      console.log('🎯 PRE-COMMIT VALIDATION SUMMARY');
       console.log('='.repeat(50));
       console.log('✅ STATUS: SUCCESS');
-      console.log('📊 RESULT: cycle_completed');
+      console.log('📊 RESULT: validation_passed');
       console.log(`⏱️  DURATION: ${duration} seconds`);
-      console.log('🎉 Quick CI/CD cycle completed successfully!');
-      console.log('ℹ️  Pipeline monitoring skipped for quick testing');
+      console.log('🎉 Pre-commit validation passed - changes committed and pushed!');
+      console.log('ℹ️  GitHub Actions will perform comprehensive testing');
       console.log('='.repeat(50));
 
-      return { success: true, status: 'cycle_completed' };
+      return { success: true, status: 'validation_passed' };
 
     } catch (error) {
       const endTime = new Date();
       const duration = Math.round((endTime - startTime) / 1000);
 
       console.log('\n' + '='.repeat(50));
-      console.log('💥 QUICK CI/CD CYCLE TEST SUMMARY');
+      console.log('💥 PRE-COMMIT VALIDATION SUMMARY');
       console.log('='.repeat(50));
       console.log('❌ STATUS: FAILED');
       console.log(`📊 ERROR: ${error.message}`);
       console.log(`⏱️  DURATION: ${duration} seconds`);
-      console.log('💥 Quick CI/CD cycle failed');
+      console.log('💥 Pre-commit validation failed - fix issues before committing');
       console.log('='.repeat(50));
 
-      return { success: false, status: 'cycle_failed', error: error.message };
+      return { success: false, status: 'validation_failed', error: error.message };
     }
   }
 }
 
 // CLI interface
 if (require.main === module) {
-  const quickCycle = new QuickCICDCycle();
-  const commitMessage = process.argv[2] || "test: quick CI/CD cycle validation";
+  const validator = new PreCommitValidator();
+  const commitMessage = process.argv[2] || "feat: update codebase";
 
-  quickCycle.runQuickCycle(commitMessage).then(result => {
+  validator.runValidation(commitMessage).then(result => {
     process.exit(result.success ? 0 : 1);
   }).catch(error => {
     console.error('💥 Fatal error:', error);

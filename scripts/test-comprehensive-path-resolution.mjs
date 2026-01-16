@@ -24,7 +24,7 @@ console.log(`✅ ENFORCEMENT_PATH: ${ENFORCEMENT_PATH}\n`);
 console.log('=== TEST 2: Dynamic Import Resolution ===');
 try {
   const [{ RuleEnforcer }] = await Promise.all([
-    import(ENFORCEMENT_PATH + '/rule-enforcer.js')
+    import('../dist/enforcement/rule-enforcer.js')
   ]);
   const enforcer = new RuleEnforcer();
   const stats = enforcer.getRuleStats();
@@ -41,9 +41,9 @@ try {
 
   // Possible paths to try (in order of preference)
   const possiblePaths = [
-    '../dist/plugin/utils/import-resolver.js',  // Relative from scripts/
-    './dist/plugin/utils/import-resolver.js',   // Relative from project root
-    'dist/plugin/utils/import-resolver.js',     // From anywhere in project
+    '../dist/utils/import-resolver.js',  // Relative from scripts/
+    './dist/utils/import-resolver.js',   // Relative from project root
+    'dist/utils/import-resolver.js',     // From anywhere in project
   ];
 
   let lastError;

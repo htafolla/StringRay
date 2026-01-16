@@ -12,22 +12,15 @@ import fs from 'fs';
 import path from 'path';
 
 const MCP_SERVERS = [
-  { name: 'librarian', path: 'dist/mcps/knowledge-skills/project-analysis.server.js' },
   { name: 'session-management', path: '.opencode/mcps/session-management.server.js' },
-  { name: 'orchestrator', path: 'dist/mcps/orchestrator.server.js' },
-  { name: 'enhanced-orchestrator', path: 'dist/mcps/enhanced-orchestrator.server.js' },
-  { name: 'enforcer', path: 'dist/mcps/enforcer-tools.server.js' },
-  { name: 'api-design', path: 'dist/mcps/knowledge-skills/api-design.server.js' },
-  { name: 'architecture-patterns', path: 'dist/mcps/knowledge-skills/architecture-patterns.server.js' },
-  { name: 'git-workflow', path: 'dist/mcps/knowledge-skills/git-workflow.server.js' },
-  { name: 'performance-optimization', path: 'dist/mcps/knowledge-skills/performance-optimization.server.js' },
-  { name: 'project-analysis', path: 'dist/mcps/knowledge-skills/project-analysis.server.js' },
-  { name: 'testing-strategy', path: 'dist/mcps/knowledge-skills/testing-strategy.server.js' },
-  { name: 'code-review', path: 'dist/mcps/knowledge-skills/code-review.server.js' },
-  { name: 'security-audit', path: 'dist/mcps/knowledge-skills/security-audit.server.js' },
-  { name: 'ui-ux-design', path: 'dist/mcps/knowledge-skills/ui-ux-design.server.js' },
-  { name: 'refactoring-strategies', path: 'dist/mcps/knowledge-skills/refactoring-strategies.server.js' },
-  { name: 'testing-best-practices', path: 'dist/mcps/knowledge-skills/testing-best-practices.server.js' }
+  { name: 'orchestrator', path: 'dist/plugin/mcps/orchestrator.server.js' },
+  { name: 'enhanced-orchestrator', path: 'dist/plugin/mcps/enhanced-orchestrator.server.js' },
+  { name: 'enforcer', path: 'dist/plugin/mcps/enforcer-tools.server.js' },
+  { name: 'code-review', path: 'dist/plugin/mcps/knowledge-skills/code-review.server.js' },
+  { name: 'security-audit', path: 'dist/plugin/mcps/knowledge-skills/security-audit.server.js' },
+  { name: 'ui-ux-design', path: 'dist/plugin/mcps/knowledge-skills/ui-ux-design.server.js' },
+  { name: 'refactoring-strategies', path: 'dist/plugin/mcps/knowledge-skills/refactoring-strategies.server.js' },
+  { name: 'testing-best-practices', path: 'dist/plugin/mcps/knowledge-skills/testing-best-practices.server.js' }
 ];
 
 class MCPServerValidator {

@@ -117,98 +117,7 @@ function saveConfig(configPath, config) {
 
 
 
-function configureStrRayPlugin() {
-  if (!config.plugin) {
-    config.plugin = [];
-  }
 
-  const pluginPath = "stringray/dist/plugin/stringray-codex-injection.js";
-
-  if (!config.plugin.includes(pluginPath)) {
-    config.plugin.push(pluginPath);
-    console.log(`✅ Added StrRay plugin to configuration`);
-  } else {
-    console.log(`ℹ️ StrRay plugin already configured`);
-  }
-
-  // Add StrRay agent configurations
-  if (!config.agent) {
-    config.agent = {};
-  }
-
-  // Add StrRay-specific agents (only valid opencode agent config)
-  const stringrayAgents = {
-    "orchestrator": { "model": "opencode/grok-code" },
-    "enhanced-orchestrator": { "model": "opencode/grok-code" },
-    "enforcer": { "model": "opencode/grok-code" },
-    "architect": { "model": "opencode/grok-code" },
-    "test-architect": { "model": "opencode/grok-code" },
-    "bug-triage-specialist": { "model": "opencode/grok-code" },
-    "code-reviewer": { "model": "opencode/grok-code" },
-    "security-auditor": { "model": "opencode/grok-code" },
-    "refactorer": { "model": "opencode/grok-code" }
-  };
-
-  let agentsAdded = 0;
-  for (const [agentName, agentConfig] of Object.entries(stringrayAgents)) {
-    if (!config.agent[agentName]) {
-      config.agent[agentName] = agentConfig;
-      agentsAdded++;
-    }
-  }
-
-  if (agentsAdded > 0) {
-    console.log(`✅ Added ${agentsAdded} StrRay agents to configuration`);
-  }
-
-  saveConfig(configPath, config);
-
-  console.log(`🎉 StrRay plugin installation complete!`);
-  console.log(`\n📋 Next Steps:`);
-  console.log(`1. Restart oh-my-opencode to load the plugin`);
-  console.log(`2. Run 'opencode agent list' to see StrRay agents`);
-  console.log(`3. Try '@enforcer analyze this code' to test the plugin`);
-  console.log(`\n📖 Documentation: https://github.com/strray-framework/strray-plugin`);
-
-  // Add StrRay-specific settings
-  if (!config.settings) {
-    config.settings = {};
-  }
-
-  if (!config.settings.multi_agent_orchestration) {
-    config.settings.multi_agent_orchestration = {
-      enabled: true,
-      max_concurrent_agents: 5,
-      coordination_model: "async-multi-agent"
-    };
-    console.log(`✅ Enabled StrRay multi-agent orchestration`);
-  }
-
-  // Add Claude Code compatibility
-  if (!config.claude_code) {
-    config.claude_code = {
-      mcp: true,
-      commands: true,
-      skills: true,
-      agents: true,
-      hooks: true,
-      plugins: true
-    };
-    console.log(`✅ Enabled Claude Code compatibility`);
-  }
-
-  saveConfig(configPath, config);
-
-  // Create StrRay-specific configuration file separately
-  createStrRayConfig();
-
-  console.log('🎉 StrRay plugin installation complete!');
-  console.log(`\n📋 Next Steps:`);
-  console.log(`1. Restart oh-my-opencode to load the plugin`);
-  console.log(`2. Run 'opencode agent list' to see StrRay agents`);
-  console.log(`3. Try '@enforcer analyze this code' to test the plugin`);
-  console.log(`\n📖 Documentation: https://github.com/strray-framework/strray-plugin`);
-}
 
 function createStrRayConfig() {
   // Create StrRay-specific configuration in a separate file
@@ -236,15 +145,39 @@ function createStrRayConfig() {
 }
 
 function configureClaudeMCPExclusions() {
-  // Configure Claude MCP exclusions to prevent connection errors
-  const claudeConfigPath = path.join(os.homedir(), '.claude', '.mcp.json');
+  const claudeMcpPath = path.join(os.homedir(), '.claude', '.mcp.json');
 
-  console.log(`🔧 Checking Claude MCP configuration at: ${claudeConfigPath}`);
+  try {
+    if (!fs.existsSync(claudeMcpPath)) {
+      console.log('ℹ️ Claude MCP config not found, skipping exclusions');
+      return;
+    }
 
-  if (!fs.existsSync(claudeConfigPath)) {
-    console.log(`ℹ️ Claude MCP config not found at ${claudeConfigPath}, skipping exclusions`);
-    return;
+    console.log(`🔧 Checking Claude MCP configuration at: ${claudeMcpPath}`);
+    const mcpConfig = JSON.parse(fs.readFileSync(claudeMcpPath, 'utf8'));
+
+    // Disable problematic MCP servers that cause conflicts
+    const serversToDisable = ['global-everything', 'global-git', 'global-sqlite'];
+
+    let disabledCount = 0;
+    for (const serverName of serversToDisable) {
+      if (mcpConfig.mcpServers && mcpConfig.mcpServers[serverName]) {
+        delete mcpConfig.mcpServers[serverName];
+        disabledCount++;
+        console.log(`✅ Disabled problematic MCP server: ${serverName}`);
+      } else {
+        console.log(`ℹ️ MCP server already disabled: ${serverName}`);
+      }
+    }
+
+    // Always write the updated config to ensure it's clean
+    fs.writeFileSync(claudeMcpPath, JSON.stringify(mcpConfig, null, 2));
+    console.log(`🎉 MCP exclusions configured (disabled ${disabledCount} servers)`);
+
+  } catch (error) {
+    console.warn('Warning: Could not configure Claude MCP exclusions:', error.message);
   }
+}
 
   try {
     const configContent = fs.readFileSync(claudeConfigPath, 'utf-8');
@@ -278,7 +211,6 @@ function configureClaudeMCPExclusions() {
     console.warn(`⚠️ Could not configure Claude MCP exclusions: ${error.message}`);
     console.log(`💡 You can manually disable global MCP servers by adding "disabled": true to each server in ~/.claude/.mcp.json`);
   }
-}
 
 // Show beautiful ASCII art and framework branding
 console.log('\n//═══════════════════════════════════════════════════════//');
@@ -348,6 +280,90 @@ function configureStrRayPlugin() {
     }
   });
 
+  // Load and modify oh-my-opencode configuration
+  const configPath = path.join(process.cwd(), '.opencode', 'oh-my-opencode.json');
+  let config = loadConfig(configPath);
+
+  if (!config.plugin) {
+    config.plugin = [];
+  }
+
+  const pluginPath = "./dist/plugin/plugins/stringray-codex-injection.js";
+
+  // Remove any old/incorrect plugin paths
+  const oldPaths = [
+    "stringray/dist/plugin/stringray-codex-injection.js",
+    "stringray-ai/dist/plugin/stringray-codex-injection.js"
+  ];
+
+  config.plugin = config.plugin.filter(p => !oldPaths.includes(p));
+
+  if (!config.plugin.includes(pluginPath)) {
+    config.plugin.push(pluginPath);
+    console.log(`✅ Added StrRay plugin to configuration`);
+  } else {
+    console.log(`ℹ️ StrRay plugin already configured`);
+  }
+
+  // Add StrRay agent configurations
+  if (!config.agent) {
+    config.agent = {};
+  }
+
+  // Add StrRay-specific agents (only valid opencode agent config)
+  const stringrayAgents = {
+    "orchestrator": { "model": "opencode/grok-code" },
+    "enhanced-orchestrator": { "model": "opencode/grok-code" },
+    "enforcer": { "model": "opencode/grok-code" },
+    "architect": { "model": "opencode/grok-code" },
+    "test-architect": { "model": "opencode/grok-code" },
+    "bug-triage-specialist": { "model": "opencode/grok-code" },
+    "code-reviewer": { "model": "opencode/grok-code" },
+    "security-auditor": { "model": "opencode/grok-code" },
+    "refactorer": { "model": "opencode/grok-code" }
+  };
+
+  let agentsAdded = 0;
+  for (const [agentName, agentConfig] of Object.entries(stringrayAgents)) {
+    if (!config.agent[agentName]) {
+      config.agent[agentName] = agentConfig;
+      agentsAdded++;
+    }
+  }
+
+  if (agentsAdded > 0) {
+    console.log(`✅ Added ${agentsAdded} StrRay agents to configuration`);
+  }
+
+  // Add StrRay-specific settings
+  if (!config.settings) {
+    config.settings = {};
+  }
+
+  if (!config.settings.multi_agent_orchestration) {
+    config.settings.multi_agent_orchestration = {
+      enabled: true,
+      max_concurrent_agents: 5,
+      coordination_model: "async-multi-agent"
+    };
+    console.log(`✅ Enabled StrRay multi-agent orchestration`);
+  }
+
+  // Add Claude Code compatibility
+  if (!config.claude_code) {
+    config.claude_code = {
+      mcp: true,
+      commands: true,
+      skills: true,
+      agents: true,
+      hooks: true,
+      plugins: true
+    };
+    console.log(`✅ Enabled Claude Code compatibility`);
+  }
+
+  saveConfig(configPath, config);
+
   // Copy Claude configuration files to user's home directory
   claudeConfigFiles.forEach(({ source: sourcePath, dest: destPath }) => {
     const source = path.join(packageRoot, sourcePath);
@@ -382,6 +398,7 @@ function configureStrRayPlugin() {
   });
 
   // Configure Claude MCP exclusions to prevent connection errors
+  console.log('🔧 Checking Claude MCP configuration...');
   configureClaudeMCPExclusions();
 
   console.log('🎉 StrRay plugin installation complete!');
@@ -403,6 +420,6 @@ try {
   console.error('❌ [StrRay Postinstall] Stack trace:', error.stack);
   console.log('\n🔧 [StrRay Postinstall] Manual Configuration:');
   console.log('Add the following to your .opencode/oh-my-opencode.json:');
-  console.log(`"plugin": ["stringray-ai/dist/plugin/stringray-codex-injection.js"]`);
+  console.log(`"plugin": ["./dist/plugin/plugins/stringray-codex-injection.js"]`);
   process.exit(1);
 }

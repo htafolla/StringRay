@@ -38,33 +38,12 @@ class CICDOrchestrator {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 
-  // Quick validation mode (from pre-commit-validate.cjs)
+  // Quick validation mode - DISABLED to prevent multiple pipelines
   async runQuickMode(commitMessage) {
-    this.log('🚀 Starting Quick CI/CD Mode');
-
-    // Check for changes
-    if (!this.hasChanges()) {
-      this.log('✅ No changes to commit');
-      return { success: true, status: 'no_changes' };
-    }
-
-    // Validate
-    if (!this.validateCritical()) {
-      throw new Error('Validation failed');
-    }
-
-    // Stage & commit
-    if (!this.stageAndCommit(commitMessage)) {
-      throw new Error('Commit failed');
-    }
-
-    // Push
-    if (!this.pushChanges()) {
-      throw new Error('Push failed');
-    }
-
-    this.log('✅ Quick mode completed - pipeline triggered');
-    return { success: true, status: 'pipeline_triggered' };
+    this.log('🚫 Quick mode is disabled to prevent multiple pipeline creation');
+    this.log('💡 Use manual git commands instead:');
+    this.log('   git add . && git commit -m "message" && git push');
+    return { success: false, status: 'quick_mode_disabled' };
   }
 
   // Full cycle mode (from ci-cd-full-cycle.cjs)
@@ -213,9 +192,6 @@ class CICDOrchestrator {
       let result;
 
       switch (mode) {
-        case '--quick':
-          result = await this.runQuickMode(commitMessage);
-          break;
         case '--full':
           result = await this.runFullMode(commitMessage);
           break;
@@ -227,7 +203,7 @@ class CICDOrchestrator {
           break;
         default:
           this.log(`❌ Unknown mode: ${mode}`, 'ERROR');
-          this.showHelp();
+          this.log('💡 Valid modes: --full, --monitor, --fix');
           return;
       }
 
@@ -244,16 +220,17 @@ class CICDOrchestrator {
     console.log(`
 🚀 StrRay CI/CD Orchestrator
 
-Usage: node scripts/ci-cd-orchestrator.cjs <mode> [commit-message]
+Usage: node scripts/ci-cd-orchestrator.cjs <mode>
 
 Modes:
-  --quick    Fast pre-commit validation + push (20 seconds)
   --full     Complete cycle with monitoring + auto-fix (20+ minutes)
   --monitor  Monitor existing pipelines only
   --fix      Monitor and auto-fix existing pipelines
 
+⚠️  Note: --quick mode disabled to prevent multiple pipeline creation
+💡 Use manual git commands for commits: git add . && git commit -m "msg" && git push
+
 Examples:
-  node scripts/ci-cd-orchestrator.cjs --quick "feat: add new feature"
   node scripts/ci-cd-orchestrator.cjs --full "feat: major changes"
   node scripts/ci-cd-orchestrator.cjs --monitor
   node scripts/ci-cd-orchestrator.cjs --fix

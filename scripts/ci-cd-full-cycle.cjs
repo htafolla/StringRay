@@ -220,6 +220,38 @@ class CICDFullCycleManager {
   }
 
   /**
+   * Validate code quality before committing
+   */
+  validateBeforeCommit() {
+    this.log('🔍 Validating code quality before commit...');
+
+    try {
+      // Check TypeScript compilation
+      this.log('🔧 Checking TypeScript compilation...');
+      execSync('npm run typecheck', { stdio: 'pipe' });
+      this.log('✅ TypeScript compilation successful');
+
+      // Run linting
+      this.log('🎨 Running ESLint...');
+      execSync('npm run lint', { stdio: 'pipe' });
+      this.log('✅ ESLint validation passed');
+
+      // Run unit tests
+      this.log('🧪 Running unit tests...');
+      execSync('npm run test:unit', { stdio: 'pipe' });
+      this.log('✅ Unit tests passed');
+
+      this.log('🎉 All validations passed - code is ready for commit');
+      return true;
+
+    } catch (error) {
+      this.log(`❌ Validation failed: ${error.message}`, 'ERROR');
+      this.log('💡 Fix the issues above before committing');
+      return false;
+    }
+  }
+
+  /**
    * Run the complete CI/CD cycle
    */
   async runFullCycle(commitMessage = null) {
@@ -240,22 +272,27 @@ class CICDFullCycleManager {
         return { success: true, status: 'no_changes' };
       }
 
-      // Step 2: Stage changes
+      // Step 2: Validate code quality
+      if (!this.validateBeforeCommit()) {
+        throw new Error('Code validation failed - cannot commit');
+      }
+
+      // Step 3: Stage changes
       if (!this.stageChanges()) {
         throw new Error('Failed to stage changes');
       }
 
-      // Step 3: Create commit
+      // Step 4: Create commit
       if (!this.createCommit(commitMessage)) {
         throw new Error('Failed to create commit');
       }
 
-      // Step 4: Push changes
+      // Step 5: Push changes
       if (!this.pushChanges()) {
         throw new Error('Failed to push changes');
       }
 
-      // Step 5: Monitor and auto-fix
+      // Step 6: Monitor and auto-fix
       const result = await this.monitorAndFixPipeline();
 
       const endTime = new Date();

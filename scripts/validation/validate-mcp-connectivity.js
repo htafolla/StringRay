@@ -62,11 +62,14 @@ class MCPServerValidator {
         return;
       }
 
-      // Test server startup
-      const child = spawn('node', [serverPath], {
-        stdio: ['pipe', 'pipe', 'pipe'],
-        timeout: 10000
-      });
+       // Test server startup (longer timeout for CI environments)
+       const isCI = process.env.CI === 'true';
+       const spawnTimeout = isCI ? 30000 : 10000; // 30s for CI, 10s for local
+
+       const child = spawn('node', [serverPath], {
+         stdio: ['pipe', 'pipe', 'pipe'],
+         timeout: spawnTimeout
+       });
 
       let stdout = '';
       let stderr = '';
@@ -82,14 +85,16 @@ class MCPServerValidator {
         stderr += data.toString();
       });
 
-       // Set a timeout to check if server started successfully
+       // Set a timeout to check if server started successfully (longer for CI)
+       const startupCheckTimeout = isCI ? 10000 : 2000; // 10s for CI, 2s for local
+
        setTimeout(() => {
          if (!child.killed) {
            started = true;
            console.log(`  ✅ Server started successfully`);
            child.kill('SIGTERM');
          }
-       }, 2000);
+       }, startupCheckTimeout);
 
        child.on('close', (code) => {
          if (started && code === null) { // SIGTERM exit

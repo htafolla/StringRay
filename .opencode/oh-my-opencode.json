@@ -3,6 +3,14 @@
   "plugin": [
     "stringray/dist/plugin/stringray-codex-injection.js"
   ],
+  "sisyphus": {
+    "disableOrchestration": true
+  },
+  "disabled_mcps": [
+    "global-everything",
+    "global-git",
+    "global-sqlite"
+  ],
   "agent": {
     "orchestrator": {
       "model": "opencode/grok-code"
@@ -40,7 +48,7 @@
     }
   },
   "claude_code": {
-    "mcp": true,
+    "mcp": false,
     "commands": true,
     "skills": true,
     "agents": true,

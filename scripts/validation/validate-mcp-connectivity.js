@@ -77,24 +77,34 @@ class MCPServerValidator {
 
        child.stdout.on('data', (data) => {
          stdout += data.toString();
-         // MCP servers start successfully when they don't crash immediately
-         // We'll mark as started after 1 second of no errors
+         // Look for successful startup indicators
+         if (stdout.includes('server-started') || stdout.includes('SUCCESS') || stdout.includes('ready')) {
+           if (!started) {
+             started = true;
+             console.log(`  ✅ Server started successfully`);
+           }
+         }
        });
 
-      child.stderr.on('data', (data) => {
-        stderr += data.toString();
-      });
+       child.stderr.on('data', (data) => {
+         stderr += data.toString();
+       });
 
-       // Set a timeout to check if server started successfully (longer for CI)
-       const startupCheckTimeout = isCI ? 10000 : 2000; // 10s for CI, 2s for local
+       // Set a timeout to check if server is still running (MCP servers stay alive)
+       const healthCheckTimeout = isCI ? 3000 : 1000; // 3s for CI, 1s for local
 
        setTimeout(() => {
-         if (!child.killed) {
-           started = true;
-           console.log(`  ✅ Server started successfully`);
-           child.kill('SIGTERM');
+         if (!child.killed && !stderr.includes('Error') && !stderr.includes('Exception')) {
+           if (!started) {
+             started = true;
+             console.log(`  ✅ Server started successfully`);
+           }
+           // Only kill if process is still running
+           if (!child.killed) {
+             child.kill('SIGTERM');
+           }
          }
-       }, startupCheckTimeout);
+       }, healthCheckTimeout);
 
        child.on('close', (code) => {
          if (started && code === null) { // SIGTERM exit

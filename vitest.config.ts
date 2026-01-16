@@ -39,7 +39,7 @@ export default defineConfig({
     testTimeout: 30000,
     hookTimeout: 30000,
     bail: 5, // Stop after 5 test failures - prevents resource waste
-    pool: "threads",
+    pool: "forks", // Use forks for better test isolation and CI/CD reliability
     retry: 2,
   },
   resolve: {

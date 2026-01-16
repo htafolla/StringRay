@@ -223,6 +223,16 @@ class CICDAutoFix {
     this.log('Republishing to NPM...');
 
     try {
+      // First, ensure TypeScript compilation works
+      this.log('Validating TypeScript compilation before republishing...');
+      try {
+        execSync('npm run typecheck', { stdio: 'pipe' });
+        this.log('✅ TypeScript compilation successful');
+      } catch (error) {
+        this.log('❌ TypeScript compilation failed - fixing before republish', 'ERROR');
+        throw new Error(`TypeScript errors must be fixed: ${error.message}`);
+      }
+
       // Bump version if needed
       const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
       const currentVersion = packageJson.version;
@@ -233,8 +243,10 @@ class CICDAutoFix {
       this.log(`Bumping version from ${currentVersion} to ${newVersion}`);
       execSync(`npm version patch --no-git-tag-version`);
 
-      // Commit changes (bypass pre-commit validation for auto-fixes)
+      // For CI/CD auto-fixes, we bypass validation since we're fixing CI issues
+      // But we already validated TypeScript compilation above
       execSync('git add .');
+      this.log('CI/CD auto-fix: Bypassing pre-commit validation for automated fixes');
       execSync(`git commit --no-verify -m "fix: Auto-fix CI/CD issues and republish v${newVersion}"`);
 
       // Push to trigger new CI run

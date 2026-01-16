@@ -1,6 +1,6 @@
 {
   "name": "strray-ai",
-  "version": "1.0.9",
+  "version": "1.0.6",
   "description": "⚡ StringRay ⚡: Bulletproof AI orchestration with systematic error prevention. Zero dead ends. Ship clean, tested, optimized code — every time.",
   "type": "module",
   "main": "./dist/plugin/index.js",
@@ -44,7 +44,19 @@
     "test:comprehensive": "npm run test:mcp-connectivity && npm run test:oh-my-opencode-integration && npm run test:external-processes",
     "test:all": "npm run test && npm run test:architect && npm run test:e2e && npm run test:path-resolution && npm run test:comprehensive",
     "security-audit": "npm audit --audit-level moderate --production",
-    "test:ci": "CI=true npm test -- --run --reporter=json --no-coverage"
+    "test:ci": "CI=true npm test -- --run --reporter=json --no-coverage",
+    "test:coverage": "vitest run --coverage",
+    "test:npm-install": "./scripts/test-npm-install.sh",
+    "test:simple-npm": "./scripts/test-simple-npm.sh",
+    "test:security-audit": "node scripts/basic-security-audit.cjs",
+    "test:dependency-scan": "node scripts/dependency-scan.cjs",
+    "test:unit": "vitest run src/__tests__/unit/",
+    "test:integration": "vitest run src/__tests__/integration/",
+    "test:e2e-complete": "npm run test:e2e && node scripts/test-enforcement-e2e.mjs",
+    "test:simulation": "node scripts/run-simulations.mjs",
+    "test:monitoring": "node scripts/monitoring/monitoring-daemon.mjs",
+    "test:validation": "npm run test:mcp-connectivity && npm run test:oh-my-opencode-integration && node scripts/validate-codex.js",
+    "ci-fix": "node scripts/ci-cd-auto-fix.cjs"
   },
   "keywords": [
     "ai",
@@ -76,7 +88,6 @@
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.25.2",
     "@opencode-ai/sdk": "^1.0.0",
-    "stringray-ai": "^1.0.22",
     "structlog": "^1.0.0",
     "zod": "^3.23.0"
   },

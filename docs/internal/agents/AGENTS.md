@@ -315,11 +315,13 @@ Framework initializes in strict dependency order via orchestrator-first boot:
 
 ---
 
-## 📚 Universal Development Codex v1.2.24
+## 📚 Universal Development Codex v1.2.25
 
 **Purpose**: Systematic error prevention and production-ready development framework
 
-The codex defines 45 mandatory terms that guide AI-assisted development under the StrRay Framework. Every agent loads this codex during initialization and validates all actions against these terms to achieve 99.6% error prevention.
+The codex defines 46 mandatory terms that guide AI-assisted development under the StrRay Framework. Every agent loads this codex during initialization and validates all actions against these terms to achieve 99.6% error prevention.
+
+**NEW in v1.2.25**: Added CI/CD enforcement terms (46) with zero-tolerance blocking violations for deployment safety and orchestration compliance.
 
 ## Critical Codex Terms for Enforcement
 
@@ -710,6 +712,46 @@ Test execution must be optimized for speed and reliability:
 - Stop execution if 5+ tests fail (triage threshold)
 - Use sub-agents for handling large test outputs (>30k characters)
 
+#### 46. CI/CD Pipeline Enforcement (ZERO TOLERANCE)
+
+**CRITICAL ERROR - BLOCKING VIOLATION**
+
+Commits cannot be pushed to remote unless code compiles and TypeScript errors are resolved:
+
+- All TypeScript compilation must succeed without errors
+- No `any`, `@ts-ignore`, or `@ts-expect-error` usage allowed
+- Type checking must pass on all files
+- Pre-commit hooks must validate compilation before push
+
+**CRITICAL ERROR - BLOCKING VIOLATION**
+
+NPM package cannot be published unless CI/CD pipeline is verified passing:
+
+- Full test suite must pass (unit, integration, E2E)
+- Build process must complete successfully
+- Security scans must pass without critical vulnerabilities
+- No manual publishing - automated deployment only
+
+**CRITICAL ERROR - BLOCKING VIOLATION**
+
+Versions are only bumped upon release when CI/CD pipeline is verified passing:
+
+- Version bumps occur only during formal releases
+- Never bump versions for bug fixes or intermediate commits
+- Release process requires full CI/CD validation
+- Semantic versioning strictly enforced (MAJOR.MINOR.PATCH)
+- No pre-release version bumps without pipeline approval
+
+**CRITICAL ERROR - BLOCKING VIOLATION**
+
+Pipeline operations must use framework commands for orchestration:
+
+- All CI/CD operations must use `strray` framework commands
+- Direct AI execution outside framework is prohibited
+- Use `strray release`, `strray deploy`, `strray validate` commands
+- Framework handles complexity analysis and agent delegation
+- Direct tool calls bypass orchestration and violate compliance
+
 ## Interweaves (Cross-Cutting Concerns)
 
 ### Error Prevention Interweave
@@ -833,6 +875,17 @@ Evaluate performance characteristics:
 - [ ] All error paths are handled
 - [ ] Edge cases are covered
 - [ ] Logging is appropriate
+
+### CI/CD Compliance (BLOCKING)
+
+- [ ] **ZERO TOLERANCE**: Code compiles without TypeScript errors before any push
+- [ ] **ZERO TOLERANCE**: CI/CD pipeline passes before any NPM publish
+- [ ] **ZERO TOLERANCE**: Versions only bumped on formal releases with pipeline approval
+- [ ] **ZERO TOLERANCE**: All operations use framework orchestration commands
+- [ ] Pre-commit hooks validate compilation and prevent broken pushes
+- [ ] Automated deployment requires full pipeline success
+- [ ] Manual version bumps prohibited - only through release process
+- [ ] Framework commands used for all CI/CD operations
 
 ### Code Quality
 
@@ -1281,4 +1334,6 @@ Framework initializes in strict dependency order:
 
 **Framework Status**: Production-ready integrated AI orchestration platform with dual-system orchestration and systematic error prevention. Documentation updated to provide complete operational context for integrated agent ecosystem.
 
-**Accuracy**: Core architecture and capabilities accurately documented. Integration details and dual-system orchestration fully implemented and documented.
+**CI/CD Enforcement**: ZERO TOLERANCE blocking violations implemented for deployment safety. All agents must enforce CI/CD compliance through codex validation.
+
+**Accuracy**: Core architecture and capabilities accurately documented. Integration details and dual-system orchestration fully implemented and documented. CI/CD enforcement terms added with blocking violation protocols.

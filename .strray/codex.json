@@ -1,6 +1,6 @@
 {
-  "version": "1.2.24",
-  "lastUpdated": "2026-01-15",
+  "version": "1.2.25",
+  "lastUpdated": "2026-01-16",
   "errorPreventionTarget": 0.996,
   "terms": {
     "1": {
@@ -440,6 +440,38 @@
       "title": "Self-Evolution Safety Framework",
       "description": "Autonomous self-improvement systems must implement comprehensive safety mechanisms: Version consistency across all codex references, Learning rate limits to prevent destabilization, Human oversight gates for major changes, Causal inference confidence thresholds, Progressive escalation for trend monitoring, Automated remediation with rollback capabilities, Continuous validation of self-modification safety",
       "category": "self-evolution",
+      "zeroTolerance": true,
+      "enforcementLevel": "blocking"
+    },
+    "52": {
+      "number": 52,
+      "title": "CI/CD Pipeline Enforcement (ZERO TOLERANCE)",
+      "description": "Commits cannot be pushed to remote unless code compiles and all tests pass: Code must compile successfully, All tests must pass (unit, integration, E2E), No TypeScript compilation errors allowed, Pre-commit hooks must validate compilation and test execution before push",
+      "category": "ci-cd",
+      "zeroTolerance": true,
+      "enforcementLevel": "blocking"
+    },
+    "53": {
+      "number": 53,
+      "title": "NPM Package Publishing Compliance",
+      "description": "NPM package cannot be published unless CI/CD pipeline is verified passing: Full test suite must pass (unit, integration, E2E), Build process must complete successfully, Security scans must pass without critical vulnerabilities, No manual publishing - automated deployment only",
+      "category": "ci-cd",
+      "zeroTolerance": true,
+      "enforcementLevel": "blocking"
+    },
+    "54": {
+      "number": 54,
+      "title": "Version Bumping Restrictions",
+      "description": "Versions are only bumped upon release when CI/CD pipeline is verified passing: Version bumps occur only during formal releases, Never bump versions for bug fixes or intermediate commits, Release process requires full CI/CD validation, Semantic versioning strictly enforced (MAJOR.MINOR.PATCH), No pre-release version bumps without pipeline approval",
+      "category": "ci-cd",
+      "zeroTolerance": true,
+      "enforcementLevel": "blocking"
+    },
+    "55": {
+      "number": 55,
+      "title": "Framework Command Orchestration",
+      "description": "Pipeline operations must use framework commands for orchestration: All CI/CD operations must use 'strray' framework commands, Direct AI execution outside framework is prohibited, Use 'strray release', 'strray deploy', 'strray validate' commands, Framework handles complexity analysis and agent delegation, Direct tool calls bypass orchestration and violate compliance",
+      "category": "ci-cd",
       "zeroTolerance": true,
       "enforcementLevel": "blocking"
     }

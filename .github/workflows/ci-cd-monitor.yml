@@ -1,14 +1,25 @@
-name: CI/CD Health Monitor
+name: CI/CD Health Monitor & Auto-Fix
 
 on:
   workflow_run:
-    workflows: ["ci-cd", "lint", "security-audit"]
+    workflows: ["StrRay Framework CI/CD v1.0.0", "lint", "security-audit"]
     types:
       - completed
   schedule:
     # Daily health check
     - cron: '0 8 * * *'  # Every day at 8 AM UTC
   workflow_dispatch:
+    inputs:
+      max_iterations:
+        description: 'Maximum auto-fix iterations (1-5)'
+        required: false
+        default: '3'
+        type: string
+      force_fix:
+        description: 'Force auto-fix even if healthy'
+        required: false
+        default: false
+        type: boolean
 
 jobs:
   monitor-ci-health:
@@ -28,16 +39,76 @@ jobs:
       run: npm run ci-install
 
     - name: Run CI/CD Health Monitor
+      id: monitor
       run: node scripts/github-actions-monitor.cjs --report
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         GITHUB_REPOSITORY: ${{ github.repository }}
+
+    - name: Check if auto-fix needed
+      id: check-fix
+      run: |
+        if [ -f .opencode/logs/ci-cd-monitor-report.json ]; then
+          STATUS=$(jq -r '.ci_status' .opencode/logs/ci-cd-monitor-report.json)
+          HEALTH_SCORE=$(jq -r '.health_score' .opencode/logs/ci-cd-monitor-report.json)
+          ISSUE_COUNT=$(jq -r '.issues | length' .opencode/logs/ci-cd-monitor-report.json)
+
+          echo "status=$STATUS" >> $GITHUB_OUTPUT
+          echo "health_score=$HEALTH_SCORE" >> $GITHUB_OUTPUT
+          echo "issue_count=$ISSUE_COUNT" >> $GITHUB_OUTPUT
+
+          # Determine if auto-fix should run
+          FORCE_FIX="${{ inputs.force_fix || false }}"
+          TRIGGER_TYPE="${{ github.event_name }}"
+
+          if [ "$FORCE_FIX" = "true" ] || [ "$TRIGGER_TYPE" = "workflow_run" ]; then
+            if [ "$STATUS" = "critical" ] || [ "$STATUS" = "warning" ] || [ "$HEALTH_SCORE" -lt 80 ] || [ "$ISSUE_COUNT" -gt 0 ]; then
+              echo "needs_fix=true" >> $GITHUB_OUTPUT
+              echo "🔧 Auto-fix needed: Status=$STATUS, Health=$HEALTH_SCORE%, Issues=$ISSUE_COUNT" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "needs_fix=false" >> $GITHUB_OUTPUT
+              echo "✅ No auto-fix needed: Status=$STATUS, Health=$HEALTH_SCORE%, Issues=$ISSUE_COUNT" >> $GITHUB_STEP_SUMMARY
+            fi
+          else
+            echo "needs_fix=false" >> $GITHUB_OUTPUT
+            echo "⏭️ Skipping auto-fix: Manual trigger without force flag" >> $GITHUB_STEP_SUMMARY
+          fi
+        else
+          echo "needs_fix=false" >> $GITHUB_OUTPUT
+          echo "❌ No monitoring report found" >> $GITHUB_STEP_SUMMARY
+        fi
 
     - name: Upload monitoring report
       uses: actions/upload-artifact@v4
       with:
         name: ci-cd-health-report
         path: .opencode/logs/ci-cd-monitor-report.json
+
+    - name: Run CI/CD Auto-Fix
+      if: steps.check-fix.outputs.needs_fix == 'true'
+      id: auto-fix
+      run: node scripts/ci-cd-auto-fix.cjs
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_REPOSITORY: ${{ github.repository }}
+        MAX_ITERATIONS: ${{ inputs.max_iterations || 3 }}
+
+    - name: Auto-Fix Summary
+      if: steps.check-fix.outputs.needs_fix == 'true'
+      run: |
+        echo "## CI/CD Auto-Fix Results" >> $GITHUB_STEP_SUMMARY
+        echo "**Trigger:** ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Health Status:** ${{ steps.check-fix.outputs.status }} (${{ steps.check-fix.outputs.health_score }}%)" >> $GITHUB_STEP_SUMMARY
+        echo "**Issues Found:** ${{ steps.check-fix.outputs.issue_count }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Auto-Fix Applied:** Yes" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+
+        if [ -f .opencode/logs/ci-cd-monitor-report.json ]; then
+          echo "### Updated Health Status" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`json" >> $GITHUB_STEP_SUMMARY
+          cat .opencode/logs/ci-cd-monitor-report.json >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+        fi
 
     - name: Health status notification
       if: failure()
@@ -46,10 +117,10 @@ jobs:
         echo "CI/CD pipelines may be unhealthy"
         echo "Check the monitoring report for details"
 
-    - name: Summary report
+    - name: Final Summary Report
       run: |
         if [ -f .opencode/logs/ci-cd-monitor-report.json ]; then
-          echo "## CI/CD Health Summary" >> $GITHUB_STEP_SUMMARY
+          echo "## Final CI/CD Health Summary" >> $GITHUB_STEP_SUMMARY
           echo "\`\`\`json" >> $GITHUB_STEP_SUMMARY
           cat .opencode/logs/ci-cd-monitor-report.json >> $GITHUB_STEP_SUMMARY
           echo "\`\`\`" >> $GITHUB_STEP_SUMMARY

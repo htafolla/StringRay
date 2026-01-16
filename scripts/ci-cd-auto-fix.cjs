@@ -268,8 +268,22 @@ class CICDAutoFix {
     for (let iteration = 1; iteration <= maxIterations; iteration++) {
       this.log(`\n=== ITERATION ${iteration}/${maxIterations} ===`);
 
-      // Check pipeline status
-      const status = await this.checkPipelineStatus();
+      // Wait for pipeline completion if needed
+      let status = await this.checkPipelineStatus();
+      let waitCount = 0;
+      const maxWaits = 40; // Wait up to 20 minutes for completion
+
+      while ((status.status === 'in_progress' || status.status === 'queued') && waitCount < maxWaits) {
+        waitCount++;
+        this.log(`⏳ Waiting for pipeline completion (${waitCount}/${maxWaits})...`);
+        await this.sleep(this.retryDelay);
+        status = await this.checkPipelineStatus();
+      }
+
+      if (status.status === 'in_progress' || status.status === 'queued') {
+        this.log('❌ Pipeline still running after maximum wait time', 'ERROR');
+        return { success: false, status: 'pipeline_timeout' };
+      }
 
       if (status.status === 'success') {
         this.log('✅ CI/CD pipeline is already successful!');
@@ -320,16 +334,49 @@ class CICDAutoFix {
   }
 
   async run() {
+    const startTime = new Date();
+    this.log('🚀 Starting StrRay CI/CD Auto-Fix System');
+
     try {
       const result = await this.monitorAndFix();
+      const endTime = new Date();
+      const duration = Math.round((endTime - startTime) / 1000); // seconds
+
+      // Print clear summary
+      console.log('\n' + '='.repeat(60));
+      console.log('🎯 STRRAY CI/CD AUTO-FIX EXECUTION SUMMARY');
+      console.log('='.repeat(60));
+
       if (result.success) {
+        console.log('✅ STATUS: SUCCESS');
+        console.log(`📊 RESULT: ${result.status || 'Pipeline healthy - no fixes needed'}`);
+        console.log(`⏱️  DURATION: ${duration} seconds`);
+        console.log('🎉 CI/CD Auto-Fix completed successfully!');
+        console.log('='.repeat(60));
         this.log('🎉 CI/CD Auto-Fix completed successfully!');
         process.exit(0);
       } else {
+        console.log('❌ STATUS: FAILED');
+        console.log(`📊 RESULT: ${result.status || 'Unknown failure'}`);
+        console.log(`⏱️  DURATION: ${duration} seconds`);
+        console.log('💥 CI/CD Auto-Fix failed - manual intervention may be required');
+        console.log('='.repeat(60));
         this.log(`💥 CI/CD Auto-Fix failed: ${result.status}`, 'ERROR');
         process.exit(1);
       }
     } catch (error) {
+      const endTime = new Date();
+      const duration = Math.round((endTime - startTime) / 1000);
+
+      console.log('\n' + '='.repeat(60));
+      console.log('💥 STRRAY CI/CD AUTO-FIX EXECUTION SUMMARY');
+      console.log('='.repeat(60));
+      console.log('❌ STATUS: CRASHED');
+      console.log(`📊 ERROR: ${error.message}`);
+      console.log(`⏱️  DURATION: ${duration} seconds`);
+      console.log('💥 Unexpected error occurred');
+      console.log('='.repeat(60));
+
       this.log(`💥 Unexpected error: ${error.message}`, 'ERROR');
       process.exit(1);
     }

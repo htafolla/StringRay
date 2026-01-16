@@ -200,8 +200,8 @@
   "cleanup:session_metadata": {
     "default": {
       "sessionId": "default",
-      "createdAt": 1768584739800,
-      "lastActivity": 1768584739800,
+      "createdAt": 1768584858706,
+      "lastActivity": 1768584858706,
       "ttlMs": 86400000,
       "isActive": true,
       "agentCount": 0,
@@ -379,7 +379,7 @@
   },
   "session:default:coordinator": {
     "sessionId": "default",
-    "startTime": 1768584739800,
+    "startTime": 1768584858706,
     "activeDelegations": {},
     "agentInteractions": {},
     "conflictHistory": [],
@@ -400,12 +400,12 @@
   },
   "delegation:default_session": {
     "sessionId": "default",
-    "createdAt": "2026-01-16T17:32:19.800Z",
+    "createdAt": "2026-01-16T17:34:18.706Z",
     "active": true,
     "agentCount": 8
   },
   "session:active": true,
-  "session:boot_time": 1768584739800,
+  "session:boot_time": 1768584858706,
   "session:agents": [],
   "session:state_manager": {
     "stateManager": {
@@ -874,7 +874,7 @@
       "enforcementLevel": "blocking"
     }
   ],
-  "enforcement:enabled_at": 1768584739801,
+  "enforcement:enabled_at": 1768584858706,
   "session:validator-test-session:coordinator": {
     "sessionId": "validator-test-session",
     "startTime": 1768335491257,

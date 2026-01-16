@@ -115,41 +115,9 @@ function saveConfig(configPath, config) {
   fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
 }
 
-function configureClaudeMCPExclusions() {
-  // Copy Claude configuration files to user's home directory
-  claudeConfigFiles.forEach(({ source: sourcePath, dest: destPath }) => {
-    const source = path.join(packageRoot, sourcePath);
-    const dest = path.join(os.homedir(), destPath);
 
-    console.log(`Copying Claude config ${sourcePath} -> ${destPath}`);
 
-    try {
-      if (fs.existsSync(source)) {
-        // Ensure destination directory exists
-        const destDir = path.dirname(dest);
-        if (!fs.existsSync(destDir)) {
-          fs.mkdirSync(destDir, { recursive: true });
-          console.log(`Created Claude directory: ${destDir}`);
-        }
-
-        // Check if file already exists, backup if it does
-        if (fs.existsSync(dest)) {
-          const backupPath = `${dest}.backup.${Date.now()}`;
-          fs.copyFileSync(dest, backupPath);
-          console.log(`Backed up existing Claude config to: ${backupPath}`);
-        }
-
-        fs.copyFileSync(source, dest);
-        console.log(`✅ Claude config installed: ${destPath}`);
-      } else {
-        console.warn(`Warning: Claude config ${sourcePath} not found at ${source}`);
-      }
-    } catch (error) {
-      console.error(`Error copying Claude config ${sourcePath}:`, error.message);
-    }
-  });
-
-  // Add plugin to the plugin array
+function configureStrRayPlugin() {
   if (!config.plugin) {
     config.plugin = [];
   }
@@ -338,6 +306,91 @@ console.log('🚀 [StrRay Postinstall] Starting StrRay plugin postinstall config
 console.log('🚀 [StrRay Postinstall] Node version:', process.version);
 console.log('🚀 [StrRay Postinstall] Platform:', process.platform);
 console.log('🚀 [StrRay Postinstall] Working directory:', process.cwd());
+
+function configureStrRayPlugin() {
+  console.log('🔧 Configuring StrRay plugin...');
+
+  // Copy configuration files
+  configFiles.forEach(({ source: sourcePath, dest: destPath }) => {
+    const source = path.join(packageRoot, sourcePath);
+    const dest = path.join(process.cwd(), destPath);
+
+    console.log(`Copying ${sourcePath} -> ${destPath}`);
+
+    try {
+      if (fs.existsSync(source)) {
+        // Ensure destination directory exists
+        const destDir = path.dirname(dest);
+        if (!fs.existsSync(destDir)) {
+          fs.mkdirSync(destDir, { recursive: true });
+          console.log(`Created directory: ${destDir}`);
+        }
+
+        fs.copyFileSync(source, dest);
+        console.log(`✅ ${sourcePath} installed`);
+      } else {
+        console.warn(`Warning: ${sourcePath} not found at ${source}`);
+        // Try alternative locations for installed package
+        const altSource = path.join(packageRoot, 'node_modules', 'stringray-ai', sourcePath);
+        if (fs.existsSync(altSource)) {
+          const destDir = path.dirname(dest);
+          if (!fs.existsSync(destDir)) {
+            fs.mkdirSync(destDir, { recursive: true });
+          }
+          fs.copyFileSync(altSource, dest);
+          console.log(`✅ ${sourcePath} installed (from node_modules)`);
+        } else {
+          console.warn(`Warning: ${sourcePath} not found in alternative locations`);
+        }
+      }
+    } catch (error) {
+      console.error(`Error copying ${sourcePath}:`, error.message);
+    }
+  });
+
+  // Copy Claude configuration files to user's home directory
+  claudeConfigFiles.forEach(({ source: sourcePath, dest: destPath }) => {
+    const source = path.join(packageRoot, sourcePath);
+    const dest = path.join(os.homedir(), destPath);
+
+    console.log(`Copying Claude config ${sourcePath} -> ${destPath}`);
+
+    try {
+      if (fs.existsSync(source)) {
+        // Ensure destination directory exists
+        const destDir = path.dirname(dest);
+        if (!fs.existsSync(destDir)) {
+          fs.mkdirSync(destDir, { recursive: true });
+          console.log(`Created Claude directory: ${destDir}`);
+        }
+
+        // Check if file already exists, backup if it does
+        if (fs.existsSync(dest)) {
+          const backupPath = `${dest}.backup.${Date.now()}`;
+          fs.copyFileSync(dest, backupPath);
+          console.log(`Backed up existing Claude config to: ${backupPath}`);
+        }
+
+        fs.copyFileSync(source, dest);
+        console.log(`✅ Claude config installed: ${destPath}`);
+      } else {
+        console.warn(`Warning: Claude config ${sourcePath} not found at ${source}`);
+      }
+    } catch (error) {
+      console.error(`Error copying Claude config ${sourcePath}:`, error.message);
+    }
+  });
+
+  // Configure Claude MCP exclusions to prevent connection errors
+  configureClaudeMCPExclusions();
+
+  console.log('🎉 StrRay plugin installation complete!');
+  console.log(`\n📋 Next Steps:`);
+  console.log(`1. Restart oh-my-opencode to load the plugin`);
+  console.log(`2. Run 'opencode agent list' to see StrRay agents`);
+  console.log(`3. Try '@enforcer analyze this code' to test the plugin`);
+  console.log(`\n📖 Documentation: https://github.com/strray-framework/strray-plugin`);
+}
 
 try {
   configureStrRayPlugin();

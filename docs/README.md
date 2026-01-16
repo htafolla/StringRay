@@ -1,4 +1,4 @@
-# ⚡ StringRay AI v1.0.4 – Enterprise AI Agent Coordination Platform
+# ⚡ StringRay AI v1.0.5 – Enterprise AI Agent Coordination Platform
 
 [![Version](https://img.shields.io/badge/version-1.0.4-blue.svg)](https://github.com/htafolla/strray)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -10,7 +10,7 @@
 
 ## ⚠️ Important Notice
 
-**StringRay AI v1.0.4 - Enterprise CI/CD Automation Plugin**
+**StringRay AI v1.0.5 - Enterprise CI/CD Automation Plugin**
 
 StringRay Framework is available as both:
 

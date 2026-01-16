@@ -1,5 +1,5 @@
 /**
- * StringRay AI v1.0.4 - Performance Monitoring Dashboard
+ * StringRay AI v1.0.5 - Performance Monitoring Dashboard
  *
  * Real-time performance monitoring dashboard with historical analytics,
  * alerting, and performance budget visualization.

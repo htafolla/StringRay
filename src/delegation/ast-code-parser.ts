@@ -1,5 +1,5 @@
 /**
- * StringRay AI v1.0.4 - AST Code Parser
+ * StringRay AI v1.0.5 - AST Code Parser
  *
  * AST-based code parsing and structural analysis using ast-grep.
  * Provides advanced code understanding, pattern detection, and refactoring insights.

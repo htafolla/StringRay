@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * StringRay AI v1.0.4 - Boot Sequence Verification Script
+ * StringRay AI v1.0.5 - Boot Sequence Verification Script
  *
  * Tests the complete boot sequence and Phase 1 implementations.
  */

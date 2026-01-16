@@ -19,6 +19,8 @@
     "clean": "rm -rf dist",
     "prepublishOnly": "npm run build:plugin",
     "postinstall": "node scripts/postinstall.cjs",
+    "ci-install": "npm ci --ignore-scripts && npm run postinstall",
+    "preinstall": "echo '🔧 Installing StringRay Framework dependencies...'",
     "ci-monitor": "node scripts/github-actions-monitor.cjs",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",

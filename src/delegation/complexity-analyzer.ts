@@ -1,5 +1,5 @@
 /**
- * StringRay AI v1.0.4 - Complexity Analyzer
+ * StringRay AI v1.0.5 - Complexity Analyzer
  *
  * Assesses operation complexity to determine optimal agent delegation strategy.
  * Implements metrics-based complexity scoring for intelligent task distribution.

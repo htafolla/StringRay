@@ -1,5 +1,5 @@
 /**
- * StringRay AI v1.0.4 - Boot Orchestrator Unit Tests
+ * StringRay AI v1.0.5 - Boot Orchestrator Unit Tests
  *
  * Tests the boot sequence orchestration and component initialization.
  *

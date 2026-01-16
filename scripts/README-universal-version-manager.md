@@ -18,7 +18,7 @@ The Universal Version Manager (`scripts/universal-version-manager.js`) maintains
 const OFFICIAL_VERSIONS = {
   framework: {
     version: '1.0.4',
-    displayName: 'StringRay AI v1.0.5',
+    displayName: 'StringRay AI v1.0.7',
     lastUpdated: '2026-01-15'
   },
   codex: {
@@ -56,14 +56,14 @@ git add . && git commit -m "chore: bump version to 1.0.5"
 ## What Gets Updated
 
 ### Framework References
-- `StringRay AI v1.0.5` → `StringRay AI v1.0.5`
-- `StringRay AI v1.0.5` → `StringRay AI v1.0.5`
+- `StringRay AI v1.0.7` → `StringRay AI v1.0.7`
+- `StringRay AI v1.0.7` → `StringRay AI v1.0.7`
 - Version badges and headers
 
 ### Codex References
-- `Universal Development Codex v1.2.24` → `Universal Development Codex v1.2.24`
-- `43-term` → `50-term`
-- `45 Universal Development Codex` → `50 Universal Development Codex`
+- `Universal Development Codex v1.2.25` → `Universal Development Codex v1.2.25`
+- `55-term` → `55-term`
+- `55 Universal Development Codex` → `55 Universal Development Codex`
 
 ### Dependency References
 - `oh-my-opencode v2.14.0` → `oh-my-opencode v2.14.0`

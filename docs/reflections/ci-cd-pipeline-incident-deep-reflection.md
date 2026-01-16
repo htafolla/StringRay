@@ -13,7 +13,7 @@ This document chronicles a critical DevOps incident where I violated fundamental
 
 **What Happened:**
 ```bash
-npm publish --tag latest  # Published broken v1.0.9
+npm publish --tag latest  # Published broken v1.0.7
 ```
 
 **Root Cause:**
@@ -338,6 +338,6 @@ The recovery process demonstrated that with proper debugging and systematic fixe
 ---
 
 *Documented on: January 16, 2026*
-*Framework: StringRay v1.0.5*
+*Framework: StringRay v1.0.7*
 *Status: CI/CD Pipeline Fully Operational*</content>
 <parameter name="filePath">docs/reflections/ci-cd-pipeline-incident-deep-reflection.md

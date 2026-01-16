@@ -1,5 +1,5 @@
 /**
- * StringRay AI v1.0.5 - Processors Module
+ * StringRay AI v1.0.7 - Processors Module
  *
  * Exports all processor-related functionality.
  *

@@ -1,5 +1,5 @@
 /**
- * StringRay AI v1.0.5 - Security Testing Configuration
+ * StringRay AI v1.0.7 - Security Testing Configuration
  *
  * Specialized testing configuration for security validation,
  * vulnerability testing, and OWASP compliance verification.

@@ -1,6 +1,6 @@
-#  - Complete Agent Context & Universal Development Codex v1.2.24
+#  - Complete Agent Context & Universal Development Codex v1.2.25
 
-**Framework Version**: 1.0.6
+**Framework Version**: 1.0.7
 **Last Updated**: 2026-01-16 (Updated Architecture Documentation)
 **Purpose**: Enterprise AI orchestration with systematic error prevention and production-ready development
 
@@ -1181,7 +1181,66 @@ Framework initializes in strict dependency order:
 4. **Route to Appropriate Agents**: Based on capabilities and availability
 5. **Monitor and Adapt**: Track performance and adjust strategies
 
+### Long-Running Operations & Multi-Tasking
+
+**CRITICAL**: Never cancel running scripts or processes. Always allow complete outcomes for accurate results.
+
+#### **🚫 AVOID: Premature Cancellation**
+```bash
+# WRONG - Cancels running processes
+pkill -f "ci-cd-full-cycle"
+timeout 120 node scripts/long-running-script.js
+```
+
+#### **✅ CORRECT: Multi-Tasking Approaches**
+
+##### **Option 1: Background Execution**
+```bash
+# Use nohup for long-running scripts
+nohup node scripts/ci-cd-full-cycle.cjs "commit message" &
+tail -f nohup.out  # Monitor progress
+```
+
+##### **Option 2: Subagent Parallel Execution**
+```bash
+# Launch subagents for parallel work
+background_task(agent="orchestrator", prompt="Monitor CI/CD pipeline completion")
+background_task(agent="bug-triage-specialist", prompt="Analyze any failures detected")
+
+# Continue with other tasks while subagents work
+# System will notify when subagents complete
+```
+
+##### **Option 3: Session-Based Multi-Tasking**
+```bash
+# Use session management for complex workflows
+session_create("ci-cd-monitoring")
+background_task(session_id="ci-cd-monitoring", agent="orchestrator", prompt="Full CI/CD cycle")
+background_task(session_id="ci-cd-monitoring", agent="code-reviewer", prompt="Review changes")
+
+# Monitor session progress
+session_status("ci-cd-monitoring")
+```
+
+#### **🎯 Multi-Tasking Best Practices:**
+
+1. **Allow Complete Outcomes**: Never interrupt running processes
+2. **Use Subagents**: Launch parallel agents for concurrent work
+3. **Session Management**: Group related tasks in sessions
+4. **Background Execution**: Use `nohup` for long-running scripts
+5. **Progress Monitoring**: Track multiple tasks simultaneously
+6. **Resource Management**: Ensure adequate resources for parallel execution
+
+#### **📊 Multi-Tasking Benefits:**
+- **Complete Results**: No truncated or incomplete outcomes
+- **Parallel Efficiency**: Multiple tasks progress simultaneously
+- **Resource Optimization**: Better utilization of available capacity
+- **Reliable Monitoring**: Continuous tracking of all operations
+- **Enterprise Scalability**: Handle complex workflows effectively
+
 ---
+
+
 
 ## 🌉 Cross-Language Integration
 
@@ -1313,7 +1372,7 @@ Framework initializes in strict dependency order:
 ### Implemented Features ✅
 
 - **8 Specialized Agents**: All configured with proper tools and permissions
-- **Codex Compliance**: 50-term validation with zero-tolerance blocking
+- **Codex Compliance**: 55-term validation with zero-tolerance blocking
 - **Hybrid Architecture**: TypeScript/Python integration operational
 - **Boot Orchestration**: Dependency-ordered initialization working
 - **State Management**: Session persistence and cross-session coordination
@@ -2226,17 +2285,17 @@ npm version major  # for breaking changes
 **2. Release Execution:**
 ```bash
 # Create release branch
-git checkout -b release/v1.0.6
+git checkout -b release/v1.0.7
 
 # Update version in all files
 # package.json, codex.json, AGENTS.md
 
 # Commit version changes
 git add .
-git commit -m "chore: release v1.0.6"
+git commit -m "chore: release v1.0.7"
 
 # Push to trigger CI/CD
-git push origin release/v1.0.6
+git push origin release/v1.0.7
 ```
 
 **3. Post-Release Validation:**
@@ -2301,16 +2360,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 #### Tag Creation Process
 ```bash
 # After successful release
-git tag -a v1.0.6 -m "Release v1.0.6: CI/CD pipeline enhancements"
-git push origin v1.0.6
+git tag -a v1.0.7 -m "Release v1.0.7: CI/CD pipeline enhancements"
+git push origin v1.0.7
 
 # Verify tag
-git tag -l | grep v1.0.6
+git tag -l | grep v1.0.7
 ```
 
 #### Tag Naming Convention
 - **vMAJOR.MINOR.PATCH**: Standard semantic versioning
-- **Pre-releases**: v1.0.0-beta.1, v1.0.0-rc.1
+- **Pre-releases**: v1.0.7-beta.1, v1.0.7-rc.1
 - **Annotated tags**: Always use `-a` flag with message
 
 ### Deployment Documentation
@@ -2451,8 +2510,8 @@ npm version 1.0.5 --no-git-tag-version  # Reset to correct version
 npm publish strray-ai@1.0.5 --tag latest
 
 # 3. Update tags
-git tag -d v1.0.6
-git push origin :refs/tags/v1.0.6
+git tag -d v1.0.7
+git push origin :refs/tags/v1.0.7
 
 # 4. Revert commits if needed
 git revert <broken-commit>

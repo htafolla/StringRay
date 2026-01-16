@@ -18,16 +18,16 @@ import path from 'path';
 const OFFICIAL_VERSIONS = {
   // Framework versions
   framework: {
-    version: '1.0.5',
-    displayName: 'StringRay AI v1.0.5',
-    lastUpdated: '2026-01-15'
+    version: '1.0.7',
+    displayName: 'StringRay AI v1.0.7',
+    lastUpdated: '2026-01-16'
   },
 
   // Codex versions
   codex: {
-    version: 'v1.2.24',
-    termsCount: 50,
-    lastUpdated: '2026-01-15'
+    version: 'v1.2.25',
+    termsCount: 55,
+    lastUpdated: '2026-01-16'
   },
 
   // External dependencies
@@ -51,6 +51,49 @@ const UPDATE_PATTERNS = [
     pattern: /StringRay AI v1\.0\.[0-9]+/g,
     replacement: OFFICIAL_VERSIONS.framework.displayName
   },
+  {
+    pattern: /version-1\.0\.[0-9]+-blue\.svg/g,
+    replacement: `version-${OFFICIAL_VERSIONS.framework.version}-blue.svg`
+  },
+  // Framework Version patterns
+  {
+    pattern: /\*\*Framework Version\*\*: 1\.0\.[0-9]+/g,
+    replacement: `**Framework Version**: ${OFFICIAL_VERSIONS.framework.version}`
+  },
+  {
+    pattern: /\*\*Framework Version:\*\* v1\.0\.[0-9]+/g,
+    replacement: `**Framework Version:** v${OFFICIAL_VERSIONS.framework.version}`
+  },
+  {
+    pattern: /- Framework Version: StrRay v1\.0\.[0-9]+/g,
+    replacement: `- Framework Version: ${OFFICIAL_VERSIONS.framework.displayName}`
+  },
+  {
+    pattern: /- Framework Version: 1\.0\.[0-9]+/g,
+    replacement: `- Framework Version: ${OFFICIAL_VERSIONS.framework.version}`
+  },
+  {
+    pattern: /Framework Version: StrRay v1\.0\.[0-9]+/g,
+    replacement: `Framework Version: ${OFFICIAL_VERSIONS.framework.displayName}`
+  },
+  // Simple version patterns
+  {
+    pattern: /StrRay v1\.0\.[0-9]+/g,
+    replacement: `${OFFICIAL_VERSIONS.framework.displayName.replace('StringRay AI ', 'StrRay ')}`
+  },
+  {
+    pattern: /v1\.0\.[0-9]+/g,
+    replacement: `v${OFFICIAL_VERSIONS.framework.version}`
+  },
+  // API documentation patterns
+  {
+    pattern: /\*\*Version\*\*: v1\.0\.[0-9]+/g,
+    replacement: `**Version**: v${OFFICIAL_VERSIONS.framework.version}`
+  },
+  {
+    pattern: /\*\*Framework\*\*: StrRay AI v1\.0\.[0-9]+/g,
+    replacement: `**Framework**: ${OFFICIAL_VERSIONS.framework.displayName}`
+  },
 
   // === CODEX VERSION UPDATES ===
   {
@@ -65,27 +108,49 @@ const UPDATE_PATTERNS = [
     pattern: /Universal Development Codex v1\.2\.24/g,
     replacement: `Universal Development Codex ${OFFICIAL_VERSIONS.codex.version}`
   },
+  {
+    pattern: /Universal Development Codex v1\.2\.25/g,
+    replacement: `Universal Development Codex ${OFFICIAL_VERSIONS.codex.version}`
+  },
+  // Flexible codex version patterns
+  {
+    pattern: /Codex v1\.2\.[0-9]+/g,
+    replacement: `Codex ${OFFICIAL_VERSIONS.codex.version}`
+  },
+  {
+    pattern: /codex v1\.2\.[0-9]+/g,
+    replacement: `codex ${OFFICIAL_VERSIONS.codex.version}`
+  },
 
   // === TERM COUNT UPDATES ===
   {
-    pattern: /50-term/g,
+    pattern: /55-term/g,
     replacement: `${OFFICIAL_VERSIONS.codex.termsCount}-term`
   },
   {
-    pattern: /50 Universal Development Codex/g,
+    pattern: /55 Universal Development Codex/g,
     replacement: `${OFFICIAL_VERSIONS.codex.termsCount} Universal Development Codex`
   },
   {
-    pattern: /50-term/g,
+    pattern: /55-term/g,
     replacement: `${OFFICIAL_VERSIONS.codex.termsCount}-term`
   },
   {
-    pattern: /50 Universal Development Codex/g,
+    pattern: /55 Universal Development Codex/g,
     replacement: `${OFFICIAL_VERSIONS.codex.termsCount} Universal Development Codex`
   },
   {
-    pattern: /50-term Universal Development Codex/g,
+    pattern: /55-term Universal Development Codex/g,
     replacement: `${OFFICIAL_VERSIONS.codex.termsCount}-term Universal Development Codex`
+  },
+  // Flexible term count patterns
+  {
+    pattern: /[0-9]+-term/g,
+    replacement: `${OFFICIAL_VERSIONS.codex.termsCount}-term`
+  },
+  {
+    pattern: /[0-9]+ Universal Development Codex/g,
+    replacement: `${OFFICIAL_VERSIONS.codex.termsCount} Universal Development Codex`
   },
 
   // === DEPENDENCY VERSION UPDATES ===
@@ -95,6 +160,11 @@ const UPDATE_PATTERNS = [
   },
   {
     pattern: /oh-my-opencode v2\.14\.0/g,
+    replacement: `oh-my-opencode v${OFFICIAL_VERSIONS.dependencies.ohMyOpencode}`
+  },
+  // Flexible dependency patterns
+  {
+    pattern: /oh-my-opencode v[0-9]+\.[0-9]+\.[0-9]+/g,
     replacement: `oh-my-opencode v${OFFICIAL_VERSIONS.dependencies.ohMyOpencode}`
   }
 ];

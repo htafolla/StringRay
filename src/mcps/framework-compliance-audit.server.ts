@@ -68,7 +68,7 @@ class StrRayFrameworkComplianceAuditServer {
           {
             name: "codex-validation",
             description:
-              "Validate compliance with Universal Development Codex v1.2.24",
+              "Validate compliance with Universal Development Codex v1.2.25",
             inputSchema: {
               type: "object",
               properties: {
@@ -385,7 +385,7 @@ ${results.recommendations.map((r) => `• 💡 ${r}`).join("\n")}
           const codexPatterns = [
             /codex/i,
             /Universal Development Codex/i,
-            /50-terms/i,
+            /55-terms/i,
             /error prevention/i,
             /zero-tolerance/i,
           ];

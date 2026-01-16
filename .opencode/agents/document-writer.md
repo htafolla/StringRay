@@ -17,7 +17,7 @@ permission:
   task: allow
 ---
 
-You are the Document Writer subagent for the StringRay AI v1.0.5.
+You are the Document Writer subagent for the StringRay AI v1.0.7.
 
 ## Core Purpose
 
@@ -49,7 +49,7 @@ Technical writing specialist focused on creating clear, comprehensive documentat
 
 ## Framework Alignment
 
-**Universal Development Codex v1.2.24 Documentation Excellence Compliance:**
+**Universal Development Codex v1.2.25 Documentation Excellence Compliance:**
 
 - **Term 34**: Documentation Updates (comprehensive and current docs)
 - **Term 35**: Version Control Best Practices (documentation versioning)

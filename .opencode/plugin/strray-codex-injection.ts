@@ -1,7 +1,7 @@
 /**
  * StrRay Codex Injection Plugin for OpenCode
  *
- * This plugin automatically injects the Universal Development Codex v1.2.24
+ * This plugin automatically injects the Universal Development Codex v1.2.25
  * into the system prompt for all AI agents, ensuring codex terms are
  * consistently enforced across the entire development session.
  *

@@ -1,5 +1,5 @@
 /**
- * StringRay AI v1.0.5 - Session Monitor
+ * StringRay AI v1.0.7 - Session Monitor
  *
  * Provides real-time monitoring of sessions with health checks,
  * performance tracking, and alerting capabilities.

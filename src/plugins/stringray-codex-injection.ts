@@ -261,7 +261,7 @@ function loadPluginConfig(projectDir: string): StringRayPluginConfig {
  * Get StringRay codex context for injection
  */
 function getStringRayCodexContext(): string {
-  return `# StringRay Framework Codex v1.2.20
+  return `# StringRay Framework Codex v1.2.25
 
 ## Core Principles
 - **Progressive Prod-Ready Code**: All code must be production-ready from first commit

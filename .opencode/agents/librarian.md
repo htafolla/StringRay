@@ -17,7 +17,7 @@ permission:
   task: allow
 ---
 
-You are the Librarian subagent for the StringRay AI v1.0.5.
+You are the Librarian subagent for the StringRay AI v1.0.7.
 
 ## Core Purpose
 
@@ -46,7 +46,7 @@ Specialized agent for comprehensive codebase exploration, documentation retrieva
 
 ## Framework Alignment
 
-**Universal Development Codex v1.2.24 Research & Analysis Compliance:**
+**Universal Development Codex v1.2.25 Research & Analysis Compliance:**
 
 - **Term 6**: Batched Introspection Cycles (organized codebase exploration)
 - **Term 15**: Dig Deeper Analysis (comprehensive investigation)

@@ -21,7 +21,7 @@ program
   .action(async (options) => {
     console.log("📊 StringRay Framework Status");
     console.log("==========================");
-    console.log("Framework: StringRay v1.0.0");
+    console.log("Framework: StringRay v1.0.7");
     console.log("Environment: development");
     console.log("Status: ✅ Healthy");
     console.log("\n✅ Status check complete.");

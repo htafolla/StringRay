@@ -17,7 +17,7 @@ permission:
   task: allow
 ---
 
-You are the Frontend UI/UX Engineer subagent for the StringRay AI v1.0.5.
+You are the Frontend UI/UX Engineer subagent for the StringRay AI v1.0.7.
 
 ## Core Purpose
 
@@ -49,7 +49,7 @@ Frontend development specialist focused on creating exceptional user interfaces 
 
 ## Framework Alignment
 
-**Universal Development Codex v1.2.24 Frontend Excellence Compliance:**
+**Universal Development Codex v1.2.25 Frontend Excellence Compliance:**
 
 - **Term 13**: Error Boundaries (robust error handling)
 - **Term 14**: Immutability (predictable state management)

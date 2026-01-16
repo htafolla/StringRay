@@ -16,6 +16,11 @@ const configFiles = [
   { source: '.opencode/package.json', dest: '.opencode/package.json' }
 ];
 
+// Claude configuration files to copy to user's home directory
+const claudeConfigFiles = [
+  { source: '.claude/.mcp.json', dest: '.claude/.mcp.json' }
+];
+
 // Find the package root relative to this script
 const packageRoot = path.join(__dirname, '..');
 
@@ -110,17 +115,39 @@ function saveConfig(configPath, config) {
   fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
 }
 
-function configureStrRayPlugin() {
-  const configPath = getOhMyOpenCodeConfigPath();
+function configureClaudeMCPExclusions() {
+  // Copy Claude configuration files to user's home directory
+  claudeConfigFiles.forEach(({ source: sourcePath, dest: destPath }) => {
+    const source = path.join(packageRoot, sourcePath);
+    const dest = path.join(os.homedir(), destPath);
 
-  console.log(`🔧 Configuring StrRay plugin for oh-my-opencode at: ${configPath}`);
+    console.log(`Copying Claude config ${sourcePath} -> ${destPath}`);
 
-  let config = loadConfig(configPath);
+    try {
+      if (fs.existsSync(source)) {
+        // Ensure destination directory exists
+        const destDir = path.dirname(dest);
+        if (!fs.existsSync(destDir)) {
+          fs.mkdirSync(destDir, { recursive: true });
+          console.log(`Created Claude directory: ${destDir}`);
+        }
 
-  // Initialize basic config structure if needed (only valid opencode keys)
-  if (!config.model) {
-    config.model = "opencode/grok-code";
-  }
+        // Check if file already exists, backup if it does
+        if (fs.existsSync(dest)) {
+          const backupPath = `${dest}.backup.${Date.now()}`;
+          fs.copyFileSync(dest, backupPath);
+          console.log(`Backed up existing Claude config to: ${backupPath}`);
+        }
+
+        fs.copyFileSync(source, dest);
+        console.log(`✅ Claude config installed: ${destPath}`);
+      } else {
+        console.warn(`Warning: Claude config ${sourcePath} not found at ${source}`);
+      }
+    } catch (error) {
+      console.error(`Error copying Claude config ${sourcePath}:`, error.message);
+    }
+  });
 
   // Add plugin to the plugin array
   if (!config.plugin) {
@@ -207,10 +234,7 @@ function configureStrRayPlugin() {
   // Create StrRay-specific configuration file separately
   createStrRayConfig();
 
-  // Configure Claude MCP exclusions to prevent connection errors
-  configureClaudeMCPExclusions();
-
-  console.log(`🎉 StrRay plugin installation complete!`);
+  console.log('🎉 StrRay plugin installation complete!');
   console.log(`\n📋 Next Steps:`);
   console.log(`1. Restart oh-my-opencode to load the plugin`);
   console.log(`2. Run 'opencode agent list' to see StrRay agents`);

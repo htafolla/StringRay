@@ -100,6 +100,7 @@
     "opencode.json",
     ".opencode/oh-my-opencode.json",
     ".opencode/package.json",
+    ".claude/.mcp.json",
     "scripts/postinstall.cjs",
     "dist/cli",
     "dist/plugin",

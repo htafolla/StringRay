@@ -1,6 +1,6 @@
 {
   "sisyphus_orchestrator": {
-    "enabled": true,
+    "enabled": false,
     "relentless_execution": true,
     "progress_tracking": true,
     "error_recovery": true
@@ -21,7 +21,7 @@
   },
   "agents": {
     "sisyphus": {
-      "enabled": true,
+      "enabled": false,
       "mode": "primary",
       "capabilities": ["orchestration", "coordination", "delegation"]
     },

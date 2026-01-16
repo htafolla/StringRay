@@ -1,11 +1,9 @@
 {
   "model": "opencode/grok-code",
   "plugin": [
-    "stringray/dist/plugin/stringray-codex-injection.js"
+    "./dist/plugin/plugins/stringray-codex-injection.js"
   ],
-  "sisyphus": {
-    "disableOrchestration": true
-  },
+  "disabled_agents": ["sisyphus"],
   "disabled_mcps": [
     "global-everything",
     "global-git",

@@ -1,5 +1,5 @@
 /**
- * StringRay AI v1.0.7 - Security Module Index
+ * StringRay AI v1.0.9 - Security Module Index
  *
  * Unified exports for the comprehensive security system.
  *

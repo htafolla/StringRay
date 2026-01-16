@@ -127,6 +127,9 @@ create_configuration() {
     mkdir -p "$target_dir/.opencode"
     cp -r "$SCRIPT_DIR/.opencode"/* "$target_dir/.opencode"/ 2>/dev/null || true
 
+    # Copy Claude configuration
+    mkdir -p "$target_dir/.claude"
+    cp -r "$SCRIPT_DIR/.claude"/* "$target_dir/.claude"/ 2>/dev/null || true
     # Customize enforcer-config.json
     if [ -f "$target_dir/.opencode/enforcer-config.json" ]; then
         # Update project information

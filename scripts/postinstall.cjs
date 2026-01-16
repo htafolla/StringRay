@@ -145,7 +145,11 @@ function createStrRayConfig() {
 }
 
 function configureClaudeMCPExclusions() {
-  const claudeMcpPath = path.join(os.homedir(), '.claude', '.mcp.json');
+  // Try project-level .claude config first, then fall back to user home
+  let claudeMcpPath = path.join(process.cwd(), '.claude', '.mcp.json');
+  if (!fs.existsSync(claudeMcpPath)) {
+    claudeMcpPath = path.join(os.homedir(), '.claude', '.mcp.json');
+  }
 
   try {
     if (!fs.existsSync(claudeMcpPath)) {
@@ -280,89 +284,42 @@ function configureStrRayPlugin() {
     }
   });
 
-  // Load and modify oh-my-opencode configuration
-  const configPath = path.join(process.cwd(), '.opencode', 'oh-my-opencode.json');
-  let config = loadConfig(configPath);
+  // Update MCP server paths in the copied .mcp.json file
+  const mcpConfigPath = path.join(process.cwd(), '.mcp.json');
+  console.log('Checking MCP config at:', mcpConfigPath);
+  if (fs.existsSync(mcpConfigPath)) {
+    console.log('MCP config file exists, updating paths...');
+    try {
+      const mcpConfig = JSON.parse(fs.readFileSync(mcpConfigPath, 'utf-8'));
+      let updated = false;
 
-  if (!config.plugin) {
-    config.plugin = [];
-  }
+      // Update all server command arguments to use correct paths
+      for (const [serverName, serverConfig] of Object.entries(mcpConfig.mcpServers || {})) {
+        if (serverConfig.args && Array.isArray(serverConfig.args)) {
+          for (let i = 0; i < serverConfig.args.length; i++) {
+            const arg = serverConfig.args[i];
+            // Replace template paths with actual package paths
+            if (typeof arg === 'string' && arg.includes('dist/plugin/mcps/')) {
+              // Remove the /plugin/ part and use node_modules/strray-ai/dist/mcps/
+              const newArg = arg.replace('dist/plugin/mcps/', 'node_modules/strray-ai/dist/mcps/');
+              if (newArg !== arg) {
+                serverConfig.args[i] = newArg;
+                updated = true;
+                console.log(`✅ Updated MCP server ${serverName} path: ${arg} -> ${newArg}`);
+              }
+            }
+          }
+        }
+      }
 
-  const pluginPath = "./dist/plugin/plugins/stringray-codex-injection.js";
-
-  // Remove any old/incorrect plugin paths
-  const oldPaths = [
-    "stringray/dist/plugin/stringray-codex-injection.js",
-    "stringray-ai/dist/plugin/stringray-codex-injection.js"
-  ];
-
-  config.plugin = config.plugin.filter(p => !oldPaths.includes(p));
-
-  if (!config.plugin.includes(pluginPath)) {
-    config.plugin.push(pluginPath);
-    console.log(`✅ Added StrRay plugin to configuration`);
-  } else {
-    console.log(`ℹ️ StrRay plugin already configured`);
-  }
-
-  // Add StrRay agent configurations
-  if (!config.agent) {
-    config.agent = {};
-  }
-
-  // Add StrRay-specific agents (only valid opencode agent config)
-  const stringrayAgents = {
-    "orchestrator": { "model": "opencode/grok-code" },
-    "enhanced-orchestrator": { "model": "opencode/grok-code" },
-    "enforcer": { "model": "opencode/grok-code" },
-    "architect": { "model": "opencode/grok-code" },
-    "test-architect": { "model": "opencode/grok-code" },
-    "bug-triage-specialist": { "model": "opencode/grok-code" },
-    "code-reviewer": { "model": "opencode/grok-code" },
-    "security-auditor": { "model": "opencode/grok-code" },
-    "refactorer": { "model": "opencode/grok-code" }
-  };
-
-  let agentsAdded = 0;
-  for (const [agentName, agentConfig] of Object.entries(stringrayAgents)) {
-    if (!config.agent[agentName]) {
-      config.agent[agentName] = agentConfig;
-      agentsAdded++;
+      if (updated) {
+        fs.writeFileSync(mcpConfigPath, JSON.stringify(mcpConfig, null, 2));
+        console.log('✅ Updated MCP server paths in .mcp.json');
+      }
+    } catch (error) {
+      console.warn('Warning: Could not update MCP server paths:', error.message);
     }
   }
-
-  if (agentsAdded > 0) {
-    console.log(`✅ Added ${agentsAdded} StrRay agents to configuration`);
-  }
-
-  // Add StrRay-specific settings
-  if (!config.settings) {
-    config.settings = {};
-  }
-
-  if (!config.settings.multi_agent_orchestration) {
-    config.settings.multi_agent_orchestration = {
-      enabled: true,
-      max_concurrent_agents: 5,
-      coordination_model: "async-multi-agent"
-    };
-    console.log(`✅ Enabled StrRay multi-agent orchestration`);
-  }
-
-  // Add Claude Code compatibility
-  if (!config.claude_code) {
-    config.claude_code = {
-      mcp: true,
-      commands: true,
-      skills: true,
-      agents: true,
-      hooks: true,
-      plugins: true
-    };
-    console.log(`✅ Enabled Claude Code compatibility`);
-  }
-
-  saveConfig(configPath, config);
 
   // Copy Claude configuration files to user's home directory
   claudeConfigFiles.forEach(({ source: sourcePath, dest: destPath }) => {
@@ -400,6 +357,21 @@ function configureStrRayPlugin() {
   // Configure Claude MCP exclusions to prevent connection errors
   console.log('🔧 Checking Claude MCP configuration...');
   configureClaudeMCPExclusions();
+
+  // MCP server paths are now correct in the template - no updating needed
+            }
+          }
+        }
+      }
+
+      if (updated) {
+        fs.writeFileSync(mcpConfigPath, JSON.stringify(mcpConfig, null, 2));
+        console.log('✅ Updated MCP server paths in .mcp.json');
+      }
+    } catch (error) {
+      console.warn('Warning: Could not update MCP server paths:', error.message);
+    }
+  }
 
   console.log('🎉 StrRay plugin installation complete!');
   console.log(`\n📋 Next Steps:`);

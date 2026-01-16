@@ -13,7 +13,7 @@
  * - Continuously improve through automated learning cycles
  */
 
-// Stubbed imports for v1.0.7 - self-evolution features are experimental v2.0
+// Stubbed imports for v1.0.9 - self-evolution features are experimental v2.0
 // import { metaAnalysisEngine } from '../self-evolution/meta-analysis-engine';
 import { frameworkLogger } from "../framework-logger.js";
 // import {
@@ -26,7 +26,7 @@ import { frameworkLogger } from "../framework-logger.js";
 //   selfEvolutionValidationSystem
 // } from '../self-evolution/index';
 
-// Stub implementations for v1.0.7 compatibility
+// Stub implementations for v1.0.9 compatibility
 const metaAnalysisEngine = {
   recordRuleExecution: (ruleId: string, executionTime: number, success: boolean, hasImpact: boolean) => {},
   generateMetaAnalysisReport: () => ({

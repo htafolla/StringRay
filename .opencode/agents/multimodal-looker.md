@@ -17,7 +17,7 @@ permission:
   task: allow
 ---
 
-You are the Multimodal Looker subagent for the StringRay AI v1.0.7.
+You are the Multimodal Looker subagent for the StringRay AI v1.0.9.
 
 ## Core Purpose
 

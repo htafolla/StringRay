@@ -29,8 +29,14 @@ const isTestEnvironment = dirName.includes('stringray-') || dirName.includes('fi
   dirName.includes('test-') || dirName.includes('deploy-verify') || dirName.includes('final-test') ||
   dirName.includes('jelly') || isDeployedEnvironment;
 
+// When running from within an installed package, use relative path
+import { fileURLToPath } from 'url';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const isInstalledPackage = __dirname.includes('node_modules/strray-ai');
 const PLUGIN_PATH = process.env.STRINGRAY_PLUGIN_PATH ||
-  (isTestEnvironment ? 'node_modules/stringray-ai/dist/plugin/plugins' : 'dist/plugin/plugins');
+  (isInstalledPackage ? '../dist/plugin/plugins' :  // Relative to scripts/ directory
+   isTestEnvironment ? 'node_modules/strray-ai/dist/plugin/plugins' : 'dist/plugin/plugins');
 
 console.log('🧪 Testing StringRay Plugin Loading...');
 console.log('=====================================\n');
@@ -38,7 +44,7 @@ console.log('=====================================\n');
 (async () => {
   try {
     // Dynamic import for cross-environment compatibility
-    const fullPath = new URL(`${PLUGIN_PATH}/stringray-codex-injection.js`, `file://${cwd}/`).href;
+    const fullPath = new URL(`${PLUGIN_PATH}/strray-codex-injection.js`, `file://${cwd}/`).href;
     const { default: stringrayCodexPlugin } = await import(fullPath);
     const plugin = await stringrayCodexPlugin({});
     console.log('✅ Plugin loaded successfully');
@@ -54,8 +60,8 @@ console.log('=====================================\n');
       console.log(`✨ Welcome message: ${testOutput.system[0].substring(0, 80)}...`);
 
       // Check if codex content is included
-      const allContent = testOutput.system.join('\n');
-      const hasCodex = allContent.includes('StringRay Framework Codex v1.2.20');
+      const allContent = testOutput.system.join('\\n');
+      const hasCodex = allContent.includes('StringRay Framework Codex v1.2.25');
       const hasTerms = allContent.includes('Progressive Prod-Ready Code');
 
       console.log(`📚 Codex context injected: ${hasCodex ? '✅' : '❌'}`);

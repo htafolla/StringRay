@@ -1,7 +1,7 @@
 /**
  * StringRay Codex Context Injector Hook
  *
- * Injects Universal Development Codex v1.2.24 context into agent operations.
+ * Injects Universal Development Codex v1.2.25 context into agent operations.
  * Follows production-tested pattern from rules-injector.
  *
  * @version 1.0.0

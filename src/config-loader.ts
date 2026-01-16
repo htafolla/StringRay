@@ -1,5 +1,5 @@
 /**
- * StringRay AI v1.0.7 - Configuration Loader
+ * StringRay AI v1.0.9 - Configuration Loader
  *
  * Loads and validates StringRay-specific configuration from oh-my-opencode.json
  *

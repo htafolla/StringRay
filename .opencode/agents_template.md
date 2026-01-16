@@ -35,9 +35,9 @@ The Universal Development Framework Master Agent Template v2.4.0 represents the 
 
 ## 📋 Framework Overview
 
-**StrRay 1.0.0** is a complete Codex-aligned, prescriptive methodology that **prevents 90% of runtime errors**, **eliminates code rot**, and **ensures syntax error prevention** through systematic introspection cycles, subagent-driven development, and Enforcer compliance monitoring. This document serves as an **executable framework** for AI agents to build applications that **actually run, work reliably, and maintain pristine code quality**. StringRay implements the principles established in the Universal Development Codex v1.2.20.
+**StrRay 1.0.0** is a complete Codex-aligned, prescriptive methodology that **prevents 90% of runtime errors**, **eliminates code rot**, and **ensures syntax error prevention** through systematic introspection cycles, subagent-driven development, and Enforcer compliance monitoring. This document serves as an **executable framework** for AI agents to build applications that **actually run, work reliably, and maintain pristine code quality**. StringRay implements the principles established in the Universal Development Codex v1.2.24.
 
-**Codex Foundation**: Complete integration of Universal Development Codex v1.2.20 (all 30+ terms, interweaves, lenses, and principles)
+**Codex Foundation**: Complete integration of Universal Development Codex v1.2.24 (all 30+ terms, interweaves, lenses, and principles)
 
 ### 🎯 Implementation Variants
 
@@ -64,7 +64,7 @@ The Universal Development Framework supports two implementation approaches:
 - **Functionality Guarantee**: Apps work as intended, not just compile
 - **AI-Adherence**: Clear thresholds and boundaries prevent approximation errors
 
-**Codex Foundation**: Complete Universal Development Codex v1.2.20 integration (all 30+ terms, interweaves, lenses, and principles)
+**Codex Foundation**: Complete Universal Development Codex v1.2.24 integration (all 30+ terms, interweaves, lenses, and principles)
 
 ---
 
@@ -2403,7 +2403,7 @@ Implementation → Measurement → Insights → Refinement → Implementation...
 
 ---
 
-_This document is a living artifact of StringRay 1.0.0. It evolves through each development cycle, incorporating validated patterns and emerging best practices. Updated quarterly or when significant architectural insights emerge. StringRay implements the principles established in the Universal Development Codex v1.2.20._
+_This document is a living artifact of StringRay 1.0.0. It evolves through each development cycle, incorporating validated patterns and emerging best practices. Updated quarterly or when significant architectural insights emerge. StringRay implements the principles established in the Universal Development Codex v1.2.24._
 
 # Universal Development Codex Integration (Complete v1.2.20)
 

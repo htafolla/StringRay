@@ -59,14 +59,14 @@ class ComprehensiveValidator {
       // Check if ESLint is available
       const hasEslint = fs.existsSync(path.join(this.projectRoot, 'node_modules', '.bin', 'eslint'));
       if (hasEslint) {
-        console.log('🔍 Running ESLint...');
+        // ESLint start - kept as console.log for user visibility
         try {
           execSync('npx eslint . --ext .js,.ts,.jsx,.tsx --max-warnings 0', {
             cwd: this.projectRoot,
             stdio: 'pipe',
             timeout: 30000
           });
-          console.log('✅ ESLint passed');
+          await frameworkLogger.log("comprehensive-validator", "eslint-passed", "success");
         } catch (error: any) {
           const output = error.stdout?.toString() || error.stderr?.toString() || '';
           const errorCount = (output.match(/error/g) || []).length;
@@ -84,14 +84,14 @@ class ComprehensiveValidator {
       // Check TypeScript compilation
       const hasTypescript = fs.existsSync(path.join(this.projectRoot, 'node_modules', '.bin', 'tsc'));
       if (hasTypescript && fs.existsSync(path.join(this.projectRoot, 'tsconfig.json'))) {
-        console.log('🔍 Running TypeScript compilation...');
+        // TypeScript compilation start - kept as console.log for user visibility
         try {
           execSync('npx tsc --noEmit', {
             cwd: this.projectRoot,
             stdio: 'pipe',
             timeout: 30000
           });
-          console.log('✅ TypeScript compilation passed');
+          await frameworkLogger.log("comprehensive-validator", "typescript-compilation-passed", "success");
         } catch (error) {
           errors.push('TypeScript compilation failed');
         }
@@ -133,7 +133,7 @@ class ComprehensiveValidator {
           if (failed > 0) {
             errors.push(`Tests failed: ${failed} out of ${passed + failed} tests failed`);
           } else {
-            console.log(`✅ Tests passed: ${passed} tests`);
+            await frameworkLogger.log("comprehensive-validator", "tests-passed", "success", { testCount: passed });
           }
 
           return {
@@ -153,7 +153,7 @@ class ComprehensiveValidator {
             stdio: 'pipe',
             timeout: 120000
           });
-          console.log('✅ Jest tests completed');
+          await frameworkLogger.log("comprehensive-validator", "jest-tests-completed", "success");
         } catch (error) {
           errors.push('Jest tests failed');
         }
@@ -176,14 +176,14 @@ class ComprehensiveValidator {
     try {
       // Check for package vulnerabilities
       if (fs.existsSync(path.join(this.projectRoot, 'package.json'))) {
-        console.log('🔒 Running npm audit...');
+        // NPM audit start - kept as console.log for user visibility
         try {
           execSync('npm audit --audit-level high', {
             cwd: this.projectRoot,
             stdio: 'pipe',
             timeout: 30000
           });
-          console.log('✅ Security audit passed');
+          await frameworkLogger.log("comprehensive-validator", "security-audit-passed", "success");
         } catch (error: any) {
           const output = error.stdout?.toString() || '';
           const vulnCount = (output.match(/vulnerabilities/g) || []).length;
@@ -194,7 +194,7 @@ class ComprehensiveValidator {
       }
 
       // Check for secrets in code
-      console.log('🔍 Scanning for potential secrets...');
+      // Secret scanning start - kept as console.log for user visibility
       const secretPatterns = [
         /password\s*[:=]\s*['"][^'"]*['"]/i,
         /secret\s*[:=]\s*['"][^'"]*['"]/i,
@@ -223,7 +223,7 @@ class ComprehensiveValidator {
       }
 
       if (!secretFound) {
-        console.log('✅ No secrets detected');
+        await frameworkLogger.log("comprehensive-validator", "no-secrets-detected", "success");
       }
 
     } catch (error) {
@@ -246,7 +246,7 @@ class ComprehensiveValidator {
 
         // Try to run build script
         if (packageJson.scripts?.build) {
-          console.log('🔨 Running build process...');
+          // Build process start - kept as console.log for user visibility
           try {
             execSync('npm run build', {
               cwd: this.projectRoot,
@@ -254,7 +254,7 @@ class ComprehensiveValidator {
               timeout: 120000, // 2 minutes
               env: { ...process.env, NODE_ENV: 'production' }
             });
-            console.log('✅ Build completed successfully');
+            await frameworkLogger.log("comprehensive-validator", "build-completed", "success");
           } catch (error) {
             errors.push('Build process failed');
           }
@@ -277,7 +277,7 @@ class ComprehensiveValidator {
     let testResults;
 
     try {
-      console.log('🚀 Post-push: Comprehensive validation started');
+      await frameworkLogger.log("comprehensive-validator", "post-push-validation-started", "info");
 
       // Linting checks
       const lintResults = await this.runLinting();
@@ -300,7 +300,7 @@ class ComprehensiveValidator {
       allErrors.push(...buildResults.errors);
       allWarnings.push(...buildResults.warnings);
 
-      console.log('📊 Post-push: Validation checks completed');
+      await frameworkLogger.log("comprehensive-validator", "post-push-validation-completed", "info");
 
     } catch (error) {
       allErrors.push(`Validation failed: ${error instanceof Error ? error.message : String(error)}`);

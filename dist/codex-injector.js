@@ -1,7 +1,7 @@
 /**
  * StringRay Codex Context Injector Hook
  *
- * Injects Universal Development Codex v1.2.20 context into agent operations.
+ * Injects Universal Development Codex v1.2.24 context into agent operations.
  * Follows production-tested pattern from rules-injector.
  *
  * @version 1.0.0
@@ -182,7 +182,7 @@ export function createStringRayCodexInjectorHook() {
                     const contextLoader = new StringRayContextLoader();
                     const loadResult = await contextLoader.loadCodexContext(sessionId);
                     if (!loadResult.success || !loadResult.context) {
-                        console.log("⚠️  No codex context available - allowing action");
+                        // Codex context warning - operational, keep
                         return;
                     }
                     // Validate action against codex

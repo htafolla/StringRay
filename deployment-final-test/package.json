@@ -1,8 +1,0 @@
-{
-  "name": "strray-test-env",
-  "version": "1.0.0",
-  "description": "StrRay Plugin Test Environment",
-  "dependencies": {
-    "strray": "file:../strray-1.0.0.tgz"
-  }
-}

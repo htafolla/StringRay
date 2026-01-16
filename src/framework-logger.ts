@@ -51,15 +51,44 @@ export class FrameworkUsageLogger {
       this.logs.shift();
     }
 
-    const emoji =
-      status === "success"
-        ? "✅"
-        : status === "error"
-          ? "❌"
-          : status === "debug"
-            ? "🔍"
-            : "ℹ️";
-    console.log(`${emoji} [${component}] ${action} - ${status.toUpperCase()}`);
+    // Suppress console output when running in OpenCode CLI mode to avoid breaking the interface
+    const isCliMode = process.env.STRRAY_CLI_MODE === "true" || process.env.OPENCODE_CLI === "true";
+    if (!isCliMode) {
+      const emoji =
+        status === "success"
+          ? "✅"
+          : status === "error"
+            ? "❌"
+            : status === "debug"
+              ? "🔍"
+              : "ℹ️";
+      console.log(`${emoji} [${component}] ${action} - ${status.toUpperCase()}`);
+    }
+
+    // Override console methods in CLI mode to prevent breaking the interface
+    if (isCliMode) {
+      const originalConsoleLog = console.log;
+      const originalConsoleError = console.error;
+      const originalConsoleWarn = console.warn;
+
+      console.log = (...args: any[]) => {
+        // Only allow essential user-facing CLI messages through
+        if (args[0] && typeof args[0] === 'string' &&
+            (args[0].includes('🎉') || args[0].includes('✅') ||
+             args[0].includes('🎯') || args[0].includes('🚀'))) {
+          originalConsoleLog(...args);
+        }
+        // Suppress all other console output in CLI mode
+      };
+
+      console.error = (...args: any[]) => {
+        // Suppress error output in CLI mode to avoid breaking interface
+      };
+
+      console.warn = (...args: any[]) => {
+        // Suppress warning output in CLI mode to avoid breaking interface
+      };
+    }
 
     await this.persistLog(entry);
   }
@@ -74,8 +103,8 @@ export class FrameworkUsageLogger {
         // Skip logging if cwd is not available (e.g., in test environments)
         return;
       }
-      const logDir = path.join(cwd, ".opencode", "logs");
-      const logFile = path.join(logDir, "framework-activity.log");
+      const logDir = path.join(cwd, "logs", "framework");
+      const logFile = path.join(logDir, "activity.log");
 
       // Ensure log directory exists
       if (!fs.existsSync(logDir)) {
@@ -99,31 +128,8 @@ export class FrameworkUsageLogger {
   }
 
   printRundown() {
-    console.log("\n🎯 STRRAY FRAMEWORK USAGE RUNDOWN");
-    console.log("=====================================");
-
-    const components = Array.from(new Set(this.logs.map((l) => l.component)));
-
-    components.forEach((component) => {
-      const componentLogs = this.getComponentUsage(component);
-      const successCount = componentLogs.filter(
-        (l) => l.status === "success",
-      ).length;
-      const errorCount = componentLogs.filter(
-        (l) => l.status === "error",
-      ).length;
-
-      console.log(`\n📊 ${component.toUpperCase()}`);
-      console.log(`   Total Actions: ${componentLogs.length}`);
-      console.log(`   Success: ${successCount}, Errors: ${errorCount}`);
-      console.log(
-        `   Last Activity: ${new Date(componentLogs[componentLogs.length - 1]?.timestamp || 0).toLocaleTimeString()}`,
-      );
-    });
-
-    console.log(
-      "\n✅ VERIFICATION: Framework components are actively being used",
-    );
+    // Framework usage analytics - kept for debugging but could be made conditional
+    console.log("Framework usage rundown:", this.getRecentLogs(10));
   }
 }
 

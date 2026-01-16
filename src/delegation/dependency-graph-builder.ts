@@ -1,5 +1,5 @@
 /**
- * StringRay Framework v1.0.0 - Dependency Graph Builder
+ * StringRay AI v1.0.4 - Dependency Graph Builder
  *
  * Builds comprehensive dependency graphs for codebase analysis.
  * Tracks file relationships, import/export chains, and architectural dependencies.

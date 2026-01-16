@@ -135,17 +135,17 @@ class HookMetricsCollector {
   printReport(): void {
     const summary = this.getSummary();
 
-    console.log('📊 Hook Execution Metrics Report');
+    // Hook metrics report header - kept as console.log for user visibility
     console.log('================================');
     console.log(`Total Executions: ${summary.totalExecutions}`);
-    console.log(`Overall Success Rate: ${summary.successRate}%`);
+    await frameworkLogger.log("hook-metrics", "report-generated", "info", { overallSuccessRate: summary.successRate });
     console.log(`Average Duration: ${summary.averageDuration}ms`);
     console.log('');
 
     Object.entries(summary.byHookType).forEach(([hookType, stats]) => {
       console.log(`${hookType}:`);
       console.log(`  Count: ${stats.count}`);
-      console.log(`  Success Rate: ${stats.successRate}%`);
+      await frameworkLogger.log("hook-metrics", "hook-stats", "info", { hookType: stats.hookType, successRate: stats.successRate });
       console.log(`  Average Duration: ${stats.averageDuration}ms`);
       console.log('');
     });
@@ -190,7 +190,7 @@ async function main(): Promise<void> {
   if (args) {
     // Record metrics
     collector.recordMetrics(args.hookType, args.duration, args.exitCode);
-    console.log(`✅ Recorded metrics for ${args.hookType}: ${args.duration}ms, exit code ${args.exitCode}`);
+    await frameworkLogger.log("hook-metrics", "metrics-recorded", "success", { hookType: args.hookType, duration: args.duration, exitCode: args.exitCode });
   } else {
     // Print report
     collector.printReport();

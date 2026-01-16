@@ -12,6 +12,7 @@ import {
 } from "@modelcontextprotocol/sdk/types.js";
 import fs from "fs";
 import path from "path";
+import { frameworkLogger } from "../framework-logger.js";
 
 class StrRayStateManagerServer {
   private server: Server;
@@ -42,7 +43,7 @@ class StrRayStateManagerServer {
     this.loadState();
 
     this.setupToolHandlers();
-    console.log("StrRay State Manager MCP Server initialized");
+    frameworkLogger.log("mcps/state-manager", "initialize", "info");
   }
 
   private ensureStateDirectory() {
@@ -58,7 +59,9 @@ class StrRayStateManagerServer {
         const data = fs.readFileSync(this.stateFile, "utf8");
         const parsed = JSON.parse(data);
         this.state = new Map(Object.entries(parsed));
-        console.log(`Loaded ${this.state.size} state entries`);
+        frameworkLogger.log("mcps/state-manager", "load-state", "info", {
+      stateEntries: this.state.size,
+    });
       }
     } catch (error) {
       console.warn("Failed to load state file:", error);
@@ -679,7 +682,7 @@ ${results.repairedKeys.length > 0 ? `**Repaired Keys:**\n${results.repairedKeys.
   async run() {
     const transport = new StdioServerTransport();
     await this.server.connect(transport);
-    console.log("StrRay State Manager MCP Server started");
+    frameworkLogger.log("mcps/state-manager", "start", "success");
   }
 }
 

@@ -1,5 +1,5 @@
 /**
- * StringRay Framework v1.0.0 - Refactoring Logging Processor
+ * StringRay AI v1.0.4 - Refactoring Logging Processor
  *
  * Post-processor that automatically logs agent task completions to REFACTORING_LOG.md
  * for pattern analysis and continuous improvement.
@@ -228,7 +228,7 @@ ${this.summarizeResult(context.result)}
 
   private async appendToRefactoringLog(content: string): Promise<void> {
     const projectRoot = process.cwd();
-    const logPath = path.join(projectRoot, ".opencode", "REFACTORING_LOG.md");
+    const logPath = path.join(projectRoot, "logs", "agents", "refactoring-log.md");
 
     // Ensure directory exists
     const logDir = path.dirname(logPath);

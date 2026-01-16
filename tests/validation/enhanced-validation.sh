@@ -116,7 +116,7 @@ echo ""
 echo "⚙️ Framework Activation Validation:"
 
 # Check if framework has been activated recently
-LOG_FILE=".opencode/logs/framework-activity.log"
+LOG_FILE="logs/framework/activity.log"
 if [ -f "$LOG_FILE" ]; then
     # Check for activation success within last activation
     if grep -q "strray-activation.*activation completed successfully" "$LOG_FILE" 2>/dev/null; then

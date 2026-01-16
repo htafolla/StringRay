@@ -13,6 +13,7 @@ import {
 } from "@modelcontextprotocol/sdk/types.js";
 import * as fs from "fs";
 import * as path from "path";
+import { frameworkLogger } from "../../framework-logger.js";
 
 interface ProjectMetrics {
   totalFiles: number;
@@ -52,7 +53,7 @@ class StrRayProjectAnalysisServer {
     );
 
     this.setupToolHandlers();
-    console.log("StrRay Project Analysis MCP Server initialized");
+    // Server initialization - removed unnecessary startup logging
   }
 
   private setupToolHandlers() {
@@ -211,7 +212,7 @@ class StrRayProjectAnalysisServer {
   private async analyzeProjectStructure(args: any): Promise<any> {
     const { projectRoot, includeMetrics = true, maxDepth = 10 } = args;
 
-    console.log(`🔍 Analyzing project structure: ${projectRoot}`);
+    // Project analysis start - removed unnecessary operational logging
 
     const structure = this.analyzeDirectoryStructure(projectRoot, maxDepth);
     const metrics = includeMetrics
@@ -240,7 +241,7 @@ class StrRayProjectAnalysisServer {
   private async assessProjectComplexity(args: any): Promise<any> {
     const { projectRoot, includeBreakdown = true, focusAreas } = args;
 
-    console.log(`🧠 Assessing project complexity: ${projectRoot}`);
+    // Project complexity analysis - removed unnecessary operational logging
 
     const files = this.getProjectFiles(projectRoot);
     const complexityAnalysis = this.analyzeComplexity(files, focusAreas);
@@ -884,7 +885,7 @@ class StrRayProjectAnalysisServer {
   async run(): Promise<void> {
     const transport = new StdioServerTransport();
     await this.server.connect(transport);
-    console.log("StrRay Project Analysis MCP Server started");
+    await frameworkLogger.log("mcp-project-analysis", "server-started", "success");
   }
 }
 

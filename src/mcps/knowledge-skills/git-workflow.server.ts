@@ -11,6 +11,7 @@ import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
+import { frameworkLogger } from "../../framework-logger.js";
 
 class StrRayGitWorkflowServer {
   private server: Server;
@@ -29,7 +30,7 @@ class StrRayGitWorkflowServer {
     );
 
     this.setupToolHandlers();
-    console.log("StrRay Git Workflow MCP Server initialized");
+    // Server initialization - removed unnecessary startup logging
   }
 
   private setupToolHandlers() {
@@ -122,7 +123,7 @@ class StrRayGitWorkflowServer {
   async run(): Promise<void> {
     const transport = new StdioServerTransport();
     await this.server.connect(transport);
-    console.log("StrRay Git Workflow MCP Server started");
+    // Server startup - removed unnecessary startup logging
   }
 }
 

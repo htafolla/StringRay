@@ -1,6 +1,6 @@
 {
   "version": "1.2.24",
-  "lastUpdated": "2026-01-13",
+  "lastUpdated": "2026-01-15",
   "errorPreventionTarget": 0.996,
   "terms": {
     "1": {
@@ -400,6 +400,46 @@
       "title": "Architecture Review Requirements",
       "description": "All new components, features, and architectural changes require formal architecture review. Reviews must validate: System integration impact assessment, Cross-cutting concern compliance, Performance and scalability implications, Security consideration completeness, Maintenance and extensibility evaluation, Alignment with overall system architecture. Reviews must be conducted before implementation begins",
       "category": "architectural",
+      "zeroTolerance": true,
+      "enforcementLevel": "blocking"
+    },
+    "46": {
+      "number": 46,
+      "title": "System Integrity Cross-Check",
+      "description": "All framework components must validate their integration with dependent systems during initialization. Critical components must implement integrity checks that verify: All required dependencies are available and functional, Integration interfaces work correctly, Component state is consistent across execution contexts (boot, plugin, runtime), Cross-context dependencies are properly shared, Automated remediation attempts missing components, Comprehensive logging of integration status and failures",
+      "category": "architectural",
+      "zeroTolerance": true,
+      "enforcementLevel": "blocking"
+    },
+    "47": {
+      "number": 47,
+      "title": "Integration Testing Mandate",
+      "description": "All new features and components must include integration tests using real dependencies, not mocks. Integration tests must validate: End-to-end functionality across component boundaries, Cross-context interactions (boot/plugin/runtime), Real dependency injection and resolution, Environment-specific behavior validation, Performance impact on integrated systems. Mock-based tests are insufficient for integration validation",
+      "category": "architectural",
+      "zeroTolerance": true,
+      "enforcementLevel": "blocking"
+    },
+    "48": {
+      "number": 48,
+      "title": "Path Resolution Abstraction",
+      "description": "All file and module paths must use abstracted resolution systems, never hardcoded paths. Path resolution must support: Multiple execution environments (development/build/deployed), Cross-platform compatibility (Windows/macOS/Linux), Dynamic path construction based on runtime context, Centralized path management systems, Automatic fallback mechanisms for path resolution failures",
+      "category": "architectural",
+      "zeroTolerance": true,
+      "enforcementLevel": "blocking"
+    },
+    "49": {
+      "number": 49,
+      "title": "Feature Completeness Validation",
+      "description": "No feature is considered complete until it passes comprehensive integration validation. Features must demonstrate: Full integration with dependent systems, Functional end-to-end workflows, Cross-environment compatibility, Performance within acceptable budgets, Documentation completeness, Test coverage including integration scenarios. Partial implementations are not permitted",
+      "category": "architectural",
+      "zeroTolerance": true,
+      "enforcementLevel": "blocking"
+    },
+    "51": {
+      "number": 51,
+      "title": "Self-Evolution Safety Framework",
+      "description": "Autonomous self-improvement systems must implement comprehensive safety mechanisms: Version consistency across all codex references, Learning rate limits to prevent destabilization, Human oversight gates for major changes, Causal inference confidence thresholds, Progressive escalation for trend monitoring, Automated remediation with rollback capabilities, Continuous validation of self-modification safety",
+      "category": "self-evolution",
       "zeroTolerance": true,
       "enforcementLevel": "blocking"
     }

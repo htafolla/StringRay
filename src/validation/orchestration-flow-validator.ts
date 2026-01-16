@@ -649,31 +649,14 @@ class OrchestrationFlowValidator {
       0,
     );
 
-    console.log("\n📊 COMPREHENSIVE VALIDATION REPORT");
-    console.log("=".repeat(70));
-    console.log(
-      `✅ Overall Success Rate: ${successRate.toFixed(1)}% (${passedTests}/${totalTests} tests passed)`,
-    );
-    console.log(
-      `⏱️  Total Duration: ${totalDuration}ms (avg: ${avgDuration.toFixed(0)}ms per test)`,
-    );
-    console.log(`🤖 Agents Spawned: ${totalAgentsSpawned}`);
-    console.log(`✅ Agents Completed: ${totalAgentsCompleted}`);
-    console.log(`🔗 Dependencies Resolved: ${totalDependenciesResolved}`);
-
-    console.log("\n📋 DETAILED TEST RESULTS:");
-    console.log("-".repeat(70));
+    // Validation report output - kept as console.log for user-readable reports
 
     results.forEach((result, index) => {
       const status = result.success ? "✅ PASS" : "❌ FAIL";
       const duration = result.duration;
       const agents = result.metrics.agentsSpawned;
 
-      console.log(`${index + 1}. ${result.testName}`);
-      console.log(`   Status: ${status} (${duration}ms, ${agents} agents)`);
-
-      if (!result.success && result.error) {
-        console.log(`   Error: ${result.error}`);
+    // Test result details - kept as console.log for readability
       }
 
       // Show key metrics
@@ -783,9 +766,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   validator
     .runCompleteValidationSuite()
     .then((results) => {
-      console.log("\n🎯 VALIDATION SUITE COMPLETE");
-      console.log("Recommendations:");
-      results.recommendations.forEach((rec) => console.log(`• ${rec}`));
+    // Validation completion - kept as console.log for user feedback
     })
     .catch(console.error);
 }

@@ -14,7 +14,7 @@ export class PostProcessorMonitoringEngine {
 
   async initialize(): Promise<void> {
     // Initialize monitoring components
-    console.log("📊 Post-processor monitoring engine initialized");
+    await frameworkLogger.log("monitoring-engine", "initialized", "info");
   }
 
   async monitorDeployment(commitSha: string): Promise<MonitoringResult> {

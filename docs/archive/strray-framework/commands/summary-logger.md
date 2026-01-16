@@ -73,8 +73,8 @@ fi
 
 # Validate REFACTORING_LOG.md exists
 
-if [ ! -f ".opencode/REFACTORING_LOG.md" ]; then
-echo "❌ .opencode/REFACTORING_LOG.md not found"
+if [ ! -f "logs/agents/refactoring-log.md" ]; then
+echo "❌ logs/agents/refactoring-log.md not found"
 exit 1
 fi
 
@@ -103,7 +103,7 @@ _This entry was automatically logged by the StrRay Framework summary logging sys
 
 # Append to REFACTORING_LOG.md
 
-echo "$LOG_ENTRY" >> .opencode/REFACTORING_LOG.md
+echo "$LOG_ENTRY" >> logs/agents/refactoring-log.md
 
-echo "✅ Summary successfully logged to .opencode/REFACTORING_LOG.md"
+echo "✅ Summary successfully logged to logs/agents/refactoring-log.md"
 echo "📊 Entry added with timestamp: $(date '+%Y-%m-%d %H:%M:%S')"

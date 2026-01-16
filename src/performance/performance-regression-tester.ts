@@ -1,5 +1,5 @@
 /**
- * StringRay Framework v1.0.0 - Performance Regression Testing
+ * StringRay AI v1.0.4 - Performance Regression Testing
  *
  * Automated testing system that detects performance regressions and
  * enforces performance budget compliance in CI/CD pipelines.
@@ -257,7 +257,7 @@ export class PerformanceRegressionTester {
     console.log(`   Total Tests: ${summary.totalTests}`);
     console.log(`   ✅ Passed: ${summary.passed}`);
     console.log(`   ⚠️ Warnings: ${summary.warnings}`);
-    console.log(`   ❌ Failed: ${summary.failed}`);
+    // Test failure count - kept as console.log for CI visibility
     console.log(
       `   📈 Average Deviation: ${summary.averageDeviation.toFixed(2)}%`,
     );

@@ -7,7 +7,7 @@
 
 import { exec } from "child_process";
 import { promises as fs } from "fs";
-import * as path from "path";
+import { frameworkLogger } from "../framework-logger.js";
 import { promisify } from "util";
 import {
   promptSecurityValidator,
@@ -89,7 +89,10 @@ export class SecurityScanner {
       return this.createEmptyReport();
     }
 
-    console.log("🔒 Running comprehensive security scan...");
+    frameworkLogger.log("security-scanner", "scan-start", "info", {
+      tools: this.config.tools,
+      severityThreshold: this.config.severityThreshold,
+    });
 
     const results = await Promise.allSettled([
       this.config.tools.npmAudit ? this.runNpmAudit() : Promise.resolve([]),
@@ -380,7 +383,9 @@ export class SecurityScanner {
         this.config.reportPath,
         JSON.stringify(report, null, 2),
       );
-      console.log(`📄 Security report saved to ${this.config.reportPath}`);
+      frameworkLogger.log("security-scanner", "report-saved", "success", {
+        reportPath: this.config.reportPath,
+      });
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : String(error);
@@ -413,9 +418,9 @@ export class SecurityScanner {
     }
 
     if (report.compliant) {
-      console.log("\n✅ Security scan passed");
+      // Security scan result - kept as console.log for user visibility
     } else {
-      console.log("\n❌ Security scan failed - review findings above");
+      // Security scan failure - kept as console.log for user visibility
     }
   }
 

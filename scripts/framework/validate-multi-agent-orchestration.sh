@@ -164,14 +164,14 @@ node -e "
 # Test 6: Framework Boot Integration
 echo ""
 echo "6️⃣ Testing Framework Boot Integration..."
-if [ -f ".opencode/logs/framework-activity.log" ]; then
-    if grep -q "agent-delegator" .opencode/logs/framework-activity.log; then
+if [ -f "logs/framework/activity.log" ]; then
+    if grep -q "agent-delegator" logs/framework/activity.log; then
         echo "✅ Agent delegator integrated with framework boot"
     else
         echo "❌ Agent delegator not found in framework logs"
     fi
 
-    if grep -q "multi-agent" .opencode/logs/framework-activity.log; then
+    if grep -q "multi-agent" logs/framework/activity.log; then
         echo "✅ Multi-agent orchestration active in framework"
     else
         echo "❌ Multi-agent orchestration not active"

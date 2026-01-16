@@ -1,5 +1,5 @@
 /**
- * StringRay Framework v1.0.0 - Infrastructure as Code Validation System
+ * StringRay AI v1.0.4 - Infrastructure as Code Validation System
  *
  * Comprehensive IaC validation with schema enforcement, pre-commit hooks,
  * and automated CI/CD integration for enterprise-grade cloud deployments.

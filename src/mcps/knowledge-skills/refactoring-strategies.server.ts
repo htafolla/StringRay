@@ -68,7 +68,7 @@ class StrRayRefactoringStrategiesServer {
     );
 
     this.setupToolHandlers();
-    console.log("StrRay Refactoring Strategies MCP Server initialized");
+    // Server initialization - removed unnecessary startup logging
   }
 
   private setupToolHandlers() {

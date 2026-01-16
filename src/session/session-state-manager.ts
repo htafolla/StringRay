@@ -1,5 +1,5 @@
 /**
- * StringRay Framework v1.0.0 - Session State Manager
+ * StringRay AI v1.0.4 - Session State Manager
  *
  * Manages cross-session state sharing, dependency tracking,
  * and coordination for complex workflows.
@@ -10,6 +10,7 @@
 
 import { StringRayStateManager } from "../state/state-manager";
 import { SessionCoordinator } from "../delegation/session-coordinator";
+import { frameworkLogger } from "../framework-logger";
 
 export interface SessionDependency {
   sessionId: string;
@@ -91,9 +92,7 @@ export class SessionStateManager {
         "state_manager",
       );
 
-      console.log(
-        `🔄 Session State Manager: Shared state '${key}' from ${fromSessionId} to ${toSessionId}`,
-      );
+      frameworkLogger.log("session-state-manager", "state-shared", "info", { fromSessionId, toSessionId, key });
       return true;
     } catch (error) {
       console.error(`❌ Session State Manager: Failed to share state:`, error);
@@ -118,9 +117,7 @@ export class SessionStateManager {
       }
     }
 
-    console.log(
-      `📢 Session State Manager: Broadcasted '${key}' to ${successCount}/${targetSessionIds.length} sessions`,
-    );
+    frameworkLogger.log("session-state-manager", "state-broadcasted", "info", { key, successCount, totalCount: targetSessionIds.length });
     return successCount;
   }
 
@@ -161,9 +158,7 @@ export class SessionStateManager {
     this.dependencies.set(sessionId, dependency);
     this.persistDependencies();
 
-    console.log(
-      `🔗 Session State Manager: Registered dependency for ${sessionId} on ${dependsOn.join(", ")}`,
-    );
+    frameworkLogger.log("session-state-manager", "dependency-registered", "info", { sessionId, dependsOn });
   }
 
   /**
@@ -182,9 +177,7 @@ export class SessionStateManager {
         this.propagateDependencyUpdate(sessionId, state);
       }
 
-      console.log(
-        `🔄 Session State Manager: Updated ${sessionId} dependency state to ${state}`,
-      );
+      frameworkLogger.log("session-state-manager", "dependency-state-updated", "info", { sessionId, state });
     }
   }
 
@@ -246,9 +239,7 @@ export class SessionStateManager {
       );
     }
 
-    console.log(
-      `👥 Session State Manager: Created group ${groupId} with ${sessionIds.length} sessions`,
-    );
+    frameworkLogger.log("session-state-manager", "session-group-created", "info", { groupId, sessionCount: sessionIds.length });
     return group;
   }
 
@@ -278,9 +269,7 @@ export class SessionStateManager {
         );
       }
 
-      console.log(
-        `👥 Session State Manager: Updated group ${groupId} state to ${state}`,
-      );
+      frameworkLogger.log("session-state-manager", "session-group-state-updated", "info", { groupId, state });
     }
   }
 
@@ -357,9 +346,7 @@ export class SessionStateManager {
       ],
     };
 
-    console.log(
-      `📋 Session State Manager: Planned migration for ${sessionId} to ${targetCoordinator}`,
-    );
+    frameworkLogger.log("session-state-manager", "migration-planned", "info", { sessionId, targetCoordinator });
     return plan;
   }
 
@@ -470,9 +457,7 @@ export class SessionStateManager {
     const rollbackData: any[] = [];
 
     try {
-      console.log(
-        `🚀 Session State Manager: Executing migration for ${plan.sessionId}`,
-      );
+      frameworkLogger.log("session-state-manager", "migration-executing", "info", { sessionId: plan.sessionId });
 
       for (const step of plan.migrationSteps) {
         console.log(`  → Executing step: ${step}`);
@@ -589,9 +574,7 @@ export class SessionStateManager {
         }
       }
 
-      console.log(
-        `✅ Session State Manager: Migration completed for ${plan.sessionId}`,
-      );
+      frameworkLogger.log("session-state-manager", "migration-completed", "success", { sessionId: plan.sessionId });
       return true;
     } catch (error) {
       console.error(
@@ -622,9 +605,7 @@ export class SessionStateManager {
     this.failoverConfigs.set(sessionId, config);
     this.persistFailoverConfigs();
 
-    console.log(
-      `🛡️ Session State Manager: Configured failover for ${sessionId} with ${backupCoordinators.length} backups`,
-    );
+    frameworkLogger.log("session-state-manager", "failover-configured", "info", { sessionId, backupCount: backupCoordinators.length });
   }
 
   /**
@@ -640,9 +621,7 @@ export class SessionStateManager {
       try {
         const plan = this.planMigration(sessionId, backupCoordinator);
         if (await this.executeMigration(plan)) {
-          console.log(
-            `🛡️ Session State Manager: Failover successful for ${sessionId} to ${backupCoordinator}`,
-          );
+          frameworkLogger.log("session-state-manager", "failover-successful", "success", { sessionId, backupCoordinator });
           return true;
         }
       } catch (error) {
@@ -770,7 +749,7 @@ export class SessionStateManager {
   }
 
   shutdown(): void {
-    console.log("🛑 Session State Manager: Shutdown complete");
+    frameworkLogger.log("session-state-manager", "shutdown-complete", "info");
   }
 }
 

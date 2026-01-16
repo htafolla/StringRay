@@ -1,5 +1,5 @@
 /**
- * StringRay Framework v1.0.0 - Live Metrics Collector
+ * StringRay AI v1.0.4 - Live Metrics Collector
  *
  * Real-time metrics collection engine for performance dashboards.
  * Collects, aggregates, and streams metrics from multiple sources.
@@ -196,10 +196,10 @@ export class LiveMetricsCollector extends EventEmitter {
       return;
     }
 
-    console.log("📊 Starting Live Metrics Collector");
-    console.log(`   Collection Interval: ${this.config.collectionInterval}ms`);
-    console.log(`   Max Buffer Size: ${this.config.maxBufferSize}`);
-    console.log(`   Sources: ${this.sources.size}`);
+    // Live metrics startup - kept as console.log for user visibility
+    // Collection interval - kept as console.log for user visibility
+    // Max buffer size - kept as console.log for user visibility
+    // Sources count - kept as console.log for user visibility
 
     this.isCollecting = true;
 
@@ -235,7 +235,7 @@ export class LiveMetricsCollector extends EventEmitter {
     }
     this.collectionTimers.clear();
 
-    console.log("🛑 Stopped Live Metrics Collector");
+    // Live metrics stop - kept as console.log for user visibility
     this.emit("stopped");
   }
 
@@ -732,7 +732,7 @@ export class LiveMetricsCollector extends EventEmitter {
 
       const removed = initialLength - this.metricsBuffer.length;
       if (removed > 0) {
-        console.log(`🧹 Cleaned up ${removed} old metrics from buffer`);
+        await frameworkLogger.log("live-metrics-collector", "buffer-cleaned", "info", { metricsRemoved: removed });
         this.stats.bufferSize = this.metricsBuffer.length;
       }
     }, 60000); // Clean up every minute
@@ -893,7 +893,7 @@ export class LiveMetricsCollector extends EventEmitter {
    */
   updateConfig(newConfig: Partial<MetricsCollectionConfig>): void {
     this.config = { ...this.config, ...newConfig };
-    console.log("⚙️ Live Metrics Collector configuration updated");
+    await frameworkLogger.log("live-metrics-collector", "config-updated", "info");
     this.emit("config-updated", { ...this.config });
   }
 }

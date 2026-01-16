@@ -1,48 +1,8 @@
 {
-  "version": "2.14.0",
   "model": "opencode/grok-code",
-
-  "settings": {
-    "theme": "auto",
-    "maxConcurrentAgents": 5,
-    "multi_agent_orchestration": {
-      "enabled": true,
-      "max_concurrent_agents": 5,
-      "coordination_model": "async-multi-agent"
-    },
-    "relentlessExecution": true,
-    "errorTolerance": 0,
-    "performanceBudget": {
-      "bundleSizeKb": 2048,
-      "responseTimeMs": 2000,
-      "memoryUsageMb": 512
-    },
-    "security": {
-      "inputValidation": true,
-      "sanitizeData": true,
-      "auditLogging": true
-    }
-  },
-  "hooks": {
-    "preCommit": ["lint", "test", "security-scan"],
-    "postCommit": ["deploy-preview"],
-    "onError": ["notify-team", "log-error"]
-  },
-  "integrations": {
-    "github": true,
-    "slack": false,
-    "datadog": false
-  },
-
-  "plugin": ["oh-my-opencode", "dist/plugin/plugins/stringray-codex-injection.js"],
-  "claude_code": {
-    "mcp": true,
-    "commands": true,
-    "skills": true,
-    "agents": true,
-    "hooks": true,
-    "plugins": true
-  },
+  "plugin": [
+    "stringray/dist/plugin/stringray-codex-injection.js"
+  ],
   "agent": {
     "orchestrator": {
       "model": "opencode/grok-code"
@@ -70,24 +30,21 @@
     },
     "refactorer": {
       "model": "opencode/grok-code"
-    },
-    "librarian": {
-      "model": "opencode/grok-code"
-    },
-    "explore": {
-      "model": "opencode/grok-code"
-    },
-    "oracle": {
-      "model": "opencode/grok-code"
-    },
-    "frontend-ui-ux-engineer": {
-      "model": "opencode/grok-code"
-    },
-    "document-writer": {
-      "model": "opencode/grok-code"
-    },
-    "multimodal-looker": {
-      "model": "opencode/grok-code"
     }
+  },
+  "settings": {
+    "multi_agent_orchestration": {
+      "enabled": true,
+      "max_concurrent_agents": 5,
+      "coordination_model": "async-multi-agent"
+    }
+  },
+  "claude_code": {
+    "mcp": true,
+    "commands": true,
+    "skills": true,
+    "agents": true,
+    "hooks": true,
+    "plugins": true
   }
 }

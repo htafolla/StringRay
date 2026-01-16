@@ -1,5 +1,5 @@
 /**
- * StringRay Framework v1.0.0 - Enterprise Monitoring System
+ * StringRay AI v1.0.4 - Enterprise Monitoring System
  *
  * Comprehensive enterprise-scale monitoring and health check system.
  * Supports distributed deployments, auto-scaling, and production monitoring.
@@ -261,7 +261,7 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
       return;
     }
 
-    console.log("🚀 Starting Enterprise Monitoring System...");
+    // System startup - removed redundant startup logging (already logged elsewhere)
     console.log(`   Instance ID: ${this.instanceId}`);
     console.log(`   Collection Interval: ${this.config.collectionInterval}ms`);
     console.log(
@@ -293,7 +293,7 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
     // Start data cleanup
     this.startDataCleanup();
 
-    console.log("✅ Enterprise Monitoring System started successfully");
+    // System started - removed redundant startup logging
     this.emit("started");
   }
 
@@ -305,7 +305,7 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
       return;
     }
 
-    console.log("⏹️ Stopping Enterprise Monitoring System...");
+    // System stopping - removed redundant shutdown logging
     this.isRunning = false;
 
     if (this.collectionTimer) {
@@ -323,7 +323,7 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
       this.cleanupTimer = undefined;
     }
 
-    console.log("✅ Enterprise Monitoring System stopped");
+    // System stopped - removed redundant shutdown logging
     this.emit("stopped");
   }
 
@@ -705,19 +705,19 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
     // Prometheus integration
     if (this.config.integrations.prometheus?.enabled) {
       // Send metric to Prometheus pushgateway
-      console.log(`📊 Prometheus: ${alert.metric} = ${alert.value}`);
+      await frameworkLogger.log("enterprise-monitoring", "prometheus-alert", "warning", { metric: alert.metric, value: alert.value });
     }
 
     // DataDog integration
     if (this.config.integrations.datadog?.enabled) {
       // Send event to DataDog
-      console.log(`🐕 DataDog: Alert ${alert.id} - ${alert.message}`);
+      await frameworkLogger.log("enterprise-monitoring", "datadog-alert", "warning", { alertId: alert.id, message: alert.message });
     }
 
     // New Relic integration
     if (this.config.integrations.newRelic?.enabled) {
       // Send event to New Relic
-      console.log(`📈 New Relic: Alert ${alert.id} - ${alert.message}`);
+      await frameworkLogger.log("enterprise-monitoring", "newrelic-alert", "warning", { alertId: alert.id, message: alert.message });
     }
   }
 
@@ -943,7 +943,7 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
   }
 
   private handleReportGenerated(reportPath: string): void {
-    console.log(`📊 Performance report generated: ${reportPath}`);
+    await frameworkLogger.log("enterprise-monitoring", "performance-report-generated", "info", { reportPath });
   }
 
   /**
@@ -980,7 +980,7 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
     if (alert && !alert.resolved) {
       alert.resolved = true;
       alert.resolvedAt = Date.now();
-      console.log(`✅ Alert resolved: ${alert.message}`);
+      await frameworkLogger.log("enterprise-monitoring", "alert-resolved", "success", { message: alert.message });
       return true;
     }
     return false;

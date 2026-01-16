@@ -300,7 +300,7 @@ const report = await reportingSystem.generateCustomReport('${template.name}');
     timeRange?: ReportConfig["timeRange"],
   ): Promise<any[]> {
     const logs: any[] = [];
-    const logDir = path.join(process.cwd(), ".opencode", "logs");
+    const logDir = path.join(process.cwd(), "logs", "framework");
 
     if (!fs.existsSync(logDir)) return logs;
 
@@ -408,7 +408,7 @@ const report = await reportingSystem.generateCustomReport('${template.name}');
   ): Promise<any[]> {
     const logs: any[] = [];
     const logDir = path.join(process.cwd(), ".opencode", "logs");
-    const logFile = path.join(logDir, "framework-activity.log");
+    const logFile = path.join(logDir, "activity.log");
 
     try {
       const fs = await import("fs");
@@ -947,7 +947,7 @@ ${data.recommendations.map((rec) => `- ${rec}`).join("\n")}
 - **Error Prevention**: Systematic validation preventing runtime failures
 
 ### Framework Status: PRODUCTION READY 🚀
-**StringRay Framework v1.0.0** is fully operational with:
+**StringRay AI v1.0.4** is fully operational with:
 - ✅ Complete agent-MCP integration
 - ✅ Architectural integrity validation
 - ✅ Enterprise-grade logging and monitoring

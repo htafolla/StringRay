@@ -259,7 +259,7 @@ ${postResults.auditEntries
             text: `📚 Codex Validation Results
 
 **Content Validated:** ${content.length} characters
-**Terms Checked:** ${terms.length === 1 && terms[0] === "all" ? "All 43 terms" : terms.length}
+**Terms Checked:** ${terms.length === 1 && terms[0] === "all" ? "All 50-terms" : terms.length}
 **Compliance:** ${validationResults.compliance}%
 
 **Violations:** ${validationResults.violations.length}

@@ -63,7 +63,7 @@ export class AutoFixEngine {
 
           console.log(`✅ Fix applied successfully: ${fix.description}`);
         } else {
-          console.log(`❌ Fix failed: ${fix.description} - ${result.error}`);
+          await frameworkLogger.log("auto-fix-engine", "fix-failed", "error", { description: fix.description, error: result.error });
         }
       } catch (error) {
         console.log(`❌ Fix error: ${fix.description} - ${error}`);
@@ -279,7 +279,7 @@ export class AutoFixEngine {
       console.log("✅ Fix validation passed");
       return true;
     } catch (error) {
-      console.log("❌ Fix validation failed");
+      await frameworkLogger.log("auto-fix-engine", "validation-failed", "error");
       return false;
     }
   }

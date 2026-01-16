@@ -1,5 +1,5 @@
 /**
- * StringRay Framework v1.0.0 - Enterprise Monitoring System
+ * StringRay AI v1.0.4 - Enterprise Monitoring System
  *
  * Comprehensive enterprise-scale monitoring and health check system.
  * Supports distributed deployments, auto-scaling, and production monitoring.
@@ -11,6 +11,7 @@ import { EventEmitter } from "events";
 import * as os from "os";
 import { performance } from "perf_hooks";
 import { advancedProfiler } from "./advanced-profiler.js";
+import { frameworkLogger } from "../framework-logger.js";
 /**
  * Enterprise monitoring and health check system
  */
@@ -79,12 +80,11 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
     if (this.isRunning) {
       return;
     }
-    console.log("🚀 Starting Enterprise Monitoring System...");
-    console.log(`   Instance ID: ${this.instanceId}`);
-    console.log(`   Collection Interval: ${this.config.collectionInterval}ms`);
-    console.log(
-      `   Health Check Interval: ${this.config.healthChecks.interval}ms`,
-    );
+    frameworkLogger.log("enterprise-monitoring", "start", "Starting Enterprise Monitoring System", {
+      instanceId: this.instanceId,
+      collectionInterval: this.config.collectionInterval,
+      healthCheckInterval: this.config.healthChecks.interval,
+    });
     this.isRunning = true;
     // Initial data collection
     await this.collectMetrics();
@@ -105,7 +105,10 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
     }
     // Start data cleanup
     this.startDataCleanup();
-    console.log("✅ Enterprise Monitoring System started successfully");
+    frameworkLogger.log("enterprise-monitoring", "start", "Enterprise Monitoring System started successfully", {
+      status: "running",
+      instanceId: this.instanceId,
+    });
     this.emit("started");
   }
   /**
@@ -115,7 +118,9 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
     if (!this.isRunning) {
       return;
     }
-    console.log("⏹️ Stopping Enterprise Monitoring System...");
+    frameworkLogger.log("enterprise-monitoring", "stop", "Stopping Enterprise Monitoring System", {
+      instanceId: this.instanceId,
+    });
     this.isRunning = false;
     if (this.collectionTimer) {
       clearInterval(this.collectionTimer);
@@ -129,7 +134,10 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
       clearInterval(this.cleanupTimer);
       this.cleanupTimer = undefined;
     }
-    console.log("✅ Enterprise Monitoring System stopped");
+    frameworkLogger.log("enterprise-monitoring", "stop", "Enterprise Monitoring System stopped", {
+      status: "stopped",
+      instanceId: this.instanceId,
+    });
     this.emit("stopped");
   }
   /**
@@ -451,17 +459,30 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
     // Prometheus integration
     if (this.config.integrations.prometheus?.enabled) {
       // Send metric to Prometheus pushgateway
-      console.log(`📊 Prometheus: ${alert.metric} = ${alert.value}`);
+      frameworkLogger.log("enterprise-monitoring", "external-alert", "Alert sent to Prometheus", {
+        alertId: alert.id,
+        metric: alert.metric,
+        value: alert.value,
+        instanceId: this.instanceId,
+      });
     }
     // DataDog integration
     if (this.config.integrations.datadog?.enabled) {
       // Send event to DataDog
-      console.log(`🐕 DataDog: Alert ${alert.id} - ${alert.message}`);
+      frameworkLogger.log("enterprise-monitoring", "external-alert", "Alert sent to DataDog", {
+        alertId: alert.id,
+        message: alert.message,
+        instanceId: this.instanceId,
+      });
     }
     // New Relic integration
     if (this.config.integrations.newRelic?.enabled) {
       // Send event to New Relic
-      console.log(`📈 New Relic: Alert ${alert.id} - ${alert.message}`);
+      frameworkLogger.log("enterprise-monitoring", "external-alert", "Alert sent to New Relic", {
+        alertId: alert.id,
+        message: alert.message,
+        instanceId: this.instanceId,
+      });
     }
   }
   /**
@@ -598,14 +619,25 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
     this.alerts = this.alerts.filter(
       (a) => !a.resolved || a.timestamp > cutoffTime,
     );
-    console.log("🧹 Cleaned up old monitoring data");
+    frameworkLogger.log("enterprise-monitoring", "cleanup", "Cleaned up old monitoring data", {
+      metricsCleaned: this.metrics.length,
+      alertsCleaned: this.alerts.length,
+      healthResultsCleaned: this.healthResults.length,
+    });
   }
   /**
    * Event handlers
    */
   handleAlertTriggered(alert) {
-    console.log(`🚨 Alert [${alert.severity.toUpperCase()}]: ${alert.message}`);
-    console.log(`[SECURITY] Performance alert triggered: ${alert.message}`);
+    frameworkLogger.log("enterprise-monitoring", "alert-triggered", "Alert triggered", {
+      alertId: alert.id,
+      severity: alert.severity,
+      message: alert.message,
+      metric: alert.metric,
+      value: alert.value,
+      threshold: alert.threshold,
+      instanceId: alert.instanceId,
+    });
   }
   handleHealthCheckFailed(result) {
     console.warn(
@@ -665,7 +697,10 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
     this.emit("alert-triggered", alert);
   }
   handleReportGenerated(reportPath) {
-    console.log(`📊 Performance report generated: ${reportPath}`);
+    frameworkLogger.log("enterprise-monitoring", "report-generated", "Performance report generated", {
+      reportPath,
+      instanceId: this.instanceId,
+    });
   }
   /**
    * Get current metrics
@@ -698,7 +733,11 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
     if (alert && !alert.resolved) {
       alert.resolved = true;
       alert.resolvedAt = Date.now();
-      console.log(`✅ Alert resolved: ${alert.message}`);
+      frameworkLogger.log("enterprise-monitoring", "alert-resolved", "Alert resolved", {
+        alertId: alertId,
+        message: alert.message,
+        resolvedAt: alert.resolvedAt,
+      });
       return true;
     }
     return false;
@@ -715,7 +754,11 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
       health: [],
     };
     this.clusterNodes.set(node.id, clusterNode);
-    console.log(`➕ Added cluster node: ${node.id} (${node.hostname})`);
+    frameworkLogger.log("enterprise-monitoring", "cluster-node-added", "Added cluster node", {
+      nodeId: node.id,
+      hostname: node.hostname,
+      instanceId: this.instanceId,
+    });
   }
   /**
    * Update cluster node heartbeat
@@ -796,16 +839,19 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
    */
   updateConfig(newConfig) {
     this.config = { ...this.config, ...newConfig };
-    console.log("⚙️ Monitoring system configuration updated");
+    frameworkLogger.log("enterprise-monitoring", "config-updated", "Monitoring system configuration updated", {
+      instanceId: this.instanceId,
+    });
   }
   /**
    * Record a custom metric
    */
   recordMetric(name, value, tags) {
-    console.log(`📊 Metric recorded: ${name}`, {
+    frameworkLogger.log("enterprise-monitoring", "metric-recorded", "Metric recorded", {
+      metricName: name,
       value,
       tags,
-      timestamp: new Date().toISOString(),
+      instanceId: this.instanceId,
     });
     // In a real implementation, this would store metrics for analysis
   }

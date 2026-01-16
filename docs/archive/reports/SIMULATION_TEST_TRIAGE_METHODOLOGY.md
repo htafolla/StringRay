@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document outlines the comprehensive triage methodology implemented to systematically identify, analyze, and resolve all failing simulation tests in the StrRay Framework v1.0.0. The triage process was initiated following the detection of widespread test failures across the codex rule simulation suite, affecting 45+ codex terms and multiple agent personas.
+This document outlines the comprehensive triage methodology implemented to systematically identify, analyze, and resolve all failing simulation tests in the StringRay AI v1.0.4. The triage process was initiated following the detection of widespread test failures across the codex rule simulation suite, affecting 45+ codex terms and multiple agent personas.
 
 ## Executive Summary
 

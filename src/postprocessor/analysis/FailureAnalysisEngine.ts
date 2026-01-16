@@ -3,6 +3,7 @@
  */
 
 import { FailureAnalysis, SuggestedFix, MonitoringResult } from "../types.js";
+import { frameworkLogger } from "../../framework-logger.js";
 
 export class FailureAnalysisEngine {
   constructor() {
@@ -323,6 +324,6 @@ export class FailureAnalysisEngine {
   private initializeAnalysisPatterns(): void {
     // Initialize patterns for failure classification
     // This could be expanded with more sophisticated pattern matching
-    console.log("🔍 Failure analysis patterns initialized");
+    frameworkLogger.log("failure-analysis", "patterns-initialized", "info");
   }
 }

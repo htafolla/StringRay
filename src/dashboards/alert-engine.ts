@@ -1,5 +1,5 @@
 /**
- * StringRay Framework v1.0.0 - Alert Engine
+ * StringRay AI v1.0.4 - Alert Engine
  *
  * Advanced alert management system for performance dashboards.
  * Handles alert generation, escalation, notification, and lifecycle management.
@@ -273,9 +273,9 @@ export class AlertEngine extends EventEmitter {
       return;
     }
 
-    console.log("🚨 Starting Alert Engine");
-    console.log(`   Rules: ${this.rules.size}`);
-    console.log(`   Max Active Alerts: ${this.config.maxActiveAlerts}`);
+    // Alert engine startup - kept as console.log for user visibility
+    // Rules count - kept as console.log for user visibility
+    // Max alerts - kept as console.log for user visibility
     console.log(
       `   Anomaly Detection: ${this.config.anomalyDetection.enabled ? "enabled" : "disabled"}`,
     );
@@ -301,7 +301,7 @@ export class AlertEngine extends EventEmitter {
     }
     this.escalationTimers.clear();
 
-    console.log("🛑 Stopped Alert Engine");
+    // Alert engine stop - kept as console.log for user visibility
     this.emit("stopped");
   }
 
@@ -566,7 +566,7 @@ export class AlertEngine extends EventEmitter {
     channel: NotificationChannel,
     alert: Alert,
   ): void {
-    console.log(`📧 Email notification: ${alert.title} - ${alert.description}`);
+    await frameworkLogger.log("alert-engine", "email-notification", "info", { alertTitle: alert.title, alertDescription: alert.description });
     // Implementation would integrate with email service
   }
 
@@ -577,7 +577,7 @@ export class AlertEngine extends EventEmitter {
     channel: NotificationChannel,
     alert: Alert,
   ): void {
-    console.log(`💬 Slack notification: ${alert.title} - ${alert.description}`);
+    await frameworkLogger.log("alert-engine", "slack-notification", "info", { alertTitle: alert.title, alertDescription: alert.description });
     // Implementation would integrate with Slack API
   }
 
@@ -601,7 +601,7 @@ export class AlertEngine extends EventEmitter {
     channel: NotificationChannel,
     alert: Alert,
   ): void {
-    console.log(`📱 SMS notification: ${alert.title} - ${alert.description}`);
+    await frameworkLogger.log("alert-engine", "sms-notification", "info", { alertTitle: alert.title, alertDescription: alert.description });
     // Implementation would integrate with SMS service
   }
 
@@ -930,7 +930,7 @@ export class AlertEngine extends EventEmitter {
    */
   updateConfig(newConfig: Partial<AlertEngineConfig>): void {
     this.config = { ...this.config, ...newConfig };
-    console.log("⚙️ Alert Engine configuration updated");
+    await frameworkLogger.log("alert-engine", "config-updated", "info");
     this.emit("config-updated", { ...this.config });
   }
 }

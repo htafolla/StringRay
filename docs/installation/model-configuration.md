@@ -30,7 +30,7 @@ This guide explains how to configure and update AI models in the StrRay framewor
   },
   "logging": {
     "enabled": true,
-    "refactoring_log_path": ".opencode/REFACTORING_LOG.md",
+    "refactoring_log_path": "logs/agents/refactoring-log.md",
     "auto_capture": true,
     "format": "markdown",
     "include_timestamps": true,

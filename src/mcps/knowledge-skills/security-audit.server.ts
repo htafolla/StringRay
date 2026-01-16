@@ -74,7 +74,7 @@ class StrRaySecurityAuditServer {
     );
 
     this.setupToolHandlers();
-    console.log("StrRay Security Audit MCP Server initialized");
+    // Server initialization - removed unnecessary startup logging
   }
 
   private setupToolHandlers() {

@@ -1,5 +1,5 @@
 /**
- * StringRay Framework v1.0.0 - Dashboard UI Engine
+ * StringRay AI v1.0.4 - Dashboard UI Engine
  *
  * Real-time dashboard UI engine for performance monitoring.
  * Handles UI rendering, updates, and user interactions with live data.
@@ -272,10 +272,10 @@ export class DashboardUIEngine extends EventEmitter {
       return;
     }
 
-    console.log("📊 Starting Dashboard UI Engine");
-    console.log(`   Active Layout: ${this.state.activeLayout}`);
-    console.log(`   Widgets: ${this.getActiveLayout()?.widgets.length || 0}`);
-    console.log(`   Real-time Updates: ${this.config.realTimeUpdates}`);
+    // Dashboard UI startup - kept as console.log for user visibility
+    // Active layout - kept as console.log for user visibility
+    // Widgets count - kept as console.log for user visibility
+    // Real-time updates - kept as console.log for user visibility
 
     // Connect to WebSocket gateway
     await this.connectToGateway();
@@ -299,7 +299,7 @@ export class DashboardUIEngine extends EventEmitter {
     }
 
     this.disconnectFromGateway();
-    console.log("🛑 Stopped Dashboard UI Engine");
+    // Dashboard UI stop - kept as console.log for user visibility
     this.emit("stopped");
   }
 
@@ -1020,7 +1020,7 @@ export class DashboardUIEngine extends EventEmitter {
    */
   updateConfig(newConfig: Partial<DashboardConfig>): void {
     this.config = { ...this.config, ...newConfig };
-    console.log("⚙️ Dashboard UI Engine configuration updated");
+    await frameworkLogger.log("dashboard-ui-engine", "config-updated", "info");
     this.emit("config-updated", { ...this.config });
   }
 }

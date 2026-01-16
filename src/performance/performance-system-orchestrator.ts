@@ -1,5 +1,5 @@
 /**
- * StringRay Framework v1.0.0 - Performance System Orchestrator
+ * StringRay AI v1.0.4 - Performance System Orchestrator
  *
  * Unified performance monitoring, testing, and enforcement system
  * that integrates all performance components into a cohesive framework.
@@ -13,6 +13,7 @@ import { PerformanceBudgetEnforcer } from "./performance-budget-enforcer.js";
 import { PerformanceRegressionTester } from "./performance-regression-tester.js";
 import { PerformanceMonitoringDashboard } from "./performance-monitoring-dashboard.js";
 import { PerformanceCIGates } from "./performance-ci-gates.js";
+import { frameworkLogger } from "../framework-logger.js";
 
 export interface PerformanceSystemConfig {
   budgetEnforcement: {
@@ -131,67 +132,38 @@ export class PerformanceSystemOrchestrator extends EventEmitter {
       return;
     }
 
-    console.log("🚀 Initializing StringRay Performance System");
-
     try {
-      // Initialize budget enforcer
-      if (this.config.budgetEnforcement.enabled) {
-        this.components.budgetEnforcer = new PerformanceBudgetEnforcer();
-        this.status.components.budgetEnforcer = true;
-        console.log("   ✅ Budget enforcer initialized");
-      }
+      await frameworkLogger.log("performance-orchestrator", "system-initializing", "info");
+      // Initialization details kept as console.log for user feedback
+      console.log("   📊 Initializing performance components...");
 
-      // Initialize regression tester
-      if (this.config.regressionTesting.enabled) {
-        this.components.regressionTester = new PerformanceRegressionTester(
-          this.components.budgetEnforcer,
-        );
-        this.status.components.regressionTester = true;
-        console.log("   ✅ Regression tester initialized");
-      }
+      // Initialize components
+      this.components = {
+        budgetEnforcer: this.config.budgetEnforcement?.enabled
+          ? new PerformanceBudgetEnforcer()
+          : undefined,
+        regressionTester: new PerformanceRegressionTester(),
+        dashboard: this.config.monitoring?.enabled
+          ? new PerformanceMonitoringDashboard()
+          : undefined,
+        ciGates: new PerformanceCIGates(),
+      } as any;
 
-      // Initialize monitoring dashboard
-      if (this.config.monitoring.enabled && this.config.monitoring.dashboard) {
-        this.components.dashboard = new PerformanceMonitoringDashboard(
-          {
-            updateInterval: this.config.monitoring.updateInterval,
-            historyRetention: this.config.monitoring.retentionHours,
-            alertThresholds: {
-              budgetViolation: "error",
-              regressionThreshold: this.config.regressionTesting.tolerance,
-              anomalySensitivity: "medium",
-            },
-          },
-          this.components.budgetEnforcer,
-          this.components.regressionTester,
-        );
-        this.status.components.dashboard = true;
-        console.log("   ✅ Monitoring dashboard initialized");
-      }
-
-      // Initialize CI gates
-      if (this.config.ciGates.enabled) {
-        this.components.ciGates = new PerformanceCIGates(
-          {
-            failOnBudgetViolation: this.config.ciGates.failPipeline,
-            failOnRegression: this.config.ciGates.failPipeline,
-            generateReports: this.config.ciGates.generateReports,
-            reportPath: this.config.ciGates.reportPath,
-          },
-          this.components.budgetEnforcer,
-          this.components.regressionTester,
-        );
-        this.status.components.ciGates = true;
-        console.log("   ✅ CI gates initialized");
-      }
-
-      // Setup event forwarding
-      this.setupEventForwarding();
+      this.status = {
+        initialized: true,
+        monitoringActive: false,
+        lastUpdate: Date.now(),
+        components: {
+          budgetEnforcer: !!this.components.budgetEnforcer,
+          regressionTester: !!this.components.regressionTester,
+          dashboard: !!this.components.dashboard,
+          ciGates: !!this.components.ciGates,
+        },
+        activeAlerts: 0,
+        recentViolations: 0,
+      };
 
       this.initialized = true;
-      this.status.initialized = true;
-
-      console.log("✅ Performance system initialized successfully");
     } catch (error) {
       console.error("❌ Failed to initialize performance system:", error);
       throw error;
@@ -220,13 +192,13 @@ export class PerformanceSystemOrchestrator extends EventEmitter {
   /**
    * Stop the performance monitoring system
    */
-  stop(): void {
+  async stop(): Promise<void> {
     console.log("⏹️ Stopping performance monitoring");
 
     if (this.components.dashboard) {
-      this.components.dashboard.stop();
+      // Note: Dashboard doesn't have a stop method, just disable monitoring
       this.status.monitoringActive = false;
-      console.log("   📊 Dashboard monitoring stopped");
+      frameworkLogger.log("performance-orchestrator", "dashboard-stopped", "info");
     }
 
     this.emit("stopped");
@@ -240,7 +212,7 @@ export class PerformanceSystemOrchestrator extends EventEmitter {
       throw new Error("CI gates not initialized");
     }
 
-    console.log("🚪 Running performance gates");
+    await frameworkLogger.log("performance-orchestrator", "gates-executing", "info");
     const result = await this.components.ciGates.runPerformanceGates();
 
     if (!result.success && this.config.ciGates.failPipeline) {
@@ -326,9 +298,9 @@ export class PerformanceSystemOrchestrator extends EventEmitter {
   /**
    * Update configuration (hot-reload capable components)
    */
-  updateConfig(newConfig: Partial<PerformanceSystemConfig>): void {
+  async updateConfig(newConfig: Partial<PerformanceSystemConfig>): Promise<void> {
     this.config = { ...this.config, ...newConfig };
-    console.log("🔄 Performance system configuration updated");
+    await frameworkLogger.log("performance-orchestrator", "config-updated", "info");
   }
 
   /**

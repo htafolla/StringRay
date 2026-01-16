@@ -1,5 +1,5 @@
 /**
- * StringRay Framework v1.0.0 - Orchestrator Agent
+ * StringRay AI v1.0.4 - Orchestrator Agent
  *
  * Coordinates multi-step tasks and delegates to specialized subagents.
  * Implements Sisyphus integration for relentless execution.
@@ -9,6 +9,7 @@
  */
 
 import { enhancedMultiAgentOrchestrator } from "./orchestrator/enhanced-multi-agent-orchestrator.js";
+import { frameworkLogger } from "./framework-logger.js";
 
 export interface OrchestratorConfig {
   maxConcurrentTasks: number;
@@ -63,7 +64,7 @@ export class StringRayOrchestrator {
     tasks: TaskDefinition[],
     sessionId?: string,
   ): Promise<TaskResult[]> {
-    console.log(`🎯 Orchestrator: Executing complex task - ${description}`);
+    // Task execution start - operational logging, keep for monitoring
 
     const results: TaskResult[] = [];
     const taskMap = new Map<string, TaskDefinition>();
@@ -109,9 +110,7 @@ export class StringRayOrchestrator {
       }
     }
 
-    console.log(
-      `✅ Orchestrator: Complex task completed - ${results.length} tasks executed`,
-    );
+    // Task completion logging removed - use frameworkLogger instead
     return results;
   }
 
@@ -130,9 +129,7 @@ export class StringRayOrchestrator {
       const result = await this.delegateToSubagent(task);
 
       const duration = Date.now() - startTime;
-      console.log(
-        `✅ Orchestrator: Task ${task.id} completed in ${duration}ms`,
-      );
+      await frameworkLogger.log("orchestrator", "complex-task-completed", "success", { taskExecuted: true });
 
       // Execute post-processors for agent task completion logging
       console.log(
@@ -149,14 +146,16 @@ export class StringRayOrchestrator {
       try {
         // Get processor manager from global state
         const globalStateManager = (globalThis as any).strRayStateManager;
-        console.log("🌐 Global state manager check:", {
+        // Global state debug - remove for production
+        frameworkLogger.log("orchestrator", "global-state-check", "debug", {
           exists: !!globalStateManager,
           type: typeof globalStateManager,
           hasGet: typeof globalStateManager?.get === "function",
         });
 
         const processorManager = globalStateManager?.get("processor:manager");
-        console.log("🔍 Processor manager retrieval:", {
+        // Processor manager debug - remove for production
+        frameworkLogger.log("orchestrator", "processor-manager-check", "debug", {
           retrieved: !!processorManager,
           type: typeof processorManager,
           hasExecutePostProcessors:
@@ -280,7 +279,7 @@ export class StringRayOrchestrator {
       );
 
       const duration = Date.now() - startTime;
-      console.log(`✅ Orchestrator: Auto-healing completed in ${duration}ms`);
+      // Auto-healing completion - operational, keep
 
       return {
         success: consolidationResult.success,

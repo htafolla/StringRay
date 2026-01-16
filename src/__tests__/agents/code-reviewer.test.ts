@@ -54,7 +54,7 @@ describe("Code Reviewer Agent Configuration", () => {
 
     it("should reference Universal Development Codex", () => {
       const system = codeReviewer.system;
-      expect(system).toContain("Universal Development Codex v1.2.20");
+      expect(system).toContain("Universal Development Codex v1.2.24");
     });
 
     it("should specify monitoring and analytics capabilities", () => {

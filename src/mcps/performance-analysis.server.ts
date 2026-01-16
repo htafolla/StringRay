@@ -34,7 +34,7 @@ class StrRayPerformanceAnalysisServer {
 
     this.startTime = Date.now();
     this.setupToolHandlers();
-    console.log("StrRay Performance Analysis MCP Server initialized");
+    await frameworkLogger.log("mcp-performance-analysis", "server-initialized", "info");
   }
 
   private setupToolHandlers() {
@@ -117,7 +117,7 @@ class StrRayPerformanceAnalysisServer {
     const duration = args.duration || 30;
     const detailed = args.detailed || false;
 
-    console.log("📊 MCP: Performing performance analysis:", {
+    await frameworkLogger.log("mcp-performance-analysis", "analysis-started", "info", {
       scope,
       duration,
       detailed,
@@ -228,7 +228,7 @@ ${analysisResults.recommendations.length > 0 ? analysisResults.recommendations.m
     const operation = args.operation || "general";
     const threshold = args.threshold || 1000;
 
-    console.log("🔍 MCP: Detecting bottlenecks:", { operation, threshold });
+    await frameworkLogger.log("mcp-performance-analysis", "bottleneck-detection", "info", { operation, threshold });
 
     try {
       const results = await this.analyzeSpecificBottlenecks(
@@ -634,7 +634,7 @@ ${results.recommendations.map((r) => `• 💡 ${r}`).join("\n") || "No recommen
   async run() {
     const transport = new StdioServerTransport();
     await this.server.connect(transport);
-    console.log("StrRay Performance Analysis MCP Server started");
+    await frameworkLogger.log("mcp-performance-analysis", "server-started", "success");
   }
 }
 

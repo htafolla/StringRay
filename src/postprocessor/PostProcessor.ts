@@ -237,23 +237,23 @@ export class PostProcessor {
     // Initialize monitoring
     if (this.config.monitoring.enabled) {
       await this.monitoringEngine.initialize();
-      console.log("✅ Monitoring engine initialized");
+      // Postprocessor initialization - removed unnecessary startup logging
     }
 
     // Initialize triggers
     if (this.config.triggers.gitHooks) {
       await this.triggers.gitHook.initialize();
-      console.log("✅ Git hook triggers initialized");
+      // Git hooks initialization - removed unnecessary startup logging
     }
 
     if (this.config.triggers.webhooks) {
       await this.triggers.webhook.initialize();
-      console.log("✅ Webhook triggers initialized");
+      // Webhook triggers initialization - removed unnecessary startup logging
     }
 
     if (this.config.triggers.api) {
       await this.triggers.api.initialize();
-      console.log("✅ API triggers initialized");
+      // API triggers initialization - removed unnecessary startup logging
     }
 
     console.log("🎯 Post-Processor initialization complete");
@@ -674,7 +674,7 @@ All path violations will be automatically detected and blocked.
       }
 
       // Pipeline failed - analyze and attempt fixes
-      console.log("❌ CI/CD pipeline failed - analyzing issues...");
+      await frameworkLogger.log("postprocessor", "ci-cd-pipeline-failed", "error", { action: "analyzing-issues" });
 
       const analysis =
         await this.failureAnalysisEngine.analyzeFailure(monitoringResult);
@@ -702,7 +702,7 @@ All path violations will be automatically detected and blocked.
           // Continue monitoring with next attempt
           continue;
         } else {
-          console.log("❌ Fix validation failed - rolling back...");
+          await frameworkLogger.log("postprocessor", "fix-validation-failed", "error", { action: "rolling-back" });
           await this.fixValidator.rollbackFixes(fixResult.appliedFixes);
         }
       }
@@ -776,7 +776,7 @@ All path violations will be automatically detected and blocked.
     if (redeployResult.success) {
       console.log(`✅ Redeployment successful: ${redeployResult.deploymentId}`);
     } else {
-      console.log(`❌ Redeployment failed: ${redeployResult.error}`);
+      await frameworkLogger.log("postprocessor", "redeployment-failed", "error", { error: redeployResult.error });
       throw new Error(`Redeployment failed: ${redeployResult.error}`);
     }
   }

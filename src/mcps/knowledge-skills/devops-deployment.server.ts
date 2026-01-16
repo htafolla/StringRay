@@ -83,7 +83,7 @@ class StrRayDevOpsDeploymentServer {
     );
 
     this.setupToolHandlers();
-    console.log("StrRay DevOps Deployment MCP Server initialized");
+    // Server initialization - removed unnecessary startup logging
   }
 
   private setupToolHandlers() {

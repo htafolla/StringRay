@@ -200,8 +200,8 @@
   "cleanup:session_metadata": {
     "default": {
       "sessionId": "default",
-      "createdAt": 1768568839375,
-      "lastActivity": 1768568839375,
+      "createdAt": 1768569422423,
+      "lastActivity": 1768569422423,
       "ttlMs": 86400000,
       "isActive": true,
       "agentCount": 0,
@@ -358,7 +358,7 @@
   },
   "session:default:coordinator": {
     "sessionId": "default",
-    "startTime": 1768568839375,
+    "startTime": 1768569422423,
     "activeDelegations": {},
     "agentInteractions": {},
     "conflictHistory": [],
@@ -379,12 +379,12 @@
   },
   "delegation:default_session": {
     "sessionId": "default",
-    "createdAt": "2026-01-16T13:07:19.375Z",
+    "createdAt": "2026-01-16T13:17:02.423Z",
     "active": true,
     "agentCount": 8
   },
   "session:active": true,
-  "session:boot_time": 1768568839375,
+  "session:boot_time": 1768569422423,
   "session:agents": [],
   "session:state_manager": {
     "stateManager": {
@@ -821,7 +821,7 @@
       "enforcementLevel": "blocking"
     }
   ],
-  "enforcement:enabled_at": 1768568839375,
+  "enforcement:enabled_at": 1768569422423,
   "session:validator-test-session:coordinator": {
     "sessionId": "validator-test-session",
     "startTime": 1768335491257,
@@ -1041,7 +1041,7 @@
   },
   "processor:active": true,
   "security:initial_audit": {
-    "totalFiles": 1697,
+    "totalFiles": 1709,
     "issues": [
       {
         "severity": "high",

@@ -3,6 +3,7 @@
  */
 
 import { FixResult, FailureAnalysis, PostProcessorContext } from "../types.js";
+import { frameworkLogger } from "../../framework-logger.js";
 import { execSync } from "child_process";
 
 export class FixValidator {

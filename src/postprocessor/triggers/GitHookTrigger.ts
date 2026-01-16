@@ -8,6 +8,16 @@ import * as fs from "fs";
 import * as path from "path";
 import { frameworkLogger } from "../../framework-logger.js";
 
+interface LogArchiveConfig {
+  archiveDirectory: string;
+  maxFileSizeMB: number;
+  rotationIntervalHours: number;
+  compressionEnabled: boolean;
+  maxAgeHours: number;
+  directories: string[];
+  excludePatterns: string[];
+}
+
 // Re-export for backwards compatibility and external usage
 export { cleanupLogFiles };
 import { execSync } from "child_process";
@@ -30,7 +40,7 @@ interface LogCleanupConfig {
  * Archive and rotate log files to prevent unbounded growth
  */
 async function archiveLogFiles(config: LogArchiveConfig): Promise<{ archived: number; errors: string[] }> {
-  const result = { archived: 0, errors: [] };
+  const result: { archived: number; errors: string[] } = { archived: 0, errors: [] };
 
   try {
     const fs = await import("fs");
@@ -111,7 +121,7 @@ async function archiveLogFiles(config: LogArchiveConfig): Promise<{ archived: nu
  * Special archiving strategy for critical historical logs
  */
 async function archiveCriticalHistoricalLogs(): Promise<{ archived: number; errors: string[] }> {
-  const result = { archived: 0, errors: [] };
+  const result: { archived: number; errors: string[] } = { archived: 0, errors: [] };
 
   try {
     const fs = await import("fs");
@@ -162,8 +172,8 @@ async function archiveCriticalHistoricalLogs(): Promise<{ archived: number; erro
   return result;
 }
 
-async function cleanupLogFiles(config: any): Promise<any> {
-  const result = { cleaned: 0, errors: [] };
+async function cleanupLogFiles(config: any): Promise<{ cleaned: number; errors: string[] }> {
+  const result: { cleaned: number; errors: string[] } = { cleaned: 0, errors: [] };
   const maxAgeMs = config.maxAgeHours * 60 * 60 * 1000;
   const now = Date.now();
 
@@ -181,7 +191,7 @@ async function cleanupLogFiles(config: any): Promise<any> {
         if (stat.isDirectory()) continue;
 
         // Check if file should be excluded
-        const shouldExclude = config.excludePatterns.some(pattern =>
+        const shouldExclude = config.excludePatterns.some((pattern: string) =>
           file.includes(pattern.replace('*', ''))
         );
 

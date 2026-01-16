@@ -9,6 +9,7 @@ import {
   PostProcessorContext,
 } from "../types.js";
 import { execSync } from "child_process";
+import { frameworkLogger } from "../../framework-logger.js";
 import * as fs from "fs";
 import * as path from "path";
 

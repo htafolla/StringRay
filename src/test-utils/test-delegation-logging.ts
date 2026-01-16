@@ -1,4 +1,5 @@
 import { AgentDelegator } from "../delegation/agent-delegator.js";
+import { frameworkLogger } from "../framework-logger.js";
 import { StringRayStateManager } from "../state/state-manager.js";
 
 async function testDelegationLogging() {

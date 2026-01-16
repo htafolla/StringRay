@@ -6,6 +6,7 @@
  */
 
 import * as fs from 'fs';
+import { frameworkLogger } from "../../framework-logger.js";
 import * as path from 'path';
 
 interface HookMetrics {
@@ -132,7 +133,7 @@ class HookMetricsCollector {
   /**
    * Print metrics report
    */
-  printReport(): void {
+  async printReport(): Promise<void> {
     const summary = this.getSummary();
 
     // Hook metrics report header - kept as console.log for user visibility
@@ -142,13 +143,13 @@ class HookMetricsCollector {
     console.log(`Average Duration: ${summary.averageDuration}ms`);
     console.log('');
 
-    Object.entries(summary.byHookType).forEach(([hookType, stats]) => {
+    for (const [hookType, stats] of Object.entries(summary.byHookType)) {
       console.log(`${hookType}:`);
       console.log(`  Count: ${stats.count}`);
-      await frameworkLogger.log("hook-metrics", "hook-stats", "info", { hookType: stats.hookType, successRate: stats.successRate });
+      await frameworkLogger.log("hook-metrics", "hook-stats", "info", { hookType, successRate: stats.successRate });
       console.log(`  Average Duration: ${stats.averageDuration}ms`);
       console.log('');
-    });
+    }
   }
 }
 

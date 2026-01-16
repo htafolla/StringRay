@@ -3,6 +3,7 @@
  */
 
 import { FixResult, PostProcessorContext } from "../types.js";
+import { frameworkLogger } from "../../framework-logger.js";
 import { execSync } from "child_process";
 
 export interface RedeployResult {
@@ -190,7 +191,7 @@ export class RedeployCoordinator {
           return {};
         }
       } catch (error) {
-        await frameworkLogger.log("redeploy-coordinator", "deployment-attempt-failed", "error", { attempt: attempt + 1, error: error.message });
+        await frameworkLogger.log("redeploy-coordinator", "deployment-attempt-failed", "error", { attempt: attempt + 1, error: error instanceof Error ? error.message : String(error) });
 
         if (attempt === maxRetries - 1) {
           throw error; // Final attempt failed
@@ -267,7 +268,7 @@ export class RedeployCoordinator {
           await this.waitBetweenPhases();
         }
       } catch (error) {
-        await frameworkLogger.log("redeploy-coordinator", "canary-phase-failed", "error", { phase, error: error.message });
+        await frameworkLogger.log("redeploy-coordinator", "canary-phase-failed", "error", { phase, error: error instanceof Error ? error.message : String(error) });
         throw error;
       }
     }

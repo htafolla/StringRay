@@ -9,6 +9,7 @@
  */
 
 import * as path from "path";
+import { frameworkLogger } from "../framework-logger.js";
 import { StringRayStateManager } from "../state/state-manager.js";
 import { SessionMonitor } from "../session/session-monitor.js";
 import { GitHookTrigger } from "./triggers/GitHookTrigger.js";

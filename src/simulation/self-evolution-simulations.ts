@@ -14,6 +14,7 @@
  */
 
 import { metaAnalysisEngine } from '../self-evolution/meta-analysis-engine';
+import { frameworkLogger } from "../framework-logger.js";
 import {
   ruleEvolutionSystem,
   safeRuleEvolutionSystem,

@@ -5,6 +5,7 @@
  */
 
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
+import { frameworkLogger } from "../framework-logger.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import {
   CallToolRequestSchema,
@@ -34,7 +35,7 @@ class StrRayPerformanceAnalysisServer {
 
     this.startTime = Date.now();
     this.setupToolHandlers();
-    await frameworkLogger.log("mcp-performance-analysis", "server-initialized", "info");
+    frameworkLogger.log("mcp-performance-analysis", "server-initialized", "info");
   }
 
   private setupToolHandlers() {

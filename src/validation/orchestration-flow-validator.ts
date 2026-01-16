@@ -656,8 +656,8 @@ class OrchestrationFlowValidator {
       const duration = result.duration;
       const agents = result.metrics.agentsSpawned;
 
-    // Test result details - kept as console.log for readability
-      }
+      // Test result details - kept as console.log for readability
+      console.log(`${index + 1}. ${result.testName} - ${status} (${duration}ms, ${agents} agents)`);
 
       // Show key metrics
       console.log(

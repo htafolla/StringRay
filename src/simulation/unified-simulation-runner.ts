@@ -11,6 +11,7 @@
  */
 
 import { executeCompleteE2ESimulation } from './complete-end-to-end-simulation';
+import { frameworkLogger } from "../framework-logger.js";
 import { codexSimulationRunner } from './codex-rule-simulations';
 import { runSessionRecoverySimulation } from './session-recovery-simulation';
 import { runSessionPersistenceSimulation } from './session-persistence-simulation';

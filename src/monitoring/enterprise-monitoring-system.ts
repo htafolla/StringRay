@@ -9,6 +9,7 @@
  */
 
 import { EventEmitter } from "events";
+import { frameworkLogger } from "../framework-logger.js";
 import * as os from "os";
 import * as fs from "fs";
 import * as path from "path";
@@ -705,19 +706,19 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
     // Prometheus integration
     if (this.config.integrations.prometheus?.enabled) {
       // Send metric to Prometheus pushgateway
-      await frameworkLogger.log("enterprise-monitoring", "prometheus-alert", "warning", { metric: alert.metric, value: alert.value });
+      await frameworkLogger.log("enterprise-monitoring", "prometheus-alert", "debug", { metric: alert.metric, value: alert.value });
     }
 
     // DataDog integration
     if (this.config.integrations.datadog?.enabled) {
       // Send event to DataDog
-      await frameworkLogger.log("enterprise-monitoring", "datadog-alert", "warning", { alertId: alert.id, message: alert.message });
+      await frameworkLogger.log("enterprise-monitoring", "datadog-alert", "debug", { alertId: alert.id, message: alert.message });
     }
 
     // New Relic integration
     if (this.config.integrations.newRelic?.enabled) {
       // Send event to New Relic
-      await frameworkLogger.log("enterprise-monitoring", "newrelic-alert", "warning", { alertId: alert.id, message: alert.message });
+      await frameworkLogger.log("enterprise-monitoring", "newrelic-alert", "debug", { alertId: alert.id, message: alert.message });
     }
   }
 
@@ -942,7 +943,7 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
     this.emit("alert-triggered", alert);
   }
 
-  private handleReportGenerated(reportPath: string): void {
+  private async handleReportGenerated(reportPath: string): Promise<void> {
     await frameworkLogger.log("enterprise-monitoring", "performance-report-generated", "info", { reportPath });
   }
 
@@ -975,7 +976,7 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
   /**
    * Resolve alert
    */
-  resolveAlert(alertId: string): boolean {
+  async resolveAlert(alertId: string): Promise<boolean> {
     const alert = this.alerts.find((a) => a.id === alertId);
     if (alert && !alert.resolved) {
       alert.resolved = true;

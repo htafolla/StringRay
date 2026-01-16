@@ -2,6 +2,7 @@ import express, { Request, Response, NextFunction } from "express";
 import { exec } from "child_process";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
+import * as fs from "fs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -94,18 +95,19 @@ app.get("/logs", async (req: any, res: any) => {
   const logPath = join(__dirname, "..", ".opencode", "REFACTORING_LOG.md");
     // Server debug logging - remove for production
 
-    if (fs.existsSync(logPath)) {
-      const content = fs.readFileSync(logPath, "utf-8");
-      res.setHeader("Content-Type", "text/markdown");
-      res.send(content);
-    } else {
-      res
-        .status(404)
-        .send(
-          "Refactoring log not found. The framework may not have generated any logs yet.",
-        );
-    }
-  } catch (error) {
+    try {
+      if (fs.existsSync(logPath)) {
+        const content = fs.readFileSync(logPath, "utf-8");
+        res.setHeader("Content-Type", "text/markdown");
+        res.send(content);
+      } else {
+        res
+          .status(404)
+          .send(
+            "Refactoring log not found. The framework may not have generated any logs yet.",
+          );
+      }
+    } catch (error) {
     // File read error - remove debug logging
     res.status(500).send("Server error reading log file.");
   }

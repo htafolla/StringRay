@@ -3,6 +3,7 @@
  */
 
 import { StringRayStateManager } from "../../state/state-manager.js";
+import { frameworkLogger } from "../../framework-logger.js";
 import { SessionMonitor } from "../../session/session-monitor.js";
 import { MonitoringResult } from "../types.js";
 

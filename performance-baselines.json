@@ -1,10 +1,10 @@
 {
   "bundle-size-analysis": {
     "testName": "bundle-size-analysis",
-    "averageDuration": 121.58464952941176,
-    "standardDeviation": 7.405325469389696,
-    "sampleCount": 17,
-    "lastUpdated": 1768673261657,
+    "averageDuration": 121.1080185,
+    "standardDeviation": 7.475388369714946,
+    "sampleCount": 18,
+    "lastUpdated": 1768679722115,
     "tolerance": 10
   },
   "module-import-performance": {

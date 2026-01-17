@@ -176,10 +176,9 @@
       "behavioral-testing"
     ]
   },
-  "agent:enforcer:active_tasks": 3,
-  "session:consistency-test-1:coordinator": {
-    "sessionId": "consistency-test-1",
-    "startTime": 1768310688521,
+  "session:expired-test:coordinator": {
+    "sessionId": "expired-test",
+    "startTime": 1768307064813,
     "activeDelegations": {},
     "agentInteractions": {},
     "conflictHistory": [],
@@ -201,13 +200,35 @@
   "cleanup:session_metadata": {
     "default": {
       "sessionId": "default",
-      "createdAt": 1768674353347,
-      "lastActivity": 1768674353347,
+      "createdAt": 1768679723293,
+      "lastActivity": 1768679723293,
       "ttlMs": 86400000,
       "isActive": true,
       "agentCount": 0,
       "memoryUsage": 0
     }
+  },
+  "agent:enforcer:active_tasks": 3,
+  "session:consistency-test-1:coordinator": {
+    "sessionId": "consistency-test-1",
+    "startTime": 1768310688521,
+    "activeDelegations": {},
+    "agentInteractions": {},
+    "conflictHistory": [],
+    "coordinationState": {
+      "activeAgents": {},
+      "pendingCommunications": [],
+      "sharedContext": {},
+      "sessionMetrics": {
+        "totalInteractions": 0,
+        "successfulInteractions": 0,
+        "failedInteractions": 0,
+        "averageResponseTime": 0,
+        "conflictResolutionRate": 0,
+        "coordinationEfficiency": 0
+      }
+    },
+    "isActive": true
   },
   "monitor:health": {
     "default": {
@@ -458,27 +479,6 @@
     },
     "isActive": true
   },
-  "session:expired-test:coordinator": {
-    "sessionId": "expired-test",
-    "startTime": 1768307064813,
-    "activeDelegations": {},
-    "agentInteractions": {},
-    "conflictHistory": [],
-    "coordinationState": {
-      "activeAgents": {},
-      "pendingCommunications": [],
-      "sharedContext": {},
-      "sessionMetrics": {
-        "totalInteractions": 0,
-        "successfulInteractions": 0,
-        "failedInteractions": 0,
-        "averageResponseTime": 0,
-        "conflictResolutionRate": 0,
-        "coordinationEfficiency": 0
-      }
-    },
-    "isActive": true
-  },
   "session:cleanup-test-2:coordinator": {
     "sessionId": "cleanup-test-2",
     "startTime": 1768530947065,
@@ -617,7 +617,7 @@
   },
   "session:default:coordinator": {
     "sessionId": "default",
-    "startTime": 1768674353347,
+    "startTime": 1768679723292,
     "activeDelegations": {},
     "agentInteractions": {},
     "conflictHistory": [],
@@ -638,12 +638,12 @@
   },
   "delegation:default_session": {
     "sessionId": "default",
-    "createdAt": "2026-01-17T18:25:53.347Z",
+    "createdAt": "2026-01-17T19:55:23.292Z",
     "active": true,
     "agentCount": 8
   },
   "session:active": true,
-  "session:boot_time": 1768674353347,
+  "session:boot_time": 1768679723293,
   "session:agents": [],
   "session:state_manager": {
     "stateManager": {
@@ -1112,7 +1112,7 @@
       "enforcementLevel": "blocking"
     }
   ],
-  "enforcement:enabled_at": 1768674353347,
+  "enforcement:enabled_at": 1768679723293,
   "session:validator-test-session:coordinator": {
     "sessionId": "validator-test-session",
     "startTime": 1768335491257,
@@ -1376,7 +1376,7 @@
   },
   "processor:active": true,
   "security:initial_audit": {
-    "totalFiles": 1858,
+    "totalFiles": 1870,
     "issues": [
       {
         "severity": "high",
@@ -6825,7 +6825,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/scripts/validation/validate-mcp-connectivity.js",
-        "line": 41,
+        "line": 49,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -9206,7 +9206,7 @@
         "severity": "high",
         "category": "command-injection",
         "file": "/Users/blaze/dev/stringray/src/plugins/stringray-codex-injection.ts",
-        "line": 123,
+        "line": 149,
         "description": "Potentially dangerous pattern detected: /execSync\\s*\\(/g",
         "recommendation": "Validate and sanitize all user inputs, use parameterized commands",
         "cwe": "CWE-78"
@@ -9215,7 +9215,7 @@
         "severity": "high",
         "category": "command-injection",
         "file": "/Users/blaze/dev/stringray/src/plugins/stringray-codex-injection.ts",
-        "line": 196,
+        "line": 222,
         "description": "Potentially dangerous pattern detected: /execSync\\s*\\(/g",
         "recommendation": "Validate and sanitize all user inputs, use parameterized commands",
         "cwe": "CWE-78"

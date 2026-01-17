@@ -1,36 +1,4 @@
 {
-  "session:expired-test:coordinator": {
-    "sessionId": "expired-test",
-    "startTime": 1768307064813,
-    "activeDelegations": {},
-    "agentInteractions": {},
-    "conflictHistory": [],
-    "coordinationState": {
-      "activeAgents": {},
-      "pendingCommunications": [],
-      "sharedContext": {},
-      "sessionMetrics": {
-        "totalInteractions": 0,
-        "successfulInteractions": 0,
-        "failedInteractions": 0,
-        "averageResponseTime": 0,
-        "conflictResolutionRate": 0,
-        "coordinationEfficiency": 0
-      }
-    },
-    "isActive": true
-  },
-  "cleanup:session_metadata": {
-    "default": {
-      "sessionId": "default",
-      "createdAt": 1768671542292,
-      "lastActivity": 1768671542292,
-      "ttlMs": 86400000,
-      "isActive": true,
-      "agentCount": 0,
-      "memoryUsage": 0
-    }
-  },
   "agent:enforcer": {},
   "agent:architect": {},
   "agent:code-reviewer": {},
@@ -208,21 +176,204 @@
       "behavioral-testing"
     ]
   },
-  "monitor:health": {
-    "default": {
-      "sessionId": "default",
-      "status": "unknown",
-      "lastCheck": 0,
-      "responseTime": 0,
-      "errorCount": 0,
-      "activeAgents": 0,
-      "memoryUsage": 0,
-      "issues": []
+  "session:test-session-7:coordinator": {
+    "sessionId": "test-session-7",
+    "startTime": 1768672930003,
+    "activeDelegations": {},
+    "agentInteractions": {},
+    "conflictHistory": [],
+    "coordinationState": {
+      "activeAgents": {},
+      "pendingCommunications": [],
+      "sharedContext": {},
+      "sessionMetrics": {
+        "totalInteractions": 1,
+        "successfulInteractions": 1,
+        "failedInteractions": 0,
+        "averageResponseTime": 0,
+        "conflictResolutionRate": 0,
+        "coordinationEfficiency": 1
+      }
+    },
+    "isActive": true
+  },
+  "session:test-session-8:coordinator": {
+    "sessionId": "test-session-8",
+    "startTime": 1768672930003,
+    "activeDelegations": {},
+    "agentInteractions": {},
+    "conflictHistory": [],
+    "coordinationState": {
+      "activeAgents": {},
+      "pendingCommunications": [],
+      "sharedContext": {},
+      "sessionMetrics": {
+        "totalInteractions": 2,
+        "successfulInteractions": 2,
+        "failedInteractions": 0,
+        "averageResponseTime": 0,
+        "conflictResolutionRate": 0,
+        "coordinationEfficiency": 1
+      }
+    },
+    "isActive": true
+  },
+  "session:test-session-9:coordinator": {
+    "sessionId": "test-session-9",
+    "startTime": 1768672930003,
+    "activeDelegations": {},
+    "agentInteractions": {},
+    "conflictHistory": [],
+    "coordinationState": {
+      "activeAgents": {},
+      "pendingCommunications": [],
+      "sharedContext": {},
+      "sessionMetrics": {
+        "totalInteractions": 2,
+        "successfulInteractions": 2,
+        "failedInteractions": 0,
+        "averageResponseTime": 0,
+        "conflictResolutionRate": 0,
+        "coordinationEfficiency": 1
+      }
+    },
+    "isActive": true
+  },
+  "state_manager:groups": {
+    "test-group": {
+      "groupId": "test-group",
+      "sessionIds": [
+        "test-session-7",
+        "test-session-8",
+        "test-session-9"
+      ],
+      "coordinatorSession": "test-session-7",
+      "state": "forming",
+      "sharedState": {},
+      "createdAt": 1768672930003
     }
   },
-  "session:cleanup-test-2:coordinator": {
-    "sessionId": "cleanup-test-2",
-    "startTime": 1768530947065,
+  "session:test-session-7:shared:group:test-group:membership": {
+    "groupId": "test-group",
+    "role": "coordinator",
+    "members": [
+      "test-session-7",
+      "test-session-8",
+      "test-session-9"
+    ]
+  },
+  "session:test-session-7:interactions:state_manager": [
+    {
+      "agentName": "state_manager",
+      "action": "share_context",
+      "result": {
+        "key": "group:test-group:membership",
+        "value": {
+          "groupId": "test-group",
+          "role": "coordinator",
+          "members": [
+            "test-session-7",
+            "test-session-8",
+            "test-session-9"
+          ]
+        }
+      },
+      "duration": 0,
+      "success": true,
+      "timestamp": 1768672930003
+    }
+  ],
+  "session:test-session-8:shared:group:test-group:membership": {
+    "groupId": "test-group",
+    "role": "member",
+    "members": [
+      "test-session-7",
+      "test-session-8",
+      "test-session-9"
+    ]
+  },
+  "session:test-session-8:interactions:state_manager": [
+    {
+      "agentName": "state_manager",
+      "action": "share_context",
+      "result": {
+        "key": "group:test-group:membership",
+        "value": {
+          "groupId": "test-group",
+          "role": "member",
+          "members": [
+            "test-session-7",
+            "test-session-8",
+            "test-session-9"
+          ]
+        }
+      },
+      "duration": 0,
+      "success": true,
+      "timestamp": 1768672930003
+    }
+  ],
+  "session:test-session-9:shared:group:test-group:membership": {
+    "groupId": "test-group",
+    "role": "member",
+    "members": [
+      "test-session-7",
+      "test-session-8",
+      "test-session-9"
+    ]
+  },
+  "session:test-session-9:interactions:state_manager": [
+    {
+      "agentName": "state_manager",
+      "action": "share_context",
+      "result": {
+        "key": "group:test-group:membership",
+        "value": {
+          "groupId": "test-group",
+          "role": "member",
+          "members": [
+            "test-session-7",
+            "test-session-8",
+            "test-session-9"
+          ]
+        }
+      },
+      "duration": 0,
+      "success": true,
+      "timestamp": 1768672930003
+    }
+  ],
+  "session:test-session-8:shared:group:test-group:group-key": "group-value",
+  "session:test-session-8:interactions:test-session-7": [
+    {
+      "agentName": "test-session-7",
+      "action": "share_context",
+      "result": {
+        "key": "group:test-group:group-key",
+        "value": "group-value"
+      },
+      "duration": 0,
+      "success": true,
+      "timestamp": 1768672930004
+    }
+  ],
+  "session:test-session-9:shared:group:test-group:group-key": "group-value",
+  "session:test-session-9:interactions:test-session-7": [
+    {
+      "agentName": "test-session-7",
+      "action": "share_context",
+      "result": {
+        "key": "group:test-group:group-key",
+        "value": "group-value"
+      },
+      "duration": 0,
+      "success": true,
+      "timestamp": 1768672930004
+    }
+  ],
+  "session:consistency-test-1:coordinator": {
+    "sessionId": "consistency-test-1",
+    "startTime": 1768310688521,
     "activeDelegations": {},
     "agentInteractions": {},
     "conflictHistory": [],
@@ -241,9 +392,95 @@
     },
     "isActive": true
   },
-  "session:consistency-test-1:coordinator": {
-    "sessionId": "consistency-test-1",
-    "startTime": 1768310688521,
+  "cleanup:session_metadata": {
+    "default": {
+      "sessionId": "default",
+      "createdAt": 1768673120895,
+      "lastActivity": 1768673120895,
+      "ttlMs": 86400000,
+      "isActive": true,
+      "agentCount": 0,
+      "memoryUsage": 0
+    }
+  },
+  "monitor:health": {
+    "default": {
+      "sessionId": "default",
+      "status": "unknown",
+      "lastCheck": 0,
+      "responseTime": 0,
+      "errorCount": 0,
+      "activeAgents": 0,
+      "memoryUsage": 0,
+      "issues": []
+    }
+  },
+  "session:cleanup-test-1:coordinator": {
+    "sessionId": "cleanup-test-1",
+    "startTime": 1768310688276,
+    "activeDelegations": {},
+    "agentInteractions": {},
+    "conflictHistory": [],
+    "coordinationState": {
+      "activeAgents": {},
+      "pendingCommunications": [],
+      "sharedContext": {},
+      "sessionMetrics": {
+        "totalInteractions": 0,
+        "successfulInteractions": 0,
+        "failedInteractions": 0,
+        "averageResponseTime": 0,
+        "conflictResolutionRate": 0,
+        "coordinationEfficiency": 0
+      }
+    },
+    "isActive": true
+  },
+  "session:transition-test-2:coordinator": {
+    "sessionId": "transition-test-2",
+    "startTime": 1768672927217,
+    "activeDelegations": {},
+    "agentInteractions": {},
+    "conflictHistory": [],
+    "coordinationState": {
+      "activeAgents": {},
+      "pendingCommunications": [],
+      "sharedContext": {},
+      "sessionMetrics": {
+        "totalInteractions": 0,
+        "successfulInteractions": 0,
+        "failedInteractions": 0,
+        "averageResponseTime": 0,
+        "conflictResolutionRate": 0,
+        "coordinationEfficiency": 0
+      }
+    },
+    "isActive": true
+  },
+  "session:expired-test:coordinator": {
+    "sessionId": "expired-test",
+    "startTime": 1768307064813,
+    "activeDelegations": {},
+    "agentInteractions": {},
+    "conflictHistory": [],
+    "coordinationState": {
+      "activeAgents": {},
+      "pendingCommunications": [],
+      "sharedContext": {},
+      "sessionMetrics": {
+        "totalInteractions": 0,
+        "successfulInteractions": 0,
+        "failedInteractions": 0,
+        "averageResponseTime": 0,
+        "conflictResolutionRate": 0,
+        "coordinationEfficiency": 0
+      }
+    },
+    "isActive": true
+  },
+  "session:cleanup-test-2:coordinator": {
+    "sessionId": "cleanup-test-2",
+    "startTime": 1768530947065,
     "activeDelegations": {},
     "agentInteractions": {},
     "conflictHistory": [],
@@ -379,7 +616,7 @@
   },
   "session:default:coordinator": {
     "sessionId": "default",
-    "startTime": 1768671542292,
+    "startTime": 1768673120895,
     "activeDelegations": {},
     "agentInteractions": {},
     "conflictHistory": [],
@@ -400,12 +637,12 @@
   },
   "delegation:default_session": {
     "sessionId": "default",
-    "createdAt": "2026-01-17T17:39:02.292Z",
+    "createdAt": "2026-01-17T18:05:20.895Z",
     "active": true,
     "agentCount": 8
   },
   "session:active": true,
-  "session:boot_time": 1768671542292,
+  "session:boot_time": 1768673120895,
   "session:agents": [],
   "session:state_manager": {
     "stateManager": {
@@ -874,7 +1111,7 @@
       "enforcementLevel": "blocking"
     }
   ],
-  "enforcement:enabled_at": 1768671542293,
+  "enforcement:enabled_at": 1768673120896,
   "session:validator-test-session:coordinator": {
     "sessionId": "validator-test-session",
     "startTime": 1768335491257,
@@ -1007,6 +1244,18 @@
         "coordinationEfficiency": 1,
         "memoryUsage": 0,
         "agentCount": 3
+      },
+      {
+        "timestamp": 1768672929973,
+        "sessionId": "healthy-session",
+        "totalInteractions": 0,
+        "successfulInteractions": 0,
+        "failedInteractions": 0,
+        "averageResponseTime": 0,
+        "conflictResolutionRate": 1,
+        "coordinationEfficiency": 1,
+        "memoryUsage": 0,
+        "agentCount": 3
       }
     ],
     "high-conflict-session": [
@@ -1021,29 +1270,20 @@
         "coordinationEfficiency": 1,
         "memoryUsage": 0,
         "agentCount": 1
-      }
-    ]
-  },
-  "session:cleanup-test-1:coordinator": {
-    "sessionId": "cleanup-test-1",
-    "startTime": 1768310688276,
-    "activeDelegations": {},
-    "agentInteractions": {},
-    "conflictHistory": [],
-    "coordinationState": {
-      "activeAgents": {},
-      "pendingCommunications": [],
-      "sharedContext": {},
-      "sessionMetrics": {
+      },
+      {
+        "timestamp": 1768673117572,
+        "sessionId": "high-conflict-session",
         "totalInteractions": 0,
         "successfulInteractions": 0,
         "failedInteractions": 0,
         "averageResponseTime": 0,
-        "conflictResolutionRate": 0,
-        "coordinationEfficiency": 0
+        "conflictResolutionRate": 1,
+        "coordinationEfficiency": 1,
+        "memoryUsage": 0,
+        "agentCount": 1
       }
-    },
-    "isActive": true
+    ]
   },
   "session:lifecycle-test-2:coordinator": {
     "sessionId": "lifecycle-test-2",
@@ -1123,7 +1363,7 @@
   },
   "processor:active": true,
   "security:initial_audit": {
-    "totalFiles": 1821,
+    "totalFiles": 1851,
     "issues": [
       {
         "severity": "high",
@@ -6288,6 +6528,69 @@
       },
       {
         "severity": "high",
+        "category": "path-traversal",
+        "file": "/Users/blaze/dev/stringray/scripts/reporting/generate-phase1-report.js",
+        "line": 1,
+        "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
+        "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
+        "cwe": "CWE-22"
+      },
+      {
+        "severity": "high",
+        "category": "path-traversal",
+        "file": "/Users/blaze/dev/stringray/scripts/reporting/run-postprocessor.js",
+        "line": 1,
+        "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
+        "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
+        "cwe": "CWE-22"
+      },
+      {
+        "severity": "high",
+        "category": "path-traversal",
+        "file": "/Users/blaze/dev/stringray/scripts/reporting/run-postprocessor.js",
+        "line": 2,
+        "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
+        "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
+        "cwe": "CWE-22"
+      },
+      {
+        "severity": "high",
+        "category": "path-traversal",
+        "file": "/Users/blaze/dev/stringray/scripts/reporting/run-postprocessor.js",
+        "line": 3,
+        "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
+        "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
+        "cwe": "CWE-22"
+      },
+      {
+        "severity": "high",
+        "category": "path-traversal",
+        "file": "/Users/blaze/dev/stringray/scripts/reporting/run-postprocessor.js",
+        "line": 4,
+        "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
+        "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
+        "cwe": "CWE-22"
+      },
+      {
+        "severity": "high",
+        "category": "path-traversal",
+        "file": "/Users/blaze/dev/stringray/scripts/reporting/run-postprocessor.js",
+        "line": 5,
+        "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
+        "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
+        "cwe": "CWE-22"
+      },
+      {
+        "severity": "high",
+        "category": "path-traversal",
+        "file": "/Users/blaze/dev/stringray/scripts/reporting/trigger-report.js",
+        "line": 1,
+        "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
+        "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
+        "cwe": "CWE-22"
+      },
+      {
+        "severity": "high",
         "category": "hardcoded-secrets",
         "file": "/Users/blaze/dev/stringray/scripts/scenarios/scenario-security-check.ts",
         "line": 7,
@@ -10985,7 +11288,7 @@
     ],
     "summary": {
       "critical": 106,
-      "high": 620,
+      "high": 627,
       "medium": 338,
       "low": 48,
       "info": 0
@@ -11329,5 +11632,8 @@
       }
     },
     "isActive": true
+  },
+  "clear-test-test-framework-init-session": {
+    "test": "data"
   }
 }

@@ -16,7 +16,7 @@
     "build:all": "npm run build && npm run build:plugin",
     "build:plugin": "tsc --project tsconfig.plugin.json",
     "clean": "rm -rf dist",
-    "prepublishOnly": "npm run build:plugin",
+    "prepublishOnly": "npm run build:all",
     "postinstall": "node scripts/postinstall.cjs",
     "ci-install": "npm ci --ignore-scripts && npm run postinstall",
     "preinstall": "echo '🔧 Installing StringRay Framework dependencies...'",

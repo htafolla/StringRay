@@ -40,13 +40,13 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
 
-       - name: Install dependencies
-         run: npm ci --ignore-scripts
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
 
-       - name: Run postinstall configuration
-         run: npm run postinstall
+      - name: Run postinstall configuration
+        run: npm run postinstall
 
-       - name: TypeScript type check
+      - name: TypeScript type check
         run: npm run typecheck
 
       - name: Lint code

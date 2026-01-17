@@ -7,8 +7,11 @@ on:
     branches: [main, master]
   workflow_dispatch:
 
-# Disable CodeQL for this workflow
-permissions: {}
+# Enable CodeQL permissions for this workflow
+permissions:
+  security-events: read
+  actions: read
+  contents: read
 
 # Disable CodeQL
 env:

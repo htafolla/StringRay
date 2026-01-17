@@ -94,7 +94,11 @@ export async function simulateSessionPersistence(
     issues,
   };
 
-  await frameworkLogger.log("simulation-session-persistence", "simulation-complete", "success");
+  await frameworkLogger.log(
+    "simulation-session-persistence",
+    "simulation-complete",
+    "success",
+  );
   console.log(
     `Persisted: ${result.persistedSessions}/${result.totalSessions}, Recovered: ${result.recoveredSessions}/${result.corruptedSessions}`,
   );

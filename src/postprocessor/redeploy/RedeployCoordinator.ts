@@ -82,7 +82,12 @@ export class RedeployCoordinator {
       const validationResult = await this.validatePostDeployment(deployResult);
 
       if (validationResult.success) {
-        await frameworkLogger.log("redeploy-coordinator", "deployment-completed", "success", { deploymentId });
+        await frameworkLogger.log(
+          "redeploy-coordinator",
+          "deployment-completed",
+          "success",
+          { deploymentId },
+        );
         const result: RedeployResult = {
           success: true,
           deploymentId,
@@ -97,7 +102,12 @@ export class RedeployCoordinator {
       } else {
         // Deployment validation failed - rollback if enabled
         if (this.config.rollbackOnFailure) {
-          await frameworkLogger.log("redeploy-coordinator", "deployment-validation-failed", "error", { action: "rollback-initiated" });
+          await frameworkLogger.log(
+            "redeploy-coordinator",
+            "deployment-validation-failed",
+            "error",
+            { action: "rollback-initiated" },
+          );
           await this.rollbackDeployment(deploymentId, context);
           const result: RedeployResult = {
             success: false,
@@ -191,7 +201,15 @@ export class RedeployCoordinator {
           return {};
         }
       } catch (error) {
-        await frameworkLogger.log("redeploy-coordinator", "deployment-attempt-failed", "error", { attempt: attempt + 1, error: error instanceof Error ? error.message : String(error) });
+        await frameworkLogger.log(
+          "redeploy-coordinator",
+          "deployment-attempt-failed",
+          "error",
+          {
+            attempt: attempt + 1,
+            error: error instanceof Error ? error.message : String(error),
+          },
+        );
 
         if (attempt === maxRetries - 1) {
           throw error; // Final attempt failed
@@ -268,14 +286,27 @@ export class RedeployCoordinator {
           await this.waitBetweenPhases();
         }
       } catch (error) {
-        await frameworkLogger.log("redeploy-coordinator", "canary-phase-failed", "error", { phase, error: error instanceof Error ? error.message : String(error) });
+        await frameworkLogger.log(
+          "redeploy-coordinator",
+          "canary-phase-failed",
+          "error",
+          {
+            phase,
+            error: error instanceof Error ? error.message : String(error),
+          },
+        );
         throw error;
       }
     }
 
     // All phases successful - complete deployment
     await this.promoteToProduction(context, deploymentId);
-    await frameworkLogger.log("redeploy-coordinator", "canary-promoted", "success", { phase: "complete" });
+    await frameworkLogger.log(
+      "redeploy-coordinator",
+      "canary-promoted",
+      "success",
+      { phase: "complete" },
+    );
 
     return results;
   }
@@ -405,7 +436,11 @@ export class RedeployCoordinator {
       console.log("✅ Post-deployment validation passed");
       return { success: true, error: "" };
     } catch (error) {
-      await frameworkLogger.log("redeploy-coordinator", "post-deployment-validation-failed", "error");
+      await frameworkLogger.log(
+        "redeploy-coordinator",
+        "post-deployment-validation-failed",
+        "error",
+      );
       return {
         success: false,
         error: error instanceof Error ? error.message : String(error),

@@ -14,17 +14,20 @@ import {
 // Environment-aware path configuration for cross-environment compatibility
 // From dist/mcps/ (built): ../../orchestrator/
 // From src/mcps/ (source): ../orchestrator/
-const ORCHESTRATOR_BASE_PATH = process.env.STRRAY_ORCHESTRATOR_PATH ||
-  (process.cwd().includes('/dist/') ? "../../orchestrator" : "../orchestrator");
+const ORCHESTRATOR_BASE_PATH =
+  process.env.STRRAY_ORCHESTRATOR_PATH ||
+  (process.cwd().includes("/dist/") ? "../../orchestrator" : "../orchestrator");
 
 // Dynamic imports for cross-environment compatibility
-const { enhancedMultiAgentOrchestrator } = await import(`${ORCHESTRATOR_BASE_PATH}/enhanced-multi-agent-orchestrator.js`);
+const { enhancedMultiAgentOrchestrator } = await import(
+  `${ORCHESTRATOR_BASE_PATH}/enhanced-multi-agent-orchestrator.js`
+);
 
 class EnhancedMultiAgentOrchestratorServer {
   private server: Server;
 
   constructor() {
-        this.server = new Server(
+    this.server = new Server(
       {
         name: "enhanced-multi-agent-orchestrator",
         version: "1.0.0",
@@ -33,7 +36,7 @@ class EnhancedMultiAgentOrchestratorServer {
         capabilities: {
           tools: {},
         },
-      }
+      },
     );
 
     this.setupToolHandlers();
@@ -236,7 +239,8 @@ class EnhancedMultiAgentOrchestratorServer {
 
           case "execute-complex-task":
             // Import the main orchestrator for complex task execution
-            const { StringRayOrchestrator } = await import("../orchestrator.js");
+            const { StringRayOrchestrator } =
+              await import("../orchestrator.js");
 
             const orchestrator = new StringRayOrchestrator({
               maxConcurrentTasks: 5,

@@ -11,29 +11,29 @@
  * @since 2026-01-15
  */
 
-import fs from 'fs';
-import path from 'path';
+import fs from "fs";
+import path from "path";
 
 // Official version information - SINGLE SOURCE OF TRUTH
 const OFFICIAL_VERSIONS = {
   // Framework versions
   framework: {
-    version: '1.0.27',
-    displayName: 'StringRay AI v1.0.27',
-    lastUpdated: '2026-01-16'
+    version: "1.0.27",
+    displayName: "StringRay AI v1.0.27",
+    lastUpdated: "2026-01-16",
   },
 
   // Codex versions
   codex: {
-    version: 'v1.2.25',
+    version: "v1.2.25",
     termsCount: 55,
-    lastUpdated: '2026-01-16'
+    lastUpdated: "2026-01-16",
   },
 
   // External dependencies
   dependencies: {
-    ohMyOpencode: '2.14.0'
-  }
+    ohMyOpencode: "2.14.0",
+  },
 };
 
 // Comprehensive update patterns for all version types
@@ -41,136 +41,140 @@ const UPDATE_PATTERNS = [
   // === FRAMEWORK VERSION UPDATES ===
   {
     pattern: /StringRay Framework v1\.0\.0/g,
-    replacement: OFFICIAL_VERSIONS.framework.displayName
+    replacement: OFFICIAL_VERSIONS.framework.displayName,
   },
   {
     pattern: /StrRay Framework v1\.0\.0/g,
-    replacement: OFFICIAL_VERSIONS.framework.displayName
+    replacement: OFFICIAL_VERSIONS.framework.displayName,
   },
   {
     pattern: /StringRay AI v1\.0\.[0-9]+/g,
-    replacement: OFFICIAL_VERSIONS.framework.displayName
+    replacement: OFFICIAL_VERSIONS.framework.displayName,
   },
   {
     pattern: /version-1\.0\.[0-9]+-blue\.svg/g,
-    replacement: `version-${OFFICIAL_VERSIONS.framework.version}-blue.svg`
+    replacement: `version-${OFFICIAL_VERSIONS.framework.version}-blue.svg`,
   },
   // Framework Version patterns
   {
     pattern: /\*\*Framework Version\*\*: 1\.0\.[0-9]+/g,
-    replacement: `**Framework Version**: ${OFFICIAL_VERSIONS.framework.version}`
+    replacement: `**Framework Version**: ${OFFICIAL_VERSIONS.framework.version}`,
   },
   {
     pattern: /\*\*Framework Version:\*\* v1\.0\.[0-9]+/g,
-    replacement: `**Framework Version:** v${OFFICIAL_VERSIONS.framework.version}`
+    replacement: `**Framework Version:** v${OFFICIAL_VERSIONS.framework.version}`,
   },
   {
     pattern: /- Framework Version: StrRay v1\.0\.[0-9]+/g,
-    replacement: `- Framework Version: ${OFFICIAL_VERSIONS.framework.displayName}`
+    replacement: `- Framework Version: ${OFFICIAL_VERSIONS.framework.displayName}`,
   },
   {
     pattern: /- Framework Version: 1\.0\.[0-9]+/g,
-    replacement: `- Framework Version: ${OFFICIAL_VERSIONS.framework.version}`
+    replacement: `- Framework Version: ${OFFICIAL_VERSIONS.framework.version}`,
   },
   {
     pattern: /Framework Version: StrRay v1\.0\.[0-9]+/g,
-    replacement: `Framework Version: ${OFFICIAL_VERSIONS.framework.displayName}`
+    replacement: `Framework Version: ${OFFICIAL_VERSIONS.framework.displayName}`,
   },
   // Simple version patterns
   {
     pattern: /StrRay v1\.0\.[0-9]+/g,
-    replacement: `${OFFICIAL_VERSIONS.framework.displayName.replace('StringRay AI ', 'StrRay ')}`
+    replacement: `${OFFICIAL_VERSIONS.framework.displayName.replace("StringRay AI ", "StrRay ")}`,
   },
   {
     pattern: /v1\.0\.[0-9]+/g,
-    replacement: `v${OFFICIAL_VERSIONS.framework.version}`
+    replacement: `v${OFFICIAL_VERSIONS.framework.version}`,
   },
   // API documentation patterns
   {
     pattern: /\*\*Version\*\*: v1\.0\.[0-9]+/g,
-    replacement: `**Version**: v${OFFICIAL_VERSIONS.framework.version}`
+    replacement: `**Version**: v${OFFICIAL_VERSIONS.framework.version}`,
   },
   {
     pattern: /\*\*Framework\*\*: StrRay AI v1\.0\.[0-9]+/g,
-    replacement: `**Framework**: ${OFFICIAL_VERSIONS.framework.displayName}`
+    replacement: `**Framework**: ${OFFICIAL_VERSIONS.framework.displayName}`,
   },
 
   // === CODEX VERSION UPDATES ===
   {
     pattern: /Universal Development Codex v1\.2\.20/g,
-    replacement: `Universal Development Codex ${OFFICIAL_VERSIONS.codex.version}`
+    replacement: `Universal Development Codex ${OFFICIAL_VERSIONS.codex.version}`,
   },
   {
     pattern: /Universal Development Codex v1\.2\.22/g,
-    replacement: `Universal Development Codex ${OFFICIAL_VERSIONS.codex.version}`
+    replacement: `Universal Development Codex ${OFFICIAL_VERSIONS.codex.version}`,
   },
   {
     pattern: /Universal Development Codex v1\.2\.24/g,
-    replacement: `Universal Development Codex ${OFFICIAL_VERSIONS.codex.version}`
+    replacement: `Universal Development Codex ${OFFICIAL_VERSIONS.codex.version}`,
   },
   {
     pattern: /Universal Development Codex v1\.2\.25/g,
-    replacement: `Universal Development Codex ${OFFICIAL_VERSIONS.codex.version}`
+    replacement: `Universal Development Codex ${OFFICIAL_VERSIONS.codex.version}`,
   },
   // Flexible codex version patterns
   {
     pattern: /Codex v1\.2\.[0-9]+/g,
-    replacement: `Codex ${OFFICIAL_VERSIONS.codex.version}`
+    replacement: `Codex ${OFFICIAL_VERSIONS.codex.version}`,
   },
   {
     pattern: /codex v1\.2\.[0-9]+/g,
-    replacement: `codex ${OFFICIAL_VERSIONS.codex.version}`
+    replacement: `codex ${OFFICIAL_VERSIONS.codex.version}`,
   },
 
   // === TERM COUNT UPDATES ===
   {
     pattern: /55-term/g,
-    replacement: `${OFFICIAL_VERSIONS.codex.termsCount}-term`
+    replacement: `${OFFICIAL_VERSIONS.codex.termsCount}-term`,
   },
   {
     pattern: /55 Universal Development Codex/g,
-    replacement: `${OFFICIAL_VERSIONS.codex.termsCount} Universal Development Codex`
+    replacement: `${OFFICIAL_VERSIONS.codex.termsCount} Universal Development Codex`,
   },
   {
     pattern: /55-term/g,
-    replacement: `${OFFICIAL_VERSIONS.codex.termsCount}-term`
+    replacement: `${OFFICIAL_VERSIONS.codex.termsCount}-term`,
   },
   {
     pattern: /55 Universal Development Codex/g,
-    replacement: `${OFFICIAL_VERSIONS.codex.termsCount} Universal Development Codex`
+    replacement: `${OFFICIAL_VERSIONS.codex.termsCount} Universal Development Codex`,
   },
   {
     pattern: /55-term Universal Development Codex/g,
-    replacement: `${OFFICIAL_VERSIONS.codex.termsCount}-term Universal Development Codex`
+    replacement: `${OFFICIAL_VERSIONS.codex.termsCount}-term Universal Development Codex`,
   },
   // Flexible term count patterns
   {
     pattern: /[0-9]+-term/g,
-    replacement: `${OFFICIAL_VERSIONS.codex.termsCount}-term`
+    replacement: `${OFFICIAL_VERSIONS.codex.termsCount}-term`,
   },
   {
     pattern: /[0-9]+ Universal Development Codex/g,
-    replacement: `${OFFICIAL_VERSIONS.codex.termsCount} Universal Development Codex`
+    replacement: `${OFFICIAL_VERSIONS.codex.termsCount} Universal Development Codex`,
   },
 
   // === DEPENDENCY VERSION UPDATES ===
   {
     pattern: /oh-my-opencode v2\.12\.0/g,
-    replacement: `oh-my-opencode v${OFFICIAL_VERSIONS.dependencies.ohMyOpencode}`
+    replacement: `oh-my-opencode v${OFFICIAL_VERSIONS.dependencies.ohMyOpencode}`,
   },
   {
     pattern: /oh-my-opencode v2\.14\.0/g,
-    replacement: `oh-my-opencode v${OFFICIAL_VERSIONS.dependencies.ohMyOpencode}`
+    replacement: `oh-my-opencode v${OFFICIAL_VERSIONS.dependencies.ohMyOpencode}`,
   },
   // Flexible dependency patterns
   {
     pattern: /oh-my-opencode v[0-9]+\.[0-9]+\.[0-9]+/g,
-    replacement: `oh-my-opencode v${OFFICIAL_VERSIONS.dependencies.ohMyOpencode}`
-  }
+    replacement: `oh-my-opencode v${OFFICIAL_VERSIONS.dependencies.ohMyOpencode}`,
+  },
 ];
 
 // Simple recursive file finder
-function findFiles(dir, extensions, ignoreDirs = ['node_modules', '.git', 'dist', 'build']) {
+function findFiles(
+  dir,
+  extensions,
+  ignoreDirs = ["node_modules", ".git", "dist", "build"],
+) {
   const files = [];
 
   function walk(currentDir) {
@@ -198,22 +202,26 @@ function findFiles(dir, extensions, ignoreDirs = ['node_modules', '.git', 'dist'
 }
 
 async function standardizeVersions() {
-  console.log('🔧 Starting Universal Version Standardization');
+  console.log("🔧 Starting Universal Version Standardization");
   console.log(`📋 Framework: ${OFFICIAL_VERSIONS.framework.displayName}`);
-  console.log(`📋 Codex: ${OFFICIAL_VERSIONS.codex.version} (${OFFICIAL_VERSIONS.codex.termsCount} terms)`);
-  console.log(`📋 oh-my-opencode: v${OFFICIAL_VERSIONS.dependencies.ohMyOpencode}`);
-  console.log('='.repeat(60));
+  console.log(
+    `📋 Codex: ${OFFICIAL_VERSIONS.codex.version} (${OFFICIAL_VERSIONS.codex.termsCount} terms)`,
+  );
+  console.log(
+    `📋 oh-my-opencode: v${OFFICIAL_VERSIONS.dependencies.ohMyOpencode}`,
+  );
+  console.log("=".repeat(60));
 
   // Find all files that might contain version references
-  const extensions = ['.ts', '.js', '.md', '.json', '.txt'];
-  const files = findFiles('.', extensions);
+  const extensions = [".ts", ".js", ".md", ".json", ".txt"];
+  const files = findFiles(".", extensions);
 
   let totalFilesUpdated = 0;
   let totalChanges = 0;
 
   for (const file of files) {
     try {
-      const content = fs.readFileSync(file, 'utf8');
+      const content = fs.readFileSync(file, "utf8");
       let updatedContent = content;
       let fileChanged = false;
 
@@ -229,31 +237,32 @@ async function standardizeVersions() {
 
       // Write back if changed
       if (fileChanged) {
-        fs.writeFileSync(file, updatedContent, 'utf8');
+        fs.writeFileSync(file, updatedContent, "utf8");
         console.log(`✅ Updated: ${file}`);
         totalFilesUpdated++;
       }
-
     } catch (error) {
       console.error(`❌ Error processing ${file}:`, error.message);
     }
   }
 
-  console.log('\n' + '='.repeat(60));
-  console.log('🎉 Universal Version Standardization Complete!');
+  console.log("\n" + "=".repeat(60));
+  console.log("🎉 Universal Version Standardization Complete!");
   console.log(`📊 Summary:`);
   console.log(`   Files Updated: ${totalFilesUpdated}`);
   console.log(`   Total Changes: ${totalChanges}`);
   console.log(`   Framework Version: ${OFFICIAL_VERSIONS.framework.version}`);
-  console.log(`   Codex Version: ${OFFICIAL_VERSIONS.codex.version} (${OFFICIAL_VERSIONS.codex.termsCount} terms)`);
+  console.log(
+    `   Codex Version: ${OFFICIAL_VERSIONS.codex.version} (${OFFICIAL_VERSIONS.codex.termsCount} terms)`,
+  );
   console.log(`   Dependencies Updated: ✅`);
   console.log(`   Last Updated: ${OFFICIAL_VERSIONS.framework.lastUpdated}`);
 
   // Version management reminder
-  console.log('\n💡 To update versions in the future:');
-  console.log('   1. Edit OFFICIAL_VERSIONS object in this script');
-  console.log('   2. Run: node scripts/standardize-codex-versions.js');
-  console.log('   3. Commit the changes');
+  console.log("\n💡 To update versions in the future:");
+  console.log("   1. Edit OFFICIAL_VERSIONS object in this script");
+  console.log("   2. Run: node scripts/standardize-codex-versions.js");
+  console.log("   3. Commit the changes");
 }
 
 // Run the standardization

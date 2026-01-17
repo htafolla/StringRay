@@ -117,7 +117,7 @@ class StrRayDocumentationGenerationServer {
   private server: Server;
 
   constructor() {
-        this.server = new Server(
+    this.server = new Server(
       {
         name: "strray-documentation-generation",
         version: "1.0.0",
@@ -126,7 +126,7 @@ class StrRayDocumentationGenerationServer {
         capabilities: {
           tools: {},
         },
-      }
+      },
     );
 
     this.setupToolHandlers();

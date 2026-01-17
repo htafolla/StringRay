@@ -17,7 +17,7 @@ class StrRayFrameworkComplianceAuditServer {
   private server: Server;
 
   constructor() {
-        this.server = new Server(
+    this.server = new Server(
       {
         name: "strray-framework-compliance-audit",
         version: "1.0.0",
@@ -26,7 +26,7 @@ class StrRayFrameworkComplianceAuditServer {
         capabilities: {
           tools: {},
         },
-      }
+      },
     );
 
     this.setupToolHandlers();

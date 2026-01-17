@@ -80,11 +80,16 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
     if (this.isRunning) {
       return;
     }
-    frameworkLogger.log("enterprise-monitoring", "start", "Starting Enterprise Monitoring System", {
-      instanceId: this.instanceId,
-      collectionInterval: this.config.collectionInterval,
-      healthCheckInterval: this.config.healthChecks.interval,
-    });
+    frameworkLogger.log(
+      "enterprise-monitoring",
+      "start",
+      "Starting Enterprise Monitoring System",
+      {
+        instanceId: this.instanceId,
+        collectionInterval: this.config.collectionInterval,
+        healthCheckInterval: this.config.healthChecks.interval,
+      },
+    );
     this.isRunning = true;
     // Initial data collection
     await this.collectMetrics();
@@ -105,10 +110,15 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
     }
     // Start data cleanup
     this.startDataCleanup();
-    frameworkLogger.log("enterprise-monitoring", "start", "Enterprise Monitoring System started successfully", {
-      status: "running",
-      instanceId: this.instanceId,
-    });
+    frameworkLogger.log(
+      "enterprise-monitoring",
+      "start",
+      "Enterprise Monitoring System started successfully",
+      {
+        status: "running",
+        instanceId: this.instanceId,
+      },
+    );
     this.emit("started");
   }
   /**
@@ -118,9 +128,14 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
     if (!this.isRunning) {
       return;
     }
-    frameworkLogger.log("enterprise-monitoring", "stop", "Stopping Enterprise Monitoring System", {
-      instanceId: this.instanceId,
-    });
+    frameworkLogger.log(
+      "enterprise-monitoring",
+      "stop",
+      "Stopping Enterprise Monitoring System",
+      {
+        instanceId: this.instanceId,
+      },
+    );
     this.isRunning = false;
     if (this.collectionTimer) {
       clearInterval(this.collectionTimer);
@@ -134,10 +149,15 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
       clearInterval(this.cleanupTimer);
       this.cleanupTimer = undefined;
     }
-    frameworkLogger.log("enterprise-monitoring", "stop", "Enterprise Monitoring System stopped", {
-      status: "stopped",
-      instanceId: this.instanceId,
-    });
+    frameworkLogger.log(
+      "enterprise-monitoring",
+      "stop",
+      "Enterprise Monitoring System stopped",
+      {
+        status: "stopped",
+        instanceId: this.instanceId,
+      },
+    );
     this.emit("stopped");
   }
   /**
@@ -459,30 +479,45 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
     // Prometheus integration
     if (this.config.integrations.prometheus?.enabled) {
       // Send metric to Prometheus pushgateway
-      frameworkLogger.log("enterprise-monitoring", "external-alert", "Alert sent to Prometheus", {
-        alertId: alert.id,
-        metric: alert.metric,
-        value: alert.value,
-        instanceId: this.instanceId,
-      });
+      frameworkLogger.log(
+        "enterprise-monitoring",
+        "external-alert",
+        "Alert sent to Prometheus",
+        {
+          alertId: alert.id,
+          metric: alert.metric,
+          value: alert.value,
+          instanceId: this.instanceId,
+        },
+      );
     }
     // DataDog integration
     if (this.config.integrations.datadog?.enabled) {
       // Send event to DataDog
-      frameworkLogger.log("enterprise-monitoring", "external-alert", "Alert sent to DataDog", {
-        alertId: alert.id,
-        message: alert.message,
-        instanceId: this.instanceId,
-      });
+      frameworkLogger.log(
+        "enterprise-monitoring",
+        "external-alert",
+        "Alert sent to DataDog",
+        {
+          alertId: alert.id,
+          message: alert.message,
+          instanceId: this.instanceId,
+        },
+      );
     }
     // New Relic integration
     if (this.config.integrations.newRelic?.enabled) {
       // Send event to New Relic
-      frameworkLogger.log("enterprise-monitoring", "external-alert", "Alert sent to New Relic", {
-        alertId: alert.id,
-        message: alert.message,
-        instanceId: this.instanceId,
-      });
+      frameworkLogger.log(
+        "enterprise-monitoring",
+        "external-alert",
+        "Alert sent to New Relic",
+        {
+          alertId: alert.id,
+          message: alert.message,
+          instanceId: this.instanceId,
+        },
+      );
     }
   }
   /**
@@ -619,25 +654,35 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
     this.alerts = this.alerts.filter(
       (a) => !a.resolved || a.timestamp > cutoffTime,
     );
-    frameworkLogger.log("enterprise-monitoring", "cleanup", "Cleaned up old monitoring data", {
-      metricsCleaned: this.metrics.length,
-      alertsCleaned: this.alerts.length,
-      healthResultsCleaned: this.healthResults.length,
-    });
+    frameworkLogger.log(
+      "enterprise-monitoring",
+      "cleanup",
+      "Cleaned up old monitoring data",
+      {
+        metricsCleaned: this.metrics.length,
+        alertsCleaned: this.alerts.length,
+        healthResultsCleaned: this.healthResults.length,
+      },
+    );
   }
   /**
    * Event handlers
    */
   handleAlertTriggered(alert) {
-    frameworkLogger.log("enterprise-monitoring", "alert-triggered", "Alert triggered", {
-      alertId: alert.id,
-      severity: alert.severity,
-      message: alert.message,
-      metric: alert.metric,
-      value: alert.value,
-      threshold: alert.threshold,
-      instanceId: alert.instanceId,
-    });
+    frameworkLogger.log(
+      "enterprise-monitoring",
+      "alert-triggered",
+      "Alert triggered",
+      {
+        alertId: alert.id,
+        severity: alert.severity,
+        message: alert.message,
+        metric: alert.metric,
+        value: alert.value,
+        threshold: alert.threshold,
+        instanceId: alert.instanceId,
+      },
+    );
   }
   handleHealthCheckFailed(result) {
     console.warn(
@@ -697,10 +742,15 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
     this.emit("alert-triggered", alert);
   }
   handleReportGenerated(reportPath) {
-    frameworkLogger.log("enterprise-monitoring", "report-generated", "Performance report generated", {
-      reportPath,
-      instanceId: this.instanceId,
-    });
+    frameworkLogger.log(
+      "enterprise-monitoring",
+      "report-generated",
+      "Performance report generated",
+      {
+        reportPath,
+        instanceId: this.instanceId,
+      },
+    );
   }
   /**
    * Get current metrics
@@ -733,11 +783,16 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
     if (alert && !alert.resolved) {
       alert.resolved = true;
       alert.resolvedAt = Date.now();
-      frameworkLogger.log("enterprise-monitoring", "alert-resolved", "Alert resolved", {
-        alertId: alertId,
-        message: alert.message,
-        resolvedAt: alert.resolvedAt,
-      });
+      frameworkLogger.log(
+        "enterprise-monitoring",
+        "alert-resolved",
+        "Alert resolved",
+        {
+          alertId: alertId,
+          message: alert.message,
+          resolvedAt: alert.resolvedAt,
+        },
+      );
       return true;
     }
     return false;
@@ -754,11 +809,16 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
       health: [],
     };
     this.clusterNodes.set(node.id, clusterNode);
-    frameworkLogger.log("enterprise-monitoring", "cluster-node-added", "Added cluster node", {
-      nodeId: node.id,
-      hostname: node.hostname,
-      instanceId: this.instanceId,
-    });
+    frameworkLogger.log(
+      "enterprise-monitoring",
+      "cluster-node-added",
+      "Added cluster node",
+      {
+        nodeId: node.id,
+        hostname: node.hostname,
+        instanceId: this.instanceId,
+      },
+    );
   }
   /**
    * Update cluster node heartbeat
@@ -839,20 +899,30 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
    */
   updateConfig(newConfig) {
     this.config = { ...this.config, ...newConfig };
-    frameworkLogger.log("enterprise-monitoring", "config-updated", "Monitoring system configuration updated", {
-      instanceId: this.instanceId,
-    });
+    frameworkLogger.log(
+      "enterprise-monitoring",
+      "config-updated",
+      "Monitoring system configuration updated",
+      {
+        instanceId: this.instanceId,
+      },
+    );
   }
   /**
    * Record a custom metric
    */
   recordMetric(name, value, tags) {
-    frameworkLogger.log("enterprise-monitoring", "metric-recorded", "Metric recorded", {
-      metricName: name,
-      value,
-      tags,
-      instanceId: this.instanceId,
-    });
+    frameworkLogger.log(
+      "enterprise-monitoring",
+      "metric-recorded",
+      "Metric recorded",
+      {
+        metricName: name,
+        value,
+        tags,
+        instanceId: this.instanceId,
+      },
+    );
     // In a real implementation, this would store metrics for analysis
   }
   /**

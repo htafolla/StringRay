@@ -518,10 +518,17 @@ export class PerformanceMonitoringDashboard extends EventEmitter {
   /**
    * Send webhook notification
    */
-  private async sendWebhookNotification(alert: DashboardMetrics["alerts"][0]): Promise<void> {
+  private async sendWebhookNotification(
+    alert: DashboardMetrics["alerts"][0],
+  ): Promise<void> {
     try {
       // In a real implementation, this would make an HTTP request
-      await frameworkLogger.log("performance-dashboard", "webhook-notification", "info", { message: alert.message });
+      await frameworkLogger.log(
+        "performance-dashboard",
+        "webhook-notification",
+        "info",
+        { message: alert.message },
+      );
     } catch (error) {
       console.error("Failed to send webhook notification:", error);
     }

@@ -76,7 +76,7 @@ class StrRayDatabaseDesignServer {
   private server: Server;
 
   constructor() {
-        this.server = new Server(
+    this.server = new Server(
       {
         name: "strray-database-design",
         version: "1.0.0",
@@ -85,7 +85,7 @@ class StrRayDatabaseDesignServer {
         capabilities: {
           tools: {},
         },
-      }
+      },
     );
 
     this.setupToolHandlers();

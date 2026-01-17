@@ -10,13 +10,16 @@
  * Provides comprehensive testing and validation coverage for the entire framework.
  */
 
-import { executeCompleteE2ESimulation } from './complete-end-to-end-simulation';
+import { executeCompleteE2ESimulation } from "./complete-end-to-end-simulation";
 import { frameworkLogger } from "../framework-logger.js";
-import { codexSimulationRunner } from './codex-rule-simulations';
-import { runSessionRecoverySimulation } from './session-recovery-simulation';
-import { runSessionPersistenceSimulation } from './session-persistence-simulation';
-import { runDistributedSessionSimulation } from './distributed-session-simulation';
-import { runSelfEvolutionSimulation, runSelfEvolutionComponentTests } from './self-evolution-simulations';
+import { codexSimulationRunner } from "./codex-rule-simulations";
+import { runSessionRecoverySimulation } from "./session-recovery-simulation";
+import { runSessionPersistenceSimulation } from "./session-persistence-simulation";
+import { runDistributedSessionSimulation } from "./distributed-session-simulation";
+import {
+  runSelfEvolutionSimulation,
+  runSelfEvolutionComponentTests,
+} from "./self-evolution-simulations";
 
 export interface SimulationSuiteResult {
   suiteName: string;
@@ -31,7 +34,7 @@ export interface SimulationSuiteResult {
 
 export interface SimulationResult {
   name: string;
-  type: 'e2e' | 'codex' | 'session' | 'self-evolution' | 'component-test';
+  type: "e2e" | "codex" | "session" | "self-evolution" | "component-test";
   success: boolean;
   executionTime: number;
   details: any;
@@ -45,15 +48,30 @@ export class UnifiedSimulationRunner {
    * Run all simulation suites
    */
   async runAllSimulations(): Promise<SimulationSuiteResult[]> {
-    console.log('🎯 STARTING UNIFIED SIMULATION SUITE');
-    console.log('======================================');
+    console.log("🎯 STARTING UNIFIED SIMULATION SUITE");
+    console.log("======================================");
 
     const suites = [
-      { name: 'End-to-End Pipeline', runner: this.runE2ESimulations.bind(this) },
-      { name: 'Codex Rule Validation', runner: this.runCodexSimulations.bind(this) },
-      { name: 'Session Management', runner: this.runSessionSimulations.bind(this) },
-      { name: 'Self-Evolution System', runner: this.runSelfEvolutionSimulations.bind(this) },
-      { name: 'Component Isolation', runner: this.runComponentTests.bind(this) }
+      {
+        name: "End-to-End Pipeline",
+        runner: this.runE2ESimulations.bind(this),
+      },
+      {
+        name: "Codex Rule Validation",
+        runner: this.runCodexSimulations.bind(this),
+      },
+      {
+        name: "Session Management",
+        runner: this.runSessionSimulations.bind(this),
+      },
+      {
+        name: "Self-Evolution System",
+        runner: this.runSelfEvolutionSimulations.bind(this),
+      },
+      {
+        name: "Component Isolation",
+        runner: this.runComponentTests.bind(this),
+      },
     ];
 
     const results: SimulationSuiteResult[] = [];
@@ -63,9 +81,13 @@ export class UnifiedSimulationRunner {
       try {
         const result = await suite.runner();
         results.push(result);
-        console.log(`✅ ${suite.name}: ${result.successfulSimulations}/${result.totalSimulations} passed`);
+        console.log(
+          `✅ ${suite.name}: ${result.successfulSimulations}/${result.totalSimulations} passed`,
+        );
       } catch (error) {
-        console.error(`❌ ${suite.name}: Failed - ${error instanceof Error ? error.message : error}`);
+        console.error(
+          `❌ ${suite.name}: Failed - ${error instanceof Error ? error.message : error}`,
+        );
         results.push({
           suiteName: suite.name,
           totalSimulations: 0,
@@ -74,7 +96,7 @@ export class UnifiedSimulationRunner {
           executionTime: 0,
           results: [],
           overallSuccess: false,
-          coverage: 0
+          coverage: 0,
         });
       }
     }
@@ -95,10 +117,10 @@ export class UnifiedSimulationRunner {
     try {
       // Test with different prompt types
       const testPrompts = [
-        'Implement a user authentication system',
-        'Create a REST API for task management',
-        'Build a real-time chat application',
-        'Design a database schema for e-commerce'
+        "Implement a user authentication system",
+        "Create a REST API for task management",
+        "Build a real-time chat application",
+        "Design a database schema for e-commerce",
       ];
 
       for (const prompt of testPrompts) {
@@ -107,43 +129,47 @@ export class UnifiedSimulationRunner {
           const result = await executeCompleteE2ESimulation(prompt);
           results.push({
             name: `E2E: ${prompt.substring(0, 30)}...`,
-            type: 'e2e',
+            type: "e2e",
             success: result.success,
             executionTime: Date.now() - promptStartTime,
             details: {
               phases: result.phases.length,
               metrics: result.metrics,
-              performanceImprovement: result.results?.performanceImprovement || 0
-            }
+              performanceImprovement:
+                result.results?.performanceImprovement || 0,
+            },
           });
         } catch (error) {
           results.push({
             name: `E2E: ${prompt.substring(0, 30)}...`,
-            type: 'e2e',
+            type: "e2e",
             success: false,
             executionTime: Date.now() - promptStartTime,
             details: {},
-            error: error instanceof Error ? error.message : 'Unknown error'
+            error: error instanceof Error ? error.message : "Unknown error",
           });
         }
       }
     } catch (error) {
-      console.error('E2E simulation suite failed:', error);
+      console.error("E2E simulation suite failed:", error);
     }
 
     const executionTime = Date.now() - startTime;
-    const successfulSimulations = results.filter(r => r.success).length;
+    const successfulSimulations = results.filter((r) => r.success).length;
     const totalSimulations = results.length;
 
     return {
-      suiteName: 'End-to-End Pipeline',
+      suiteName: "End-to-End Pipeline",
       totalSimulations,
       successfulSimulations,
       failedSimulations: totalSimulations - successfulSimulations,
       executionTime,
       results,
       overallSuccess: successfulSimulations === totalSimulations,
-      coverage: totalSimulations > 0 ? (successfulSimulations / totalSimulations) * 100 : 0
+      coverage:
+        totalSimulations > 0
+          ? (successfulSimulations / totalSimulations) * 100
+          : 0,
     };
   }
 
@@ -156,43 +182,50 @@ export class UnifiedSimulationRunner {
     try {
       const results = await codexSimulationRunner.runAllSimulations();
 
-      const simulationResults: SimulationResult[] = results.map(result => ({
+      const simulationResults: SimulationResult[] = results.map((result) => ({
         name: result.ruleId,
-        type: 'codex',
-        success: result.results.filter(r => r.success).length === result.results.length,
+        type: "codex",
+        success:
+          result.results.filter((r) => r.success).length ===
+          result.results.length,
         executionTime: 0, // Codex simulations don't track individual execution time
         details: {
           totalTests: result.results.length,
-          passedTests: result.results.filter(r => r.success).length,
-          failedTests: result.results.filter(r => !r.success).length
-        }
+          passedTests: result.results.filter((r) => r.success).length,
+          failedTests: result.results.filter((r) => !r.success).length,
+        },
       }));
 
       const executionTime = Date.now() - startTime;
-      const successfulSimulations = simulationResults.filter(r => r.success).length;
+      const successfulSimulations = simulationResults.filter(
+        (r) => r.success,
+      ).length;
       const totalSimulations = simulationResults.length;
 
       return {
-        suiteName: 'Codex Rule Validation',
+        suiteName: "Codex Rule Validation",
         totalSimulations,
         successfulSimulations,
         failedSimulations: totalSimulations - successfulSimulations,
         executionTime,
         results: simulationResults,
         overallSuccess: successfulSimulations === totalSimulations,
-        coverage: totalSimulations > 0 ? (successfulSimulations / totalSimulations) * 100 : 0
+        coverage:
+          totalSimulations > 0
+            ? (successfulSimulations / totalSimulations) * 100
+            : 0,
       };
     } catch (error) {
-      console.error('Codex simulation suite failed:', error);
+      console.error("Codex simulation suite failed:", error);
       return {
-        suiteName: 'Codex Rule Validation',
+        suiteName: "Codex Rule Validation",
         totalSimulations: 0,
         successfulSimulations: 0,
         failedSimulations: 1,
         executionTime: Date.now() - startTime,
         results: [],
         overallSuccess: false,
-        coverage: 0
+        coverage: 0,
       };
     }
   }
@@ -205,9 +238,9 @@ export class UnifiedSimulationRunner {
     const results: SimulationResult[] = [];
 
     const sessionTests = [
-      { name: 'Session Recovery', runner: runSessionRecoverySimulation },
-      { name: 'Session Persistence', runner: runSessionPersistenceSimulation },
-      { name: 'Distributed Sessions', runner: runDistributedSessionSimulation }
+      { name: "Session Recovery", runner: runSessionRecoverySimulation },
+      { name: "Session Persistence", runner: runSessionPersistenceSimulation },
+      { name: "Distributed Sessions", runner: runDistributedSessionSimulation },
     ];
 
     for (const test of sessionTests) {
@@ -216,36 +249,42 @@ export class UnifiedSimulationRunner {
         const result = await test.runner();
         results.push({
           name: test.name,
-          type: 'session',
-          success: result.success || (result as any).successfulRecoveries > 0 || (result as any).successfulPersistence > 0,
+          type: "session",
+          success:
+            result.success ||
+            (result as any).successfulRecoveries > 0 ||
+            (result as any).successfulPersistence > 0,
           executionTime: Date.now() - testStartTime,
-          details: result
+          details: result,
         });
       } catch (error) {
         results.push({
           name: test.name,
-          type: 'session',
+          type: "session",
           success: false,
           executionTime: Date.now() - testStartTime,
           details: {},
-          error: error instanceof Error ? error.message : 'Unknown error'
+          error: error instanceof Error ? error.message : "Unknown error",
         });
       }
     }
 
     const executionTime = Date.now() - startTime;
-    const successfulSimulations = results.filter(r => r.success).length;
+    const successfulSimulations = results.filter((r) => r.success).length;
     const totalSimulations = results.length;
 
     return {
-      suiteName: 'Session Management',
+      suiteName: "Session Management",
       totalSimulations,
       successfulSimulations,
       failedSimulations: totalSimulations - successfulSimulations,
       executionTime,
       results,
       overallSuccess: successfulSimulations === totalSimulations,
-      coverage: totalSimulations > 0 ? (successfulSimulations / totalSimulations) * 100 : 0
+      coverage:
+        totalSimulations > 0
+          ? (successfulSimulations / totalSimulations) * 100
+          : 0,
     };
   }
 
@@ -258,43 +297,45 @@ export class UnifiedSimulationRunner {
     try {
       const result = await runSelfEvolutionSimulation();
 
-      const simulationResults: SimulationResult[] = [{
-        name: 'Complete Self-Evolution',
-        type: 'self-evolution',
-        success: result.success,
-        executionTime: result.executionTime,
-        details: {
-          componentsTested: result.componentsTested,
-          autonomousActions: result.autonomousActions,
-          safetyIncidents: result.safetyIncidents,
-          finalReadinessScore: result.finalReadinessScore
-        }
-      }];
+      const simulationResults: SimulationResult[] = [
+        {
+          name: "Complete Self-Evolution",
+          type: "self-evolution",
+          success: result.success,
+          executionTime: result.executionTime,
+          details: {
+            componentsTested: result.componentsTested,
+            autonomousActions: result.autonomousActions,
+            safetyIncidents: result.safetyIncidents,
+            finalReadinessScore: result.finalReadinessScore,
+          },
+        },
+      ];
 
       const executionTime = Date.now() - startTime;
       const successfulSimulations = result.success ? 1 : 0;
 
       return {
-        suiteName: 'Self-Evolution System',
+        suiteName: "Self-Evolution System",
         totalSimulations: 1,
         successfulSimulations,
         failedSimulations: 1 - successfulSimulations,
         executionTime,
         results: simulationResults,
         overallSuccess: result.success,
-        coverage: result.success ? 100 : 0
+        coverage: result.success ? 100 : 0,
       };
     } catch (error) {
-      console.error('Self-evolution simulation suite failed:', error);
+      console.error("Self-evolution simulation suite failed:", error);
       return {
-        suiteName: 'Self-Evolution System',
+        suiteName: "Self-Evolution System",
         totalSimulations: 1,
         successfulSimulations: 0,
         failedSimulations: 1,
         executionTime: Date.now() - startTime,
         results: [],
         overallSuccess: false,
-        coverage: 0
+        coverage: 0,
       };
     }
   }
@@ -308,42 +349,45 @@ export class UnifiedSimulationRunner {
     try {
       const results = await runSelfEvolutionComponentTests();
 
-      const simulationResults: SimulationResult[] = results.map(result => ({
+      const simulationResults: SimulationResult[] = results.map((result) => ({
         name: result.simulationName,
-        type: 'component-test',
+        type: "component-test",
         success: result.success,
         executionTime: result.executionTime,
         details: {
           componentsTested: result.componentsTested,
-          safetyIncidents: result.safetyIncidents
-        }
+          safetyIncidents: result.safetyIncidents,
+        },
       }));
 
       const executionTime = Date.now() - startTime;
-      const successfulSimulations = results.filter(r => r.success).length;
+      const successfulSimulations = results.filter((r) => r.success).length;
       const totalSimulations = results.length;
 
       return {
-        suiteName: 'Component Isolation',
+        suiteName: "Component Isolation",
         totalSimulations,
         successfulSimulations,
         failedSimulations: totalSimulations - successfulSimulations,
         executionTime,
         results: simulationResults,
         overallSuccess: successfulSimulations === totalSimulations,
-        coverage: totalSimulations > 0 ? (successfulSimulations / totalSimulations) * 100 : 0
+        coverage:
+          totalSimulations > 0
+            ? (successfulSimulations / totalSimulations) * 100
+            : 0,
       };
     } catch (error) {
-      console.error('Component test suite failed:', error);
+      console.error("Component test suite failed:", error);
       return {
-        suiteName: 'Component Isolation',
+        suiteName: "Component Isolation",
         totalSimulations: 0,
         successfulSimulations: 0,
         failedSimulations: 1,
         executionTime: Date.now() - startTime,
         results: [],
         overallSuccess: false,
-        coverage: 0
+        coverage: 0,
       };
     }
   }
@@ -351,9 +395,11 @@ export class UnifiedSimulationRunner {
   /**
    * Print comprehensive test report
    */
-  private async printComprehensiveReport(results: SimulationSuiteResult[]): Promise<void> {
-    console.log('\n🎯 COMPREHENSIVE SIMULATION REPORT');
-    console.log('===================================');
+  private async printComprehensiveReport(
+    results: SimulationSuiteResult[],
+  ): Promise<void> {
+    console.log("\n🎯 COMPREHENSIVE SIMULATION REPORT");
+    console.log("===================================");
 
     let totalSimulations = 0;
     let totalSuccessful = 0;
@@ -361,7 +407,9 @@ export class UnifiedSimulationRunner {
 
     for (const suite of results) {
       console.log(`\n📊 ${suite.suiteName}`);
-      console.log(`   Simulations: ${suite.successfulSimulations}/${suite.totalSimulations}`);
+      console.log(
+        `   Simulations: ${suite.successfulSimulations}/${suite.totalSimulations}`,
+      );
       console.log(`   Success Rate: ${suite.coverage.toFixed(1)}%`);
       console.log(`   Execution Time: ${suite.executionTime}ms`);
 
@@ -370,23 +418,41 @@ export class UnifiedSimulationRunner {
       totalExecutionTime += suite.executionTime;
     }
 
-    const overallSuccessRate = totalSimulations > 0 ? (totalSuccessful / totalSimulations) * 100 : 0;
+    const overallSuccessRate =
+      totalSimulations > 0 ? (totalSuccessful / totalSimulations) * 100 : 0;
 
-    console.log('\n🎉 OVERALL RESULTS');
-    console.log('==================');
+    console.log("\n🎉 OVERALL RESULTS");
+    console.log("==================");
     console.log(`Total Simulations: ${totalSuccessful}/${totalSimulations}`);
     console.log(`Overall Success Rate: ${overallSuccessRate.toFixed(1)}%`);
     console.log(`Total Execution Time: ${totalExecutionTime}ms`);
-    console.log(`Average Time per Simulation: ${totalSimulations > 0 ? (totalExecutionTime / totalSimulations).toFixed(0) : 0}ms`);
+    console.log(
+      `Average Time per Simulation: ${totalSimulations > 0 ? (totalExecutionTime / totalSimulations).toFixed(0) : 0}ms`,
+    );
 
     if (overallSuccessRate >= 90) {
-      console.log('🏆 STATUS: EXCELLENT - Framework fully validated');
+      console.log("🏆 STATUS: EXCELLENT - Framework fully validated");
     } else if (overallSuccessRate >= 75) {
-      await frameworkLogger.log("simulation-runner", "validation-status", "success", { status: "good", description: "Framework mostly validated" });
+      await frameworkLogger.log(
+        "simulation-runner",
+        "validation-status",
+        "success",
+        { status: "good", description: "Framework mostly validated" },
+      );
     } else if (overallSuccessRate >= 50) {
-      await frameworkLogger.log("simulation-runner", "validation-status", "debug", { status: "fair", description: "Framework needs attention" });
+      await frameworkLogger.log(
+        "simulation-runner",
+        "validation-status",
+        "debug",
+        { status: "fair", description: "Framework needs attention" },
+      );
     } else {
-      await frameworkLogger.log("simulation-runner", "validation-status", "error", { status: "poor", description: "Framework requires significant fixes" });
+      await frameworkLogger.log(
+        "simulation-runner",
+        "validation-status",
+        "error",
+        { status: "poor", description: "Framework requires significant fixes" },
+      );
     }
   }
 
@@ -400,13 +466,15 @@ export class UnifiedSimulationRunner {
   /**
    * Run specific simulation suite
    */
-  async runSimulationSuite(suiteName: string): Promise<SimulationSuiteResult | null> {
+  async runSimulationSuite(
+    suiteName: string,
+  ): Promise<SimulationSuiteResult | null> {
     const suiteMap: Record<string, () => Promise<SimulationSuiteResult>> = {
-      'e2e': this.runE2ESimulations.bind(this),
-      'codex': this.runCodexSimulations.bind(this),
-      'session': this.runSessionSimulations.bind(this),
-      'self-evolution': this.runSelfEvolutionSimulations.bind(this),
-      'component': this.runComponentTests.bind(this)
+      e2e: this.runE2ESimulations.bind(this),
+      codex: this.runCodexSimulations.bind(this),
+      session: this.runSessionSimulations.bind(this),
+      "self-evolution": this.runSelfEvolutionSimulations.bind(this),
+      component: this.runComponentTests.bind(this),
     };
 
     const runner = suiteMap[suiteName.toLowerCase()];

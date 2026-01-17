@@ -5,10 +5,10 @@
  * Full CI/CD validation for git push hooks (<5 minutes)
  */
 
-import * as fs from 'fs';
+import * as fs from "fs";
 import { frameworkLogger } from "../../framework-logger.js";
-import * as path from 'path';
-import { execSync } from 'child_process';
+import * as path from "path";
+import { execSync } from "child_process";
 
 interface ComprehensiveValidationResult {
   passed: boolean;
@@ -39,12 +39,18 @@ class ComprehensiveValidator {
    */
   private getChangedFiles(): string[] {
     try {
-      const output = execSync('git log --name-only --oneline -1 HEAD | tail -n +2', {
-        encoding: 'utf8'
-      });
-      return output.trim().split('\n').filter(f => f.trim());
+      const output = execSync(
+        "git log --name-only --oneline -1 HEAD | tail -n +2",
+        {
+          encoding: "utf8",
+        },
+      );
+      return output
+        .trim()
+        .split("\n")
+        .filter((f) => f.trim());
     } catch (error) {
-      console.warn('⚠️ Could not determine changed files');
+      console.warn("⚠️ Could not determine changed files");
       return [];
     }
   }
@@ -52,24 +58,34 @@ class ComprehensiveValidator {
   /**
    * Run linting checks
    */
-  private async runLinting(): Promise<{ errors: string[], warnings: string[] }> {
+  private async runLinting(): Promise<{
+    errors: string[];
+    warnings: string[];
+  }> {
     const errors: string[] = [];
     const warnings: string[] = [];
 
     try {
       // Check if ESLint is available
-      const hasEslint = fs.existsSync(path.join(this.projectRoot, 'node_modules', '.bin', 'eslint'));
+      const hasEslint = fs.existsSync(
+        path.join(this.projectRoot, "node_modules", ".bin", "eslint"),
+      );
       if (hasEslint) {
         // ESLint start - kept as console.log for user visibility
         try {
-          execSync('npx eslint . --ext .js,.ts,.jsx,.tsx --max-warnings 0', {
+          execSync("npx eslint . --ext .js,.ts,.jsx,.tsx --max-warnings 0", {
             cwd: this.projectRoot,
-            stdio: 'pipe',
-            timeout: 30000
+            stdio: "pipe",
+            timeout: 30000,
           });
-          await frameworkLogger.log("comprehensive-validator", "eslint-passed", "success");
+          await frameworkLogger.log(
+            "comprehensive-validator",
+            "eslint-passed",
+            "success",
+          );
         } catch (error: any) {
-          const output = error.stdout?.toString() || error.stderr?.toString() || '';
+          const output =
+            error.stdout?.toString() || error.stderr?.toString() || "";
           const errorCount = (output.match(/error/g) || []).length;
           const warningCount = (output.match(/warning/g) || []).length;
 
@@ -83,23 +99,31 @@ class ComprehensiveValidator {
       }
 
       // Check TypeScript compilation
-      const hasTypescript = fs.existsSync(path.join(this.projectRoot, 'node_modules', '.bin', 'tsc'));
-      if (hasTypescript && fs.existsSync(path.join(this.projectRoot, 'tsconfig.json'))) {
+      const hasTypescript = fs.existsSync(
+        path.join(this.projectRoot, "node_modules", ".bin", "tsc"),
+      );
+      if (
+        hasTypescript &&
+        fs.existsSync(path.join(this.projectRoot, "tsconfig.json"))
+      ) {
         // TypeScript compilation start - kept as console.log for user visibility
         try {
-          execSync('npx tsc --noEmit', {
+          execSync("npx tsc --noEmit", {
             cwd: this.projectRoot,
-            stdio: 'pipe',
-            timeout: 30000
+            stdio: "pipe",
+            timeout: 30000,
           });
-          await frameworkLogger.log("comprehensive-validator", "typescript-compilation-passed", "success");
+          await frameworkLogger.log(
+            "comprehensive-validator",
+            "typescript-compilation-passed",
+            "success",
+          );
         } catch (error) {
-          errors.push('TypeScript compilation failed');
+          errors.push("TypeScript compilation failed");
         }
       }
-
     } catch (error) {
-      warnings.push('Linting checks could not be completed');
+      warnings.push("Linting checks could not be completed");
     }
 
     return { errors, warnings };
@@ -108,23 +132,31 @@ class ComprehensiveValidator {
   /**
    * Run unit tests
    */
-  private async runTests(): Promise<{ errors: string[], warnings: string[], testResults?: any }> {
+  private async runTests(): Promise<{
+    errors: string[];
+    warnings: string[];
+    testResults?: any;
+  }> {
     const errors: string[] = [];
     const warnings: string[] = [];
 
     try {
       // Check for test runners
-      const hasVitest = fs.existsSync(path.join(this.projectRoot, 'node_modules', '.bin', 'vitest'));
-      const hasJest = fs.existsSync(path.join(this.projectRoot, 'node_modules', '.bin', 'jest'));
+      const hasVitest = fs.existsSync(
+        path.join(this.projectRoot, "node_modules", ".bin", "vitest"),
+      );
+      const hasJest = fs.existsSync(
+        path.join(this.projectRoot, "node_modules", ".bin", "jest"),
+      );
 
       if (hasVitest) {
-        console.log('🧪 Running Vitest...');
+        console.log("🧪 Running Vitest...");
         try {
-          const result = execSync('npx vitest run --coverage --reporter=json', {
+          const result = execSync("npx vitest run --coverage --reporter=json", {
             cwd: this.projectRoot,
-            stdio: 'pipe',
+            stdio: "pipe",
             timeout: 120000, // 2 minutes
-            encoding: 'utf8'
+            encoding: "utf8",
           });
 
           // Parse test results (simplified)
@@ -132,36 +164,45 @@ class ComprehensiveValidator {
           const failed = (result.match(/"passed":\s*false/g) || []).length;
 
           if (failed > 0) {
-            errors.push(`Tests failed: ${failed} out of ${passed + failed} tests failed`);
+            errors.push(
+              `Tests failed: ${failed} out of ${passed + failed} tests failed`,
+            );
           } else {
-            await frameworkLogger.log("comprehensive-validator", "tests-passed", "success", { testCount: passed });
+            await frameworkLogger.log(
+              "comprehensive-validator",
+              "tests-passed",
+              "success",
+              { testCount: passed },
+            );
           }
 
           return {
             errors,
             warnings,
-            testResults: { passed, failed, total: passed + failed }
+            testResults: { passed, failed, total: passed + failed },
           };
-
         } catch (error) {
-          errors.push('Vitest execution failed');
+          errors.push("Vitest execution failed");
         }
       } else if (hasJest) {
-        console.log('🧪 Running Jest...');
+        console.log("🧪 Running Jest...");
         try {
-          execSync('npx jest --coverage --passWithNoTests', {
+          execSync("npx jest --coverage --passWithNoTests", {
             cwd: this.projectRoot,
-            stdio: 'pipe',
-            timeout: 120000
+            stdio: "pipe",
+            timeout: 120000,
           });
-          await frameworkLogger.log("comprehensive-validator", "jest-tests-completed", "success");
+          await frameworkLogger.log(
+            "comprehensive-validator",
+            "jest-tests-completed",
+            "success",
+          );
         } catch (error) {
-          errors.push('Jest tests failed');
+          errors.push("Jest tests failed");
         }
       }
-
     } catch (error) {
-      warnings.push('Test execution could not be completed');
+      warnings.push("Test execution could not be completed");
     }
 
     return { errors, warnings };
@@ -170,26 +211,35 @@ class ComprehensiveValidator {
   /**
    * Run security checks
    */
-  private async runSecurityChecks(): Promise<{ errors: string[], warnings: string[] }> {
+  private async runSecurityChecks(): Promise<{
+    errors: string[];
+    warnings: string[];
+  }> {
     const errors: string[] = [];
     const warnings: string[] = [];
 
     try {
       // Check for package vulnerabilities
-      if (fs.existsSync(path.join(this.projectRoot, 'package.json'))) {
+      if (fs.existsSync(path.join(this.projectRoot, "package.json"))) {
         // NPM audit start - kept as console.log for user visibility
         try {
-          execSync('npm audit --audit-level high', {
+          execSync("npm audit --audit-level high", {
             cwd: this.projectRoot,
-            stdio: 'pipe',
-            timeout: 30000
+            stdio: "pipe",
+            timeout: 30000,
           });
-          await frameworkLogger.log("comprehensive-validator", "security-audit-passed", "success");
+          await frameworkLogger.log(
+            "comprehensive-validator",
+            "security-audit-passed",
+            "success",
+          );
         } catch (error: any) {
-          const output = error.stdout?.toString() || '';
+          const output = error.stdout?.toString() || "";
           const vulnCount = (output.match(/vulnerabilities/g) || []).length;
           if (vulnCount > 0) {
-            errors.push(`Security vulnerabilities found: ${vulnCount} high/critical issues`);
+            errors.push(
+              `Security vulnerabilities found: ${vulnCount} high/critical issues`,
+            );
           }
         }
       }
@@ -202,7 +252,7 @@ class ComprehensiveValidator {
         /token\s*[:=]\s*['"][^'"]*['"]/i,
         /api_key\s*[:=]\s*['"][^'"]*['"]/i,
         /private_key/i,
-        /BEGIN\s+(RSA\s+)?PRIVATE\s+KEY/i
+        /BEGIN\s+(RSA\s+)?PRIVATE\s+KEY/i,
       ];
 
       let secretFound = false;
@@ -210,7 +260,7 @@ class ComprehensiveValidator {
         if (!fs.existsSync(file)) continue;
 
         try {
-          const content = fs.readFileSync(file, 'utf8');
+          const content = fs.readFileSync(file, "utf8");
           for (const pattern of secretPatterns) {
             if (pattern.test(content)) {
               errors.push(`Potential secret detected in ${file}`);
@@ -224,11 +274,14 @@ class ComprehensiveValidator {
       }
 
       if (!secretFound) {
-        await frameworkLogger.log("comprehensive-validator", "no-secrets-detected", "success");
+        await frameworkLogger.log(
+          "comprehensive-validator",
+          "no-secrets-detected",
+          "success",
+        );
       }
-
     } catch (error) {
-      warnings.push('Security checks could not be completed');
+      warnings.push("Security checks could not be completed");
     }
 
     return { errors, warnings };
@@ -237,33 +290,41 @@ class ComprehensiveValidator {
   /**
    * Check build process
    */
-  private async runBuildCheck(): Promise<{ errors: string[], warnings: string[] }> {
+  private async runBuildCheck(): Promise<{
+    errors: string[];
+    warnings: string[];
+  }> {
     const errors: string[] = [];
     const warnings: string[] = [];
 
     try {
-      if (fs.existsSync(path.join(this.projectRoot, 'package.json'))) {
-        const packageJson = JSON.parse(fs.readFileSync(path.join(this.projectRoot, 'package.json'), 'utf8'));
+      if (fs.existsSync(path.join(this.projectRoot, "package.json"))) {
+        const packageJson = JSON.parse(
+          fs.readFileSync(path.join(this.projectRoot, "package.json"), "utf8"),
+        );
 
         // Try to run build script
         if (packageJson.scripts?.build) {
           // Build process start - kept as console.log for user visibility
           try {
-            execSync('npm run build', {
+            execSync("npm run build", {
               cwd: this.projectRoot,
-              stdio: 'pipe',
+              stdio: "pipe",
               timeout: 120000, // 2 minutes
-              env: { ...process.env, NODE_ENV: 'production' }
+              env: { ...process.env, NODE_ENV: "production" },
             });
-            await frameworkLogger.log("comprehensive-validator", "build-completed", "success");
+            await frameworkLogger.log(
+              "comprehensive-validator",
+              "build-completed",
+              "success",
+            );
           } catch (error) {
-            errors.push('Build process failed');
+            errors.push("Build process failed");
           }
         }
       }
-
     } catch (error) {
-      warnings.push('Build check could not be completed');
+      warnings.push("Build check could not be completed");
     }
 
     return { errors, warnings };
@@ -278,7 +339,11 @@ class ComprehensiveValidator {
     let testResults;
 
     try {
-      await frameworkLogger.log("comprehensive-validator", "post-push-validation-started", "info");
+      await frameworkLogger.log(
+        "comprehensive-validator",
+        "post-push-validation-started",
+        "info",
+      );
 
       // Linting checks
       const lintResults = await this.runLinting();
@@ -301,10 +366,15 @@ class ComprehensiveValidator {
       allErrors.push(...buildResults.errors);
       allWarnings.push(...buildResults.warnings);
 
-      await frameworkLogger.log("comprehensive-validator", "post-push-validation-completed", "info");
-
+      await frameworkLogger.log(
+        "comprehensive-validator",
+        "post-push-validation-completed",
+        "info",
+      );
     } catch (error) {
-      allErrors.push(`Validation failed: ${error instanceof Error ? error.message : String(error)}`);
+      allErrors.push(
+        `Validation failed: ${error instanceof Error ? error.message : String(error)}`,
+      );
     }
 
     const duration = Date.now() - this.startTime;
@@ -314,7 +384,7 @@ class ComprehensiveValidator {
       errors: allErrors,
       warnings: allWarnings,
       duration,
-      testResults
+      testResults,
     };
   }
 }
@@ -329,22 +399,26 @@ async function main(): Promise<void> {
   // Report results
   if (result.warnings.length > 0) {
     console.log(`⚠️ ${result.warnings.length} warning(s) found:`);
-    result.warnings.forEach(warning => console.log(`   ${warning}`));
+    result.warnings.forEach((warning) => console.log(`   ${warning}`));
   }
 
   if (result.errors.length > 0) {
     console.log(`❌ ${result.errors.length} error(s) found:`);
-    result.errors.forEach(error => console.log(`   ${error}`));
+    result.errors.forEach((error) => console.log(`   ${error}`));
   }
 
   if (result.testResults) {
-    console.log(`🧪 Test Results: ${result.testResults.passed}/${result.testResults.total} passed`);
+    console.log(
+      `🧪 Test Results: ${result.testResults.passed}/${result.testResults.total} passed`,
+    );
   }
 
-  console.log(`✅ Post-push: Comprehensive validation completed in ${result.duration}ms`);
+  console.log(
+    `✅ Post-push: Comprehensive validation completed in ${result.duration}ms`,
+  );
 
   if (!result.passed) {
-    console.log('💡 Fix the errors above before pushing');
+    console.log("💡 Fix the errors above before pushing");
     process.exit(1);
   }
 
@@ -352,7 +426,10 @@ async function main(): Promise<void> {
 }
 
 // Run validation
-main().catch(error => {
-  console.error('❌ Comprehensive validation failed:', error instanceof Error ? error.message : String(error));
+main().catch((error) => {
+  console.error(
+    "❌ Comprehensive validation failed:",
+    error instanceof Error ? error.message : String(error),
+  );
   process.exit(1);
 });

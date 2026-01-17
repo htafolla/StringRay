@@ -1,4 +1,4 @@
-#  - Complete Agent Context & Universal Development Codex v1.2.25
+# - Complete Agent Context & Universal Development Codex v1.2.25
 
 **Framework Version**: 1.0.27
 **Last Updated**: 2026-01-16 (Updated Architecture Documentation)
@@ -238,22 +238,22 @@ StrRay uses a **hybrid TypeScript/Python architecture** with two key directories
 
 ### Initialization Flow: OpenCode → Framework Boot
 
-| Stage | Component | Location | Action | Output | Dependencies |
-|-------|-----------|----------|--------|--------|--------------|
-| **1. OpenCode** | Core Runtime | `~/.opencode/` | Start OpenCode environment | Runtime ready | None |
-| **2. oh-my-opencode** | Framework Loader | `~/.opencode/plugins/` | Load oh-my-opencode framework | Framework active | OpenCode |
-| **3. Plugin Discovery** | Plugin System | `.opencode/plugins/` | Scan for StrRay plugin | Plugin detected | oh-my-opencode |
-| **4. Plugin Loading** | Codex Injection | `plugin/strray-codex-injection.ts` | Load plugin with codex injection | Plugin active | Plugin discovery |
-| **5. Claude Override** | MCP Exclusion | `.claude/.mcp.json` | Disable problematic global MCP servers | Clean MCP environment | Plugin loading |
-| **6. MCP Registration** | Server Registry | `.mcp.json` | Register 16 MCP servers | Servers available | Claude override |
-| **7. Agent Initialization** | Agent System | `src/agents/` | Load 8 specialized agents | Agents ready | Plugin loading |
-| **8. Context Loading** | Codex System | `.strray/codex.json` | Load 55 codex terms | Validation active | Plugin loading |
-| **9. State Manager** | Persistence | `src/state/state-manager.ts` | Initialize state management | State ready | Context loading |
-| **10. Orchestrator** | Coordination | `src/orchestrator.ts` | Load task orchestration | Delegation ready | State manager |
-| **11. Delegation System** | Routing | `src/delegation/` | Setup complexity analysis | Routing active | Orchestrator |
-| **12. Processor Pipeline** | Execution | `src/processors/` | Activate pre/post processing | Pipeline ready | Delegation |
-| **13. Security Components** | Protection | `src/security/` | Enable security hardening | Security active | Processor pipeline |
-| **14. Monitoring** | Observability | `src/monitoring/` | Start performance tracking | Monitoring active | Security |
+| Stage                       | Component        | Location                           | Action                                 | Output                | Dependencies       |
+| --------------------------- | ---------------- | ---------------------------------- | -------------------------------------- | --------------------- | ------------------ |
+| **1. OpenCode**             | Core Runtime     | `~/.opencode/`                     | Start OpenCode environment             | Runtime ready         | None               |
+| **2. oh-my-opencode**       | Framework Loader | `~/.opencode/plugins/`             | Load oh-my-opencode framework          | Framework active      | OpenCode           |
+| **3. Plugin Discovery**     | Plugin System    | `.opencode/plugins/`               | Scan for StrRay plugin                 | Plugin detected       | oh-my-opencode     |
+| **4. Plugin Loading**       | Codex Injection  | `plugin/strray-codex-injection.ts` | Load plugin with codex injection       | Plugin active         | Plugin discovery   |
+| **5. Claude Override**      | MCP Exclusion    | `.claude/.mcp.json`                | Disable problematic global MCP servers | Clean MCP environment | Plugin loading     |
+| **6. MCP Registration**     | Server Registry  | `.mcp.json`                        | Register 16 MCP servers                | Servers available     | Claude override    |
+| **7. Agent Initialization** | Agent System     | `src/agents/`                      | Load 8 specialized agents              | Agents ready          | Plugin loading     |
+| **8. Context Loading**      | Codex System     | `.strray/codex.json`               | Load 55 codex terms                    | Validation active     | Plugin loading     |
+| **9. State Manager**        | Persistence      | `src/state/state-manager.ts`       | Initialize state management            | State ready           | Context loading    |
+| **10. Orchestrator**        | Coordination     | `src/orchestrator.ts`              | Load task orchestration                | Delegation ready      | State manager      |
+| **11. Delegation System**   | Routing          | `src/delegation/`                  | Setup complexity analysis              | Routing active        | Orchestrator       |
+| **12. Processor Pipeline**  | Execution        | `src/processors/`                  | Activate pre/post processing           | Pipeline ready        | Delegation         |
+| **13. Security Components** | Protection       | `src/security/`                    | Enable security hardening              | Security active       | Processor pipeline |
+| **14. Monitoring**          | Observability    | `src/monitoring/`                  | Start performance tracking             | Monitoring active     | Security           |
 
 ### Boot Orchestration Sequence
 
@@ -923,7 +923,7 @@ Evaluate performance characteristics:
 
 ## Framework Alignment
 
-###  Integration
+### Integration
 
 - Dual orchestration system (Prometheus + Sisyphus + StrRay multi-agent)
 - Configuration follows OpenCode's merged hierarchy (global → project → StrRay)
@@ -932,7 +932,7 @@ Evaluate performance characteristics:
 - Session management with cross-system coordination
 - Tool orchestration with automatic complexity-based routing
 
-### 
+###
 
 - Integrated agent initialization alongside oh-my-opencode
 - 99.6% error prevention through dual-system validation
@@ -1186,6 +1186,7 @@ Framework initializes in strict dependency order:
 **CRITICAL**: Never cancel running scripts or processes. Always allow complete outcomes for accurate results.
 
 #### **🚫 AVOID: Premature Cancellation**
+
 ```bash
 # WRONG - Cancels running processes
 pkill -f "ci-cd-full-cycle"
@@ -1195,6 +1196,7 @@ timeout 120 node scripts/long-running-script.js
 #### **✅ CORRECT: Multi-Tasking Approaches**
 
 ##### **Option 1: Background Execution**
+
 ```bash
 # Use nohup for long-running scripts
 nohup node scripts/ci-cd-full-cycle.cjs "commit message" &
@@ -1202,6 +1204,7 @@ tail -f nohup.out  # Monitor progress
 ```
 
 ##### **Option 2: Subagent Parallel Execution**
+
 ```bash
 # Launch subagents for parallel work
 background_task(agent="orchestrator", prompt="Monitor CI/CD pipeline completion")
@@ -1212,6 +1215,7 @@ background_task(agent="bug-triage-specialist", prompt="Analyze any failures dete
 ```
 
 ##### **Option 3: Session-Based Multi-Tasking**
+
 ```bash
 # Use session management for complex workflows
 session_create("ci-cd-monitoring")
@@ -1232,6 +1236,7 @@ session_status("ci-cd-monitoring")
 6. **Resource Management**: Ensure adequate resources for parallel execution
 
 #### **📊 Multi-Tasking Benefits:**
+
 - **Complete Results**: No truncated or incomplete outcomes
 - **Parallel Efficiency**: Multiple tasks progress simultaneously
 - **Resource Optimization**: Better utilization of available capacity
@@ -1239,8 +1244,6 @@ session_status("ci-cd-monitoring")
 - **Enterprise Scalability**: Handle complex workflows effectively
 
 ---
-
-
 
 ## 🌉 Cross-Language Integration
 
@@ -1405,27 +1408,29 @@ session_status("ci-cd-monitoring")
 **All framework scripts are centralized in the `scripts/` directory for consistent organization and automation.**
 
 ### 📊 Scripts Overview
+
 - **Total Scripts**: 112 files across 11 subdirectories
 - **Location**: `scripts/` (all in same folder as requested)
 - **Organization**: Categorized by functionality and purpose
 
 ### 📂 Script Categories
 
-| Category | Scripts | Purpose | Key Files |
-|----------|---------|---------|-----------|
-| **🏗️ Build & Deployment** | 18+ | Plugin deployment, MCP registration, build automation | `deploy-stringray-plugin.sh`, `extract-framework.sh`, `register-mcp-servers*.sh`, `build/` |
-| **🧪 Testing** | 70+ | Comprehensive testing suite, NPM validation, codex validation | `test-npm-install.sh ⭐`, `test-simple-npm.sh`, `validate-codex.js`, `src/__tests__/` |
-| **🔍 Analysis & Monitoring** | 5+ | Performance profiling, health monitoring, reporting | `monitoring/`, `profile-performance.sh`, `reporting/`, `run-performance-gates.mjs` |
-| **🔧 Framework** | 7+ | Core framework operations, initialization, version management | `postinstall.cjs`, `framework/`, `universal-version-manager.js`, `init.ts` |
-| **🔒 Security & Validation** | 5+ | Security auditing, dependency scanning, validation | `basic-security-audit.cjs`, `dependency-scan.cjs`, `validation/`, `boot-check.cjs` |
-| **🎭 Demo & Simulation** | 5+ | Framework demonstrations, simulations, scenarios | `demo/`, `simulation/`, `scenarios/`, `run-simulations.mjs` |
-| **🧹 Maintenance** | 4+ | Repository maintenance, issue triage, cleanup | `cleanup-repository.js`, `strray-triage.sh`, `cleanup-doc-versions.js` |
+| Category                     | Scripts | Purpose                                                       | Key Files                                                                                  |
+| ---------------------------- | ------- | ------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| **🏗️ Build & Deployment**    | 18+     | Plugin deployment, MCP registration, build automation         | `deploy-stringray-plugin.sh`, `extract-framework.sh`, `register-mcp-servers*.sh`, `build/` |
+| **🧪 Testing**               | 70+     | Comprehensive testing suite, NPM validation, codex validation | `test-npm-install.sh ⭐`, `test-simple-npm.sh`, `validate-codex.js`, `src/__tests__/`      |
+| **🔍 Analysis & Monitoring** | 5+      | Performance profiling, health monitoring, reporting           | `monitoring/`, `profile-performance.sh`, `reporting/`, `run-performance-gates.mjs`         |
+| **🔧 Framework**             | 7+      | Core framework operations, initialization, version management | `postinstall.cjs`, `framework/`, `universal-version-manager.js`, `init.ts`                 |
+| **🔒 Security & Validation** | 5+      | Security auditing, dependency scanning, validation            | `basic-security-audit.cjs`, `dependency-scan.cjs`, `validation/`, `boot-check.cjs`         |
+| **🎭 Demo & Simulation**     | 5+      | Framework demonstrations, simulations, scenarios              | `demo/`, `simulation/`, `scenarios/`, `run-simulations.mjs`                                |
+| **🧹 Maintenance**           | 4+      | Repository maintenance, issue triage, cleanup                 | `cleanup-repository.js`, `strray-triage.sh`, `cleanup-doc-versions.js`                     |
 
 ### 🧪 Comprehensive Testing Framework
 
 **65+ test files across unit, integration, E2E, and performance testing:**
 
 #### **Unit Tests (25+ files)**
+
 ```bash
 npm run test:unit                    # All unit tests
 npm run test                         # Core unit tests
@@ -1433,6 +1438,7 @@ npm run test:architect              # Agent tests
 ```
 
 **Key Unit Test Categories:**
+
 - Agent functionality (architect, orchestrator, enforcer, etc.)
 - Framework components (boot orchestrator, codex injector, etc.)
 - Security modules (auditor, hardener, headers)
@@ -1440,6 +1446,7 @@ npm run test:architect              # Agent tests
 - Utilities (codex parser, path resolver, etc.)
 
 #### **Integration Tests (20+ files)**
+
 ```bash
 npm run test:integration            # All integration tests
 npm run test:e2e                    # E2E framework integration
@@ -1448,6 +1455,7 @@ npm run test:e2e-complete           # Complete E2E testing
 ```
 
 **Key Integration Areas:**
+
 - Framework initialization and setup
 - Codex enforcement across components
 - Session management and lifecycle
@@ -1456,12 +1464,14 @@ npm run test:e2e-complete           # Complete E2E testing
 - oh-my-opencode integration
 
 #### **Performance Tests (2+ files)**
+
 ```bash
 npm run test:performance           # Performance regression tests
 npm run test:architect            # Architecture performance
 ```
 
 #### **Validation & Security Tests**
+
 ```bash
 npm run test:validation            # All validation scripts
 npm run test:security-audit        # Security vulnerability scanning
@@ -1470,18 +1480,21 @@ npm run test:mcp-connectivity      # MCP server connectivity
 ```
 
 #### **NPM Package Testing**
+
 ```bash
 npm run test:npm-install          # Automated NPM installation testing ⭐
 npm run test:simple-npm           # Quick NPM validation
 ```
 
 #### **Simulation & Monitoring**
+
 ```bash
 npm run test:simulation           # Framework simulation testing
 npm run test:monitoring           # System monitoring validation
 ```
 
 #### **CI/CD Testing**
+
 ```bash
 npm run test:ci                   # CI-optimized test suite
 npm run test:all                  # Complete test suite
@@ -1491,6 +1504,7 @@ npm run test:comprehensive        # MCP and integration validation
 ### 🚀 Key Automation Scripts
 
 #### **NPM Installation Testing**
+
 ```bash
 npm run test:npm-install          # Comprehensive automated testing
 ./scripts/test-npm-install.sh      # Direct script execution
@@ -1498,12 +1512,14 @@ npm run test:npm-install          # Comprehensive automated testing
 ```
 
 #### **CI/CD Automation**
+
 ```bash
 node scripts/ci-cd-auto-fix.cjs    # Auto-fix CI/CD issues
 node scripts/github-actions-monitor.cjs  # Monitor pipeline status
 ```
 
 #### **Framework Operations**
+
 ```bash
 node scripts/postinstall.cjs       # NPM postinstall automation
 node scripts/universal-version-manager.js  # Version management
@@ -1512,12 +1528,14 @@ node scripts/universal-version-manager.js  # Version management
 ### 📋 Package.json Integration
 
 **For detailed script usage and additional npm scripts, review `package.json` which contains:**
+
 - Complete test suite commands (`test:*` scripts)
 - Build and deployment scripts
 - Validation and monitoring commands
 - Framework operation scripts
 
 **Key npm scripts available:**
+
 - `npm run test:all` - Complete test suite
 - `npm run test:ci` - CI-optimized testing
 - `npm run test:npm-install` - Automated NPM validation ⭐
@@ -1542,6 +1560,7 @@ node scripts/universal-version-manager.js  # Version management
 ### 📝 Scripts Inventory Generation
 
 **The scripts inventory was generated using shell commands (not a dedicated script):**
+
 ```bash
 find scripts/ -type f | wc -l                    # Count total scripts
 find scripts/ -name "*.sh" -perm +111 | wc -l    # Count executables
@@ -1556,84 +1575,84 @@ ls -la scripts/*/ | wc -l                        # Count subdirectories
 
 ### CI/CD Pipeline Flow
 
-| Stage | Step | Responsible | Input | Action | Output | Success Criteria | Failure Handling |
-|-------|------|-------------|-------|--------|--------|------------------|------------------|
-| **1. Trigger** | Code Push | Developer/Git | Commit/PR | Push to main | Repository Update | Valid commit | Block merge |
-| **2. Setup** | Environment | GitHub Actions | Node.js matrix (18.x, 20.x) | Install dependencies | Ready environment | Dependencies installed | Fail fast |
-| **3. Quality** | Type Check | TypeScript | Source code | `npm run typecheck` | Compiled JS | No TS errors | Block deployment |
-| **4. Quality** | Lint | ESLint | Source code | `npm run lint` | Lint report | Zero errors | Require fixes |
-| **5. Test** | Unit Tests | Vitest | Test files | `npm run test:unit` | Coverage report | >85% coverage | Block deployment |
-| **6. Test** | Integration | Vitest | Integration tests | `npm run test:integration` | Test results | All tests pass | Block deployment |
-| **7. Test** | E2E Tests | Vitest | E2E scenarios | `npm run test:e2e` | Test results | All tests pass | Block deployment |
-| **8. Security** | Audit | NPM Audit | Dependencies | `npm audit` | Security report | No high/critical | Require updates |
-| **9. Build** | Package | TypeScript | Source code | `npm run build` | Dist files | Clean build | Block deployment |
-| **10. Deploy** | NPM Publish | GitHub Actions | Built package | `npm publish` | Published package | Version bumped | Manual intervention |
+| Stage           | Step        | Responsible    | Input                       | Action                     | Output            | Success Criteria       | Failure Handling    |
+| --------------- | ----------- | -------------- | --------------------------- | -------------------------- | ----------------- | ---------------------- | ------------------- |
+| **1. Trigger**  | Code Push   | Developer/Git  | Commit/PR                   | Push to main               | Repository Update | Valid commit           | Block merge         |
+| **2. Setup**    | Environment | GitHub Actions | Node.js matrix (18.x, 20.x) | Install dependencies       | Ready environment | Dependencies installed | Fail fast           |
+| **3. Quality**  | Type Check  | TypeScript     | Source code                 | `npm run typecheck`        | Compiled JS       | No TS errors           | Block deployment    |
+| **4. Quality**  | Lint        | ESLint         | Source code                 | `npm run lint`             | Lint report       | Zero errors            | Require fixes       |
+| **5. Test**     | Unit Tests  | Vitest         | Test files                  | `npm run test:unit`        | Coverage report   | >85% coverage          | Block deployment    |
+| **6. Test**     | Integration | Vitest         | Integration tests           | `npm run test:integration` | Test results      | All tests pass         | Block deployment    |
+| **7. Test**     | E2E Tests   | Vitest         | E2E scenarios               | `npm run test:e2e`         | Test results      | All tests pass         | Block deployment    |
+| **8. Security** | Audit       | NPM Audit      | Dependencies                | `npm audit`                | Security report   | No high/critical       | Require updates     |
+| **9. Build**    | Package     | TypeScript     | Source code                 | `npm run build`            | Dist files        | Clean build            | Block deployment    |
+| **10. Deploy**  | NPM Publish | GitHub Actions | Built package               | `npm publish`              | Published package | Version bumped         | Manual intervention |
 
 ### Release Process Flow
 
-| Phase | Step | Owner | Prerequisites | Activities | Deliverables | Gate Criteria | Rollback Plan |
-|-------|------|-------|----------------|------------|--------------|----------------|---------------|
-| **Planning** | Feature Complete | Product/Dev | Requirements signed off | Sprint planning, estimation | Release scope | All features implemented | Cancel release |
-| **Development** | Code Complete | Development Team | Feature branches merged | Code review, testing | Main branch stable | CI passing | Feature flags off |
-| **Staging** | Pre-release | DevOps | Main branch green | Deploy to staging | Staging environment | All tests pass | Roll back to previous |
-| **Validation** | QA Testing | QA Team | Staging deployed | Functional, performance, security testing | Test reports | Zero critical bugs | Fix and redeploy |
-| **Approval** | Release Review | Product/Engineering | QA passed | Final review meeting | Release approval | Business sign-off | Postpone release |
-| **Production** | Deployment | DevOps | Release approved | Blue-green deployment | Production live | Monitoring green | Immediate rollback |
-| **Monitoring** | Post-release | SRE Team | Production deployed | Error monitoring, performance tracking | Health reports | <5% error rate | Rollback within 30min |
+| Phase           | Step             | Owner               | Prerequisites           | Activities                                | Deliverables        | Gate Criteria            | Rollback Plan         |
+| --------------- | ---------------- | ------------------- | ----------------------- | ----------------------------------------- | ------------------- | ------------------------ | --------------------- |
+| **Planning**    | Feature Complete | Product/Dev         | Requirements signed off | Sprint planning, estimation               | Release scope       | All features implemented | Cancel release        |
+| **Development** | Code Complete    | Development Team    | Feature branches merged | Code review, testing                      | Main branch stable  | CI passing               | Feature flags off     |
+| **Staging**     | Pre-release      | DevOps              | Main branch green       | Deploy to staging                         | Staging environment | All tests pass           | Roll back to previous |
+| **Validation**  | QA Testing       | QA Team             | Staging deployed        | Functional, performance, security testing | Test reports        | Zero critical bugs       | Fix and redeploy      |
+| **Approval**    | Release Review   | Product/Engineering | QA passed               | Final review meeting                      | Release approval    | Business sign-off        | Postpone release      |
+| **Production**  | Deployment       | DevOps              | Release approved        | Blue-green deployment                     | Production live     | Monitoring green         | Immediate rollback    |
+| **Monitoring**  | Post-release     | SRE Team            | Production deployed     | Error monitoring, performance tracking    | Health reports      | <5% error rate           | Rollback within 30min |
 
 ### Testing Pipeline Flow
 
-| Test Type | Scope | Trigger | Environment | Execution | Reporting | Failure Impact | Retry Strategy |
-|-----------|-------|---------|-------------|-----------|-----------|----------------|----------------|
-| **Unit Tests** | Individual functions | Code change | Local/CI | `npm run test:unit` | Coverage report | Block merge | Auto-retry 3x |
-| **Integration** | Component interaction | PR created | CI environment | `npm run test:integration` | Test results | Block deployment | Manual investigation |
-| **E2E Tests** | User workflows | Release candidate | Staging environment | `npm run test:e2e` | Test recordings | Block production | Fix and retest |
-| **Performance** | Load & scalability | Daily/weekly | Performance env | `npm run test:performance` | Performance metrics | Performance regression | Optimize and retest |
-| **Security** | Vulnerabilities | Dependency change | CI environment | `npm run security-audit` | Security report | Block deployment | Update dependencies |
-| **Compatibility** | Cross-platform | Release prep | Multiple OS | Manual testing | Compatibility matrix | Platform issues | Platform-specific fixes |
+| Test Type         | Scope                 | Trigger           | Environment         | Execution                  | Reporting            | Failure Impact         | Retry Strategy          |
+| ----------------- | --------------------- | ----------------- | ------------------- | -------------------------- | -------------------- | ---------------------- | ----------------------- |
+| **Unit Tests**    | Individual functions  | Code change       | Local/CI            | `npm run test:unit`        | Coverage report      | Block merge            | Auto-retry 3x           |
+| **Integration**   | Component interaction | PR created        | CI environment      | `npm run test:integration` | Test results         | Block deployment       | Manual investigation    |
+| **E2E Tests**     | User workflows        | Release candidate | Staging environment | `npm run test:e2e`         | Test recordings      | Block production       | Fix and retest          |
+| **Performance**   | Load & scalability    | Daily/weekly      | Performance env     | `npm run test:performance` | Performance metrics  | Performance regression | Optimize and retest     |
+| **Security**      | Vulnerabilities       | Dependency change | CI environment      | `npm run security-audit`   | Security report      | Block deployment       | Update dependencies     |
+| **Compatibility** | Cross-platform        | Release prep      | Multiple OS         | Manual testing             | Compatibility matrix | Platform issues        | Platform-specific fixes |
 
 ### Deployment Pipeline Flow
 
-| Stage | Environment | Deployment Method | Validation Steps | Rollback Time | Monitoring | Success Metrics |
-|-------|-------------|-------------------|------------------|---------------|------------|------------------|
-| **Development** | Local dev | Hot reload | Unit tests pass | N/A | N/A | Code compiles |
-| **CI Build** | GitHub Actions | Container build | All CI checks | N/A | Build logs | Clean build |
-| **Staging** | Staging cluster | Blue-green | Integration tests | 5 minutes | Application logs | E2E tests pass |
-| **Production** | Prod cluster | Blue-green | Smoke tests, monitoring | 15 minutes | APM, alerts | <1% error rate |
-| **Post-deploy** | Prod monitoring | Automated checks | Performance validation | 30 minutes | Dashboards | SLA compliance |
+| Stage           | Environment     | Deployment Method | Validation Steps        | Rollback Time | Monitoring       | Success Metrics |
+| --------------- | --------------- | ----------------- | ----------------------- | ------------- | ---------------- | --------------- |
+| **Development** | Local dev       | Hot reload        | Unit tests pass         | N/A           | N/A              | Code compiles   |
+| **CI Build**    | GitHub Actions  | Container build   | All CI checks           | N/A           | Build logs       | Clean build     |
+| **Staging**     | Staging cluster | Blue-green        | Integration tests       | 5 minutes     | Application logs | E2E tests pass  |
+| **Production**  | Prod cluster    | Blue-green        | Smoke tests, monitoring | 15 minutes    | APM, alerts      | <1% error rate  |
+| **Post-deploy** | Prod monitoring | Automated checks  | Performance validation  | 30 minutes    | Dashboards       | SLA compliance  |
 
 ### Quality Assurance Flow
 
-| Phase | Activity | Owner | Tools | Entry Criteria | Exit Criteria | Escalation Path |
-|-------|----------|-------|-------|----------------|----------------|-----------------|
-| **Code Review** | Static analysis | Dev Team | ESLint, TypeScript | Code committed | Zero lint errors | Senior dev review |
-| **Unit Testing** | Function validation | Dev Team | Vitest | Code reviewed | >85% coverage | Add missing tests |
-| **Integration** | Component testing | Dev Team | Vitest | Unit tests pass | All integrations work | Architecture review |
-| **Security Review** | Vulnerability check | Security Team | NPM audit, manual | Code stable | No critical issues | Security team approval |
-| **Performance** | Load testing | DevOps | Custom scripts | Security passed | Meets SLAs | Performance optimization |
-| **User Acceptance** | Business validation | QA/Product | Staging environment | Performance passed | Business requirements met | Product manager approval |
-| **Production Ready** | Final validation | SRE Team | Production monitoring | UAT passed | System stable | Emergency rollback |
+| Phase                | Activity            | Owner         | Tools                 | Entry Criteria     | Exit Criteria             | Escalation Path          |
+| -------------------- | ------------------- | ------------- | --------------------- | ------------------ | ------------------------- | ------------------------ |
+| **Code Review**      | Static analysis     | Dev Team      | ESLint, TypeScript    | Code committed     | Zero lint errors          | Senior dev review        |
+| **Unit Testing**     | Function validation | Dev Team      | Vitest                | Code reviewed      | >85% coverage             | Add missing tests        |
+| **Integration**      | Component testing   | Dev Team      | Vitest                | Unit tests pass    | All integrations work     | Architecture review      |
+| **Security Review**  | Vulnerability check | Security Team | NPM audit, manual     | Code stable        | No critical issues        | Security team approval   |
+| **Performance**      | Load testing        | DevOps        | Custom scripts        | Security passed    | Meets SLAs                | Performance optimization |
+| **User Acceptance**  | Business validation | QA/Product    | Staging environment   | Performance passed | Business requirements met | Product manager approval |
+| **Production Ready** | Final validation    | SRE Team      | Production monitoring | UAT passed         | System stable             | Emergency rollback       |
 
 ### Development Workflow Flow
 
-| Workflow | Trigger | Process Steps | Validation Points | Completion Criteria | Time Estimate |
-|----------|---------|----------------|-------------------|---------------------|---------------|
-| **Feature Development** | Issue assigned | 1. Create feature branch<br>2. Implement code<br>3. Write tests<br>4. Code review<br>5. Merge to main | • Tests pass<br>• Code review approved<br>• CI green | Feature deployed to production | 1-3 days |
-| **Bug Fix** | Bug reported | 1. Reproduce issue<br>2. Create fix branch<br>3. Implement fix<br>4. Add regression test<br>5. Merge to main | • Bug reproduced<br>• Fix verified<br>• Tests added | Bug resolved in production | 2-8 hours |
-| **Hotfix** | Production issue | 1. Emergency branch<br>2. Implement fix<br>3. Skip full tests<br>4. Deploy immediately<br>5. Add tests later | • Issue critical<br>• Minimal risk<br>• Quick verification | Production stable | 1-4 hours |
-| **Refactoring** | Tech debt identified | 1. Analysis phase<br>2. Incremental changes<br>3. Full test coverage<br>4. Performance validation | • No functional changes<br>• Performance maintained<br>• Tests pass | Code quality improved | 1-2 weeks |
+| Workflow                | Trigger              | Process Steps                                                                                                | Validation Points                                                   | Completion Criteria            | Time Estimate |
+| ----------------------- | -------------------- | ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------- | ------------------------------ | ------------- |
+| **Feature Development** | Issue assigned       | 1. Create feature branch<br>2. Implement code<br>3. Write tests<br>4. Code review<br>5. Merge to main        | • Tests pass<br>• Code review approved<br>• CI green                | Feature deployed to production | 1-3 days      |
+| **Bug Fix**             | Bug reported         | 1. Reproduce issue<br>2. Create fix branch<br>3. Implement fix<br>4. Add regression test<br>5. Merge to main | • Bug reproduced<br>• Fix verified<br>• Tests added                 | Bug resolved in production     | 2-8 hours     |
+| **Hotfix**              | Production issue     | 1. Emergency branch<br>2. Implement fix<br>3. Skip full tests<br>4. Deploy immediately<br>5. Add tests later | • Issue critical<br>• Minimal risk<br>• Quick verification          | Production stable              | 1-4 hours     |
+| **Refactoring**         | Tech debt identified | 1. Analysis phase<br>2. Incremental changes<br>3. Full test coverage<br>4. Performance validation            | • No functional changes<br>• Performance maintained<br>• Tests pass | Code quality improved          | 1-2 weeks     |
 
 ### Monitoring & Alerting Flow
 
-| Component | Metric | Threshold | Alert Level | Response Time | Escalation | Recovery Action |
-|-----------|--------|-----------|-------------|---------------|------------|-----------------|
-| **Application** | Error Rate | >5% | Critical | 5 minutes | SRE on-call | Rollback deployment |
-| **Application** | Response Time | >2s (95th percentile) | Warning | 15 minutes | DevOps team | Performance optimization |
-| **Infrastructure** | CPU Usage | >80% | Warning | 10 minutes | DevOps team | Scale resources |
-| **Infrastructure** | Memory Usage | >85% | Critical | 5 minutes | DevOps team | Restart services |
-| **Database** | Connection Pool | >90% used | Warning | 10 minutes | DBA team | Connection tuning |
-| **Security** | Failed Auth | >10/minute | Critical | 2 minutes | Security team | IP blocking, investigation |
-| **CI/CD** | Build Failures | >0 (main branch) | Critical | 1 minute | Dev team | Fix and redeploy |
+| Component          | Metric          | Threshold             | Alert Level | Response Time | Escalation    | Recovery Action            |
+| ------------------ | --------------- | --------------------- | ----------- | ------------- | ------------- | -------------------------- |
+| **Application**    | Error Rate      | >5%                   | Critical    | 5 minutes     | SRE on-call   | Rollback deployment        |
+| **Application**    | Response Time   | >2s (95th percentile) | Warning     | 15 minutes    | DevOps team   | Performance optimization   |
+| **Infrastructure** | CPU Usage       | >80%                  | Warning     | 10 minutes    | DevOps team   | Scale resources            |
+| **Infrastructure** | Memory Usage    | >85%                  | Critical    | 5 minutes     | DevOps team   | Restart services           |
+| **Database**       | Connection Pool | >90% used             | Warning     | 10 minutes    | DBA team      | Connection tuning          |
+| **Security**       | Failed Auth     | >10/minute            | Critical    | 2 minutes     | Security team | IP blocking, investigation |
+| **CI/CD**          | Build Failures  | >0 (main branch)      | Critical    | 1 minute      | Dev team      | Fix and redeploy           |
 
 ---
 
@@ -1641,73 +1660,73 @@ ls -la scripts/*/ | wc -l                        # Count subdirectories
 
 ### Logging Systems
 
-| Component | Purpose | Location | Key Features |
-|-----------|---------|----------|--------------|
-| **Framework Logger** | Centralized logging system | `src/framework-logger.ts` | Structured logging, multiple levels, configurable outputs |
-| **Refactoring Logger** | Tracks code refactoring operations | `src/processors/refactoring-logging-processor.ts` | Change tracking, impact analysis, rollback support |
-| **MCP Logger** | Model Context Protocol communication logs | `src/mcp-logger.ts` | Protocol monitoring, error tracking, performance metrics |
-| **Session Logger** | Session lifecycle and state logging | `src/session/session-monitor.ts` | Activity tracking, error monitoring, performance logs |
+| Component              | Purpose                                   | Location                                          | Key Features                                              |
+| ---------------------- | ----------------------------------------- | ------------------------------------------------- | --------------------------------------------------------- |
+| **Framework Logger**   | Centralized logging system                | `src/framework-logger.ts`                         | Structured logging, multiple levels, configurable outputs |
+| **Refactoring Logger** | Tracks code refactoring operations        | `src/processors/refactoring-logging-processor.ts` | Change tracking, impact analysis, rollback support        |
+| **MCP Logger**         | Model Context Protocol communication logs | `src/mcp-logger.ts`                               | Protocol monitoring, error tracking, performance metrics  |
+| **Session Logger**     | Session lifecycle and state logging       | `src/session/session-monitor.ts`                  | Activity tracking, error monitoring, performance logs     |
 
 ### Performance Systems
 
-| Component | Purpose | Location | Key Features |
-|-----------|---------|----------|--------------|
-| **Advanced Profiler** | Code performance profiling | `src/monitoring/advanced-profiler.ts` | CPU/memory profiling, bottleneck detection, flame graphs |
-| **Regression Tester** | Performance regression detection | `src/performance/performance-regression-tester.ts` | Baseline comparison, trend analysis, automated alerts |
-| **Budget Enforcer** | Performance budget enforcement | `src/performance/performance-budget-enforcer.ts` | Size limits, load time thresholds, automated blocking |
-| **CI Gates** | Performance validation in CI/CD | `src/performance/performance-ci-gates.ts` | Automated testing, SLA compliance, deployment blocking |
-| **System Orchestrator** | Performance system coordination | `src/performance/performance-system-orchestrator.ts` | Multi-component coordination, resource allocation, optimization |
-| **Monitoring Dashboard** | Performance visualization | `src/performance/performance-monitoring-dashboard.ts` | Real-time metrics, historical trends, alerting dashboard |
+| Component                | Purpose                          | Location                                              | Key Features                                                    |
+| ------------------------ | -------------------------------- | ----------------------------------------------------- | --------------------------------------------------------------- |
+| **Advanced Profiler**    | Code performance profiling       | `src/monitoring/advanced-profiler.ts`                 | CPU/memory profiling, bottleneck detection, flame graphs        |
+| **Regression Tester**    | Performance regression detection | `src/performance/performance-regression-tester.ts`    | Baseline comparison, trend analysis, automated alerts           |
+| **Budget Enforcer**      | Performance budget enforcement   | `src/performance/performance-budget-enforcer.ts`      | Size limits, load time thresholds, automated blocking           |
+| **CI Gates**             | Performance validation in CI/CD  | `src/performance/performance-ci-gates.ts`             | Automated testing, SLA compliance, deployment blocking          |
+| **System Orchestrator**  | Performance system coordination  | `src/performance/performance-system-orchestrator.ts`  | Multi-component coordination, resource allocation, optimization |
+| **Monitoring Dashboard** | Performance visualization        | `src/performance/performance-monitoring-dashboard.ts` | Real-time metrics, historical trends, alerting dashboard        |
 
 ### Security Systems
 
-| Component | Purpose | Location | Key Features |
-|-----------|---------|----------|--------------|
-| **Security Auditor** | Code security analysis | `src/security/security-auditor.ts` | Vulnerability scanning, compliance checking, risk assessment |
-| **Security Hardener** | Security policy enforcement | `src/security/security-hardener.ts` | Input validation, sanitization, access control |
-| **Security Headers** | HTTP security headers | `src/security/security-headers.ts` | CSP, HSTS, XSS protection, secure defaults |
-| **Security Scanner** | Automated security scanning | `src/security/security-scanner.ts` | Dependency auditing, code analysis, compliance validation |
-| **Security Middleware** | Request/response security | `src/security/security-middleware.ts` | Rate limiting, authentication, encryption, logging |
-| **Prompt Security** | AI prompt security validation | `src/security/prompt-security-validator.ts` | Injection prevention, content filtering, safety validation |
+| Component               | Purpose                       | Location                                    | Key Features                                                 |
+| ----------------------- | ----------------------------- | ------------------------------------------- | ------------------------------------------------------------ |
+| **Security Auditor**    | Code security analysis        | `src/security/security-auditor.ts`          | Vulnerability scanning, compliance checking, risk assessment |
+| **Security Hardener**   | Security policy enforcement   | `src/security/security-hardener.ts`         | Input validation, sanitization, access control               |
+| **Security Headers**    | HTTP security headers         | `src/security/security-headers.ts`          | CSP, HSTS, XSS protection, secure defaults                   |
+| **Security Scanner**    | Automated security scanning   | `src/security/security-scanner.ts`          | Dependency auditing, code analysis, compliance validation    |
+| **Security Middleware** | Request/response security     | `src/security/security-middleware.ts`       | Rate limiting, authentication, encryption, logging           |
+| **Prompt Security**     | AI prompt security validation | `src/security/prompt-security-validator.ts` | Injection prevention, content filtering, safety validation   |
 
 ### State Management Systems
 
-| Component | Purpose | Location | Key Features |
-|-----------|---------|----------|--------------|
-| **State Manager** | Global state management | `src/state/state-manager.ts` | Centralized state, persistence, synchronization |
-| **Session Manager** | User session handling | `src/session/session-state-manager.ts` | Session lifecycle, data persistence, cleanup |
-| **Context Providers** | React context management | `src/state/context-providers.ts` | Provider components, state injection, consumer patterns |
-| **Session Coordinator** | Multi-session coordination | `src/delegation/session-coordinator.ts` | Session communication, conflict resolution, resource sharing |
-| **Context Analyzer** | Codebase context analysis | `src/delegation/codebase-context-analyzer.ts` | Dependency mapping, impact analysis, relationship tracking |
-| **Session Monitor** | Session health monitoring | `src/session/session-monitor.ts` | Performance tracking, error detection, automatic recovery |
+| Component               | Purpose                    | Location                                      | Key Features                                                 |
+| ----------------------- | -------------------------- | --------------------------------------------- | ------------------------------------------------------------ |
+| **State Manager**       | Global state management    | `src/state/state-manager.ts`                  | Centralized state, persistence, synchronization              |
+| **Session Manager**     | User session handling      | `src/session/session-state-manager.ts`        | Session lifecycle, data persistence, cleanup                 |
+| **Context Providers**   | React context management   | `src/state/context-providers.ts`              | Provider components, state injection, consumer patterns      |
+| **Session Coordinator** | Multi-session coordination | `src/delegation/session-coordinator.ts`       | Session communication, conflict resolution, resource sharing |
+| **Context Analyzer**    | Codebase context analysis  | `src/delegation/codebase-context-analyzer.ts` | Dependency mapping, impact analysis, relationship tracking   |
+| **Session Monitor**     | Session health monitoring  | `src/session/session-monitor.ts`              | Performance tracking, error detection, automatic recovery    |
 
 ### Processor Systems
 
-| Component | Purpose | Location | Key Features |
-|-----------|---------|----------|--------------|
-| **Processor Manager** | Processor orchestration | `src/processors/processor-manager.ts` | Registration, execution, error handling, resource management |
-| **Refactoring Processor** | Code refactoring operations | `src/processors/refactoring-logging-processor.ts` | Automated refactoring, change tracking, safety validation |
-| **Postprocessor Pipeline** | Post-execution processing | `src/postprocessor/` | Result processing, cleanup, notification, integration |
-| **MCP Processor Pipeline** | Model Context Protocol processing | `src/mcps/processor-pipeline.server.ts` | Request/response processing, validation, transformation |
+| Component                  | Purpose                           | Location                                          | Key Features                                                 |
+| -------------------------- | --------------------------------- | ------------------------------------------------- | ------------------------------------------------------------ |
+| **Processor Manager**      | Processor orchestration           | `src/processors/processor-manager.ts`             | Registration, execution, error handling, resource management |
+| **Refactoring Processor**  | Code refactoring operations       | `src/processors/refactoring-logging-processor.ts` | Automated refactoring, change tracking, safety validation    |
+| **Postprocessor Pipeline** | Post-execution processing         | `src/postprocessor/`                              | Result processing, cleanup, notification, integration        |
+| **MCP Processor Pipeline** | Model Context Protocol processing | `src/mcps/processor-pipeline.server.ts`           | Request/response processing, validation, transformation      |
 
 ### Monitoring Systems
 
-| Component | Purpose | Location | Key Features |
-|-----------|---------|----------|--------------|
-| **Enterprise Monitoring** | System-wide monitoring | `src/monitoring/enterprise-monitoring-system.ts` | Centralized metrics, alerting, dashboard integration |
-| **Memory Monitor** | Memory usage tracking | `src/monitoring/memory-monitor.ts` | Leak detection, usage analysis, optimization recommendations |
-| **Session Monitor** | Session performance monitoring | `src/session/session-monitor.ts` | Session health, performance metrics, anomaly detection |
-| **Advanced Profiler** | Deep performance analysis | `src/monitoring/advanced-profiler.ts` | Detailed profiling, bottleneck identification, optimization planning |
+| Component                 | Purpose                        | Location                                         | Key Features                                                         |
+| ------------------------- | ------------------------------ | ------------------------------------------------ | -------------------------------------------------------------------- |
+| **Enterprise Monitoring** | System-wide monitoring         | `src/monitoring/enterprise-monitoring-system.ts` | Centralized metrics, alerting, dashboard integration                 |
+| **Memory Monitor**        | Memory usage tracking          | `src/monitoring/memory-monitor.ts`               | Leak detection, usage analysis, optimization recommendations         |
+| **Session Monitor**       | Session performance monitoring | `src/session/session-monitor.ts`                 | Session health, performance metrics, anomaly detection               |
+| **Advanced Profiler**     | Deep performance analysis      | `src/monitoring/advanced-profiler.ts`            | Detailed profiling, bottleneck identification, optimization planning |
 
 ### Validation Systems
 
-| Component | Purpose | Location | Key Features |
-|-----------|---------|----------|--------------|
-| **MCP Connectivity Validator** | MCP server validation | `scripts/validation/validate-mcp-connectivity.js` | Server availability, response validation, error handling |
-| **Oh My OpenCode Integration** | Framework integration validation | `scripts/validation/validate-oh-my-opencode-integration.js` | Plugin loading, API compatibility, functionality testing |
-| **External Processes Validator** | System integration testing | `scripts/validation/validate-external-processes.js` | Process communication, error handling, resource management |
-| **Report Validator** | Output validation | `scripts/validation/validate-reports.ts` | Report generation, content validation, format checking |
-| **Session Validators** | Session system validation | `src/validation/session-*.ts` | Session lifecycle, security, migration validation |
+| Component                        | Purpose                          | Location                                                    | Key Features                                               |
+| -------------------------------- | -------------------------------- | ----------------------------------------------------------- | ---------------------------------------------------------- |
+| **MCP Connectivity Validator**   | MCP server validation            | `scripts/validation/validate-mcp-connectivity.js`           | Server availability, response validation, error handling   |
+| **Oh My OpenCode Integration**   | Framework integration validation | `scripts/validation/validate-oh-my-opencode-integration.js` | Plugin loading, API compatibility, functionality testing   |
+| **External Processes Validator** | System integration testing       | `scripts/validation/validate-external-processes.js`         | Process communication, error handling, resource management |
+| **Report Validator**             | Output validation                | `scripts/validation/validate-reports.ts`                    | Report generation, content validation, format checking     |
+| **Session Validators**           | Session system validation        | `src/validation/session-*.ts`                               | Session lifecycle, security, migration validation          |
 
 ---
 
@@ -1813,25 +1832,25 @@ docs/
 
 ### Key Directory Relationships
 
-| Directory | Purpose | Dependencies | Outputs |
-|-----------|---------|--------------|---------|
-| **`.github/workflows/`** | CI/CD automation | Source code | Build artifacts, test results |
-| **`.opencode/`** | Framework integration | Plugin configs | Enhanced functionality |
-| **`.strray/`** | Configuration data | Codex rules | System behavior |
-| **`docs/`** | Documentation | Source code | User guides, API docs |
-| **`scripts/`** | Automation tools | Source code | Build artifacts, reports |
-| **`src/`** | Core implementation | Dependencies | Framework library |
-| **`src/__tests__/`** | Quality assurance | Source code | Test results, coverage |
+| Directory                | Purpose               | Dependencies   | Outputs                       |
+| ------------------------ | --------------------- | -------------- | ----------------------------- |
+| **`.github/workflows/`** | CI/CD automation      | Source code    | Build artifacts, test results |
+| **`.opencode/`**         | Framework integration | Plugin configs | Enhanced functionality        |
+| **`.strray/`**           | Configuration data    | Codex rules    | System behavior               |
+| **`docs/`**              | Documentation         | Source code    | User guides, API docs         |
+| **`scripts/`**           | Automation tools      | Source code    | Build artifacts, reports      |
+| **`src/`**               | Core implementation   | Dependencies   | Framework library             |
+| **`src/__tests__/`**     | Quality assurance     | Source code    | Test results, coverage        |
 
 ### File Naming Conventions
 
-| File Type | Pattern | Example | Purpose |
-|-----------|---------|---------|---------|
-| **Test Files** | `*.test.ts` | `agent.test.ts` | Unit/integration tests |
-| **MCP Servers** | `*.server.ts` | `performance-optimization.server.ts` | Model Context Protocol |
-| **Processors** | `*-processor.ts` | `refactoring-logging-processor.ts` | Operation processing |
-| **Validators** | `validate-*.ts` | `validate-mcp-connectivity.ts` | Validation logic |
-| **Scripts** | `*.cjs/*.js` | `ci-cd-auto-fix.cjs` | Automation scripts |
+| File Type       | Pattern          | Example                              | Purpose                |
+| --------------- | ---------------- | ------------------------------------ | ---------------------- |
+| **Test Files**  | `*.test.ts`      | `agent.test.ts`                      | Unit/integration tests |
+| **MCP Servers** | `*.server.ts`    | `performance-optimization.server.ts` | Model Context Protocol |
+| **Processors**  | `*-processor.ts` | `refactoring-logging-processor.ts`   | Operation processing   |
+| **Validators**  | `validate-*.ts`  | `validate-mcp-connectivity.ts`       | Validation logic       |
+| **Scripts**     | `*.cjs/*.js`     | `ci-cd-auto-fix.cjs`                 | Automation scripts     |
 
 ### Development Workflow Structure
 
@@ -1883,9 +1902,11 @@ Configuration Management:
 ### Core Orchestration Components
 
 #### **1. Complexity Analysis Engine**
+
 **Location**: `src/delegation/`
 **Purpose**: Analyzes task complexity using 6 metrics
 **Metrics**:
+
 - File Count (0-20 points)
 - Change Volume (0-25 points)
 - Operation Type (create/modify/refactor/analyze/debug/test)
@@ -1894,6 +1915,7 @@ Configuration Management:
 - Estimated Duration (0-15 points)
 
 **Decision Logic**:
+
 ```typescript
 Score Range | Strategy | Agent Count | Use Case
 0-25        | Single-agent | 1 | Basic operations
@@ -1903,8 +1925,10 @@ Score Range | Strategy | Agent Count | Use Case
 ```
 
 #### **2. Agent Delegation System**
+
 **Location**: `src/agents/`, `src/delegation/`
 **Components**:
+
 - **Agent Selector**: Matches tasks to appropriate agents
 - **Conflict Resolver**: Handles competing agent recommendations
 - **Load Balancer**: Distributes work across available agents
@@ -1923,20 +1947,25 @@ Score Range | Strategy | Agent Count | Use Case
 | test-architect | Test | read, grep, bash | Expert priority |
 
 #### **3. Processor Pipeline**
+
 **Location**: `src/processors/`, `src/postprocessor/`
 **Execution Order**:
+
 ```
 Input Validation → Pre-Processing → Agent Execution → Post-Processing → Result Formatting
 ```
 
 **Key Processors**:
+
 - **Refactoring Processor**: `src/processors/refactoring-logging-processor.ts`
 - **MCP Processor Pipeline**: `src/mcps/processor-pipeline.server.ts`
 - **Postprocessor Pipeline**: `src/postprocessor/`
 
 #### **4. MCP Server Integration**
+
 **Location**: `src/mcps/`, `.mcp.json`
 **16 Active Servers**:
+
 - `framework-compliance-audit` - Security & compliance
 - `knowledge-skills` - Specialized knowledge (8 servers)
 - `performance-analysis` - Performance optimization
@@ -1948,8 +1977,10 @@ Input Validation → Pre-Processing → Agent Execution → Post-Processing → 
 **Configuration**: `.mcp.json` (auto-generated by postinstall)
 
 #### **5. State Management & Persistence**
+
 **Location**: `src/state/`, `src/session/`
 **Components**:
+
 - **Session Manager**: `src/session/session-state-manager.ts`
 - **State Manager**: `src/state/state-manager.ts`
 - **Context Providers**: `src/state/context-providers.ts`
@@ -1958,8 +1989,10 @@ Input Validation → Pre-Processing → Agent Execution → Post-Processing → 
 **Persistence**: `.strray/state/` directory
 
 #### **6. Logging & Monitoring**
+
 **Location**: `src/framework-logger.ts`, `src/monitoring/`
 **Components**:
+
 - **Framework Logger**: Centralized logging with multiple levels
 - **Refactoring Logger**: Change tracking and impact analysis
 - **Enterprise Monitoring**: System-wide metrics and alerting
@@ -1986,6 +2019,7 @@ Input Validation → Pre-Processing → Agent Execution → Post-Processing → 
 ### Pipeline Failure Recovery
 
 **Automatic Recovery Process**:
+
 ```bash
 1. Pipeline failure detected
 2. Diagnosis: Local testing vs CI environment differences
@@ -2002,7 +2036,9 @@ Input Validation → Pre-Processing → Agent Execution → Post-Processing → 
 ### How Agents Should Use AGENTS.MD
 
 #### **1. Session Initialization**
+
 **First Action**: Read framework overview and codex terms
+
 ```bash
 # Every new session should:
 1. Review "StrRay Framework - oh-my-opencode Integration"
@@ -2012,7 +2048,9 @@ Input Validation → Pre-Processing → Agent Execution → Post-Processing → 
 ```
 
 #### **2. Task Processing Flow**
+
 **Standard Workflow**:
+
 ```bash
 # For every task:
 1. Check "Complexity Analysis System" → Calculate complexity score
@@ -2055,21 +2093,25 @@ COMPLETION PHASE
 #### **4. Critical Reference Points**
 
 **For Code Quality**:
+
 - Section 4: Universal Development Codex (55 terms)
 - Section 9: Validation Criteria
 - Section 21: Quality Assurance Flow
 
 **For Task Execution**:
+
 - Section 8: Complexity Analysis System
 - Section 9: Agent Capabilities Matrix
 - Section 10: Pipeline Process Flows
 
 **For Framework Usage**:
+
 - Section 11: Advanced Framework Systems
 - Section 12: Directory Structure Guide
 - Section 13: Framework Scripts Inventory
 
 **For CI/CD Operations**:
+
 - Section 19: Version Control & Release Management
 - Section 20: CI/CD Pipeline Documentation
 - Section 21: Quality Assurance Flow
@@ -2077,6 +2119,7 @@ COMPLETION PHASE
 #### **5. Cross-Session Consistency Rules**
 
 **Every Agent Must**:
+
 1. **Follow Complexity Analysis**: Always calculate task complexity first
 2. **Use Appropriate Agents**: Select based on capabilities matrix
 3. **Follow Pipeline Flows**: Execute tasks in documented sequences
@@ -2086,6 +2129,7 @@ COMPLETION PHASE
 7. **Log Actions**: Use framework logging for all operations
 
 **Consistency Enforcement**:
+
 - All agents follow identical workflow patterns
 - Pipeline flows ensure standardized execution
 - Codex terms provide universal quality standards
@@ -2095,17 +2139,19 @@ COMPLETION PHASE
 #### **6. Emergency Procedures**
 
 **When Uncertain**:
+
 ```bash
 1. Refer to "Complexity Analysis System"
-2. Check "Agent Capabilities Matrix" 
+2. Check "Agent Capabilities Matrix"
 3. Follow appropriate "Pipeline Process Flow"
 4. Apply "Universal Development Codex" terms
 5. Use "Framework Scripts Inventory" for automation
 ```
 
 **When Errors Occur**:
+
 ```bash
-1. Review "Validation Criteria" 
+1. Review "Validation Criteria"
 2. Check "Quality Assurance Flow"
 3. Use "Rollback Procedures" if needed
 4. Apply "Error Prevention Interweave"
@@ -2115,6 +2161,7 @@ COMPLETION PHASE
 #### **7. Learning & Adaptation**
 
 **Continuous Improvement**:
+
 - Review "Reflections" directory after incidents
 - Update understanding based on new codex terms
 - Adapt to framework evolution through documentation updates
@@ -2143,6 +2190,7 @@ COMPLETION PHASE
 **CRITICAL: Versions are ONLY updated on formal releases, NEVER for bug fixes or intermediate commits.**
 
 #### When to Update Versions
+
 - ✅ **MAJOR releases** (x.0.0): Breaking changes, major feature additions
 - ✅ **MINOR releases** (1.x.0): New features, enhancements
 - ✅ **PATCH releases** (1.0.x): Bug fixes, security updates
@@ -2153,6 +2201,7 @@ COMPLETION PHASE
 #### How to Update Versions
 
 **1. Manual Version Bumping (Development):**
+
 ```bash
 # For patch releases (bug fixes)
 npm version patch
@@ -2165,6 +2214,7 @@ npm version major
 ```
 
 **2. Automated Release Process:**
+
 ```bash
 # Use the universal version manager for consistency
 node scripts/universal-version-manager.js --bump patch --release
@@ -2173,6 +2223,7 @@ node scripts/universal-version-manager.js --bump major --release
 ```
 
 **3. CI/CD Release Integration:**
+
 - Versions are bumped automatically during release workflow
 - CI/CD pipeline validates version consistency
 - NPM publishing requires successful CI/CD completion
@@ -2181,17 +2232,20 @@ node scripts/universal-version-manager.js --bump major --release
 #### Version Management Rules
 
 **Semantic Versioning (MAJOR.MINOR.PATCH):**
+
 - **MAJOR**: Breaking changes (resets MINOR.PATCH to 0.0)
 - **MINOR**: New features (resets PATCH to 0)
 - **PATCH**: Bug fixes and patches
 
 **Version Consistency:**
+
 - Package.json version must match
 - Codex.json version must be updated
 - AGENTS.md version references must be updated
 - Git tags must match version numbers
 
 **Release Checklist:**
+
 - [ ] CI/CD pipeline passes completely
 - [ ] All tests pass (unit, integration, E2E)
 - [ ] Security audit passes
@@ -2203,6 +2257,7 @@ node scripts/universal-version-manager.js --bump major --release
 - [ ] NPM package published
 
 **Forbidden Actions:**
+
 - ❌ Bumping version for test fixes
 - ❌ Bumping version for documentation updates
 - ❌ Bumping version for CI/CD improvements
@@ -2214,6 +2269,7 @@ node scripts/universal-version-manager.js --bump major --release
 #### Pipeline Stages & Workflow
 
 **1. Code Quality Gates:**
+
 ```yaml
 # .github/workflows/ci-cd.yml
 jobs:
@@ -2235,28 +2291,31 @@ jobs:
 ```
 
 **2. Build & Validation:**
+
 ```yaml
-  build:
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - run: npm ci
-      - run: npm run build
-      - run: npm run test:e2e
+build:
+  needs: test
+  runs-on: ubuntu-latest
+  steps:
+    - uses: actions/checkout@v4
+    - run: npm ci
+    - run: npm run build
+    - run: npm run test:e2e
 ```
 
 **3. Security & Performance:**
+
 ```yaml
-  security-scan:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - run: npm audit --audit-level moderate
-      - run: node scripts/basic-security-audit.cjs
+security-scan:
+  needs: build
+  runs-on: ubuntu-latest
+  steps:
+    - run: npm audit --audit-level moderate
+    - run: node scripts/basic-security-audit.cjs
 ```
 
 #### Pipeline Triggers
+
 - **Push to main/master**: Full CI/CD pipeline
 - **Pull Request**: Code quality checks only
 - **Manual Dispatch**: Full pipeline on demand
@@ -2267,6 +2326,7 @@ jobs:
 #### Step-by-Step Release Process
 
 **1. Pre-Release Preparation:**
+
 ```bash
 # Ensure all tests pass
 npm run test:all
@@ -2283,6 +2343,7 @@ npm version major  # for breaking changes
 ```
 
 **2. Release Execution:**
+
 ```bash
 # Create release branch
 git checkout -b release/v1.0.27
@@ -2299,6 +2360,7 @@ git push origin release/v1.0.27
 ```
 
 **3. Post-Release Validation:**
+
 ```bash
 # Verify NPM publication
 npm view strray-ai@1.0.6
@@ -2313,6 +2375,7 @@ npm install strray-ai@1.0.6 --dry-run
 ### Change Log Management
 
 #### Change Log Format
+
 ```markdown
 # Changelog
 
@@ -2324,32 +2387,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.0.6] - 2026-01-16
 
 ### Added
+
 - New CI/CD pipeline enforcement rules
 - Enhanced test isolation mechanisms
 - Comprehensive NPM installation testing
 
 ### Changed
+
 - Updated vitest configuration for CI environments
 - Improved error handling in test setup
 
 ### Fixed
+
 - Test directory creation issues in CI
 - Race conditions in parallel test execution
 - NPM package dependency conflicts
 
 ### Security
+
 - Updated security audit dependencies
 - Enhanced input validation
 
 ## [1.0.5] - 2026-01-15
 
 ### Added
+
 - Universal Development Codex v1.2.25
 - CI/CD enforcement terms
 - Enhanced monitoring capabilities
 ```
 
 #### Change Log Maintenance
+
 - Update change log with every PR
 - Categorize changes: Added, Changed, Fixed, Security
 - Include breaking changes prominently
@@ -2358,6 +2427,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Git Tag Management
 
 #### Tag Creation Process
+
 ```bash
 # After successful release
 git tag -a v1.0.27 -m "Release v1.0.27: CI/CD pipeline enhancements"
@@ -2368,6 +2438,7 @@ git tag -l | grep v1.0.27
 ```
 
 #### Tag Naming Convention
+
 - **vMAJOR.MINOR.PATCH**: Standard semantic versioning
 - **Pre-releases**: v1.0.27-beta.1, v1.0.27-rc.1
 - **Annotated tags**: Always use `-a` flag with message
@@ -2375,6 +2446,7 @@ git tag -l | grep v1.0.27
 ### Deployment Documentation
 
 #### NPM Publication Process
+
 ```bash
 # Automatic (CI/CD)
 npm run build
@@ -2386,6 +2458,7 @@ npm publish --tag latest
 ```
 
 #### Deployment Validation
+
 ```bash
 # Check publication
 npm view strray-ai version
@@ -2399,6 +2472,7 @@ npx strray-ai doctor
 ### NPM Publish Process
 
 #### Pre-Publish Requirements
+
 ```bash
 # Mandatory checks before publishing
 ✅ CI/CD pipeline passes completely
@@ -2412,6 +2486,7 @@ npx strray-ai doctor
 ```
 
 #### Publish Execution Process
+
 ```bash
 # 1. Version bump (only on releases, not bug fixes)
 npm version patch  # For bug fixes
@@ -2432,6 +2507,7 @@ npm install strray-ai@latest --dry-run  # Test installability
 ```
 
 #### Publish Validation Steps
+
 - [ ] Package appears on NPM registry
 - [ ] Correct version number displayed
 - [ ] Package installs without errors
@@ -2442,6 +2518,7 @@ npm install strray-ai@latest --dry-run  # Test installability
 ### CI/CD Self-Healing Process
 
 #### Automated Pipeline Recovery
+
 ```bash
 # 1. Pipeline failure detection
 # CI/CD system detects test failures or build errors
@@ -2477,6 +2554,7 @@ notify_team_if_needed
 ```
 
 #### Self-Healing Trigger Conditions
+
 - **Test Failures**: Local tests pass but CI fails
 - **Build Errors**: Compilation succeeds locally but fails in CI
 - **Dependency Issues**: Package installation problems
@@ -2484,6 +2562,7 @@ notify_team_if_needed
 - **Race Conditions**: Parallel execution conflicts
 
 #### Self-Healing Capabilities
+
 - **Automatic Diagnosis**: Categorizes failure types
 - **Intelligent Fixes**: Applies appropriate solutions
 - **Version Management**: Handles version bumping when needed
@@ -2492,6 +2571,7 @@ notify_team_if_needed
 - **Notification**: Alerts team if manual intervention required
 
 #### Self-Healing Limitations
+
 - **No Code Changes**: Only fixes configuration and environment issues
 - **TypeScript Errors**: Cannot fix actual code compilation errors
 - **Security Issues**: Cannot resolve critical security vulnerabilities
@@ -2500,6 +2580,7 @@ notify_team_if_needed
 ### Rollback Procedures
 
 #### Emergency Rollback Steps
+
 ```bash
 # 1. Deprecate broken version
 npm deprecate strray-ai@1.0.6 "BROKEN BUILD - CI/CD pipeline failed. Do not use this version."
@@ -2518,6 +2599,7 @@ git revert <broken-commit>
 ```
 
 #### Rollback Checklist
+
 - [ ] Identify root cause
 - [ ] Notify users of issues
 - [ ] Deprecate broken version

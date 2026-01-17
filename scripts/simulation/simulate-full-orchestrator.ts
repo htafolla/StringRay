@@ -5,11 +5,11 @@
 
 // Path configuration for cross-environment compatibility
 // When running from test environment, use relative paths to dist
-const isTestEnvironment = process.cwd().includes('stringray-') || process.cwd().includes('final-');
+const isTestEnvironment =
+  process.cwd().includes("stringray-") || process.cwd().includes("final-");
 const basePath = isTestEnvironment ? "../../dist" : "../../dist";
 
-const ORCHESTRATOR_PATH =
-  process.env.STRRAY_ORCHESTRATOR_PATH || `${basePath}`;
+const ORCHESTRATOR_PATH = process.env.STRRAY_ORCHESTRATOR_PATH || `${basePath}`;
 const DELEGATION_PATH =
   process.env.STRRAY_DELEGATION_PATH || `${basePath}/delegation`;
 const STATE_PATH = process.env.STRRAY_STATE_PATH || `${basePath}/state`;
@@ -17,10 +17,18 @@ const STATE_PATH = process.env.STRRAY_STATE_PATH || `${basePath}/state`;
 // Dynamic imports for cross-environment compatibility
 export {}; // Make this a module to allow top-level await
 
-const { StringRayOrchestrator } = await import(ORCHESTRATOR_PATH + "/orchestrator.js");
-const { enhancedMultiAgentOrchestrator } = await import(ORCHESTRATOR_PATH + "/orchestrator/enhanced-multi-agent-orchestrator.js");
-const { createAgentDelegator } = await import(DELEGATION_PATH + "/agent-delegator.js");
-const { StringRayStateManager } = await import(STATE_PATH + "/state-manager.js");
+const { StringRayOrchestrator } = await import(
+  ORCHESTRATOR_PATH + "/orchestrator.js"
+);
+const { enhancedMultiAgentOrchestrator } = await import(
+  ORCHESTRATOR_PATH + "/orchestrator/enhanced-multi-agent-orchestrator.js"
+);
+const { createAgentDelegator } = await import(
+  DELEGATION_PATH + "/agent-delegator.js"
+);
+const { StringRayStateManager } = await import(
+  STATE_PATH + "/state-manager.js"
+);
 
 async function simulateCompleteOrchestratorPipeline() {
   console.log("🚀 COMPLETE ORCHESTRATOR INTEGRATION SIMULATION\n");
@@ -33,12 +41,12 @@ async function simulateCompleteOrchestratorPipeline() {
   const stateManager = new StringRayStateManager();
   const agentDelegator = createAgentDelegator(stateManager);
 
-const orchestrator = new StringRayOrchestrator({
-  stateManager: stateManager,
-  agentDelegator: agentDelegator,
-});
+  const orchestrator = new StringRayOrchestrator({
+    stateManager: stateManager,
+    agentDelegator: agentDelegator,
+  });
 
-console.log("✅ StringRayOrchestrator initialized");
+  console.log("✅ StringRayOrchestrator initialized");
   console.log("✅ Enhanced Multi-Agent Orchestrator initialized");
   console.log("✅ Agent Delegator initialized");
   console.log("✅ State Manager initialized\n");

@@ -21,7 +21,7 @@ class StrRayStateManagerServer {
   private backups: Map<string, any> = new Map();
 
   constructor() {
-        this.server = new Server(
+    this.server = new Server(
       {
         name: "strray-state-manager",
         version: "1.0.0",
@@ -30,7 +30,7 @@ class StrRayStateManagerServer {
         capabilities: {
           tools: {},
         },
-      }
+      },
     );
 
     this.stateFile = path.join(
@@ -60,8 +60,8 @@ class StrRayStateManagerServer {
         const parsed = JSON.parse(data);
         this.state = new Map(Object.entries(parsed));
         frameworkLogger.log("mcps/state-manager", "load-state", "info", {
-      stateEntries: this.state.size,
-    });
+          stateEntries: this.state.size,
+        });
       }
     } catch (error) {
       console.warn("Failed to load state file:", error);

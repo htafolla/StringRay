@@ -6,27 +6,30 @@
  * Adds missing capabilities declarations to all MCP server constructors
  */
 
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 function addCapabilitiesToServer(serverPath) {
-  const content = fs.readFileSync(serverPath, 'utf8');
+  const content = fs.readFileSync(serverPath, "utf8");
 
   // Check if capabilities already exist
-  if (content.includes('capabilities:')) {
+  if (content.includes("capabilities:")) {
     console.log(`  ✅ ${path.basename(serverPath)} - already has capabilities`);
     return;
   }
 
   // Find the Server constructor pattern
-  const constructorPattern = /this\.server = new Server\(\{[\s\S]*?name: "([^"]*)",[\s\S]*?version: "([^"]*)",\s*\}\);/;
+  const constructorPattern =
+    /this\.server = new Server\(\{[\s\S]*?name: "([^"]*)",[\s\S]*?version: "([^"]*)",\s*\}\);/;
 
   const match = content.match(constructorPattern);
   if (!match) {
-    console.log(`  ❌ ${path.basename(serverPath)} - constructor pattern not found`);
+    console.log(
+      `  ❌ ${path.basename(serverPath)} - constructor pattern not found`,
+    );
     return;
   }
 
@@ -46,7 +49,7 @@ function addCapabilitiesToServer(serverPath) {
   const newContent = content.replace(constructorPattern, newConstructor);
 
   if (newContent !== content) {
-    fs.writeFileSync(serverPath, newContent, 'utf8');
+    fs.writeFileSync(serverPath, newContent, "utf8");
     console.log(`  🔧 ${path.basename(serverPath)} - capabilities added`);
   } else {
     console.log(`  ❌ ${path.basename(serverPath)} - replacement failed`);
@@ -54,11 +57,11 @@ function addCapabilitiesToServer(serverPath) {
 }
 
 function fixAllMcpServers() {
-  console.log('🔧 Adding capabilities declarations to all MCP servers...\n');
+  console.log("🔧 Adding capabilities declarations to all MCP servers...\n");
 
   const mcpDirs = [
-    path.join(__dirname, '../src/mcps'),
-    path.join(__dirname, '../src/mcps/knowledge-skills')
+    path.join(__dirname, "../src/mcps"),
+    path.join(__dirname, "../src/mcps/knowledge-skills"),
   ];
 
   let fixedCount = 0;
@@ -66,9 +69,10 @@ function fixAllMcpServers() {
   for (const mcpDir of mcpDirs) {
     if (!fs.existsSync(mcpDir)) continue;
 
-    const files = fs.readdirSync(mcpDir)
-      .filter(file => file.endsWith('.server.ts'))
-      .map(file => path.join(mcpDir, file));
+    const files = fs
+      .readdirSync(mcpDir)
+      .filter((file) => file.endsWith(".server.ts"))
+      .map((file) => path.join(mcpDir, file));
 
     for (const file of files) {
       addCapabilitiesToServer(file);

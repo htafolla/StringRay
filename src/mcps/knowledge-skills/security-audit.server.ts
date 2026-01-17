@@ -61,7 +61,7 @@ class StrRaySecurityAuditServer {
   private server: Server;
 
   constructor() {
-        this.server = new Server(
+    this.server = new Server(
       {
         name: "strray-security-audit",
         version: "1.0.0",
@@ -70,7 +70,7 @@ class StrRaySecurityAuditServer {
         capabilities: {
           tools: {},
         },
-      }
+      },
     );
 
     this.setupToolHandlers();

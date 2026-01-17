@@ -18,7 +18,7 @@ class StrRayArchitectToolsServer {
   private server: Server;
 
   constructor() {
-        this.server = new Server(
+    this.server = new Server(
       {
         name: "strray-architect-tools",
         version: "1.0.0",
@@ -27,7 +27,7 @@ class StrRayArchitectToolsServer {
         capabilities: {
           tools: {},
         },
-      }
+      },
     );
 
     this.setupToolHandlers();

@@ -93,21 +93,21 @@ app.get("/", (req: any, res: any) => {
 // Add route for refactoring logs
 app.get("/logs", async (req: any, res: any) => {
   const logPath = join(__dirname, "..", ".opencode", "REFACTORING_LOG.md");
-    // Server debug logging - remove for production
+  // Server debug logging - remove for production
 
-    try {
-      if (fs.existsSync(logPath)) {
-        const content = fs.readFileSync(logPath, "utf-8");
-        res.setHeader("Content-Type", "text/markdown");
-        res.send(content);
-      } else {
-        res
-          .status(404)
-          .send(
-            "Refactoring log not found. The framework may not have generated any logs yet.",
-          );
-      }
-    } catch (error) {
+  try {
+    if (fs.existsSync(logPath)) {
+      const content = fs.readFileSync(logPath, "utf-8");
+      res.setHeader("Content-Type", "text/markdown");
+      res.send(content);
+    } else {
+      res
+        .status(404)
+        .send(
+          "Refactoring log not found. The framework may not have generated any logs yet.",
+        );
+    }
+  } catch (error) {
     // File read error - remove debug logging
     res.status(500).send("Server error reading log file.");
   }

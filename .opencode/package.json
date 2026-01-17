@@ -1,0 +1,19 @@
+{
+  "name": "@opencode/oh-my-opencode",
+  "version": "1.0.0",
+  "description": "oh-my-opencode framework configuration",
+  "main": "oh-my-opencode.json",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "opencode",
+    "framework",
+    "configuration"
+  ],
+  "author": "htafolla",
+  "license": "MIT",
+  "dependencies": {
+    "@opencode-ai/plugin": "1.1.25"
+  }
+}

@@ -18,7 +18,7 @@ class StrRaySecurityScanServer {
   private server: Server;
 
   constructor() {
-        this.server = new Server(
+    this.server = new Server(
       {
         name: "strray-security-scan",
         version: "1.0.0",
@@ -27,7 +27,7 @@ class StrRaySecurityScanServer {
         capabilities: {
           tools: {},
         },
-      }
+      },
     );
 
     this.setupToolHandlers();

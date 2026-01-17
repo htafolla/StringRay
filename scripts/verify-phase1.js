@@ -8,7 +8,8 @@
 
 // Path configuration for cross-environment compatibility
 const BOOT_PATH = process.env.STRRAY_BOOT_PATH || "../dist/boot-orchestrator";
-const DELEGATION_PATH = process.env.STRRAY_DELEGATION_PATH || "../dist/delegation";
+const DELEGATION_PATH =
+  process.env.STRRAY_DELEGATION_PATH || "../dist/delegation";
 const SESSION_PATH = process.env.STRRAY_SESSION_PATH || "../dist/session";
 
 import { BootOrchestrator } from "../dist/boot-orchestrator.js";

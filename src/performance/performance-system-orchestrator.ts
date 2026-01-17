@@ -133,7 +133,11 @@ export class PerformanceSystemOrchestrator extends EventEmitter {
     }
 
     try {
-      await frameworkLogger.log("performance-orchestrator", "system-initializing", "info");
+      await frameworkLogger.log(
+        "performance-orchestrator",
+        "system-initializing",
+        "info",
+      );
       // Initialization details kept as console.log for user feedback
       console.log("   📊 Initializing performance components...");
 
@@ -198,7 +202,11 @@ export class PerformanceSystemOrchestrator extends EventEmitter {
     if (this.components.dashboard) {
       // Note: Dashboard doesn't have a stop method, just disable monitoring
       this.status.monitoringActive = false;
-      frameworkLogger.log("performance-orchestrator", "dashboard-stopped", "info");
+      frameworkLogger.log(
+        "performance-orchestrator",
+        "dashboard-stopped",
+        "info",
+      );
     }
 
     this.emit("stopped");
@@ -212,7 +220,11 @@ export class PerformanceSystemOrchestrator extends EventEmitter {
       throw new Error("CI gates not initialized");
     }
 
-    await frameworkLogger.log("performance-orchestrator", "gates-executing", "info");
+    await frameworkLogger.log(
+      "performance-orchestrator",
+      "gates-executing",
+      "info",
+    );
     const result = await this.components.ciGates.runPerformanceGates();
 
     if (!result.success && this.config.ciGates.failPipeline) {
@@ -298,9 +310,15 @@ export class PerformanceSystemOrchestrator extends EventEmitter {
   /**
    * Update configuration (hot-reload capable components)
    */
-  async updateConfig(newConfig: Partial<PerformanceSystemConfig>): Promise<void> {
+  async updateConfig(
+    newConfig: Partial<PerformanceSystemConfig>,
+  ): Promise<void> {
     this.config = { ...this.config, ...newConfig };
-    await frameworkLogger.log("performance-orchestrator", "config-updated", "info");
+    await frameworkLogger.log(
+      "performance-orchestrator",
+      "config-updated",
+      "info",
+    );
   }
 
   /**

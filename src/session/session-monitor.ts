@@ -132,7 +132,9 @@ export class SessionMonitor {
     this.metricsHistory.set(sessionId, []);
     this.persistHealthData();
 
-    frameworkLogger.log("session-monitor", "session-registered", "info", { sessionId });
+    frameworkLogger.log("session-monitor", "session-registered", "info", {
+      sessionId,
+    });
   }
 
   unregisterSession(sessionId: string): void {
@@ -147,7 +149,9 @@ export class SessionMonitor {
     }
 
     this.persistHealthData();
-    frameworkLogger.log("session-monitor", "session-unregistered", "info", { sessionId });
+    frameworkLogger.log("session-monitor", "session-unregistered", "info", {
+      sessionId,
+    });
   }
 
   async performHealthCheck(sessionId: string): Promise<SessionHealth> {
@@ -165,7 +169,12 @@ export class SessionMonitor {
       const sessionStatus = this.sessionCoordinator.getSessionStatus(sessionId);
       if (!sessionStatus) {
         // Session was cleaned up but monitor wasn't notified - auto-unregister silently
-        frameworkLogger.log("session-monitor", "auto-unregister-cleaned-session", "info", { sessionId });
+        frameworkLogger.log(
+          "session-monitor",
+          "auto-unregister-cleaned-session",
+          "info",
+          { sessionId },
+        );
         this.unregisterSession(sessionId);
         // Return a basic health status for the cleaned up session
         return {
@@ -300,7 +309,9 @@ export class SessionMonitor {
       alert.resolvedAt = Date.now();
       this.activeAlerts.delete(alertId);
       this.persistAlertData();
-      frameworkLogger.log("session-monitor", "alert-resolved", "info", { alertId });
+      frameworkLogger.log("session-monitor", "alert-resolved", "info", {
+        alertId,
+      });
       return true;
     }
     return false;
@@ -361,7 +372,9 @@ export class SessionMonitor {
       }
     }, this.config.healthCheckIntervalMs);
 
-    frameworkLogger.log("session-monitor", "health-checks-started", "info", { intervalMs: this.config.healthCheckIntervalMs });
+    frameworkLogger.log("session-monitor", "health-checks-started", "info", {
+      intervalMs: this.config.healthCheckIntervalMs,
+    });
   }
 
   private startMetricsCollection(): void {
@@ -378,7 +391,12 @@ export class SessionMonitor {
       }
     }, this.config.metricsCollectionIntervalMs);
 
-    frameworkLogger.log("session-monitor", "metrics-collection-started", "info", { intervalMs: this.config.metricsCollectionIntervalMs });
+    frameworkLogger.log(
+      "session-monitor",
+      "metrics-collection-started",
+      "info",
+      { intervalMs: this.config.metricsCollectionIntervalMs },
+    );
   }
 
   private generateAlerts(
@@ -401,7 +419,10 @@ export class SessionMonitor {
       };
 
       this.activeAlerts.set(alert.id, alert);
-      frameworkLogger.log("session-monitor", "alert-generated", "info", { sessionId, issue });
+      frameworkLogger.log("session-monitor", "alert-generated", "info", {
+        sessionId,
+        issue,
+      });
     }
 
     this.persistAlertData();

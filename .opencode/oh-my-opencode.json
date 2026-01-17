@@ -1,7 +1,15 @@
 {
   "model": "opencode/grok-code",
-  "plugin": ["./dist/plugin/plugins/stringray-codex-injection.js"],
-  "disabled_agents": ["Sisyphus", "build", "plan", "Planner-Sisyphus", "OpenCode-Builder"],
+  "plugin": [
+    "../node_modules/strray-ai/dist/plugin/plugins/stringray-codex-injection.js"
+  ],
+  "disabled_agents": [
+    "sisyphus",
+    "build",
+    "plan",
+    "Planner-Sisyphus",
+    "OpenCode-Builder"
+  ],
   "sisyphus_agent": {
     "disabled": true
   },

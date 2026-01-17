@@ -32,7 +32,10 @@ export class RefactoringLoggingProcessor implements ProcessorHook {
   name = "refactoring-logging";
   priority = 100; // High priority to ensure logging happens
   enabled = true;
-  debugEnabled = process.env.STRRAY_DEBUG_LOGGING === "true" || process.env.NODE_ENV === "development" || false;
+  debugEnabled =
+    process.env.STRRAY_DEBUG_LOGGING === "true" ||
+    process.env.NODE_ENV === "development" ||
+    false;
 
   async execute(context: any): Promise<any> {
     if (this.debugEnabled) {
@@ -228,7 +231,12 @@ ${this.summarizeResult(context.result)}
 
   private async appendToRefactoringLog(content: string): Promise<void> {
     const projectRoot = process.cwd();
-    const logPath = path.join(projectRoot, "logs", "agents", "refactoring-log.md");
+    const logPath = path.join(
+      projectRoot,
+      "logs",
+      "agents",
+      "refactoring-log.md",
+    );
 
     // Ensure directory exists
     const logDir = path.dirname(logPath);
@@ -297,14 +305,14 @@ export async function testRefactoringLogging(): Promise<void> {
     true, // success
     "This is a test result that should be logged verbatim to REFACTORING_LOG.md",
     ["testing", "logging", "verification"],
-    "test-session-123"
+    "test-session-123",
   );
 
   console.log("📝 Test context created:", {
     agentName: testContext.agentName,
     task: testContext.task.substring(0, 50) + "...",
     duration: testContext.endTime - testContext.startTime,
-    success: testContext.success
+    success: testContext.success,
   });
 
   try {
@@ -319,15 +327,19 @@ export async function testRefactoringLogging(): Promise<void> {
     if (fs.existsSync(logPath)) {
       const content = fs.readFileSync(logPath, "utf-8");
       const hasTestEntry = content.includes("test-agent");
-      console.log("📄 REFACTORING_LOG.md exists:", hasTestEntry ? "✅ Contains test entry" : "❌ Missing test entry");
+      console.log(
+        "📄 REFACTORING_LOG.md exists:",
+        hasTestEntry ? "✅ Contains test entry" : "❌ Missing test entry",
+      );
 
       if (hasTestEntry) {
-        console.log("🎯 SUCCESS: Agent summary was written to REFACTORING_LOG.md");
+        console.log(
+          "🎯 SUCCESS: Agent summary was written to REFACTORING_LOG.md",
+        );
       }
     } else {
       console.log("❌ REFACTORING_LOG.md file not found");
     }
-
   } catch (error) {
     console.error("❌ Refactoring logging test failed:", error);
   }

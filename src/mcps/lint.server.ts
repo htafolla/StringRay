@@ -17,7 +17,7 @@ class StrRayLintServer {
   private server: Server;
 
   constructor() {
-        this.server = new Server(
+    this.server = new Server(
       {
         name: "strray-lint",
         version: "1.0.0",
@@ -26,7 +26,7 @@ class StrRayLintServer {
         capabilities: {
           tools: {},
         },
-      }
+      },
     );
 
     this.setupToolHandlers();

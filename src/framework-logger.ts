@@ -52,7 +52,9 @@ export class FrameworkUsageLogger {
     }
 
     // Suppress console output when running in OpenCode CLI mode to avoid breaking the interface
-    const isCliMode = process.env.STRRAY_CLI_MODE === "true" || process.env.OPENCODE_CLI === "true";
+    const isCliMode =
+      process.env.STRRAY_CLI_MODE === "true" ||
+      process.env.OPENCODE_CLI === "true";
     if (!isCliMode) {
       const emoji =
         status === "success"
@@ -62,7 +64,9 @@ export class FrameworkUsageLogger {
             : status === "debug"
               ? "🔍"
               : "ℹ️";
-      console.log(`${emoji} [${component}] ${action} - ${status.toUpperCase()}`);
+      console.log(
+        `${emoji} [${component}] ${action} - ${status.toUpperCase()}`,
+      );
     }
 
     // Override console methods in CLI mode to prevent breaking the interface
@@ -73,9 +77,14 @@ export class FrameworkUsageLogger {
 
       console.log = (...args: any[]) => {
         // Only allow essential user-facing CLI messages through
-        if (args[0] && typeof args[0] === 'string' &&
-            (args[0].includes('🎉') || args[0].includes('✅') ||
-             args[0].includes('🎯') || args[0].includes('🚀'))) {
+        if (
+          args[0] &&
+          typeof args[0] === "string" &&
+          (args[0].includes("🎉") ||
+            args[0].includes("✅") ||
+            args[0].includes("🎯") ||
+            args[0].includes("🚀"))
+        ) {
           originalConsoleLog(...args);
         }
         // Suppress all other console output in CLI mode

@@ -34,10 +34,10 @@ beforeAll(() => {
     ".opencode/mcps",
     ".opencode/logs",
     ".strray",
-    "src"
+    "src",
   ];
 
-  requiredDirs.forEach(dir => {
+  requiredDirs.forEach((dir) => {
     const fullPath = path.resolve(dir);
     if (!fs.existsSync(fullPath)) {
       fs.mkdirSync(fullPath, { recursive: true });
@@ -53,11 +53,14 @@ beforeAll(() => {
 
   const ohMyOpencodeConfig = {
     plugin: "./dist/plugin/plugins/stringray-codex-injection.js",
-    agents: ["enforcer", "architect", "orchestrator"]
+    agents: ["enforcer", "architect", "orchestrator"],
   };
   const ohMyOpencodePath = path.resolve(".opencode/oh-my-opencode.json");
   if (!fs.existsSync(ohMyOpencodePath)) {
-    fs.writeFileSync(ohMyOpencodePath, JSON.stringify(ohMyOpencodeConfig, null, 2));
+    fs.writeFileSync(
+      ohMyOpencodePath,
+      JSON.stringify(ohMyOpencodeConfig, null, 2),
+    );
   }
 });
 

@@ -17,18 +17,18 @@ The Universal Version Manager (`scripts/universal-version-manager.js`) maintains
 ```javascript
 const OFFICIAL_VERSIONS = {
   framework: {
-    version: '1.0.4',
-    displayName: 'StringRay AI v1.0.27',
-    lastUpdated: '2026-01-15'
+    version: "1.0.4",
+    displayName: "StringRay AI v1.0.27",
+    lastUpdated: "2026-01-15",
   },
   codex: {
-    version: 'v1.2.24',
+    version: "v1.2.24",
     termsCount: 50,
-    lastUpdated: '2026-01-15'
+    lastUpdated: "2026-01-15",
   },
   dependencies: {
-    ohMyOpencode: '2.14.0'
-  }
+    ohMyOpencode: "2.14.0",
+  },
 };
 ```
 
@@ -56,16 +56,19 @@ git add . && git commit -m "chore: bump version to 1.0.5"
 ## What Gets Updated
 
 ### Framework References
+
 - `StringRay AI v1.0.27` → `StringRay AI v1.0.27`
 - `StringRay AI v1.0.27` → `StringRay AI v1.0.27`
 - Version badges and headers
 
 ### Codex References
+
 - `Universal Development Codex v1.2.25` → `Universal Development Codex v1.2.25`
 - `55-term` → `55-term`
 - `55 Universal Development Codex` → `55 Universal Development Codex`
 
 ### Dependency References
+
 - `oh-my-opencode v2.14.0` → `oh-my-opencode v2.14.0`
 
 ## Files Excluded
@@ -85,6 +88,7 @@ git add . && git commit -m "chore: bump version to 1.0.5"
 ## Maintenance
 
 When updating versions:
+
 1. Update `OFFICIAL_VERSIONS` object
 2. Run the script
 3. Test the changes

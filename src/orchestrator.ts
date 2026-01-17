@@ -129,7 +129,12 @@ export class StringRayOrchestrator {
       const result = await this.delegateToSubagent(task);
 
       const duration = Date.now() - startTime;
-      await frameworkLogger.log("orchestrator", "complex-task-completed", "success", { taskExecuted: true });
+      await frameworkLogger.log(
+        "orchestrator",
+        "complex-task-completed",
+        "success",
+        { taskExecuted: true },
+      );
 
       // Execute post-processors for agent task completion logging
       console.log(
@@ -155,12 +160,17 @@ export class StringRayOrchestrator {
 
         const processorManager = globalStateManager?.get("processor:manager");
         // Processor manager debug - remove for production
-        frameworkLogger.log("orchestrator", "processor-manager-check", "debug", {
-          retrieved: !!processorManager,
-          type: typeof processorManager,
-          hasExecutePostProcessors:
-            typeof processorManager?.executePostProcessors === "function",
-        });
+        frameworkLogger.log(
+          "orchestrator",
+          "processor-manager-check",
+          "debug",
+          {
+            retrieved: !!processorManager,
+            type: typeof processorManager,
+            hasExecutePostProcessors:
+              typeof processorManager?.executePostProcessors === "function",
+          },
+        );
 
         if (processorManager) {
           // Create agent task context for logging

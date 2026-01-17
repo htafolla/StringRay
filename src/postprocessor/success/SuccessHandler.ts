@@ -133,7 +133,11 @@ export class SuccessHandler {
     // - Notify downstream systems
 
     console.log("✅ Cleanup completed");
-    await frameworkLogger.log("success-handler", "cleanup-completed", "success");
+    await frameworkLogger.log(
+      "success-handler",
+      "cleanup-completed",
+      "success",
+    );
   }
 
   /**

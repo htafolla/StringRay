@@ -266,7 +266,10 @@ describe("StringRayStateManager - Persistence Features", () => {
         throw new Error("Permission denied");
       });
 
-      const failingManager = new StringRayStateManager("/test/state.json", true);
+      const failingManager = new StringRayStateManager(
+        "/test/state.json",
+        true,
+      );
       await new Promise((resolve) => setTimeout(resolve, 10));
 
       expect(failingManager.isPersistenceEnabled()).toBe(false);

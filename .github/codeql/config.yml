@@ -1,0 +1,5 @@
+disable-default-queries: true
+queries: []
+paths-ignore:
+  - "**"
+disable-all-queries: true

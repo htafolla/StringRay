@@ -37,7 +37,7 @@ class StrRayTestingStrategyServer {
   private server: Server;
 
   constructor() {
-        this.server = new Server(
+    this.server = new Server(
       {
         name: "strray-testing-strategy",
         version: "1.0.0",
@@ -46,7 +46,7 @@ class StrRayTestingStrategyServer {
         capabilities: {
           tools: {},
         },
-      }
+      },
     );
 
     this.setupToolHandlers();

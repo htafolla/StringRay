@@ -268,7 +268,12 @@ describe("Processor Activation", () => {
       });
 
       // These should be valid (no errors thrown)
-      const validNames = ["test-processor", "test.processor", "test_processor", "validName"];
+      const validNames = [
+        "test-processor",
+        "test.processor",
+        "test_processor",
+        "validName",
+      ];
 
       validNames.forEach((name) => {
         expect(() => {

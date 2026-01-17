@@ -1,50 +1,77 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "mcp": {
-    "context7": { "enabled": false },
-    "global-everything": { "enabled": false },
-    "global-filesystem": { "enabled": false },
-    "global-git": { "enabled": false },
-    "global-sqlite": { "enabled": false },
-    "grep_app": { "enabled": false },
+    "context7": {
+      "enabled": false
+    },
+    "global-everything": {
+      "enabled": false
+    },
+    "global-filesystem": {
+      "enabled": false
+    },
+    "global-git": {
+      "enabled": false
+    },
+    "global-sqlite": {
+      "enabled": false
+    },
+    "grep_app": {
+      "enabled": false
+    },
     "orchestrator": {
       "type": "local",
-      "command": ["node", "dist/plugin/mcps/orchestrator.server.js"],
+      "command": [
+        "node",
+        "node_modules/strray-ai/node_modules/strray-ai/dist/plugin/mcps/orchestrator.server.js"
+      ],
       "enabled": true
     },
     "enhanced-orchestrator": {
       "type": "local",
-      "command": ["node", "dist/plugin/mcps/enhanced-orchestrator.server.js"],
+      "command": [
+        "node",
+        "node_modules/strray-ai/node_modules/strray-ai/dist/plugin/mcps/enhanced-orchestrator.server.js"
+      ],
       "enabled": true
     },
     "enforcer": {
       "type": "local",
-      "command": ["node", "dist/plugin/mcps/enforcer-tools.server.js"],
+      "command": [
+        "node",
+        "node_modules/strray-ai/node_modules/strray-ai/dist/plugin/mcps/enforcer-tools.server.js"
+      ],
       "enabled": true
     },
     "api-design": {
       "type": "local",
-      "command": ["node", "dist/plugin/mcps/knowledge-skills/api-design.server.js"],
+      "command": [
+        "node",
+        "node_modules/strray-ai/node_modules/strray-ai/dist/plugin/mcps/knowledge-skills/api-design.server.js"
+      ],
       "enabled": true
     },
     "architecture-patterns": {
       "type": "local",
       "command": [
         "node",
-        "dist/plugin/mcps/knowledge-skills/architecture-patterns.server.js"
+        "node_modules/strray-ai/node_modules/strray-ai/dist/plugin/mcps/knowledge-skills/architecture-patterns.server.js"
       ],
       "enabled": true
     },
     "git-workflow": {
       "type": "local",
-      "command": ["node", "dist/plugin/mcps/knowledge-skills/git-workflow.server.js"],
+      "command": [
+        "node",
+        "node_modules/strray-ai/node_modules/strray-ai/dist/plugin/mcps/knowledge-skills/git-workflow.server.js"
+      ],
       "enabled": true
     },
     "performance-optimization": {
       "type": "local",
       "command": [
         "node",
-        "dist/plugin/mcps/knowledge-skills/performance-optimization.server.js"
+        "node_modules/strray-ai/node_modules/strray-ai/dist/plugin/mcps/knowledge-skills/performance-optimization.server.js"
       ],
       "enabled": true
     },
@@ -52,7 +79,7 @@
       "type": "local",
       "command": [
         "node",
-        "dist/plugin/mcps/knowledge-skills/project-analysis.server.js"
+        "node_modules/strray-ai/node_modules/strray-ai/dist/plugin/mcps/knowledge-skills/project-analysis.server.js"
       ],
       "enabled": true
     },
@@ -60,33 +87,39 @@
       "type": "local",
       "command": [
         "node",
-        "dist/plugin/mcps/knowledge-skills/testing-strategy.server.js"
+        "node_modules/strray-ai/node_modules/strray-ai/dist/plugin/mcps/knowledge-skills/testing-strategy.server.js"
       ],
       "enabled": true
     },
     "code-review": {
       "type": "local",
-      "command": ["node", "dist/plugin/mcps/knowledge-skills/code-review.server.js"],
+      "command": [
+        "node",
+        "node_modules/strray-ai/node_modules/strray-ai/dist/plugin/mcps/knowledge-skills/code-review.server.js"
+      ],
       "enabled": true
     },
     "security-audit": {
       "type": "local",
       "command": [
         "node",
-        "dist/plugin/mcps/knowledge-skills/security-audit.server.js"
+        "node_modules/strray-ai/node_modules/strray-ai/dist/plugin/mcps/knowledge-skills/security-audit.server.js"
       ],
       "enabled": true
     },
     "ui-ux-design": {
       "type": "local",
-      "command": ["node", "dist/plugin/mcps/knowledge-skills/ui-ux-design.server.js"],
+      "command": [
+        "node",
+        "node_modules/strray-ai/node_modules/strray-ai/dist/plugin/mcps/knowledge-skills/ui-ux-design.server.js"
+      ],
       "enabled": true
     },
     "refactoring-strategies": {
       "type": "local",
       "command": [
         "node",
-        "dist/plugin/mcps/knowledge-skills/refactoring-strategies.server.js"
+        "node_modules/strray-ai/node_modules/strray-ai/dist/plugin/mcps/knowledge-skills/refactoring-strategies.server.js"
       ],
       "enabled": true
     },
@@ -94,7 +127,7 @@
       "type": "local",
       "command": [
         "node",
-        "dist/plugin/mcps/knowledge-skills/testing-best-practices.server.js"
+        "node_modules/strray-ai/node_modules/strray-ai/dist/plugin/mcps/knowledge-skills/testing-best-practices.server.js"
       ],
       "enabled": true
     },
@@ -102,7 +135,7 @@
       "type": "local",
       "command": [
         "node",
-        "dist/plugin/mcps/knowledge-skills/project-analysis.server.js"
+        "node_modules/strray-ai/node_modules/strray-ai/dist/plugin/mcps/knowledge-skills/project-analysis.server.js"
       ],
       "enabled": true
     }

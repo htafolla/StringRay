@@ -371,7 +371,10 @@ export function createStringRayCodexInjectorHook() {
               tool: input.tool,
             },
           );
-          console.error(`❌ StringRay: Error in tool.execute.before hook:`, error);
+          console.error(
+            `❌ StringRay: Error in tool.execute.before hook:`,
+            error,
+          );
           // For blocking violations, re-throw to prevent action
           if (
             error instanceof Error &&
@@ -471,7 +474,10 @@ export function createStringRayCodexInjectorHook() {
               tool: input.tool,
             },
           );
-          console.error(`❌ StringRay: Error in tool.execute.after hook:`, error);
+          console.error(
+            `❌ StringRay: Error in tool.execute.after hook:`,
+            error,
+          );
           // Return original output on error to not break the session
           return output;
         }

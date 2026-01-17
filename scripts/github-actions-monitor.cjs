@@ -9,22 +9,26 @@
  * For new usage, prefer: node scripts/ci-cd-orchestrator.cjs --monitor
  */
 
-const { spawn } = require('child_process');
+const { spawn } = require("child_process");
 
 // Delegate to the unified orchestrator
 const args = process.argv.slice(2);
-const orchestratorArgs = ['scripts/ci-cd-orchestrator.cjs', '--monitor', ...args];
+const orchestratorArgs = [
+  "scripts/ci-cd-orchestrator.cjs",
+  "--monitor",
+  ...args,
+];
 
-const child = spawn('node', orchestratorArgs, {
-  stdio: 'inherit',
-  cwd: process.cwd()
+const child = spawn("node", orchestratorArgs, {
+  stdio: "inherit",
+  cwd: process.cwd(),
 });
 
-child.on('exit', (code) => {
+child.on("exit", (code) => {
   process.exit(code);
 });
 
-child.on('error', (error) => {
-  console.error('Failed to run CI/CD orchestrator:', error);
+child.on("error", (error) => {
+  console.error("Failed to run CI/CD orchestrator:", error);
   process.exit(1);
 });

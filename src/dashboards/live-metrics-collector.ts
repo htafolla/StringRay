@@ -732,7 +732,12 @@ export class LiveMetricsCollector extends EventEmitter {
 
       const removed = initialLength - this.metricsBuffer.length;
       if (removed > 0) {
-        await frameworkLogger.log("live-metrics-collector", "buffer-cleaned", "info", { metricsRemoved: removed });
+        await frameworkLogger.log(
+          "live-metrics-collector",
+          "buffer-cleaned",
+          "info",
+          { metricsRemoved: removed },
+        );
         this.stats.bufferSize = this.metricsBuffer.length;
       }
     }, 60000); // Clean up every minute
@@ -893,7 +898,11 @@ export class LiveMetricsCollector extends EventEmitter {
    */
   updateConfig(newConfig: Partial<MetricsCollectionConfig>): void {
     this.config = { ...this.config, ...newConfig };
-    await frameworkLogger.log("live-metrics-collector", "config-updated", "info");
+    await frameworkLogger.log(
+      "live-metrics-collector",
+      "config-updated",
+      "info",
+    );
     this.emit("config-updated", { ...this.config });
   }
 }

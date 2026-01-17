@@ -6,20 +6,20 @@
  */
 
 // Direct import for deployed environment compatibility
-const { pathResolver } = await import('../dist/plugin/utils/path-resolver.js');
+const { pathResolver } = await import("../dist/plugin/utils/path-resolver.js");
 
-console.log('🔍 StrRay Path Resolver Test\n');
+console.log("🔍 StrRay Path Resolver Test\n");
 
-console.log('📊 Environment Information:');
+console.log("📊 Environment Information:");
 const envInfo = pathResolver.getEnvironmentInfo();
 console.log(JSON.stringify(envInfo, null, 2));
 
-console.log('\n🔗 Agent Path Resolution Tests:');
-const agents = ['enforcer', 'architect', 'refactorer'];
+console.log("\n🔗 Agent Path Resolution Tests:");
+const agents = ["enforcer", "architect", "refactorer"];
 
-agents.forEach(agentName => {
+agents.forEach((agentName) => {
   const resolvedPath = pathResolver.resolveAgentPath(agentName);
   console.log(`  ${agentName}: ${resolvedPath}`);
 });
 
-console.log('\n✅ Path resolver test completed!');
+console.log("\n✅ Path resolver test completed!");

@@ -13,7 +13,7 @@
 
 ⚡ StringRay ⚡ provides intelligent multi-agent coordination, codex-based code quality enforcement, and enterprise-grade development practices through oh-my-opencode integration. Eliminate spaghetti code, hallucinations, and code rot through systematic validation and intelligent agent delegation.
 
-> **📦 Current Version: 1.0.11** - Enterprise production release with automated postinstall configuration, MCP server integration, and comprehensive testing. Use `npm install strray-ai@latest` for installation.
+> **📦 Current Version: 1.0.27** - Enterprise production release with automated postinstall configuration, MCP server integration, and comprehensive testing. Use `npm install strray-ai@latest` for installation.
 
 ---
 
@@ -22,24 +22,28 @@
 ### 🎯 Enterprise Production Release
 
 **Automated Postinstall Configuration**
+
 - ✅ Zero-setup installation with automatic configuration
 - ✅ oh-my-opencode integration (9 agents enabled, sisyphus disabled)
 - ✅ Claude Desktop MCP exclusions (3 problematic servers disabled)
 - ✅ Project configuration files automatically copied
 
 **NPM Package Optimization**
+
 - ✅ Complete framework published to npm registry
 - ✅ 662 files, 657.3KB compressed package size
 - ✅ All validation scripts included for testing
 - ✅ Comprehensive package.json with all necessary files
 
 **Framework Validation**
+
 - ✅ Postinstall script creates all required configuration files
 - ✅ MCP connectivity validation (4/4 validators operational)
 - ✅ oh-my-opencode integration testing (plugin loading confirmed)
 - ✅ External process communication verified
 
 **CI/CD & Publishing**
+
 - ✅ Successful npm publish workflow
 - ✅ Package installation testing in fresh environments
 - ✅ Automated configuration validation
@@ -140,12 +144,14 @@ node node_modules/strray-ai/scripts/test-stringray-plugin.mjs
 
 **Validation Results:**
 The comprehensive test suite verifies:
+
 - ✅ MCP server connectivity (4/4 operational)
 - ✅ oh-my-opencode integration (plugin loading confirmed)
 - ✅ Postinstall configuration (all files created correctly)
 - ✅ External process communication (framework ready)
 
 **Framework Status:**
+
 - **8 Specialized Agents**: All configured and ready
 - **16 MCP Servers**: Fully operational
 - **Codex Compliance**: 99.6% error prevention active
@@ -207,7 +213,7 @@ npm publish
 **Package Details:**
 
 - **Name**: `strray-ai`
-- **Version**: `1.0.11`
+- **Version**: `1.0.27`
 - **Size**: ~657KB (gzipped)
 - **Files**: 662 total (including all agents, MCP servers, validation scripts, and documentation)
 
@@ -298,6 +304,7 @@ Create `.stringray/config.json` in your project root:
 StringRay supports several environment variables for advanced configuration:
 
 #### Logging & Debugging
+
 ```bash
 # Disable all logging (default: enabled)
 export STRRAY_LOGGING_ENABLED=false
@@ -313,6 +320,7 @@ export STRRAY_DEBUG_LOGGING=true
 ```
 
 #### Path Overrides (Advanced)
+
 ```bash
 # Override default paths for development/testing
 export STRRAY_AGENTS_PATH="../custom/agents"
@@ -324,6 +332,7 @@ export STRRAY_MCP_PATH="../custom/mcp"
 ```
 
 #### Enterprise & Clustering
+
 ```bash
 # Instance identification for monitoring
 export STRRAY_INSTANCE_ID="production-instance-1"
@@ -625,7 +634,7 @@ Update your `.opencode/oh-my-opencode.json` for enterprise deployment:
   },
   "framework": {
     "name": "strray-ai",
-    "version": "1.0.11",
+    "version": "1.0.27",
     "performance_mode": "optimized",
     "monitoring_enabled": true,
     "plugin_security": "strict"

@@ -31,7 +31,11 @@ async function testDelegationLogging() {
       context: result.metrics as any,
     });
 
-    await frameworkLogger.log("test-delegation", "execution-completed", "success");
+    await frameworkLogger.log(
+      "test-delegation",
+      "execution-completed",
+      "success",
+    );
   } catch (error) {
     console.log(
       "⚠️  Delegation execution failed (expected in test environment):",

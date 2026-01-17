@@ -45,7 +45,10 @@ function setupGracefulShutdown(): void {
       process.exit(0);
     } catch (error) {
       // Suppress error output in CLI mode to avoid breaking interface
-      if (process.env.STRRAY_CLI_MODE !== "true" && process.env.OPENCODE_CLI !== "true") {
+      if (
+        process.env.STRRAY_CLI_MODE !== "true" &&
+        process.env.OPENCODE_CLI !== "true"
+      ) {
         console.error("❌ Error during graceful shutdown:", error);
       }
       process.exit(1);
@@ -67,7 +70,10 @@ function setupGracefulShutdown(): void {
   // Handle uncaught exceptions that might cause JSON parsing errors
   process.on("uncaughtException", (error) => {
     // Suppress error output in CLI mode to avoid breaking interface
-    if (process.env.STRRAY_CLI_MODE !== "true" && process.env.OPENCODE_CLI !== "true") {
+    if (
+      process.env.STRRAY_CLI_MODE !== "true" &&
+      process.env.OPENCODE_CLI !== "true"
+    ) {
       console.error("❌ Uncaught Exception:", error);
     }
     memoryMonitor.stop();
@@ -76,7 +82,10 @@ function setupGracefulShutdown(): void {
 
   process.on("unhandledRejection", (reason, promise) => {
     // Suppress error output in CLI mode to avoid breaking interface
-    if (process.env.STRRAY_CLI_MODE !== "true" && process.env.OPENCODE_CLI !== "true") {
+    if (
+      process.env.STRRAY_CLI_MODE !== "true" &&
+      process.env.OPENCODE_CLI !== "true"
+    ) {
       console.error("❌ Unhandled Rejection at:", promise, "reason:", reason);
     }
     memoryMonitor.stop();
@@ -298,8 +307,11 @@ export class BootOrchestrator {
       );
 
       // Register the refactoring logging processor with its hook
-      const { refactoringLoggingProcessor } = await import("./processors/refactoring-logging-processor.js");
-      this.processorManager.registerProcessorWithHook(refactoringLoggingProcessor);
+      const { refactoringLoggingProcessor } =
+        await import("./processors/refactoring-logging-processor.js");
+      this.processorManager.registerProcessorWithHook(
+        refactoringLoggingProcessor,
+      );
       frameworkLogger.log(
         "boot-orchestrator",
         "registered refactoringLogging processor with hook",
@@ -363,7 +375,12 @@ export class BootOrchestrator {
       try {
         // Dynamic import of agent modules using path resolver
         const agentPath = pathResolver.resolveAgentPath(agentName);
-        await frameworkLogger.log("boot-orchestrator", "agent-loading", "info", { agentName, agentPath });
+        await frameworkLogger.log(
+          "boot-orchestrator",
+          "agent-loading",
+          "info",
+          { agentName, agentPath },
+        );
         const agentModule = await import(agentPath);
         const agentClass =
           agentModule[
@@ -832,42 +849,90 @@ export class BootOrchestrator {
         codex_version: "v1.2.20",
         codex_terms: [
           1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
-          21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
-          41, 42, 43
+          21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37,
+          38, 39, 40, 41, 42, 43,
         ],
         monitoring_metrics: [
-          "bundle-size", "test-coverage", "code-duplication", "build-time", "error-rate"
+          "bundle-size",
+          "test-coverage",
+          "code-duplication",
+          "build-time",
+          "error-rate",
         ],
         monitoring_alerts: [
-          "threshold-violations", "security-issues", "performance-degradation", "test-failures"
+          "threshold-violations",
+          "security-issues",
+          "performance-degradation",
+          "test-failures",
         ],
         agent_capabilities: {
-          enforcer: ["compliance-monitoring", "threshold-enforcement", "automation-orchestration"],
-          architect: ["design-review", "architecture-validation", "dependency-analysis"],
-          orchestrator: ["task-coordination", "multi-agent-orchestration", "workflow-management"],
-          "bug-triage-specialist": ["error-analysis", "root-cause-identification", "fix-suggestions"],
-          "code-reviewer": ["code-quality-assessment", "best-practice-validation", "security-review"],
-          "security-auditor": ["vulnerability-detection", "threat-analysis", "security-validation"],
+          enforcer: [
+            "compliance-monitoring",
+            "threshold-enforcement",
+            "automation-orchestration",
+          ],
+          architect: [
+            "design-review",
+            "architecture-validation",
+            "dependency-analysis",
+          ],
+          orchestrator: [
+            "task-coordination",
+            "multi-agent-orchestration",
+            "workflow-management",
+          ],
+          "bug-triage-specialist": [
+            "error-analysis",
+            "root-cause-identification",
+            "fix-suggestions",
+          ],
+          "code-reviewer": [
+            "code-quality-assessment",
+            "best-practice-validation",
+            "security-review",
+          ],
+          "security-auditor": [
+            "vulnerability-detection",
+            "threat-analysis",
+            "security-validation",
+          ],
           refactorer: ["code-modernization", "debt-reduction", "consolidation"],
-          "test-architect": ["test-strategy-design", "coverage-optimization", "behavioral-testing"]
-        }
+          "test-architect": [
+            "test-strategy-design",
+            "coverage-optimization",
+            "behavioral-testing",
+          ],
+        },
       };
 
       // Store configuration in state manager for use by other components
       this.stateManager.set("strray:config", stringRayConfig);
       this.stateManager.set("strray:version", stringRayConfig.version);
-      this.stateManager.set("strray:codex_enabled", stringRayConfig.codex_enabled);
-      this.stateManager.set("strray:codex_terms", stringRayConfig.codex_terms);
-      this.stateManager.set("strray:monitoring_metrics", stringRayConfig.monitoring_metrics);
-      this.stateManager.set("strray:monitoring_alerts", stringRayConfig.monitoring_alerts);
-      this.stateManager.set("strray:agent_capabilities", stringRayConfig.agent_capabilities);
-
-      await frameworkLogger.log("boot-orchestrator", "configuration-loaded", "success");
-    } catch (error) {
-      console.warn(
-        "⚠️ Failed to load StringRay configuration:",
-        error,
+      this.stateManager.set(
+        "strray:codex_enabled",
+        stringRayConfig.codex_enabled,
       );
+      this.stateManager.set("strray:codex_terms", stringRayConfig.codex_terms);
+      this.stateManager.set(
+        "strray:monitoring_metrics",
+        stringRayConfig.monitoring_metrics,
+      );
+      this.stateManager.set(
+        "strray:monitoring_alerts",
+        stringRayConfig.monitoring_alerts,
+      );
+      this.stateManager.set(
+        "strray:agent_capabilities",
+        stringRayConfig.agent_capabilities,
+      );
+
+      await frameworkLogger.log(
+        "boot-orchestrator",
+        "configuration-loaded",
+        "success",
+      );
+    } catch (error) {
+      console.warn("⚠️ Failed to load StringRay configuration:", error);
       // Continue with defaults if loading fails
     }
   }

@@ -1,9 +1,7 @@
 disable-default-queries: true
-
 queries: []
-
+paths:
+  - "**/*"
 paths-ignore:
   - "**"
-
-workflows:
-  - ci-cd.yml: false
+disable-all-queries: true

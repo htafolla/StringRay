@@ -123,6 +123,7 @@
     "dist/processors",
     "dist/state",
     "dist/utils",
+    "src/__tests__",
     "README.md",
     "LICENSE"
   ],

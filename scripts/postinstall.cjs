@@ -428,6 +428,59 @@ function configureStrRayPlugin() {
     }
   }
 
+  // Update paths in test files
+  console.log("Checking test files for path updates...");
+  const testDir = path.join(process.cwd(), "node_modules", "strray-ai", "src", "__tests__");
+  if (fs.existsSync(testDir)) {
+    console.log("Test files found, updating paths...");
+    let testFilesUpdated = 0;
+
+    function processTestFile(filePath) {
+      try {
+        let content = fs.readFileSync(filePath, "utf-8");
+        let updated = false;
+
+        // Convert dist/plugin paths to node_modules/strray-ai/dist/plugin paths
+        if (content.includes('./dist/plugin/')) {
+          content = content.replace(/'\.\/dist\/plugin\//g, "'./node_modules/strray-ai/dist/plugin/");
+          content = content.replace(/"\.\/dist\/plugin\//g, '"./node_modules/strray-ai/dist/plugin/');
+          updated = true;
+        }
+
+        if (updated) {
+          fs.writeFileSync(filePath, content);
+          testFilesUpdated++;
+          console.log(`✅ Updated test file: ${path.relative(process.cwd(), filePath)}`);
+        }
+      } catch (error) {
+        console.warn(`Warning: Could not update test file ${filePath}:`, error.message);
+      }
+    }
+
+    function processDirectory(dirPath) {
+      const items = fs.readdirSync(dirPath);
+      for (const item of items) {
+        const fullPath = path.join(dirPath, item);
+        const stat = fs.statSync(fullPath);
+        if (stat.isDirectory()) {
+          processDirectory(fullPath);
+        } else if (item.endsWith('.ts') || item.endsWith('.js')) {
+          processTestFile(fullPath);
+        }
+      }
+    }
+
+    processDirectory(testDir);
+
+    if (testFilesUpdated > 0) {
+      console.log(`✅ Updated ${testFilesUpdated} test files with consumer paths`);
+    } else {
+      console.log("ℹ️ No test file path updates needed");
+    }
+  } else {
+    console.log("ℹ️ Test files not found (this is normal for some installations)");
+  }
+
   // All configuration paths are now updated for consumer usage
 
   console.log('🎉 StrRay plugin installation complete!');

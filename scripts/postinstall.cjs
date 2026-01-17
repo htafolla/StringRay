@@ -27,6 +27,7 @@ const packageRoot = path.join(__dirname, '..');
 console.log('Postinstall running...');
 console.log('Script dir:', __dirname);
 console.log('Package root:', packageRoot);
+console.log('Current working directory:', process.cwd());
 
 // Copy all configuration files
 configFiles.forEach(({ source: sourcePath, dest: destPath }) => {
@@ -118,6 +119,91 @@ function saveConfig(configPath, config) {
 
 
 
+
+function createMCPConfig(mcpConfigPath) {
+  console.log('🔧 Creating MCP configuration...');
+  console.log('Package root:', packageRoot);
+  const mcpServers = {};
+
+  // Scan for MCP servers in the package
+  const mcpsDir = path.join(packageRoot, 'dist', 'mcps');
+  const knowledgeSkillsDir = path.join(mcpsDir, 'knowledge-skills');
+
+  console.log('Scanning MCP servers in:', mcpsDir);
+
+  try {
+    // Add main MCP servers
+    const mainServers = [
+      'orchestrator',
+      'enhanced-orchestrator',
+      'enforcer-tools',
+      'framework-compliance-audit',
+      'performance-analysis',
+      'lint',
+      'architect-tools',
+      'security-scan',
+      'state-manager',
+      'auto-format',
+      'model-health-check',
+      'processor-pipeline'
+    ];
+
+    mainServers.forEach(server => {
+      const serverPath = path.join(mcpsDir, `${server}.server.js`);
+      if (fs.existsSync(serverPath)) {
+        mcpServers[server] = {
+          command: 'node',
+          args: [path.join('node_modules', 'strray-ai', 'dist', 'mcps', `${server}.server.js`)],
+          env: {}
+        };
+        console.log(`✅ Added MCP server: ${server}`);
+      }
+    });
+
+    // Add knowledge skills servers
+    if (fs.existsSync(knowledgeSkillsDir)) {
+      const knowledgeSkills = [
+        'project-analysis',
+        'api-design',
+        'architecture-patterns',
+        'git-workflow',
+        'performance-optimization',
+        'testing-strategy',
+        'code-review',
+        'security-audit',
+        'ui-ux-design',
+        'refactoring-strategies',
+        'testing-best-practices',
+        'database-design',
+        'devops-deployment',
+        'documentation-generation'
+      ];
+
+      knowledgeSkills.forEach(skill => {
+        const skillPath = path.join(knowledgeSkillsDir, `${skill}.server.js`);
+        if (fs.existsSync(skillPath)) {
+          mcpServers[skill] = {
+            command: 'node',
+            args: [path.join('node_modules', 'strray-ai', 'dist', 'mcps', 'knowledge-skills', `${skill}.server.js`)],
+            env: {}
+          };
+          console.log(`✅ Added knowledge skill: ${skill}`);
+        }
+      });
+    }
+
+    // Create the MCP configuration
+    const mcpConfig = {
+      mcpServers: mcpServers
+    };
+
+    fs.writeFileSync(mcpConfigPath, JSON.stringify(mcpConfig, null, 2));
+    console.log(`✅ Created MCP configuration with ${Object.keys(mcpServers).length} servers`);
+
+  } catch (error) {
+    console.warn('Warning: Could not create MCP configuration:', error.message);
+  }
+}
 
 function createStrRayConfig() {
   // Create StrRay-specific configuration in a separate file
@@ -245,6 +331,10 @@ console.log('🚀 [StrRay Postinstall] Working directory:', process.cwd());
 
 function configureStrRayPlugin() {
   console.log('🔧 Configuring StrRay plugin...');
+  console.log('🚀 configureStrRayPlugin function called');
+
+  try {
+    console.log('🔍 About to start file copying...');
 
   // Copy configuration files
   configFiles.forEach(({ source: sourcePath, dest: destPath }) => {
@@ -284,41 +374,28 @@ function configureStrRayPlugin() {
     }
   });
 
-  // Update MCP server paths in the copied .mcp.json file
-  const mcpConfigPath = path.join(process.cwd(), '.mcp.json');
-  console.log('Checking MCP config at:', mcpConfigPath);
-  if (fs.existsSync(mcpConfigPath)) {
-    console.log('MCP config file exists, updating paths...');
-    try {
-      const mcpConfig = JSON.parse(fs.readFileSync(mcpConfigPath, 'utf-8'));
-      let updated = false;
+    console.log('📄 File copying completed, starting MCP configuration...');
 
-      // Update all server command arguments to use correct paths
-      for (const [serverName, serverConfig] of Object.entries(mcpConfig.mcpServers || {})) {
-        if (serverConfig.args && Array.isArray(serverConfig.args)) {
-          for (let i = 0; i < serverConfig.args.length; i++) {
-            const arg = serverConfig.args[i];
-            // Replace template paths with actual package paths
-            if (typeof arg === 'string' && arg.includes('dist/plugin/mcps/')) {
-              // Remove the /plugin/ part and use node_modules/strray-ai/dist/mcps/
-              const newArg = arg.replace('dist/plugin/mcps/', 'node_modules/strray-ai/dist/mcps/');
-              if (newArg !== arg) {
-                serverConfig.args[i] = newArg;
-                updated = true;
-                console.log(`✅ Updated MCP server ${serverName} path: ${arg} -> ${newArg}`);
-              }
-            }
-          }
-        }
-      }
+    // Create MCP configuration if it doesn't exist
+    console.log('🔧 Starting MCP configuration section...');
+    console.log('📍 Reached MCP config section in configureStrRayPlugin');
+    const mcpConfigPath = path.join(process.cwd(), '.mcp.json');
+    console.log('Checking MCP config at:', mcpConfigPath);
 
-      if (updated) {
-        fs.writeFileSync(mcpConfigPath, JSON.stringify(mcpConfig, null, 2));
-        console.log('✅ Updated MCP server paths in .mcp.json');
-      }
-    } catch (error) {
-      console.warn('Warning: Could not update MCP server paths:', error.message);
-    }
+    console.log('MCP config exists check:', fs.existsSync(mcpConfigPath));
+  if (!fs.existsSync(mcpConfigPath)) {
+    console.log('MCP config file does not exist, creating from available servers...');
+    createMCPConfig(mcpConfigPath);
+  } else {
+    console.log('MCP config file exists, no action needed...');
+  }
+
+  // Skip path updating since config is created with correct paths
+  console.log('MCP configuration setup complete');
+
+  } catch (error) {
+    console.error('❌ Error in configureStrRayPlugin:', error.message);
+    throw error;
   }
 
   // Copy Claude configuration files to user's home directory

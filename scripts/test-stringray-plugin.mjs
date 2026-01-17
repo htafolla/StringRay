@@ -40,6 +40,8 @@ const PLUGIN_PATH = process.env.STRINGRAY_PLUGIN_PATH ||
 
 console.log('🧪 Testing StringRay Plugin Loading...');
 console.log('=====================================\n');
+console.log('Current working directory:', process.cwd());
+console.log('Script location:', import.meta.url);
 
 (async () => {
   try {

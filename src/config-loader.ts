@@ -63,8 +63,8 @@ export class StringRayConfigLoader {
       const configPath = path.resolve(process.cwd(), this.configPath);
 
       if (!fs.existsSync(configPath)) {
-        console.warn(
-          `⚠️  StringRay config not found at ${configPath}, using defaults`,
+        console.log(
+          `ℹ️  StringRay config not found at ${configPath}, using defaults`,
         );
         return this.getDefaultConfig();
       }

@@ -176,6 +176,72 @@
       "behavioral-testing"
     ]
   },
+  "agent:enforcer:active_tasks": 3,
+  "session:consistency-test-1:coordinator": {
+    "sessionId": "consistency-test-1",
+    "startTime": 1768310688521,
+    "activeDelegations": {},
+    "agentInteractions": {},
+    "conflictHistory": [],
+    "coordinationState": {
+      "activeAgents": {},
+      "pendingCommunications": [],
+      "sharedContext": {},
+      "sessionMetrics": {
+        "totalInteractions": 0,
+        "successfulInteractions": 0,
+        "failedInteractions": 0,
+        "averageResponseTime": 0,
+        "conflictResolutionRate": 0,
+        "coordinationEfficiency": 0
+      }
+    },
+    "isActive": true
+  },
+  "cleanup:session_metadata": {
+    "default": {
+      "sessionId": "default",
+      "createdAt": 1768674353347,
+      "lastActivity": 1768674353347,
+      "ttlMs": 86400000,
+      "isActive": true,
+      "agentCount": 0,
+      "memoryUsage": 0
+    }
+  },
+  "monitor:health": {
+    "default": {
+      "sessionId": "default",
+      "status": "unknown",
+      "lastCheck": 0,
+      "responseTime": 0,
+      "errorCount": 0,
+      "activeAgents": 0,
+      "memoryUsage": 0,
+      "issues": []
+    }
+  },
+  "session:cleanup-test-1:coordinator": {
+    "sessionId": "cleanup-test-1",
+    "startTime": 1768310688276,
+    "activeDelegations": {},
+    "agentInteractions": {},
+    "conflictHistory": [],
+    "coordinationState": {
+      "activeAgents": {},
+      "pendingCommunications": [],
+      "sharedContext": {},
+      "sessionMetrics": {
+        "totalInteractions": 0,
+        "successfulInteractions": 0,
+        "failedInteractions": 0,
+        "averageResponseTime": 0,
+        "conflictResolutionRate": 0,
+        "coordinationEfficiency": 0
+      }
+    },
+    "isActive": true
+  },
   "session:test-session-7:coordinator": {
     "sessionId": "test-session-7",
     "startTime": 1768672930003,
@@ -371,71 +437,6 @@
       "timestamp": 1768672930004
     }
   ],
-  "session:consistency-test-1:coordinator": {
-    "sessionId": "consistency-test-1",
-    "startTime": 1768310688521,
-    "activeDelegations": {},
-    "agentInteractions": {},
-    "conflictHistory": [],
-    "coordinationState": {
-      "activeAgents": {},
-      "pendingCommunications": [],
-      "sharedContext": {},
-      "sessionMetrics": {
-        "totalInteractions": 0,
-        "successfulInteractions": 0,
-        "failedInteractions": 0,
-        "averageResponseTime": 0,
-        "conflictResolutionRate": 0,
-        "coordinationEfficiency": 0
-      }
-    },
-    "isActive": true
-  },
-  "cleanup:session_metadata": {
-    "default": {
-      "sessionId": "default",
-      "createdAt": 1768673120895,
-      "lastActivity": 1768673120895,
-      "ttlMs": 86400000,
-      "isActive": true,
-      "agentCount": 0,
-      "memoryUsage": 0
-    }
-  },
-  "monitor:health": {
-    "default": {
-      "sessionId": "default",
-      "status": "unknown",
-      "lastCheck": 0,
-      "responseTime": 0,
-      "errorCount": 0,
-      "activeAgents": 0,
-      "memoryUsage": 0,
-      "issues": []
-    }
-  },
-  "session:cleanup-test-1:coordinator": {
-    "sessionId": "cleanup-test-1",
-    "startTime": 1768310688276,
-    "activeDelegations": {},
-    "agentInteractions": {},
-    "conflictHistory": [],
-    "coordinationState": {
-      "activeAgents": {},
-      "pendingCommunications": [],
-      "sharedContext": {},
-      "sessionMetrics": {
-        "totalInteractions": 0,
-        "successfulInteractions": 0,
-        "failedInteractions": 0,
-        "averageResponseTime": 0,
-        "conflictResolutionRate": 0,
-        "coordinationEfficiency": 0
-      }
-    },
-    "isActive": true
-  },
   "session:transition-test-2:coordinator": {
     "sessionId": "transition-test-2",
     "startTime": 1768672927217,
@@ -616,7 +617,7 @@
   },
   "session:default:coordinator": {
     "sessionId": "default",
-    "startTime": 1768673120895,
+    "startTime": 1768674353347,
     "activeDelegations": {},
     "agentInteractions": {},
     "conflictHistory": [],
@@ -637,12 +638,12 @@
   },
   "delegation:default_session": {
     "sessionId": "default",
-    "createdAt": "2026-01-17T18:05:20.895Z",
+    "createdAt": "2026-01-17T18:25:53.347Z",
     "active": true,
     "agentCount": 8
   },
   "session:active": true,
-  "session:boot_time": 1768673120895,
+  "session:boot_time": 1768674353347,
   "session:agents": [],
   "session:state_manager": {
     "stateManager": {
@@ -1111,7 +1112,7 @@
       "enforcementLevel": "blocking"
     }
   ],
-  "enforcement:enabled_at": 1768673120896,
+  "enforcement:enabled_at": 1768674353347,
   "session:validator-test-session:coordinator": {
     "sessionId": "validator-test-session",
     "startTime": 1768335491257,
@@ -1256,6 +1257,18 @@
         "coordinationEfficiency": 1,
         "memoryUsage": 0,
         "agentCount": 3
+      },
+      {
+        "timestamp": 1768673264789,
+        "sessionId": "healthy-session",
+        "totalInteractions": 0,
+        "successfulInteractions": 0,
+        "failedInteractions": 0,
+        "averageResponseTime": 0,
+        "conflictResolutionRate": 1,
+        "coordinationEfficiency": 1,
+        "memoryUsage": 0,
+        "agentCount": 3
       }
     ],
     "high-conflict-session": [
@@ -1363,7 +1376,7 @@
   },
   "processor:active": true,
   "security:initial_audit": {
-    "totalFiles": 1851,
+    "totalFiles": 1858,
     "issues": [
       {
         "severity": "high",
@@ -11632,8 +11645,5 @@
       }
     },
     "isActive": true
-  },
-  "clear-test-test-framework-init-session": {
-    "test": "data"
   }
 }

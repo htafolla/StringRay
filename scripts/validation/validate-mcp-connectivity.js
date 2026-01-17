@@ -10,6 +10,10 @@
 import { spawn } from 'child_process';
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Detect if running in consumer environment (node_modules)
 const isConsumerEnvironment = __dirname.includes('node_modules/strray-ai');
@@ -53,7 +57,10 @@ class MCPServerValidator {
   }
 
   async validateServer(server) {
-    const serverPath = path.join(process.cwd(), server.path);
+    // Resolve paths relative to package root, not consumer working directory
+    const scriptDir = path.dirname(__filename);
+    const packageRoot = path.join(scriptDir, '..', '..'); // scripts/validation -> scripts -> package root
+    const serverPath = path.join(packageRoot, server.path);
 
     return new Promise((resolve) => {
       console.log(`🔧 Testing: ${server.name}`);

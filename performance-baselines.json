@@ -1,10 +1,10 @@
 {
   "bundle-size-analysis": {
     "testName": "bundle-size-analysis",
-    "averageDuration": 122.14913806249999,
-    "standardDeviation": 7.246427134183526,
-    "sampleCount": 16,
-    "lastUpdated": 1768671541266,
+    "averageDuration": 121.58464952941176,
+    "standardDeviation": 7.405325469389696,
+    "sampleCount": 17,
+    "lastUpdated": 1768673261657,
     "tolerance": 10
   },
   "module-import-performance": {
@@ -25,10 +25,10 @@
   },
   "test-execution-performance": {
     "testName": "test-execution-performance",
-    "averageDuration": 0.09894726666671734,
-    "standardDeviation": 0.012953836482316938,
-    "sampleCount": 45,
-    "lastUpdated": 1768673117748,
+    "averageDuration": 0.09861960869569755,
+    "standardDeviation": 0.013003559550265364,
+    "sampleCount": 46,
+    "lastUpdated": 1768673263148,
     "tolerance": 10
   }
 }

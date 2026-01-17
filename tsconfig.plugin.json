@@ -8,26 +8,19 @@
     "sourceMap": true
   },
   "include": [
-    "src/index.ts",
-    "src/cli/**/*.ts",
-    "src/plugins/**/*.ts",
-    "src/orchestrator/**/*.ts",
-    "src/state/**/*.ts",
-    "src/processors/**/*.ts",
-    "src/enforcement/**/*.ts",
-    "src/utils/**/*.ts",
-    "src/agents/**/*.ts",
-    "src/mcps/**/*.ts",
-    "src/strray-activation.ts",
-    "src/context-loader.ts",
-    "src/codex-injector.ts"
+    "src/**/*.ts"
   ],
   "exclude": [
-    "src/cli/**/*",
-    "src/server/**/*",
+    "node_modules",
     "src/__tests__/**/*",
     "src/**/*.test.ts",
     "src/**/*.spec.ts",
-    "node_modules"
+    "src/server/**/*",
+    "src/cli/**/*",
+    "src/dashboards/**/*",
+    "src/distributed/**/*",
+    "src/streaming/**/*",
+    "src/cross-language-bridge.ts",
+    "src/security/secure-authentication-system.ts"
   ]
 }

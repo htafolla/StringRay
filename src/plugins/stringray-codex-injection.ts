@@ -89,11 +89,37 @@ export default async function stringrayPlugin(input: {
         }
       }
 
-      // Inject StringRay codex context
-      const codexContext = getStringRayCodexContext();
-      if (output.system && Array.isArray(output.system)) {
-        output.system.unshift(codexContext, "", "---", "");
-      }
+            // Inject StringRay codex context
+            const codexContext = `# StringRay Framework Codex v1.2.25
+
+## Core Principles
+- **Progressive Prod-Ready Code**: All code must be production-ready from first commit
+- **No Patches/Stubs/Bridge Code**: Complete implementations only
+- **Surgical Fixes**: Address root causes, not symptoms
+- **99.6% Error Prevention**: Systematic validation and type safety
+
+## Agent Capabilities
+- **orchestrator**: Multi-agent task coordination and delegation
+- **enforcer**: Codex compliance validation and error prevention
+- **architect**: System design and technical decision making
+- **test-architect**: Testing strategy and coverage optimization
+- **code-reviewer**: Quality assessment and standards validation
+- **security-auditor**: Vulnerability detection and compliance
+- **refactorer**: Technical debt elimination and code consolidation
+
+## Integration Features
+- Complexity-based task routing to appropriate agents
+- Real-time codex validation on code changes
+- Intelligent agent coordination and conflict resolution
+- Performance monitoring and optimization
+- Memory management and resource optimization
+
+---
+*StringRay Framework: Enterprise AI orchestration for systematic error prevention*
+`;
+            if (output.system && Array.isArray(output.system)) {
+              output.system.unshift(codexContext, "", "---", "");
+            }
     },
 
     /**
@@ -257,35 +283,4 @@ function loadPluginConfig(projectDir: string): StringRayPluginConfig {
   return DEFAULT_CONFIG;
 }
 
-/**
- * Get StringRay codex context for injection
- */
-function getStringRayCodexContext(): string {
-  return `# StringRay Framework Codex v1.2.25
 
-## Core Principles
-- **Progressive Prod-Ready Code**: All code must be production-ready from first commit
-- **No Patches/Stubs/Bridge Code**: Complete implementations only
-- **Surgical Fixes**: Address root causes, not symptoms
-- **99.6% Error Prevention**: Systematic validation and type safety
-
-## Agent Capabilities
-- **orchestrator**: Multi-agent task coordination and delegation
-- **enforcer**: Codex compliance validation and error prevention
-- **architect**: System design and technical decision making
-- **test-architect**: Testing strategy and coverage optimization
-- **code-reviewer**: Quality assessment and standards validation
-- **security-auditor**: Vulnerability detection and compliance
-- **refactorer**: Technical debt elimination and code consolidation
-
-## Integration Features
-- Complexity-based task routing to appropriate agents
-- Real-time codex validation on code changes
-- Intelligent agent coordination and conflict resolution
-- Performance monitoring and optimization
-- Memory management and resource optimization
-
----
-*StringRay Framework: Enterprise AI orchestration for systematic error prevention*
-`;
-}

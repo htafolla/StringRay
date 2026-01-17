@@ -11,23 +11,27 @@ import { spawn } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 
+// Detect if running in consumer environment (node_modules)
+const isConsumerEnvironment = __dirname.includes('node_modules/strray-ai');
+const pathPrefix = isConsumerEnvironment ? '' : '';
+
 const MCP_SERVERS = [
-  { name: 'librarian', path: 'dist/plugin/mcps/knowledge-skills/project-analysis.server.js' },
-  { name: 'session-management', path: '.opencode/mcps/session-management.server.js' },
-  { name: 'orchestrator', path: 'dist/plugin/mcps/orchestrator.server.js' },
-  { name: 'enhanced-orchestrator', path: 'dist/plugin/mcps/enhanced-orchestrator.server.js' },
-  { name: 'enforcer', path: 'dist/plugin/mcps/enforcer-tools.server.js' },
-  { name: 'api-design', path: 'dist/plugin/mcps/knowledge-skills/api-design.server.js' },
-  { name: 'architecture-patterns', path: 'dist/plugin/mcps/knowledge-skills/architecture-patterns.server.js' },
-  { name: 'git-workflow', path: 'dist/plugin/mcps/knowledge-skills/git-workflow.server.js' },
-  { name: 'performance-optimization', path: 'dist/plugin/mcps/knowledge-skills/performance-optimization.server.js' },
-  { name: 'project-analysis', path: 'dist/plugin/mcps/knowledge-skills/project-analysis.server.js' },
-  { name: 'testing-strategy', path: 'dist/plugin/mcps/knowledge-skills/testing-strategy.server.js' },
-  { name: 'code-review', path: 'dist/plugin/mcps/knowledge-skills/code-review.server.js' },
-  { name: 'security-audit', path: 'dist/plugin/mcps/knowledge-skills/security-audit.server.js' },
-  { name: 'ui-ux-design', path: 'dist/plugin/mcps/knowledge-skills/ui-ux-design.server.js' },
-  { name: 'refactoring-strategies', path: 'dist/plugin/mcps/knowledge-skills/refactoring-strategies.server.js' },
-  { name: 'testing-best-practices', path: 'dist/plugin/mcps/knowledge-skills/testing-best-practices.server.js' }
+  { name: 'librarian', path: `${pathPrefix}dist/plugin/mcps/knowledge-skills/project-analysis.server.js` },
+  { name: 'session-management', path: `${pathPrefix}.opencode/mcps/session-management.server.js` },
+  { name: 'orchestrator', path: `${pathPrefix}dist/plugin/mcps/orchestrator.server.js` },
+  { name: 'enhanced-orchestrator', path: `${pathPrefix}dist/plugin/mcps/enhanced-orchestrator.server.js` },
+  { name: 'enforcer', path: `${pathPrefix}dist/plugin/mcps/enforcer-tools.server.js` },
+  { name: 'api-design', path: `${pathPrefix}dist/plugin/mcps/knowledge-skills/api-design.server.js` },
+  { name: 'architecture-patterns', path: `${pathPrefix}dist/plugin/mcps/knowledge-skills/architecture-patterns.server.js` },
+  { name: 'git-workflow', path: `${pathPrefix}dist/plugin/mcps/knowledge-skills/git-workflow.server.js` },
+  { name: 'performance-optimization', path: `${pathPrefix}dist/plugin/mcps/knowledge-skills/performance-optimization.server.js` },
+  { name: 'project-analysis', path: `${pathPrefix}dist/plugin/mcps/knowledge-skills/project-analysis.server.js` },
+  { name: 'testing-strategy', path: `${pathPrefix}dist/plugin/mcps/knowledge-skills/testing-strategy.server.js` },
+  { name: 'code-review', path: `${pathPrefix}dist/plugin/mcps/knowledge-skills/code-review.server.js` },
+  { name: 'security-audit', path: `${pathPrefix}dist/plugin/mcps/knowledge-skills/security-audit.server.js` },
+  { name: 'ui-ux-design', path: `${pathPrefix}dist/plugin/mcps/knowledge-skills/ui-ux-design.server.js` },
+  { name: 'refactoring-strategies', path: `${pathPrefix}dist/plugin/mcps/knowledge-skills/refactoring-strategies.server.js` },
+  { name: 'testing-best-practices', path: `${pathPrefix}dist/plugin/mcps/knowledge-skills/testing-best-practices.server.js` }
 ];
 
 class MCPServerValidator {

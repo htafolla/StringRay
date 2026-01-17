@@ -10,6 +10,12 @@ on:
 # Disable CodeQL for this workflow
 permissions:
   security-events: none
+  actions: read
+  contents: read
+
+# Disable CodeQL
+env:
+  CODEQL_ACTION_DISABLE: true
 
 jobs:
   test:

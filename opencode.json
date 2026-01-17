@@ -23,7 +23,7 @@
       "type": "local",
       "command": [
         "node",
-        "node_modules/strray-ai/dist/plugin/mcps/orchestrator.server.js"
+        "node_modules/strray-ai/node_modules/strray-ai/dist/plugin/mcps/orchestrator.server.js"
       ],
       "enabled": true
     },
@@ -31,7 +31,7 @@
       "type": "local",
       "command": [
         "node",
-        "node_modules/strray-ai/dist/plugin/mcps/enhanced-orchestrator.server.js"
+        "node_modules/strray-ai/node_modules/strray-ai/dist/plugin/mcps/enhanced-orchestrator.server.js"
       ],
       "enabled": true
     },
@@ -39,7 +39,7 @@
       "type": "local",
       "command": [
         "node",
-        "node_modules/strray-ai/dist/plugin/mcps/enforcer-tools.server.js"
+        "node_modules/strray-ai/node_modules/strray-ai/dist/plugin/mcps/enforcer-tools.server.js"
       ],
       "enabled": true
     },
@@ -47,7 +47,7 @@
       "type": "local",
       "command": [
         "node",
-        "node_modules/strray-ai/dist/plugin/mcps/knowledge-skills/api-design.server.js"
+        "node_modules/strray-ai/node_modules/strray-ai/dist/plugin/mcps/knowledge-skills/api-design.server.js"
       ],
       "enabled": true
     },
@@ -55,7 +55,7 @@
       "type": "local",
       "command": [
         "node",
-        "node_modules/strray-ai/dist/plugin/mcps/knowledge-skills/architecture-patterns.server.js"
+        "node_modules/strray-ai/node_modules/strray-ai/dist/plugin/mcps/knowledge-skills/architecture-patterns.server.js"
       ],
       "enabled": true
     },
@@ -63,7 +63,7 @@
       "type": "local",
       "command": [
         "node",
-        "node_modules/strray-ai/dist/plugin/mcps/knowledge-skills/git-workflow.server.js"
+        "node_modules/strray-ai/node_modules/strray-ai/dist/plugin/mcps/knowledge-skills/git-workflow.server.js"
       ],
       "enabled": true
     },
@@ -71,7 +71,7 @@
       "type": "local",
       "command": [
         "node",
-        "node_modules/strray-ai/dist/plugin/mcps/knowledge-skills/performance-optimization.server.js"
+        "node_modules/strray-ai/node_modules/strray-ai/dist/plugin/mcps/knowledge-skills/performance-optimization.server.js"
       ],
       "enabled": true
     },
@@ -79,7 +79,7 @@
       "type": "local",
       "command": [
         "node",
-        "node_modules/strray-ai/dist/plugin/mcps/knowledge-skills/project-analysis.server.js"
+        "node_modules/strray-ai/node_modules/strray-ai/dist/plugin/mcps/knowledge-skills/project-analysis.server.js"
       ],
       "enabled": true
     },
@@ -87,7 +87,7 @@
       "type": "local",
       "command": [
         "node",
-        "node_modules/strray-ai/dist/plugin/mcps/knowledge-skills/testing-strategy.server.js"
+        "node_modules/strray-ai/node_modules/strray-ai/dist/plugin/mcps/knowledge-skills/testing-strategy.server.js"
       ],
       "enabled": true
     },
@@ -95,7 +95,7 @@
       "type": "local",
       "command": [
         "node",
-        "node_modules/strray-ai/dist/plugin/mcps/knowledge-skills/code-review.server.js"
+        "node_modules/strray-ai/node_modules/strray-ai/dist/plugin/mcps/knowledge-skills/code-review.server.js"
       ],
       "enabled": true
     },
@@ -103,7 +103,7 @@
       "type": "local",
       "command": [
         "node",
-        "node_modules/strray-ai/dist/plugin/mcps/knowledge-skills/security-audit.server.js"
+        "node_modules/strray-ai/node_modules/strray-ai/dist/plugin/mcps/knowledge-skills/security-audit.server.js"
       ],
       "enabled": true
     },
@@ -111,7 +111,7 @@
       "type": "local",
       "command": [
         "node",
-        "node_modules/strray-ai/dist/plugin/mcps/knowledge-skills/ui-ux-design.server.js"
+        "node_modules/strray-ai/node_modules/strray-ai/dist/plugin/mcps/knowledge-skills/ui-ux-design.server.js"
       ],
       "enabled": true
     },
@@ -119,7 +119,7 @@
       "type": "local",
       "command": [
         "node",
-        "node_modules/strray-ai/dist/plugin/mcps/knowledge-skills/refactoring-strategies.server.js"
+        "node_modules/strray-ai/node_modules/strray-ai/dist/plugin/mcps/knowledge-skills/refactoring-strategies.server.js"
       ],
       "enabled": true
     },
@@ -127,7 +127,7 @@
       "type": "local",
       "command": [
         "node",
-        "node_modules/strray-ai/dist/plugin/mcps/knowledge-skills/testing-best-practices.server.js"
+        "node_modules/strray-ai/node_modules/strray-ai/dist/plugin/mcps/knowledge-skills/testing-best-practices.server.js"
       ],
       "enabled": true
     },
@@ -135,7 +135,7 @@
       "type": "local",
       "command": [
         "node",
-        "node_modules/strray-ai/dist/plugin/mcps/knowledge-skills/project-analysis.server.js"
+        "node_modules/strray-ai/node_modules/strray-ai/dist/plugin/mcps/knowledge-skills/project-analysis.server.js"
       ],
       "enabled": true
     }

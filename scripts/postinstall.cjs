@@ -481,6 +481,72 @@ function configureStrRayPlugin() {
     console.log("ℹ️ Test files not found (this is normal for some installations)");
   }
 
+  // Update paths in .opencode directory files
+  console.log("Checking .opencode directory files for path updates...");
+  const opencodeDir = path.join(process.cwd(), ".opencode");
+  if (fs.existsSync(opencodeDir)) {
+    console.log(".opencode directory found, updating paths...");
+    let opencodeFilesUpdated = 0;
+
+    function processOpencodeFile(filePath) {
+      try {
+        let content = fs.readFileSync(filePath, "utf-8");
+        let updated = false;
+
+        // Convert relative dist/ paths to node_modules/strray-ai/dist/ paths
+        if (content.includes('../dist/') || content.includes('./dist/') || content.includes('dist/')) {
+          // Convert '../dist/' paths
+          content = content.replace(/'\.\.\/dist\//g, "'./node_modules/strray-ai/dist/");
+          content = content.replace(/"\.\.\/dist\//g, '"./node_modules/strray-ai/dist/');
+          content = content.replace(/`\.\.\/dist\//g, "`./node_modules/strray-ai/dist/");
+
+          // Convert './dist/' paths
+          content = content.replace(/'\.\/dist\//g, "'./node_modules/strray-ai/dist/");
+          content = content.replace(/"\.\/dist\//g, '"./node_modules/strray-ai/dist/');
+          content = content.replace(/`\.\.\/dist\//g, "`./node_modules/strray-ai/dist/");
+
+          // Convert 'dist/' paths (relative to project root)
+          content = content.replace(/'dist\//g, "'./node_modules/strray-ai/dist/");
+          content = content.replace(/"dist\//g, '"./node_modules/strray-ai/dist/');
+          content = content.replace(/`dist\//g, "`./node_modules/strray-ai/dist/");
+
+          updated = true;
+        }
+
+        if (updated) {
+          fs.writeFileSync(filePath, content);
+          opencodeFilesUpdated++;
+          console.log(`✅ Updated .opencode file: ${path.relative(process.cwd(), filePath)}`);
+        }
+      } catch (error) {
+        console.warn(`Warning: Could not update .opencode file ${filePath}:`, error.message);
+      }
+    }
+
+    function processOpencodeDirectory(dirPath) {
+      const items = fs.readdirSync(dirPath);
+      for (const item of items) {
+        const fullPath = path.join(dirPath, item);
+        const stat = fs.statSync(fullPath);
+        if (stat.isDirectory()) {
+          processOpencodeDirectory(fullPath);
+        } else if (item.endsWith('.js') || item.endsWith('.ts') || item.endsWith('.json') || item.endsWith('.md') || item.endsWith('.sh')) {
+          processOpencodeFile(fullPath);
+        }
+      }
+    }
+
+    processOpencodeDirectory(opencodeDir);
+
+    if (opencodeFilesUpdated > 0) {
+      console.log(`✅ Updated ${opencodeFilesUpdated} .opencode files with consumer paths`);
+    } else {
+      console.log("ℹ️ No .opencode file path updates needed");
+    }
+  } else {
+    console.log("ℹ️ .opencode directory not found");
+  }
+
   // Consumer scripts already have correct relative paths - no conversion needed
 
   // All configuration paths are now updated for consumer usage

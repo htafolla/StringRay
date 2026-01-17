@@ -10,7 +10,7 @@
     console.log('Testing simple prompt orchestration...');
 
     // Import the orchestrator
-    const { StringRayOrchestrator } = await import('stringray-ai');
+    const { StringRayOrchestrator } = await import('../dist/orchestrator.js');
 
     // Create orchestrator instance
     const orchestrator = new StringRayOrchestrator({

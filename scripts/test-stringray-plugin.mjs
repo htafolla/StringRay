@@ -43,9 +43,8 @@ console.log('=====================================\n');
 
 (async () => {
   try {
-    // Dynamic import for cross-environment compatibility
-    const fullPath = new URL(`${PLUGIN_PATH}/strray-codex-injection.js`, `file://${cwd}/`).href;
-    const { default: stringrayCodexPlugin } = await import(fullPath);
+    // Import the plugin using relative path for consumer compatibility
+    const { default: stringrayCodexPlugin } = await import('../dist/plugin/plugins/strray-codex-injection.js');
     const plugin = await stringrayCodexPlugin({});
     console.log('✅ Plugin loaded successfully');
 

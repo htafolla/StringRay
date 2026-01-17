@@ -55,7 +55,7 @@ class StrRayRefactoringStrategiesServer {
   private server: Server;
 
   constructor() {
-        this.server = new Server(
+    this.server = new Server(
       {
         name: "strray-refactoring-strategies",
         version: "1.0.0",
@@ -64,7 +64,7 @@ class StrRayRefactoringStrategiesServer {
         capabilities: {
           tools: {},
         },
-      }
+      },
     );
 
     this.setupToolHandlers();

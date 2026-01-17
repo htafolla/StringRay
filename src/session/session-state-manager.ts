@@ -92,7 +92,11 @@ export class SessionStateManager {
         "state_manager",
       );
 
-      frameworkLogger.log("session-state-manager", "state-shared", "info", { fromSessionId, toSessionId, key });
+      frameworkLogger.log("session-state-manager", "state-shared", "info", {
+        fromSessionId,
+        toSessionId,
+        key,
+      });
       return true;
     } catch (error) {
       console.error(`❌ Session State Manager: Failed to share state:`, error);
@@ -117,7 +121,11 @@ export class SessionStateManager {
       }
     }
 
-    frameworkLogger.log("session-state-manager", "state-broadcasted", "info", { key, successCount, totalCount: targetSessionIds.length });
+    frameworkLogger.log("session-state-manager", "state-broadcasted", "info", {
+      key,
+      successCount,
+      totalCount: targetSessionIds.length,
+    });
     return successCount;
   }
 
@@ -158,7 +166,12 @@ export class SessionStateManager {
     this.dependencies.set(sessionId, dependency);
     this.persistDependencies();
 
-    frameworkLogger.log("session-state-manager", "dependency-registered", "info", { sessionId, dependsOn });
+    frameworkLogger.log(
+      "session-state-manager",
+      "dependency-registered",
+      "info",
+      { sessionId, dependsOn },
+    );
   }
 
   /**
@@ -177,7 +190,12 @@ export class SessionStateManager {
         this.propagateDependencyUpdate(sessionId, state);
       }
 
-      frameworkLogger.log("session-state-manager", "dependency-state-updated", "info", { sessionId, state });
+      frameworkLogger.log(
+        "session-state-manager",
+        "dependency-state-updated",
+        "info",
+        { sessionId, state },
+      );
     }
   }
 
@@ -239,7 +257,12 @@ export class SessionStateManager {
       );
     }
 
-    frameworkLogger.log("session-state-manager", "session-group-created", "info", { groupId, sessionCount: sessionIds.length });
+    frameworkLogger.log(
+      "session-state-manager",
+      "session-group-created",
+      "info",
+      { groupId, sessionCount: sessionIds.length },
+    );
     return group;
   }
 
@@ -269,7 +292,12 @@ export class SessionStateManager {
         );
       }
 
-      frameworkLogger.log("session-state-manager", "session-group-state-updated", "info", { groupId, state });
+      frameworkLogger.log(
+        "session-state-manager",
+        "session-group-state-updated",
+        "info",
+        { groupId, state },
+      );
     }
   }
 
@@ -346,7 +374,10 @@ export class SessionStateManager {
       ],
     };
 
-    frameworkLogger.log("session-state-manager", "migration-planned", "info", { sessionId, targetCoordinator });
+    frameworkLogger.log("session-state-manager", "migration-planned", "info", {
+      sessionId,
+      targetCoordinator,
+    });
     return plan;
   }
 
@@ -457,7 +488,12 @@ export class SessionStateManager {
     const rollbackData: any[] = [];
 
     try {
-      frameworkLogger.log("session-state-manager", "migration-executing", "info", { sessionId: plan.sessionId });
+      frameworkLogger.log(
+        "session-state-manager",
+        "migration-executing",
+        "info",
+        { sessionId: plan.sessionId },
+      );
 
       for (const step of plan.migrationSteps) {
         console.log(`  → Executing step: ${step}`);
@@ -574,7 +610,12 @@ export class SessionStateManager {
         }
       }
 
-      frameworkLogger.log("session-state-manager", "migration-completed", "success", { sessionId: plan.sessionId });
+      frameworkLogger.log(
+        "session-state-manager",
+        "migration-completed",
+        "success",
+        { sessionId: plan.sessionId },
+      );
       return true;
     } catch (error) {
       console.error(
@@ -605,7 +646,12 @@ export class SessionStateManager {
     this.failoverConfigs.set(sessionId, config);
     this.persistFailoverConfigs();
 
-    frameworkLogger.log("session-state-manager", "failover-configured", "info", { sessionId, backupCount: backupCoordinators.length });
+    frameworkLogger.log(
+      "session-state-manager",
+      "failover-configured",
+      "info",
+      { sessionId, backupCount: backupCoordinators.length },
+    );
   }
 
   /**
@@ -621,7 +667,12 @@ export class SessionStateManager {
       try {
         const plan = this.planMigration(sessionId, backupCoordinator);
         if (await this.executeMigration(plan)) {
-          frameworkLogger.log("session-state-manager", "failover-successful", "success", { sessionId, backupCoordinator });
+          frameworkLogger.log(
+            "session-state-manager",
+            "failover-successful",
+            "success",
+            { sessionId, backupCoordinator },
+          );
           return true;
         }
       } catch (error) {

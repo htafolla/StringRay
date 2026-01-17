@@ -95,7 +95,7 @@ class StrRayUIUXDesignServer {
   private server: Server;
 
   constructor() {
-        this.server = new Server(
+    this.server = new Server(
       {
         name: "strray-ui-ux-design",
         version: "1.0.0",
@@ -104,7 +104,7 @@ class StrRayUIUXDesignServer {
         capabilities: {
           tools: {},
         },
-      }
+      },
     );
 
     this.setupToolHandlers();

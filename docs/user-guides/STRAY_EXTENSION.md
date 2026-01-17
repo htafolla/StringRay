@@ -2,7 +2,7 @@
 
 ## Overview
 
-StrRay is a comprehensive extension framework for  that adds specialized AI agents and development automation capabilities. This document explains what StrRay adds to oh-my-opencode and how to leverage its enhanced features.
+StrRay is a comprehensive extension framework for that adds specialized AI agents and development automation capabilities. This document explains what StrRay adds to oh-my-opencode and how to leverage its enhanced features.
 
 ## What StrRay Adds to oh-my-opencode
 

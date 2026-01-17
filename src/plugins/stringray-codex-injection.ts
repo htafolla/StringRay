@@ -89,8 +89,8 @@ export default async function stringrayPlugin(input: {
         }
       }
 
-            // Inject StringRay codex context
-            const codexContext = `# StringRay Framework Codex v1.2.25
+      // Inject StringRay codex context
+      const codexContext = `# StringRay Framework Codex v1.2.25
 
 ## Core Principles
 - **Progressive Prod-Ready Code**: All code must be production-ready from first commit
@@ -117,9 +117,9 @@ export default async function stringrayPlugin(input: {
 ---
 *StringRay Framework: Enterprise AI orchestration for systematic error prevention*
 `;
-            if (output.system && Array.isArray(output.system)) {
-              output.system.unshift(codexContext, "", "---", "");
-            }
+      if (output.system && Array.isArray(output.system)) {
+        output.system.unshift(codexContext, "", "---", "");
+      }
     },
 
     /**
@@ -282,5 +282,3 @@ function loadPluginConfig(projectDir: string): StringRayPluginConfig {
 
   return DEFAULT_CONFIG;
 }
-
-

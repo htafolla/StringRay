@@ -1,4 +1,8 @@
-import { isLoggingEnabled, shouldLog, getLoggingConfig } from "./logging-config.js";
+import {
+  isLoggingEnabled,
+  shouldLog,
+  getLoggingConfig,
+} from "./logging-config.js";
 
 /**
  * MCP Server Logger
@@ -27,7 +31,11 @@ export class MCPLogger {
     this.log("error", message, error);
   }
 
-  private log(level: "debug" | "info" | "warn" | "error", message: string, details?: any) {
+  private log(
+    level: "debug" | "info" | "warn" | "error",
+    message: string,
+    details?: any,
+  ) {
     if (!isLoggingEnabled() || !shouldLog(level)) {
       return;
     }
@@ -49,7 +57,8 @@ export class MCPLogger {
 
     // Output based on destinations
     if (config.destinations.includes("console")) {
-      const consoleMethod = level === "error" ? "error" : level === "warn" ? "warn" : "log";
+      const consoleMethod =
+        level === "error" ? "error" : level === "warn" ? "warn" : "log";
       console[consoleMethod](logMessage);
     }
 

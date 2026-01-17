@@ -566,7 +566,10 @@ export class AlertEngine extends EventEmitter {
     channel: NotificationChannel,
     alert: Alert,
   ): void {
-    await frameworkLogger.log("alert-engine", "email-notification", "info", { alertTitle: alert.title, alertDescription: alert.description });
+    await frameworkLogger.log("alert-engine", "email-notification", "info", {
+      alertTitle: alert.title,
+      alertDescription: alert.description,
+    });
     // Implementation would integrate with email service
   }
 
@@ -577,7 +580,10 @@ export class AlertEngine extends EventEmitter {
     channel: NotificationChannel,
     alert: Alert,
   ): void {
-    await frameworkLogger.log("alert-engine", "slack-notification", "info", { alertTitle: alert.title, alertDescription: alert.description });
+    await frameworkLogger.log("alert-engine", "slack-notification", "info", {
+      alertTitle: alert.title,
+      alertDescription: alert.description,
+    });
     // Implementation would integrate with Slack API
   }
 
@@ -601,7 +607,10 @@ export class AlertEngine extends EventEmitter {
     channel: NotificationChannel,
     alert: Alert,
   ): void {
-    await frameworkLogger.log("alert-engine", "sms-notification", "info", { alertTitle: alert.title, alertDescription: alert.description });
+    await frameworkLogger.log("alert-engine", "sms-notification", "info", {
+      alertTitle: alert.title,
+      alertDescription: alert.description,
+    });
     // Implementation would integrate with SMS service
   }
 

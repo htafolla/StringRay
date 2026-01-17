@@ -854,9 +854,17 @@ export class CodexSimulationRunner {
   /**
    * Generate comprehensive health report with accurate status assessment
    */
-  private async generateHealthReport(results: SimulationResult[]): Promise<void> {
-    await frameworkLogger.log("codex-simulation", "\n🏥 CODEX RULE HEALTH ASSESSMENT");
-    await frameworkLogger.log("codex-simulation", "============================================================");
+  private async generateHealthReport(
+    results: SimulationResult[],
+  ): Promise<void> {
+    await frameworkLogger.log(
+      "codex-simulation",
+      "\n🏥 CODEX RULE HEALTH ASSESSMENT",
+    );
+    await frameworkLogger.log(
+      "codex-simulation",
+      "============================================================",
+    );
 
     let totalTests = 0;
     let totalPassed = 0;
@@ -908,41 +916,72 @@ export class CodexSimulationRunner {
       const isHealthy = !isPerfect && !needsAttention;
 
       if (isPerfect) {
-        await frameworkLogger.log("codex-simulation", `${ruleName}: ${passed}/${total} (${Math.round((passed / total) * 100)}%) - PERFECT`, "info", { ruleId: result.ruleId, status: "perfect" });
-        await frameworkLogger.log("codex-simulation",
+        await frameworkLogger.log(
+          "codex-simulation",
+          `${ruleName}: ${passed}/${total} (${Math.round((passed / total) * 100)}%) - PERFECT`,
+          "info",
+          { ruleId: result.ruleId, status: "perfect" },
+        );
+        await frameworkLogger.log(
+          "codex-simulation",
           `✅ ${ruleName}: ${passed}/${total} (${Math.round((passed / total) * 100)}%) - PERFECT`,
-          "info", { ruleId: result.ruleId, status: "perfect" });
+          "info",
+          { ruleId: result.ruleId, status: "perfect" },
+        );
         perfectRules++;
       } else if (isHealthy) {
-        await frameworkLogger.log("codex-simulation",
+        await frameworkLogger.log(
+          "codex-simulation",
           `🔶 ${ruleName}: ${passed}/${total} (${Math.round((passed / total) * 100)}%) - HEALTHY`,
-          "info", { ruleId: result.ruleId, status: "healthy" });
+          "info",
+          { ruleId: result.ruleId, status: "healthy" },
+        );
         healthyRules++;
       } else if (needsAttention) {
-        await frameworkLogger.log("codex-simulation",
+        await frameworkLogger.log(
+          "codex-simulation",
           `❌ ${ruleName}: ${passed}/${total} (${Math.round((passed / total) * 100)}%) - NEEDS ATTENTION`,
-          "info", { ruleId: result.ruleId, status: "needs-attention" });
+          "info",
+          { ruleId: result.ruleId, status: "needs-attention" },
+        );
         concerningRules++;
       } else {
         // This shouldn't happen, but handle gracefully
-        await frameworkLogger.log("codex-simulation", 
+        await frameworkLogger.log(
+          "codex-simulation",
           `❓ ${ruleName}: ${passed}/${total} (${Math.round((passed / total) * 100)}%) - UNKNOWN STATUS`,
         );
       }
     }
 
-    await frameworkLogger.log("codex-simulation", "============================================================");
-    await frameworkLogger.log("codex-simulation", 
+    await frameworkLogger.log(
+      "codex-simulation",
+      "============================================================",
+    );
+    await frameworkLogger.log(
+      "codex-simulation",
       `📊 OVERALL HEALTH: ${totalPassed}/${totalTests} tests passed (${Math.round((totalPassed / totalTests) * 100)}%)`,
     );
-    await frameworkLogger.log("codex-simulation",
-      `Rule health summary: ${perfectRules} Perfect, ${healthyRules} Healthy, ${concerningRules} Need Attention`, "info");
-    await frameworkLogger.log("codex-simulation", "============================================================");
+    await frameworkLogger.log(
+      "codex-simulation",
+      `Rule health summary: ${perfectRules} Perfect, ${healthyRules} Healthy, ${concerningRules} Need Attention`,
+      "info",
+    );
+    await frameworkLogger.log(
+      "codex-simulation",
+      "============================================================",
+    );
 
     if (concerningRules === 0) {
-      await frameworkLogger.log("codex-simulation", "🎉 ALL RULES HEALTHY - Framework validation complete!");
+      await frameworkLogger.log(
+        "codex-simulation",
+        "🎉 ALL RULES HEALTHY - Framework validation complete!",
+      );
     } else {
-      await frameworkLogger.log("codex-simulation", "⚠️  Some rules need attention for optimal performance.");
+      await frameworkLogger.log(
+        "codex-simulation",
+        "⚠️  Some rules need attention for optimal performance.",
+      );
     }
     await frameworkLogger.log("codex-simulation", "");
   }
@@ -1095,7 +1134,10 @@ export class CodexSimulationRunner {
   }
 
   async generateReport(results: SimulationResult[]): Promise<void> {
-    await frameworkLogger.log("codex-simulation", "🎯 CODEX RULE SIMULATION REPORT");
+    await frameworkLogger.log(
+      "codex-simulation",
+      "🎯 CODEX RULE SIMULATION REPORT",
+    );
     await frameworkLogger.log("codex-simulation", "=".repeat(60));
 
     let totalTests = 0;
@@ -1120,7 +1162,8 @@ export class CodexSimulationRunner {
         result.failed === 0 || hasOnlyCorrectFailCaseFailures;
       const status = isActuallyPassing ? "✅ PASS" : "❌ FAIL";
 
-      await frameworkLogger.log("codex-simulation", 
+      await frameworkLogger.log(
+        "codex-simulation",
         `${result.ruleId}: ${result.passed}/${result.totalTests} (${successRate}%) ${status}`,
       );
 
@@ -1132,13 +1175,17 @@ export class CodexSimulationRunner {
         if (actualFailures.length > 0) {
           await frameworkLogger.log("codex-simulation", "  Failed tests:");
           for (const test of actualFailures) {
-            await frameworkLogger.log("codex-simulation", `    - ${test.testName} (${test.testType})`);
+            await frameworkLogger.log(
+              "codex-simulation",
+              `    - ${test.testName} (${test.testType})`,
+            );
           }
         }
       } else if (hasOnlyCorrectFailCaseFailures) {
         // Show that fail cases are correctly failing
         await frameworkLogger.log("codex-simulation", `  Failed tests:`);
-        await frameworkLogger.log("codex-simulation", 
+        await frameworkLogger.log(
+          "codex-simulation",
           `    - ${failedTests.length} fail test(s) correctly failing as expected`,
         );
       }
@@ -1146,7 +1193,8 @@ export class CodexSimulationRunner {
 
     await frameworkLogger.log("codex-simulation", "=".repeat(60));
     const overallSuccess = Math.round((totalPassed / totalTests) * 100);
-    await frameworkLogger.log("codex-simulation", 
+    await frameworkLogger.log(
+      "codex-simulation",
       `OVERALL: ${totalPassed}/${totalTests} tests passed (${overallSuccess}%)`,
     );
 
@@ -1156,9 +1204,13 @@ export class CodexSimulationRunner {
     );
 
     if (!hasActualFailures) {
-      await frameworkLogger.log("codex-simulation", "🎉 ALL TESTS PASSED - Framework validation successful!");
+      await frameworkLogger.log(
+        "codex-simulation",
+        "🎉 ALL TESTS PASSED - Framework validation successful!",
+      );
     } else {
-      await frameworkLogger.log("codex-simulation", 
+      await frameworkLogger.log(
+        "codex-simulation",
         "⚠️ SOME SIMULATIONS FAILED - Rule behavior needs adjustment",
       );
     }

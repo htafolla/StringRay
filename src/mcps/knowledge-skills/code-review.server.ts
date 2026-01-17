@@ -45,7 +45,7 @@ class StrRayCodeReviewServer {
   private server: Server;
 
   constructor() {
-        this.server = new Server(
+    this.server = new Server(
       {
         name: "strray-code-review",
         version: "1.0.0",
@@ -54,7 +54,7 @@ class StrRayCodeReviewServer {
         capabilities: {
           tools: {},
         },
-      }
+      },
     );
 
     this.setupToolHandlers();

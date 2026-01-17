@@ -657,7 +657,9 @@ class OrchestrationFlowValidator {
       const agents = result.metrics.agentsSpawned;
 
       // Test result details - kept as console.log for readability
-      console.log(`${index + 1}. ${result.testName} - ${status} (${duration}ms, ${agents} agents)`);
+      console.log(
+        `${index + 1}. ${result.testName} - ${status} (${duration}ms, ${agents} agents)`,
+      );
 
       // Show key metrics
       console.log(
@@ -766,7 +768,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   validator
     .runCompleteValidationSuite()
     .then((results) => {
-    // Validation completion - kept as console.log for user feedback
+      // Validation completion - kept as console.log for user feedback
     })
     .catch(console.error);
 }

@@ -19,7 +19,7 @@ class StrRayArchitecturePatternsServer {
   private server: Server;
 
   constructor() {
-        this.server = new Server(
+    this.server = new Server(
       {
         name: "strray-architecture-patterns",
         version: "1.0.0",
@@ -28,7 +28,7 @@ class StrRayArchitecturePatternsServer {
         capabilities: {
           tools: {},
         },
-      }
+      },
     );
 
     this.setupToolHandlers();

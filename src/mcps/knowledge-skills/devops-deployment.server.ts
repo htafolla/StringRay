@@ -70,7 +70,7 @@ class StrRayDevOpsDeploymentServer {
   private server: Server;
 
   constructor() {
-        this.server = new Server(
+    this.server = new Server(
       {
         name: "strray-devops-deployment",
         version: "1.0.0",
@@ -79,7 +79,7 @@ class StrRayDevOpsDeploymentServer {
         capabilities: {
           tools: {},
         },
-      }
+      },
     );
 
     this.setupToolHandlers();

@@ -238,7 +238,12 @@ export class WebSocketGateway extends EventEmitter {
     this.stats.activeConnections++;
     this.stats.totalConnections++;
 
-    await frameworkLogger.log("websocket-gateway", "dashboard-connected", "info", { connectionId });
+    await frameworkLogger.log(
+      "websocket-gateway",
+      "dashboard-connected",
+      "info",
+      { connectionId },
+    );
 
     // Send welcome message
     this.sendToConnection(connectionId, {
@@ -341,7 +346,12 @@ export class WebSocketGateway extends EventEmitter {
   private handleDisconnection(connectionId: string): void {
     const connection = this.connections.get(connectionId);
     if (connection) {
-      await frameworkLogger.log("websocket-gateway", "dashboard-disconnected", "info", { connectionId });
+      await frameworkLogger.log(
+        "websocket-gateway",
+        "dashboard-disconnected",
+        "info",
+        { connectionId },
+      );
       this.connections.delete(connectionId);
       this.stats.activeConnections--;
       this.stats.subscriptionsActive -= connection.subscriptions.length;
@@ -381,7 +391,12 @@ export class WebSocketGateway extends EventEmitter {
     connection.subscriptions.push(subscription);
     this.stats.subscriptionsActive++;
 
-  await frameworkLogger.log("websocket-gateway", "dashboard-subscribed", "info", { connectionId, channelsCount: channels.length });
+    await frameworkLogger.log(
+      "websocket-gateway",
+      "dashboard-subscribed",
+      "info",
+      { connectionId, channelsCount: channels.length },
+    );
 
     this.sendToConnection(connectionId, {
       type: "system",

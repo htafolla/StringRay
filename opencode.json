@@ -24,7 +24,10 @@
     },
     "api-design": {
       "type": "local",
-      "command": ["node", "dist/plugin/mcps/knowledge-skills/api-design.server.js"],
+      "command": [
+        "node",
+        "dist/plugin/mcps/knowledge-skills/api-design.server.js"
+      ],
       "enabled": true
     },
     "architecture-patterns": {
@@ -37,7 +40,10 @@
     },
     "git-workflow": {
       "type": "local",
-      "command": ["node", "dist/plugin/mcps/knowledge-skills/git-workflow.server.js"],
+      "command": [
+        "node",
+        "dist/plugin/mcps/knowledge-skills/git-workflow.server.js"
+      ],
       "enabled": true
     },
     "performance-optimization": {
@@ -66,7 +72,10 @@
     },
     "code-review": {
       "type": "local",
-      "command": ["node", "dist/plugin/mcps/knowledge-skills/code-review.server.js"],
+      "command": [
+        "node",
+        "dist/plugin/mcps/knowledge-skills/code-review.server.js"
+      ],
       "enabled": true
     },
     "security-audit": {
@@ -79,7 +88,10 @@
     },
     "ui-ux-design": {
       "type": "local",
-      "command": ["node", "dist/plugin/mcps/knowledge-skills/ui-ux-design.server.js"],
+      "command": [
+        "node",
+        "dist/plugin/mcps/knowledge-skills/ui-ux-design.server.js"
+      ],
       "enabled": true
     },
     "refactoring-strategies": {

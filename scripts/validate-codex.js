@@ -14,43 +14,49 @@ if (!isDevelopment && !isDeployed) {
 
 // In deployed environment, check if the plugin was installed correctly
 if (isDeployed) {
-  console.log('DEBUG: Running in deployed environment');
-  console.log('DEBUG: Current directory:', process.cwd());
+  console.log("DEBUG: Running in deployed environment");
+  console.log("DEBUG: Current directory:", process.cwd());
 
-// Check if .mcp.json exists (created by postinstall)
-// If it doesn't exist, try to run postinstall script
-const mcpExists = fs.existsSync(".mcp.json");
-console.log('DEBUG: .mcp.json exists:', mcpExists);
-if (!mcpExists) {
-  console.log('DEBUG: .mcp.json not found, attempting to run postinstall script');
-  try {
-    // Import and run the postinstall script
-    const { execSync } = await import('child_process');
-    execSync('node node_modules/stringray-ai/scripts/postinstall.cjs', { stdio: 'inherit' });
-    console.log('DEBUG: Postinstall script executed successfully');
-  } catch (error) {
-    console.log('DEBUG: Failed to run postinstall script:', error.message);
-    process.exit(1);
+  // Check if .mcp.json exists (created by postinstall)
+  // If it doesn't exist, try to run postinstall script
+  const mcpExists = fs.existsSync(".mcp.json");
+  console.log("DEBUG: .mcp.json exists:", mcpExists);
+  if (!mcpExists) {
+    console.log(
+      "DEBUG: .mcp.json not found, attempting to run postinstall script",
+    );
+    try {
+      // Import and run the postinstall script
+      const { execSync } = await import("child_process");
+      execSync("node node_modules/stringray-ai/scripts/postinstall.cjs", {
+        stdio: "inherit",
+      });
+      console.log("DEBUG: Postinstall script executed successfully");
+    } catch (error) {
+      console.log("DEBUG: Failed to run postinstall script:", error.message);
+      process.exit(1);
+    }
   }
-}
 
   // Check if package.json exists
   const pkgExists = fs.existsSync("package.json");
-  console.log('DEBUG: package.json exists:', pkgExists);
+  console.log("DEBUG: package.json exists:", pkgExists);
   if (!pkgExists) {
-    console.log('DEBUG: package.json not found, exiting with code 1');
+    console.log("DEBUG: package.json not found, exiting with code 1");
     process.exit(1);
   }
 
   // Check if the plugin files exist
-  const pluginExists = fs.existsSync("node_modules/stringray-ai/dist/plugin/plugins/stringray-codex-injection.js");
-  console.log('DEBUG: plugin file exists:', pluginExists);
+  const pluginExists = fs.existsSync(
+    "node_modules/stringray-ai/dist/plugin/plugins/stringray-codex-injection.js",
+  );
+  console.log("DEBUG: plugin file exists:", pluginExists);
   if (!pluginExists) {
-    console.log('DEBUG: plugin file not found, exiting with code 1');
+    console.log("DEBUG: plugin file not found, exiting with code 1");
     process.exit(1);
   }
 
-  console.log('DEBUG: All checks passed, exiting with code 0');
+  console.log("DEBUG: All checks passed, exiting with code 0");
   process.exit(0); // All checks passed for deployed environment
 }
 
@@ -70,7 +76,9 @@ if (isDevelopment) {
       // Basic validation of codex content
       try {
         const content = fs.readFileSync(file, "utf-8");
-        const versionMatch = content.match(/\*\*Version\*\*:\s*(\d+\.\d+\.\d+)/);
+        const versionMatch = content.match(
+          /\*\*Version\*\*:\s*(\d+\.\d+\.\d+)/,
+        );
         if (versionMatch) {
         }
 

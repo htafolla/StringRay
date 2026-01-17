@@ -34,7 +34,12 @@ export class FixValidator {
         );
         return true;
       } else {
-        await frameworkLogger.log("fix-validator", "validation-failed", "error", { issue: "still-exists" });
+        await frameworkLogger.log(
+          "fix-validator",
+          "validation-failed",
+          "error",
+          { issue: "still-exists" },
+        );
         return false;
       }
     } catch (error) {

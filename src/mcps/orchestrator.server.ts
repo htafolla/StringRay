@@ -27,7 +27,7 @@ class StrRayOrchestratorServer {
         capabilities: {
           tools: {},
         },
-      }
+      },
     );
 
     this.initializeAgentCapabilities();

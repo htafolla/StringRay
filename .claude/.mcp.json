@@ -7,7 +7,12 @@
     },
     "global-sqlite": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-sqlite", "--db-path", "~/sqlite.db"],
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-sqlite",
+        "--db-path",
+        "~/sqlite.db"
+      ],
       "disabled": true
     },
     "global-everything": {

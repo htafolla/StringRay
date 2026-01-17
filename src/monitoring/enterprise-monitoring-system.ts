@@ -706,19 +706,34 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
     // Prometheus integration
     if (this.config.integrations.prometheus?.enabled) {
       // Send metric to Prometheus pushgateway
-      await frameworkLogger.log("enterprise-monitoring", "prometheus-alert", "debug", { metric: alert.metric, value: alert.value });
+      await frameworkLogger.log(
+        "enterprise-monitoring",
+        "prometheus-alert",
+        "debug",
+        { metric: alert.metric, value: alert.value },
+      );
     }
 
     // DataDog integration
     if (this.config.integrations.datadog?.enabled) {
       // Send event to DataDog
-      await frameworkLogger.log("enterprise-monitoring", "datadog-alert", "debug", { alertId: alert.id, message: alert.message });
+      await frameworkLogger.log(
+        "enterprise-monitoring",
+        "datadog-alert",
+        "debug",
+        { alertId: alert.id, message: alert.message },
+      );
     }
 
     // New Relic integration
     if (this.config.integrations.newRelic?.enabled) {
       // Send event to New Relic
-      await frameworkLogger.log("enterprise-monitoring", "newrelic-alert", "debug", { alertId: alert.id, message: alert.message });
+      await frameworkLogger.log(
+        "enterprise-monitoring",
+        "newrelic-alert",
+        "debug",
+        { alertId: alert.id, message: alert.message },
+      );
     }
   }
 
@@ -944,7 +959,12 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
   }
 
   private async handleReportGenerated(reportPath: string): Promise<void> {
-    await frameworkLogger.log("enterprise-monitoring", "performance-report-generated", "info", { reportPath });
+    await frameworkLogger.log(
+      "enterprise-monitoring",
+      "performance-report-generated",
+      "info",
+      { reportPath },
+    );
   }
 
   /**
@@ -981,7 +1001,12 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
     if (alert && !alert.resolved) {
       alert.resolved = true;
       alert.resolvedAt = Date.now();
-      await frameworkLogger.log("enterprise-monitoring", "alert-resolved", "success", { message: alert.message });
+      await frameworkLogger.log(
+        "enterprise-monitoring",
+        "alert-resolved",
+        "success",
+        { message: alert.message },
+      );
       return true;
     }
     return false;

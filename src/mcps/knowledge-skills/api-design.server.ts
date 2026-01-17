@@ -17,7 +17,7 @@ class StrRayApiDesignServer {
   private server: Server;
 
   constructor() {
-        this.server = new Server(
+    this.server = new Server(
       {
         name: "strray-api-design",
         version: "1.0.0",
@@ -26,7 +26,7 @@ class StrRayApiDesignServer {
         capabilities: {
           tools: {},
         },
-      }
+      },
     );
 
     this.setupToolHandlers();

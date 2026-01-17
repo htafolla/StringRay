@@ -29,13 +29,18 @@ export async function executeCompleteE2ESimulation(
   const startTime = Date.now();
   const phases: string[] = [];
 
-  await frameworkLogger.log("simulation-e2e", "simulation-started", "info", { userPrompt });
+  await frameworkLogger.log("simulation-e2e", "simulation-started", "info", {
+    userPrompt,
+  });
   // Simulation progress kept as console.log for user visibility
 
   try {
     // Phase 1: Prompt Processing
     phases.push("prompt-processing");
-  await frameworkLogger.log("simulation-e2e", "phase-started", "info", { phase: 1, description: "Prompt Processing" });
+    await frameworkLogger.log("simulation-e2e", "phase-started", "info", {
+      phase: 1,
+      description: "Prompt Processing",
+    });
 
     // Simulate prompt processing (would integrate with actual context loader)
     const processedPrompt = {
@@ -44,11 +49,16 @@ export async function executeCompleteE2ESimulation(
       codexInjected: true,
     };
 
-  await frameworkLogger.log("simulation-e2e", "phase-completed", "success", { phase: 1 });
+    await frameworkLogger.log("simulation-e2e", "phase-completed", "success", {
+      phase: 1,
+    });
 
     // Phase 2: Orchestration Setup
     phases.push("orchestration-setup");
-  await frameworkLogger.log("simulation-e2e", "phase-started", "info", { phase: 2, description: "Orchestration Setup" });
+    await frameworkLogger.log("simulation-e2e", "phase-started", "info", {
+      phase: 2,
+      description: "Orchestration Setup",
+    });
 
     const orchestrator = new StringRayOrchestrator({
       maxConcurrentTasks: 3,
@@ -56,21 +66,33 @@ export async function executeCompleteE2ESimulation(
       conflictResolutionStrategy: "expert_priority",
     });
 
-  await frameworkLogger.log("simulation-e2e", "phase-completed", "success", { phase: 2 });
+    await frameworkLogger.log("simulation-e2e", "phase-completed", "success", {
+      phase: 2,
+    });
 
     // Phase 3: Complexity Analysis
     phases.push("complexity-analysis");
-  await frameworkLogger.log("simulation-e2e", "phase-started", "info", { phase: 3, description: "Complexity Analysis" });
+    await frameworkLogger.log("simulation-e2e", "phase-started", "info", {
+      phase: 3,
+      description: "Complexity Analysis",
+    });
 
     // Simulate complexity analysis
     const complexityScore = Math.floor(Math.random() * 100);
     const agentAssignments = ["architect", "enforcer", "test-architect"];
 
-  await frameworkLogger.log("simulation-e2e", "phase-completed", "success", { phase: 3, complexityScore, agentAssignments });
+    await frameworkLogger.log("simulation-e2e", "phase-completed", "success", {
+      phase: 3,
+      complexityScore,
+      agentAssignments,
+    });
 
     // Phase 4: Agent Execution
     phases.push("agent-execution");
-  await frameworkLogger.log("simulation-e2e", "phase-started", "info", { phase: 4, description: "Agent Execution" });
+    await frameworkLogger.log("simulation-e2e", "phase-started", "info", {
+      phase: 4,
+      description: "Agent Execution",
+    });
 
     // Simulate agent execution with the orchestrator
     const taskDescription = `Process user request: ${userPrompt}`;
@@ -107,7 +129,10 @@ export async function executeCompleteE2ESimulation(
 
     // Phase 5: MCP Integration
     phases.push("mcp-integration");
-  await frameworkLogger.log("simulation-e2e", "phase-started", "info", { phase: 5, description: "MCP Integration" });
+    await frameworkLogger.log("simulation-e2e", "phase-started", "info", {
+      phase: 5,
+      description: "MCP Integration",
+    });
 
     // Simulate MCP integration
     const mcpCalls = ["code-review", "security-audit", "testing-strategy"];
@@ -125,7 +150,10 @@ export async function executeCompleteE2ESimulation(
 
     // Phase 6: Result Processing
     phases.push("result-processing");
-  await frameworkLogger.log("simulation-e2e", "phase-started", "info", { phase: 6, description: "Result Processing" });
+    await frameworkLogger.log("simulation-e2e", "phase-started", "info", {
+      phase: 6,
+      description: "Result Processing",
+    });
 
     // Simulate result processing
     const processedResults = {
@@ -134,11 +162,16 @@ export async function executeCompleteE2ESimulation(
       validationPassed: true,
     };
 
-  await frameworkLogger.log("simulation-e2e", "phase-completed", "success", { phase: 6 });
+    await frameworkLogger.log("simulation-e2e", "phase-completed", "success", {
+      phase: 6,
+    });
 
     // Phase 7: Monitoring & Analytics
     phases.push("monitoring-analytics");
-  await frameworkLogger.log("simulation-e2e", "phase-started", "info", { phase: 7, description: "Monitoring & Analytics" });
+    await frameworkLogger.log("simulation-e2e", "phase-started", "info", {
+      phase: 7,
+      description: "Monitoring & Analytics",
+    });
 
     const analytics = {
       totalExecutionTime: Date.now() - startTime,
@@ -147,19 +180,26 @@ export async function executeCompleteE2ESimulation(
       qualityImprovement: 78,
     };
 
-  await frameworkLogger.log("simulation-e2e", "phase-completed", "success", { phase: 7 });
+    await frameworkLogger.log("simulation-e2e", "phase-completed", "success", {
+      phase: 7,
+    });
 
     // Final success check
     const executionTime = Date.now() - startTime;
     const allPhasesSuccessful = phases.length === 7;
     const performanceImprovement = Math.floor(Math.random() * 30) + 60; // 60-90%
 
-  await frameworkLogger.log("simulation-e2e", "simulation-completed", "success", {
-    executionTime,
-    phasesCompleted: phases.length,
-    performanceImprovement
-  });
-  // Final summary kept as console.log for user visibility
+    await frameworkLogger.log(
+      "simulation-e2e",
+      "simulation-completed",
+      "success",
+      {
+        executionTime,
+        phasesCompleted: phases.length,
+        performanceImprovement,
+      },
+    );
+    // Final summary kept as console.log for user visibility
 
     await frameworkLogger.log(
       "e2e-simulation",

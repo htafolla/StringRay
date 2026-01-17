@@ -302,7 +302,8 @@ export class PostProcessor {
       }
 
       // Rule 50: Path Analysis Guidelines Enforcement
-      const pathGuidelinesCheck = await this.checkPathAnalysisGuidelines(context);
+      const pathGuidelinesCheck =
+        await this.checkPathAnalysisGuidelines(context);
       if (!pathGuidelinesCheck.passed) {
         console.log(
           `❌ Path analysis guidelines violation: ${pathGuidelinesCheck.message}`,
@@ -385,7 +386,8 @@ export class PostProcessor {
     if (!context.commitSha || !context.repository) {
       return {
         passed: false,
-        message: "Missing required context fields for feature completeness check",
+        message:
+          "Missing required context fields for feature completeness check",
       };
     }
     return { passed: true, message: "Feature completeness verified" };
@@ -405,12 +407,19 @@ export class PostProcessor {
     }
 
     // Check for TypeScript/JavaScript files that might contain imports
-    const codeFiles = context.files.filter(file =>
-      file.endsWith('.ts') || file.endsWith('.js') || file.endsWith('.tsx') || file.endsWith('.jsx')
+    const codeFiles = context.files.filter(
+      (file) =>
+        file.endsWith(".ts") ||
+        file.endsWith(".js") ||
+        file.endsWith(".tsx") ||
+        file.endsWith(".jsx"),
     );
 
     if (codeFiles.length === 0) {
-      return { passed: true, message: "No code files to validate for path guidelines" };
+      return {
+        passed: true,
+        message: "No code files to validate for path guidelines",
+      };
     }
 
     // For write/edit operations, notify AIs about ALL THREE types of path violations
@@ -533,7 +542,8 @@ All path violations will be automatically detected and blocked.
 
     return {
       passed: true,
-      message: "Comprehensive path analysis guidelines notification sent to AI operations"
+      message:
+        "Comprehensive path analysis guidelines notification sent to AI operations",
     };
   }
 
@@ -675,7 +685,12 @@ All path violations will be automatically detected and blocked.
       }
 
       // Pipeline failed - analyze and attempt fixes
-      await frameworkLogger.log("postprocessor", "ci-cd-pipeline-failed", "error", { action: "analyzing-issues" });
+      await frameworkLogger.log(
+        "postprocessor",
+        "ci-cd-pipeline-failed",
+        "error",
+        { action: "analyzing-issues" },
+      );
 
       const analysis =
         await this.failureAnalysisEngine.analyzeFailure(monitoringResult);
@@ -703,7 +718,12 @@ All path violations will be automatically detected and blocked.
           // Continue monitoring with next attempt
           continue;
         } else {
-          await frameworkLogger.log("postprocessor", "fix-validation-failed", "error", { action: "rolling-back" });
+          await frameworkLogger.log(
+            "postprocessor",
+            "fix-validation-failed",
+            "error",
+            { action: "rolling-back" },
+          );
           await this.fixValidator.rollbackFixes(fixResult.appliedFixes);
         }
       }
@@ -777,7 +797,12 @@ All path violations will be automatically detected and blocked.
     if (redeployResult.success) {
       console.log(`✅ Redeployment successful: ${redeployResult.deploymentId}`);
     } else {
-      await frameworkLogger.log("postprocessor", "redeployment-failed", "error", { error: redeployResult.error });
+      await frameworkLogger.log(
+        "postprocessor",
+        "redeployment-failed",
+        "error",
+        { error: redeployResult.error },
+      );
       throw new Error(`Redeployment failed: ${redeployResult.error}`);
     }
   }

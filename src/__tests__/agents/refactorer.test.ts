@@ -25,7 +25,9 @@ describe("Refactorer Agent Configuration", () => {
 
   describe("Description and System Prompt", () => {
     it("should have appropriate refactoring description", () => {
-      expect(refactorer.description).toContain("StringRay Framework refactorer");
+      expect(refactorer.description).toContain(
+        "StringRay Framework refactorer",
+      );
       expect(refactorer.description).toContain("technical debt elimination");
       expect(refactorer.description).toContain("code consolidation");
     });

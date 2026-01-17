@@ -40,7 +40,7 @@ class StrRayProjectAnalysisServer {
   private server: Server;
 
   constructor() {
-        this.server = new Server(
+    this.server = new Server(
       {
         name: "strray-project-analysis",
         version: "1.0.0",
@@ -49,7 +49,7 @@ class StrRayProjectAnalysisServer {
         capabilities: {
           tools: {},
         },
-      }
+      },
     );
 
     this.setupToolHandlers();
@@ -885,7 +885,11 @@ class StrRayProjectAnalysisServer {
   async run(): Promise<void> {
     const transport = new StdioServerTransport();
     await this.server.connect(transport);
-    await frameworkLogger.log("mcp-project-analysis", "server-started", "success");
+    await frameworkLogger.log(
+      "mcp-project-analysis",
+      "server-started",
+      "success",
+    );
   }
 }
 

@@ -101,7 +101,8 @@ async function activateCodexInjection(): Promise<void> {
     "info",
   );
 
-  const { createStringRayCodexInjectorHook } = await import("./codex-injector.js");
+  const { createStringRayCodexInjectorHook } =
+    await import("./codex-injector.js");
   const hook = createStringRayCodexInjectorHook();
 
   (globalThis as any).strRayHooks = (globalThis as any).strRayHooks || [];

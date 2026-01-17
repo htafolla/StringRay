@@ -22,10 +22,6 @@ interface LogArchiveConfig {
 export { cleanupLogFiles };
 import { execSync } from "child_process";
 
-
-
-
-
 /**
  * Configuration for log cleanup
  */
@@ -39,8 +35,13 @@ interface LogCleanupConfig {
 /**
  * Archive and rotate log files to prevent unbounded growth
  */
-async function archiveLogFiles(config: LogArchiveConfig): Promise<{ archived: number; errors: string[] }> {
-  const result: { archived: number; errors: string[] } = { archived: 0, errors: [] };
+async function archiveLogFiles(
+  config: LogArchiveConfig,
+): Promise<{ archived: number; errors: string[] }> {
+  const result: { archived: number; errors: string[] } = {
+    archived: 0,
+    errors: [],
+  };
 
   try {
     const fs = await import("fs");
@@ -52,19 +53,28 @@ async function archiveLogFiles(config: LogArchiveConfig): Promise<{ archived: nu
       fs.mkdirSync(config.archiveDirectory, { recursive: true });
     }
 
-
-    const activityLogPath = path.join(process.cwd(), "logs", "framework", "activity.log");
+    const activityLogPath = path.join(
+      process.cwd(),
+      "logs",
+      "framework",
+      "activity.log",
+    );
     if (fs.existsSync(activityLogPath)) {
       const stats = fs.statSync(activityLogPath);
-      const shouldArchive = (
+      const shouldArchive =
         stats.size > config.maxFileSizeMB * 1024 * 1024 || // Size-based
-        (Date.now() - stats.mtime.getTime()) > config.rotationIntervalHours * 60 * 60 * 1000 // Time-based
-      );
+        Date.now() - stats.mtime.getTime() >
+          config.rotationIntervalHours * 60 * 60 * 1000; // Time-based
 
       if (shouldArchive) {
-        const timestamp = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+        const timestamp = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
         const archiveName = `framework-activity-${timestamp}.log`; // Match existing naming convention
-        const archivePath = path.join(process.cwd(), "logs", "framework", archiveName); // Archive in same directory
+        const archivePath = path.join(
+          process.cwd(),
+          "logs",
+          "framework",
+          archiveName,
+        ); // Archive in same directory
 
         // Copy current log to archive
         fs.copyFileSync(activityLogPath, archivePath);
@@ -77,12 +87,14 @@ async function archiveLogFiles(config: LogArchiveConfig): Promise<{ archived: nu
           const output = fs.createWriteStream(compressedPath);
 
           await new Promise((resolve, reject) => {
-            input.pipe(gzip).pipe(output)
-              .on('finish', () => {
+            input
+              .pipe(gzip)
+              .pipe(output)
+              .on("finish", () => {
                 fs.unlinkSync(archivePath); // Remove uncompressed
                 resolve(void 0);
               })
-              .on('error', reject);
+              .on("error", reject);
           });
         }
 
@@ -92,25 +104,32 @@ async function archiveLogFiles(config: LogArchiveConfig): Promise<{ archived: nu
 
         result.archived++;
 
-        await frameworkLogger.log("log-archiver", "activity-log-rotated", "success", {
-          archivePath: config.compressionEnabled ? `${archivePath}.gz` : archivePath,
-          originalSize: stats.size,
-          rotationReason: stats.size > config.maxFileSizeMB * 1024 * 1024 ? "size" : "time",
-          compatibleWithReporting: true // Uses framework-activity-*.log.gz naming
-        });
+        await frameworkLogger.log(
+          "log-archiver",
+          "activity-log-rotated",
+          "success",
+          {
+            archivePath: config.compressionEnabled
+              ? `${archivePath}.gz`
+              : archivePath,
+            originalSize: stats.size,
+            rotationReason:
+              stats.size > config.maxFileSizeMB * 1024 * 1024 ? "size" : "time",
+            compatibleWithReporting: true, // Uses framework-activity-*.log.gz naming
+          },
+        );
       }
     }
 
     // Clean up old archives beyond retention period (integrate with existing cleanup)
     // Note: Framework reporting system already handles cleanup of framework-activity-*.log.gz files
     // This ensures compatibility and prevents double-cleanup
-
   } catch (error) {
     const errorMsg = `Log archiving failed: ${error}`;
     result.errors.push(errorMsg);
 
     await frameworkLogger.log("log-archiver", "archiving-error", "error", {
-      error: error instanceof Error ? error.message : String(error)
+      error: error instanceof Error ? error.message : String(error),
     });
   }
 
@@ -120,60 +139,79 @@ async function archiveLogFiles(config: LogArchiveConfig): Promise<{ archived: nu
 /**
  * Special archiving strategy for critical historical logs
  */
-async function archiveCriticalHistoricalLogs(): Promise<{ archived: number; errors: string[] }> {
-  const result: { archived: number; errors: string[] } = { archived: 0, errors: [] };
+async function archiveCriticalHistoricalLogs(): Promise<{
+  archived: number;
+  errors: string[];
+}> {
+  const result: { archived: number; errors: string[] } = {
+    archived: 0,
+    errors: [],
+  };
 
   try {
     const fs = await import("fs");
     const path = await import("path");
-
 
     const historicalDir = path.join(process.cwd(), "logs", "historical");
     if (!fs.existsSync(historicalDir)) {
       fs.mkdirSync(historicalDir, { recursive: true });
     }
 
-
-    const refactoringLogPath = path.join(process.cwd(), "logs", "agents", "refactoring-log.md");
+    const refactoringLogPath = path.join(
+      process.cwd(),
+      "logs",
+      "agents",
+      "refactoring-log.md",
+    );
     if (fs.existsSync(refactoringLogPath)) {
       const stats = fs.statSync(refactoringLogPath);
       const lastModified = new Date(stats.mtime);
-      const currentMonth = `${lastModified.getFullYear()}-${String(lastModified.getMonth() + 1).padStart(2, '0')}`;
-
+      const currentMonth = `${lastModified.getFullYear()}-${String(lastModified.getMonth() + 1).padStart(2, "0")}`;
 
       const monthlyArchiveName = `refactoring-log-${currentMonth}.md`;
       const monthlyArchivePath = path.join(historicalDir, monthlyArchiveName);
 
       if (!fs.existsSync(monthlyArchivePath)) {
-
         fs.copyFileSync(refactoringLogPath, monthlyArchivePath);
 
         result.archived++;
 
-        await frameworkLogger.log("log-archiver", "refactoring-log-archived", "info", {
-          archivePath: monthlyArchivePath,
-          size: stats.size,
-          snapshotMonth: currentMonth
-        });
+        await frameworkLogger.log(
+          "log-archiver",
+          "refactoring-log-archived",
+          "info",
+          {
+            archivePath: monthlyArchivePath,
+            size: stats.size,
+            snapshotMonth: currentMonth,
+          },
+        );
       }
     }
-
-
-
   } catch (error) {
     const errorMsg = `Critical log archiving failed: ${error}`;
     result.errors.push(errorMsg);
 
-    await frameworkLogger.log("log-archiver", "critical-archiving-error", "error", {
-      error: error instanceof Error ? error.message : String(error)
-    });
+    await frameworkLogger.log(
+      "log-archiver",
+      "critical-archiving-error",
+      "error",
+      {
+        error: error instanceof Error ? error.message : String(error),
+      },
+    );
   }
 
   return result;
 }
 
-async function cleanupLogFiles(config: any): Promise<{ cleaned: number; errors: string[] }> {
-  const result: { cleaned: number; errors: string[] } = { cleaned: 0, errors: [] };
+async function cleanupLogFiles(
+  config: any,
+): Promise<{ cleaned: number; errors: string[] }> {
+  const result: { cleaned: number; errors: string[] } = {
+    cleaned: 0,
+    errors: [],
+  };
   const maxAgeMs = config.maxAgeHours * 60 * 60 * 1000;
   const now = Date.now();
 
@@ -192,7 +230,7 @@ async function cleanupLogFiles(config: any): Promise<{ cleaned: number; errors: 
 
         // Check if file should be excluded
         const shouldExclude = config.excludePatterns.some((pattern: string) =>
-          file.includes(pattern.replace('*', ''))
+          file.includes(pattern.replace("*", "")),
         );
 
         if (shouldExclude) continue;
@@ -207,16 +245,21 @@ async function cleanupLogFiles(config: any): Promise<{ cleaned: number; errors: 
             await frameworkLogger.log("git-hooks", "log-file-cleaned", "info", {
               file: filePath,
               age: Math.round(ageMs / (1000 * 60 * 60)), // hours
-              size: stat.size
+              size: stat.size,
             });
           } catch (error) {
             const errorMsg = `Failed to clean log file ${filePath}: ${error}`;
             result.errors.push(errorMsg);
 
-            await frameworkLogger.log("git-hooks", "log-cleanup-error", "error", {
-              file: filePath,
-              error: error instanceof Error ? error.message : String(error)
-            });
+            await frameworkLogger.log(
+              "git-hooks",
+              "log-cleanup-error",
+              "error",
+              {
+                file: filePath,
+                error: error instanceof Error ? error.message : String(error),
+              },
+            );
           }
         }
       }
@@ -224,12 +267,17 @@ async function cleanupLogFiles(config: any): Promise<{ cleaned: number; errors: 
       const errorMsg = `Failed to process directory ${dir}: ${error}`;
       result.errors.push(errorMsg);
 
-      await frameworkLogger.log("git-hooks", "log-cleanup-directory-error", "error", {
-        directory: dir,
-        error: error instanceof Error ? error.message : String(error)
-       });
-     }
-   }
+      await frameworkLogger.log(
+        "git-hooks",
+        "log-cleanup-directory-error",
+        "error",
+        {
+          directory: dir,
+          error: error instanceof Error ? error.message : String(error),
+        },
+      );
+    }
+  }
 
   return result;
 }
@@ -254,7 +302,9 @@ export class GitHookTrigger {
 
     // Ensure .git/hooks directory exists (should exist in git repo)
     if (!fs.existsSync(gitHooksDir)) {
-      console.warn("⚠️ .git/hooks directory not found - not a git repository or hooks disabled");
+      console.warn(
+        "⚠️ .git/hooks directory not found - not a git repository or hooks disabled",
+      );
       return;
     }
 
@@ -460,7 +510,7 @@ exit 0
   private activateGitHooks(
     gitHooksDir: string,
     postCommitHook: string,
-    postPushHook: string
+    postPushHook: string,
   ): void {
     try {
       // Define the target hook paths in .git/hooks
@@ -478,12 +528,15 @@ exit 0
       // Create symlinks to activate our hooks
       fs.symlinkSync(relativePostCommit, gitPostCommitHook);
       fs.symlinkSync(relativePostPush, gitPostPushHook);
-
     } catch (error) {
       console.error("❌ Failed to activate git hooks:", error);
       console.log("💡 To activate manually, run:");
-      console.log(`   ln -s "../../.opencode/hooks/post-commit" ".git/hooks/post-commit"`);
-      console.log(`   ln -s "../../.opencode/hooks/post-push" ".git/hooks/post-push"`);
+      console.log(
+        `   ln -s "../../.opencode/hooks/post-commit" ".git/hooks/post-commit"`,
+      );
+      console.log(
+        `   ln -s "../../.opencode/hooks/post-push" ".git/hooks/post-push"`,
+      );
     }
   }
 

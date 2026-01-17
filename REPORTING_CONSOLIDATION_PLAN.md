@@ -3,10 +3,12 @@
 ## Current Reporting Locations (Audit)
 
 ### Root Directory Logs/Reports:
+
 - `logs/` - General logging directory
 - Various `*.log` files scattered in root
 
 ### Component-Specific Locations:
+
 - `.opencode/logs/` - oh-my-opencode integration logs
 - `.opencode/reports/` - Plugin reports
 - `performance-reports/` - Performance analysis
@@ -15,11 +17,13 @@
 - `src/` components writing to various locations
 
 ### Documentation Archives:
+
 - `docs/archive/reports/` - Historical reports
 - `docs/performance/` - Performance docs
 - `docs/reports/` - Documentation reports
 
 ## Problems Identified:
+
 1. **Scattered Output**: 10+ different directories for logs/reports
 2. **Inconsistent Naming**: Various naming conventions
 3. **No Central Control**: Components write wherever they want
@@ -29,7 +33,9 @@
 ## Consolidation Strategy:
 
 ### Phase 1: Directory Consolidation
+
 Create unified structure:
+
 ```
 logs/
 ├── framework/          # Core framework logs
@@ -47,15 +53,16 @@ reports/
 ```
 
 ### Phase 2: Central Logger Implementation
+
 Create `ReportingManager` class:
+
 ```typescript
 class ReportingManager {
   private loggers = new Map<string, Logger>();
   private reporters = new Map<string, Reporter>();
 
   getLogger(component: string): Logger {
-    return this.loggers.get(component) ||
-           this.createLogger(component);
+    return this.loggers.get(component) || this.createLogger(component);
   }
 
   generateReport(type: ReportType, data: any): Report {
@@ -66,14 +73,18 @@ class ReportingManager {
 ```
 
 ### Phase 3: Component Migration
+
 Update all components to use centralized reporting:
+
 - Framework components → `ReportingManager.getLogger('framework')`
 - Agents → `ReportingManager.getLogger('agents')`
 - Tests → `ReportingManager.generateReport('testing', testData)`
 - Performance → `ReportingManager.generateReport('performance', metrics)`
 
 ### Phase 4: Configuration Management
+
 Add reporting configuration:
+
 ```json
 {
   "reporting": {

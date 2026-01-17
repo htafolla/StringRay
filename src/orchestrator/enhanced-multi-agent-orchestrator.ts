@@ -54,7 +54,10 @@ export class EnhancedMultiAgentOrchestrator {
   private executionContext: any;
   private cleanupTimer: any;
 
-  constructor(stateManager?: StringRayStateManager, isMainOrchestrator: boolean = false) {
+  constructor(
+    stateManager?: StringRayStateManager,
+    isMainOrchestrator: boolean = false,
+  ) {
     this.stateManager = stateManager || new StringRayStateManager();
     this.complexityAnalyzer = new ComplexityAnalyzer();
     this.agentDelegator = createAgentDelegator(this.stateManager);
@@ -74,7 +77,7 @@ export class EnhancedMultiAgentOrchestrator {
     this.executionContext = {
       isExecutingAsSubagent: false,
       currentAgentId: null,
-      spawnStack: []
+      spawnStack: [],
     };
 
     this.initializeCleanupSystem();
@@ -98,8 +101,8 @@ export class EnhancedMultiAgentOrchestrator {
     if (this.isCurrentlyExecutingAsSubagent()) {
       const error = new Error(
         `SECURITY VIOLATION: Subagent attempted to spawn another agent. ` +
-        `Only the main orchestrator may spawn agents. ` +
-        `Subagent spawning is strictly prohibited to prevent infinite loops and resource exhaustion.`
+          `Only the main orchestrator may spawn agents. ` +
+          `Subagent spawning is strictly prohibited to prevent infinite loops and resource exhaustion.`,
       );
       console.error(`🚨 ${error.message}`);
       throw error;

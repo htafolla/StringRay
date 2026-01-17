@@ -17,7 +17,7 @@ class StrRayPerformanceOptimizationServer {
   private server: Server;
 
   constructor() {
-        this.server = new Server(
+    this.server = new Server(
       {
         name: "strray-performance-optimization",
         version: "1.0.0",
@@ -26,7 +26,7 @@ class StrRayPerformanceOptimizationServer {
         capabilities: {
           tools: {},
         },
-      }
+      },
     );
 
     this.setupToolHandlers();

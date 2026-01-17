@@ -21,7 +21,7 @@ class StrRayPerformanceAnalysisServer {
   private startTime: number;
 
   constructor() {
-        this.server = new Server(
+    this.server = new Server(
       {
         name: "strray-performance-analysis",
         version: "1.0.0",
@@ -30,12 +30,16 @@ class StrRayPerformanceAnalysisServer {
         capabilities: {
           tools: {},
         },
-      }
+      },
     );
 
     this.startTime = Date.now();
     this.setupToolHandlers();
-    frameworkLogger.log("mcp-performance-analysis", "server-initialized", "info");
+    frameworkLogger.log(
+      "mcp-performance-analysis",
+      "server-initialized",
+      "info",
+    );
   }
 
   private setupToolHandlers() {
@@ -118,11 +122,16 @@ class StrRayPerformanceAnalysisServer {
     const duration = args.duration || 30;
     const detailed = args.detailed || false;
 
-    await frameworkLogger.log("mcp-performance-analysis", "analysis-started", "info", {
-      scope,
-      duration,
-      detailed,
-    });
+    await frameworkLogger.log(
+      "mcp-performance-analysis",
+      "analysis-started",
+      "info",
+      {
+        scope,
+        duration,
+        detailed,
+      },
+    );
 
     const analysisResults = {
       metrics: {} as Record<string, any>,
@@ -229,7 +238,12 @@ ${analysisResults.recommendations.length > 0 ? analysisResults.recommendations.m
     const operation = args.operation || "general";
     const threshold = args.threshold || 1000;
 
-    await frameworkLogger.log("mcp-performance-analysis", "bottleneck-detection", "info", { operation, threshold });
+    await frameworkLogger.log(
+      "mcp-performance-analysis",
+      "bottleneck-detection",
+      "info",
+      { operation, threshold },
+    );
 
     try {
       const results = await this.analyzeSpecificBottlenecks(
@@ -635,7 +649,11 @@ ${results.recommendations.map((r) => `• 💡 ${r}`).join("\n") || "No recommen
   async run() {
     const transport = new StdioServerTransport();
     await this.server.connect(transport);
-    await frameworkLogger.log("mcp-performance-analysis", "server-started", "success");
+    await frameworkLogger.log(
+      "mcp-performance-analysis",
+      "server-started",
+      "success",
+    );
   }
 }
 

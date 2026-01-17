@@ -1,6 +1,6 @@
 ## CI/CD Health Summary
 
-```json
+````json
 {
   "timestamp": "2026-01-16T13:31:57.416Z",
   "repository": "strray-framework/stringray",
@@ -37,3 +37,4 @@
 - 🟢 **Issues**: 0
 - 🟢 **Workflows**: 8/8 configured
 - 🟢 **Build Status**: Available
+````

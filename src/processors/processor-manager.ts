@@ -86,9 +86,7 @@ export class ProcessorManager {
     }
 
     if (config.name.includes(" ")) {
-      throw new Error(
-        "Processor name must be a valid identifier (no spaces)",
-      );
+      throw new Error("Processor name must be a valid identifier (no spaces)");
     }
 
     // Allow hyphens, underscores, and dots as they are commonly used in processor names

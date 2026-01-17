@@ -5,9 +5,9 @@
  * Fast validation for git commit hooks (<2 seconds)
  */
 
-import * as fs from 'fs';
-import * as path from 'path';
-import { execSync } from 'child_process';
+import * as fs from "fs";
+import * as path from "path";
+import { execSync } from "child_process";
 
 interface ValidationResult {
   passed: boolean;
@@ -29,21 +29,30 @@ class LightweightValidator {
    * Get files changed in this commit
    */
   private getChangedFiles(): string[] {
-      try {
-        const output = execSync('git diff --name-only HEAD~1 2>/dev/null || git diff --name-only --cached', {
-          encoding: 'utf8'
-        });
-        return output.trim().split('\n').filter(f => f.trim());
-      } catch (error) {
-        console.warn('⚠️ Could not determine changed files:', error instanceof Error ? error.message : String(error));
-        return [];
-      }
+    try {
+      const output = execSync(
+        "git diff --name-only HEAD~1 2>/dev/null || git diff --name-only --cached",
+        {
+          encoding: "utf8",
+        },
+      );
+      return output
+        .trim()
+        .split("\n")
+        .filter((f) => f.trim());
+    } catch (error) {
+      console.warn(
+        "⚠️ Could not determine changed files:",
+        error instanceof Error ? error.message : String(error),
+      );
+      return [];
+    }
   }
 
   /**
    * Basic file existence and accessibility checks
    */
-  private validateFileExistence(): { errors: string[], warnings: string[] } {
+  private validateFileExistence(): { errors: string[]; warnings: string[] } {
     const errors: string[] = [];
     const warnings: string[] = [];
 
@@ -62,8 +71,11 @@ class LightweightValidator {
 
       // Check file size (warn on very large files)
       const stats = fs.statSync(file);
-      if (stats.size > 10 * 1024 * 1024) { // 10MB
-        warnings.push(`Large file detected: ${file} (${(stats.size / 1024 / 1024).toFixed(1)}MB)`);
+      if (stats.size > 10 * 1024 * 1024) {
+        // 10MB
+        warnings.push(
+          `Large file detected: ${file} (${(stats.size / 1024 / 1024).toFixed(1)}MB)`,
+        );
       }
     }
 
@@ -73,7 +85,7 @@ class LightweightValidator {
   /**
    * Basic syntax validation for common file types
    */
-  private validateSyntax(): { errors: string[], warnings: string[] } {
+  private validateSyntax(): { errors: string[]; warnings: string[] } {
     const errors: string[] = [];
     const warnings: string[] = [];
 
@@ -84,24 +96,26 @@ class LightweightValidator {
 
       try {
         switch (ext) {
-          case '.json':
+          case ".json":
             this.validateJsonFile(file, errors);
             break;
-          case '.js':
-          case '.ts':
-          case '.jsx':
-          case '.tsx':
+          case ".js":
+          case ".ts":
+          case ".jsx":
+          case ".tsx":
             this.validateJsTsFile(file, errors, warnings);
             break;
-          case '.py':
+          case ".py":
             this.validatePythonFile(file, errors, warnings);
             break;
-          case '.md':
+          case ".md":
             this.validateMarkdownFile(file, warnings);
             break;
         }
       } catch (error) {
-        warnings.push(`Could not validate ${file}: ${error instanceof Error ? error.message : String(error)}`);
+        warnings.push(
+          `Could not validate ${file}: ${error instanceof Error ? error.message : String(error)}`,
+        );
       }
     }
 
@@ -110,28 +124,36 @@ class LightweightValidator {
 
   private validateJsonFile(file: string, errors: string[]): void {
     try {
-      const content = fs.readFileSync(file, 'utf8');
+      const content = fs.readFileSync(file, "utf8");
       JSON.parse(content);
     } catch (error) {
-      errors.push(`Invalid JSON in ${file}: ${error instanceof Error ? error.message : String(error)}`);
+      errors.push(
+        `Invalid JSON in ${file}: ${error instanceof Error ? error.message : String(error)}`,
+      );
     }
   }
 
-  private validateJsTsFile(file: string, errors: string[], warnings: string[]): void {
-    const content = fs.readFileSync(file, 'utf8');
+  private validateJsTsFile(
+    file: string,
+    errors: string[],
+    warnings: string[],
+  ): void {
+    const content = fs.readFileSync(file, "utf8");
 
     // Check for console.log statements (warning)
-    if (content.includes('console.log')) {
-      warnings.push(`console.log found in ${file} (consider removing for production)`);
+    if (content.includes("console.log")) {
+      warnings.push(
+        `console.log found in ${file} (consider removing for production)`,
+      );
     }
 
     // Check for TODO comments
-    if (content.includes('TODO') || content.includes('FIXME')) {
+    if (content.includes("TODO") || content.includes("FIXME")) {
       warnings.push(`TODO/FIXME comments found in ${file}`);
     }
 
     // Check for debugger statements
-    if (content.includes('debugger')) {
+    if (content.includes("debugger")) {
       errors.push(`debugger statement found in ${file}`);
     }
 
@@ -148,29 +170,35 @@ class LightweightValidator {
     }
   }
 
-  private validatePythonFile(file: string, errors: string[], warnings: string[]): void {
-    const content = fs.readFileSync(file, 'utf8');
+  private validatePythonFile(
+    file: string,
+    errors: string[],
+    warnings: string[],
+  ): void {
+    const content = fs.readFileSync(file, "utf8");
 
     // Check for print statements (warning)
-    if (content.includes('print(')) {
-      warnings.push(`print statement found in ${file} (consider using logging)`);
+    if (content.includes("print(")) {
+      warnings.push(
+        `print statement found in ${file} (consider using logging)`,
+      );
     }
 
     // Check for TODO comments
-    if (content.includes('# TODO') || content.includes('# FIXME')) {
+    if (content.includes("# TODO") || content.includes("# FIXME")) {
       warnings.push(`TODO/FIXME comments found in ${file}`);
     }
   }
 
   private validateMarkdownFile(file: string, warnings: string[]): void {
-    const content = fs.readFileSync(file, 'utf8');
+    const content = fs.readFileSync(file, "utf8");
 
     // Check for broken links (simple check)
     const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
     let match;
     while ((match = linkRegex.exec(content)) !== null) {
       const url = match[2];
-      if (url && url.startsWith('http') && !url.includes('.')) {
+      if (url && url.startsWith("http") && !url.includes(".")) {
         warnings.push(`Potentially broken link in ${file}: ${url}`);
       }
     }
@@ -179,21 +207,21 @@ class LightweightValidator {
   /**
    * Check for basic security issues
    */
-  private validateSecurity(): { errors: string[], warnings: string[] } {
+  private validateSecurity(): { errors: string[]; warnings: string[] } {
     const errors: string[] = [];
     const warnings: string[] = [];
 
     for (const file of this.files) {
       if (!fs.existsSync(file)) continue;
 
-      const content = fs.readFileSync(file, 'utf8');
+      const content = fs.readFileSync(file, "utf8");
 
       // Check for hardcoded secrets (simple patterns)
       const secretPatterns = [
         /password\s*[:=]\s*['"][^'"]*['"]/i,
         /secret\s*[:=]\s*['"][^'"]*['"]/i,
         /token\s*[:=]\s*['"][^'"]*['"]/i,
-        /api_key\s*[:=]\s*['"][^'"]*['"]/i
+        /api_key\s*[:=]\s*['"][^'"]*['"]/i,
       ];
 
       for (const pattern of secretPatterns) {
@@ -204,7 +232,7 @@ class LightweightValidator {
       }
 
       // Check for eval usage
-      if (content.includes('eval(')) {
+      if (content.includes("eval(")) {
         warnings.push(`eval() usage detected in ${file} (security risk)`);
       }
     }
@@ -234,9 +262,10 @@ class LightweightValidator {
       const securityChecks = this.validateSecurity();
       allErrors.push(...securityChecks.errors);
       allWarnings.push(...securityChecks.warnings);
-
     } catch (error) {
-      allErrors.push(`Validation failed: ${error instanceof Error ? error.message : String(error)}`);
+      allErrors.push(
+        `Validation failed: ${error instanceof Error ? error.message : String(error)}`,
+      );
     }
 
     const duration = Date.now() - this.startTime;
@@ -245,7 +274,7 @@ class LightweightValidator {
       passed: allErrors.length === 0,
       errors: allErrors,
       warnings: allWarnings,
-      duration
+      duration,
     };
   }
 }
@@ -254,7 +283,7 @@ class LightweightValidator {
  * Main validation function
  */
 async function main(): Promise<void> {
-  console.log('⚡ Post-commit: Quick validation initiated');
+  console.log("⚡ Post-commit: Quick validation initiated");
 
   const validator = new LightweightValidator();
   const result = await validator.validate();
@@ -262,18 +291,20 @@ async function main(): Promise<void> {
   // Report results
   if (result.warnings.length > 0) {
     console.log(`⚠️ ${result.warnings.length} warning(s) found:`);
-    result.warnings.forEach(warning => console.log(`   ${warning}`));
+    result.warnings.forEach((warning) => console.log(`   ${warning}`));
   }
 
   if (result.errors.length > 0) {
     console.log(`❌ ${result.errors.length} error(s) found:`);
-    result.errors.forEach(error => console.log(`   ${error}`));
+    result.errors.forEach((error) => console.log(`   ${error}`));
   }
 
   console.log(`✅ Post-commit: Validation completed in ${result.duration}ms`);
 
   if (!result.passed) {
-    console.log('💡 Fix the errors above or use --no-verify to skip validation');
+    console.log(
+      "💡 Fix the errors above or use --no-verify to skip validation",
+    );
     process.exit(1);
   }
 
@@ -281,7 +312,10 @@ async function main(): Promise<void> {
 }
 
 // Run validation
-main().catch(error => {
-  console.error('❌ Validation failed:', error instanceof Error ? error.message : String(error));
+main().catch((error) => {
+  console.error(
+    "❌ Validation failed:",
+    error instanceof Error ? error.message : String(error),
+  );
   process.exit(1);
 });

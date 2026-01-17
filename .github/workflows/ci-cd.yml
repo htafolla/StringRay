@@ -9,7 +9,7 @@ on:
 
 # Enable CodeQL permissions for this workflow
 permissions:
-  security-events: read
+  security-events: write
   actions: read
   contents: read
 

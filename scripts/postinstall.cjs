@@ -370,10 +370,10 @@ function configureStrRayPlugin() {
       // Update MCP server commands in opencode.json
       if (opencodeConfig.mcp) {
         for (const [serverName, serverConfig] of Object.entries(opencodeConfig.mcp)) {
-          if (serverConfig.command   // MCP server paths are now correct in the template - no updating needed  // MCP server paths are now correct in the template - no updating needed Array.isArray(serverConfig.command)) {
+          if (serverConfig.command && Array.isArray(serverConfig.command)) {
             for (let i = 0; i < serverConfig.command.length; i++) {
               const cmd = serverConfig.command[i];
-              if (typeof cmd === "string"   // MCP server paths are now correct in the template - no updating needed  // MCP server paths are now correct in the template - no updating needed cmd.includes("dist/plugin/mcps/")) {
+              if (typeof cmd === "string" && cmd.includes("dist/plugin/mcps/")) {
                 const newCmd = cmd.replace("dist/plugin/mcps/", "node_modules/strray-ai/dist/plugin/mcps/");
                 if (newCmd !== cmd) {
                   serverConfig.command[i] = newCmd;
@@ -405,10 +405,10 @@ function configureStrRayPlugin() {
       let ohMyUpdated = false;
       
       // Update plugin path
-      if (ohMyConfig.plugin   // MCP server paths are now correct in the template - no updating needed  // MCP server paths are now correct in the template - no updating needed Array.isArray(ohMyConfig.plugin)) {
+      if (ohMyConfig.plugin && Array.isArray(ohMyConfig.plugin)) {
         for (let i = 0; i < ohMyConfig.plugin.length; i++) {
           const pluginPath = ohMyConfig.plugin[i];
-          if (typeof pluginPath === "string"   // MCP server paths are now correct in the template - no updating needed  // MCP server paths are now correct in the template - no updating needed pluginPath.includes("./dist/")) {
+          if (typeof pluginPath === "string" && pluginPath.includes("./dist/")) {
             const newPath = pluginPath.replace("./dist/", "../node_modules/strray-ai/dist/");
             if (newPath !== pluginPath) {
               ohMyConfig.plugin[i] = newPath;
@@ -429,19 +429,7 @@ function configureStrRayPlugin() {
   }
 
   // All configuration paths are now updated for consumer usage
-            }
-          }
-        }
-      }
-
-      if (updated) {
-        fs.writeFileSync(mcpConfigPath, JSON.stringify(mcpConfig, null, 2));
-        console.log('✅ Updated MCP server paths in .mcp.json');
-      }
-    } catch (error) {
-      console.warn('Warning: Could not update MCP server paths:', error.message);
-    }
-  }
+}
 
   console.log('🎉 StrRay plugin installation complete!');
   console.log(`\n📋 Next Steps:`);

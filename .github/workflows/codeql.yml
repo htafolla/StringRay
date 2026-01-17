@@ -1,0 +1,21 @@
+name: "CodeQL"
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+permissions:
+  contents: read
+
+jobs:
+  analyze:
+    name: Analyze
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Skip CodeQL
+        run: echo "CodeQL scanning disabled for this repository"

@@ -4,7 +4,7 @@
     "../node_modules/strray-ai/dist/plugin/plugins/stringray-codex-injection.js"
   ],
   "disabled_agents": [
-    "Sisyphus",
+    "sisyphus",
     "build",
     "plan",
     "Planner-Sisyphus",

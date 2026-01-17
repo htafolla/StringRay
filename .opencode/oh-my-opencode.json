@@ -1,6 +1,8 @@
 {
   "model": "opencode/grok-code",
-  "plugin": ["./dist/plugin/plugins/stringray-codex-injection.js"],
+  "plugin": [
+    "../node_modules/strray-ai/dist/plugin/plugins/stringray-codex-injection.js"
+  ],
   "disabled_agents": [
     "Sisyphus",
     "build",
@@ -11,7 +13,11 @@
   "sisyphus_agent": {
     "disabled": true
   },
-  "disabled_mcps": ["global-everything", "global-git", "global-sqlite"],
+  "disabled_mcps": [
+    "global-everything",
+    "global-git",
+    "global-sqlite"
+  ],
   "agent": {
     "strray-orchestrator": {
       "model": "opencode/grok-code"

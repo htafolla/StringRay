@@ -1,253 +1,376 @@
 {
   "mcpServers": {
-    "global-git": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-git", "--repository", "~"],
-      "disabled": true
-    },
-    "global-sqlite": {
+    "global-filesystem": {
       "command": "npx",
       "args": [
         "-y",
-        "@modelcontextprotocol/server-sqlite",
-        "--db-path",
-        "~/sqlite.db"
+        "@modelcontextprotocol/server-filesystem",
+        "/tmp"
       ],
-      "disabled": true
-    },
-    "global-everything": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-everything", "~/Desktop"],
-      "disabled": true
-    },
-    "global-filesystem": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-filesystem", "/tmp"],
       "disabled": true
     },
     "project-git": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-git", "--repository", "."],
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-git",
+        "--repository",
+        "."
+      ],
       "disabled": true
     },
     "project-filesystem": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-filesystem", "."],
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "."
+      ],
       "disabled": true
     },
     "typescript": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-typescript", "--stdio"],
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-typescript",
+        "--stdio"
+      ],
       "disabled": true
     },
     "context7": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-context7"],
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-context7"
+      ],
       "disabled": true
     },
     "grep": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-grep"],
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-grep"
+      ],
       "disabled": true
     },
     "github": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-github"
+      ],
       "disabled": true
     },
     "slack": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-slack"],
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-slack"
+      ],
       "disabled": true
     },
     "discord": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-discord"],
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-discord"
+      ],
       "disabled": true
     },
     "brave-search": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-brave-search"],
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-brave-search"
+      ],
       "disabled": true
     },
     "web-browser": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-web-browser"],
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-web-browser"
+      ],
       "disabled": true
     },
     "youtube-transcript": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-youtube-transcript"],
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-youtube-transcript"
+      ],
       "disabled": true
     },
     "obsidian": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-obsidian"],
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-obsidian"
+      ],
       "disabled": true
     },
     "notion": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-notion"],
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-notion"
+      ],
       "disabled": true
     },
     "linear": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-linear"],
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-linear"
+      ],
       "disabled": true
     },
     "jira": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-jira"],
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-jira"
+      ],
       "disabled": true
     },
     "confluence": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-confluence"],
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-confluence"
+      ],
       "disabled": true
     },
     "gitlab": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-gitlab"],
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-gitlab"
+      ],
       "disabled": true
     },
     "azure-devops": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-azure-devops"],
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-azure-devops"
+      ],
       "disabled": true
     },
     "bitbucket": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-bitbucket"],
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-bitbucket"
+      ],
       "disabled": true
     },
     "postgres": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-postgres"],
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-postgres"
+      ],
       "disabled": true
     },
     "mysql": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-mysql"],
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-mysql"
+      ],
       "disabled": true
     },
     "mongodb": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-mongodb"],
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-mongodb"
+      ],
       "disabled": true
     },
     "redis": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-redis"],
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-redis"
+      ],
       "disabled": true
     },
     "elasticsearch": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-elasticsearch"],
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-elasticsearch"
+      ],
       "disabled": true
     },
     "kafka": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-kafka"],
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-kafka"
+      ],
       "disabled": true
     },
     "rabbitmq": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-rabbitmq"],
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-rabbitmq"
+      ],
       "disabled": true
     },
     "aws": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-aws"],
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-aws"
+      ],
       "disabled": true
     },
     "gcp": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-gcp"],
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-gcp"
+      ],
       "disabled": true
     },
     "azure": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-azure"],
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-azure"
+      ],
       "disabled": true
     },
     "kubernetes": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-kubernetes"],
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-kubernetes"
+      ],
       "disabled": true
     },
     "docker": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-docker"],
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-docker"
+      ],
       "disabled": true
     },
     "terraform": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-terraform"],
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-terraform"
+      ],
       "disabled": true
     },
     "ansible": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-ansible"],
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-ansible"
+      ],
       "disabled": true
     },
     "jenkins": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-jenkins"],
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-jenkins"
+      ],
       "disabled": true
     },
     "circleci": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-circleci"],
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-circleci"
+      ],
       "disabled": true
     },
     "github-actions": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-github-actions"],
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-github-actions"
+      ],
       "disabled": true
     },
     "datadog": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-datadog"],
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-datadog"
+      ],
       "disabled": true
     },
     "new-relic": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-new-relic"],
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-new-relic"
+      ],
       "disabled": true
     },
     "splunk": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-splunk"],
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-splunk"
+      ],
       "disabled": true
     },
     "grafana": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-grafana"],
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-grafana"
+      ],
       "disabled": true
     },
     "prometheus": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-prometheus"],
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-prometheus"
+      ],
       "disabled": true
     },
     "zabbix": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-zabbix"],
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-zabbix"
+      ],
       "disabled": true
     },
     "nagios": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-nagios"],
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-nagios"
+      ],
       "disabled": true
     },
     "icinga": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-icinga"],
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-icinga"
+      ],
       "disabled": true
     },
     "checkmk": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-checkmk"],
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-checkmk"
+      ],
       "disabled": true
     }
   }

@@ -24,10 +24,7 @@ const MCP_SERVERS = [
     name: "librarian",
     path: `${pathPrefix}dist/plugin/mcps/knowledge-skills/project-analysis.server.js`,
   },
-  {
-    name: "session-management",
-    path: `${pathPrefix}.opencode/mcps/session-management.server.js`,
-  },
+
   {
     name: "orchestrator",
     path: `${pathPrefix}dist/plugin/mcps/orchestrator.server.js`,

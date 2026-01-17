@@ -1095,11 +1095,11 @@ function analyzeBundle() {
   const fs = require("fs");
   const gzipSize = require("gzip-size");
 
-  const bundlePath = "dist/index-*.js";
+  const bundlePath = "./node_modules/strray-ai/dist/index-*.js";
   const files = fs.readdirSync("dist").filter((f) => f.match(/index-.*\.js$/));
 
   files.forEach((file) => {
-    const content = fs.readFileSync(`dist/${file}`);
+    const content = fs.readFileSync(`./node_modules/strray-ai/dist/${file}`);
     const size = gzipSize.sync(content);
 
     if (size > 500 * 1024) {
@@ -1152,12 +1152,12 @@ function detectMemoryLeaks() {
 {
   "budgets": [
     {
-      "path": "dist/index-*.js",
+      "path": "./node_modules/strray-ai/dist/index-*.js",
       "maximumError": "500 kB",
       "maximumWarning": "400 kB"
     },
     {
-      "path": "dist/*.js",
+      "path": "./node_modules/strray-ai/dist/*.js",
       "maximumError": "2 MB",
       "maximumWarning": "1.5 MB"
     }

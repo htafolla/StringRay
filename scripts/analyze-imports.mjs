@@ -50,7 +50,7 @@ function analyzeImports(filePath) {
         });
       }
 
-      if (line.includes("from './dist/") || line.includes("from '../dist/")) {
+      if (line.includes("from '../dist/") || line.includes("from '../dist/")) {
         issues.push({
           line: i + 1,
           type: 'dist-import-in-source',

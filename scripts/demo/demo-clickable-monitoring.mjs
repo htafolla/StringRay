@@ -3,7 +3,7 @@
  * Demonstrates the enhanced multi-agent orchestration with clickable monitoring
  */
 
-import { enhancedMultiAgentOrchestrator } from '../dist/orchestrator/enhanced-multi-agent-orchestrator.js';
+import { enhancedMultiAgentOrchestrator } from '../../dist/orchestrator/enhanced-multi-agent-orchestrator.js';
 
 async function demonstrateClickableAgentMonitoring() {
   console.log('🚀 Demonstrating Enhanced Multi-Agent Orchestration with Clickable Monitoring\n');

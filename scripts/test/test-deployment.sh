@@ -84,7 +84,7 @@ if npm install "../$PACK_FILE"; then
     echo "✅ Local installation successful"
     
     # Check if plugin file exists
-    if [ -f "node_modules/strray/dist/plugin/plugins/strray-codex-injection.js" ]; then
+    if [ -f "node_modules/strray-ai/dist/plugin/plugins/strray-codex-injection.js" ]; then
         echo "✅ Plugin file found in node_modules"
     else
         echo "❌ Plugin file not found in node_modules"

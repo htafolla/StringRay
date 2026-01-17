@@ -16,7 +16,7 @@ import path from 'path';
 // Path configuration for cross-environment compatibility
 const ORCHESTRATOR_PATH = process.env.STRRAY_ORCHESTRATOR_PATH || '../../dist/orchestrator';
 
-import { StrRayOrchestrator } from `${ORCHESTRATOR_PATH}.js`;
+import { StringRayOrchestrator } from `${ORCHESTRATOR_PATH}.js`;
 
 const MAX_OUTPUT_SIZE = 100000; // Increased buffer for large test outputs
 const MAX_FILES_THRESHOLD = 15; // Run individually if more than 15 test files (AGGRESSIVE)
@@ -322,7 +322,7 @@ class SmartTestRunner {
 
       try {
         // Create orchestrator instance
-        const orchestrator = new StrRayOrchestrator({
+        const orchestrator = new StringRayOrchestrator({
           maxConcurrentTasks: 3,
           taskTimeout: 300000, // 5 minutes per task
           conflictResolutionStrategy: 'expert_priority'

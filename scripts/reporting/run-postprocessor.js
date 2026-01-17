@@ -1,8 +1,8 @@
-import { PostProcessor } from "./dist/postprocessor/PostProcessor.js";
-import { createSessionCoordinator } from "./dist/delegation/session-coordinator.js";
-import { StrRayStateManager } from "./dist/state/state-manager.js";
-import { createSessionCleanupManager } from "./dist/session/session-cleanup-manager.js";
-import { createSessionMonitor } from "./dist/session/session-monitor.js";
+import { PostProcessor } from "../../dist/postprocessor/PostProcessor.js";
+import { createSessionCoordinator } from "../../dist/delegation/session-coordinator.js";
+import { StrRayStateManager } from "../../dist/state/state-manager.js";
+import { createSessionCleanupManager } from "../../dist/session/session-cleanup-manager.js";
+import { createSessionMonitor } from "../../dist/session/session-monitor.js";
 
 console.log(
   "🚀 Running Post-Processor to trigger automated report generation...",

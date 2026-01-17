@@ -1,4 +1,4 @@
-import { ruleEnforcer } from './dist/enforcement/rule-enforcer.js';
+import { ruleEnforcer } from '../../dist/enforcement/rule-enforcer.js';
 
 async function debugRuleLoading() {
   console.log('🔍 Debugging Rule Loading\n');

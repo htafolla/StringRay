@@ -1,4 +1,36 @@
 {
+  "session:expired-test:coordinator": {
+    "sessionId": "expired-test",
+    "startTime": 1768307064813,
+    "activeDelegations": {},
+    "agentInteractions": {},
+    "conflictHistory": [],
+    "coordinationState": {
+      "activeAgents": {},
+      "pendingCommunications": [],
+      "sharedContext": {},
+      "sessionMetrics": {
+        "totalInteractions": 0,
+        "successfulInteractions": 0,
+        "failedInteractions": 0,
+        "averageResponseTime": 0,
+        "conflictResolutionRate": 0,
+        "coordinationEfficiency": 0
+      }
+    },
+    "isActive": true
+  },
+  "cleanup:session_metadata": {
+    "default": {
+      "sessionId": "default",
+      "createdAt": 1768671542292,
+      "lastActivity": 1768671542292,
+      "ttlMs": 86400000,
+      "isActive": true,
+      "agentCount": 0,
+      "memoryUsage": 0
+    }
+  },
   "agent:enforcer": {},
   "agent:architect": {},
   "agent:code-reviewer": {},
@@ -176,38 +208,6 @@
       "behavioral-testing"
     ]
   },
-  "session:expired-test:coordinator": {
-    "sessionId": "expired-test",
-    "startTime": 1768307064813,
-    "activeDelegations": {},
-    "agentInteractions": {},
-    "conflictHistory": [],
-    "coordinationState": {
-      "activeAgents": {},
-      "pendingCommunications": [],
-      "sharedContext": {},
-      "sessionMetrics": {
-        "totalInteractions": 0,
-        "successfulInteractions": 0,
-        "failedInteractions": 0,
-        "averageResponseTime": 0,
-        "conflictResolutionRate": 0,
-        "coordinationEfficiency": 0
-      }
-    },
-    "isActive": true
-  },
-  "cleanup:session_metadata": {
-    "default": {
-      "sessionId": "default",
-      "createdAt": 1768603078979,
-      "lastActivity": 1768603078979,
-      "ttlMs": 86400000,
-      "isActive": true,
-      "agentCount": 0,
-      "memoryUsage": 0
-    }
-  },
   "monitor:health": {
     "default": {
       "sessionId": "default",
@@ -379,7 +379,7 @@
   },
   "session:default:coordinator": {
     "sessionId": "default",
-    "startTime": 1768603078979,
+    "startTime": 1768671542292,
     "activeDelegations": {},
     "agentInteractions": {},
     "conflictHistory": [],
@@ -400,12 +400,12 @@
   },
   "delegation:default_session": {
     "sessionId": "default",
-    "createdAt": "2026-01-16T22:37:58.979Z",
+    "createdAt": "2026-01-17T17:39:02.292Z",
     "active": true,
     "agentCount": 8
   },
   "session:active": true,
-  "session:boot_time": 1768603078979,
+  "session:boot_time": 1768671542292,
   "session:agents": [],
   "session:state_manager": {
     "stateManager": {
@@ -874,7 +874,7 @@
       "enforcementLevel": "blocking"
     }
   ],
-  "enforcement:enabled_at": 1768603078979,
+  "enforcement:enabled_at": 1768671542293,
   "session:validator-test-session:coordinator": {
     "sessionId": "validator-test-session",
     "startTime": 1768335491257,
@@ -1123,7 +1123,7 @@
   },
   "processor:active": true,
   "security:initial_audit": {
-    "totalFiles": 1797,
+    "totalFiles": 1821,
     "issues": [
       {
         "severity": "high",
@@ -1887,7 +1887,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/README.md",
-        "line": 325,
+        "line": 318,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -1896,7 +1896,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/README.md",
-        "line": 326,
+        "line": 319,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -1905,7 +1905,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/README.md",
-        "line": 327,
+        "line": 320,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -1914,7 +1914,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/README.md",
-        "line": 328,
+        "line": 321,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -1923,7 +1923,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/README.md",
-        "line": 329,
+        "line": 322,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -1932,7 +1932,7 @@
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/README.md",
-        "line": 330,
+        "line": 323,
         "description": "Potentially dangerous pattern detected: /\\.\\.[\\/\\\\]/g",
         "recommendation": "Validate paths, use allowlists, resolve to absolute paths",
         "cwe": "CWE-22"
@@ -6547,6 +6547,14 @@
         "cwe": "CWE-350"
       },
       {
+        "severity": "medium",
+        "category": "dangerous-imports",
+        "file": "/Users/blaze/dev/stringray/scripts/validation/validate-postinstall-config.js",
+        "description": "Potentially dangerous import detected: fs",
+        "recommendation": "Review usage and ensure proper sandboxing/validation",
+        "cwe": "CWE-350"
+      },
+      {
         "severity": "high",
         "category": "path-traversal",
         "file": "/Users/blaze/dev/stringray/scripts/validation/validate-reports.ts",
@@ -10978,7 +10986,7 @@
     "summary": {
       "critical": 106,
       "high": 620,
-      "medium": 337,
+      "medium": 338,
       "low": 48,
       "info": 0
     },

@@ -1,4 +1,4 @@
-import { frameworkReportingSystem } from "./dist/reporting/framework-reporting-system.js";
+import { frameworkReportingSystem } from "../../dist/reporting/framework-reporting-system.js";
 
 async function generatePhase1Report() {
   console.log("🚀 Generating Phase 1 Completion Report...");

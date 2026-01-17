@@ -3,10 +3,10 @@
 // StrRay Framework - Continuous Monitoring Daemon
 // Runs persistent background monitoring services
 
-import { StrRayStateManager } from './dist/state/state-manager.js';
-import { createSessionCoordinator } from './dist/delegation/session-coordinator.js';
-import { createSessionCleanupManager } from './dist/session/session-cleanup-manager.js';
-import { createSessionMonitor } from './dist/session/session-monitor.js';
+import { StrRayStateManager } from '../../dist/state/state-manager.js';
+import { createSessionCoordinator } from '../../dist/delegation/session-coordinator.js';
+import { createSessionCleanupManager } from '../../dist/session/session-cleanup-manager.js';
+import { createSessionMonitor } from '../../dist/session/session-monitor.js';
 
 async function startMonitoring() {
   try {

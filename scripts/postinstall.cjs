@@ -358,7 +358,77 @@ function configureStrRayPlugin() {
   console.log('🔧 Checking Claude MCP configuration...');
   configureClaudeMCPExclusions();
 
-  // MCP server paths are now correct in the template - no updating needed
+  // Update paths in opencode.json
+  const opencodeConfigPath = path.join(process.cwd(), "opencode.json");
+  console.log("Checking opencode config at:", opencodeConfigPath);
+  if (fs.existsSync(opencodeConfigPath)) {
+    console.log("opencode.json exists, updating paths...");
+    try {
+      const opencodeConfig = JSON.parse(fs.readFileSync(opencodeConfigPath, "utf-8"));
+      let opencodeUpdated = false;
+      
+      // Update MCP server commands in opencode.json
+      if (opencodeConfig.mcp) {
+        for (const [serverName, serverConfig] of Object.entries(opencodeConfig.mcp)) {
+          if (serverConfig.command   // MCP server paths are now correct in the template - no updating needed  // MCP server paths are now correct in the template - no updating needed Array.isArray(serverConfig.command)) {
+            for (let i = 0; i < serverConfig.command.length; i++) {
+              const cmd = serverConfig.command[i];
+              if (typeof cmd === "string"   // MCP server paths are now correct in the template - no updating needed  // MCP server paths are now correct in the template - no updating needed cmd.includes("dist/plugin/mcps/")) {
+                const newCmd = cmd.replace("dist/plugin/mcps/", "node_modules/strray-ai/dist/plugin/mcps/");
+                if (newCmd !== cmd) {
+                  serverConfig.command[i] = newCmd;
+                  opencodeUpdated = true;
+                  console.log(`✅ Updated opencode ${serverName} path: ${cmd} -> ${newCmd}`);
+                }
+              }
+            }
+          }
+        }
+      }
+      
+      if (opencodeUpdated) {
+        fs.writeFileSync(opencodeConfigPath, JSON.stringify(opencodeConfig, null, 2));
+        console.log("✅ Updated MCP server paths in opencode.json");
+      }
+    } catch (error) {
+      console.warn("Warning: Could not update opencode.json paths:", error.message);
+    }
+  }
+
+  // Update paths in .opencode/oh-my-opencode.json
+  const ohMyConfigPath = path.join(process.cwd(), ".opencode", "oh-my-opencode.json");
+  console.log("Checking oh-my-opencode config at:", ohMyConfigPath);
+  if (fs.existsSync(ohMyConfigPath)) {
+    console.log("oh-my-opencode.json exists, updating paths...");
+    try {
+      const ohMyConfig = JSON.parse(fs.readFileSync(ohMyConfigPath, "utf-8"));
+      let ohMyUpdated = false;
+      
+      // Update plugin path
+      if (ohMyConfig.plugin   // MCP server paths are now correct in the template - no updating needed  // MCP server paths are now correct in the template - no updating needed Array.isArray(ohMyConfig.plugin)) {
+        for (let i = 0; i < ohMyConfig.plugin.length; i++) {
+          const pluginPath = ohMyConfig.plugin[i];
+          if (typeof pluginPath === "string"   // MCP server paths are now correct in the template - no updating needed  // MCP server paths are now correct in the template - no updating needed pluginPath.includes("./dist/")) {
+            const newPath = pluginPath.replace("./dist/", "../node_modules/strray-ai/dist/");
+            if (newPath !== pluginPath) {
+              ohMyConfig.plugin[i] = newPath;
+              ohMyUpdated = true;
+              console.log(`✅ Updated plugin path: ${pluginPath} -> ${newPath}`);
+            }
+          }
+        }
+      }
+      
+      if (ohMyUpdated) {
+        fs.writeFileSync(ohMyConfigPath, JSON.stringify(ohMyConfig, null, 2));
+        console.log("✅ Updated plugin paths in .opencode/oh-my-opencode.json");
+      }
+    } catch (error) {
+      console.warn("Warning: Could not update oh-my-opencode.json paths:", error.message);
+    }
+  }
+
+  // All configuration paths are now updated for consumer usage
             }
           }
         }

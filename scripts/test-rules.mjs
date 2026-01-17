@@ -47,7 +47,7 @@ import { validateEmail } from './utils/validation.js';`;
 
   // Test case 3: Bad import from dist/ (should fail)
   console.log('Test 3: Bad import from dist/ directory');
-  const distImport = `import { config } from './dist/config.js';`;
+  const distImport = `import { config } from '../dist/config.js';`;
 
   const result3 = await ruleEnforcer.validateOperation('write', {
     operation: 'write',

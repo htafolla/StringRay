@@ -2,14 +2,14 @@
  * Test the integrated orchestration pipeline with clickable monitoring
  */
 
-import { StringRayOrchestrator } from '../../dist/orchestrator.js';
+import { StrRayOrchestrator } from '../../dist/orchestrator.js';
 import { enhancedMultiAgentOrchestrator } from '../../dist/orchestrator/enhanced-multi-agent-orchestrator.js';
 
 async function testIntegratedOrchestration() {
   console.log('🧪 Testing Integrated Orchestration Pipeline\n');
 
   // Create orchestrator instance
-  const orchestrator = new StringRayOrchestrator({
+  const orchestrator = new StrRayOrchestrator({
     maxConcurrentTasks: 3,
     conflictResolutionStrategy: 'expert_priority'
   });

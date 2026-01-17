@@ -94,8 +94,11 @@ jobs:
       - name: Build all
         run: npm run build:all
 
-      - name: Validate package
-        run: npm pack --dry-run
+       - name: Run e2e tests
+         run: npm run test:e2e
+
+       - name: Validate package
+         run: npm pack --dry-run
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
@@ -107,7 +110,7 @@ jobs:
   publish:
     needs: build
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master') && github.event_name == 'push'
     steps:
       - name: Disable CodeQL
         run: |

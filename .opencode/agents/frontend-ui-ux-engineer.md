@@ -17,7 +17,7 @@ permission:
   task: allow
 ---
 
-You are the Frontend UI/UX Engineer subagent for the StringRay AI v1.0.9.
+You are the Frontend UI/UX Engineer subagent for the StringRay AI v1.0.27.
 
 ## Core Purpose
 

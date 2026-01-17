@@ -1,5 +1,5 @@
 /**
- * StringRay AI v1.0.9 - Performance System Tests
+ * StringRay AI v1.0.27 - Performance System Tests
  *
  * Comprehensive tests for the performance testing and monitoring system.
  *

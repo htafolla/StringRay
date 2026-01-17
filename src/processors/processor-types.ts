@@ -1,5 +1,5 @@
 /**
- * StringRay AI v1.0.9 - Processor Types
+ * StringRay AI v1.0.27 - Processor Types
  *
  * Type definitions for the processor activation system.
  *

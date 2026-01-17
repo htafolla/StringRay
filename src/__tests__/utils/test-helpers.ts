@@ -236,7 +236,7 @@ export class MockCodexGenerator {
       },
       frameworkAlignment: {
         "oh-my-opencode": "v2.12.0",
-        "strray-framework": "v1.0.9",
+        "strray-framework": "v1.0.27",
       },
     });
   }
@@ -415,7 +415,7 @@ export class MockContextFactory {
       },
       frameworkAlignment: {
         "oh-my-opencode": "v2.12.0",
-        "StringRay Framework": "v1.0.9",
+        "StringRay Framework": "v1.0.27",
       },
       errorPreventionTarget: 0.996,
     };

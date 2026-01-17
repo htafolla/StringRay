@@ -406,7 +406,7 @@ node scripts/boot-check.cjs
 
 ## Version History
 
-- **v1.0.9**: Initial production release with all path and initialization issues resolved
+- **v1.0.27**: Initial production release with all path and initialization issues resolved
 - **Plugin deployment process**: Refined through 5+ iterations
 - **Testing procedures**: Comprehensive coverage of all integration points
 

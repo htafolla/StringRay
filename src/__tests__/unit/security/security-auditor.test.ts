@@ -1,5 +1,5 @@
 /**
- * StringRay AI v1.0.9 - SecurityAuditor Unit Tests
+ * StringRay AI v1.0.27 - SecurityAuditor Unit Tests
  *
  * Comprehensive tests for the SecurityAuditor class including:
  * - Vulnerability detection patterns

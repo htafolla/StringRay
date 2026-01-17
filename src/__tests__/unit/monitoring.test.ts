@@ -1,5 +1,5 @@
 /**
- * StringRay AI v1.0.9 - Advanced Monitoring System Unit Tests
+ * StringRay AI v1.0.27 - Advanced Monitoring System Unit Tests
  *
  * Tests the real-time monitoring, anomaly detection, and alerting functionality.
  *

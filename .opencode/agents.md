@@ -10,7 +10,7 @@ The platform protects both investors and founders through smart contract-enforce
 
 ## Development Principles (StrRay Framework Integration)
 
-This project integrates with **StringRay AI v1.0.9**, which implements **Universal Development Codex v1.2.25** for systematic error prevention and code quality assurance.
+This project integrates with **StringRay AI v1.0.27**, which implements **Universal Development Codex v1.2.25** for systematic error prevention and code quality assurance.
 
 ### Default AI Model
 

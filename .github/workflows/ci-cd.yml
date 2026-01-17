@@ -8,14 +8,13 @@ on:
   workflow_dispatch:
 
 # Disable CodeQL for this workflow
-permissions:
-  security-events: none
-  actions: read
-  contents: read
+permissions: {}
 
 # Disable CodeQL
 env:
   CODEQL_ACTION_DISABLE: true
+  CODEQL_ACTION_FEATURE_MULTI_LANGUAGE: false
+  CODEQL_ACTION_FEATURE_SARIF_COMBINE: false
 
 jobs:
   test:

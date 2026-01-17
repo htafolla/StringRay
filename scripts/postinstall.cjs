@@ -481,71 +481,7 @@ function configureStrRayPlugin() {
     console.log("ℹ️ Test files not found (this is normal for some installations)");
   }
 
-  // Update paths in consumer scripts
-  console.log("Checking consumer scripts for path updates...");
-  const scriptsDir = path.join(process.cwd(), "node_modules", "strray-ai", "scripts");
-  if (fs.existsSync(scriptsDir)) {
-    console.log("Consumer scripts found, updating paths...");
-    let scriptsUpdated = 0;
-
-    function processScriptFile(filePath) {
-      try {
-        let content = fs.readFileSync(filePath, "utf-8");
-        let updated = false;
-
-        // Convert relative dist/ paths to node_modules/strray-ai/dist/ paths
-        if (content.includes('../dist/') || content.includes('./dist/') || content.includes('dist/')) {
-          // Convert '../dist/' paths
-          content = content.replace(/'\.\.\/dist\//g, "'./node_modules/strray-ai/dist/");
-          content = content.replace(/"\.\.\/dist\//g, '"./node_modules/strray-ai/dist/');
-          content = content.replace(/`\.\.\/dist\//g, "`./node_modules/strray-ai/dist/");
-
-          // Convert './dist/' paths
-          content = content.replace(/'\.\/dist\//g, "'./node_modules/strray-ai/dist/");
-          content = content.replace(/"\.\/dist\//g, '"./node_modules/strray-ai/dist/');
-          content = content.replace(/`\.\.\/dist\//g, "`./node_modules/strray-ai/dist/");
-
-          // Convert 'dist/' paths (relative to project root)
-          content = content.replace(/'dist\//g, "'./node_modules/strray-ai/dist/");
-          content = content.replace(/"dist\//g, '"./node_modules/strray-ai/dist/');
-          content = content.replace(/`dist\//g, "`./node_modules/strray-ai/dist/");
-
-          updated = true;
-        }
-
-        if (updated) {
-          fs.writeFileSync(filePath, content);
-          scriptsUpdated++;
-          console.log(`✅ Updated script file: ${path.relative(process.cwd(), filePath)}`);
-        }
-      } catch (error) {
-        console.warn(`Warning: Could not update script file ${filePath}:`, error.message);
-      }
-    }
-
-    function processScriptsDirectory(dirPath) {
-      const items = fs.readdirSync(dirPath);
-      for (const item of items) {
-        const fullPath = path.join(dirPath, item);
-        const stat = fs.statSync(fullPath);
-        if (stat.isDirectory()) {
-          processScriptsDirectory(fullPath);
-        } else if (item.endsWith('.js') || item.endsWith('.mjs') || item.endsWith('.ts')) {
-          processScriptFile(fullPath);
-        }
-      }
-    }
-
-    processScriptsDirectory(scriptsDir);
-
-    if (scriptsUpdated > 0) {
-      console.log(`✅ Updated ${scriptsUpdated} consumer scripts with correct paths`);
-    } else {
-      console.log("ℹ️ No script path updates needed");
-    }
-  } else {
-    console.log("ℹ️ Consumer scripts not found");
-  }
+  // Consumer scripts already have correct relative paths - no conversion needed
 
   // All configuration paths are now updated for consumer usage
 

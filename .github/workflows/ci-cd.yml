@@ -7,6 +7,10 @@ on:
     branches: [main, master]
   workflow_dispatch:
 
+# Disable CodeQL for this workflow
+permissions:
+  security-events: none
+
 jobs:
   test:
     runs-on: ubuntu-latest

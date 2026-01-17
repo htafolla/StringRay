@@ -6,7 +6,7 @@
     "global-filesystem": { "enabled": false },
     "global-git": { "enabled": false },
     "global-sqlite": { "enabled": false },
-    "grep_app": { "enabled": false }
+    "grep_app": { "enabled": false },
     "orchestrator": {
       "type": "local",
       "command": ["node", "dist/plugin/mcps/orchestrator.server.js"],

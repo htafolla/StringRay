@@ -429,7 +429,6 @@ function configureStrRayPlugin() {
   }
 
   // All configuration paths are now updated for consumer usage
-}
 
   console.log('🎉 StrRay plugin installation complete!');
   console.log(`\n📋 Next Steps:`);

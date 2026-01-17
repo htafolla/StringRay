@@ -14,9 +14,11 @@ import {
 // Environment-aware path configuration for cross-environment compatibility
 // From dist/mcps/ (built): ../../orchestrator/
 // From src/mcps/ (source): ../orchestrator/
+// From node_modules (installed): ../orchestrator/
 const ORCHESTRATOR_BASE_PATH =
   process.env.STRRAY_ORCHESTRATOR_PATH ||
-  (process.cwd().includes("/dist/") ? "../../orchestrator" : "../orchestrator");
+  (process.cwd().includes("node_modules") ? "../orchestrator" :
+   process.cwd().includes("/dist/") ? "../../orchestrator" : "../orchestrator");
 
 // Dynamic imports for cross-environment compatibility
 const { enhancedMultiAgentOrchestrator } = await import(

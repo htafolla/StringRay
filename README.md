@@ -13,7 +13,7 @@
 
 ⚡ StringRay ⚡ provides intelligent multi-agent coordination, codex-based code quality enforcement, and enterprise-grade development practices through oh-my-opencode integration. Eliminate spaghetti code, hallucinations, and code rot through systematic validation and intelligent agent delegation.
 
-> **📦 Current Version: 1.0.11** - Enterprise production release with automated postinstall configuration, MCP server integration, and comprehensive testing. Use `npm install strray-ai@latest` for installation.
+> **📦 Current Version: 1.0.27** - Enterprise production release with automated postinstall configuration, MCP server integration, and comprehensive testing. Use `npm install strray-ai@latest` for installation.
 
 ---
 
@@ -213,7 +213,7 @@ npm publish
 **Package Details:**
 
 - **Name**: `strray-ai`
-- **Version**: `1.0.11`
+- **Version**: `1.0.27`
 - **Size**: ~657KB (gzipped)
 - **Files**: 662 total (including all agents, MCP servers, validation scripts, and documentation)
 
@@ -634,7 +634,7 @@ Update your `.opencode/oh-my-opencode.json` for enterprise deployment:
   },
   "framework": {
     "name": "strray-ai",
-    "version": "1.0.11",
+    "version": "1.0.27",
     "performance_mode": "optimized",
     "monitoring_enabled": true,
     "plugin_security": "strict"

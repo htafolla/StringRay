@@ -16,6 +16,19 @@ import { StringRayOrchestrator } from "../orchestrator.js";
 import { ProcessorManager } from "../processors/processor-manager.js";
 import { StringRayStateManager } from "../state/state-manager.js";
 
+// Import StringRay agents
+import { architect } from "../agents/architect.js";
+import { bugTriageSpecialist } from "../agents/bug-triage-specialist.js";
+import { codeReviewer } from "../agents/code-reviewer.js";
+import { enforcer } from "../agents/enforcer.js";
+import { librarian } from "../agents/librarian.js";
+import { logMonitorAgent } from "../agents/log-monitor.js";
+import { orchestrator } from "../agents/orchestrator.js";
+import { refactorer } from "../agents/refactorer.js";
+import { securityAuditor } from "../agents/security-auditor.js";
+import { sisyphusAgent } from "../agents/sisyphus.js";
+import { testArchitect } from "../agents/test-architect.js";
+
 /**
  * Plugin configuration interface
  */
@@ -47,6 +60,8 @@ export default async function stringrayPlugin(input: {
   worktree?: string;
 }) {
   const { directory: projectDir = process.cwd() } = input;
+
+  console.log("🔧 StringRay Plugin: Loading StringRay agents...");
 
   // Load plugin configuration
   const config = loadPluginConfig(projectDir);
@@ -253,17 +268,54 @@ export default async function stringrayPlugin(input: {
           config.mcpAutoRegistration ? "ENABLED" : "DISABLED",
         );
 
-        if (config.mcpAutoRegistration) {
-          console.log(
-            "⚠️ MCP auto-registration is experimental due to oh-my-opencode limitations",
-          );
-        }
-      } catch (error) {
-        console.error("❌ StringRay Plugin initialization failed:", error);
-      }
-    },
-  };
-}
+         if (config.mcpAutoRegistration) {
+           console.log(
+             "⚠️ MCP auto-registration is experimental due to oh-my-opencode limitations",
+           );
+         }
+       } catch (error) {
+         console.error("❌ StringRay Plugin initialization failed:", error);
+       }
+     },
+
+     /**
+      * Register StringRay agents with oh-my-opencode
+      */
+     agents: {
+       "strray-orchestrator": orchestrator,
+       "strray-enhanced-orchestrator": orchestrator, // Use same orchestrator implementation
+       "strray-enforcer": enforcer,
+       "strray-architect": architect,
+       "strray-test-architect": testArchitect,
+       "strray-bug-triage-specialist": bugTriageSpecialist,
+       "strray-code-reviewer": codeReviewer,
+       "strray-security-auditor": securityAuditor,
+       "strray-refactorer": refactorer,
+       "strray-librarian": librarian,
+       "strray-log-monitor": logMonitorAgent,
+       "strray-sisyphus": sisyphusAgent,
+     },
+
+     // Log successful registration
+     onLoad: () => {
+       console.log("✅ StringRay Plugin: Agents registered successfully");
+       console.log("Available agents:", Object.keys({
+         "strray-orchestrator": orchestrator,
+         "strray-enhanced-orchestrator": orchestrator,
+         "strray-enforcer": enforcer,
+         "strray-architect": architect,
+         "strray-test-architect": testArchitect,
+         "strray-bug-triage-specialist": bugTriageSpecialist,
+         "strray-code-reviewer": codeReviewer,
+         "strray-security-auditor": securityAuditor,
+         "strray-refactorer": refactorer,
+         "strray-librarian": librarian,
+         "strray-log-monitor": logMonitorAgent,
+         "strray-sisyphus": sisyphusAgent,
+       }));
+     },
+   };
+ }
 
 /**
  * Load plugin configuration from project

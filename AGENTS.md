@@ -1,6 +1,6 @@
 # - Complete Agent Context & Universal Development Codex v1.2.25
 
-**Framework Version**: 1.0.27
+**Framework Version**: 1.1.0
 **Last Updated**: 2026-01-16 (Updated Architecture Documentation)
 **Purpose**: Enterprise AI orchestration with systematic error prevention and production-ready development
 
@@ -2346,17 +2346,17 @@ npm version major  # for breaking changes
 
 ```bash
 # Create release branch
-git checkout -b release/v1.0.27
+git checkout -b release/v1.1.0
 
 # Update version in all files
 # package.json, codex.json, AGENTS.md
 
 # Commit version changes
 git add .
-git commit -m "chore: release v1.0.27"
+git commit -m "chore: release v1.1.0"
 
 # Push to trigger CI/CD
-git push origin release/v1.0.27
+git push origin release/v1.1.0
 ```
 
 **3. Post-Release Validation:**
@@ -2430,17 +2430,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ```bash
 # After successful release
-git tag -a v1.0.27 -m "Release v1.0.27: CI/CD pipeline enhancements"
-git push origin v1.0.27
+git tag -a v1.1.0 -m "Release v1.1.0: CI/CD pipeline enhancements"
+git push origin v1.1.0
 
 # Verify tag
-git tag -l | grep v1.0.27
+git tag -l | grep v1.1.0
 ```
 
 #### Tag Naming Convention
 
 - **vMAJOR.MINOR.PATCH**: Standard semantic versioning
-- **Pre-releases**: v1.0.27-beta.1, v1.0.27-rc.1
+- **Pre-releases**: v1.1.0-beta.1, v1.1.0-rc.1
 - **Annotated tags**: Always use `-a` flag with message
 
 ### Deployment Documentation
@@ -2591,8 +2591,8 @@ npm version 1.0.5 --no-git-tag-version  # Reset to correct version
 npm publish strray-ai@1.0.5 --tag latest
 
 # 3. Update tags
-git tag -d v1.0.27
-git push origin :refs/tags/v1.0.27
+git tag -d v1.1.0
+git push origin :refs/tags/v1.1.0
 
 # 4. Revert commits if needed
 git revert <broken-commit>

@@ -1,5 +1,5 @@
 /**
- * StringRay AI v1.0.27 - Agent Delegator Unit Tests
+ * StringRay AI v1.1.0 - Agent Delegator Unit Tests
  *
  * Comprehensive unit tests for the AgentDelegator class to achieve 85%+ coverage.
  *

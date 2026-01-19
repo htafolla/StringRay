@@ -1,5 +1,5 @@
 /**
- * StringRay AI v1.0.27 - Delegation System
+ * StringRay AI v1.1.0 - Delegation System
  *
  * Complete automatic multi-agent delegation system with complexity assessment
  * and session-based coordination.

@@ -1,5 +1,5 @@
 /**
- * StringRay AI v1.0.27 - Cloud Infrastructure Schemas
+ * StringRay AI v1.1.0 - Cloud Infrastructure Schemas
  *
  * Schema definitions for cloud provider configurations, ensuring
  * enterprise-grade validation and compliance with Universal Development Codex v1.2.25.

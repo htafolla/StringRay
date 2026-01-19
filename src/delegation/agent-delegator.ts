@@ -1,5 +1,5 @@
 /**
- * StringRay AI v1.0.27 - Agent Delegator
+ * StringRay AI v1.1.0 - Agent Delegator
  *
  * Intelligent agent delegation system that uses complexity analysis to determine
  * optimal task distribution strategies and conflict resolution.

@@ -1,5 +1,5 @@
 /**
- * StringRay AI v1.0.27 - Codex Enforcement Integration Tests
+ * StringRay AI v1.1.0 - Codex Enforcement Integration Tests
  *
  * Tests that the codex enforcement actually blocks violations as designed.
  *

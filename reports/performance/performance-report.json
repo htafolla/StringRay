@@ -1,6 +1,6 @@
 {
   "timestamp": "2026-01-13T03:03:27.547Z",
-  "framework": "StrRay v1.0.27",
+  "framework": "StrRay v1.1.0",
   "totalTests": 4,
   "baselines": {
     "bundle-size-analysis": {

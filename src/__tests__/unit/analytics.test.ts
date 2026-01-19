@@ -1,5 +1,5 @@
 /**
- * StringRay AI v1.0.27 - Predictive Analytics Unit Tests
+ * StringRay AI v1.1.0 - Predictive Analytics Unit Tests
  *
  * Tests the agent performance analysis and task prediction functionality.
  *

@@ -22,7 +22,7 @@ const program = new Command();
 program
   .name('strray-ai')
   .description('⚡ StringRay ⚡: Bulletproof AI orchestration with systematic error prevention')
-  .version('1.0.27');
+  .version('1.1.0');
 
 program
   .command('install')

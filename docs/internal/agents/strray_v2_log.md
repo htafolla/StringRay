@@ -22423,7 +22423,7 @@ All changes have been committed and pushed to the remote repository. Here's a fi
 
 # 1. Copy critical template (REQUIRED)
 
-cp .opencode/agents_template.md .opencode/
+cp docs/framework/master-agent-template.md .opencode/agents.md # (documentation template)
 
 # 2. Initialize framework
 
@@ -22471,7 +22471,7 @@ Configuration Files:
   🎯 Recommendations for Your Project
   Immediate Actions:
 
-1. Copy the template: cp .opencode/agents_template.md .opencode/ (critical)
+1. Copy the template: cp docs/framework/master-agent-template.md .opencode/agents.md # (documentation template) (critical)
 2. Choose version: Start with Framework Lite for most teams
 3. Verify setup: Run bash .opencode/init.sh to confirm all components load
    For Production Use:

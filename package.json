@@ -3,14 +3,16 @@
   "version": "1.0.27",
   "description": "⚡ StringRay ⚡: Bulletproof AI orchestration with systematic error prevention. Zero dead ends. Ship clean, tested, optimized code — every time.",
   "type": "module",
-  "main": "./dist/plugin/index.js",
-  "types": "./dist/plugin/index.d.ts",
-  "oh-my-opencode": {
-    "plugin": "./dist/plugin/plugins/stringray-codex-injection.js"
-  },
+  "main": "./dist/plugin/plugins/stringray-codex-injection.js",
+  "types": "./dist/plugin/plugins/stringray-codex-injection.d.ts",
   "bin": {
-    "strray": "dist/cli/index.js"
+    "strray-ai": "./dist/cli/index.js"
   },
+    "oh-my-opencode": {
+      "plugin": "./dist/plugin/plugins/stringray-codex-injection.js",
+      "mcps": "./dist/plugin/mcps/"
+    },
+
   "scripts": {
     "build": "tsc",
     "build:all": "npm run build && npm run build:plugin",
@@ -18,45 +20,10 @@
     "clean": "rm -rf dist",
     "prepublishOnly": "npm run build:all",
     "postinstall": "node scripts/postinstall.cjs",
-    "ci-install": "npm ci --ignore-scripts && npm run postinstall",
-    "preinstall": "echo '🔧 Installing StringRay Framework dependencies...'",
-    "ci-monitor": "node scripts/github-actions-monitor.cjs",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "lint": "eslint src",
-    "lint:fix": "eslint src --fix",
-    "framework:init": "bash .opencode/init.sh",
-    "validate": "npm run lint && npm run typecheck && npm run test:all && npm run build",
-    "ci-report": "echo 'CI/CD health check passed'",
-    "test:performance": "vitest run src/__tests__/performance/",
-    "performance:report": "node scripts/performance-report.js",
-    "performance:gates": "node scripts/run-performance-gates.mjs",
-    "test:architect": "vitest run src/__tests__/agents/architect.test.ts src/__tests__/agents/test-architect.test.ts",
-    "test:e2e": "vitest run src/__tests__/integration/e2e-framework-integration.test.ts",
-    "test:path-resolution": "node scripts/test-comprehensive-path-resolution.mjs",
-    "test:plugin": "node scripts/test-stringray-plugin.mjs",
-    "test:orchestration": "vitest run src/__tests__/unit/orchestrator.test.ts src/__tests__/integration/orchestrator/",
-    "test:mcp-integration": "opencode mcp list && echo 'MCP servers verified'",
-    "test:mcp-connectivity": "node scripts/validation/validate-mcp-connectivity.js",
-    "test:oh-my-opencode-integration": "node scripts/validation/validate-oh-my-opencode-integration.js",
-    "test:postinstall-config": "node scripts/validation/validate-postinstall-config.js",
-    "test:external-processes": "node scripts/validation/validate-external-processes.js",
-    "test:comprehensive": "npm run test:mcp-connectivity && npm run test:oh-my-opencode-integration && npm run test:postinstall-config && npm run test:external-processes",
-    "test:all": "npm run test && npm run test:architect && npm run test:e2e && npm run test:path-resolution && npm run test:comprehensive",
-    "security-audit": "npm audit --audit-level moderate --production",
-    "test:ci": "CI=true npm test -- --run --reporter=json --no-coverage",
-    "test:coverage": "vitest run --coverage",
-    "test:npm-install": "./scripts/test-npm-install.sh",
-    "test:simple-npm": "./scripts/test-simple-npm.sh",
-    "test:security-audit": "node scripts/basic-security-audit.cjs",
-    "test:dependency-scan": "node scripts/dependency-scan.cjs",
-    "test:unit": "vitest run src/__tests__/unit/",
-    "test:integration": "vitest run src/__tests__/integration/",
-    "test:e2e-complete": "npm run test:e2e && node scripts/test-enforcement-e2e.mjs",
-    "test:simulation": "node scripts/run-simulations.mjs",
-    "test:monitoring": "node scripts/monitoring/monitoring-daemon.mjs",
-    "test:validation": "npm run test:mcp-connectivity && npm run test:oh-my-opencode-integration && node scripts/validate-codex.js",
-    "ci-fix": "node scripts/ci-cd-auto-fix.cjs"
+    "lint:fix": "eslint src --fix"
   },
   "keywords": [
     "ai",
@@ -110,38 +77,20 @@
   "files": [
     ".mcp.json",
     "opencode.json",
-    ".opencode/oh-my-opencode.json",
-    ".opencode/package.json",
-    ".opencode/README.md",
-    ".claude/.mcp.json",
-    "scripts/postinstall.cjs",
-    "scripts/test-consumer-validation.mjs",
-    "scripts/test-consumer-readiness.mjs",
-    "scripts/test-final-consumer-validation.mjs",
-    "scripts/test-framework-boot.mjs",
-    "scripts/test-mcp-functionality.mjs",
-    "scripts/test-postinstall-files.mjs",
-    "scripts/test-configuration-validation.mjs",
-    "scripts/test-*.mjs",
-    "scripts/test-*.sh",
-    "scripts/validation/",
-    "dist/cli",
-    "dist/plugin",
-    "dist/mcps",
-    "dist/agents",
-    "dist/orchestrator",
-    "dist/processors",
-    "dist/state",
-    "dist/utils",
-    "src/__tests__",
-    "README.md",
-    "LICENSE"
+    ".opencode/",
+    "dist/plugin/",
+    "scripts/postinstall.cjs"
   ],
   "exports": {
     ".": {
       "types": "./dist/plugin/index.d.ts",
       "import": "./dist/plugin/index.js"
     },
+    "./dist/plugin/orchestrator.js": "./dist/plugin/orchestrator.js",
+    "./dist/plugin/processors/processor-manager.js": "./dist/plugin/processors/processor-manager.js",
+    "./dist/plugin/state/state-manager.js": "./dist/plugin/state/state-manager.js",
+    "./dist/plugin/agents/index.js": "./dist/plugin/agents/index.js",
+    "./dist/plugin/*": "./dist/plugin/*",
     "./agents": {
       "types": "./dist/agents/index.d.ts",
       "import": "./dist/agents/index.js"

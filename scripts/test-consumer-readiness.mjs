@@ -17,7 +17,9 @@ const __dirname = path.dirname(__filename);
 class ConsumerReadinessCheck {
   constructor() {
     this.checks = [];
-    this.isConsumerEnvironment = __dirname.includes("node_modules/strray-ai");
+    // Check if we're running from a consumer environment (not the source directory)
+    const cwd = process.cwd();
+    this.isConsumerEnvironment = !cwd.includes("dev/stringray") && cwd.includes("dev/jelly");
   }
 
   async runChecks() {

@@ -12,17 +12,18 @@
     "skipLibCheck": true
   },
   "include": ["src/**/*.ts"],
-  "exclude": [
-    "node_modules",
-    "src/__tests__/**/*",
-    "src/**/*.test.ts",
-    "src/**/*.spec.ts",
-    "src/server/**/*",
-    "src/cli/**/*",
-    "src/dashboards/**/*",
-    "src/distributed/**/*",
-    "src/streaming/**/*",
-    "src/cross-language-bridge.ts",
-    "src/security/secure-authentication-system.ts"
-  ]
+   "exclude": [
+     "node_modules",
+     "src/__tests__/**/*",
+     "src/**/*.test.ts",
+     "src/**/*.spec.ts",
+     "src/server/**/*",
+     "src/cli/**/*",
+     "src/dashboards/**/*",
+     "src/distributed/**/*",
+     "src/streaming/**/*",
+     "src/cross-language-bridge.ts",
+     "src/security/secure-authentication-system.ts",
+     "src/agents/**/*"
+   ]
 }

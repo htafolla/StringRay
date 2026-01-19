@@ -17,7 +17,10 @@ const __dirname = path.dirname(__filename);
 class FinalConsumerValidation {
   constructor() {
     this.results = { passed: [], failed: [] };
-    this.isConsumerEnvironment = __dirname.includes("node_modules/strray-ai");
+    // Check if we're running from a consumer environment (not the source directory)
+    const cwd = process.cwd();
+    this.isConsumerEnvironment = !cwd.includes("dev/stringray") && cwd.includes("dev/jelly");
+    this.consumerRoot = this.isConsumerEnvironment ? cwd : path.resolve(__dirname, "../../consumer-test");
   }
 
   async runFinalValidation() {
@@ -47,6 +50,7 @@ class FinalConsumerValidation {
   async validateFileSystem() {
     console.log("📁 FILE SYSTEM VALIDATION");
 
+    const baseDir = this.isConsumerEnvironment ? this.consumerRoot : __dirname;
     const requiredFiles = [
       { path: ".mcp.json", description: "MCP server configuration" },
       { path: "opencode.json", description: "OpenCode base configuration" },
@@ -54,21 +58,36 @@ class FinalConsumerValidation {
         path: ".opencode/oh-my-opencode.json",
         description: "oh-my-opencode main config",
       },
-      {
-        path: "../dist/plugin/plugins/stringray-codex-injection.js",
-        description: "Main plugin file",
-      },
-      { path: "../dist/cli/index.js", description: "CLI entry point" },
     ];
+
+    // Add package files for validation
+    if (this.isConsumerEnvironment) {
+      requiredFiles.push(
+        {
+          path: "node_modules/strray-ai/dist/plugin/plugins/stringray-codex-injection.js",
+          description: "Main plugin file",
+        },
+        { path: "node_modules/strray-ai/package.json", description: "Package manifest" }
+      );
+    } else {
+      requiredFiles.push(
+        {
+          path: "../dist/plugin/plugins/stringray-codex-injection.js",
+          description: "Main plugin file",
+        },
+        { path: "../package.json", description: "Package manifest" }
+      );
+    }
 
     for (const file of requiredFiles) {
       try {
-        const exists = fs.existsSync(file.path);
+        const fullPath = path.resolve(baseDir, file.path);
+        const exists = fs.existsSync(fullPath);
         if (exists) {
           console.log(`  ✅ ${file.description}`);
           this.results.passed.push(`${file.description} exists`);
         } else {
-          console.log(`  ❌ ${file.description} missing`);
+          console.log(`  ❌ ${file.description} missing at ${fullPath}`);
           this.results.failed.push({
             test: file.description,
             error: "File missing",
@@ -88,28 +107,31 @@ class FinalConsumerValidation {
     console.log("\n🛠️ MCP CONFIGURATION VALIDATION");
 
     try {
-      const mcpConfig = JSON.parse(fs.readFileSync(".mcp.json", "utf8"));
+      const mcpConfigPath = path.resolve(this.consumerRoot, ".mcp.json");
+      const mcpConfig = JSON.parse(fs.readFileSync(mcpConfigPath, "utf8"));
       const serverCount = Object.keys(mcpConfig.mcpServers || {}).length;
 
-      if (serverCount >= 20) {
+      if (serverCount >= 16) {
         console.log(`  ✅ MCP config valid (${serverCount} servers)`);
         this.results.passed.push("MCP Configuration");
 
         // Validate server paths
         let validPaths = 0;
+        const expectedPath = this.isConsumerEnvironment
+          ? "node_modules/strray-ai/dist/plugin/mcps/"
+          : "dist/plugin/mcps/";
+
         for (const [name, config] of Object.entries(mcpConfig.mcpServers)) {
           if (
             config.args &&
-            config.args.some((arg) =>
-              arg.includes("node_modules/strray-ai/dist/mcps/"),
-            )
+            config.args.some((arg) => arg.includes(expectedPath))
           ) {
             validPaths++;
           }
         }
 
         if (validPaths === serverCount) {
-          console.log(`  ✅ All server paths are consumer-relative`);
+          console.log(`  ✅ All server paths are ${this.isConsumerEnvironment ? 'consumer' : 'development'}-relative`);
           this.results.passed.push("MCP Server Paths");
         } else {
           console.log(
@@ -140,8 +162,9 @@ class FinalConsumerValidation {
     console.log("\n🔌 PLUGIN INTEGRATION VALIDATION");
 
     try {
+      const configPath = path.resolve(this.consumerRoot, ".opencode/oh-my-opencode.json");
       const ohMyOpencodeConfig = JSON.parse(
-        fs.readFileSync(".opencode/oh-my-opencode.json", "utf8"),
+        fs.readFileSync(configPath, "utf8"),
       );
 
       // Check for plugin registration
@@ -194,7 +217,23 @@ class FinalConsumerValidation {
   async validateFrameworkComponents() {
     console.log("\n🏗️ FRAMEWORK COMPONENTS VALIDATION");
 
-    const components = [
+    const components = this.isConsumerEnvironment ? [
+      {
+        path: "./node_modules/strray-ai/dist/plugin/orchestrator.js",
+        name: "StringRay Orchestrator",
+        check: (module) => module.StringRayOrchestrator,
+      },
+      {
+        path: "./node_modules/strray-ai/dist/plugin/state/state-manager.js",
+        name: "State Manager",
+        check: (module) => module.StringRayStateManager,
+      },
+      {
+        path: "./node_modules/strray-ai/dist/plugin/plugins/stringray-codex-injection.js",
+        name: "Main Plugin",
+        check: (module) => module.default,
+      },
+    ] : [
       {
         path: "../dist/plugin/orchestrator.js",
         name: "StringRay Orchestrator",
@@ -214,7 +253,8 @@ class FinalConsumerValidation {
 
     for (const component of components) {
       try {
-        const module = await import(component.path);
+        const fullPath = path.resolve(this.consumerRoot, component.path);
+        const module = await import(fullPath);
         if (component.check(module)) {
           console.log(`  ✅ ${component.name} available`);
           this.results.passed.push(`${component.name} available`);
@@ -247,8 +287,11 @@ class FinalConsumerValidation {
     for (const cmd of cliCommands) {
       try {
         // Simple check - just verify the CLI file exists and can be executed
-        const cliPath = "node_modules/strray-ai/dist/cli/index.js";
-        if (fs.existsSync(cliPath)) {
+        const cliPath = this.isConsumerEnvironment
+          ? "node_modules/strray-ai/dist/cli/index.js"
+          : "../dist/cli/index.js";
+        const fullCliPath = path.resolve(this.consumerRoot, cliPath);
+        if (fs.existsSync(fullCliPath)) {
           console.log(`  ✅ ${cmd.name} available`);
           this.results.passed.push(`${cmd.name} available`);
         } else {

@@ -72,7 +72,7 @@ describe("StringRay Framework Initialization Integration", () => {
     test("should validate core directory structure", () => {
       expect(checkDir(".opencode")).toBe(true);
       expect(checkDir(".opencode/agents")).toBe(true);
-      expect(checkDir(".opencode/mcps")).toBe(true);
+      expect(checkDir("dist/plugin/mcps")).toBe(true);
       expect(checkDir(".opencode/logs")).toBe(true);
       expect(checkDir("src")).toBe(true);
       expect(checkDir(".strray")).toBe(true);
@@ -240,26 +240,17 @@ describe("StringRay Framework Initialization Integration", () => {
 
   describe("MCP Ecosystem Validation", () => {
     test("should validate MCP server configurations", () => {
-      expect(checkDir(".opencode/mcps")).toBe(true);
-
-      const mcpFiles = fs.readdirSync(".opencode/mcps");
-      const jsonFiles = mcpFiles.filter((f) => f.endsWith(".mcp.json"));
-      expect(jsonFiles.length).toBeGreaterThanOrEqual(11); // At least 11 MCP configs
-
-      // Validate MCP config structure
-      jsonFiles.forEach((file) => {
-        const config = JSON.parse(
-          fs.readFileSync(path.join(".opencode/mcps", file), "utf8"),
-        );
-        expect(config).toHaveProperty("mcpServers");
-        expect(typeof config.mcpServers).toBe("object");
-        // At least one MCP server should be defined
-        expect(Object.keys(config.mcpServers).length).toBeGreaterThan(0);
-      });
+      // Check that the root .mcp.json exists and has proper structure
+      expect(checkJson(".mcp.json")).toBe(true);
+      const config = JSON.parse(fs.readFileSync(".mcp.json", "utf8"));
+      expect(config).toHaveProperty("mcpServers");
+      expect(typeof config.mcpServers).toBe("object");
+      expect(Object.keys(config.mcpServers).length).toBeGreaterThan(10); // At least 10 MCP servers
     });
 
     test("should validate compiled MCP servers", () => {
-      const mcpFiles = fs.readdirSync(".opencode/mcps");
+      expect(checkDir("dist/plugin/mcps")).toBe(true);
+      const mcpFiles = fs.readdirSync("dist/plugin/mcps");
       const serverFiles = mcpFiles.filter((f) => f.endsWith(".server.js"));
       expect(serverFiles.length).toBeGreaterThanOrEqual(11); // At least 11 MCP servers
     });
@@ -302,7 +293,7 @@ describe("StringRay Framework Initialization Integration", () => {
       const requiredDirs = [
         ".opencode",
         ".opencode/agents",
-        ".opencode/mcps",
+        "dist/plugin/mcps",
         ".opencode/logs",
         ".strray",
         "src",

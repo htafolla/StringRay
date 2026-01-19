@@ -90,7 +90,15 @@ class StrRayStateManagerServer {
               type: "object",
               properties: {
                 key: { type: "string" },
-                defaultValue: { type: "any" },
+                defaultValue: {
+                  oneOf: [
+                    { type: "string" },
+                    { type: "number" },
+                    { type: "boolean" },
+                    { type: "object" },
+                    { type: "array" }
+                  ]
+                },
                 validate: { type: "boolean", default: true },
               },
               required: ["key"],
@@ -104,7 +112,15 @@ class StrRayStateManagerServer {
               type: "object",
               properties: {
                 key: { type: "string" },
-                value: { type: "any" },
+                value: {
+                  oneOf: [
+                    { type: "string" },
+                    { type: "number" },
+                    { type: "boolean" },
+                    { type: "object" },
+                    { type: "array" }
+                  ]
+                },
                 persist: { type: "boolean", default: true },
                 backup: { type: "boolean", default: false },
               },

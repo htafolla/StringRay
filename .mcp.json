@@ -2,75 +2,67 @@
   "mcpServers": {
     "librarian": {
       "command": "node",
-      "args": ["dist/plugin/mcps/knowledge-skills/project-analysis.server.js"]
+      "args": ["node_modules/strray-ai/dist/plugin/mcps/knowledge-skills/project-analysis.server.js"]
     },
     "session-management": {
       "command": "node",
-      "args": [".opencode/mcps/session-management.server.js"]
+      "args": ["node_modules/strray-ai/dist/plugin/mcps/state-manager.server.js"]
     },
     "orchestrator": {
       "command": "node",
-      "args": ["dist/plugin/mcps/orchestrator.server.js"]
+      "args": ["node_modules/strray-ai/dist/plugin/mcps/orchestrator.server.js"]
     },
     "enhanced-orchestrator": {
       "command": "node",
-      "args": ["dist/plugin/mcps/enhanced-orchestrator.server.js"]
+      "args": ["node_modules/strray-ai/dist/plugin/mcps/enhanced-orchestrator.server.js"]
     },
     "enforcer": {
       "command": "node",
-      "args": ["dist/plugin/mcps/enforcer-tools.server.js"]
+      "args": ["node_modules/strray-ai/dist/plugin/mcps/enforcer-tools.server.js"]
     },
     "api-design": {
       "command": "node",
-      "args": ["dist/plugin/mcps/knowledge-skills/api-design.server.js"]
+      "args": ["node_modules/strray-ai/dist/plugin/mcps/knowledge-skills/api-design.server.js"]
     },
     "architecture-patterns": {
       "command": "node",
-      "args": [
-        "dist/plugin/mcps/knowledge-skills/architecture-patterns.server.js"
-      ]
+      "args": ["node_modules/strray-ai/dist/plugin/mcps/knowledge-skills/architecture-patterns.server.js"]
     },
     "git-workflow": {
       "command": "node",
-      "args": ["dist/plugin/mcps/knowledge-skills/git-workflow.server.js"]
+      "args": ["node_modules/strray-ai/dist/plugin/mcps/knowledge-skills/git-workflow.server.js"]
     },
     "performance-optimization": {
       "command": "node",
-      "args": [
-        "dist/plugin/mcps/knowledge-skills/performance-optimization.server.js"
-      ]
+      "args": ["node_modules/strray-ai/dist/plugin/mcps/knowledge-skills/performance-optimization.server.js"]
     },
     "project-analysis": {
       "command": "node",
-      "args": ["dist/plugin/mcps/knowledge-skills/project-analysis.server.js"]
+      "args": ["node_modules/strray-ai/dist/plugin/mcps/knowledge-skills/project-analysis.server.js"]
     },
     "testing-strategy": {
       "command": "node",
-      "args": ["dist/plugin/mcps/knowledge-skills/testing-strategy.server.js"]
+      "args": ["node_modules/strray-ai/dist/plugin/mcps/knowledge-skills/testing-strategy.server.js"]
     },
     "code-review": {
       "command": "node",
-      "args": ["dist/plugin/mcps/knowledge-skills/code-review.server.js"]
+      "args": ["node_modules/strray-ai/dist/plugin/mcps/knowledge-skills/code-review.server.js"]
     },
     "security-audit": {
       "command": "node",
-      "args": ["dist/plugin/mcps/knowledge-skills/security-audit.server.js"]
+      "args": ["node_modules/strray-ai/dist/plugin/mcps/knowledge-skills/security-audit.server.js"]
     },
     "ui-ux-design": {
       "command": "node",
-      "args": ["dist/plugin/mcps/knowledge-skills/ui-ux-design.server.js"]
+      "args": ["node_modules/strray-ai/dist/plugin/mcps/knowledge-skills/ui-ux-design.server.js"]
     },
     "refactoring-strategies": {
       "command": "node",
-      "args": [
-        "dist/plugin/mcps/knowledge-skills/refactoring-strategies.server.js"
-      ]
+      "args": ["node_modules/strray-ai/dist/plugin/mcps/knowledge-skills/refactoring-strategies.server.js"]
     },
     "testing-best-practices": {
       "command": "node",
-      "args": [
-        "dist/plugin/mcps/knowledge-skills/testing-best-practices.server.js"
-      ]
+      "args": ["node_modules/strray-ai/dist/plugin/mcps/knowledge-skills/testing-best-practices.server.js"]
     }
   }
 }

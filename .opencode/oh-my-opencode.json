@@ -4,11 +4,9 @@
     "../node_modules/strray-ai/dist/plugin/plugins/stringray-codex-injection.js"
   ],
   "disabled_agents": [
-    "sisyphus",
-    "build",
-    "plan",
-    "Planner-Sisyphus",
-    "OpenCode-Builder"
+    "Sisyphus",
+    "oracle",
+    "librarian"
   ],
   "sisyphus_agent": {
     "disabled": true

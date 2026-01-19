@@ -18,7 +18,10 @@ const __dirname = path.dirname(__filename);
 class FrameworkBootTest {
   constructor() {
     this.results = { passed: [], failed: [] };
-    this.isConsumerEnvironment = __dirname.includes("node_modules/strray-ai");
+    // Check if we're running from a consumer environment (not the source directory)
+    const cwd = process.cwd();
+    this.isConsumerEnvironment = !cwd.includes("dev/stringray") && cwd.includes("dev/jelly");
+    this.consumerRoot = cwd; // The current working directory is the consumer root
   }
 
   async testFrameworkBoot() {
@@ -44,10 +47,12 @@ class FrameworkBootTest {
   async testOrchestratorImport() {
     console.log("\n🔧 Testing Orchestrator Import...");
 
-    try {
-      const { StringRayOrchestrator } =
-        await import("../dist/plugin/orchestrator.js");
-      const orchestrator = new StringRayOrchestrator({ maxConcurrentTasks: 1 });
+      try {
+        const orchestratorPath = this.isConsumerEnvironment
+          ? "./node_modules/strray-ai/dist/plugin/orchestrator.js"
+          : "../dist/plugin/orchestrator.js";
+        const { StringRayOrchestrator } = await import(orchestratorPath);
+        const orchestrator = new StringRayOrchestrator({ maxConcurrentTasks: 1 });
 
       if (
         orchestrator &&
@@ -74,10 +79,12 @@ class FrameworkBootTest {
   async testStateManagerImport() {
     console.log("\n💾 Testing State Manager Import...");
 
-    try {
-      const { StringRayStateManager } =
-        await import("../dist/plugin/state/state-manager.js");
-      const stateManager = new StringRayStateManager();
+      try {
+        const stateManagerPath = this.isConsumerEnvironment
+          ? "./node_modules/strray-ai/dist/plugin/state/state-manager.js"
+          : "../dist/plugin/state/state-manager.js";
+        const { StringRayStateManager } = await import(stateManagerPath);
+        const stateManager = new StringRayStateManager();
 
       if (stateManager && typeof stateManager.get === "function") {
         console.log(

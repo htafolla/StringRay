@@ -31,10 +31,10 @@ beforeAll(() => {
   const requiredDirs = [
     ".opencode",
     ".opencode/agents",
-    ".opencode/mcps",
     ".opencode/logs",
     ".strray",
     "src",
+    "dist/plugin/mcps",
   ];
 
   requiredDirs.forEach((dir) => {

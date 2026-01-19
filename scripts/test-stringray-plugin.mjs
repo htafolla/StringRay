@@ -64,9 +64,9 @@ console.log("Script location:", import.meta.url);
 (async () => {
   try {
     // Import the plugin using relative path for consumer compatibility
-    const { default: stringrayCodexPlugin } =
-      await import("../dist/plugin/plugins/strray-codex-injection.js");
-    const plugin = await stringrayCodexPlugin({});
+    const { stringrayPlugin } =
+      await import("../dist/plugin/plugins/stringray-codex-injection.js");
+    const plugin = stringrayPlugin({});
     console.log("✅ Plugin loaded successfully");
 
     // Test the system transform hook

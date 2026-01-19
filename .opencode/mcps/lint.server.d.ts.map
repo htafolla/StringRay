@@ -1,1 +1,0 @@
-{"version":3,"file":"lint.server.d.ts","sourceRoot":"","sources":["../../src/mcps/lint.server.ts"],"names":[],"mappings":"AAAA;;;;GAIG;AAWH,cAAM,gBAAgB;IACpB,OAAO,CAAC,MAAM,CAAS;;IAYvB,OAAO,CAAC,iBAAiB;YAsEX,UAAU;YAwDV,eAAe;YAuCf,SAAS;YAyHT,cAAc;IAmD5B,OAAO,CAAC,mBAAmB;IAWrB,GAAG;CAKV;AAQD,OAAO,EAAE,gBAAgB,EAAE,CAAC"}

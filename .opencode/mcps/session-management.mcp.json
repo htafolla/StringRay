@@ -1,8 +1,0 @@
-{
-  "mcpServers": {
-    "session-management": {
-      "command": "node",
-      "args": ["mcps/session-management.server.js"]
-    }
-  }
-}

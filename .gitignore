@@ -285,6 +285,7 @@ dynamodb/
 .opencode/mcps/*
 !.opencode/mcps/
 !.opencode/mcps/.gitkeep
+.opencode/state
 .opencode/.pytest_cache/
 .opencode/__pycache__/
 .strray/.pytest_cache/

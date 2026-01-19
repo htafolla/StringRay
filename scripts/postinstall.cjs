@@ -5,25 +5,31 @@ console.log("🎉 StringRay plugin installed!");
 console.log("Setting up configuration files...");
 
 // Copy config files and .opencode directory from package to project
-const requiredFiles = ['.mcp.json', 'opencode.json'];
+const requiredFiles = ['.mcp.json', 'opencode.json', 'codex.codex'];
 const requiredDirs = ['.opencode'];
 const packageDir = path.dirname(__dirname);
 const projectDir = path.dirname(path.dirname(path.dirname(__dirname))); // Go up three levels to project root
 
 let filesCopied = 0;
 
+// Ensure .opencode directory exists
+const opencodeDir = path.join(projectDir, '.opencode');
+if (!fs.existsSync(opencodeDir)) {
+  fs.mkdirSync(opencodeDir, { recursive: true });
+}
+
 // Copy individual files
 for (const file of requiredFiles) {
-  const sourcePath = path.join(packageDir, file);
+  let sourcePath = path.join(packageDir, file);
   let destPath = path.join(projectDir, file);
 
-  // Special handling for opencode.json - place it in .opencode/oh-my-opencode.json
+  // Special handling for files in .opencode directory
   if (file === 'opencode.json') {
-    const opencodeDir = path.join(projectDir, '.opencode');
-    if (!fs.existsSync(opencodeDir)) {
-      fs.mkdirSync(opencodeDir, { recursive: true });
-    }
+    sourcePath = path.join(packageDir, '.opencode', 'oh-my-opencode.json');
     destPath = path.join(opencodeDir, 'oh-my-opencode.json');
+  } else if (file === 'codex.codex') {
+    sourcePath = path.join(packageDir, '.opencode', 'codex.codex');
+    destPath = path.join(opencodeDir, 'codex.codex');
   }
 
   // Copy file, overwriting if it exists
@@ -94,6 +100,43 @@ for (const dir of requiredDirs) {
   } else {
     console.error(`❌ Source directory missing: ${dir}`);
     process.exit(1);
+  }
+}
+
+// Create symlink to .strray directory for persistent state
+const strraySource = path.join(packageDir, '.strray');
+const strrayDest = path.join(projectDir, '.strray');
+
+if (fs.existsSync(strraySource) && !fs.existsSync(strrayDest)) {
+  try {
+    fs.symlinkSync(strraySource, strrayDest, 'dir');
+    console.log(`✅ .strray directory symlinked`);
+    filesCopied++;
+  } catch (error) {
+    console.error(`❌ Failed to symlink .strray:`, error.message);
+    // Fallback: copy the directory
+    try {
+      function copyDir(src, dest) {
+        if (!fs.existsSync(dest)) {
+          fs.mkdirSync(dest, { recursive: true });
+        }
+        const entries = fs.readdirSync(src, { withFileTypes: true });
+        for (const entry of entries) {
+          const srcPath = path.join(src, entry.name);
+          const destPath = path.join(dest, entry.name);
+          if (entry.isDirectory()) {
+            copyDir(srcPath, destPath);
+          } else {
+            fs.copyFileSync(srcPath, destPath);
+          }
+        }
+      }
+      copyDir(strraySource, strrayDest);
+      console.log(`✅ .strray directory copied (fallback)`);
+      filesCopied++;
+    } catch (copyError) {
+      console.error(`❌ Failed to copy .strray:`, copyError.message);
+    }
   }
 }
 

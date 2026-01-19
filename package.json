@@ -78,8 +78,12 @@
     ".mcp.json",
     "opencode.json",
     ".opencode/",
+    ".strray/",
     "dist/plugin/",
     "scripts/postinstall.cjs"
+  ],
+  "exclude": [
+    ".opencode/state"
   ],
   "exports": {
     ".": {

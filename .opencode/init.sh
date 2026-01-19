@@ -94,9 +94,9 @@ log "🔧 Automation hooks: $HOOKS_LOADED loaded, $HOOKS_MISSING missing"
 log "🧠 MCP skills: $MCPS_LOADED loaded, $MCPS_MISSING missing"
 log "🤖 Agent configs: $AGENTS_LOADED loaded, $AGENTS_MISSING missing"
     # Check codex system status (old style with emojis)
-    if [ -f "$PROJECT_ROOT/.strray/codex.json" ]; then
-        CODEX_VERSION=$(grep '"version"' "$PROJECT_ROOT/.strray/codex.json" | head -1 | sed 's/.*"version": *"\([^"]*\)".*/\1/')
-        log "📚 Codex system: ✅ Universal Development Codex v${CODEX_VERSION:-1.2.20}"
+    if [ -f "$PROJECT_ROOT/.opencode/codex.codex" ]; then
+        CODEX_VERSION=$(grep '"version"' "$PROJECT_ROOT/.opencode/codex.codex" | head -1 | sed 's/.*"version": *"\([^"]*\)".*/\1/')
+        log "📚 Codex system: ✅ Universal Development Codex v${CODEX_VERSION:-1.2.25}"
     else
         log "📚 Codex system: ❌ Codex file missing"
     fi
@@ -124,7 +124,7 @@ sleep 1
 log "🚀 INIT Initializing boot sequence..."
 sleep 1
 
-if command -v node &> /dev/null && [ -f "$PROJECT_ROOT/src/boot-orchestrator.ts" ]; then
+if command -v node &> /dev/null && ([ -f "$PROJECT_ROOT/src/boot-orchestrator.ts" ] || [ -f "$PROJECT_ROOT/node_modules/strray-ai/src/boot-orchestrator.ts" ] || [ -f "$PROJECT_ROOT/node_modules/strray-ai/dist/plugin/boot-orchestrator.js" ]); then
     log "⚙️ BootOrchestrator: orchestrator-first initiated"
     sleep 0.5
     log "🔄 BootOrchestrator: session management activated"

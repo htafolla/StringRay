@@ -1,8 +1,0 @@
-{
-  "mcpServers": {
-    "refactorer": {
-      "command": "node",
-      "args": ["mcps/refactorer.server.js"]
-    }
-  }
-}

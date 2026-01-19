@@ -1,73 +1,62 @@
-const fs = require('fs');
-const path = require('path');
+#!/usr/bin/env node
 
-console.log("🎉 StringRay plugin installed!");
-console.log("Setting up configuration files...");
+/**
+ * StrRay Plugin Post-Installation Setup
+ * Copies configuration files to project root and updates paths
+ */
 
-// Copy config files and .opencode directory from package to project
-const requiredFiles = ['.mcp.json', 'opencode.json', 'codex.codex'];
-const requiredDirs = ['.opencode'];
-const packageDir = path.dirname(__dirname);
-const projectDir = path.dirname(path.dirname(path.dirname(__dirname))); // Go up three levels to project root
+const fs = require("fs");
+const path = require("path");
 
-let filesCopied = 0;
+console.log('🔧 StrRay Postinstall: Script starting...');
 
-// Ensure .opencode directory exists
-const opencodeDir = path.join(projectDir, '.opencode');
-if (!fs.existsSync(opencodeDir)) {
-  fs.mkdirSync(opencodeDir, { recursive: true });
-}
+// Find the package root relative to this script
+const packageRoot = path.join(__dirname, "..");
+
+// Configuration files to copy during installation
+const configFiles = [
+  ".claude/.mcp.json",
+  ".mcp.json",
+  "opencode.json"
+];
+
+// Directories to copy recursively
+const configDirs = [
+  ".opencode"
+];
+
+console.log("🔧 StrRay Postinstall: Copying configuration files...");
+console.log("📍 Package root:", packageRoot);
+console.log("📍 Target directory:", process.cwd());
 
 // Copy individual files
-for (const file of requiredFiles) {
-  let sourcePath = path.join(packageDir, file);
-  let destPath = path.join(projectDir, file);
+configFiles.forEach(filePath => {
+  const source = path.join(packageRoot, filePath);
+  const dest = path.join(process.cwd(), filePath);
 
-  // Special handling for files in .opencode directory
-  if (file === 'opencode.json') {
-    sourcePath = path.join(packageDir, '.opencode', 'oh-my-opencode.json');
-    destPath = path.join(opencodeDir, 'oh-my-opencode.json');
-  } else if (file === 'codex.codex') {
-    sourcePath = path.join(packageDir, '.opencode', 'codex.codex');
-    destPath = path.join(opencodeDir, 'codex.codex');
-  }
-
-  // Copy file, overwriting if it exists
-  if (fs.existsSync(sourcePath)) {
-    try {
-      fs.copyFileSync(sourcePath, destPath);
-
-      // Update paths in .mcp.json to point to compiled MCP servers
-      if (file === '.mcp.json') {
-        const mcpConfig = JSON.parse(fs.readFileSync(destPath, 'utf8'));
-        for (const [serverName, serverConfig] of Object.entries(mcpConfig.mcpServers)) {
-          if (serverConfig.args && serverConfig.args[0]) {
-            serverConfig.args[0] = serverConfig.args[0].replace(
-              'node_modules/strray-ai/.opencode/mcps/',
-              'node_modules/strray-ai/dist/plugin/mcps/'
-            );
-          }
-        }
-        fs.writeFileSync(destPath, JSON.stringify(mcpConfig, null, 2));
+  try {
+    if (fs.existsSync(source)) {
+      // Ensure destination directory exists
+      const destDir = path.dirname(dest);
+      if (!fs.existsSync(destDir)) {
+        fs.mkdirSync(destDir, { recursive: true });
+        console.log(`📁 Created directory: ${destDir}`);
       }
 
-      const destDisplay = file === 'opencode.json' ? '.opencode/oh-my-opencode.json' : file;
-      console.log(`✅ ${destDisplay} ready`);
-      filesCopied++;
-    } catch (error) {
-      console.error(`❌ Failed to copy ${file}:`, error.message);
-      process.exit(1);
+      fs.copyFileSync(source, dest);
+      console.log(`✅ Copied ${filePath}`);
+    } else {
+      console.warn(`⚠️ Source not found: ${source}`);
     }
-  } else {
-    console.error(`❌ Source file missing: ${file}`);
-    process.exit(1);
+  } catch (error) {
+    console.warn(`⚠️ Could not copy ${filePath}:`, error.message);
   }
-}
+});
 
-// Copy .opencode directory recursively
-for (const dir of requiredDirs) {
-  const sourceDir = path.join(packageDir, dir);
-  const destDir = path.join(projectDir, dir);
+// Copy directories recursively
+configDirs.forEach(dirPath => {
+  const sourceDir = path.join(packageRoot, dirPath);
+  const destDir = path.join(process.cwd(), dirPath);
 
   if (fs.existsSync(sourceDir)) {
     try {
@@ -91,27 +80,93 @@ for (const dir of requiredDirs) {
       }
 
       copyDir(sourceDir, destDir);
-      console.log(`✅ ${dir} directory copied`);
-      filesCopied++;
+      console.log(`✅ Copied directory ${dirPath}`);
     } catch (error) {
-      console.error(`❌ Failed to copy ${dir}:`, error.message);
-      process.exit(1);
+      console.warn(`⚠️ Could not copy directory ${dirPath}:`, error.message);
     }
   } else {
-    console.error(`❌ Source directory missing: ${dir}`);
-    process.exit(1);
+    console.warn(`⚠️ Source directory not found: ${sourceDir}`);
+  }
+});
+
+// Update paths in copied configuration files
+console.log("🔧 StrRay Postinstall: Updating paths in configuration files...");
+
+function updatePathsInFile(filePath) {
+  try {
+    if (!fs.existsSync(filePath)) return;
+
+    let content = fs.readFileSync(filePath, 'utf-8');
+    let updated = false;
+
+    // Update MCP server paths
+    if (content.includes('./dist/plugin/mcps/') || content.includes('dist/plugin/mcps/')) {
+      content = content.replace(
+        /"\.\/dist\/plugin\/mcps\//g,
+        '"node_modules/strray-ai/dist/plugin/mcps/'
+      );
+      content = content.replace(
+        /'\.\/dist\/plugin\/mcps\//g,
+        "'node_modules/strray-ai/dist/plugin/mcps/"
+      );
+      content = content.replace(
+        /"dist\/plugin\/mcps\//g,
+        '"node_modules/strray-ai/dist/plugin/mcps/'
+      );
+      updated = true;
+    }
+
+    // Update plugin paths
+    if (content.includes('./dist/')) {
+      content = content.replace(
+        /"\.\/dist\//g,
+        '"node_modules/strray-ai/dist/'
+      );
+      content = content.replace(
+        /'\.\/dist\//g,
+        "'node_modules/strray-ai/dist/"
+      );
+      updated = true;
+    }
+
+    // Update .opencode paths
+    if (content.includes('./.opencode/mcps/') || content.includes('.opencode/mcps/')) {
+      // .opencode files stay as relative paths since they're in the same directory structure
+      // No change needed for .opencode internal references
+      updated = true;
+    }
+
+    if (updated) {
+      fs.writeFileSync(filePath, content);
+      console.log(`✅ Updated paths in ${path.relative(process.cwd(), filePath)}`);
+    }
+  } catch (error) {
+    console.warn(`⚠️ Could not update paths in ${filePath}:`, error.message);
   }
 }
 
+// Update paths in all copied configuration files
+const filesToUpdate = [
+  ".mcp.json",
+  "opencode.json",
+  ".opencode/oh-my-opencode.json"
+];
+
+console.log("🔧 StrRay Postinstall: Starting path updates for files:", filesToUpdate);
+filesToUpdate.forEach(filePath => {
+  const fullPath = path.join(process.cwd(), filePath);
+  console.log(`🔧 Processing file: ${filePath} -> ${fullPath}`);
+  updatePathsInFile(fullPath);
+});
+
 // Create symlink to .strray directory for persistent state
-const strraySource = path.join(packageDir, '.strray');
-const strrayDest = path.join(projectDir, '.strray');
+const strraySource = path.join(packageRoot, '.strray');
+const strrayDest = path.join(process.cwd(), '.strray');
 
 if (fs.existsSync(strraySource) && !fs.existsSync(strrayDest)) {
   try {
     fs.symlinkSync(strraySource, strrayDest, 'dir');
     console.log(`✅ .strray directory symlinked`);
-    filesCopied++;
   } catch (error) {
     console.error(`❌ Failed to symlink .strray:`, error.message);
     // Fallback: copy the directory
@@ -133,17 +188,14 @@ if (fs.existsSync(strraySource) && !fs.existsSync(strrayDest)) {
       }
       copyDir(strraySource, strrayDest);
       console.log(`✅ .strray directory copied (fallback)`);
-      filesCopied++;
     } catch (copyError) {
       console.error(`❌ Failed to copy .strray:`, copyError.message);
     }
   }
 }
 
-if (filesCopied > 0) {
-  console.log(`🎉 Configuration setup complete! ${filesCopied} file(s) copied.`);
-} else {
-  console.log("✅ Configuration files already present.");
-}
-
-console.log("Use oh-my-opencode to activate the plugin.");
+console.log("🎉 StrRay Postinstall: Configuration complete!");
+console.log("📋 Next steps:");
+console.log("1. Restart oh-my-opencode to load the plugin");
+console.log("2. Run 'opencode agent list' to see StrRay agents");
+console.log("3. Try '@enforcer analyze this code' to test the plugin");

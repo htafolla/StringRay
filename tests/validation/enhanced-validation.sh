@@ -82,7 +82,7 @@ echo ""
 echo "📁 Core Framework Structure:"
 check_dir ".opencode" "OpenCode directory"
 check_dir ".opencode/agents" "Agent configurations"
-check_dir ".opencode/mcps" "MCP server configs"
+check_dir "dist/plugin/mcps" "MCP server binaries"
 check_dir ".opencode/logs" "Framework logs"
 check_dir "src" "Source code"
 check_dir "dist" "Compiled code"
@@ -156,12 +156,12 @@ fi
 
 echo ""
 echo "🔧 MCP Ecosystem Validation:"
-mcp_count=$(ls -1 .opencode/mcps/ 2>/dev/null | grep "\.mcp\.json$" | wc -l)
-server_count=$(ls -1 .opencode/mcps/ 2>/dev/null | grep "\.server\.js$" | wc -l)
+mcp_count=$(grep -c '"command":' .mcp.json 2>/dev/null || echo "0")
+server_count=$(ls -1 dist/plugin/mcps/ 2>/dev/null | grep "\.server\.js$" | wc -l)
 if [ "$mcp_count" -ge 11 ]; then
-    echo -e "${GREEN}✅ MCP configurations: $mcp_count found${NC}"
+    echo -e "${GREEN}✅ MCP configurations: $mcp_count registered${NC}"
 else
-    echo -e "${YELLOW}⚠️ MCP configurations: $mcp_count found (may be normal)${NC}"
+    echo -e "${YELLOW}⚠️ MCP configurations: $mcp_count registered (may be normal)${NC}"
 fi
 
 if [ "$server_count" -ge 11 ]; then

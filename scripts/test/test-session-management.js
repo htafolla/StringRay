@@ -17,7 +17,7 @@ class SessionManagementTester {
 
     this.serverProcess = spawn(
       "node",
-      [".opencode/mcps/session-management.server.js"],
+      ["dist/plugin/mcps/state-manager.server.js"],
       {
         stdio: ["pipe", "pipe", "pipe"],
       },

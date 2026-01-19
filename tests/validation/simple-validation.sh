@@ -55,7 +55,7 @@ echo ""
 echo "📁 Directory Structure:"
 check_dir ".opencode" "OpenCode directory"
 check_dir ".opencode/agents" "Agent configurations"
-check_dir ".opencode/mcps" "MCP server configs"
+check_dir "dist/plugin/mcps" "MCP server binaries"
 check_dir ".opencode/commands" "Automation commands"
 check_dir ".opencode/scripts" "Validation scripts"
 check_dir "src" "Source code"
@@ -78,10 +78,10 @@ fi
 
 echo ""
 echo "⚙️ MCP Files:"
-mcp_count=$(ls -1 .opencode/mcps/ 2>/dev/null | grep "\.mcp\.json$" | wc -l)
-server_count=$(ls -1 .opencode/mcps/ 2>/dev/null | grep "\.server\.js$" | wc -l)
-echo -e "${GREEN}✅ MCP configs: $mcp_count found${NC}"
-echo -e "${GREEN}✅ MCP servers: $server_count found${NC}"
+mcp_count=$(grep -c '"command":' .mcp.json 2>/dev/null || echo "0")
+server_count=$(ls -1 dist/plugin/mcps/ 2>/dev/null | grep "\.server\.js$" | wc -l)
+echo -e "${GREEN}✅ MCP configs: $mcp_count registered${NC}"
+echo -e "${GREEN}✅ MCP servers: $server_count built${NC}"
 
 echo ""
 echo "🚀 Initialization Test:"

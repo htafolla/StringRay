@@ -20,6 +20,46 @@
       "command": "node",
       "args": ["node_modules/strray-ai/dist/plugin/mcps/enforcer-tools.server.js"]
     },
+    "architect-tools": {
+      "command": "node",
+      "args": ["node_modules/strray-ai/dist/plugin/mcps/architect-tools.server.js"]
+    },
+    "auto-format": {
+      "command": "node",
+      "args": ["node_modules/strray-ai/dist/plugin/mcps/auto-format.server.js"]
+    },
+    "boot-orchestrator": {
+      "command": "node",
+      "args": ["node_modules/strray-ai/dist/plugin/mcps/boot-orchestrator.server.js"]
+    },
+    "framework-compliance-audit": {
+      "command": "node",
+      "args": ["node_modules/strray-ai/dist/plugin/mcps/framework-compliance-audit.server.js"]
+    },
+    "lint": {
+      "command": "node",
+      "args": ["node_modules/strray-ai/dist/plugin/mcps/lint.server.js"]
+    },
+    "model-health-check": {
+      "command": "node",
+      "args": ["node_modules/strray-ai/dist/plugin/mcps/model-health-check.server.js"]
+    },
+    "performance-analysis": {
+      "command": "node",
+      "args": ["node_modules/strray-ai/dist/plugin/mcps/performance-analysis.server.js"]
+    },
+    "processor-pipeline": {
+      "command": "node",
+      "args": ["node_modules/strray-ai/dist/plugin/mcps/processor-pipeline.server.js"]
+    },
+    "security-scan": {
+      "command": "node",
+      "args": ["node_modules/strray-ai/dist/plugin/mcps/security-scan.server.js"]
+    },
+    "state-manager": {
+      "command": "node",
+      "args": ["node_modules/strray-ai/dist/plugin/mcps/state-manager.server.js"]
+    },
     "api-design": {
       "command": "node",
       "args": ["node_modules/strray-ai/dist/plugin/mcps/knowledge-skills/api-design.server.js"]

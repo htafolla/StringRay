@@ -59,8 +59,23 @@ merge_mcp_configs() {
     local strray_servers=""
     local server_count=0
 
+    # Note: MCP configurations are now maintained in main .mcp.json file
+    # Individual .mcp.json files in .opencode/mcps/ have been consolidated
+    log "MCP configurations are now centralized in .mcp.json"
+    log "Individual .mcp.json files have been removed for simplicity"
+
+    # Check if main .mcp.json exists and has configurations
+    if [ -f ".mcp.json" ]; then
+        server_count=$(grep -c '"command":' .mcp.json 2>/dev/null || echo "0")
+        log "Found $server_count MCP server configurations in .mcp.json"
+    fi
+
+    # Skip the individual file processing since they're consolidated
+    return 0
+
+    # Legacy code below (no longer used):
     # Find all .mcp.json files in .opencode/mcps/
-    for mcp_file in .opencode/mcps/*.mcp.json; do
+    # for mcp_file in .opencode/mcps/*.mcp.json; do
         if [ -f "$mcp_file" ]; then
             log "Processing $mcp_file"
 

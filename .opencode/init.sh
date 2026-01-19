@@ -57,17 +57,20 @@ for hook in "${HOOKS[@]}"; do
     fi
 done
 
-MCPS=("project-analysis" "testing-strategy" "architecture-patterns" "performance-optimization" "git-workflow" "api-design")
 MCPS_LOADED=0
 MCPS_MISSING=0
 
-for mcp in "${MCPS[@]}"; do
-    if [ -f ".opencode/mcps/${mcp}.mcp.json" ]; then
-        ((MCPS_LOADED++))
+# Check if opencode.json exists and count configured MCP servers
+if [ -f "opencode.json" ]; then
+    MCPS_LOADED=$(grep -c '"command":' opencode.json 2>/dev/null || echo "0")
+    if [ "$MCPS_LOADED" -gt 0 ]; then
+        MCPS_MISSING=0
     else
-        ((MCPS_MISSING++))
+        MCPS_MISSING=62  # Expected number of MCP servers
     fi
-done
+else
+    MCPS_MISSING=62
+fi
 
 AGENTS=("enforcer" "architect" "orchestrator" "bug-triage-specialist" "code-reviewer" "security-auditor" "refactorer" "test-architect")
 AGENTS_LOADED=0
@@ -108,13 +111,14 @@ log "🤖 Agent configs: $AGENTS_LOADED loaded, $AGENTS_MISSING missing"
         log "🔌 Plugin system: ❌ TypeScript integration"
     fi
     sleep 0.5
-    # Count configured MCP servers
+    # Count active MCP server implementations
     CONFIGURED_MCP_SERVERS=0
-    for mcp in "${MCPS[@]}"; do
-        if [ -f "$PROJECT_ROOT/.opencode/mcps/${mcp}.server.js" ]; then
-            ((CONFIGURED_MCP_SERVERS++))
-        fi
-    done
+    # Check in dist/plugin/mcps/ (dev environment) or node_modules/strray-ai/dist/plugin/mcps/ (installed)
+    if [ -d "dist/plugin/mcps" ]; then
+        CONFIGURED_MCP_SERVERS=$(find "dist/plugin/mcps" -name "*.server.js" 2>/dev/null | wc -l)
+    elif [ -d "node_modules/strray-ai/dist/plugin/mcps" ]; then
+        CONFIGURED_MCP_SERVERS=$(find "node_modules/strray-ai/dist/plugin/mcps" -name "*.server.js" 2>/dev/null | wc -l)
+    fi
 
     log "⚙️ MCP servers: $CONFIGURED_MCP_SERVERS active server implementations"
     sleep 1

@@ -145,15 +145,30 @@ class MCPFunctionalityTest {
         }
 
         try {
-          // For now, just test that the server file can be required/imported
-          // In a real scenario, we'd start the server process and test communication
+          // Test that the server file exists and is executable
+          // MCP servers should be run as separate processes, not imported
           const serverPath = serverConfig.args[serverConfig.args.length - 1];
 
           if (serverPath.endsWith(".js")) {
-            // Try to import the server module
-            await import(serverPath);
-            initializedServers++;
-            console.log(`  ✅ Server ${serverName} module loaded`);
+            // Check if the file can be executed (basic syntax check)
+            const { spawn } = await import("child_process");
+            const child = spawn("node", ["-c", serverPath], {
+              stdio: "pipe",
+              timeout: 5000,
+            });
+
+            await new Promise((resolve, reject) => {
+              child.on("close", (code) => {
+                if (code === 0) {
+                  initializedServers++;
+                  console.log(`  ✅ Server ${serverName} syntax valid`);
+                  resolve();
+                } else {
+                  reject(new Error(`Syntax check failed with code ${code}`));
+                }
+              });
+              child.on("error", reject);
+            });
           } else {
             console.log(`  ⚠️ Server ${serverName} has unsupported file type`);
           }

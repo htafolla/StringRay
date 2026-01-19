@@ -229,52 +229,6 @@ create_documentation() {
     log_info "Creating project documentation..."
 
     # Create README for the framework
-    cat > "$target_dir/.opencode/README.md" << EOF
-# Universal Development Framework v${FRAMEWORK_VERSION}
-
-This project uses the Universal Development Framework v${FRAMEWORK_VERSION} for automated code quality assurance and development acceleration.
-
-## Framework Features
-
-- ✅ **90% Runtime Error Prevention** - Comprehensive validation prevents common errors
-- ✅ **Zero-Tolerance Code Rot** - Active monitoring and automated fixes
-- ✅ **Multi-Agent Coordination** - 8 specialized AI agents for different concerns
-- ✅ **Comprehensive Automation** - Pre-commit validation, security scanning, auto-formatting
-
-## Getting Started
-
-The framework is automatically initialized when you start development. Key commands:
-
-\`\`\`bash
-# Initialize framework (run once)
-bash .opencode/init.sh
-
-# Manual validation
-bash .opencode/commands/enforcer-daily-scan.md
-bash .opencode/commands/security-scan.md
-
-# Performance analysis
-bash .opencode/commands/performance-analysis.md
-\`\`\`
-
-## Configuration
-
-Framework settings are in:
-- \`.opencode/enforcer-config.json\` - Thresholds and rules
-- \`.opencode/oh-my-opencode.json\` - AI agent configuration
-
-## Support
-
-For issues or questions about the Universal Development Framework:
-- Documentation: Check INTEGRATION_LESSONS.md
-- Performance: Run performance-analysis.md for metrics
-- Troubleshooting: See framework logs in console output
-
----
-*Framework Version: ${FRAMEWORK_VERSION}*
-*Project: ${project_name}*
-*Installed: $(date)*
-EOF
 
     # Create troubleshooting guide
     cat > "$target_dir/.opencode/TROUBLESHOOTING.md" << EOF
@@ -390,7 +344,6 @@ main() {
         log_success "Framework extraction completed successfully!"
         echo ""
         echo "🎯 Next Steps:"
-        echo "  1. Review .opencode/README.md for usage instructions"
         echo "  2. Run 'bash .opencode/init.sh' to initialize"
         echo "  3. Check .opencode/TROUBLESHOOTING.md for common issues"
         echo ""

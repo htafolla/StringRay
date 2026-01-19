@@ -211,7 +211,6 @@ bash .opencode/commands/mode-switch.md lite
 
 - **Documentation**: See `framework/README.md` for detailed framework information
 - **Compliance**: Refer to `framework/COMPLIANCE.md` for oh-my-opencode compatibility
-- **Configuration**: Check `.opencode/README.md` for setup instructions
 - **Agent Guidelines**: See `AGENTS_GUIDELINES.md` for proper agent usage
 
 ## Future Development

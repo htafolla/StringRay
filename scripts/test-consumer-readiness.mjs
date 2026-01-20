@@ -100,7 +100,7 @@ class ConsumerReadinessCheck {
       const config = JSON.parse(
         fs.readFileSync(".opencode/oh-my-opencode.json", "utf8"),
       );
-      const pluginArray = config.plugins || config.plugin || [];
+      const pluginArray = config.plugin || config.plugins || [];
       const hasStringRayPlugin =
         Array.isArray(pluginArray) &&
         pluginArray.some(

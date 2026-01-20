@@ -172,7 +172,8 @@ tmp/
 temp/
 .tmp/
 
-# Lock files (keep package-lock.json, ignore others)
+# Lock files
+package-lock.json
 yarn.lock
 bun.lock
 pnpm-lock.yaml

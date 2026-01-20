@@ -1,6 +1,6 @@
 {
   "name": "strray-ai",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "⚡ StringRay ⚡: Bulletproof AI orchestration with systematic error prevention. Zero dead ends. Ship clean, tested, optimized code — every time.",
   "type": "module",
   "main": "./dist/plugin/plugins/stringray-codex-injection.js",
@@ -18,8 +18,10 @@
     "build:all": "npm run build && npm run build:plugin",
     "build:plugin": "tsc --project tsconfig.plugin.json",
     "clean": "rm -rf dist",
-    "prepublishOnly": "npm run build:all",
+    "prepublishOnly": "npm run prepare-consumer && npm run build:all",
     "postinstall": "node scripts/postinstall.cjs",
+    "setup-dev": "node scripts/setup-dev.cjs",
+    "prepare-consumer": "node scripts/prepare-consumer.cjs",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "lint": "eslint src",
@@ -32,7 +34,14 @@
     "test:coverage": "vitest run --coverage",
     "test:security-audit": "node scripts/validation/validate-mcp-connectivity.js",
     "test:dependency-scan": "node scripts/test-consumer-readiness.mjs",
-    "ci-install": "npm ci --ignore-scripts"
+    "test:npm-install": "./scripts/test-npm-install.sh",
+    "test:plugin-deploy": "./scripts/deploy-stringray-plugin.sh",
+    "deploy": "./scripts/deploy.sh",
+    "deploy:patch": "./scripts/deploy.sh patch",
+    "deploy:minor": "./scripts/deploy.sh minor",
+    "deploy:major": "./scripts/deploy.sh major",
+    "deploy:dry-run": "./scripts/deploy.sh patch true",
+    "ci-install": "npm install --ignore-scripts"
   },
   "keywords": [
     "ai",

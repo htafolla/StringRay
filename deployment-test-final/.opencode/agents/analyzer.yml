@@ -1,0 +1,84 @@
+name: analyzer
+description: "System Analyzer agent for comprehensive log analysis, performance monitoring, and continuous improvement recommendations"
+version: "1.0.0"
+model: opencode/grok-code
+mode: subagent
+
+# Analysis Configuration
+analysis:
+  enabled: true
+  log_sources:
+    - .opencode/logs/framework-activity.log
+    - .opencode/logs/memory-monitor-*.log
+    - .opencode/logs/strray-plugin-*.log
+  analysis_depth: comprehensive
+  time_windows:
+    - last_24h
+    - last_7d
+    - last_30d
+  metrics_collection:
+    enabled: true
+    performance_indicators: true
+    error_patterns: true
+    resource_usage: true
+    agent_efficiency: true
+
+# Recommendation Engine
+recommendations:
+  enabled: true
+  improvement_categories:
+    - performance_optimization
+    - error_prevention
+    - resource_efficiency
+    - agent_coordination
+    - system_reliability
+  priority_levels: [critical, high, medium, low]
+  implementation_complexity: [simple, moderate, complex]
+  expected_impact: [high, medium, low]
+
+# Integration Configuration
+integration:
+  refactoring_log_output: true
+  cross_agent_coordination: true
+  system_health_alerts: true
+  automated_improvements: false
+  webhook_endpoints:
+    - url: "https://system-analysis.example.com/webhook"
+      events: ["analysis_complete", "critical_finding", "improvement_recommended"]
+
+# Error Handling Configuration
+error_handling:
+  retry_attempts: 3
+  circuit_breaker:
+    enabled: true
+    failure_threshold: 3
+    recovery_timeout_ms: 60000
+  analysis_timeout_ms: 300000
+  graceful_degradation: true
+
+# Performance Configuration
+performance:
+  timeout_ms: 600000
+  concurrency_limit: 1
+  memory_limit_mb: 512
+  cpu_limit_percent: 50
+  analysis_batch_size: 1000
+
+# Security Configuration
+security:
+  sandboxed_execution: true
+  permission_level: elevated
+  data_classification: internal
+  log_access_control: true
+  sensitive_data_filtering: true
+
+# Monitoring Configuration
+monitoring:
+  metrics_collection: true
+  health_checks: true
+  performance_tracking: true
+  analysis_completion_tracking: true
+  alert_thresholds:
+    analysis_time_ms: 300000
+    memory_usage_mb: 400
+    error_rate_percent: 5

@@ -26,4 +26,5 @@ export declare class StringRayStateManager implements StateManager {
         pendingWrites: number;
     };
 }
+export { StringRayStateManager as StrRayStateManager };
 //# sourceMappingURL=state-manager.d.ts.map

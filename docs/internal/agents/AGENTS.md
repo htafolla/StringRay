@@ -1,6 +1,6 @@
-# - Complete Agent Context & Universal Development Codex v1.2.25
+# - Complete Agent Context & Universal Development Codex v1.1.1
 
-**Framework Version**: 1.1.0
+**Framework Version**: 1.1.1
 **Last Updated**: 2026-01-10 (Integrated Architecture)
 **Last Updated**: 2026-01-10
 **Purpose**: Enterprise AI orchestration with systematic error prevention and production-ready development
@@ -315,13 +315,13 @@ Framework initializes in strict dependency order via orchestrator-first boot:
 
 ---
 
-## 📚 Universal Development Codex v1.2.25
+## 📚 Universal Development Codex v1.1.1
 
 **Purpose**: Systematic error prevention and production-ready development framework
 
 The codex defines 46 mandatory terms that guide AI-assisted development under the StrRay Framework. Every agent loads this codex during initialization and validates all actions against these terms to achieve 99.6% error prevention.
 
-**NEW in v1.2.25**: Added CI/CD enforcement terms (46) with zero-tolerance blocking violations for deployment safety and orchestration compliance.
+**NEW in v1.1.1**: Added CI/CD enforcement terms (46) with zero-tolerance blocking violations for deployment safety and orchestration compliance.
 
 ## Critical Codex Terms for Enforcement
 

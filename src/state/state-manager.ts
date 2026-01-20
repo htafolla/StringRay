@@ -207,3 +207,6 @@ export class StringRayStateManager implements StateManager {
     };
   }
 }
+
+// Export alias for scripts expecting StrRayStateManager (backward compatibility)
+export { StringRayStateManager as StrRayStateManager };

@@ -1,0 +1,37 @@
+[
+  {
+    "timestamp": 1768875474947,
+    "hookType": "post-commit",
+    "duration": 0,
+    "exitCode": 127,
+    "success": false
+  },
+  {
+    "timestamp": 1768876658397,
+    "hookType": "post-commit",
+    "duration": 0,
+    "exitCode": 127,
+    "success": false
+  },
+  {
+    "timestamp": 1768877833824,
+    "hookType": "post-commit",
+    "duration": 0,
+    "exitCode": 127,
+    "success": false
+  },
+  {
+    "timestamp": 1768878045703,
+    "hookType": "post-commit",
+    "duration": 0,
+    "exitCode": 127,
+    "success": false
+  },
+  {
+    "timestamp": 1768878207845,
+    "hookType": "post-commit",
+    "duration": 0,
+    "exitCode": 127,
+    "success": false
+  }
+]

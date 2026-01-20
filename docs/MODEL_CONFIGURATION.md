@@ -50,7 +50,7 @@ This guide explains how to configure and update AI models in the StrRay framewor
 defaults = {
     "strray_version": "1.0.0",
     "codex_enabled": True,
-    "codex_version": "v1.2.20",
+    "codex_version": "v1.1.1",
     "codex_terms": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, ...],
     "agent_capabilities": {
         "enforcer": ["compliance-monitoring", "threshold-enforcement"],

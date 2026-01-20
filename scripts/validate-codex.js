@@ -6,7 +6,7 @@ import path from "path";
 
 // Check if we're in development or deployed environment
 const isDevelopment = fs.existsSync("src/codex-injector.ts");
-const isDeployed = fs.existsSync("node_modules/stringray-ai");
+const isDeployed = fs.existsSync("node_modules/strray-ai");
 
 if (!isDevelopment && !isDeployed) {
   process.exit(1); // Not in a valid environment
@@ -28,7 +28,7 @@ if (isDeployed) {
     try {
       // Import and run the postinstall script
       const { execSync } = await import("child_process");
-      execSync("node node_modules/stringray-ai/scripts/postinstall.cjs", {
+      execSync("node node_modules/strray-ai/scripts/postinstall.cjs", {
         stdio: "inherit",
       });
       console.log("DEBUG: Postinstall script executed successfully");
@@ -48,7 +48,7 @@ if (isDeployed) {
 
   // Check if the plugin files exist
   const pluginExists = fs.existsSync(
-    "node_modules/stringray-ai/dist/plugin/plugins/stringray-codex-injection.js",
+    "node_modules/strray-ai/dist/plugin/plugins/stringray-codex-injection.js",
   );
   console.log("DEBUG: plugin file exists:", pluginExists);
   if (!pluginExists) {

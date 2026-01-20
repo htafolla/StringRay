@@ -1,0 +1,100 @@
+name: document-writer
+description: "Document Writer agent for technical documentation and content creation"
+version: "1.0.0"
+model: opencode/grok-code
+mode: subagent
+
+# State Management Configuration
+state_management:
+  enabled: true
+  namespaces:
+    - documentation_state
+    - content_templates
+    - knowledge_base
+  persistence: true
+  recovery: transactional
+  backup_interval: 30m
+  retention_days: 30
+
+# Logging Configuration
+logging:
+  level: info
+  format: json
+  destinations:
+    - console
+    - file
+    - monitoring
+  retention_days: 30
+  sensitive_data_filtering: true
+  audit_trail: true
+
+# Processor Pipeline Configuration
+processor_pipeline:
+  - name: content-validation
+    type: validation
+    priority: high
+    timeout_ms: 10000
+    retry_attempts: 3
+  - name: grammar-check
+    type: validation
+    priority: medium
+    timeout_ms: 8000
+    retry_attempts: 2
+  - name: technical-accuracy
+    type: validation
+    priority: high
+    timeout_ms: 15000
+    retry_attempts: 2
+
+# Agent Capabilities
+capabilities:
+  - technical_writing
+  - api_documentation
+  - user_guides
+  - code_documentation
+  - content_organization
+  - knowledge_base_management
+
+# Error Handling Configuration
+error_handling:
+  retry_attempts: 3
+  circuit_breaker:
+    enabled: true
+    failure_threshold: 3
+    recovery_timeout_ms: 30000
+  fallback_strategy: retry
+  alert_on_failure: true
+
+# Performance Configuration
+performance:
+  timeout_ms: 45000
+  concurrency_limit: 2
+  memory_limit_mb: 384
+  cpu_limit_percent: 35
+
+# Integration Hooks
+integration:
+  documentation_generated: true
+  content_reviewed: true
+  knowledge_updated: true
+  api_docs_published: true
+  webhook_endpoints:
+    - url: "https://documentation.example.com/webhook"
+      events: ["doc_completed", "content_reviewed", "knowledge_updated"]
+
+# Security Configuration
+security:
+  sandboxed_execution: true
+  permission_level: standard
+  data_classification: internal
+  encryption_required: false
+
+# Monitoring Configuration
+monitoring:
+  metrics_collection: true
+  health_checks: true
+  performance_tracking: true
+  alert_thresholds:
+    response_time_ms: 40000
+    error_rate_percent: 2
+    memory_usage_mb: 300

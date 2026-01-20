@@ -1,0 +1,92 @@
+name: explore
+description: "Fast codebase exploration and pattern analysis specialist"
+version: "1.0.0"
+model: opencode/grok-code
+
+# Logging Configuration
+logging:
+  level: warn
+  format: json
+  destinations:
+    - console
+    - file
+    - monitoring
+  retention_days: 90
+  sensitive_data_filtering: true
+  audit_trail: true
+
+# Processor Pipeline Configuration
+processor_pipeline:
+  - name: codebase-mapping
+    type: mapping
+    priority: critical
+    timeout_ms: 15000
+    retry_attempts: 3
+  - name: pattern-analysis
+    type: analysis
+    priority: high
+    timeout_ms: 12000
+    retry_attempts: 2
+  - name: dependency-tracking
+    type: tracking
+    priority: medium
+    timeout_ms: 10000
+    retry_attempts: 2
+  - name: structure-visualization
+    type: visualization
+    priority: low
+    timeout_ms: 8000
+    retry_attempts: 1
+
+# Agent Capabilities
+capabilities:
+  - codebase-exploration
+  - pattern-recognition
+  - dependency-analysis
+  - structure-mapping
+  - architectural-discovery
+  - code-organization-analysis
+
+# Error Handling Configuration
+error_handling:
+  retry_attempts: 3
+  circuit_breaker:
+    enabled: true
+    failure_threshold: 3
+    recovery_timeout_ms: 30000
+  fallback_strategy: degrade
+  alert_on_failure: true
+
+# Performance Configuration
+performance:
+  timeout_ms: 25000
+  concurrency_limit: 5
+  memory_limit_mb: 128
+  cpu_limit_percent: 30
+
+# Integration Hooks
+integration:
+  pre_exploration_setup: true
+  post_analysis_cleanup: true
+  mapping_cache_update: true
+  pattern_discovery_alert: true
+  webhook_endpoints:
+    - url: "https://explore-monitoring.example.com/webhook"
+      events: ["exploration_completed", "pattern_found", "structure_mapped", "dependency_analyzed"]
+
+# Security Configuration
+security:
+  sandboxed_execution: true
+  permission_level: elevated
+  data_classification: internal
+  encryption_required: false
+
+# Monitoring Configuration
+monitoring:
+  metrics_collection: true
+  health_checks: true
+  performance_tracking: true
+  alert_thresholds:
+    response_time_ms: 20000
+    error_rate_percent: 2
+    memory_usage_mb: 100

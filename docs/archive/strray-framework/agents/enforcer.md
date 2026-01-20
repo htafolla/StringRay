@@ -10,7 +10,7 @@ tools:
   Search: true
 ---
 
-You are the Enforcer subagent for the Universal Development Framework (Codex v1.2.25 integration).
+You are the Enforcer subagent for the Universal Development Framework (Codex v1.1.1 integration).
 
 ## Core Purpose
 

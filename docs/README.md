@@ -1,6 +1,6 @@
-# ⚡ StringRay AI v1.1.0 – Enterprise AI Agent Coordination Platform
+# ⚡ StringRay AI v1.1.1 – Enterprise AI Agent Coordination Platform
 
-[![Version](https://img.shields.io/badge/version-1.1.0-blue.svg)](https://github.com/htafolla/strray)
+[![Version](https://img.shields.io/badge/version-1.1.1-blue.svg)](https://github.com/htafolla/strray)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9+-blue.svg)](https://www.typescriptlang.org/)
@@ -10,7 +10,7 @@
 
 ## ⚠️ Important Notice
 
-**StringRay AI v1.1.0 - Enterprise CI/CD Automation Plugin**
+**StringRay AI v1.1.1 - Enterprise CI/CD Automation Plugin**
 
 StringRay Framework is available as both:
 
@@ -97,7 +97,7 @@ StringRay Framework automatically configures itself based on your installation m
 
 #### Standalone Configuration
 
-- Loads the Universal Development Codex v1.2.25
+- Loads the Universal Development Codex v1.1.1
 - Enables enterprise CI/CD automation with post-processor
 - Registers all 9 specialized agents
 - Sets up MCP servers for agent communication
@@ -160,7 +160,7 @@ Update your `.opencode/oh-my-opencode.json`:
   },
   "framework": {
     "name": "strray",
-    "version": "1.0.0"
+    "version": "1.1.1"
   }
 }
 ```
@@ -226,7 +226,7 @@ Update your `.opencode/oh-my-opencode.json`:
 - **Memory Pool Management**: Object reuse and garbage collection optimization
 - **Task Processing**: Batch operations and parallel processing optimization
 
-#### 🚀 CI/CD Automation System (v1.1.0)
+#### 🚀 CI/CD Automation System (v1.1.1)
 
 - **Automated Remediation Loop**: Commit → Monitor → Analyze → Fix → Validate → Redeploy
 - **Intelligent Failure Analysis**: Root cause detection with confidence scoring
@@ -391,7 +391,7 @@ Update your `.opencode/oh-my-opencode.json` for enterprise deployment:
   },
   "framework": {
     "name": "strray",
-    "version": "1.0.0",
+    "version": "1.1.1",
     "performance_mode": "optimized",
     "monitoring_enabled": true,
     "plugin_security": "strict"
@@ -438,7 +438,7 @@ STRRAY_LOG_LEVEL=info
 
 ## 🎯 CURRENT STATUS & ROADMAP
 
-### ✅ Production Ready (v1.1.0)
+### ✅ Production Ready (v1.1.1)
 
 - **100% Test Pass Rate**: 833/833 comprehensive tests + CI/CD automation testing
 - **Zero Compilation Errors**: Full TypeScript compliance

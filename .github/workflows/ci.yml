@@ -95,32 +95,136 @@ jobs:
         run: npm audit --audit-level moderate
         continue-on-error: true
 
-#  publish:
-#    runs-on: ubuntu-latest
-#    needs: [test, build-and-test, security-scan]
-#    if: github.event_name == 'release' && github.event.action == 'published'
-#
-#    steps:
-#      - name: Checkout code
-#        uses: actions/checkout@v4
-#
-#      - name: Setup Node.js
-#        uses: actions/setup-node@v4
-#        with:
-#          node-version: "20.x"
-#          cache: "npm"
-#          registry-url: "https://registry.npmjs.org"
-#
-#      - name: Install dependencies
-#        run: npm run ci-install
-#
-#      - name: Build for production
-#        run: npm run build:all
-#
-#      - name: Run final tests
-#        run: npm test
-#
-#      - name: Publish to npm
-#        run: npm publish --tag latest
-#        env:
-#          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+  version-bump:
+    runs-on: ubuntu-latest
+    needs: [test, build-and-test, security-scan]
+    if: github.event_name == 'release' && github.event.action == 'published'
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20.x"
+          cache: "npm"
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Install dependencies
+        run: npm run ci-install
+
+      - name: Determine version bump
+        id: version
+        run: |
+          # Extract version from release tag (e.g., v1.1.1 -> 1.1.1)
+          VERSION=$(echo ${{ github.event.release.tag_name }} | sed 's/^v//')
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "📋 Release version: $VERSION"
+
+      - name: Update version in package.json
+        run: |
+          npm version ${{ steps.version.outputs.version }} --no-git-tag-version --no-commit-hooks
+          echo "📦 Updated package.json to version ${{ steps.version.outputs.version }}"
+
+      - name: Run universal version manager
+        run: |
+          echo "🔧 Updating all version references to ${{ steps.version.outputs.version }}"
+          node scripts/universal-version-manager.js
+
+      - name: Build with updated versions
+        run: npm run build:all
+
+      - name: Commit version updates
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add .
+          git commit -m "chore: bump version to ${{ steps.version.outputs.version }} [automated]" || echo "No changes to commit"
+
+      - name: Push version updates
+        run: git push
+
+  test-deployment:
+    runs-on: ubuntu-latest
+    needs: version-bump
+    if: github.event_name == 'release' && github.event.action == 'published'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20.x"
+          cache: "npm"
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Install dependencies
+        run: npm run ci-install
+
+      - name: Run comprehensive deployment test
+        run: |
+          echo "🧪 Running comprehensive plugin deployment test..."
+          bash scripts/deploy-stringray-plugin.sh ci-deployment-test-${{ needs.version-bump.outputs.version }}
+
+      - name: Upload deployment report
+        uses: actions/upload-artifact@v4
+        with:
+          name: deployment-report-${{ needs.version-bump.outputs.version }}
+          path: reports/deployment/deployment-report-*.txt
+
+      - name: Upload test package
+        uses: actions/upload-artifact@v4
+        with:
+          name: strray-ai-test-${{ needs.version-bump.outputs.version }}.tgz
+          path: stringray-ai-*.tgz
+
+  publish:
+    runs-on: ubuntu-latest
+    needs: [version-bump, test-deployment]
+    if: github.event_name == 'release' && github.event.action == 'published'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20.x"
+          cache: "npm"
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Install dependencies
+        run: npm run ci-install
+
+      - name: Build for production
+        run: npm run build:all
+
+      - name: Run final validation
+        run: npm run test:comprehensive
+
+      - name: Publish to npm
+        run: npm publish --tag latest
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Create deployment summary
+        run: |
+          echo "## 🚀 Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "- **Package**: strray-ai" >> $GITHUB_STEP_SUMMARY
+          echo "- **Version**: ${{ needs.version-bump.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Published**: $(date -u)" >> $GITHUB_STEP_SUMMARY
+          echo "- **Status**: ✅ Success" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Validation Results:" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ CI/CD Pipeline: Passed" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Version Management: Updated" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Deployment Test: Passed" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ NPM Publish: Successful" >> $GITHUB_STEP_SUMMARY

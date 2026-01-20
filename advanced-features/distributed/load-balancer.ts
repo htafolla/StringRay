@@ -1,5 +1,5 @@
 /**
- * StringRay AI v1.1.0 - Distributed Load Balancer
+ * StringRay AI v1.1.1 - Distributed Load Balancer
  *
  * Enterprise-grade load balancer with session affinity, health checks,
  * and auto-scaling capabilities for multi-instance deployments.

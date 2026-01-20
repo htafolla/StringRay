@@ -1,0 +1,91 @@
+name: librarian
+description: "Codebase and documentation search specialist"
+version: "1.0.0"
+model: opencode/grok-code
+
+# Logging Configuration
+logging:
+  level: warn
+  format: json
+  destinations:
+    - console
+    - file
+    - monitoring
+  retention_days: 90
+  sensitive_data_filtering: true
+  audit_trail: true
+
+# Processor Pipeline Configuration
+processor_pipeline:
+  - name: documentation-search
+    type: search
+    priority: high
+    timeout_ms: 15000
+    retry_attempts: 2
+  - name: codebase-analysis
+    type: analysis
+    priority: medium
+    timeout_ms: 12000
+    retry_attempts: 2
+  - name: pattern-discovery
+    type: discovery
+    priority: medium
+    timeout_ms: 10000
+    retry_attempts: 1
+  - name: relevance-ranking
+    type: ranking
+    priority: low
+    timeout_ms: 8000
+    retry_attempts: 1
+
+# Agent Capabilities
+capabilities:
+  - documentation-search
+  - codebase-pattern-discovery
+  - external-resource-analysis
+  - knowledge-base-navigation
+  - contextual-information-retrieval
+
+# Error Handling Configuration
+error_handling:
+  retry_attempts: 3
+  circuit_breaker:
+    enabled: true
+    failure_threshold: 3
+    recovery_timeout_ms: 30000
+  fallback_strategy: degrade
+  alert_on_failure: true
+
+# Performance Configuration
+performance:
+  timeout_ms: 25000
+  concurrency_limit: 5
+  memory_limit_mb: 128
+  cpu_limit_percent: 30
+
+# Integration Hooks
+integration:
+  pre_search_validation: true
+  post_results_filtering: true
+  relevance_scoring: true
+  knowledge_base_sync: true
+  webhook_endpoints:
+    - url: "https://librarian-monitoring.example.com/webhook"
+      events: ["search_completed", "pattern_discovered", "knowledge_updated"]
+
+# Security Configuration
+security:
+  sandboxed_execution: true
+  permission_level: elevated
+  data_classification: internal
+  encryption_required: false
+
+# Monitoring Configuration
+monitoring:
+  metrics_collection: true
+  health_checks: true
+  performance_tracking: true
+  alert_thresholds:
+    response_time_ms: 20000
+    error_rate_percent: 2
+    memory_usage_mb: 100

@@ -1,6 +1,6 @@
 # StrRay Framework - Comprehensive Agent Specifications
 
-**Version**: **Last Updated**: 2026-01-05 | **Framework**: StrRay v2.4.0
+**Version**: **Last Updated**: 2026-01-05 | **Framework**: StrRay v1.1.1
 
 ## Framework Overview
 

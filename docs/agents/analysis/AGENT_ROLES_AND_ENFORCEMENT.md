@@ -44,7 +44,7 @@ The StrRay Framework employs **5 specialized AI agents** with **clear separation
 **Responsibilities**:
 
 - **FINAL AUTHORITY** on all development rules
-- Enforce Universal Development Codex v1.2.25 (all 55-terms)
+- Enforce Universal Development Codex v1.1.1 (all 55-terms)
 - Validate contextual analysis integration
 - Block operations violating rules
 - Implement automated fixes and remediation

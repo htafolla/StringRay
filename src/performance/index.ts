@@ -1,5 +1,5 @@
 /**
- * StringRay AI v1.1.0 - Performance Module Index
+ * StringRay AI v1.1.1 - Performance Module Index
  *
  * Unified exports for the comprehensive performance testing and monitoring system.
  *

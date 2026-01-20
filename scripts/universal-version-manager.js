@@ -18,14 +18,14 @@ import path from "path";
 const OFFICIAL_VERSIONS = {
   // Framework versions
   framework: {
-    version: "1.1.0",
-    displayName: "StringRay AI v1.1.0",
-    lastUpdated: "2026-01-19",
+    version: "1.1.1",
+    displayName: "StringRay AI v1.1.1",
+    lastUpdated: "2026-01-20",
   },
 
   // Codex versions
   codex: {
-    version: "v1.2.25",
+    version: "v1.1.1",
     termsCount: 55,
     lastUpdated: "2026-01-16",
   },
@@ -36,140 +36,7 @@ const OFFICIAL_VERSIONS = {
   },
 };
 
-// Comprehensive update patterns for all version types
-const UPDATE_PATTERNS = [
-  // === FRAMEWORK VERSION UPDATES ===
-  {
-    pattern: /StringRay Framework v1\.0\.0/g,
-    replacement: OFFICIAL_VERSIONS.framework.displayName,
-  },
-  {
-    pattern: /StrRay Framework v1\.0\.0/g,
-    replacement: OFFICIAL_VERSIONS.framework.displayName,
-  },
-  {
-    pattern: /StringRay AI v1\.0\.[0-9]+/g,
-    replacement: OFFICIAL_VERSIONS.framework.displayName,
-  },
-  {
-    pattern: /version-1\.0\.[0-9]+-blue\.svg/g,
-    replacement: `version-${OFFICIAL_VERSIONS.framework.version}-blue.svg`,
-  },
-  // Framework Version patterns
-  {
-    pattern: /\*\*Framework Version\*\*: 1\.0\.[0-9]+/g,
-    replacement: `**Framework Version**: ${OFFICIAL_VERSIONS.framework.version}`,
-  },
-  {
-    pattern: /\*\*Framework Version:\*\* v1\.0\.[0-9]+/g,
-    replacement: `**Framework Version:** v${OFFICIAL_VERSIONS.framework.version}`,
-  },
-  {
-    pattern: /- Framework Version: StrRay v1\.0\.[0-9]+/g,
-    replacement: `- Framework Version: ${OFFICIAL_VERSIONS.framework.displayName}`,
-  },
-  {
-    pattern: /- Framework Version: 1\.0\.[0-9]+/g,
-    replacement: `- Framework Version: ${OFFICIAL_VERSIONS.framework.version}`,
-  },
-  {
-    pattern: /Framework Version: StrRay v1\.0\.[0-9]+/g,
-    replacement: `Framework Version: ${OFFICIAL_VERSIONS.framework.displayName}`,
-  },
-  // Simple version patterns
-  {
-    pattern: /StrRay v1\.0\.[0-9]+/g,
-    replacement: `${OFFICIAL_VERSIONS.framework.displayName.replace("StringRay AI ", "StrRay ")}`,
-  },
-  {
-    pattern: /v1\.0\.[0-9]+/g,
-    replacement: `v${OFFICIAL_VERSIONS.framework.version}`,
-  },
-  // API documentation patterns
-  {
-    pattern: /\*\*Version\*\*: v1\.0\.[0-9]+/g,
-    replacement: `**Version**: v${OFFICIAL_VERSIONS.framework.version}`,
-  },
-  {
-    pattern: /\*\*Framework\*\*: StrRay AI v1\.0\.[0-9]+/g,
-    replacement: `**Framework**: ${OFFICIAL_VERSIONS.framework.displayName}`,
-  },
-
-  // === CODEX VERSION UPDATES ===
-  {
-    pattern: /Universal Development Codex v1\.2\.20/g,
-    replacement: `Universal Development Codex ${OFFICIAL_VERSIONS.codex.version}`,
-  },
-  {
-    pattern: /Universal Development Codex v1\.2\.22/g,
-    replacement: `Universal Development Codex ${OFFICIAL_VERSIONS.codex.version}`,
-  },
-  {
-    pattern: /Universal Development Codex v1\.2\.24/g,
-    replacement: `Universal Development Codex ${OFFICIAL_VERSIONS.codex.version}`,
-  },
-  {
-    pattern: /Universal Development Codex v1\.2\.25/g,
-    replacement: `Universal Development Codex ${OFFICIAL_VERSIONS.codex.version}`,
-  },
-  // Flexible codex version patterns
-  {
-    pattern: /Codex v1\.2\.[0-9]+/g,
-    replacement: `Codex ${OFFICIAL_VERSIONS.codex.version}`,
-  },
-  {
-    pattern: /codex v1\.2\.[0-9]+/g,
-    replacement: `codex ${OFFICIAL_VERSIONS.codex.version}`,
-  },
-
-  // === TERM COUNT UPDATES ===
-  {
-    pattern: /55-term/g,
-    replacement: `${OFFICIAL_VERSIONS.codex.termsCount}-term`,
-  },
-  {
-    pattern: /55 Universal Development Codex/g,
-    replacement: `${OFFICIAL_VERSIONS.codex.termsCount} Universal Development Codex`,
-  },
-  {
-    pattern: /55-term/g,
-    replacement: `${OFFICIAL_VERSIONS.codex.termsCount}-term`,
-  },
-  {
-    pattern: /55 Universal Development Codex/g,
-    replacement: `${OFFICIAL_VERSIONS.codex.termsCount} Universal Development Codex`,
-  },
-  {
-    pattern: /55-term Universal Development Codex/g,
-    replacement: `${OFFICIAL_VERSIONS.codex.termsCount}-term Universal Development Codex`,
-  },
-  // Flexible term count patterns
-  {
-    pattern: /[0-9]+-term/g,
-    replacement: `${OFFICIAL_VERSIONS.codex.termsCount}-term`,
-  },
-  {
-    pattern: /[0-9]+ Universal Development Codex/g,
-    replacement: `${OFFICIAL_VERSIONS.codex.termsCount} Universal Development Codex`,
-  },
-
-  // === DEPENDENCY VERSION UPDATES ===
-  {
-    pattern: /oh-my-opencode v2\.12\.0/g,
-    replacement: `oh-my-opencode v${OFFICIAL_VERSIONS.dependencies.ohMyOpencode}`,
-  },
-  {
-    pattern: /oh-my-opencode v2\.14\.0/g,
-    replacement: `oh-my-opencode v${OFFICIAL_VERSIONS.dependencies.ohMyOpencode}`,
-  },
-  // Flexible dependency patterns
-  {
-    pattern: /oh-my-opencode v[0-9]+\.[0-9]+\.[0-9]+/g,
-    replacement: `oh-my-opencode v${OFFICIAL_VERSIONS.dependencies.ohMyOpencode}`,
-  },
-];
-
-// Simple recursive file finder
+// Simple recursive file finder - necessary for explaining complex directory traversal logic
 function findFiles(
   dir,
   extensions,
@@ -200,6 +67,74 @@ function findFiles(
   walk(dir);
   return files;
 }
+
+// Comprehensive update patterns for all version types
+const UPDATE_PATTERNS = [
+   // === FRAMEWORK VERSION UPDATES ===
+    {
+      pattern: /"version": "[0-9]+\.[0-9]+\.[0-9]+"/g,
+      replacement: `"version": "${OFFICIAL_VERSIONS.framework.version}"`,
+    },
+    {
+      pattern: /StringRay Framework v[0-9]+\.[0-9]+\.[0-9]+/g,
+      replacement: OFFICIAL_VERSIONS.framework.displayName,
+    },
+   {
+     pattern: /\*\*📦 Current Version: 1\.[0-9]+\.[0-9]+\*\* - Enterprise production release with automated postinstall configuration, MCP server integration, and comprehensive testing\. Use `npm install strray-ai@latest` for installation\./g,
+     replacement: `**📦 Current Version: ${OFFICIAL_VERSIONS.framework.version}** - Enterprise production release with automated postinstall configuration, MCP server integration, and comprehensive testing. Use \`npm install strray-ai@latest\` for installation.`,
+   },
+   {
+     pattern: /# ⚡ StringRay AI v1\.[0-9]+\.[0-9]+ – Bulletproof AI Orchestration for Production-Grade Development/g,
+     replacement: `# ⚡ ${OFFICIAL_VERSIONS.framework.displayName} – Bulletproof AI Orchestration for Production-Grade Development`,
+   },
+   {
+     pattern: /version-1\.[0-9]+\.[0-9]+-blue\.svg/g,
+     replacement: `version-${OFFICIAL_VERSIONS.framework.version}-blue.svg`,
+   },
+   {
+     pattern: /StrRay Framework v[0-9]+\.[0-9]+\.[0-9]+/g,
+     replacement: OFFICIAL_VERSIONS.framework.displayName,
+   },
+   {
+     pattern: /StringRay AI v[0-9]+\.[0-9]+\.[0-9]+/g,
+     replacement: OFFICIAL_VERSIONS.framework.displayName,
+   },
+   {
+     pattern: /version-[0-9]+\.[0-9]+\.[0-9]+-blue\.svg/g,
+     replacement: `version-${OFFICIAL_VERSIONS.framework.version}-blue.svg`,
+   },
+   // Framework Version patterns
+   {
+     pattern: /\*\*Framework Version\*\*: [0-9]+\.[0-9]+\.[0-9]+/g,
+     replacement: `**Framework Version**: ${OFFICIAL_VERSIONS.framework.version}`,
+   },
+   {
+     pattern: /\*\*Framework Version:\*\* v[0-9]+\.[0-9]+\.[0-9]+/g,
+     replacement: `**Framework Version:** v${OFFICIAL_VERSIONS.framework.version}`,
+   },
+   {
+     pattern: /- Framework Version: StrRay v[0-9]+\.[0-9]+\.[0-9]+/g,
+     replacement: `- Framework Version: ${OFFICIAL_VERSIONS.framework.displayName}`,
+   },
+   {
+     pattern: /- Framework Version: [0-9]+\.[0-9]+\.[0-9]+/g,
+     replacement: `- Framework Version: ${OFFICIAL_VERSIONS.framework.version}`,
+   },
+    {
+      pattern: /Framework Version: StrRay v[0-9]+\.[0-9]+\.[0-9]+/g,
+      replacement: `Framework Version: ${OFFICIAL_VERSIONS.framework.displayName}`,
+    },
+
+   // Simple version patterns
+   {
+     pattern: /StrRay v[0-9]+\.[0-9]+\.[0-9]+/g,
+     replacement: `${OFFICIAL_VERSIONS.framework.displayName.replace("StringRay AI ", "StrRay ")}`,
+   },
+    {
+      pattern: /v[0-9]+\.[0-9]+\.[0-9]+/g,
+      replacement: `v${OFFICIAL_VERSIONS.framework.version}`,
+    },
+];
 
 async function standardizeVersions() {
   console.log("🔧 Starting Universal Version Standardization");

@@ -1,5 +1,5 @@
 /**
- * StringRay AI v1.1.0 - Alert Engine
+ * StringRay AI v1.1.1 - Alert Engine
  *
  * Advanced alert management system for performance dashboards.
  * Handles alert generation, escalation, notification, and lifecycle management.

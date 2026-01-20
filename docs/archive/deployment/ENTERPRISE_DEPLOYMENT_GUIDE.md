@@ -98,7 +98,7 @@ npm install -g oh-my-opencode
 # Install from https://grafana.com/docs/grafana/latest/installation/
 
 # cert-manager (for TLS certificates)
-kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.13.0/cert-manager.yaml
+kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.1.1/cert-manager.yaml
 ```
 
 ### Network Requirements
@@ -148,7 +148,7 @@ npm install
   },
   "framework": {
     "name": "strray",
-    "version": "1.0.0",
+    "version": "1.1.1",
     "performance_mode": "optimized",
     "monitoring_enabled": true
   }
@@ -391,7 +391,7 @@ data:
     {
       "framework": {
         "name": "strray",
-        "version": "1.0.0",
+        "version": "1.1.1",
         "performance_mode": "optimized",
         "monitoring_enabled": true
       },
@@ -680,7 +680,7 @@ Resources:
           Fn::Base64: |
             #!/bin/bash
             yum update -y
-            curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+            curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v1.1.1/install.sh | bash
             source ~/.bashrc
             nvm install 18
             nvm use 18

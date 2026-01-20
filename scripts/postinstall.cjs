@@ -88,75 +88,8 @@ configDirs.forEach(dirPath => {
   }
 });
 
-// Update paths in copied configuration files
-console.log("🔧 StrRay Postinstall: Updating paths in configuration files...");
-
-function updatePathsInFile(filePath) {
-  try {
-    if (!fs.existsSync(filePath)) return;
-
-    let content = fs.readFileSync(filePath, 'utf-8');
-    let updated = false;
-
-    // Update MCP server paths
-    if (content.includes('./dist/plugin/mcps/') || content.includes('dist/plugin/mcps/')) {
-      content = content.replace(
-        /"\.\/dist\/plugin\/mcps\//g,
-        '"node_modules/strray-ai/dist/plugin/mcps/'
-      );
-      content = content.replace(
-        /'\.\/dist\/plugin\/mcps\//g,
-        "'node_modules/strray-ai/dist/plugin/mcps/"
-      );
-      content = content.replace(
-        /"dist\/plugin\/mcps\//g,
-        '"node_modules/strray-ai/dist/plugin/mcps/'
-      );
-      updated = true;
-    }
-
-    // Update plugin paths
-    if (content.includes('./dist/')) {
-      content = content.replace(
-        /"\.\/dist\//g,
-        '"node_modules/strray-ai/dist/'
-      );
-      content = content.replace(
-        /'\.\/dist\//g,
-        "'node_modules/strray-ai/dist/"
-      );
-      updated = true;
-    }
-
-    // Update .opencode paths
-    if (content.includes('./.opencode/mcps/') || content.includes('.opencode/mcps/')) {
-      // .opencode files stay as relative paths since they're in the same directory structure
-      // No change needed for .opencode internal references
-      updated = true;
-    }
-
-    if (updated) {
-      fs.writeFileSync(filePath, content);
-      console.log(`✅ Updated paths in ${path.relative(process.cwd(), filePath)}`);
-    }
-  } catch (error) {
-    console.warn(`⚠️ Could not update paths in ${filePath}:`, error.message);
-  }
-}
-
-// Update paths in all copied configuration files
-const filesToUpdate = [
-  ".mcp.json",
-  "opencode.json",
-  ".opencode/oh-my-opencode.json"
-];
-
-console.log("🔧 StrRay Postinstall: Starting path updates for files:", filesToUpdate);
-filesToUpdate.forEach(filePath => {
-  const fullPath = path.join(process.cwd(), filePath);
-  console.log(`🔧 Processing file: ${filePath} -> ${fullPath}`);
-  updatePathsInFile(fullPath);
-});
+// Consumer installation: configuration files are ready as-is
+console.log("🔧 StrRay Postinstall: Consumer installation complete - all paths are correctly configured.");
 
 // Create symlink to .strray directory for persistent state
 const strraySource = path.join(packageRoot, '.strray');

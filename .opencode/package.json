@@ -1,6 +1,6 @@
 {
   "name": "@opencode/oh-my-opencode",
-  "version": "1.0.0",
+  "version": "1.1.1",
   "description": "oh-my-opencode framework configuration",
   "main": "oh-my-opencode.json",
   "scripts": {
@@ -14,6 +14,6 @@
   "author": "htafolla",
   "license": "MIT",
   "dependencies": {
-    "@opencode-ai/plugin": "1.1.25"
+    "@opencode-ai/plugin": "1.1.26"
   }
 }

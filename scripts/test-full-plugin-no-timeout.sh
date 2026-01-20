@@ -9,6 +9,13 @@ echo "Running complete StringRay framework initialization..."
 echo "This may take several minutes due to enterprise component loading."
 echo ""
 
+# Ensure we're in the project root
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+cd "$PROJECT_ROOT"
+
+echo "Running from directory: $(pwd)"
+
 # Run the test and capture output
 node scripts/test-stringray-plugin.mjs
 

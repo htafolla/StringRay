@@ -19,7 +19,7 @@
     "error_rate": 0.1
   },
   "strray_framework": {
-    "version": "1.0.0",
+    "version": "1.1.1",
     "codex_terms": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 24, 29, 32, 38, 42, 43],
     "session_initialization": {
       "auto_format": true,

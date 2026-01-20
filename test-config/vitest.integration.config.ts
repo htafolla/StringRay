@@ -1,5 +1,5 @@
 /**
- * StringRay AI v1.1.0 - Integration Testing Configuration
+ * StringRay AI v1.1.1 - Integration Testing Configuration
  *
  * Comprehensive integration testing setup with parallel execution,
  * thread pooling, and multi-component testing capabilities.

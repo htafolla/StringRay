@@ -1,0 +1,94 @@
+name: test-architect
+description: "Test architect agent for comprehensive testing strategy and validation"
+version: "1.0.0"
+model: opencode/grok-code
+mode: subagent
+
+# Logging Configuration
+logging:
+  level: warn
+  format: json
+  destinations:
+    - console
+    - file
+    - monitoring
+  retention_days: 90
+  sensitive_data_filtering: true
+  audit_trail: true
+
+# Processor Pipeline Configuration
+processor_pipeline:
+  - name: test-validation
+    type: validation
+    priority: critical
+    timeout_ms: 10000
+    retry_attempts: 3
+  - name: coverage-analysis
+    type: analysis
+    priority: high
+    timeout_ms: 15000
+    retry_attempts: 2
+  - name: performance-testing
+    type: execution
+    priority: medium
+    timeout_ms: 30000
+    retry_attempts: 1
+  - name: integration-testing
+    type: validation
+    priority: high
+    timeout_ms: 20000
+    retry_attempts: 2
+
+# Agent Capabilities
+capabilities:
+  - test_strategy_design
+  - coverage_analysis
+  - performance_testing
+  - integration_testing
+  - test_automation
+  - quality_assurance
+  - new_file_analysis
+
+# Error Handling Configuration
+error_handling:
+  retry_attempts: 3
+  circuit_breaker:
+    enabled: true
+    failure_threshold: 3
+    recovery_timeout_ms: 30000
+  fallback_strategy: strict
+  alert_on_failure: true
+
+# Performance Configuration
+performance:
+  timeout_ms: 25000
+  concurrency_limit: 5
+  memory_limit_mb: 128
+  cpu_limit_percent: 30
+
+# Integration Hooks
+integration:
+  pre_commit: true
+  post_commit: true
+  daily_scan: true
+  deployment_validation: true
+  webhook_endpoints:
+    - url: "https://compliance-monitoring.example.com/webhook"
+      events: ["policy_violation", "threshold_exceeded"]
+
+# Security Configuration
+security:
+  sandboxed_execution: true
+  permission_level: elevated
+  data_classification: internal
+  encryption_required: false
+
+# Monitoring Configuration
+monitoring:
+  metrics_collection: true
+  health_checks: true
+  performance_tracking: true
+  alert_thresholds:
+    response_time_ms: 20000
+    error_rate_percent: 2
+    memory_usage_mb: 100

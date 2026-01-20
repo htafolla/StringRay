@@ -54,7 +54,7 @@ jobs:
 
       - name: Run unit tests
         run: |
-          npm run test:unit || (echo "Retrying with clean install..." && rm -rf node_modules package-lock.json && npm install --ignore-scripts && npm run test:unit)
+          npm run test:unit || (echo "Retrying with clean install..." && rm -rf node_modules && npm install --ignore-scripts && npm run test:unit)
 
       - name: Run integration tests
         run: npm run test:integration
@@ -90,7 +90,8 @@ jobs:
         run: npm ci --ignore-scripts
 
       - name: Build all
-        run: npm run build:all
+        run: |
+          npm run build:all || (echo "Build failed, trying clean build..." && rm -rf dist && npm run build:all)
 
       - name: Check MCP server build
         run: |

@@ -38,10 +38,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          cache: "npm"
+          cache: false
 
       - name: Install dependencies
-        run: npm ci --ignore-scripts
+        run: npm ci --ignore-scripts --no-optional
 
       - name: Run postinstall configuration
         run: npm run postinstall
@@ -63,7 +63,7 @@ jobs:
 
       - name: Run unit tests
         run: |
-          npm run test:unit || (echo "Retrying with clean install..." && rm -rf node_modules package-lock.json && npm install --ignore-scripts && npm run test:unit)
+          npm run test:unit || (echo "Retrying with clean install..." && rm -rf node_modules package-lock.json && npm install --ignore-scripts --no-optional && npm run test:unit)
 
       - name: Run integration tests
         run: npm run test:integration
@@ -90,7 +90,7 @@ jobs:
           cache: "npm"
 
       - name: Install dependencies
-        run: npm ci --ignore-scripts
+        run: npm ci --ignore-scripts --no-optional
 
       - name: Build plugin
         run: npm run build:plugin
@@ -128,7 +128,7 @@ jobs:
           cache: "npm"
 
       - name: Install dependencies
-        run: npm ci --ignore-scripts
+        run: npm ci --ignore-scripts --no-optional
 
       - name: Build for publish
         run: npm run build:plugin
@@ -154,7 +154,7 @@ jobs:
       - name: Install dependencies
         run: |
           rm -f package-lock.json
-          npm install --ignore-scripts
+          npm install --ignore-scripts --no-optional
 
       - name: Package for release validation
         run: npm pack

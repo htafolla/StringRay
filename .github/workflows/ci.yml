@@ -92,6 +92,12 @@ jobs:
       - name: Build all
         run: npm run build:all
 
+      - name: Check MCP server build
+        run: |
+          echo "Checking MCP server build..."
+          ls -la dist/plugin/mcps/ || echo "MCP directory not found"
+          find dist/plugin/mcps/ -name "*.server.js" | wc -l || echo "No server files found"
+
       - name: Validate package
         run: npm pack --dry-run
 

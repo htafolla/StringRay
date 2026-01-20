@@ -15,7 +15,6 @@ const packageRoot = path.join(__dirname, "..");
 
 // Configuration files to copy during installation
 const configFiles = [
-  ".claude/.mcp.json",
   ".mcp.json",
   "opencode.json"
 ];

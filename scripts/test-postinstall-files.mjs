@@ -13,6 +13,10 @@ import path from "path";
 class PostinstallFileValidator {
   constructor() {
     this.results = { passed: [], failed: [] };
+    // Check if we're running from a consumer environment (not the source directory)
+    const cwd = process.cwd();
+    this.isConsumerEnvironment = !cwd.includes("dev/stringray") && cwd.includes("dev/jelly");
+    this.environment = this.isConsumerEnvironment ? "Consumer" : "Development";
   }
 
   async validateFiles() {
@@ -63,25 +67,28 @@ class PostinstallFileValidator {
         });
       }
 
-      // Validate server paths are consumer-relative
+      // Validate server paths - postinstall should always create consumer paths
       let validPaths = 0;
+      const expectedPath = "node_modules/strray-ai/dist/";
+      const pathType = "consumer";
+
       for (const [serverName, serverConfig] of Object.entries(
         mcpConfig.mcpServers || {},
       )) {
         if (serverConfig.args && Array.isArray(serverConfig.args)) {
-          const hasConsumerPath = serverConfig.args.some(
+          const hasCorrectPath = serverConfig.args.some(
             (arg) =>
               typeof arg === "string" &&
-              arg.includes("node_modules/strray-ai/dist/"),
+              arg.includes(expectedPath),
           );
-          if (hasConsumerPath) validPaths++;
+          if (hasCorrectPath) validPaths++;
         }
       }
 
       if (validPaths >= serverCount * 0.8) {
         // 80% have correct paths
         console.log(
-          `  ✅ ${validPaths}/${serverCount} servers have correct consumer paths`,
+          `  ✅ ${validPaths}/${serverCount} servers have correct ${pathType} paths`,
         );
         this.results.passed.push("MCP Server Paths");
       } else {
@@ -90,7 +97,7 @@ class PostinstallFileValidator {
         );
         this.results.failed.push({
           test: "MCP Server Paths",
-          error: "Incorrect consumer paths",
+          error: `Incorrect ${this.environment.toLowerCase()} paths`,
         });
       }
     } catch (error) {

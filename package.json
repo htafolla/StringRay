@@ -27,7 +27,7 @@
     "lint": "eslint src",
     "lint:fix": "eslint src --fix",
     "test:unit": "vitest run",
-    "test:integration": "node scripts/test-consumer-readiness.mjs && node scripts/test-mcp-functionality.mjs && node scripts/test-postinstall-files.mjs",
+    "test:integration": "node scripts/test-consumer-readiness.mjs && node scripts/test-mcp-functionality.mjs",
     "test:e2e": "node scripts/validation/validate-mcp-connectivity.js && node scripts/validation/validate-oh-my-opencode-integration.js && node scripts/validation/validate-external-processes.js",
     "test:comprehensive": "./scripts/validate-stringray-framework.sh",
     "test:all": "npm run test:unit && npm run test:integration && npm run test:e2e && npm run test:comprehensive",

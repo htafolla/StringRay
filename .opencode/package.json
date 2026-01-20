@@ -14,6 +14,6 @@
   "author": "htafolla",
   "license": "MIT",
   "dependencies": {
-    "@opencode-ai/plugin": "1.1.26"
+    "@opencode-ai/plugin": "1.1.27"
   }
 }

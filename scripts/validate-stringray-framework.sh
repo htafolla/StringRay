@@ -9,8 +9,17 @@ set -e  # Exit on any error
 echo "🎯 StringRay Framework - Production Validation Script"
 echo "=================================================="
 
-# Configuration
-PROJECT_DIR="${PROJECT_DIR:-$HOME/dev/stringray}"
+# Configuration - detect project directory intelligently
+if [[ -n "$GITHUB_WORKSPACE" ]]; then
+    # GitHub Actions CI
+    PROJECT_DIR="${PROJECT_DIR:-$GITHUB_WORKSPACE}"
+elif [[ -n "$CI_PROJECT_DIR" ]]; then
+    # Other CI systems
+    PROJECT_DIR="${PROJECT_DIR:-$CI_PROJECT_DIR}"
+else
+    # Local development
+    PROJECT_DIR="${PROJECT_DIR:-$HOME/dev/stringray}"
+fi
 
 # Get version from package.json dynamically
 if command_exists jq; then

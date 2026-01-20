@@ -28,8 +28,8 @@ jobs:
       - name: Install dependencies
         run: npm install --ignore-scripts
 
-       - name: Run TypeScript type checking
-         run: npm run typecheck
+      - name: Run TypeScript type checking
+        run: npm run typecheck
 
       - name: Run linting
         run: npm run lint

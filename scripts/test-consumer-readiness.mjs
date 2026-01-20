@@ -104,7 +104,7 @@ class ConsumerReadinessCheck {
       const hasStringRayPlugin =
         Array.isArray(pluginArray) &&
         pluginArray.some(
-          (plugin) => typeof plugin === "string" && plugin.includes("strray"),
+          (plugin) => typeof plugin === "string" && plugin.includes("stringray"),
         );
 
       this.checks.push({

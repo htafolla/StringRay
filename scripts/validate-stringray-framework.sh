@@ -11,13 +11,24 @@ echo "=================================================="
 
 # Configuration
 PROJECT_DIR="${PROJECT_DIR:-$HOME/dev/stringray}"
-PACKAGE_FILE="${PACKAGE_FILE:-strray-ai-1.1.0.tgz}"
+
+# Get version from package.json dynamically
+if command_exists jq; then
+    PACKAGE_VERSION=$(jq -r '.version' "$PROJECT_DIR/package.json")
+elif command_exists node; then
+    PACKAGE_VERSION=$(node -p "require('$PROJECT_DIR/package.json').version")
+else
+    PACKAGE_VERSION="1.1.1"  # fallback
+fi
+
+PACKAGE_FILE="${PACKAGE_FILE:-strray-ai-$PACKAGE_VERSION.tgz}"
 TEST_DIR="${TEST_DIR:-/tmp/strray-test2}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 RUN_EXTENDED="${RUN_EXTENDED:-false}"  # Set to true for full test suite
 
 echo "📋 Configuration:"
 echo "   Project Directory: $PROJECT_DIR"
+echo "   Package Version: $PACKAGE_VERSION"
 echo "   Package File: $PACKAGE_FILE"
 echo "   Test Directory: $TEST_DIR"
 echo "   Extended Tests: $RUN_EXTENDED"

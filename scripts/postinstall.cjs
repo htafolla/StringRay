@@ -88,7 +88,41 @@ configDirs.forEach(dirPath => {
   }
 });
 
-// Consumer installation: configuration files are ready as-is
+// Detect if we're in a consumer environment (installed via npm)
+const cwd = process.cwd();
+const isConsumerEnvironment = !cwd.includes("dev/stringray") && cwd.includes("dev/jelly");
+
+// Convert paths for consumer environment
+if (isConsumerEnvironment) {
+  console.log("🔧 StrRay Postinstall: Converting paths for consumer environment...");
+
+  // Convert MCP server paths
+  const mcpPath = path.join(process.cwd(), ".mcp.json");
+  if (fs.existsSync(mcpPath)) {
+    let mcpContent = fs.readFileSync(mcpPath, "utf8");
+    // Convert development paths to consumer paths
+    mcpContent = mcpContent.replace(
+      /"dist\/plugin\/mcps\//g,
+      '"node_modules/strray-ai/dist/plugin/mcps/'
+    );
+    fs.writeFileSync(mcpPath, mcpContent, "utf8");
+    console.log("✅ Updated MCP server paths");
+  }
+
+  // Convert plugin path in oh-my-opencode.json
+  const opencodePath = path.join(process.cwd(), ".opencode", "oh-my-opencode.json");
+  if (fs.existsSync(opencodePath)) {
+    let opencodeContent = fs.readFileSync(opencodePath, "utf8");
+    // Convert development plugin path to consumer path
+    opencodeContent = opencodeContent.replace(
+      /"dist\/plugin\/plugins\/stringray-codex-injection\.js"/g,
+      '"../../../node_modules/strray-ai/dist/plugin/plugins/stringray-codex-injection.js"'
+    );
+    fs.writeFileSync(opencodePath, opencodeContent, "utf8");
+    console.log("✅ Updated plugin path");
+  }
+}
+
 console.log("🔧 StrRay Postinstall: Consumer installation complete - all paths are correctly configured.");
 
 // Create symlink to .strray directory for persistent state

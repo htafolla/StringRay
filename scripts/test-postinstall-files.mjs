@@ -67,10 +67,12 @@ class PostinstallFileValidator {
         });
       }
 
-      // Validate server paths - postinstall should always create consumer paths
+      // Validate server paths based on environment
       let validPaths = 0;
-      const expectedPath = "node_modules/strray-ai/dist/";
-      const pathType = "consumer";
+      const expectedPath = this.isConsumerEnvironment
+        ? "node_modules/strray-ai/dist/"
+        : "dist/";
+      const pathType = this.isConsumerEnvironment ? "consumer" : "development";
 
       for (const [serverName, serverConfig] of Object.entries(
         mcpConfig.mcpServers || {},
@@ -186,20 +188,20 @@ class PostinstallFileValidator {
       if (hasPlugins && pluginArray) {
         hasStringRayPlugin = pluginArray.some((plugin) => {
           const isString = typeof plugin === "string";
-          const includesStrray = isString && plugin.includes("strray");
+          const includesStrray = isString && plugin.includes("stringray");
           const isObject = typeof plugin === "object";
           const hasName = isObject && plugin.name;
-          const nameIncludesStrray = hasName && plugin.name.includes("strray");
+          const nameIncludesStrray = hasName && plugin.name.includes("stringray");
 
           return includesStrray || nameIncludesStrray;
         });
       }
 
       if (hasStringRayPlugin) {
-        console.log("  ✅ StringRay plugin registered in oh-my-opencode.json");
+        console.log(`  ✅ StringRay plugin registered in oh-my-opencode.json (${this.environment})`);
         this.results.passed.push("oh-my-opencode Plugin Registration");
       } else {
-        console.log("  ❌ StringRay plugin not found in oh-my-opencode.json");
+        console.log(`  ❌ StringRay plugin not found in oh-my-opencode.json (${this.environment})`);
         this.results.failed.push({
           test: "oh-my-opencode Plugin Registration",
           error: "Plugin not registered",

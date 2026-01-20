@@ -1,8 +1,8 @@
 {
   "model": "opencode/grok-code",
-  "plugin": [
-    "../../../dist/plugin/plugins/stringray-codex-injection.js"
-  ],
+   "plugin": [
+     "dist/plugin/plugins/stringray-codex-injection.js"
+   ],
   "disabled_agents": [
     "Sisyphus",
     "oracle",

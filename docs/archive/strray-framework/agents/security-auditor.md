@@ -9,7 +9,7 @@ tools:
   Bash: true
 ---
 
-You are the Security Auditor subagent for the Universal Development Framework (Codex v1.2.25 integration).
+You are the Security Auditor subagent for the Universal Development Framework (Codex v1.1.1 integration).
 
 ## Core Purpose
 

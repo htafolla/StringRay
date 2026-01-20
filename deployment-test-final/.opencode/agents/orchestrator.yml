@@ -1,0 +1,119 @@
+name: orchestrator
+description: "Orchestrator agent for workflow coordination and task delegation"
+version: "2.0.0"
+model: opencode/grok-code
+mode: primary
+
+# State Management Configuration
+state_management:
+  enabled: true
+  namespaces:
+    - workflow_state
+    - agent_coordination
+    - task_queues
+    - progress_tracking
+  persistence: true
+  recovery: transactional
+  backup_interval: 30m
+  retention_days: 30
+
+# Delegation System Configuration
+delegation:
+  enabled: true
+  capabilities:
+    - task_delegation
+    - load_balancing
+    - dependency_management
+    - failure_recovery
+  complexity_analysis: enabled
+  monitoring_interval: 30s
+  max_concurrent_tasks: 10
+  max_chain_depth: 5
+
+# Logging Configuration
+logging:
+  level: info
+  format: json
+  destinations:
+    - console
+    - file
+    - monitoring
+  retention_days: 30
+  sensitive_data_filtering: true
+  audit_trail: true
+
+# Processor Pipeline Configuration
+processor_pipeline:
+  - name: workflow-validation
+    type: validation
+    priority: critical
+    timeout_ms: 10000
+    retry_attempts: 3
+  - name: task-scheduling
+    type: orchestration
+    priority: high
+    timeout_ms: 8000
+    retry_attempts: 2
+  - name: progress-tracking
+    type: monitoring
+    priority: medium
+    timeout_ms: 5000
+    retry_attempts: 1
+  - name: completion-validation
+    type: validation
+    priority: high
+    timeout_ms: 12000
+    retry_attempts: 2
+
+# Agent Capabilities
+capabilities:
+  - workflow_orchestration
+  - agent_coordination
+  - task_management
+  - progress_tracking
+  - dependency_resolution
+  - failure_recovery
+
+# Error Handling Configuration
+error_handling:
+  retry_attempts: 3
+  circuit_breaker:
+    enabled: true
+    failure_threshold: 3
+    recovery_timeout_ms: 30000
+  fallback_strategy: retry
+  alert_on_failure: true
+
+# Performance Configuration
+performance:
+  timeout_ms: 50000
+  concurrency_limit: 10
+  memory_limit_mb: 512
+  cpu_limit_percent: 50
+
+# Integration Hooks
+integration:
+  workflow_initialization: true
+  task_completion_handler: true
+  agent_health_monitor: true
+  progress_update_broadcast: true
+  webhook_endpoints:
+    - url: "https://orchestration-monitoring.example.com/webhook"
+      events: ["workflow_completed", "task_failed", "agent_unavailable"]
+
+# Security Configuration
+security:
+  sandboxed_execution: true
+  permission_level: elevated
+  data_classification: internal
+  encryption_required: false
+
+# Monitoring Configuration
+monitoring:
+  metrics_collection: true
+  health_checks: true
+  performance_tracking: true
+  alert_thresholds:
+    response_time_ms: 40000
+    error_rate_percent: 2
+    memory_usage_mb: 400

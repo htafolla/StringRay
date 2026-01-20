@@ -1156,7 +1156,7 @@ class StrRayDocumentationGenerationServer {
       info: {
         name: "API Collection",
         schema:
-          "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+          "https://schema.getpostman.com/json/collection/v1.1.1/collection.json",
       },
       item: apiDocs.endpoints.map((endpoint) => ({
         name: `${endpoint.method} ${endpoint.path}`,

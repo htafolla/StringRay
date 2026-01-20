@@ -115,7 +115,7 @@ class OhMyOpenCodeIntegrationValidator {
         const chunk = data.toString();
         output += chunk;
 
-        if (chunk.includes("StringRay Framework Codex v1.2.25")) {
+        if (chunk.includes("StringRay Framework Codex v1.1.1")) {
           codexFound = true;
         }
         if (chunk.includes("Progressive Prod-Ready Code")) {

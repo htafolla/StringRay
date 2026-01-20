@@ -150,4 +150,6 @@ export class StringRayStateManager {
         };
     }
 }
+// Export alias for scripts expecting StrRayStateManager (backward compatibility)
+export { StringRayStateManager as StrRayStateManager };
 //# sourceMappingURL=state-manager.js.map

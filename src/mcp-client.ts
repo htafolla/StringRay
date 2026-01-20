@@ -1,4 +1,6 @@
 import { spawn } from "child_process";
+import * as fs from "fs";
+import * as path from "path";
 import { frameworkLogger } from "./framework-logger.js";
 
 export interface MCPTool {
@@ -309,11 +311,44 @@ export class MCPClientManager {
   }
 
   /**
+   * Load MCP server configuration from .mcp.json
+   */
+  private loadServerConfig(serverName: string): MCPClientConfig | null {
+    try {
+      const mcpConfigPath = path.join(process.cwd(), '.mcp.json');
+      if (!fs.existsSync(mcpConfigPath)) {
+        return null;
+      }
+
+      const config = JSON.parse(fs.readFileSync(mcpConfigPath, 'utf-8'));
+      const serverConfig = config.mcpServers?.[serverName];
+
+      if (serverConfig) {
+        return {
+          serverName,
+          command: serverConfig.command,
+          args: serverConfig.args,
+          timeout: 30000
+        };
+      }
+    } catch (error) {
+      frameworkLogger.log('mcp-client', `Failed to load config for ${serverName}: ${error}`, 'info');
+    }
+    return null;
+  }
+
+  /**
    * Create client configuration for a server
    */
-  private createClientConfig(serverName: string): MCPClientConfig {
-    // Get server configuration from opencode.json or .mcp.json
-    // For now, use default configurations
+  public createClientConfig(serverName: string): MCPClientConfig {
+    // First try to load from .mcp.json with path resolution
+    const loadedConfig = this.loadServerConfig(serverName);
+    if (loadedConfig) {
+      return loadedConfig;
+    }
+
+    // Fallback to hardcoded configurations
+    frameworkLogger.log('mcp-client', `Using fallback config for ${serverName}`, 'info');
     const serverConfigs: Record<string, MCPClientConfig> = {
       "code-review": {
         serverName: "code-review",

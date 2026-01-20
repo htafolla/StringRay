@@ -1,5 +1,5 @@
 /**
- * StringRay AI v1.1.0 - Performance Benchmarking System
+ * StringRay AI v1.1.1 - Performance Benchmarking System
  *
  * Comprehensive performance measurement and analysis system for framework operations.
  * Measures boot sequence, orchestrator tasks, session management, and agent operations.

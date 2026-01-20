@@ -1,5 +1,5 @@
 /**
- * StringRay AI v1.1.0 - Performance Regression Testing
+ * StringRay AI v1.1.1 - Performance Regression Testing
  *
  * Automated testing system that detects performance regressions and
  * enforces performance budget compliance in CI/CD pipelines.

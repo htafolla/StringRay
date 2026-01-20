@@ -1,0 +1,186 @@
+{
+  "mcpServers": {
+    "librarian": {
+      "command": "node",
+      "args": [
+        "node_modules/strray-ai/dist/plugin/mcps/knowledge-skills/project-analysis.server.js"
+      ],
+      "env": {}
+    },
+    "session-management": {
+      "command": "node",
+      "args": [
+        "node_modules/strray-ai/dist/plugin/mcps/state-manager.server.js"
+      ],
+      "env": {}
+    },
+    "orchestrator": {
+      "command": "node",
+      "args": [
+        "node_modules/strray-ai/dist/plugin/mcps/orchestrator.server.js"
+      ],
+      "env": {}
+    },
+    "enhanced-orchestrator": {
+      "command": "node",
+      "args": [
+        "node_modules/strray-ai/dist/plugin/mcps/enhanced-orchestrator.server.js"
+      ],
+      "env": {}
+    },
+    "enforcer": {
+      "command": "node",
+      "args": [
+        "node_modules/strray-ai/dist/plugin/mcps/enforcer-tools.server.js"
+      ],
+      "env": {}
+    },
+    "architect-tools": {
+      "command": "node",
+      "args": [
+        "node_modules/strray-ai/dist/plugin/mcps/architect-tools.server.js"
+      ],
+      "env": {}
+    },
+    "auto-format": {
+      "command": "node",
+      "args": [
+        "node_modules/strray-ai/dist/plugin/mcps/auto-format.server.js"
+      ],
+      "env": {}
+    },
+    "boot-orchestrator": {
+      "command": "node",
+      "args": [
+        "node_modules/strray-ai/dist/plugin/mcps/boot-orchestrator.server.js"
+      ],
+      "env": {}
+    },
+    "framework-compliance-audit": {
+      "command": "node",
+      "args": [
+        "node_modules/strray-ai/dist/plugin/mcps/framework-compliance-audit.server.js"
+      ],
+      "env": {}
+    },
+    "lint": {
+      "command": "node",
+      "args": [
+        "node_modules/strray-ai/dist/plugin/mcps/lint.server.js"
+      ],
+      "env": {}
+    },
+    "model-health-check": {
+      "command": "node",
+      "args": [
+        "node_modules/strray-ai/dist/plugin/mcps/model-health-check.server.js"
+      ],
+      "env": {}
+    },
+    "performance-analysis": {
+      "command": "node",
+      "args": [
+        "node_modules/strray-ai/dist/plugin/mcps/performance-analysis.server.js"
+      ],
+      "env": {}
+    },
+    "processor-pipeline": {
+      "command": "node",
+      "args": [
+        "node_modules/strray-ai/dist/plugin/mcps/processor-pipeline.server.js"
+      ],
+      "env": {}
+    },
+    "security-scan": {
+      "command": "node",
+      "args": [
+        "node_modules/strray-ai/dist/plugin/mcps/security-scan.server.js"
+      ],
+      "env": {}
+    },
+    "state-manager": {
+      "command": "node",
+      "args": [
+        "node_modules/strray-ai/dist/plugin/mcps/state-manager.server.js"
+      ],
+      "env": {}
+    },
+    "api-design": {
+      "command": "node",
+      "args": [
+        "node_modules/strray-ai/dist/plugin/mcps/knowledge-skills/api-design.server.js"
+      ],
+      "env": {}
+    },
+    "architecture-patterns": {
+      "command": "node",
+      "args": [
+        "node_modules/strray-ai/dist/plugin/mcps/knowledge-skills/architecture-patterns.server.js"
+      ],
+      "env": {}
+    },
+    "git-workflow": {
+      "command": "node",
+      "args": [
+        "node_modules/strray-ai/dist/plugin/mcps/knowledge-skills/git-workflow.server.js"
+      ],
+      "env": {}
+    },
+    "performance-optimization": {
+      "command": "node",
+      "args": [
+        "node_modules/strray-ai/dist/plugin/mcps/knowledge-skills/performance-optimization.server.js"
+      ],
+      "env": {}
+    },
+    "project-analysis": {
+      "command": "node",
+      "args": [
+        "node_modules/strray-ai/dist/plugin/mcps/knowledge-skills/project-analysis.server.js"
+      ],
+      "env": {}
+    },
+    "testing-strategy": {
+      "command": "node",
+      "args": [
+        "node_modules/strray-ai/dist/plugin/mcps/knowledge-skills/testing-strategy.server.js"
+      ],
+      "env": {}
+    },
+    "code-review": {
+      "command": "node",
+      "args": [
+        "node_modules/strray-ai/dist/plugin/mcps/knowledge-skills/code-review.server.js"
+      ],
+      "env": {}
+    },
+    "security-audit": {
+      "command": "node",
+      "args": [
+        "node_modules/strray-ai/dist/plugin/mcps/knowledge-skills/security-audit.server.js"
+      ],
+      "env": {}
+    },
+    "ui-ux-design": {
+      "command": "node",
+      "args": [
+        "node_modules/strray-ai/dist/plugin/mcps/knowledge-skills/ui-ux-design.server.js"
+      ],
+      "env": {}
+    },
+    "refactoring-strategies": {
+      "command": "node",
+      "args": [
+        "node_modules/strray-ai/dist/plugin/mcps/knowledge-skills/refactoring-strategies.server.js"
+      ],
+      "env": {}
+    },
+    "testing-best-practices": {
+      "command": "node",
+      "args": [
+        "node_modules/strray-ai/dist/plugin/mcps/knowledge-skills/testing-best-practices.server.js"
+      ],
+      "env": {}
+    }
+  }
+}

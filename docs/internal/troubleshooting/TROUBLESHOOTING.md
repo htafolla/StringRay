@@ -68,7 +68,7 @@ This guide provides solutions for common issues encountered when using the StrRa
 
    ```bash
    # Install nvm
-   curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+   curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v1.1.1/install.sh | bash
 
    # Install and use Node.js
    nvm install node

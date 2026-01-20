@@ -1,5 +1,5 @@
 /**
- * StringRay AI v1.1.0 - Boot Orchestrator
+ * StringRay AI v1.1.1 - Boot Orchestrator
  *
  * Implements orchestrator-first boot sequence with automatic enforcement activation.
  * Coordinates the initialization of all framework components in the correct order.
@@ -846,7 +846,7 @@ export class BootOrchestrator {
       const stringRayConfig = {
         version: "1.0.0",
         codex_enabled: true,
-        codex_version: "v1.2.20",
+        codex_version: "v1.1.1",
         codex_terms: [
           1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
           21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37,

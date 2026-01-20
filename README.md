@@ -1,6 +1,6 @@
-# ⚡ StringRay AI v1.1.0 – Bulletproof AI Orchestration for Production-Grade Development
+# ⚡ StringRay AI v1.1.1 – Bulletproof AI Orchestration for Production-Grade Development
 
-[![Version](https://img.shields.io/badge/version-1.1.0-blue.svg)](https://github.com/htafolla/stringray)
+[![Version](https://img.shields.io/badge/version-1.1.1-blue.svg)](https://github.com/htafolla/stringray)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9+-blue.svg)](https://www.typescript.org/)
@@ -13,11 +13,11 @@
 
 ⚡ StringRay ⚡ provides intelligent multi-agent coordination, codex-based code quality enforcement, and enterprise-grade development practices through oh-my-opencode integration. Eliminate spaghetti code, hallucinations, and code rot through systematic validation and intelligent agent delegation.
 
-> **📦 Current Version: 1.0.27** - Enterprise production release with automated postinstall configuration, MCP server integration, and comprehensive testing. Use `npm install strray-ai@latest` for installation.
+> **📦 Current Version: 1.1.1** - Enterprise production release with automated path management, development environment setup, and comprehensive testing. Use `npm install strray-ai@latest` for installation.
 
 ---
 
-## 📋 v1.1.0 Release Notes
+## 📋 v1.1.1 Release Notes
 
 ### 🎯 Enterprise Production Release
 
@@ -156,6 +156,37 @@ The comprehensive test suite verifies:
 - **16 MCP Servers**: Fully operational
 - **Codex Compliance**: 99.6% error prevention active
 - **Enterprise Features**: Multi-agent orchestration enabled
+
+### Development Environment Setup
+
+**For Framework Developers:** If you're working on the StringRay framework itself, you'll need to set up the development environment paths:
+
+```bash
+# Clone the repository
+git clone https://github.com/htafolla/stringray.git
+cd stringray
+
+# Set up development paths (transforms consumer paths to local paths)
+npm run setup-dev
+
+# Build the framework
+npm run build:all
+
+# Test the framework
+npm test
+```
+
+**What `setup-dev` does:**
+- ✅ Transforms `node_modules/strray-ai/dist/...` → `dist/...` for MCP servers
+- ✅ Transforms `node_modules/strray-ai/dist/plugin/plugins/...` → `../../../dist/plugin/plugins/...` for plugins
+- ✅ Enables local development with correct relative paths
+
+**Publishing (Automatic):**
+```json
+"prepublishOnly": "npm run prepare-consumer && npm run build:all"
+```
+- Automatically transforms paths back to consumer format
+- Ensures published package works for all users
 
 ### Manual Installation
 
@@ -475,7 +506,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 **⚡ StringRay ⚡: Enterprise AI orchestration for systematic error prevention** 🚀✨
 
-_Built on the Universal Development Codex v1.2.25_
+_Built on the Universal Development Codex v1.1.1_
 
 ````
 
@@ -634,7 +665,7 @@ Update your `.opencode/oh-my-opencode.json` for enterprise deployment:
   },
   "framework": {
     "name": "strray-ai",
-    "version": "1.0.27",
+    "version": "1.1.1",
     "performance_mode": "optimized",
     "monitoring_enabled": true,
     "plugin_security": "strict"
@@ -681,7 +712,7 @@ STRRAY_LOG_LEVEL=info
 
 ## 🎯 CURRENT STATUS & ROADMAP
 
-### ✅ Production Ready (v1.1.0)
+### ✅ Production Ready (v1.1.1)
 
 - **100% Test Pass Rate**: Comprehensive validation suite passing
 - **Zero Compilation Errors**: Full TypeScript compliance

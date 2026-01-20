@@ -4,7 +4,7 @@
 
 # Comprehensive metrics analysis for framework integration
 
-echo "📊 Universal Development Framework v2.4.0 - Performance Analysis"
+echo "📊 Universal Development Framework v1.1.1 - Performance Analysis"
 echo "============================================================"
 
 # Initialize performance metrics

@@ -4,7 +4,7 @@ StrRay Lite provides essential AI-assisted development capabilities within the o
 
 ## Relationship to Full Framework
 
-- **Base**: Built on oh-my-opencode v2.14.0 (same as full version)
+- **Base**: Built on oh-my-opencode v1.1.1 (same as full version)
 - **Agents**: 4 core agents (vs 8 in full version)
 - **Configuration**: Uses same oh-my-opencode.json schema
 - **Models**: Same "opencode/grok-code" integration

@@ -20,17 +20,17 @@ const dirName = cwd.split("/").pop() || "";
 const fs = await import("fs");
 const path = await import("path");
 
-// More robust detection: check for installed stringray-ai package
+// More robust detection: check for installed strray-ai package
 const deployedPluginPath = path.join(
   cwd,
   "node_modules",
-  "stringray-ai",
+  "strray-ai",
   "dist",
   "plugin",
   "plugins",
 );
 const isDeployedEnvironment = fs.existsSync(
-  path.join(cwd, "node_modules", "stringray-ai"),
+  path.join(cwd, "node_modules", "strray-ai"),
 );
 
 // Also check directory name patterns for backward compatibility
@@ -77,12 +77,16 @@ console.log("Script location:", import.meta.url);
     console.log(`📝 System messages added: ${testOutput.system?.length || 0}`);
 
     if (testOutput.system && testOutput.system.length > 0) {
+      const firstMessage = testOutput.system[0];
+      const messageContent = typeof firstMessage === 'string' ? firstMessage : firstMessage.content || '';
       console.log(
-        `✨ Welcome message: ${testOutput.system[0].substring(0, 80)}...`,
+        `✨ Welcome message: ${messageContent.substring(0, 80)}...`,
       );
 
       // Check if codex content is included
-      const allContent = testOutput.system.join("\\n");
+      const allContent = testOutput.system.map(msg =>
+        typeof msg === 'string' ? msg : msg.content || ''
+      ).join("\\n");
       const hasCodex = allContent.includes("StringRay Framework Codex v1.2.25");
       const hasTerms = allContent.includes("Progressive Prod-Ready Code");
 

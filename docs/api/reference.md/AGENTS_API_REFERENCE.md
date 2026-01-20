@@ -79,7 +79,7 @@ const enforcer: AgentConfig = {
 - **Error Prevention**: 99.6% systematic error prevention
 - **Static Analysis**: Type checking and validation
 - **Runtime Monitoring**: Circuit breaker patterns
-- **Compliance Enforcement**: Universal Development Codex v1.2.25
+- **Compliance Enforcement**: Universal Development Codex v1.1.1
 - **Performance Budgeting**: Memory (256MB), CPU (80%), timeout (45s)
 
 #### Command Integration

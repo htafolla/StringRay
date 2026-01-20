@@ -1,6 +1,6 @@
 # API Reference
 
-**Version**: v1.1.0 | **Last Updated**: 2026-01-15 | **Framework**: StringRay AI v1.1.0
+**Version**: v1.1.1 | **Last Updated**: 2026-01-15 | **Framework**: StringRay AI v1.1.1
 
 ## Overview
 
@@ -507,7 +507,7 @@ for (const result of batchResult.results) {
   },
   "framework": {
     "name": "strray",
-    "version": "1.0.0",
+    "version": "1.1.1",
     "performance_mode": "optimized",
     "monitoring_enabled": true,
     "plugin_security": "strict"
@@ -625,7 +625,7 @@ await orchestrator.configureSecurity({
 
 #### Version Compatibility
 
-- **v1.1.0**: Current production version with all advanced features
+- **v1.1.1**: Current production version with all advanced features
 - **Migration Path**: Automatic migration from v0.x with backward compatibility
 - **Deprecation Policy**: 6-month deprecation notice for breaking changes
 - **Support**: Enterprise support for production deployments

@@ -163,7 +163,7 @@ async function simulateCompleteOrchestratorPipeline() {
   console.log("   → test-architect → oh-my-opencode test-architect agent");
 
   console.log("\n🔍 Enforcer Agent Special Processing:");
-  console.log("   → Loading Universal Development Codex v1.2.25 (50 terms)");
+  console.log("   → Loading Universal Development Codex v1.1.1 (50 terms)");
   console.log("   → Pre-execution validation of task inputs");
   console.log("   → Runtime monitoring during execution");
   console.log("   → Post-execution compliance auditing");

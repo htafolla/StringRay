@@ -18,8 +18,8 @@ This guide documents the complete process for deploying and testing the StrRay F
 
 ## Prerequisites
 
-- Node.js v18.0.0 or higher
-- npm v8.0.0 or higher
+- Node.js v1.1.1 or higher
+- npm v1.1.1 or higher
 - or higher
 - TypeScript 5.x
 
@@ -406,7 +406,7 @@ node scripts/boot-check.cjs
 
 ## Version History
 
-- **v1.1.0**: Initial production release with all path and initialization issues resolved
+- **v1.1.1**: Initial production release with all path and initialization issues resolved
 - **Plugin deployment process**: Refined through 5+ iterations
 - **Testing procedures**: Comprehensive coverage of all integration points
 

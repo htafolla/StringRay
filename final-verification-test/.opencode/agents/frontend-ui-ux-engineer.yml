@@ -1,0 +1,100 @@
+name: frontend-ui-ux-engineer
+description: "Frontend UI/UX Engineer agent for user interface and experience design"
+version: "1.0.0"
+model: opencode/grok-code
+mode: subagent
+
+# State Management Configuration
+state_management:
+  enabled: true
+  namespaces:
+    - ui_state
+    - ux_patterns
+    - design_systems
+  persistence: true
+  recovery: transactional
+  backup_interval: 30m
+  retention_days: 30
+
+# Logging Configuration
+logging:
+  level: info
+  format: json
+  destinations:
+    - console
+    - file
+    - monitoring
+  retention_days: 30
+  sensitive_data_filtering: true
+  audit_trail: true
+
+# Processor Pipeline Configuration
+processor_pipeline:
+  - name: design-validation
+    type: validation
+    priority: high
+    timeout_ms: 10000
+    retry_attempts: 3
+  - name: accessibility-check
+    type: validation
+    priority: high
+    timeout_ms: 8000
+    retry_attempts: 2
+  - name: performance-optimization
+    type: optimization
+    priority: medium
+    timeout_ms: 12000
+    retry_attempts: 2
+
+# Agent Capabilities
+capabilities:
+  - ui_design
+  - ux_research
+  - accessibility_compliance
+  - responsive_design
+  - design_system_creation
+  - user_journey_mapping
+
+# Error Handling Configuration
+error_handling:
+  retry_attempts: 3
+  circuit_breaker:
+    enabled: true
+    failure_threshold: 3
+    recovery_timeout_ms: 30000
+  fallback_strategy: retry
+  alert_on_failure: true
+
+# Performance Configuration
+performance:
+  timeout_ms: 30000
+  concurrency_limit: 3
+  memory_limit_mb: 256
+  cpu_limit_percent: 40
+
+# Integration Hooks
+integration:
+  design_review_complete: true
+  accessibility_scan_finished: true
+  ui_component_generated: true
+  user_feedback_processed: true
+  webhook_endpoints:
+    - url: "https://design-review.example.com/webhook"
+      events: ["design_completed", "accessibility_issue", "ux_improvement"]
+
+# Security Configuration
+security:
+  sandboxed_execution: true
+  permission_level: standard
+  data_classification: internal
+  encryption_required: false
+
+# Monitoring Configuration
+monitoring:
+  metrics_collection: true
+  health_checks: true
+  performance_tracking: true
+  alert_thresholds:
+    response_time_ms: 25000
+    error_rate_percent: 2
+    memory_usage_mb: 200

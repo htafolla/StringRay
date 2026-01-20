@@ -1,6 +1,6 @@
-# StringRay AI v1.1.0 - Performance Testing & Monitoring System
+# StringRay AI v1.1.1 - Performance Testing & Monitoring System
 
-[![Version](https://img.shields.io/badge/version-1.1.0-blue.svg)](https://github.com/strray-framework/stringray)
+[![Version](https://img.shields.io/badge/version-1.1.1-blue.svg)](https://github.com/strray-framework/stringray)
 [![Performance Budget](https://img.shields.io/badge/bundle-%3C2MB-brightgreen.svg)](https://github.com/strray-framework/stringray)
 [![FCP](https://img.shields.io/badge/FCP-%3C2s-brightgreen.svg)](https://github.com/strray-framework/stringray)
 [![TTI](https://img.shields.io/badge/TTI-%3C5s-brightgreen.svg)](https://github.com/strray-framework/stringray)
@@ -62,7 +62,7 @@ The system enforces the Universal Development Codex performance budget:
 
 ### Installation
 
-The performance system is included with StringRay AI v1.1.0. No additional installation required.
+The performance system is included with StringRay AI v1.1.1. No additional installation required.
 
 ### Basic Usage
 

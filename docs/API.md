@@ -618,7 +618,7 @@ console.log("Performance gates:", gatesPassed ? "PASSED" : "FAILED");
 
 ## Migration Guide
 
-### From v0.x to v1.1.0
+### From v0.x to v1.1.1
 
 1. **Configuration Changes:**
    - Move custom config to `.strray/config.json`

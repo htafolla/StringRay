@@ -50,7 +50,7 @@ export default async function strrayCodexPlugin(input: {
 #### System Prompt Injection (`experimental.chat.system.transform`)
 
 - **When**: Before LLM receives system prompt
-- **Purpose**: Inject Universal Development Codex v1.2.25 terms
+- **Purpose**: Inject Universal Development Codex v1.1.1 terms
 - **Mechanism**: Loads codex from `.strray/agents_template.md` and `AGENTS.md`
 - **Output**: Prepends formatted codex context to system messages
 

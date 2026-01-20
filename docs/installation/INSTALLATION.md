@@ -120,8 +120,8 @@ Create `.strray/config.json` in your project root:
 ```json
 {
   "framework": {
-    "version": "1.2.20",
-    "codex": "v1.2.20"
+    "version": "1.1.1",
+    "codex": "v1.1.1"
   },
   "agents": {
     "architect": {
@@ -355,7 +355,7 @@ sudo chown -R $(whoami) ~/.npm
 npm config set prefix ~/.npm-global
 
 # Or use nvm for Node.js management
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v1.1.1/install.sh | bash
 nvm install node
 ```
 

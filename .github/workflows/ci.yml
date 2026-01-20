@@ -46,6 +46,9 @@ jobs:
       - name: Run postinstall configuration
         run: npm run postinstall
 
+      - name: Setup CI paths
+        run: node scripts/setup-ci-paths.cjs
+
       - name: TypeScript type check
         run: npm run typecheck
 

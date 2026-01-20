@@ -52,15 +52,15 @@ jobs:
       - name: Lint code
         run: npm run lint
 
+      - name: Build project
+        run: npm run build:all
+
       - name: Run unit tests
         run: |
-          npm run test:unit || (echo "Retrying with clean install..." && rm -rf node_modules && npm install --ignore-scripts && npm run test:unit)
+          npm run test:unit || (echo "Retrying with clean install..." && rm -rf node_modules package-lock.json && npm install --ignore-scripts && npm run test:unit)
 
       - name: Run integration tests
         run: npm run test:integration
-
-      - name: Build project
-        run: npm run build:all
 
       - name: Run comprehensive validation
         run: npm run test:comprehensive
@@ -89,15 +89,11 @@ jobs:
       - name: Install dependencies
         run: npm ci --ignore-scripts
 
-      - name: Build all
-        run: |
-          npm run build:all || (echo "Build failed, trying clean build..." && rm -rf dist && npm run build:all)
+      - name: Build plugin
+        run: npm run build:plugin
 
-      - name: Check MCP server build
-        run: |
-          echo "Checking MCP server build..."
-          ls -la dist/plugin/mcps/ || echo "MCP directory not found"
-          find dist/plugin/mcps/ -name "*.server.js" | wc -l || echo "No server files found"
+      - name: Build all
+        run: npm run build:all
 
       - name: Validate package
         run: npm pack --dry-run

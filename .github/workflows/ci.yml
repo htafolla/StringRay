@@ -68,6 +68,9 @@ jobs:
       - name: Run integration tests
         run: npm run test:integration
 
+      - name: Package for comprehensive testing
+        run: npm pack
+
       - name: Run comprehensive validation
         run: npm run test:comprehensive
 

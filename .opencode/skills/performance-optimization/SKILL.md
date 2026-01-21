@@ -8,7 +8,7 @@ tags: [performance, performance, optimization]
 mcp:
   performance-optimization:
     command: node
-    args: [node_modules/strray-ai/dist/plugin/mcps/dist/plugin/mcps/knowledge-skills/performance-optimization.server.js]
+    args: [node_modules/strray-ai/dist/plugin/mcps/knowledge-skills/performance-optimization.server.js]
 ---
 
 # Performance Optimization Skill

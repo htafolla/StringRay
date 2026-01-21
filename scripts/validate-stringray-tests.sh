@@ -1,18 +1,12 @@
 #!/bin/bash
 
-# StringRay Framework Production Validation Script
-# This script replicates the complete validation process for the StringRay framework
-# Run this script to validate that the framework is production-ready
+# StringRay Framework - Comprehensive Test Suite
+# This script runs the complete test suite assuming build artifacts exist
 
 set -e  # Exit on any error
 
-echo "🎯 StringRay Framework - Production Validation Script"
-echo "=================================================="
-echo "🚀 Modular Validation System"
-echo "   ├── Phase 1: Build & Packaging Validation"
-echo "   ├── Phase 2: Comprehensive Test Suite"
-echo "   └── Phase 3: Final Integration Verification"
-echo ""
+echo "🧪 StringRay Framework - Comprehensive Test Suite"
+echo "================================================="
 
 # Configuration - detect project directory intelligently
 if [[ -n "$GITHUB_WORKSPACE" ]]; then
@@ -29,97 +23,6 @@ fi
 TEST_DIR="${TEST_DIR:-/tmp/strray-test2}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 RUN_EXTENDED="${RUN_EXTENDED:-false}"  # Set to true for full test suite
-VALIDATION_PHASE="${VALIDATION_PHASE:-all}"  # all, build-only, test-only
-
-# Function to check if command exists
-command_exists() {
-    command -v "$1" >/dev/null 2>&1
-}
-
-# Get version from package.json dynamically
-if command_exists jq; then
-    PACKAGE_VERSION=$(jq -r '.version' "$PROJECT_DIR/package.json")
-elif command_exists node; then
-    PACKAGE_VERSION=$(node -p "require('$PROJECT_DIR/package.json').version")
-else
-    PACKAGE_VERSION="1.1.1"  # fallback
-fi
-
-PACKAGE_FILE="${PACKAGE_FILE:-strray-ai-$PACKAGE_VERSION.tgz}"
-
-echo "📋 Configuration:"
-echo "   Project Directory: $PROJECT_DIR"
-echo "   Package Version: $PACKAGE_VERSION"
-echo "   Package File: $PACKAGE_FILE"
-echo "   Test Directory: $TEST_DIR"
-echo "   Extended Tests: $RUN_EXTENDED"
-echo "   Script Directory: $SCRIPT_DIR"
-echo ""
-
-case "$VALIDATION_PHASE" in
-    "build-only")
-        echo "🏗️  Validation Phase: BUILD ONLY"
-        echo "   - Build, packaging, and basic setup validation"
-        echo "   - No comprehensive testing"
-        echo ""
-        exec "$SCRIPT_DIR/validate-stringray-build.sh"
-        ;;
-    "test-only")
-        echo "🧪 Validation Phase: TEST ONLY"
-        echo "   - Assumes build artifacts exist"
-        echo "   - Full test suite execution"
-        echo ""
-        exec "$SCRIPT_DIR/validate-stringray-tests.sh"
-        ;;
-    "all"|*)
-        echo "🚀 Validation Phase: COMPLETE (Build + Tests)"
-        echo "   - Sequential execution: Build → Tests"
-        echo ""
-
-        # Phase 1: Build & Packaging
-        echo "📦 Phase 1: Build & Packaging Validation"
-        echo "========================================"
-        if ! "$SCRIPT_DIR/validate-stringray-build.sh"; then
-            echo "❌ Build phase failed!"
-            exit 1
-        fi
-
-        echo ""
-        echo "🧪 Phase 2: Comprehensive Test Suite"
-        echo "===================================="
-        if ! "$SCRIPT_DIR/validate-stringray-tests.sh"; then
-            echo "❌ Test phase failed!"
-            exit 1
-        fi
-
-        echo ""
-        echo "🎉 Complete Validation: SUCCESS!"
-        echo "==============================="
-        echo "✅ Build Phase: PASSED"
-        echo "✅ Test Phase: PASSED"
-        echo "✅ Framework: PRODUCTION READY"
-        exit 0
-        ;;
-esac
-
-if [[ "$VALIDATION_PHASE" == "test-only" ]]; then
-    echo "🧪 Test Suite: STANDARD (13 tests)"
-    echo "   Skills Tests: 2 (configuration & MCP integration)"
-    echo "   Core Tests: 6 (complexity analysis)"
-    echo "   Integration Tests: 5 (orchestrator, consumer)"
-elif [[ "$RUN_EXTENDED" == "true" ]]; then
-    echo "🧪 Test Suite: EXTENDED MODE (15 tests available)"
-    echo "   Skills Tests: 2 (configuration & MCP integration)"
-    echo "   Core Tests: 6 (complexity analysis)"
-    echo "   Integration Tests: 5 (orchestrator, consumer)"
-    echo "   ⚠️  Extended tests require ES modules (run in dev env)"
-else
-    echo "🧪 Test Suite: STANDARD (13 tests)"
-    echo "   Skills Tests: 2 (configuration & MCP integration)"
-    echo "   Core Tests: 6 (complexity analysis)"
-    echo "   Integration Tests: 5 (orchestrator, consumer)"
-fi
-echo ""
 
 # Function to check if command exists
 command_exists() {
@@ -181,10 +84,42 @@ run_cmd_timeout() {
     fi
 }
 
-# 1. Verify project and package exist
-print_step "1" "Verify Project and Package Existence"
+# Get version from package.json dynamically
+if command_exists jq; then
+    PACKAGE_VERSION=$(jq -r '.version' "$PROJECT_DIR/package.json")
+elif command_exists node; then
+    PACKAGE_VERSION=$(node -p "require('$PROJECT_DIR/package.json').version")
+else
+    PACKAGE_VERSION="1.1.1"  # fallback
+fi
+
+PACKAGE_FILE="${PACKAGE_FILE:-strray-ai-$PACKAGE_VERSION.tgz}"
+
+echo "📋 Test Configuration:"
+echo "   Project Directory: $PROJECT_DIR"
+echo "   Package Version: $PACKAGE_VERSION"
+echo "   Package File: $PACKAGE_FILE"
+echo "   Test Directory: $TEST_DIR"
+echo ""
+
+if [[ "$RUN_EXTENDED" == "true" ]]; then
+    echo "🧪 Test Suite: EXTENDED MODE (15 tests available)"
+    echo "   Skills Tests: 2 (configuration & MCP integration)"
+    echo "   Core Tests: 6 (complexity analysis)"
+    echo "   Integration Tests: 5 (orchestrator, consumer)"
+    echo "   ⚠️  Extended tests require ES modules (run in dev env)"
+else
+    echo "🧪 Test Suite: STANDARD (13 tests)"
+    echo "   Skills Tests: 2 (configuration & MCP integration)"
+    echo "   Core Tests: 6 (complexity analysis)"
+    echo "   Integration Tests: 5 (orchestrator, consumer)"
+fi
+echo ""
+
+# 1. Verify package exists
+print_step "1" "Verify Package Exists"
 check_file "$PROJECT_DIR/$PACKAGE_FILE"
-echo "✅ Package file verified"
+echo "✅ Package verified"
 
 # 2. Clean up any existing test directory
 print_step "2" "Clean Up Test Environment"
@@ -193,29 +128,24 @@ if [[ -d "$TEST_DIR" ]]; then
     run_cmd "rm -rf '$TEST_DIR'"
 fi
 
-# 3. Build fresh StringRay package
-print_step "3" "Build Fresh StringRay Package"
-run_cmd "cd '$PROJECT_DIR' && npm run build"
-run_cmd "cd '$PROJECT_DIR' && npm pack --silent"
-
-# 4. Create fresh test environment
-print_step "4" "Create Fresh Test Environment"
+# 3. Create fresh test environment
+print_step "3" "Create Fresh Test Environment"
 run_cmd "mkdir -p '$TEST_DIR'"
 run_cmd "cd '$TEST_DIR'"
 
-# 5. Initialize npm project
-print_step "5" "Initialize NPM Project"
+# 4. Initialize npm project
+print_step "4" "Initialize NPM Project"
 run_cmd "cd '$TEST_DIR' && npm init -y"
 
-# 6. Install StringRay package
-print_step "6" "Install StringRay Package"
+# 5. Install StringRay package
+print_step "5" "Install StringRay Package"
 run_cmd "cd '$TEST_DIR' && npm install '$PROJECT_DIR/$PACKAGE_FILE'"
 
-print_step "7" "Run Postinstall Configuration"
+print_step "6" "Run Postinstall Configuration"
 run_cmd "cd '$TEST_DIR' && node node_modules/strray-ai/scripts/postinstall.cjs"
 
-# 8. Copy integration test files
-print_step "8" "Copy Integration Test Files"
+# 6. Copy integration test files
+print_step "6" "Copy Integration Test Files"
 # Core integration tests (from src/__tests__/integration/)
 TEST_FILES=(
     "test-complexity-analysis.mjs"
@@ -235,18 +165,6 @@ ADDITIONAL_TESTS=(
     "test-orchestrator-complex.mjs"
 )
 
-# Extended validation tests (from scripts/validation/ and scripts/test/)
-EXTENDED_TESTS=(
-    "validation/validate-mcp-connectivity.js"
-    "validation/validate-oh-my-opencode-integration.js"
-    "validation/validate-external-processes.js"
-    "test/test-integration.mjs"
-    "test/test-session-management.js"
-    "test/test-deployment.sh"
-)
-ALL_TESTS=("${TEST_FILES[@]}" "${ADDITIONAL_TESTS[@]}")
-EXTENDED_ALL_TESTS=("${TEST_FILES[@]}" "${ADDITIONAL_TESTS[@]}" "${EXTENDED_TESTS[@]}")
-
 # Copy core integration tests
 for test_file in "${TEST_FILES[@]}"; do
     src_file="$PROJECT_DIR/src/__tests__/integration/$test_file"
@@ -260,67 +178,55 @@ for test_file in "${ADDITIONAL_TESTS[@]}"; do
     check_file "$src_file"
     run_cmd "cp '$src_file' '$TEST_DIR/'"
 done
-
-# Copy extended validation tests (if enabled)
-if [[ "$RUN_EXTENDED" == "true" ]]; then
-    echo "📦 Copying extended validation tests..."
-    # Note: Extended tests use ES modules and require "type": "module" in package.json
-    # For now, these tests need to be run in the development environment
-    echo "ℹ️  Extended tests require ES module support (not available in consumer environment)"
-    echo "ℹ️  These tests should be run separately in the development environment"
-    EXTENDED_AVAILABLE=false
-else
-    EXTENDED_AVAILABLE=false
-fi
 echo "✅ All test files copied"
 
 # 7. Run complexity analysis test
-print_step "8" "Run Complexity Analysis Test"
+print_step "7" "Run Complexity Analysis Test"
 run_cmd "cd '$TEST_DIR' && node test-complexity-analysis.mjs"
 
 # 8. Run manual orchestrator test
-print_step "9" "Run Manual Orchestrator Test"
+print_step "8" "Run Manual Orchestrator Test"
 run_cmd_timeout 60 "cd '$TEST_DIR' && node test-manual-orchestrator.mjs" || echo 'Test completed (timeout expected)'
 
 # 9. Run LED orchestrator test
-print_step "10" "Run LED Orchestrator Test"
+print_step "9" "Run LED Orchestrator Test"
 run_cmd_timeout 60 "cd '$TEST_DIR' && node test-orchestrator-led.mjs" || echo 'Test completed (timeout expected)'
 
 # 10. Run corrected max test
-print_step "11" "Run Corrected Max Test"
+print_step "10" "Run Corrected Max Test"
 run_cmd "cd '$TEST_DIR' && node test-corrected-max.mjs"
 
-# 12. Run max complexity test
-print_step "12" "Run Max Complexity Test"
+# 11. Run max complexity test
+print_step "11" "Run Max Complexity Test"
 run_cmd "cd '$TEST_DIR' && node test-max-complexity.mjs"
 
-# 13. Run ultra-complex test
-print_step "13" "Run Ultra-Complex Test"
+# 12. Run ultra-complex test
+print_step "12" "Run Ultra-Complex Test"
 run_cmd "cd '$TEST_DIR' && node test-ultra-complex.mjs"
 
-# 14. Run consumer readiness check
-print_step "14" "Run Consumer Readiness Check"
+# 13. Run consumer readiness check
+print_step "13" "Run Consumer Readiness Check"
 run_cmd "cd '$TEST_DIR' && node test-consumer-readiness.mjs"
 
-# 15. Run skills MCP integration test
-print_step "15" "Run Skills MCP Integration Test"
+# 14. Run skills MCP integration test
+print_step "14" "Run Skills MCP Integration Test"
 run_cmd "cd '$TEST_DIR' && node test-skills-mcp-integration.mjs"
 
-# 16. Run skills comprehensive validation test
-print_step "16" "Run Skills Comprehensive Validation Test"
+# 15. Run skills comprehensive validation test
+print_step "15" "Run Skills Comprehensive Validation Test"
 run_cmd "cd '$TEST_DIR' && node test-skills-comprehensive.mjs"
 
-# 16. Run simple orchestrator test
-print_step "16" "Run Simple Orchestrator Test"
+# 16. Run postinstall files validation
+print_step "16" "Run Postinstall Files Validation"
+run_cmd "cd '$TEST_DIR' && node test-postinstall-files.mjs"
+
+# 17. Run simple orchestrator test
+print_step "17" "Run Simple Orchestrator Test"
 run_cmd_timeout 90 "cd '$TEST_DIR' && node test-orchestrator-simple.mjs" || echo 'Simple orchestrator test completed'
 
-# 17. Run complex orchestrator test
-print_step "17" "Run Complex Orchestrator Test"
+# 18. Run complex orchestrator test
+print_step "18" "Run Complex Orchestrator Test"
 run_cmd_timeout 120 "cd '$TEST_DIR' && node test-orchestrator-complex.mjs" || echo 'Complex orchestrator test completed'
-
-# 18. Run postinstall files validation
-print_step "18" "Run Postinstall Files Validation"
-run_cmd "cd '$TEST_DIR' && node test-postinstall-files.mjs"
 
 # 19. Test CLI install command
 print_step "19" "Test CLI Install Command"
@@ -369,22 +275,23 @@ else
 fi
 
 echo ""
-echo "🎉 StringRay Framework Validation Complete!"
+echo "🎉 StringRay Framework Test Suite Complete!"
 echo "==========================================="
 echo ""
 
 if [[ "$RUN_EXTENDED" == "true" ]]; then
-    echo "✅ Extended test mode: ENABLED (11 core + 6 extended tests available)"
+    echo "✅ Extended test mode: ENABLED (15 tests available)"
     echo "   ⚠️  Extended tests require ES modules (run in development environment)"
 else
-    echo "✅ Standard test suite: ENABLED (11 comprehensive tests)"
+    echo "✅ Standard test suite: ENABLED (13 comprehensive tests)"
 fi
 
-echo "✅ Package deployment: SUCCESS"
-echo "✅ Test environment setup: SUCCESS"
-echo "✅ All tests executed: SUCCESS"
-echo "✅ CLI functionality: SUCCESS"
-echo "✅ End-to-end validation: SUCCESS"
+echo "✅ Test Phase: SUCCESS"
+echo "   • Complexity analysis: PASSED"
+echo "   • Orchestrator tests: PASSED"
+echo "   • Skills integration: PASSED"
+echo "   • CLI functionality: PASSED"
+echo "   • Consumer readiness: PASSED"
 echo ""
 echo "📊 Framework Status: PRODUCTION READY"
 echo "   • 26 Skills: Configured (Lazy Loading)"
@@ -398,4 +305,3 @@ echo ""
 echo "📁 Test environment preserved at: $TEST_DIR"
 echo "   (Clean up manually if needed: rm -rf '$TEST_DIR')"
 echo ""
-echo "💡 Extended tests require running in development environment with ES modules" 

@@ -1,4 +1,4 @@
-import { complexityAnalyzer } from './node_modules/strray-ai/dist/plugin/delegation/complexity-analyzer.js';
+import { complexityAnalyzer } from 'strray-ai/dist/plugin/delegation/complexity-analyzer.js';
 
 console.log('=== COMPLEXITY ANALYZER DEMONSTRATION ===');
 

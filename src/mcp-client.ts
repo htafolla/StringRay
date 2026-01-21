@@ -312,7 +312,9 @@ export class MCPClientManager {
 
   /**
    * Load MCP server configuration from .mcp.json
+   * COMMENTED OUT: No longer loading from .mcp.json for lazy loading approach
    */
+  /*
   private loadServerConfig(serverName: string): MCPClientConfig | null {
     try {
       const mcpConfigPath = path.join(process.cwd(), '.mcp.json');
@@ -336,16 +338,17 @@ export class MCPClientManager {
     }
     return null;
   }
+  */
 
   /**
    * Create client configuration for a server
    */
   public createClientConfig(serverName: string): MCPClientConfig {
-    // First try to load from .mcp.json with path resolution
-    const loadedConfig = this.loadServerConfig(serverName);
-    if (loadedConfig) {
-      return loadedConfig;
-    }
+    // COMMENTED OUT: No longer loading from .mcp.json for lazy loading approach
+    // const loadedConfig = this.loadServerConfig(serverName);
+    // if (loadedConfig) {
+    //   return loadedConfig;
+    // }
 
     // Fallback to hardcoded configurations
     frameworkLogger.log('mcp-client', `Using fallback config for ${serverName}`, 'info');

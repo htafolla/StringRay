@@ -15,7 +15,7 @@ const packageRoot = path.join(__dirname, "..");
 
 // Configuration files to copy during installation
 const configFiles = [
-  ".mcp.json",
+  // ".mcp.json", // Commented out - no longer auto-copying MCP config
   "opencode.json"
 ];
 

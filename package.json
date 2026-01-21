@@ -94,7 +94,6 @@
     "vitest": "^2.0.0"
   },
   "files": [
-    ".mcp.json",
     "opencode.json",
     ".opencode/",
     ".strray/",

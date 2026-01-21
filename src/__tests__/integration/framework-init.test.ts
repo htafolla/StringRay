@@ -238,14 +238,12 @@ describe("StringRay Framework Initialization Integration", () => {
     });
   });
 
-  describe("MCP Ecosystem Validation", () => {
-    test("should validate MCP server configurations", () => {
-      // Check that the root .mcp.json exists and has proper structure
-      expect(checkJson(".mcp.json")).toBe(true);
-      const config = JSON.parse(fs.readFileSync(".mcp.json", "utf8"));
-      expect(config).toHaveProperty("mcpServers");
-      expect(typeof config.mcpServers).toBe("object");
-      expect(Object.keys(config.mcpServers).length).toBeGreaterThan(10); // At least 10 MCP servers
+  describe("Skills-Based MCP Ecosystem Validation", () => {
+    test("should validate skills directory structure", () => {
+      // Check that the .opencode/skills directory exists (skills-based architecture)
+      expect(checkDir(".opencode/skills")).toBe(true);
+      const skillDirs = fs.readdirSync(".opencode/skills");
+      expect(skillDirs.length).toBeGreaterThan(20); // At least 20+ skills
     });
 
     test("should validate compiled MCP servers", () => {

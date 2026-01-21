@@ -86,7 +86,7 @@ program
       const checks = [
         { file: 'opencode.json', description: 'OpenCode configuration' },
         { file: '.opencode/enforcer-config.json', description: 'Framework configuration' },
-        { file: '.mcp.json', description: 'MCP server configuration' },
+        // { file: '.mcp.json', description: 'MCP server configuration' }, // COMMENTED OUT: No longer checking .mcp.json
       ];
 
       let allGood = true;

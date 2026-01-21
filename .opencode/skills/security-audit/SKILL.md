@@ -8,7 +8,7 @@ tags: [security, security, audit]
 mcp:
   security-audit:
     command: node
-    args: [node_modules/strray-ai/dist/plugin/mcps/dist/plugin/mcps/knowledge-skills/security-audit.server.js]
+    args: [node_modules/strray-ai/dist/plugin/mcps/knowledge-skills/security-audit.server.js]
 ---
 
 # Security Audit Skill

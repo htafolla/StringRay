@@ -1,6 +1,6 @@
 {
       "name": "stringray-test-env",
-      "version": "1.0.0",
+      "version": "1.1.1",
       "description": "StringRay Plugin Test Environment",
       "dependencies": {
             "strray-ai": "file:../strray-ai-1.1.1.tgz"

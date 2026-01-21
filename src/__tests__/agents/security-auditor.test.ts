@@ -196,8 +196,8 @@ describe("Security Auditor Agent Configuration", () => {
       expect(securityAuditor.tools?.include).toContain("webfetch");
     });
 
-    it("should have 6 security-specific tools", () => {
-      expect(securityAuditor.tools?.include).toHaveLength(6);
+    it("should have 10 security-specific tools including skill invocation", () => {
+      expect(securityAuditor.tools?.include).toHaveLength(10);
     });
   });
 

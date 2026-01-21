@@ -213,8 +213,8 @@ describe("Bug Triage Specialist Agent Configuration", () => {
       expect(bugTriageSpecialist.tools?.include).toContain("lsp_code_actions");
     });
 
-    it("should have 8 bug triage-specific tools", () => {
-      expect(bugTriageSpecialist.tools?.include).toHaveLength(8);
+    it("should have 14 bug triage-specific tools including skill invocation", () => {
+      expect(bugTriageSpecialist.tools?.include).toHaveLength(14);
     });
   });
 

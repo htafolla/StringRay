@@ -125,16 +125,23 @@ const UPDATE_PATTERNS = [
       replacement: `Framework Version: ${OFFICIAL_VERSIONS.framework.displayName}`,
     },
 
-   // Simple version patterns
-   {
-     pattern: /StrRay v[0-9]+\.[0-9]+\.[0-9]+/g,
-     replacement: `${OFFICIAL_VERSIONS.framework.displayName.replace("StringRay AI ", "StrRay ")}`,
-   },
+    // Simple version patterns
     {
-      pattern: /v[0-9]+\.[0-9]+\.[0-9]+/g,
-      replacement: `v${OFFICIAL_VERSIONS.framework.version}`,
+      pattern: /StrRay v[0-9]+\.[0-9]+\.[0-9]+/g,
+      replacement: OFFICIAL_VERSIONS.framework.displayName,
     },
-];
+
+    // Pre-commit introspection patterns
+    {
+      pattern: /StringRay [0-9]+\.[0-9]+\.[0-9]+ - Pre-commit Introspection/g,
+      replacement: `${OFFICIAL_VERSIONS.framework.displayName} - Pre-commit Introspection`,
+    },
+    {
+      pattern: /🔬 StringRay [0-9]+\.[0-9]+\.[0-9]+ - Pre-commit Introspection/g,
+      replacement: `🔬 ${OFFICIAL_VERSIONS.framework.displayName} - Pre-commit Introspection`,
+    },
+
+  ];
 
 async function standardizeVersions() {
   console.log("🔧 Starting Universal Version Standardization");
@@ -148,7 +155,7 @@ async function standardizeVersions() {
   console.log("=".repeat(60));
 
   // Find all files that might contain version references
-  const extensions = [".ts", ".js", ".md", ".json", ".txt"];
+  const extensions = [".ts", ".js", ".md", ".json", ".txt", ".sh"];
   const files = findFiles(".", extensions);
 
   let totalFilesUpdated = 0;

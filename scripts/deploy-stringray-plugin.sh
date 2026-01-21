@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# StringRay Framework v1.0.0 - Plugin Deployment Script
+# StringRay AI v1.1.1 - Plugin Deployment Script
 #
 # This script executes the complete StringRay plugin deployment process
 # as documented in docs/PLUGIN_DEPLOYMENT_GUIDE.md
@@ -144,7 +144,7 @@ deploy_to_test_env() {
     cat > package.json << EOF
 {
       "name": "stringray-test-env",
-  "version": "1.0.0",
+  "version": "1.1.1",
   "description": "StringRay Plugin Test Environment",
   "dependencies": {}
 }
@@ -349,7 +349,7 @@ generate_report() {
     local report_file="reports/deployment/deployment-report-$(date +%Y%m%d-%H%M%S).txt"
 
     cat > "$report_file" << EOF
-StringRay Framework v1.0.0 - Deployment Report
+StringRay AI v1.1.1 - Deployment Report
 ==========================================
 
 Deployment Date: $(date)

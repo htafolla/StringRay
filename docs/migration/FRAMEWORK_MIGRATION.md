@@ -26,7 +26,7 @@ This document describes the comprehensive migration and consolidation efforts im
 
 ```json
 {
-  "framework": "StrRay v1.1.1",
+  "framework": "StringRay AI v1.1.1",
   "agents": {
     "enforcer": {
       "enabled": true,

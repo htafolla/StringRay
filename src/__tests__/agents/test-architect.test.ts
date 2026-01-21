@@ -221,8 +221,8 @@ describe("Test Architect Agent Configuration", () => {
       expect(testArchitect.tools?.include).toContain("write");
     });
 
-    it("should have 6 testing-specific tools", () => {
-      expect(testArchitect.tools?.include).toHaveLength(6);
+    it("should have 12 testing-specific tools including skill invocation", () => {
+      expect(testArchitect.tools?.include).toHaveLength(12);
     });
   });
 

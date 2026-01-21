@@ -122,13 +122,11 @@ describe("Orchestrator Agent Configuration", () => {
       expect(orchestrator.tools?.include).toContain("run_terminal_cmd");
       expect(orchestrator.tools?.include).toContain("background_task");
       expect(orchestrator.tools?.include).toContain("call_omo_agent");
-      expect(orchestrator.tools?.include).toContain("session_list");
-      expect(orchestrator.tools?.include).toContain("session_read");
-      expect(orchestrator.tools?.include).toContain("session_search");
+      expect(orchestrator.tools?.include).toContain("session_*");
     });
 
-    it("should have 9 orchestration-specific tools", () => {
-      expect(orchestrator.tools?.include).toHaveLength(9);
+    it("should have 13 orchestration-specific tools including skill invocation", () => {
+      expect(orchestrator.tools?.include).toHaveLength(13);
     });
   });
 

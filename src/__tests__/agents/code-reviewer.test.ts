@@ -208,8 +208,8 @@ describe("Code Reviewer Agent Configuration", () => {
       expect(codeReviewer.tools?.include).toContain("lsp_code_action_resolve");
     });
 
-    it("should have 7 code review-specific tools", () => {
-      expect(codeReviewer.tools?.include).toHaveLength(7);
+    it("should have 12 code review-specific tools including skill invocation", () => {
+      expect(codeReviewer.tools?.include).toHaveLength(12);
     });
   });
 

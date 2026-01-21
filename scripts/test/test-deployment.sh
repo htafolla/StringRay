@@ -118,7 +118,7 @@ cd test-config
 cat > package.json << 'EOF'
 {
   "name": "test-config",
-  "version": "1.0.0"
+  "version": "1.1.1"
 }
 EOF
 
@@ -152,7 +152,7 @@ cd test-registration
 cat > package.json << 'EOF'
 {
   "name": "test-registration",
-  "version": "1.0.0"
+  "version": "1.1.1"
 }
 EOF
 
@@ -216,7 +216,7 @@ cd test-agents
 cat > package.json << 'EOF'
 {
   "name": "test-agents",
-  "version": "1.0.0"
+  "version": "1.1.1"
 }
 EOF
 

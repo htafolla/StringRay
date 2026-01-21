@@ -216,8 +216,8 @@ describe("Refactorer Agent Configuration", () => {
       expect(refactorer.tools?.include).toContain("lsp_prepare_rename");
     });
 
-    it("should have 8 refactoring-specific tools", () => {
-      expect(refactorer.tools?.include).toHaveLength(8);
+    it("should have 13 refactoring-specific tools including skill invocation", () => {
+      expect(refactorer.tools?.include).toHaveLength(13);
     });
   });
 

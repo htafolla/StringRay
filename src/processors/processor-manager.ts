@@ -647,6 +647,11 @@ export class ProcessorManager {
 
       const result = await ruleEnforcer.validateOperation(operation, validationContext);
 
+      // If violations found, attempt to fix them with agents
+      if (!result.passed && result.errors.length > 0) {
+        await this.attemptRuleViolationFixes(result.errors, validationContext);
+      }
+
       return {
         compliant: result.passed,
         violations: result.errors,
@@ -732,5 +737,72 @@ export class ProcessorManager {
         error: error instanceof Error ? error.message : String(error),
       };
     }
+  }
+
+  /**
+   * Attempt to fix rule violations by calling appropriate agents/skills
+   */
+  private async attemptRuleViolationFixes(
+    violations: any[],
+    context: any
+  ): Promise<void> {
+    for (const violation of violations) {
+      try {
+        console.log(`🔧 Attempting to fix rule violation: ${violation.rule}`);
+
+        const agentSkill = this.getAgentForRule(violation.rule);
+        if (!agentSkill) {
+          console.log(`❌ No agent/skill mapping found for rule: ${violation.rule}`);
+          continue;
+        }
+
+        const { agent, skill } = agentSkill;
+
+        // Call the skill invocation MCP server to delegate to the agent/skill
+        const { mcpClientManager } = await import('../mcp-client.js');
+        const result = await mcpClientManager.callServerTool(
+          "skill-invocation",
+          "invoke-skill",
+          {
+            skillName: skill,
+            toolName: "analyze_code_quality",
+            args: {
+              code: context.files || [],
+              language: "typescript",
+              context: {
+                rule: violation.rule,
+                message: violation.message,
+                files: context.files,
+                newCode: context.newCode
+              }
+            }
+          }
+        );
+
+        console.log(`✅ Agent ${agent} attempted fix for rule: ${violation.rule}`);
+
+      } catch (error) {
+        console.log(`❌ Failed to call agent for rule ${violation.rule}: ${error instanceof Error ? error.message : String(error)}`);
+      }
+    }
+  }
+
+  /**
+   * Get the appropriate agent/skill for a rule violation
+   */
+  private getAgentForRule(ruleId: string): { agent: string; skill: string } | null {
+    const ruleMappings: Record<string, { agent: string; skill: string }> = {
+      "tests-required": { agent: "test-architect", skill: "testing-strategy" },
+      "no-duplicate-code": { agent: "refactorer", skill: "refactoring-strategies" },
+      "no-over-engineering": { agent: "architect", skill: "architecture-patterns" },
+      "resolve-all-errors": { agent: "bug-triage-specialist", skill: "code-review" },
+      "prevent-infinite-loops": { agent: "bug-triage-specialist", skill: "code-review" },
+      "state-management-patterns": { agent: "architect", skill: "architecture-patterns" },
+      "import-consistency": { agent: "refactorer", skill: "refactoring-strategies" },
+      "documentation-required": { agent: "librarian", skill: "project-analysis" },
+      "clean-debug-logs": { agent: "refactorer", skill: "refactoring-strategies" }
+    };
+
+    return ruleMappings[ruleId] || null;
   }
 }

@@ -19,6 +19,7 @@ import { PostProcessorMonitoringEngine } from "./monitoring/MonitoringEngine.js"
 import { FailureAnalysisEngine } from "./analysis/FailureAnalysisEngine.js";
 import { AutoFixEngine } from "./autofix/AutoFixEngine.js";
 import { FixValidator } from "./autofix/FixValidator.js";
+import { mcpClientManager } from "../mcp-client.js";
 import { RedeployCoordinator } from "./redeploy/RedeployCoordinator.js";
 import { EscalationEngine } from "./escalation/EscalationEngine.js";
 import { SuccessHandler } from "./success/SuccessHandler.js";
@@ -134,40 +135,6 @@ export class PostProcessor {
   }
 
   /**
-   * Calculate complexity score for automated report triggering
-   */
-  private calculateComplexityScore(
-    monitoringResults: any[],
-    context: PostProcessorContext,
-  ): number {
-    let score = 0;
-
-    // File count factor (0-20 points)
-    score += Math.min(context.files.length * 2, 20);
-
-    // Monitoring results factor (0-30 points)
-    const totalJobs = monitoringResults.reduce(
-      (sum, result) => sum + (result.ciStatus?.totalJobs || 0),
-      0,
-    );
-    score += Math.min(totalJobs * 2, 30);
-
-    // Duration factor (0-20 points) - longer operations are more complex
-    const avgDuration =
-      monitoringResults.reduce((sum, result) => sum + result.duration, 0) /
-      Math.max(monitoringResults.length, 1);
-    score += Math.min(avgDuration / 60000, 20); // 1 point per minute
-
-    // Success rate factor (0-30 points) - lower success rates indicate complexity
-    const successRate =
-      monitoringResults.filter((r) => r.overallStatus === "success").length /
-      Math.max(monitoringResults.length, 1);
-    score += (1 - successRate) * 30; // More failures = higher complexity
-
-    return Math.min(Math.max(score, 0), 100);
-  }
-
-  /**
    * Validate generated reports for hidden issues
    */
   private async validateGeneratedReport(
@@ -273,7 +240,19 @@ export class PostProcessor {
       const integrityCheck = await this.checkSystemIntegrity(context);
       if (!integrityCheck.passed) {
         console.log(`❌ System integrity violation: ${integrityCheck.message}`);
-        return false;
+
+        // Call librarian agent to analyze system components
+        const fixed = await this.callAgentForArchitecturalFix(
+          "checkSystemIntegrity",
+          "librarian",
+          "project-analysis",
+          context,
+          integrityCheck.message
+        );
+
+        if (!fixed) {
+          return false; // Could not auto-fix
+        }
       }
 
       // Rule 47: Integration Testing Mandate
@@ -282,14 +261,38 @@ export class PostProcessor {
         console.log(
           `❌ Integration testing violation: ${integrationCheck.message}`,
         );
-        return false;
+
+        // Call test-architect agent for testing strategy
+        const fixed = await this.callAgentForArchitecturalFix(
+          "checkIntegrationTesting",
+          "test-architect",
+          "testing-strategy",
+          context,
+          integrationCheck.message
+        );
+
+        if (!fixed) {
+          return false; // Could not auto-fix
+        }
       }
 
       // Rule 48: Path Resolution Abstraction
       const pathCheck = await this.checkPathResolution(context);
       if (!pathCheck.passed) {
         console.log(`❌ Path resolution violation: ${pathCheck.message}`);
-        return false;
+
+        // Call librarian + refactorer for path analysis and fixes
+        const fixed = await this.callAgentForArchitecturalFix(
+          "checkPathResolution",
+          "librarian",
+          "project-analysis",
+          context,
+          pathCheck.message
+        );
+
+        if (!fixed) {
+          return false; // Could not auto-fix
+        }
       }
 
       // Rule 49: Feature Completeness Validation
@@ -298,7 +301,19 @@ export class PostProcessor {
         console.log(
           `❌ Feature completeness violation: ${completenessCheck.message}`,
         );
-        return false;
+
+        // Call architect agent for system design analysis
+        const fixed = await this.callAgentForArchitecturalFix(
+          "checkFeatureCompleteness",
+          "architect",
+          "architecture-patterns",
+          context,
+          completenessCheck.message
+        );
+
+        if (!fixed) {
+          return false; // Could not auto-fix
+        }
       }
 
       // Rule 50: Path Analysis Guidelines Enforcement
@@ -308,7 +323,19 @@ export class PostProcessor {
         console.log(
           `❌ Path analysis guidelines violation: ${pathGuidelinesCheck.message}`,
         );
-        return false;
+
+        // Call refactorer agent for code refactoring
+        const fixed = await this.callAgentForArchitecturalFix(
+          "checkPathAnalysisGuidelines",
+          "refactorer",
+          "refactoring-strategies",
+          context,
+          pathGuidelinesCheck.message
+        );
+
+        if (!fixed) {
+          return false; // Could not auto-fix
+        }
       }
 
       console.log("✅ All architectural compliance checks passed");
@@ -869,5 +896,106 @@ All path violations will be automatically detected and blocked.
       config: this.config,
       monitoringStatus: await this.monitoringEngine.getStatus(),
     };
+  }
+
+  /**
+   * Call appropriate agent/skill to fix architectural compliance violations
+   */
+  private async callAgentForArchitecturalFix(
+    violationType: string,
+    agentName: string,
+    skillName: string,
+    context: PostProcessorContext,
+    violationMessage: string
+  ): Promise<boolean> {
+    try {
+      console.log(`🔧 Calling ${agentName} (${skillName}) to fix: ${violationType}`);
+
+      // Call the skill invocation MCP server to delegate to the appropriate agent/skill
+      const result = await mcpClientManager.callServerTool(
+        "skill-invocation",
+        "invoke-skill",
+        {
+          skillName: skillName,
+          toolName: "analyze_code_quality", // Default tool for analysis
+          args: {
+            code: context.files || [],
+            language: "typescript",
+            context: {
+              violationType,
+              message: violationMessage,
+              commitSha: context.commitSha,
+              repository: context.repository,
+              branch: context.branch,
+              author: context.author
+            }
+          }
+        }
+      );
+
+      console.log(`✅ Agent ${agentName} completed fix attempt for ${violationType}`);
+
+      // Check if the fix was successful by re-running the validation
+      const fixed = await this.revalidateAfterFix(violationType, context);
+      if (fixed) {
+        console.log(`🎉 ${violationType} violation fixed by ${agentName}`);
+        return true;
+      } else {
+        console.log(`❌ ${violationType} violation not fixed by ${agentName}`);
+        return false;
+      }
+    } catch (error) {
+      console.log(`❌ Failed to call agent ${agentName} for ${violationType}: ${error instanceof Error ? error.message : String(error)}`);
+      return false;
+    }
+  }
+
+  /**
+   * Calculate complexity score for automated report triggering
+   */
+  private calculateComplexityScore(
+    monitoringResults: any[],
+    context: PostProcessorContext
+  ): number {
+    // Simple complexity calculation based on file count and monitoring results
+    const fileCount = context.files?.length || 0;
+    const monitoringIssues = monitoringResults?.length || 0;
+
+    // Base score from file count (max 50 points)
+    const fileScore = Math.min(fileCount * 2, 50);
+
+    // Additional score from monitoring issues (max 30 points)
+    const monitoringScore = Math.min(monitoringIssues * 5, 30);
+
+    // Total score (0-100)
+    return Math.min(fileScore + monitoringScore, 100);
+  }
+
+  /**
+   * Revalidate after agent fix attempt
+   */
+  private async revalidateAfterFix(
+    violationType: string,
+    context: PostProcessorContext
+  ): Promise<boolean> {
+    switch (violationType) {
+      case "checkSystemIntegrity":
+        const integrityCheck = await this.checkSystemIntegrity(context);
+        return integrityCheck.passed;
+      case "checkIntegrationTesting":
+        const integrationCheck = await this.checkIntegrationTesting(context);
+        return integrationCheck.passed;
+      case "checkPathResolution":
+        const pathCheck = await this.checkPathResolution(context);
+        return pathCheck.passed;
+      case "checkFeatureCompleteness":
+        const completenessCheck = await this.checkFeatureCompleteness(context);
+        return completenessCheck.passed;
+      case "checkPathAnalysisGuidelines":
+        const guidelinesCheck = await this.checkPathAnalysisGuidelines(context);
+        return guidelinesCheck.passed;
+      default:
+        return false;
+    }
   }
 }

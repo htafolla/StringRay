@@ -45,10 +45,12 @@ class PostinstallFileValidator {
       const mcpPath = path.join(process.cwd(), ".mcp.json");
 
       if (!fs.existsSync(mcpPath)) {
-        console.log("  ❌ .mcp.json not found");
-        this.results.failed.push({
+        // In lazy loading architecture, .mcp.json may not exist initially
+        // MCP servers are loaded on-demand when skills are invoked
+        console.log("  ✅ .mcp.json not present (lazy loading - normal)");
+        this.results.passed.push({
           test: "MCP Config File",
-          error: "File does not exist",
+          details: "Lazy loading - file created on-demand",
         });
         return;
       }

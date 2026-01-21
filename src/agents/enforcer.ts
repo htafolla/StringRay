@@ -39,6 +39,9 @@ Runtime error detection and prevention across all system components. Error Handl
 - **pre-commit-introspection**: Pre-commit validation and fixes
 - **interactive-validator**: Real-time code validation
 
+### Help & Discovery:
+For information about all available framework capabilities, use the framework-help system (framework-help MCP server provides strray_get_capabilities, strray_get_commands, and strray_explain_capability tools).
+
 ## Operational Protocols
 
 ### Error Prevention Priority:

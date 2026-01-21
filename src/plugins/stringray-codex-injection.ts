@@ -9,6 +9,9 @@
  */
 
 import { frameworkLogger } from "../framework-logger.js";
+import { TokenManager } from "../utils/token-manager.js";
+
+const tokenManager = new TokenManager();
 
 const pluginHooks = {
   config: (input: { client?: string; directory?: string; worktree?: string }) => {
@@ -20,12 +23,36 @@ const pluginHooks = {
 
     // Inject codex context into system messages for agent guidance
     try {
-      // Add welcome message and codex content to system messages
-      const codexMessage = {
-        role: "system",
-        content: `## StringRay Framework Codex v1.2.25
+      const fullContent = `## StringRay Framework Codex v1.2.25
 
 Welcome to StringRay AI! This session includes systematic error prevention and production-ready development guidelines.
+
+### 🚀 Available Framework Capabilities
+
+**Agent Commands (use @agent-name):**
+- **@enforcer** - Codex compliance & error prevention
+- **@architect** - System design & technical decisions
+- **@orchestrator** - Multi-agent workflow coordination
+- **@bug-triage-specialist** - Error investigation & surgical fixes
+- **@code-reviewer** - Quality assessment & standards validation
+- **@security-auditor** - Vulnerability detection & compliance
+- **@refactorer** - Technical debt elimination & code consolidation
+- **@test-architect** - Testing strategy & coverage optimization
+
+**Skills System (23 lazy-loaded capabilities):**
+- project-analysis, testing-strategy, code-review, security-audit, performance-optimization
+- refactoring-strategies, ui-ux-design, documentation-generation, and more
+
+**Framework Tools:**
+- **framework-reporting-system** - Generate comprehensive activity reports
+- **complexity-analyzer** - Analyze code complexity and delegation decisions
+- **codex-injector** - Apply development standards automatically
+
+**Help & Discovery:**
+To discover all available capabilities, use the framework-help system:
+- Get capabilities overview and command examples
+- Access detailed explanations of any framework feature
+- Available through MCP server: framework-help
 
 ### Core Principles:
 - **Progressive Prod-Ready Code**: All code must be production-ready from the first commit
@@ -41,7 +68,27 @@ Welcome to StringRay AI! This session includes systematic error prevention and p
 - **Test Coverage >85%**: Maintain comprehensive behavioral test coverage
 - **Performance Budget**: Bundle size <2MB (gzipped <700KB)
 
-For complete codex documentation, see: .strray/codex.json`
+For complete codex documentation, see: .strray/codex.json`;
+
+      const limitCheck = tokenManager.checkLimits(fullContent);
+      let finalContent = fullContent;
+
+      if (!limitCheck.withinLimit) {
+        frameworkLogger.log("codex-injector", "Codex content exceeds token limits, pruning context", "error", {
+          currentTokens: limitCheck.currentTokens,
+          maxTokens: limitCheck.maxTokens
+        });
+        finalContent = tokenManager.pruneContext(fullContent);
+      } else if (limitCheck.warning) {
+        frameworkLogger.log("codex-injector", "Codex content approaching token limits", "info", {
+          currentTokens: limitCheck.currentTokens,
+          maxTokens: limitCheck.maxTokens
+        });
+      }
+
+      const codexMessage = {
+        role: "system",
+        content: finalContent
       };
 
       // Modify context.system array to include codex message

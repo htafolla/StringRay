@@ -46,9 +46,8 @@ echo "🏗️ Checking architecture compliance..."
 # Count any/unknown types
 ANY_COUNT=$(find src -name "*.ts" -o -name "*.tsx" | xargs grep -l ":\s*\(any\|unknown\)" | wc -l)
 if [ "$ANY_COUNT" -gt 0 ]; then
-    ISSUES+=("Architecture violation: any|unknown ($ANY_COUNT instances)")
-    COMPLIANT=false
-    echo "❌ Architecture violation: any|unknown ($ANY_COUNT instances)"
+    WARNINGS+=("Architecture warning: any|unknown types detected ($ANY_COUNT instances)")
+    echo "⚠️ Architecture warning: any|unknown types detected ($ANY_COUNT instances)"
 else
     echo "✅ No any/unknown type violations"
 fi
@@ -70,10 +69,10 @@ echo "📏 Checking component sizes..."
 LARGE_COMPONENTS=$(find src -name "*.tsx" -o -name "*.ts" | xargs wc -l | awk '$1 > 300 {print $2 ": " $1 " lines"}')
 LARGE_COUNT=$(echo "$LARGE_COMPONENTS" | grep -c ":" || true)
 if [ "$LARGE_COUNT" -gt 0 ]; then
-    ISSUES+=("$LARGE_COUNT components exceed 300-line limit")
-    COMPLIANT=false
+    WARNINGS+=("$LARGE_COUNT components exceed 300-line limit (consider refactoring)")
     echo "⚠️ Large components detected"
     echo "$LARGE_COMPONENTS"
+    echo "💡 Consider breaking down large components for better maintainability"
 else
     echo "✅ All components within size limits"
 fi

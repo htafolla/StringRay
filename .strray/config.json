@@ -19,6 +19,21 @@
     "compliance_check": true,
     "threshold_monitoring": true
   },
+  "token_management": {
+    "enabled": true,
+    "max_prompt_tokens": 240000,
+    "warning_threshold": 200000,
+    "context_pruning": {
+      "enabled": true,
+      "aggressive_pruning": false,
+      "preserve_critical_context": true
+    },
+    "model_limits": {
+      "opencode/grok-code": 256000,
+      "gpt-4": 128000,
+      "claude-3": 200000
+    }
+  },
   "agents": {
     "sisyphus": {
       "enabled": false,

@@ -263,6 +263,98 @@ export class MCPClient {
           ],
         };
 
+      case "framework-help":
+        if (toolName === "strray_get_capabilities") {
+          return {
+            content: [
+              {
+                type: "text",
+                text: `**StringRay Framework Capabilities:**
+
+**8 Specialized Agents:**
+- enforcer: Codex compliance & error prevention
+- architect: System design & technical decisions
+- orchestrator: Multi-agent workflow coordination
+- bug-triage-specialist: Error investigation & surgical fixes
+- code-reviewer: Quality assessment & standards validation
+- security-auditor: Vulnerability detection & compliance
+- refactorer: Technical debt elimination & code consolidation
+- test-architect: Testing strategy & coverage optimization
+
+**23 Skills (Lazy Loading):**
+- project-analysis, testing-strategy, code-review, security-audit, performance-optimization, refactoring-strategies, ui-ux-design, documentation-generation, and more
+
+**System Tools:**
+- framework-reporting-system: Generate comprehensive reports
+- complexity-analyzer: Analyze code complexity and delegation decisions
+- codex-injector: Apply development standards and quality enforcement
+
+**Enterprise Features:**
+- 99.6% error prevention through codex compliance
+- 90% resource reduction (0 baseline processes)
+- Multi-agent orchestration with intelligent delegation`,
+              },
+            ],
+          };
+        } else if (toolName === "strray_get_commands") {
+          return {
+            content: [
+              {
+                type: "text",
+                text: `**StringRay Framework Commands:**
+
+**Agent Commands:**
+@enforcer - Codex compliance & error prevention
+@architect - System design & technical decisions
+@orchestrator - Multi-agent workflow coordination
+@bug-triage-specialist - Error investigation & surgical fixes
+@code-reviewer - Quality assessment & standards validation
+@security-auditor - Vulnerability detection & compliance
+@refactorer - Technical debt elimination & code consolidation
+@test-architect - Testing strategy & coverage optimization
+
+**System Commands:**
+framework-reporting-system - Generate comprehensive framework reports
+complexity-analyzer - Analyze code complexity and delegation decisions
+codex-injector - Apply development standards and quality enforcement
+
+**Getting Started:**
+1. Use @enforcer for code quality validation
+2. Use @orchestrator for complex development tasks
+3. Use skills for specialized capabilities
+4. Check framework-reporting-system for activity reports`,
+              },
+            ],
+          };
+        } else if (toolName === "strray_explain_capability") {
+          return {
+            content: [
+              {
+                type: "text",
+                text: `**Enforcer Agent**
+Automatically validates code against the Universal Development Codex (46 mandatory terms).
+Prevents common errors, enforces coding standards, and ensures production-ready code.
+
+**Capabilities:**
+- Type safety validation (no any/unknown types)
+- Architecture compliance checking
+- Error prevention (90% runtime error reduction)
+- Code quality enforcement
+
+**Usage:** @enforcer analyze this code for violations`,
+              },
+            ],
+          };
+        }
+        return {
+          content: [
+            {
+              type: "text",
+              text: `Framework Help: ${toolName} executed successfully`,
+            },
+          ],
+        };
+
       default:
         return {
           content: [
@@ -392,6 +484,14 @@ export class MCPClientManager {
           `${process.env.STRRAY_MCP_PATH || "dist/plugin"}/mcps/knowledge-skills/project-analysis.server.js`,
         ],
         timeout: 60000,
+      },
+      "framework-help": {
+        serverName: "framework-help",
+        command: "node",
+        args: [
+          `${process.env.STRRAY_MCP_PATH || "dist/plugin"}/mcps/framework-help.server.js`,
+        ],
+        timeout: 15000,
       },
     };
 

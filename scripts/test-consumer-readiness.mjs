@@ -30,8 +30,7 @@ class ConsumerReadinessCheck {
     );
     console.log("");
 
-    // Core file existence checks
-    this.checkFile(".mcp.json", "MCP server configuration");
+    // Core file existence checks (skip .mcp.json for lazy loading)
     this.checkFile("opencode.json", "OpenCode configuration");
     this.checkFile(
       ".opencode/oh-my-opencode.json",
@@ -48,6 +47,11 @@ class ConsumerReadinessCheck {
     this.checkSisyphusDisabled();
 
     this.printSummary();
+
+    // Return success status
+    const passed = this.checks.filter((c) => c.passed).length;
+    const total = this.checks.length;
+    return passed === total;
 
     const allPassed = this.checks.every((check) => check.passed);
     console.log("");
@@ -73,18 +77,30 @@ class ConsumerReadinessCheck {
 
   checkMCPServers() {
     try {
-      const mcpConfig = JSON.parse(fs.readFileSync(".mcp.json", "utf8"));
-      const serverCount = Object.keys(mcpConfig.mcpServers || {}).length;
-      const hasServers = serverCount >= 16; // At least 16 servers
+      // In lazy loading architecture, .mcp.json may not exist initially
+      // MCP servers are loaded on-demand when skills are invoked
+      if (fs.existsSync(".mcp.json")) {
+        const mcpConfig = JSON.parse(fs.readFileSync(".mcp.json", "utf8"));
+        const serverCount = Object.keys(mcpConfig.mcpServers || {}).length;
+        const hasServers = serverCount >= 16; // At least 16 servers
 
-      this.checks.push({
-        name: "MCP server configuration",
-        passed: hasServers,
-        details: `${serverCount} servers configured`,
-      });
-      console.log(
-        `${hasServers ? "✅" : "❌"} MCP servers: ${serverCount} configured (${hasServers ? "OK" : "Too few"})`,
-      );
+        this.checks.push({
+          name: "MCP server configuration",
+          passed: hasServers,
+          details: `${serverCount} servers configured`,
+        });
+        console.log(
+          `${hasServers ? "✅" : "❌"} MCP servers: ${serverCount} configured (${hasServers ? "OK" : "Too few"})`,
+        );
+      } else {
+        // Lazy loading: .mcp.json doesn't exist initially, which is normal
+        this.checks.push({
+          name: "MCP server configuration",
+          passed: true,
+          details: "Lazy loading - servers loaded on-demand",
+        });
+        console.log("✅ MCP servers: Lazy loading (normal for skills architecture)");
+      }
     } catch (error) {
       this.checks.push({
         name: "MCP server configuration",

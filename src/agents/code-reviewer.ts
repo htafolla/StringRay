@@ -53,6 +53,12 @@ Your goal is to maintain the highest standards of code quality while providing a
       "lsp_diagnostics",
       "lsp_code_actions",
       "lsp_code_action_resolve",
+      // Skill invocation tools for comprehensive code analysis
+      "invoke-skill",
+      "skill-code-review",
+      "skill-security-audit",
+      "skill-performance-optimization",
+      "skill-testing-strategy",
     ],
   },
   permission: {

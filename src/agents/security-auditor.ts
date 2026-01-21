@@ -53,6 +53,11 @@ Your goal is to maintain the highest levels of security and compliance while ena
       "run_terminal_cmd",
       "grep_app_searchGitHub",
       "webfetch",
+      // Skill invocation tools for security analysis
+      "invoke-skill",
+      "skill-security-audit",
+      "skill-code-review",
+      "skill-performance-optimization",
     ],
   },
   permission: {

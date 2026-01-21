@@ -73,6 +73,13 @@ Your goal is to create robust, scalable system architectures that support the en
       "background_task",
       "lsp_goto_definition",
       "lsp_find_references",
+      // Skill invocation tools for architectural analysis
+      "invoke-skill",
+      "skill-code-review",
+      "skill-security-audit",
+      "skill-performance-optimization",
+      "skill-testing-strategy",
+      "skill-project-analysis",
     ],
   },
   permission: {

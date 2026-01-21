@@ -55,6 +55,12 @@ Your goal is to continuously improve code quality and maintainability while elim
       "ast_grep_replace",
       "lsp_rename",
       "lsp_prepare_rename",
+      // Skill invocation tools for refactoring analysis
+      "invoke-skill",
+      "skill-code-review",
+      "skill-security-audit",
+      "skill-performance-optimization",
+      "skill-testing-strategy",
     ],
   },
   permission: {

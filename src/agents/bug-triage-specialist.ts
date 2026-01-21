@@ -54,6 +54,13 @@ Your goal is to eliminate bugs through systematic investigation and implement fi
       "ast_grep_replace",
       "lsp_diagnostics",
       "lsp_code_actions",
+      // Skill invocation tools for bug investigation
+      "invoke-skill",
+      "skill-code-review",
+      "skill-security-audit",
+      "skill-performance-optimization",
+      "skill-testing-strategy",
+      "skill-project-analysis",
     ],
   },
   permission: {

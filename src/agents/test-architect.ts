@@ -68,6 +68,13 @@ Your goal is to ensure comprehensive test coverage and reliable validation of sy
       "run_terminal_cmd",
       "run_terminal_cmd",
       "write",
+      // Skill invocation tools for testing strategy
+      "invoke-skill",
+      "skill-testing-strategy",
+      "skill-code-review",
+      "skill-security-audit",
+      "skill-performance-optimization",
+      "skill-project-analysis",
     ],
   },
   permission: {

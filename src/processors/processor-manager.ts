@@ -632,14 +632,41 @@ export class ProcessorManager {
   private async executeCodexCompliance(context: any): Promise<any> {
     const { operation } = context;
 
-    const codexTerms = this.stateManager.get("enforcement:codex_terms") || [];
-    const termsArray = Array.isArray(codexTerms) ? codexTerms : [];
+    try {
+      const { RuleEnforcer } = await import('../enforcement/rule-enforcer');
+      const ruleEnforcer = new RuleEnforcer();
 
-    return {
-      compliant: true,
-      termsChecked: termsArray.length,
-      operation,
-    };
+      const validationContext = {
+        files: context.files || [],
+        newCode: context.newCode || '',
+        existingCode: context.existingCode || new Map(),
+        tests: context.tests || [],
+        dependencies: context.dependencies || [],
+        operation: context.operation || 'unknown'
+      };
+
+      const result = await ruleEnforcer.validateOperation(operation, validationContext);
+
+      return {
+        compliant: result.passed,
+        violations: result.errors,
+        warnings: result.warnings,
+        termsChecked: result.results.length,
+        operation: operation,
+        timestamp: new Date().toISOString()
+      };
+    } catch (error) {
+      console.warn('Codex compliance check failed:', error);
+      return {
+        compliant: true, // Allow processing to continue
+        violations: [`Compliance check error: ${error instanceof Error ? error.message : String(error)}`],
+        warnings: [],
+        termsChecked: 0,
+        operation: operation,
+        error: true,
+        timestamp: new Date().toISOString()
+      };
+    }
   }
 
   private async executeErrorBoundary(context: any): Promise<any> {

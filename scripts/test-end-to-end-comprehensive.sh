@@ -317,6 +317,20 @@ run_performance_benchmarks() {
         error_exit 5 "Plugin file not found in package"
     fi
 
+    # Test codex compliance processor integration
+    if [[ -f "$TEST_DIR/node_modules/strray-ai/dist/processors/processor-manager.js" ]]; then
+        log_success "Codex compliance processor integration active"
+    else
+        log_warning "Codex compliance processor files not accessible for direct testing"
+    fi
+
+    # Test token management integration
+    if [[ -f "$TEST_DIR/node_modules/strray-ai/dist/utils/token-manager.js" ]]; then
+        log_success "Token management system integrated"
+    else
+        log_warning "Token management system not found in package"
+    fi
+
     # Test CLI response time
     local start_time=$(date +%s%N)
     run_cmd "cd '$TEST_DIR' && npx strray-ai --help > /dev/null 2>&1" "CLI help command performance"

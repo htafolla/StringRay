@@ -64,6 +64,15 @@ Specialized agent for comprehensive codebase exploration, documentation retrieva
       "background_task",
       "lsp_goto_definition",
       "lsp_find_references",
+      "project-analysis_*",
+      "librarian_*",
+      // Skill invocation tools for comprehensive analysis
+      "invoke-skill",
+      "skill-code-review",
+      "skill-security-audit",
+      "skill-performance-optimization",
+      "skill-testing-strategy",
+      "skill-project-analysis",
     ],
   },
   permission: {

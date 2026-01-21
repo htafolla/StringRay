@@ -182,20 +182,106 @@ export class MCPClient {
           },
         },
       ],
-      librarian: [
-        {
-          name: "analyze_codebase",
-          description:
-            "Analyze complete codebase structure and provide insights",
-          inputSchema: {
-            type: "object",
-            properties: {
-              scope: { type: "string", enum: ["full", "directory", "file"] },
-              analysis: { type: "array", items: { type: "string" } },
-            },
-          },
-        },
-      ],
+       librarian: [
+         {
+           name: "analyze_codebase",
+           description:
+             "Analyze complete codebase structure and provide insights",
+           inputSchema: {
+             type: "object",
+             properties: {
+               scope: { type: "string", enum: ["full", "directory", "file"] },
+               analysis: { type: "array", items: { type: "string" } },
+             },
+           },
+         },
+       ],
+       "skill-invocation": [
+         {
+           name: "invoke-skill",
+           description: "Generic skill invocation tool for calling any MCP skill server",
+           inputSchema: {
+             type: "object",
+             properties: {
+               skillName: {
+                 type: "string",
+                 enum: [
+                   "code-review",
+                   "security-audit",
+                   "performance-optimization",
+                   "testing-strategy",
+                   "project-analysis",
+                 ],
+               },
+               toolName: { type: "string" },
+               args: { type: "object" },
+             },
+             required: ["skillName", "toolName"],
+           },
+         },
+         {
+           name: "skill-code-review",
+           description: "Invoke code review skill for comprehensive code analysis",
+           inputSchema: {
+             type: "object",
+             properties: {
+               code: { type: "string" },
+               language: { type: "string" },
+               context: { type: "object" },
+             },
+             required: ["code"],
+           },
+         },
+         {
+           name: "skill-security-audit",
+           description: "Invoke security audit skill for vulnerability scanning",
+           inputSchema: {
+             type: "object",
+             properties: {
+               files: { type: "array", items: { type: "string" } },
+               severity: { type: "string", enum: ["low", "medium", "high", "critical"] },
+             },
+             required: ["files"],
+           },
+         },
+         {
+           name: "skill-performance-optimization",
+           description: "Invoke performance optimization skill for bottleneck analysis",
+           inputSchema: {
+             type: "object",
+             properties: {
+               code: { type: "string" },
+               language: { type: "string" },
+               metrics: { type: "array", items: { type: "string" } },
+             },
+             required: ["code"],
+           },
+         },
+         {
+           name: "skill-testing-strategy",
+           description: "Invoke testing strategy skill for test planning",
+           inputSchema: {
+             type: "object",
+             properties: {
+               code: { type: "string" },
+               existingTests: { type: "array", items: { type: "string" } },
+               requirements: { type: "object" },
+             },
+             required: ["code"],
+           },
+         },
+         {
+           name: "skill-project-analysis",
+           description: "Invoke project analysis skill for codebase insights",
+           inputSchema: {
+             type: "object",
+             properties: {
+               scope: { type: "string", enum: ["full", "directory", "file"] },
+               analysis: { type: "array", items: { type: "string" } },
+             },
+           },
+         },
+       ],
     };
 
     const tools = serverTools[this.config.serverName] || [];
@@ -355,6 +441,36 @@ Prevents common errors, enforces coding standards, and ensures production-ready 
           ],
         };
 
+      case "skill-invocation":
+        if (toolName === "invoke-skill") {
+          return {
+            content: [
+              {
+                type: "text",
+                text: `Generic skill invocation completed for ${args.skillName}:${args.toolName}`,
+              },
+            ],
+          };
+        } else if (toolName.startsWith("skill-")) {
+          const skillType = toolName.replace("skill-", "");
+          return {
+            content: [
+              {
+                type: "text",
+                text: `${skillType} skill invoked successfully`,
+              },
+            ],
+          };
+        }
+        return {
+          content: [
+            {
+              type: "text",
+              text: `Skill invocation: ${toolName} executed successfully`,
+            },
+          ],
+        };
+
       default:
         return {
           content: [
@@ -485,14 +601,22 @@ export class MCPClientManager {
         ],
         timeout: 60000,
       },
-      "framework-help": {
-        serverName: "framework-help",
-        command: "node",
-        args: [
-          `${process.env.STRRAY_MCP_PATH || "dist/plugin"}/mcps/framework-help.server.js`,
-        ],
-        timeout: 15000,
-      },
+       "framework-help": {
+         serverName: "framework-help",
+         command: "node",
+         args: [
+           `${process.env.STRRAY_MCP_PATH || "dist/plugin"}/mcps/framework-help.server.js`,
+         ],
+         timeout: 15000,
+       },
+       "skill-invocation": {
+         serverName: "skill-invocation",
+         command: "node",
+         args: [
+           `${process.env.STRRAY_MCP_PATH || "dist/plugin"}/mcps/knowledge-skills/skill-invocation.server.js`,
+         ],
+         timeout: 30000,
+       },
     };
 
     return (
@@ -531,6 +655,7 @@ export class MCPClientManager {
       "performance-optimization",
       "testing-strategy",
       "librarian",
+      "skill-invocation",
     ]) {
       try {
         const client = await this.getClient(serverName);

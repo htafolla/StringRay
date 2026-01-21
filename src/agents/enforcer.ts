@@ -97,6 +97,13 @@ Your mission is to maintain system stability, prevent all runtime errors, and en
       "framework-compliance-audit",
       "pre-commit-introspection",
       "interactive-validator",
+      // Skill invocation tools
+      "invoke-skill",
+      "skill-code-review",
+      "skill-security-audit",
+      "skill-performance-optimization",
+      "skill-testing-strategy",
+      "skill-project-analysis",
     ],
   },
   permission: {

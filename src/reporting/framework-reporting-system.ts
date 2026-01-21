@@ -407,7 +407,13 @@ const report = await reportingSystem.generateCustomReport('${template.name}');
     timeRange?: ReportConfig["timeRange"],
   ): Promise<any[]> {
     const logs: any[] = [];
-    const logDir = path.join(process.cwd(), ".opencode", "logs");
+
+    // Always use project root, not current working directory
+    // This handles cases where scripts are run from subdirectories
+    const currentFileUrl = import.meta.url;
+    const currentFilePath = new URL(currentFileUrl).pathname;
+    const projectRoot = path.resolve(path.dirname(currentFilePath), "../../");
+    const logDir = path.join(projectRoot, "logs", "framework");
     const logFile = path.join(logDir, "activity.log");
 
     try {
@@ -454,7 +460,7 @@ const report = await reportingSystem.generateCustomReport('${template.name}');
    * Parse a single log line into structured format
    */
   private parseLogLine(line: string): any | null {
-    // Actual log format: "2026-01-13T04:49:53.742Z [state-manager] set operation - SUCCESS"
+    // Actual log format: "2026-01-21T19:52:33.175Z [component] message - LEVEL"
     const logRegex =
       /^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z)\s+\[([^\]]+)\]\s+(.+?)\s+-\s+(\w+)$/;
     const match = line.match(logRegex);
@@ -462,19 +468,56 @@ const report = await reportingSystem.generateCustomReport('${template.name}');
     if (match && match[1] && match[2] && match[3] && match[4]) {
       const timestamp = match[1];
       const component = match[2];
-      const action = match[3];
-      const status = match[4];
+      const message = match[3] as string; // Type assertion since we checked match[3] exists
+      const level = match[4];
+
+      const action = message.includes(':') ? (message.split(':')[0] || '').trim() : message.trim();
+
+      // Convert log level to status
+      const status = this.levelToStatus(level);
 
       return {
         timestamp: new Date(timestamp).getTime(),
         component: component.trim(),
-        action: action.trim(),
-        status: status.toLowerCase(),
-        agent: "sisyphus", // Default agent for historical logs
+        action: action,
+        message: message.trim(),
+        level: level.toLowerCase(),
+        status: status,
+        agent: this.inferAgent(component), // Try to infer agent from component
       };
     }
 
     return null;
+  }
+
+  private levelToStatus(level: string): string {
+    switch (level.toUpperCase()) {
+      case 'ERROR':
+        return 'error';
+      case 'WARN':
+      case 'WARNING':
+        return 'warning';
+      case 'INFO':
+        return 'success';
+      case 'DEBUG':
+        return 'info';
+      default:
+        return 'info';
+    }
+  }
+
+  private inferAgent(component: string): string {
+    // Try to infer agent from component name
+    if (component.includes('enforcer')) return 'enforcer';
+    if (component.includes('architect')) return 'architect';
+    if (component.includes('orchestrator')) return 'orchestrator';
+    if (component.includes('bug-triage')) return 'bug-triage-specialist';
+    if (component.includes('code-review')) return 'code-reviewer';
+    if (component.includes('security-audit')) return 'security-auditor';
+    if (component.includes('refactor')) return 'refactorer';
+    if (component.includes('test-architect')) return 'test-architect';
+
+    return 'system'; // Default for system components
   }
 
   private async collectReportData(config: ReportConfig): Promise<ReportData> {

@@ -72,9 +72,14 @@ Your mission is to flawlessly coordinate StringRay Framework operations through 
       "run_terminal_cmd",
       "background_task",
       "call_omo_agent",
-      "session_list",
-      "session_read",
-      "session_search",
+      "session_*",
+      // Skill invocation tools for orchestration coordination
+      "invoke-skill",
+      "skill-code-review",
+      "skill-security-audit",
+      "skill-performance-optimization",
+      "skill-testing-strategy",
+      "skill-project-analysis",
     ],
   },
   permission: {

@@ -254,7 +254,7 @@ Need to analyze or plan?
 - **Individual Agent Guides**: See `.opencode/agents/` directory for detailed agent configurations
 - **Operating Procedures**: See `OPERATING_PROCEDURES.md` for workflow implementation
 - **Performance Monitoring**: See `PERFORMANCE_MONITORING.md` for optimization guidance
-- **Comprehensive Specifications**: See `COMPREHENSIVE_AGENTS.md` for complete agent details
+- **Comprehensive Specifications**: See main `AGENTS.md` for complete agent details
 
 ---
 

@@ -55,7 +55,6 @@
   "claude_code": {
     "mcp": false,
     "commands": true,
-    "skills": true,
     "agents": true,
     "hooks": true,
     "plugins": true

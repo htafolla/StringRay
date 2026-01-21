@@ -8,6 +8,8 @@
  * @since 2026-01-07
  */
 
+import { frameworkLogger } from "../framework-logger.js";
+
 export interface PluginMetadata {
   id: string;
   name: string;
@@ -459,9 +461,10 @@ export class PluginRegistry {
 
       this.plugins.set(pluginInstance.metadata.id, pluginInstance);
 
-      console.log(
-        `✅ Plugin registered: ${pluginInstance.metadata.name} v${pluginInstance.metadata.version}`,
-      );
+      frameworkLogger.log("plugin-system", "plugin registered", "success", {
+        name: pluginInstance.metadata.name,
+        version: pluginInstance.metadata.version
+      });
 
       return { success: true, errors: [] };
     } catch (error) {
@@ -487,7 +490,9 @@ export class PluginRegistry {
       await plugin.activate();
       this.activePlugins.add(pluginId);
 
-      console.log(`✅ Plugin activated: ${plugin.metadata.name}`);
+      frameworkLogger.log("plugin-system", "plugin activated", "success", {
+        name: plugin.metadata.name
+      });
       return true;
     } catch (error) {
       console.error(`❌ Plugin activation failed: ${error}`);
@@ -506,7 +511,9 @@ export class PluginRegistry {
       await plugin.deactivate();
       this.activePlugins.delete(pluginId);
 
-      console.log(`✅ Plugin deactivated: ${plugin.metadata.name}`);
+      frameworkLogger.log("plugin-system", "plugin deactivated", "success", {
+        name: plugin.metadata.name
+      });
       return true;
     } catch (error) {
       console.error(`❌ Plugin deactivation failed: ${error}`);
@@ -577,7 +584,9 @@ export class PluginRegistry {
     }
 
     this.plugins.delete(pluginId);
-    console.log(`✅ Plugin unregistered: ${plugin.metadata.name}`);
+    frameworkLogger.log("plugin-system", "plugin unregistered", "success", {
+      name: plugin.metadata.name
+    });
 
     return true;
   }

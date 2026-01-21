@@ -459,7 +459,7 @@ const logger = {
 ## 🔗 Related Documentation
 
 - **Agent Classification**: See `AGENT_CLASSIFICATION.md` for agent classification system and decision tree
-- **Comprehensive Specifications**: See `COMPREHENSIVE_AGENTS.md` for complete agent details
+- **Comprehensive Specifications**: See main `AGENTS.md` for complete agent details
 - **Performance Monitoring**: See `PERFORMANCE_MONITORING.md` for monitoring and optimization guidance
 - **Individual Agent Configurations**: See `.opencode/agents/` directory for detailed agent configurations
 

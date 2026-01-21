@@ -195,7 +195,7 @@ Framework Lite projects can migrate to Full when:
 
 - **Framework Lite Guide**: See `docs/framework/lite/README.md`
 - **Framework Full Setup**: See `docs/framework/installation/INSTALLATION.md`
-- **Agent Configuration**: See `docs/framework/agents/COMPREHENSIVE_AGENTS.md`
+- **Agent Configuration**: See main `AGENTS.md` documentation
 - **Migration Support**: See `docs/framework/architecture/MIGRATION_GUIDE.md`
 
 ---

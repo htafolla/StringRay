@@ -36,6 +36,18 @@ export class StringRayStateManager implements StateManager {
         fs.mkdirSync(dir, { recursive: true });
       }
 
+      // Handle case where persistencePath exists but is a file instead of expected location
+      if (fs.existsSync(this.persistencePath)) {
+        const stats = fs.statSync(this.persistencePath);
+        if (stats.isFile()) {
+          // If it's a file blocking our path, remove it (it's likely old state)
+          fs.unlinkSync(this.persistencePath);
+        } else if (!stats.isFile()) {
+          // If it's not a file (e.g., directory), use a different filename
+          this.persistencePath = path.join(this.persistencePath, "state.json");
+        }
+      }
+
       // Load existing state from disk
       if (fs.existsSync(this.persistencePath)) {
         const data = fs.readFileSync(this.persistencePath, "utf8");

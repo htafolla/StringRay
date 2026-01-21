@@ -245,27 +245,26 @@ npm run init
 
 ### Core Documentation
 
-- **[Installation Guide](./docs/StringRay_INSTALLATION_GUIDE.md)** - Complete setup for oh-my-opencode integration
-- **[Model Configuration](./docs/StringRay_MODEL_CONFIG.md)** - Model setup with opencode/grok-code assignments
-- **[API Reference](./docs/api/API_REFERENCE.md)** - Developer API documentation for programmatic access
-- **[Agent Documentation](./docs/agents/)** - Detailed specifications for all 9 agents with operating procedures
-- **[Architecture](./docs/architecture/)** - Framework design with Universal Development Codex principles
-- **[Troubleshooting](./docs/troubleshooting/)** - Solutions for common issues and edge cases
+- **[Architecture Overview](./architecture/ENTERPRISE_ARCHITECTURE.md)** - Complete 28-component system overview with testing coverage
+- **[Agent Documentation](./agents/)** - Detailed specifications for all 9 agents with operating procedures
+- **[API Reference](./api/API_REFERENCE.md)** - Developer API documentation for programmatic access
+- **[Installation Guide](./installation/INSTALLATION.md)** - Complete setup and configuration guide
+- **[Model Configuration](./MODEL_CONFIGURATION.md)** - Model setup with opencode/grok-code assignments
+- **[Troubleshooting](./troubleshooting/)** - Solutions for common issues and edge cases
 
-### Advanced Features Documentation
+### Development & Operations
 
-- **[Performance Benchmarking](./docs/advanced/performance-benchmarking.md)** - Metrics collection and optimization tracking
-- **[Predictive Analytics](./docs/advanced/predictive-analytics.md)** - ML-based agent optimization and forecasting
-- **[Plugin Ecosystem](./docs/advanced/plugin-system.md)** - Secure plugin development and integration
-- **[Monitoring & Alerting](./docs/advanced/monitoring.md)** - Real-time health monitoring and alerting
-- **[Performance Optimization](./docs/advanced/optimization.md)** - Sub-millisecond performance tuning
+- **[Testing Guide](./development/testing.md/TESTING.md)** - Comprehensive testing strategies and frameworks
+- **[Security Architecture](./security/SECURITY_ARCHITECTURE.md)** - Enterprise security configuration and auditing
+- **[Performance Monitoring](./performance/)** - Metrics collection and optimization tracking
+- **[Plugin Deployment](./PLUGIN_DEPLOYMENT_GUIDE.md)** - Complete plugin deployment and validation guide
+- **[Orchestrator Integration](./ORCHESTRATOR_INTEGRATION_ARCHITECTURE.md)** - Advanced orchestration and agent coordination
 
-### Deployment & Operations
+### Archive & Legacy
 
-- **[Installation Guide](./docs/installation/INSTALLATION.md)** - Complete installation and setup guide
-- **[Cloud Deployment](./docs/deployment/cloud.md)** - AWS, GCP, and Azure integration guides
-- **[Monitoring Setup](./docs/operations/monitoring.md)** - Production monitoring and alerting configuration
-- **[Security Hardening](./docs/operations/security.md)** - Enterprise security configuration and auditing
+- **[Archive Documentation](./archive/)** - Historical documentation and deprecated guides
+- **[Migration Guide](./migration/FRAMEWORK_MIGRATION.md)** - Framework migration and upgrade guides
+- **[Reflections](./reflections/)** - Incident analysis and framework evolution insights
 
 ## 📊 TECHNICAL SPECIFICATIONS & PERFORMANCE METRICS
 

@@ -89,7 +89,7 @@
 
 ## 📚 Documentation
 
-**📖 Complete Documentation**: For comprehensive documentation including architecture details, API references, troubleshooting guides, and advanced configuration options, visit the [StringRay Documentation](https://github.com/htafolla/stringray/tree/main/docs) in the GitHub repository.
+**📖 Complete Documentation**: For comprehensive documentation including architecture details, API references, troubleshooting guides, and advanced configuration options, visit the [StringRay Documentation](https://github.com/htafolla/stringray/tree/master/docs) in the GitHub repository.
 
 **📋 Quick Reference**: This README contains essential installation and usage information. For advanced features and detailed guides, see the full documentation.
 
@@ -500,7 +500,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 - **Issues**: [GitHub Issues](https://github.com/htafolla/stringray/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/htafolla/stringray/discussions)
-- **Documentation**: [StringRay Docs](https://stringray.dev)
+- **Documentation**: [StringRay Documentation](https://github.com/htafolla/stringray/tree/master/docs)
 
 ---
 
@@ -533,15 +533,12 @@ npm run init
 - **[Grok Code Guide](./docs/GROK_GUIDE.md)** - AI model configuration and optimization
 - **[Plugin Ecosystem](./docs/STRAY_EXTENSION.md)** - Extension development and plugin system
 - **[Integration Lessons](./docs/INTEGRATION_LESSONS.md)** - Lessons learned from framework integration
-- **[Achievement Recognition](./docs/ACHIEVEMENT_RECOGNITION.md)** - Framework achievements and milestones
 
 ### Deployment & Operations
 
-- **[Docker Deployment](./docs/deployment/docker.md)** - Containerized deployment guide
-- **[Kubernetes Deployment](./docs/deployment/kubernetes.md)** - Orchestrated deployment with auto-scaling
-- **[Cloud Deployment](./docs/deployment/cloud.md)** - AWS, GCP, and Azure integration guides
-- **[Monitoring Setup](./docs/operations/monitoring.md)** - Production monitoring and alerting configuration
-- **[Security Hardening](./docs/operations/security.md)** - Enterprise security configuration and auditing
+- **[Docker Deployment](./docs/archive/deployment/DOCKER_DEPLOYMENT_GUIDE.md)** - Containerized deployment guide
+- **[Monitoring Setup](./docs/archive/operations/MONITORING_SETUP_GUIDE.md)** - Production monitoring and alerting configuration
+- **[Security Hardening](./docs/security/SECURITY_ARCHITECTURE.md)** - Enterprise security configuration and auditing
 
 ## 📊 TECHNICAL SPECIFICATIONS & PERFORMANCE METRICS
 

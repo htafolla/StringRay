@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [18.x, 20.19]
+        node-version: [18.x, 20.19.6]
     steps:
       - name: Disable CodeQL
         run: |

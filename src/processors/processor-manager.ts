@@ -116,7 +116,10 @@ export class ProcessorManager {
       healthStatus: "healthy",
     });
 
-    console.log(`✅ Processor registered: ${config.name} (${config.type})`);
+    frameworkLogger.log("processor-manager", "processor registered", "success", {
+      name: config.name,
+      type: config.type
+    });
   }
 
   /**
@@ -131,7 +134,9 @@ export class ProcessorManager {
     this.metrics.delete(name);
     this.activeProcessors.delete(name);
 
-    console.log(`✅ Processor unregistered: ${name}`);
+    frameworkLogger.log("processor-manager", "processor unregistered", "success", {
+      name
+    });
   }
 
   /**
@@ -150,7 +155,7 @@ export class ProcessorManager {
       },
     );
 
-    console.log("🔄 Initializing processors...");
+    frameworkLogger.log("processor-manager", "initializing processors", "info");
 
     const initPromises = Array.from(this.processors.values())
       .filter((p) => p.enabled)
@@ -242,15 +247,16 @@ export class ProcessorManager {
    * Execute pre-processors for a given operation
    */
   async executePreProcessors(
-    operation: string,
-    data: any,
-  ): Promise<ProcessorResult[]> {
+    input: { tool: string; args?: any; context?: any },
+  ): Promise<{ success: boolean; results: ProcessorResult[] }> {
+    const { tool, args, context } = input;
+
     frameworkLogger.log(
       "processor-manager",
       "executePreProcessors called",
       "debug",
       {
-        operation,
+        tool,
         processorCount: Array.from(this.processors.values()).filter(
           (p) => p.type === "pre" && p.enabled,
         ).length,
@@ -261,27 +267,24 @@ export class ProcessorManager {
       .filter((p) => p.type === "pre" && p.enabled)
       .sort((a, b) => a.priority - b.priority);
 
+
+
     const results: ProcessorResult[] = [];
 
     for (const config of preProcessors) {
-      const result = await this.executeProcessor(config.name, {
-        operation,
-        data,
-      });
+
+      const result = await this.executeProcessor(config.name, context);
       results.push(result);
 
       // Log failures but continue execution for graceful error handling
       if (!result.success) {
-        console.log(
-          `ℹ️ Pre-processor ${config.name} failed, continuing with other processors`,
-        );
         frameworkLogger.log(
           "processor-manager",
           "pre-processor failed",
           "info",
           {
             processor: config.name,
-            operation,
+            tool,
             error: result.error,
           },
         );
@@ -292,25 +295,31 @@ export class ProcessorManager {
           "success",
           {
             processor: config.name,
-            operation,
+            tool,
             duration: result.duration,
           },
         );
       }
     }
 
+    const overallSuccess = results.every((r) => r.success);
+
     frameworkLogger.log(
       "processor-manager",
       "executePreProcessors completed",
       "debug",
       {
-        operation,
+        tool,
         totalResults: results.length,
         successCount: results.filter((r) => r.success).length,
+        overallSuccess,
       },
     );
 
-    return results;
+    return {
+      success: overallSuccess,
+      results,
+    };
   }
 
   /**
@@ -528,7 +537,7 @@ export class ProcessorManager {
    * Cleanup all processors
    */
   async cleanupProcessors(): Promise<void> {
-    console.log("🧹 Cleaning up processors...");
+    frameworkLogger.log("processor-manager", "cleaning up processors", "info");
 
     for (const name of this.activeProcessors) {
       try {
@@ -539,6 +548,8 @@ export class ProcessorManager {
     }
 
     this.activeProcessors.clear();
+    this.processors.clear(); // Clear all registered processors for test isolation
+    this.metrics.clear(); // Clear metrics for test isolation
     // Processor cleanup - kept for operational monitoring
   }
 
@@ -573,34 +584,32 @@ export class ProcessorManager {
 
   private async initializePreValidateProcessor(): Promise<void> {
     // Setup syntax checking and validation hooks
-    console.log(
-      "🔍 Initializing pre-validate processor with syntax checking...",
-    );
+    frameworkLogger.log("processor-manager", "initializing pre-validate processor", "info");
   }
 
   private async initializeCodexComplianceProcessor(): Promise<void> {
     // Setup codex compliance validation
-    console.log("📋 Initializing codex compliance processor...");
+    frameworkLogger.log("processor-manager", "initializing codex compliance processor", "info");
   }
 
   private async initializeErrorBoundaryProcessor(): Promise<void> {
     // Setup error boundary mechanisms
-    console.log("🛡️ Initializing error boundary processor...");
+    frameworkLogger.log("processor-manager", "initializing error boundary processor", "info");
   }
 
   private async initializeTestExecutionProcessor(): Promise<void> {
     // Setup automatic test execution
-    console.log("🧪 Initializing test execution processor...");
+    frameworkLogger.log("processor-manager", "initializing test execution processor", "info");
   }
 
   private async initializeRegressionTestingProcessor(): Promise<void> {
     // Setup regression testing mechanisms
-    console.log("🔄 Initializing regression testing processor...");
+    frameworkLogger.log("processor-manager", "initializing regression testing processor", "info");
   }
 
   private async initializeStateValidationProcessor(): Promise<void> {
     // Setup state validation post-operation
-    console.log("📊 Initializing state validation processor...");
+    frameworkLogger.log("processor-manager", "initializing state validation processor", "info");
   }
 
   private async executePreValidate(context: any): Promise<any> {
@@ -640,14 +649,14 @@ export class ProcessorManager {
 
   private async executeTestExecution(context: any): Promise<any> {
     // Execute tests automatically
-    console.log("🧪 Executing automatic tests...");
+    frameworkLogger.log("processor-manager", "executing automatic tests", "info");
     // Placeholder - would integrate with test runner
     return { testsExecuted: 0, passed: 0, failed: 0 };
   }
 
   private async executeRegressionTesting(context: any): Promise<any> {
     // Run regression tests
-    console.log("🔄 Running regression tests...");
+    frameworkLogger.log("processor-manager", "running regression tests", "info");
     // Placeholder - would integrate with regression test suite
     return { regressions: "checked", issues: [] };
   }

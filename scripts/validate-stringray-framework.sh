@@ -129,24 +129,29 @@ if [[ -d "$TEST_DIR" ]]; then
     run_cmd "rm -rf '$TEST_DIR'"
 fi
 
-# 3. Create fresh test environment
-print_step "3" "Create Fresh Test Environment"
+# 3. Build fresh StringRay package
+print_step "3" "Build Fresh StringRay Package"
+run_cmd "cd '$PROJECT_DIR' && npm run build"
+run_cmd "cd '$PROJECT_DIR' && npm pack"
+
+# 4. Create fresh test environment
+print_step "4" "Create Fresh Test Environment"
 run_cmd "mkdir -p '$TEST_DIR'"
 run_cmd "cd '$TEST_DIR'"
 
-# 4. Initialize npm project
-print_step "4" "Initialize NPM Project"
+# 5. Initialize npm project
+print_step "5" "Initialize NPM Project"
 run_cmd "cd '$TEST_DIR' && npm init -y"
 
-# 5. Install StringRay package
-print_step "5" "Install StringRay Package"
+# 6. Install StringRay package
+print_step "6" "Install StringRay Package"
 run_cmd "cd '$TEST_DIR' && npm install '$PROJECT_DIR/$PACKAGE_FILE'"
 
-print_step "6" "Run Postinstall Configuration"
+print_step "7" "Run Postinstall Configuration"
 run_cmd "cd '$TEST_DIR' && node node_modules/strray-ai/scripts/postinstall.cjs"
 
-# 7. Copy integration test files
-print_step "7" "Copy Integration Test Files"
+# 8. Copy integration test files
+print_step "8" "Copy Integration Test Files"
 # Core integration tests (from src/__tests__/integration/)
 TEST_FILES=(
     "test-complexity-analysis.mjs"
@@ -276,6 +281,22 @@ if [[ -L "$TEST_DIR/.strray" ]]; then
 else
     echo "❌ ERROR: Symlink .strray not found"
     exit 1
+fi
+
+# 24. Run critical issue regression tests
+print_step "24" "Critical Issue Regression Tests"
+echo "Running regression tests for StrRayStateManager and README link issues..."
+if [[ -f "$PROJECT_DIR/scripts/test-regression-critical-issues.sh" ]]; then
+    if bash "$PROJECT_DIR/scripts/test-regression-critical-issues.sh" > /tmp/regression-test.log 2>&1; then
+        echo "✅ Critical issue regression tests: PASSED"
+    else
+        echo "❌ ERROR: Critical issue regression tests failed"
+        echo "=== REGRESSION TEST LOG ==="
+        cat /tmp/regression-test.log
+        exit 1
+    fi
+else
+    echo "⚠️  Regression test script not found - skipping"
 fi
 
 echo ""

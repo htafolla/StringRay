@@ -10,14 +10,15 @@
 
 import * as path from "path";
 import * as fs from "fs";
+import { frameworkLogger } from "../framework-logger.js";
 
 const pluginHooks = {
   config: (input: { client?: string; directory?: string; worktree?: string }) => {
-    console.log("🔧 StringRay plugin initialized");
+    frameworkLogger.log("codex-injector", "plugin initialized", "info");
   },
 
   "experimental.chat.system.transform": (messages: any[], context: any) => {
-    console.log("🔄 StringRay: chat.system.transform hook called", { messageCount: messages?.length });
+    frameworkLogger.log("codex-injector", "chat.system.transform hook called", "info", { messageCount: messages?.length });
 
     // Inject codex context into system messages for agent guidance
     try {
@@ -60,17 +61,16 @@ For complete codex documentation, see: .strray/codex.json`
   },
 
   "tool.execute.before": (tool: string, args: any) => {
-    console.log("⚡ StringRay: tool.execute.before hook called", { tool, args });
+      frameworkLogger.log("codex-injector", "tool.execute.before hook called", "info", { tool });
   },
 
   "tool.execute.after": (tool: string, args: any, result: any) => {
-    console.log("✅ StringRay: tool.execute.after hook called", { tool, result: typeof result });
+      frameworkLogger.log("codex-injector", "tool.execute.after hook called", "success", { tool });
   },
 
   "mcp.servers": () => {
-    console.log("🔧 StringRay: mcp.servers hook called");
     const servers = getMCPServers();
-    console.log("🔧 StringRay: returning", Object.keys(servers).length, "MCP servers");
+    frameworkLogger.log("codex-injector", "mcp.servers hook called", "info", { serverCount: Object.keys(servers).length });
     return servers;
   }
 };

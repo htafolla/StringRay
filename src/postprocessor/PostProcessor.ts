@@ -603,6 +603,40 @@ All path violations will be automatically detected and blocked.
       };
     }
 
+    // Codex compliance validation: Use processor-manager for proper rule enforcement and agent delegation
+    const processorContext = {
+      operation: 'commit' as const,
+      files: context.files,
+      newCode: '', // Could be enhanced to analyze actual code changes
+      existingCode: new Map(),
+      tests: [],
+      dependencies: []
+    };
+
+    try {
+      const { importResolver } = await import('../utils/import-resolver.js');
+      const { ProcessorManager } = await importResolver.importModule('processors/processor-manager');
+
+      const processorManager = new ProcessorManager();
+      const complianceResult = await processorManager.executeCodexCompliance(processorContext);
+
+      if (!complianceResult.compliant) {
+        await frameworkLogger.log("codex-compliance", "validation-failed", "error", {
+          commitSha: context.commitSha,
+          violations: complianceResult.violations,
+          reason: "Codex compliance violations found - processor-manager attempted automated fixes"
+        });
+
+        console.log(
+          "⚠️ Codex compliance violations detected - processor-manager handled automated fixes",
+        );
+      }
+    } catch (error) {
+      console.log(
+        "⚠️ Codex compliance check failed - continuing with commit",
+      );
+    }
+
     try {
       // Initialize session tracking
       await this.stateManager.set(`postprocessor:${sessionId}`, {

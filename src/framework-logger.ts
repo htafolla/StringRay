@@ -4,12 +4,59 @@ import {
   getLoggingConfig,
 } from "./logging-config.js";
 
+/**
+ * Generate a unique job ID for tracking work sessions
+ */
+export function generateJobId(prefix: string = 'job'): string {
+  const timestamp = Date.now();
+  const random = Math.random().toString(36).substring(2, 8);
+  return `${prefix}-${timestamp}-${random}`;
+}
+
+/**
+ * Job context for tracking work sessions
+ */
+export class JobContext {
+  public readonly jobId: string;
+  public readonly startTime: number;
+  public complexityScore?: number;
+  public agentUsed?: string;
+  public operationType?: string;
+
+  constructor(prefix: string = 'job') {
+    this.jobId = generateJobId(prefix);
+    this.startTime = Date.now();
+  }
+
+  /**
+   * Log job completion with diagnostic info
+   */
+  async complete(success: boolean = true, details?: any) {
+    const duration = Date.now() - this.startTime;
+    await frameworkLogger.log(
+      'job-context',
+      'job-completed',
+      success ? 'success' : 'error',
+      {
+        duration,
+        complexityScore: this.complexityScore,
+        agentUsed: this.agentUsed,
+        operationType: this.operationType,
+        ...details
+      },
+      undefined, // sessionId
+      this.jobId
+    );
+  }
+}
+
 export interface FrameworkLogEntry {
   timestamp: number;
   component: string;
   action: string;
   agent: string;
   sessionId?: string | undefined;
+  jobId?: string | undefined;
   status: "success" | "error" | "info" | "debug";
   details?: any;
 }
@@ -24,6 +71,7 @@ export class FrameworkUsageLogger {
     status: "success" | "error" | "info" | "debug" = "info",
     details?: any,
     sessionId?: string,
+    jobId?: string,
   ) {
     // Check if logging is enabled globally
     if (!isLoggingEnabled()) {
@@ -41,6 +89,7 @@ export class FrameworkUsageLogger {
       action,
       agent: "sisyphus",
       sessionId,
+      jobId,
       status,
       details,
     };
@@ -77,7 +126,8 @@ export class FrameworkUsageLogger {
         fs.mkdirSync(logDir, { recursive: true });
       }
 
-      const logEntry = `${new Date(entry.timestamp).toISOString()} [${entry.component}] ${entry.action} - ${entry.status.toUpperCase()}\n`;
+      const jobIdPart = entry.jobId ? `[${entry.jobId}] ` : '';
+      const logEntry = `${new Date(entry.timestamp).toISOString()} ${jobIdPart}[${entry.component}] ${entry.action} - ${entry.status.toUpperCase()}\n`;
       fs.appendFileSync(logFile, logEntry);
     } catch (error) {
       // Fallback to console if file writing fails

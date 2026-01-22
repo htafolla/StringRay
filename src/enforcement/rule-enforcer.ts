@@ -92,14 +92,16 @@ export class RuleEnforcer {
     });
 
     this.addRule({
-      id: "tests-required",
-      name: "Tests Required for New Code",
-      description: "Requires tests for new components and features",
-      category: "testing",
-      severity: "error",
+      id: "documentation-required",
+      name: "Documentation Required for New Code",
+      description: "Requires documentation for new components and APIs",
+      category: "code-quality",
+      severity: "warning",
       enabled: true,
-      validator: this.validateTestsRequired.bind(this),
+      validator: this.validateDocumentationRequired.bind(this),
     });
+
+
 
     this.addRule({
       id: "context-analysis-integration",
@@ -142,12 +144,22 @@ export class RuleEnforcer {
       validator: this.validateInputValidation.bind(this),
     });
 
+    // Testing Rules
+    this.addRule({
+      id: "tests-required",
+      name: "Tests Required for New Code",
+      description: "Requires tests when creating new components or modifying functionality",
+      category: "testing",
+      severity: "error",
+      enabled: true,
+      validator: this.validateTestsRequired.bind(this),
+    });
+
     // Documentation Rules
     this.addRule({
       id: "documentation-required",
-      name: "Documentation Creation and Updates Required",
-      description:
-        "Requires documentation updates when adding features or changing APIs",
+      name: "Documentation Required for New Code",
+      description: "Requires documentation for new components and APIs",
       category: "code-quality",
       severity: "warning",
       enabled: true,
@@ -383,6 +395,18 @@ export class RuleEnforcer {
       enabled: true,
       validator: this.validateCleanDebugLogs.bind(this),
     });
+
+    // Console Log Usage Rule
+    this.addRule({
+      id: "console-log-usage",
+      name: "Console Log Usage Restrictions",
+      description:
+        "Console.log must be used only for debugging in dev mode - retained logs must use framework logger",
+      category: "code-quality",
+      severity: "error", // Critical for production log hygiene
+      enabled: true,
+      validator: this.validateConsoleLogUsage.bind(this),
+    });
   }
 
   /**
@@ -540,10 +564,12 @@ export class RuleEnforcer {
         return operation === "write" && !!context.newCode; // Critical for preventing module resolution issues
       case "documentation-required":
         return operation === "write" || operation === "modify";
-      case "clean-debug-logs":
-        return operation === "write" && !!context.newCode; // Development triage rule
-      default:
-        return true;
+       case "clean-debug-logs":
+         return operation === "write" && !!context.newCode; // Development triage rule
+       case "console-log-usage":
+         return operation === "write" && !!context.newCode; // Critical for production log hygiene
+       default:
+         return true;
     }
   }
 
@@ -1756,6 +1782,30 @@ export class RuleEnforcer {
     context: RuleValidationContext,
   ): Promise<RuleValidationResult> {
     return { passed: true, message: "Clean debug logs validation placeholder" };
+  }
+
+  private async validateConsoleLogUsage(
+    context: RuleValidationContext,
+  ): Promise<RuleValidationResult> {
+    const { newCode } = context;
+
+    // Skip validation if no code to check
+    if (!newCode) {
+      return { passed: true, message: "No code to validate for console.log usage" };
+    }
+
+    // Check for console.log usage
+    if (newCode.includes("console.log(")) {
+      return {
+        passed: false,
+        message: "console.log() detected - use frameworkLogger for production logs or remove for debugging",
+      };
+    }
+
+    return {
+      passed: true,
+      message: "Console log usage follows proper guidelines",
+    };
   }
 
   private async validateTestFailureReporting(

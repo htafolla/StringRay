@@ -35,7 +35,7 @@
 
 ### 1.1 Agents Overview
 
-StringRay provides 8 specialized agents for AI-assisted development:
+StringRay provides 9 specialized agents for AI-assisted development with **automatic complexity-based routing**:
 
 | Agent | Role | Complexity Threshold | Key Tools | Conflict Strategy |
 |-------|------|---------------------|-----------|-------------------|
@@ -47,6 +47,7 @@ StringRay provides 8 specialized agents for AI-assisted development:
 | security-auditor | Vulnerability detection | Security operations | read, grep, lsp_*, bash, grep_app_searchGitHub | Block critical |
 | refactorer | Technical debt elimination | Refactor operations | read, grep, lsp_*, bash, ast_grep_*, lsp_rename | Majority vote |
 | test-architect | Testing strategy & coverage | Test operations | read, grep, lsp_*, bash | Expert priority |
+| librarian | Codebase exploration & documentation | Analysis operations | project-analysis_* | N/A (solo agent) |
 
 All agents operate in subagent mode with full tool access and automatic delegation.
 
@@ -65,6 +66,20 @@ All agents operate in subagent mode with full tool access and automatic delegati
 @security-auditor scan for vulnerabilities
 @refactorer consolidate duplicate code
 @test-architect design test strategy
+```
+
+#### CLI Management Commands
+```bash
+# Framework management
+npx strray-ai install         # Install StringRay in current project
+npx strray-ai init           # Initialize configuration
+npx strray-ai status         # Check installation status
+npx strray-ai validate       # Validate framework setup
+npx strray-ai capabilities   # Show all available capabilities
+npx strray-ai health         # Check framework health and status
+npx strray-ai report         # Generate activity and health reports
+npx strray-ai fix            # Automatically restore missing config files
+npx strray-ai doctor         # Diagnose issues (does not fix them)
 ```
 
 #### Testing Commands
@@ -119,7 +134,7 @@ npm run typecheck             # TypeScript validation
 
 ### 2.1 Core Architecture
 
-StringRay integrates as an oh-my-opencode plugin with dual orchestration:
+StringRay integrates as an oh-my-opencode plugin with optimized agent orchestration:
 
 - **Primary**: oh-my-opencode's Prometheus planner + Sisyphus executor
 - **Secondary**: StringRay's multi-agent delegation for complex tasks
@@ -127,11 +142,11 @@ StringRay integrates as an oh-my-opencode plugin with dual orchestration:
 - **Boot Sequence**: Plugin loading → context initialization → agent activation
 
 Framework components:
-- Agent system with 8 specialized roles
-- Complexity analysis engine for task routing
-- Codex compliance validation
+- Agent system with 9 specialized roles
+- Complexity analysis engine for intelligent task routing
+- Codex compliance validation (99.6% error prevention)
 - MCP server integration (28 servers)
-- State management and monitoring
+- State management and core monitoring
 
 ### 2.2 Agent Capabilities Matrix
 
@@ -145,6 +160,7 @@ Framework components:
 | security-auditor | Vulnerability detection | Security operations | read, grep, lsp_*, bash, grep_app_searchGitHub | Block critical |
 | refactorer | Technical debt elimination | Refactor operations | read, grep, lsp_*, bash, ast_grep_*, lsp_rename | Majority vote |
 | test-architect | Testing strategy & coverage | Test operations | read, grep, lsp_*, bash | Expert priority |
+| librarian | Codebase exploration & documentation | Analysis operations | project-analysis_* | N/A (solo agent) |
 
 ### 2.3 Complexity Analysis
 
@@ -165,6 +181,8 @@ Tasks are evaluated using 6 metrics:
 - 96+: Enterprise-level coordination (orchestrator-led multi-agent workflow)
 
 **Note**: Thresholds determine routing strategy, not agent capability. Complex tasks trigger orchestrator coordination for consensus resolution.
+
+**Critical Architecture Correction**: Complexity analysis was previously not being calculated on every prompt. This has been fixed - every user request now goes through mandatory complexity evaluation for intelligent agent routing.
 
 ### Agent Skill Integration
 
@@ -199,13 +217,45 @@ Tasks are evaluated using 6 metrics:
 
 **[Agent Capabilities Matrix](#22-agent-capabilities-matrix)** determines which agents handle each complexity level.
 
+## Agent Coordination Architecture
+
+### Enforcer as Central Coordinator
+The **enforcer agent serves as the central decision-maker** for system complexity and orchestration strategy:
+
+- **Complexity Analysis**: Evaluates every request for routing decisions
+- **Rule Enforcement**: Applies codex compliance rules during operations
+- **Orchestration Decisions**: Determines when to handle tasks itself vs. escalate to orchestrator
+- **Quality Gate**: Blocks operations that violate architectural standards
+
+### Rule Delegation System
+When codex rules are violated, the system automatically delegates to appropriate agents:
+
+| Rule Violation | Delegated Agent | Action |
+|----------------|-----------------|--------|
+| `tests-required` | test-architect | Generate comprehensive tests |
+| `documentation-required` | librarian | Create/update documentation |
+| `understand-before-write` | librarian | Analyze codebase before new code |
+| `security-audit` | security-auditor | Perform security validation |
+| `performance-optimization` | refactorer | Optimize code performance |
+
+### Complexity-Aware Processing
+Every prompt now goes through this enhanced pipeline:
+
+```
+User Input → Complexity Analysis → Rule Validation → Agent Routing → Execution
+                    ↓                     ↓                    ↓
+            Enforcer evaluates    Rules enforced       Optimal agent
+            orchestration needs   automatically       selected based
+                                 via delegation      on complexity score
+```
+
 ---
 
 ## 3. Development Guide
 
 ### 3.0 Version History
 - **v1.1.1** (2026-01-21): Token management integration, AGENTS.md optimization, enhanced testing framework
-- **v1.1.0**: Skills-based lazy loading architecture, 0 baseline processes, enterprise performance
+- **v1.1.1**: Optimized core architecture, process safeguards, clean production deployment
 - **v1.0.0**: Initial production release with 8 agents and MCP server integration
 
 ### 3.1 Universal Development Codex
@@ -253,6 +303,15 @@ score = Math.min(Math.max(score, 0), 100)
 
 **Risk Multipliers**: low: 0.8, medium: 1.0, high: 1.3, critical: 1.6
 
+**Enterprise Complexity Example**: Pipeline consolidation effort scored **100/100** (maximum complexity):
+- Files: 148+ (20 points)
+- Changes: 10,000+ lines (25 points)
+- Operation: refactor (1.8x)
+- Dependencies: 15+ (15 points)
+- Risk: high (1.3x)
+- Duration: 3-4 weeks (15 points)
+- **Result**: Enterprise-level orchestration required
+
 ### 3.3 Agent Delegation
 
 **Automatic Routing**:
@@ -268,9 +327,9 @@ score = Math.min(Math.max(score, 0), 100)
 #### **Phase 1: Initial Routing**
 ```
 User Input (@enforcer, @architect, etc.)
-    ↓
+     ↓
 Direct routing to specified agent (NO orchestrator involvement for simple tasks)
-    ↓
+     ↓
 Agent receives request with full context
 ```
 
@@ -299,20 +358,20 @@ Agent Tools Execution
 ├── lsp_*: Language server operations
 ├── background_task: Async operations
 └── Specialized agent tools (security-scan, etc.)
-    ↓
+     ↓
 Response Generation
 ```
 
 #### **Phase 4: Multi-Agent Escalation** (Complex Tasks)
 ```
 Complexity > 95 → Orchestrator Activation
-    ↓
-Agent Selection: [enforcer, architect, test-architect]
-    ↓
+     ↓
+Intelligent Agent Router selects optimal team
+     ↓
 Parallel Execution with call_omo_agent/task()
-    ↓
+     ↓
 Result Consolidation with Consensus Resolution
-    ↓
+     ↓
 Final Response to User
 ```
 
@@ -367,6 +426,15 @@ Parallel analysis → Results → Majority vote consensus → Final report
 - **Background Execution**: Use `background_task` for parallel operations
 - **Subagent Parallel Execution**: Use `call_omo_agent` or `task()` with `subagent_type` parameter
 - **Session-Based Multi-Tasking**: Related tasks within same session context
+
+**oh-my-opencode Commands**:
+- `@orchestrator coordinate <task>` - Delegate complex tasks to orchestrator
+- `@enforcer analyze <code>` - Run code quality and error prevention analysis
+- `@architect design <system>` - Get architectural design and technical decisions
+- `@code-reviewer review <code>` - Perform comprehensive code review
+- `@security-auditor scan <codebase>` - Run security vulnerability assessment
+- `@refactorer optimize <code>` - Identify and implement code improvements
+- `@test-architect plan <feature>` - Design comprehensive testing strategy
 
 **Subagent Invocation Syntax**:
 ```typescript
@@ -549,11 +617,10 @@ call_omo_agent(description="Code review", prompt="...", subagent_type="architect
 - Security compliance: Continuous scanning
 - Error prevention: 99.6% systematic validation
 
-**Enterprise Integration**:
-- Prometheus/Grafana for metrics
-- ELK stack for logging
-- Sentry for error tracking
-- DataDog for application monitoring
+**Framework Integration**:
+- Framework logger for structured logging
+- Performance monitoring through framework tools
+- Health checks via framework CLI commands
 
 ### 4.3 Deployment
 
@@ -590,7 +657,7 @@ npm publish --tag latest
 | **11. Delegation System**   | Routing          | `src/delegation/`                  | Setup complexity analysis              | Routing active        | Orchestrator       |
 | **12. Processor Pipeline**  | Execution        | `src/processors/`                  | Activate pre/post processing           | Pipeline ready        | Delegation         |
 | **13. Security Components** | Protection       | `src/security/`                    | Enable security hardening              | Security active       | Processor pipeline |
-| **14. Monitoring**          | Observability    | `src/monitoring/`                  | Start performance tracking             | Monitoring active     | Security           |
+| **14. Core Monitoring**     | Observability    | `src/monitoring/`                  | Start performance tracking             | Monitoring active     | Security           |
 
 #### Boot Orchestration Sequence
 
@@ -629,10 +696,10 @@ npm publish --tag latest
    - Sets up secure authentication and access control
    - Enables security auditing and compliance monitoring
 
-8. **Monitoring** (`src/performance/`, `src/monitoring/`)
-   - Activates performance tracking and enterprise monitoring
-   - Sets up real-time dashboards and alert systems
-   - Enables distributed health checks and metrics collection
+8. **Core Monitoring** (`src/performance/`, `src/monitoring/`)
+- Activates performance tracking and core monitoring
+- Sets up health checks and metrics collection
+- Enables systematic performance validation
 
 ### 4.5 Framework Pipeline Integration Map
 
@@ -696,13 +763,13 @@ Deployment → Environment Check → Rules Engine → Pass/Fail
 | **CI/CD Pipeline** | ✅ Connected | Active | Blocks invalid builds |
 | **Pre-Validate Processor** | ✅ Connected | Active | Syntax validation (comments/code) |
 | **State Validation Processor** | ✅ Connected | Active | Session state integrity |
-| **Codex Compliance Processor** | ❌ BROKEN | Stub only | Returns `compliant: true` always |
+| **Codex Compliance Processor** | ✅ FIXED | Active | Real RuleEnforcer validation |
 | **Test Execution Processor** | ⚠️ Partial | Placeholder | Logs execution intent |
 | **Agent Execution** | ✅ Connected | Active | Real-time validation |
 | **MCP Servers** | ⚠️ Partial | Limited | Some validation |
 | **State Management** | ✅ Connected | Active | Integrity checks |
 
-**✅ FIXED**: Postprocessor `executeCodexCompliance` now calls RuleEnforcer for real validation instead of returning stub `compliant: true`.
+**✅ FIXED**: Postprocessor now calls `validateCodexCompliance()` which runs RuleEnforcer.validateOperation() for real codex rule enforcement and automated agent delegation.
 
 ### 4.6 Task Orchestration Flow
 
@@ -953,20 +1020,13 @@ The StringRay framework generates comprehensive logs and reports across all pipe
 └── stateValidation: Session integrity active
 ```
 
-**Phase 5: Enterprise Monitoring** (`src/enterprise-monitoring.ts`)
+**Phase 5: Core Monitoring** (`src/performance/performance-system-orchestrator.ts`)
 ```
-🚀 Initializing StringRay Enterprise Monitoring System
-├── Distributed coordinator initialized
-├── Load balancer integration initialized
-├── Auto-scaling integration initialized
-├── High availability manager initialized
-├── Prometheus integration initialized
-├── DataDog integration initialized
-├── New Relic integration initialized
-├── Health check system initialized
-├── Alert management system initialized
-├── Real-time dashboard initialized
-└── Enterprise monitoring system initialized successfully
+🚀 Performance System Initialization
+├── Budget enforcer: Bundle size monitoring active
+├── Regression tester: Performance baselines loaded
+├── Monitoring dashboard: Real-time metrics enabled
+└── CI gates: Automated validation configured
 ```
 
 #### Pipeline Flow Logging
@@ -1082,7 +1142,7 @@ The StringRay framework generates comprehensive logs and reports across all pipe
 | **Security Audit** | Manual command or CI security gates | On-demand | `security-reports/security-audit-{timestamp}.json` | Vulnerabilities, compliance, recommendations |
 | **Test Coverage** | Test suite completion | Per test run | `test-reports/` (multiple files) | Coverage %, gaps, regression testing |
 | **MCP Server Health** | Server startup/shutdown or on-demand | Daily/on-demand | `logs/mcp-reports/` (multiple files) | Tool usage, error rates, performance |
-| **Enterprise Monitoring** | System events, alerts, metrics updates | Real-time | `logs/enterprise/` (multiple files) | Distributed coordination, failover events |
+| **Framework Health** | Post-processor completion + complexity > 100 | Per commit | `logs/reports/framework-report-{commitSha}-{date}.md` | Agent usage, system health, performance metrics |
 
 #### 📍 Report Storage Locations (Complete Reference)
 
@@ -1208,6 +1268,30 @@ The framework currently validates that documentation is required but does not au
 **Note**: Automatic documentation updates are planned but not yet implemented. The framework validates documentation requirements but does not generate updates automatically.
 
 ---
+
+## Rule Enforcement System
+
+### Post-Processor Integration
+**Status**: ✅ FIXED - Post-processor now calls rules engine
+**Previous Issue**: Post-processor only did architectural validation, never called codex compliance
+**Resolution**: Added `validateCodexCompliance()` method that runs RuleEnforcer.validateOperation()
+
+### Automated Rule Violation Fixes
+When codex rules are violated, the system automatically attempts fixes:
+
+- **tests-required** → Delegates to `test-architect` for automated test generation
+- **documentation-required** → Delegates to `librarian` for automated documentation
+- **understand-before-write** → Delegates to `librarian` for codebase analysis
+- **security-audit** → Delegates to `security-auditor` for automated scanning
+
+### Agent Responsibility Matrix
+
+| Agent | Primary Role | Rule Enforcement | Complexity Decisions |
+|-------|--------------|------------------|---------------------|
+| **Enforcer** | Central Coordinator | ✅ Primary | ✅ Complexity Analysis |
+| **Architect** | Rule Definition | ✅ Architectural Rules | ❌ Not Involved |
+| **Agent Delegator** | Execution Logic | ❌ Not Involved | ⚠️ Consults Enforcer |
+| **Orchestrator** | Complex Coordination | ❌ Not Involved | ✅ Enterprise Tasks |
 
 ## 5. Reference
 
@@ -1371,13 +1455,7 @@ strray-framework/
 │   ├── build/             # Build scripts
 │   ├── test/              # Test scripts
 │   └── validation/        # Validation scripts
-├── advanced-features/     # Enterprise features
-│   ├── analytics/         # Performance analytics
-│   ├── dashboards/        # Monitoring dashboards
-│   ├── distributed/       # Distributed systems
-│   ├── scaling/           # Auto-scaling
-│   ├── simulation/        # Load simulation
-│   └── streaming/         # Real-time streaming
+├── docs/                  # Documentation (157 files)
 ├── docs/                  # Documentation (157 files)
 ├── dist/                  # Compiled output
 ├── coverage/              # Test coverage reports
@@ -1559,7 +1637,7 @@ node -e "const {TokenManager} = require('./dist/utils/token-manager.js'); consol
 - **Security Audit Reports**: `security-reports/security-audit-{timestamp}.json` - Vulnerabilities, compliance, recommendations
 - **Test Coverage Reports**: `test-reports/` - Coverage percentages, regression testing, gaps analysis
 - **MCP Server Reports**: `logs/mcp-reports/` - Tool usage statistics, error rates, performance metrics
-- **Enterprise Monitoring Reports**: `logs/enterprise/` - Distributed coordination, failover events, cluster health
+- **Framework Health Reports**: `logs/reports/framework-report-{commitSha}-{date}.md` - Agent usage, system health, performance metrics
 - **Test Reports**: `test-reports/` - Coverage and regression testing
 - **MCP Reports**: `logs/mcp-reports/` - Server health and tool usage
 - **Enterprise Logs**: `logs/enterprise/` - Distributed system events

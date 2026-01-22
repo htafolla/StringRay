@@ -176,6 +176,8 @@ async function activateOrchestrator(): Promise<void> {
   );
 }
 
+
+
 async function activateProcessors(): Promise<void> {
   frameworkLogger.log(
     "stringray-activation",

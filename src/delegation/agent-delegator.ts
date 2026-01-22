@@ -18,7 +18,7 @@ import {
   type MultiAgentOrchestrationConfig,
 } from "../config-loader.js";
 import { StringRayStateManager } from "../state/state-manager";
-import { frameworkLogger } from "../framework-logger.js";
+import { frameworkLogger, generateJobId } from "../framework-logger.js";
 
 export interface DelegationContext {
   fileCount?: number;
@@ -46,6 +46,11 @@ export interface AgentExecutionResult {
   result?: unknown;
   success: boolean;
   error?: string;
+}
+
+export interface DelegationAnalysisResult {
+  delegation: DelegationResult;
+  jobId: string;
 }
 
 export interface DelegationRequest {
@@ -105,24 +110,58 @@ export class AgentDelegator {
   }
 
   /**
-   * Analyze request and determine optimal delegation strategy
+   * Consult the enforcer for complexity analysis and orchestration decisions
+   * The enforcer is the central decision-maker for system complexity and orchestration strategy
+   *
+   * NOTE: Since agents are configuration objects (not classes), the enforcer's decision logic
+   * is implemented here in the delegation system. This represents the enforcer's complexity
+   * analysis and orchestration strategy as defined by the enforcer agent configuration.
    */
-  async analyzeDelegation(
-    request: DelegationRequest,
-  ): Promise<DelegationResult> {
+  private async consultEnforcerForComplexity(request: DelegationRequest): Promise<{
+    strategy: "single-agent" | "multi-agent" | "orchestrator-led";
+    complexity: ComplexityScore;
+    metrics: ComplexityMetrics;
+  }> {
+    // Perform complexity analysis using the enforcer's decision-making logic
     const metrics = this.complexityAnalyzer.analyzeComplexity(
       request.operation,
       request.context,
     );
-    const complexity =
-      this.complexityAnalyzer.calculateComplexityScore(metrics);
+    const complexity = this.complexityAnalyzer.calculateComplexityScore(metrics);
 
-    let finalStrategy = complexity.recommendedStrategy;
+    // Apply enforcer's orchestration strategy based on complexity thresholds
+    // This implements the enforcer's central decision-making role
+    let strategy: "single-agent" | "multi-agent" | "orchestrator-led";
+    if (complexity.score <= 25) {
+      strategy = "single-agent";  // Enforcer: Simple task, handle directly
+    } else if (complexity.score <= 95) {
+      strategy = "multi-agent";   // Enforcer: Complex task, coordinate team
+    } else {
+      strategy = "orchestrator-led"; // Enforcer: Enterprise task, escalate to orchestrator
+    }
+
+    return { strategy, complexity, metrics };
+  }
+
+  /**
+    * Analyze request and determine optimal delegation strategy
+    * Delegates complexity analysis and orchestration decisions to the enforcer
+    */
+  async analyzeDelegation(
+    request: DelegationRequest,
+  ): Promise<DelegationAnalysisResult> {
+    // Create jobId at the outset of work for tracking
+    const jobId = generateJobId('delegation');
+
+    // First, consult the enforcer for complexity analysis and orchestration decisions
+    const enforcerAnalysis = await this.consultEnforcerForComplexity(request);
+
+    let finalStrategy = enforcerAnalysis.strategy;
     let finalAgents = request.forceMultiAgent
       ? request.requiredAgents || this.selectDefaultMultiAgentTeam(request)
-      : this.selectAgents(complexity, request);
+      : this.selectAgents(enforcerAnalysis.complexity, request);
 
-    // Handle @mention requests
+    // Handle @mention requests (overrides enforcer decision)
     if (request.mentionAgent) {
       finalStrategy = "single-agent";
       finalAgents = [request.mentionAgent];
@@ -132,21 +171,24 @@ export class AgentDelegator {
       finalStrategy = "multi-agent";
     }
 
-    const conflictResolution = this.determineConflictResolution(complexity);
+    const conflictResolution = this.determineConflictResolution(enforcerAnalysis.complexity);
 
     const result: DelegationResult = {
       strategy: finalStrategy,
       agents: finalAgents,
-      complexity,
-      metrics,
-      estimatedDuration: metrics.estimatedDuration,
+      complexity: enforcerAnalysis.complexity,
+      metrics: enforcerAnalysis.metrics,
+      estimatedDuration: enforcerAnalysis.metrics.estimatedDuration,
       conflictResolution,
     };
 
     this.updateDelegationMetrics(result);
-    await this.logDelegationDecision(result, request);
+    await this.logDelegationDecision(result, request, jobId);
 
-    return result;
+    return {
+      delegation: result,
+      jobId,
+    };
   }
 
   /**
@@ -155,6 +197,7 @@ export class AgentDelegator {
   async executeDelegation(
     delegation: DelegationResult,
     request: DelegationRequest,
+    jobId?: string,
   ): Promise<any> {
     const startTime = Date.now();
 
@@ -167,6 +210,8 @@ export class AgentDelegator {
         agentCount: delegation.agents.length,
         operation: request.operation,
       },
+      undefined, // sessionId
+      jobId,
     );
 
     try {
@@ -193,6 +238,8 @@ export class AgentDelegator {
           maxConcurrentAgents:
             config.multi_agent_orchestration.max_concurrent_agents,
         },
+        undefined, // sessionId
+        jobId,
       );
 
       // Override strategy based on configuration
@@ -222,6 +269,8 @@ export class AgentDelegator {
             {
               agent: delegation.agents[0],
             },
+            undefined, // sessionId
+            jobId,
           );
           if (delegation.agents.length > 0) {
             result = await this.executeSingleAgent(
@@ -241,6 +290,8 @@ export class AgentDelegator {
               agentCount: delegation.agents.length,
               agents: delegation.agents,
             },
+            undefined, // sessionId
+            jobId,
           );
           result = await this.executeMultiAgent(delegation.agents, request);
           break;
@@ -253,6 +304,8 @@ export class AgentDelegator {
               agentCount: delegation.agents.length,
               agents: delegation.agents,
             },
+            undefined, // sessionId
+            jobId,
           );
           result = await this.executeOrchestratorLed(
             delegation.agents,
@@ -273,6 +326,8 @@ export class AgentDelegator {
           duration,
           operation: request.operation,
         },
+        undefined, // sessionId
+        jobId,
       );
 
       return result;
@@ -1108,6 +1163,7 @@ export class AgentDelegator {
   private async logDelegationDecision(
     result: DelegationResult,
     request: DelegationRequest,
+    jobId?: string,
   ): Promise<void> {
     await frameworkLogger.log(
       "agent-delegator",
@@ -1119,6 +1175,8 @@ export class AgentDelegator {
         complexity: result.complexity.score,
         operation: request.operation,
       },
+      undefined, // sessionId
+      jobId,
     );
 
     console.log(`📋 Delegation Decision: ${result.strategy} strategy`);

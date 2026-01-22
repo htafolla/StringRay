@@ -147,11 +147,14 @@ export class CodebaseContextAnalyzer {
    * Perform comprehensive codebase analysis with memory optimization
    */
   async analyzeCodebase(): Promise<CodebaseAnalysis> {
+    const jobId = `codebase-analysis-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
     await frameworkLogger.log(
       "codebase-context-analyzer",
       "analysis-start",
       "info",
       {
+        jobId,
         message: "Starting comprehensive codebase analysis",
         memoryConfig: this.memoryConfig,
       },
@@ -161,7 +164,7 @@ export class CodebaseContextAnalyzer {
     const initialMemoryUsage = process.memoryUsage().heapUsed;
 
     try {
-      const structure = await this.buildCodebaseStructure();
+      const structure = await this.buildCodebaseStructure(jobId);
       const metrics = this.calculateContextMetrics(structure);
       const insights = this.generateInsights(structure, metrics);
       const recommendations = this.generateRecommendations(structure, metrics);
@@ -185,6 +188,7 @@ export class CodebaseContextAnalyzer {
         "analysis-complete",
         "success",
         {
+          jobId,
           files: structure.totalFiles,
           loc: structure.totalLinesOfCode,
           languages: Array.from(structure.languages.keys()),
@@ -205,6 +209,7 @@ export class CodebaseContextAnalyzer {
         "analysis-failed",
         "error",
         {
+          jobId,
           error: error instanceof Error ? error.message : String(error),
           duration: endTime - startTime,
           finalMemoryMB:
@@ -310,7 +315,7 @@ export class CodebaseContextAnalyzer {
   /**
    * Build complete codebase structure map with batching for memory efficiency
    */
-  private async buildCodebaseStructure(): Promise<CodebaseStructure> {
+  private async buildCodebaseStructure(jobId: string): Promise<CodebaseStructure> {
     const fileGraph = new Map<string, FileInfo>();
     const modules = new Map<string, ModuleInfo>();
     const dependencyGraph = new Map<string, Set<string>>();
@@ -358,13 +363,14 @@ export class CodebaseContextAnalyzer {
 
         // Process directories first (may contain modules)
         for (const dirEntry of dirEntries) {
-          if (dirEntry.isModule) {
-            const moduleInfo = await this.analyzeModule(
-              dirEntry.path,
-              dirEntry.relativePath,
-            );
-            modules.set(dirEntry.relativePath, moduleInfo);
-          } else {
+            if (dirEntry.isModule) {
+              const moduleInfo = await this.analyzeModule(
+                dirEntry.path,
+                dirEntry.relativePath,
+                jobId,
+              );
+              modules.set(dirEntry.relativePath, moduleInfo);
+            } else {
             await scanDirectory(dirEntry.path, dirEntry.relativePath);
           }
         }
@@ -384,10 +390,11 @@ export class CodebaseContextAnalyzer {
           const batchPromises = batch.map(
             async ({ path: filePath, relativePath: fileRelativePath }) => {
               try {
-                const fileInfo = await this.analyzeFile(
-                  filePath,
-                  fileRelativePath,
-                );
+                 const fileInfo = await this.analyzeFile(
+                   filePath,
+                   fileRelativePath,
+                   jobId,
+                 );
                 if (fileInfo) {
                   fileGraph.set(fileRelativePath, fileInfo);
 
@@ -401,6 +408,7 @@ export class CodebaseContextAnalyzer {
                   "batch-file-processing-error",
                   "info",
                   {
+                    jobId,
                     filePath,
                     error:
                       error instanceof Error ? error.message : String(error),
@@ -423,6 +431,7 @@ export class CodebaseContextAnalyzer {
           "scan-directory-failed",
           "error",
           {
+            jobId,
             dirPath,
             error: error instanceof Error ? error.message : String(error),
           },
@@ -458,6 +467,7 @@ export class CodebaseContextAnalyzer {
   private async analyzeFile(
     filePath: string,
     relativePath: string,
+    jobId: string,
   ): Promise<FileInfo | null> {
     try {
       const stats = fs.statSync(filePath);
@@ -479,6 +489,7 @@ export class CodebaseContextAnalyzer {
           "large-file-skipped",
           "info",
           {
+            jobId,
             filePath,
             size: stats.size,
             maxSize: this.memoryConfig.maxFileSizeBytes,
@@ -538,6 +549,7 @@ export class CodebaseContextAnalyzer {
         const importExportData = await this.extractImportsExports(
           content,
           language,
+          jobId,
         );
         imports = importExportData.imports;
         exports = importExportData.exports;
@@ -557,6 +569,7 @@ export class CodebaseContextAnalyzer {
           "content-loading-failed",
           "info",
           {
+            jobId,
             filePath,
             error:
               contentError instanceof Error
@@ -593,6 +606,7 @@ export class CodebaseContextAnalyzer {
         "file-analysis-failed",
         "error",
         {
+          jobId,
           filePath,
           error: error instanceof Error ? error.message : String(error),
         },
@@ -607,6 +621,7 @@ export class CodebaseContextAnalyzer {
   private async analyzeModule(
     dirPath: string,
     relativePath: string,
+    jobId: string,
   ): Promise<ModuleInfo> {
     const files: FileInfo[] = [];
     const dependencies = new Set<string>();
@@ -627,6 +642,7 @@ export class CodebaseContextAnalyzer {
             const fileInfo = await this.analyzeFile(
               entryPath,
               entryRelativePath,
+              jobId,
             );
             if (fileInfo) {
               files.push(fileInfo);
@@ -646,6 +662,7 @@ export class CodebaseContextAnalyzer {
           "module-scan-failed",
           "error",
           {
+            jobId,
             modulePath,
             error: error instanceof Error ? error.message : String(error),
           },
@@ -678,6 +695,7 @@ export class CodebaseContextAnalyzer {
   private async extractImportsExports(
     content: string,
     language: string,
+    jobId: string,
   ): Promise<{ imports: string[]; exports: string[] }> {
     const imports: string[] = [];
     const exports: string[] = [];
@@ -700,6 +718,7 @@ export class CodebaseContextAnalyzer {
         "import-export-extraction-failed",
         "error",
         {
+          jobId,
           language,
           error: error instanceof Error ? error.message : String(error),
         },

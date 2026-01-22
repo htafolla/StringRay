@@ -250,12 +250,13 @@ export class BootOrchestrator {
   /**
    * Activate pre/post processors
    */
-  private async activateProcessors(): Promise<boolean> {
+  private async activateProcessors(jobId: string): Promise<boolean> {
     try {
       frameworkLogger.log(
         "boot-orchestrator",
         "activateProcessors started",
         "info",
+        { jobId },
       );
 
       this.processorManager.registerProcessor({
@@ -268,6 +269,7 @@ export class BootOrchestrator {
         "boot-orchestrator",
         "registered preValidate processor",
         "success",
+        { jobId },
       );
 
       this.processorManager.registerProcessor({
@@ -280,6 +282,7 @@ export class BootOrchestrator {
         "boot-orchestrator",
         "registered codexCompliance processor",
         "success",
+        { jobId },
       );
 
       this.processorManager.registerProcessor({
@@ -292,6 +295,7 @@ export class BootOrchestrator {
         "boot-orchestrator",
         "registered errorBoundary processor",
         "success",
+        { jobId },
       );
 
       this.processorManager.registerProcessor({
@@ -304,6 +308,7 @@ export class BootOrchestrator {
         "boot-orchestrator",
         "registered stateValidation processor",
         "success",
+        { jobId },
       );
 
       // Register the refactoring logging processor with its hook
@@ -316,6 +321,7 @@ export class BootOrchestrator {
         "boot-orchestrator",
         "registered refactoringLogging processor with hook",
         "success",
+        { jobId },
       );
 
       const initSuccess = await this.processorManager.initializeProcessors();
@@ -324,6 +330,7 @@ export class BootOrchestrator {
           "boot-orchestrator",
           "processor initialization failed",
           "error",
+          { jobId },
         );
         throw new Error("Processor initialization failed");
       }
@@ -332,6 +339,7 @@ export class BootOrchestrator {
         "boot-orchestrator",
         "processors initialized successfully",
         "success",
+        { jobId },
       );
 
       this.stateManager.set("processor:manager", this.processorManager);
@@ -341,6 +349,7 @@ export class BootOrchestrator {
         "boot-orchestrator",
         "processors activated and stored in state",
         "success",
+        { jobId },
       );
 
       return true;
@@ -349,7 +358,7 @@ export class BootOrchestrator {
         "boot-orchestrator",
         "activateProcessors failed",
         "error",
-        error,
+        { jobId, error },
       );
       console.error("❌ Failed to activate processors:", error);
       return false;
@@ -359,7 +368,7 @@ export class BootOrchestrator {
   /**
    * Load remaining agents after orchestrator
    */
-  private async loadRemainingAgents(): Promise<string[]> {
+  private async loadRemainingAgents(jobId: string): Promise<string[]> {
     const agents = [
       "enforcer",
       "architect",
@@ -379,7 +388,7 @@ export class BootOrchestrator {
           "boot-orchestrator",
           "agent-loading",
           "info",
-          { agentName, agentPath },
+          { jobId, agentName, agentPath },
         );
         const agentModule = await import(agentPath);
         const agentClass =
@@ -681,10 +690,13 @@ export class BootOrchestrator {
    * Execute the boot sequence (internal framework initialization)
    */
   async executeBootSequence(): Promise<BootResult> {
+    const jobId = `boot-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
     frameworkLogger.log(
       "boot-orchestrator",
       "executeBootSequence started",
       "info",
+      { jobId },
     );
 
     const result: BootResult = {
@@ -703,19 +715,22 @@ export class BootOrchestrator {
         "boot-orchestrator",
         "loading StringRay configuration",
         "info",
+        { jobId },
       );
       // Phase 0: Load StringRay configuration from Python ConfigManager
-      await this.loadStringRayConfiguration();
+      await this.loadStringRayConfiguration(jobId);
       frameworkLogger.log(
         "boot-orchestrator",
         "StringRay configuration loaded",
         "success",
+        { jobId },
       );
       // Phase 1: Initialize core systems
       frameworkLogger.log(
         "boot-orchestrator",
         "initializing core systems",
         "info",
+        { jobId },
       );
       result.orchestratorLoaded = await this.loadOrchestrator();
       if (!result.orchestratorLoaded) {
@@ -723,6 +738,7 @@ export class BootOrchestrator {
           "boot-orchestrator",
           "orchestrator loading failed",
           "error",
+          { jobId },
         );
         result.errors.push("Failed to load orchestrator");
         return result;
@@ -731,6 +747,7 @@ export class BootOrchestrator {
         "boot-orchestrator",
         "orchestrator loaded successfully",
         "success",
+        { jobId },
       );
 
       const delegationInitialized = await this.initializeDelegationSystem();
@@ -739,6 +756,7 @@ export class BootOrchestrator {
           "boot-orchestrator",
           "delegation system initialization failed",
           "error",
+          { jobId },
         );
         result.errors.push("Failed to initialize delegation system");
         return result;
@@ -747,6 +765,7 @@ export class BootOrchestrator {
         "boot-orchestrator",
         "delegation system initialized",
         "success",
+        { jobId },
       );
 
       // Phase 2: Session management
@@ -765,13 +784,15 @@ export class BootOrchestrator {
           "boot-orchestrator",
           "activating processors",
           "info",
+          { jobId },
         );
-        result.processorsActivated = await this.activateProcessors();
+        result.processorsActivated = await this.activateProcessors(jobId);
         if (!result.processorsActivated) {
           frameworkLogger.log(
             "boot-orchestrator",
             "processor activation failed",
             "error",
+            { jobId },
           );
           result.errors.push("Failed to activate processors");
           return result;
@@ -780,6 +801,7 @@ export class BootOrchestrator {
           "boot-orchestrator",
           "processors activated successfully",
           "success",
+          { jobId },
         );
 
         // Validate processor health
@@ -789,6 +811,7 @@ export class BootOrchestrator {
             "boot-orchestrator",
             "processor health validation failed",
             "error",
+            { jobId },
           );
           result.errors.push("Processor health validation failed");
           return result;
@@ -797,12 +820,13 @@ export class BootOrchestrator {
           "boot-orchestrator",
           "processor health validated",
           "success",
+          { jobId },
         );
       }
 
       // Phase 4: Load agents
       if (this.config.agentLoading) {
-        result.agentsLoaded = await this.loadRemainingAgents();
+        result.agentsLoaded = await this.loadRemainingAgents(jobId);
       }
 
       // Phase 5: Security & compliance
@@ -840,7 +864,7 @@ export class BootOrchestrator {
   /**
    * Load StringRay configuration from Python ConfigManager
    */
-  private async loadStringRayConfiguration(): Promise<void> {
+  private async loadStringRayConfiguration(jobId: string): Promise<void> {
     try {
       // Load StringRay configuration directly (no Python dependency)
       const stringRayConfig = {
@@ -930,6 +954,7 @@ export class BootOrchestrator {
         "boot-orchestrator",
         "configuration-loaded",
         "success",
+        { jobId },
       );
     } catch (error) {
       console.warn("⚠️ Failed to load StringRay configuration:", error);

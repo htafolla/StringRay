@@ -149,6 +149,8 @@ export class StringRayStateManager implements StateManager {
   }
 
   set<T>(key: string, value: T): void {
+    const jobId = `state-set-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
     // Store in memory immediately, even if persistence isn't ready yet
     this.store.set(key, value);
 
@@ -164,11 +166,11 @@ export class StringRayStateManager implements StateManager {
         "state-manager",
         "set called before initialization, queued for persistence",
         "debug",
-        { key },
+        { jobId, key },
       );
     }
 
-    frameworkLogger.log("state-manager", "set operation", "success", { key });
+    frameworkLogger.log("state-manager", "set operation", "success", { jobId, key });
   }
 
   clear(key: string): void {

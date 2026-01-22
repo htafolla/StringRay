@@ -43,6 +43,8 @@ export class SuccessHandler {
     result: PostProcessorResult,
     monitoringResults: any[],
   ): Promise<SuccessMetrics> {
+    const jobId = `success-handler-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
     console.log(
       `🎉 Post-processor completed successfully for commit ${context.commitSha}`,
     );
@@ -61,7 +63,7 @@ export class SuccessHandler {
 
     // Cleanup resources
     if (this.config.cleanupEnabled) {
-      await this.performCleanup(context);
+      await this.performCleanup(context, jobId);
     }
 
     // Log success metrics
@@ -122,7 +124,7 @@ export class SuccessHandler {
   /**
    * Perform cleanup after successful completion
    */
-  private async performCleanup(context: PostProcessorContext): Promise<void> {
+  private async performCleanup(context: PostProcessorContext, jobId: string): Promise<void> {
     console.log("🧹 Performing post-success cleanup...");
 
     // In a real system, this would:
@@ -137,6 +139,7 @@ export class SuccessHandler {
       "success-handler",
       "cleanup-completed",
       "success",
+      { jobId },
     );
   }
 

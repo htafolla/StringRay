@@ -172,12 +172,14 @@ export function createStringRayCodexInjectorHook() {
     name: "strray-codex-injector" as const,
     hooks: {
       "agent.start": async (sessionId: string) => {
+        const jobId = `agent-start-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
         try {
           await frameworkLogger.log(
             "codex-injector",
             "agent.start hook triggered",
             "info",
-            { sessionId },
+            { jobId, sessionId },
           );
           // Load codex context to ensure it's available for the session
           await loadCodexContext(sessionId);
@@ -191,7 +193,7 @@ export function createStringRayCodexInjectorHook() {
               "codex-injector",
               "codex context loaded successfully",
               "success",
-              stats,
+              { jobId, ...stats },
             );
           } else {
             console.log(
@@ -201,6 +203,7 @@ export function createStringRayCodexInjectorHook() {
               "codex-injector",
               "no codex files found",
               "error",
+              { jobId },
             );
           }
         } catch (error) {
@@ -208,7 +211,7 @@ export function createStringRayCodexInjectorHook() {
             "codex-injector",
             "agent.start hook failed",
             "error",
-            error,
+            { jobId, error },
           );
           console.error(`❌ StringRay: Error in agent.start hook:`, error);
           throw error;
@@ -218,12 +221,14 @@ export function createStringRayCodexInjectorHook() {
         input: { tool: string; args?: Record<string, unknown> },
         sessionId: string,
       ) => {
+        const jobId = `tool-before-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
         try {
           await frameworkLogger.log(
             "codex-injector",
             "tool.execute.before hook triggered",
             "info",
-            { tool: input.tool, sessionId },
+            { jobId, tool: input.tool, sessionId },
           );
 
           // Log ALL tool usage for framework transparency
@@ -232,6 +237,7 @@ export function createStringRayCodexInjectorHook() {
             `tool called: ${input.tool}`,
             "info",
             {
+              jobId,
               tool: input.tool,
               args: input.args,
               sessionId,
@@ -247,6 +253,7 @@ export function createStringRayCodexInjectorHook() {
               "codex-injector",
               "skipping enforcement in test mode",
               "info",
+              { jobId },
             );
             return;
           }
@@ -258,7 +265,7 @@ export function createStringRayCodexInjectorHook() {
               "codex-injector",
               "non-critical tool allowed",
               "info",
-              { tool: input.tool },
+              { jobId, tool: input.tool },
             );
             return; // Allow non-critical tools
           }
@@ -267,7 +274,7 @@ export function createStringRayCodexInjectorHook() {
             "codex-injector",
             "enforcing codex on critical tool",
             "info",
-            { tool: input.tool },
+            { jobId, tool: input.tool },
           );
 
           // Load codex context for validation
@@ -280,7 +287,7 @@ export function createStringRayCodexInjectorHook() {
               "codex-injector",
               "no codex context available",
               "error",
-              { sessionId },
+              { jobId, sessionId },
             );
             return;
           }
@@ -289,7 +296,7 @@ export function createStringRayCodexInjectorHook() {
             "codex-injector",
             "codex context loaded for validation",
             "success",
-            { contextCount: codexContexts.length },
+            { jobId, contextCount: codexContexts.length },
           );
 
           // Use the initialized context loader
@@ -327,6 +334,7 @@ export function createStringRayCodexInjectorHook() {
                 "blocking codex violation detected",
                 "error",
                 {
+                  jobId,
                   violationCount: blockingViolations.length,
                   tool: input.tool,
                 },
@@ -349,6 +357,7 @@ export function createStringRayCodexInjectorHook() {
               "non-blocking codex warnings",
               "info",
               {
+                jobId,
                 warningCount: validation.violations.length,
                 tool: input.tool,
               },
@@ -358,7 +367,7 @@ export function createStringRayCodexInjectorHook() {
               "codex-injector",
               "codex validation passed",
               "success",
-              { tool: input.tool },
+              { jobId, tool: input.tool },
             );
           }
         } catch (error) {
@@ -367,6 +376,7 @@ export function createStringRayCodexInjectorHook() {
             "tool.execute.before hook error",
             "error",
             {
+              jobId,
               error: error instanceof Error ? error.message : String(error),
               tool: input.tool,
             },
@@ -390,12 +400,14 @@ export function createStringRayCodexInjectorHook() {
         output: { output?: string; [key: string]: unknown },
         sessionId: string,
       ) => {
+        const jobId = `tool-after-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
         try {
           frameworkLogger.log(
             "codex-injector",
             "tool.execute.after hook triggered",
             "info",
-            { tool: input.tool, sessionId },
+            { jobId, tool: input.tool, sessionId },
           );
 
           // Skip codex enforcement during testing
@@ -407,6 +419,7 @@ export function createStringRayCodexInjectorHook() {
               "codex-injector",
               "skipping injection in test mode",
               "info",
+              { jobId },
             );
             return output;
           }
@@ -419,7 +432,7 @@ export function createStringRayCodexInjectorHook() {
               "codex-injector",
               "non-critical tool - no injection",
               "info",
-              { tool: input.tool },
+              { jobId, tool: input.tool },
             );
             return output;
           }
@@ -437,6 +450,7 @@ export function createStringRayCodexInjectorHook() {
             "codex contexts loaded for injection",
             "success",
             {
+              jobId,
               contextCount: codexContexts.length,
               tool: input.tool,
             },
@@ -458,6 +472,7 @@ export function createStringRayCodexInjectorHook() {
             "codex context injected into output",
             "success",
             {
+              jobId,
               tool: input.tool,
               outputLength: injectedOutput.output?.length,
             },
@@ -470,6 +485,7 @@ export function createStringRayCodexInjectorHook() {
             "tool.execute.after hook error",
             "error",
             {
+              jobId,
               error: error instanceof Error ? error.message : String(error),
               tool: input.tool,
             },

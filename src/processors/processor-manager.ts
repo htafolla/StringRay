@@ -143,11 +143,14 @@ export class ProcessorManager {
    * Initialize all registered processors
    */
   async initializeProcessors(): Promise<boolean> {
+    const jobId = `init-processors-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
     frameworkLogger.log(
       "processor-manager",
       "initializeProcessors called",
       "info",
       {
+        jobId,
         totalProcessors: this.processors.size,
         enabledProcessors: Array.from(this.processors.values()).filter(
           (p) => p.enabled,
@@ -155,7 +158,7 @@ export class ProcessorManager {
       },
     );
 
-    frameworkLogger.log("processor-manager", "initializing processors", "info");
+    frameworkLogger.log("processor-manager", "initializing processors", "info", { jobId });
 
     const initPromises = Array.from(this.processors.values())
       .filter((p) => p.enabled)
@@ -166,7 +169,7 @@ export class ProcessorManager {
             "processor-manager",
             "processor initialized successfully",
             "success",
-            { processor: config.name },
+            { jobId, processor: config.name },
           );
           return { name: config.name, success: true };
         } catch (error) {
@@ -175,6 +178,7 @@ export class ProcessorManager {
             "processor initialization failed",
             "error",
             {
+              jobId,
               processor: config.name,
               error: error instanceof Error ? error.message : String(error),
             },
@@ -249,6 +253,7 @@ export class ProcessorManager {
   async executePreProcessors(
     input: { tool: string; args?: any; context?: any },
   ): Promise<{ success: boolean; results: ProcessorResult[] }> {
+    const jobId = `execute-pre-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     const { tool, args, context } = input;
 
     frameworkLogger.log(
@@ -256,6 +261,7 @@ export class ProcessorManager {
       "executePreProcessors called",
       "debug",
       {
+        jobId,
         tool,
         processorCount: Array.from(this.processors.values()).filter(
           (p) => p.type === "pre" && p.enabled,
@@ -283,6 +289,7 @@ export class ProcessorManager {
           "pre-processor failed",
           "info",
           {
+            jobId,
             processor: config.name,
             tool,
             error: result.error,
@@ -294,6 +301,7 @@ export class ProcessorManager {
           "pre-processor succeeded",
           "success",
           {
+            jobId,
             processor: config.name,
             tool,
             duration: result.duration,
@@ -309,6 +317,7 @@ export class ProcessorManager {
       "executePreProcessors completed",
       "debug",
       {
+        jobId,
         tool,
         totalResults: results.length,
         successCount: results.filter((r) => r.success).length,
@@ -330,11 +339,14 @@ export class ProcessorManager {
     data: any,
     preResults: ProcessorResult[],
   ): Promise<ProcessorResult[]> {
+    const jobId = `execute-post-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
     frameworkLogger.log(
       "processor-manager",
       "executePostProcessors called",
       "debug",
       {
+        jobId,
         operation,
         preResultCount: preResults.length,
         processorCount: Array.from(this.processors.values()).filter(
@@ -365,6 +377,7 @@ export class ProcessorManager {
           "post-processor failed",
           "error",
           {
+            jobId,
             processor: config.name,
             operation,
             error: result.error,
@@ -376,6 +389,7 @@ export class ProcessorManager {
           "post-processor succeeded",
           "success",
           {
+            jobId,
             processor: config.name,
             operation,
             duration: result.duration,
@@ -389,6 +403,7 @@ export class ProcessorManager {
       "executePostProcessors completed",
       "debug",
       {
+        jobId,
         operation,
         totalResults: results.length,
         successCount: results.filter((r) => r.success).length,

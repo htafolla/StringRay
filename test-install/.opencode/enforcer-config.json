@@ -1,0 +1,229 @@
+{
+  "framework": "StringRay 1.0.0",
+  "version": "1.1.1",
+  "description": "Codex-compliant framework configuration for Credible UI project",
+  "thresholds": {
+    "bundleSize": {
+      "maxSize": "3MB",
+      "warningThreshold": "2.5MB",
+      "criticalThreshold": "3MB",
+      "optimizationTarget": "2.5MB"
+    },
+    "testCoverage": {
+      "minPercentage": 10,
+      "targetPercentage": 50,
+      "criticalThreshold": 5,
+      "progressiveTarget": 25
+    },
+    "codeDuplication": {
+      "maxPercentage": 5,
+      "warningThreshold": 3,
+      "criticalThreshold": 7
+    },
+    "componentSize": {
+      "maxLines": 300,
+      "warningThreshold": 200,
+      "criticalThreshold": 400
+    },
+    "hookComplexity": {
+      "maxResponsibilities": 3,
+      "warningThreshold": 2
+    },
+    "circularDependencies": {
+      "maxAllowed": 0,
+      "warningThreshold": 1
+    },
+    "typeSafety": {
+      "strictMode": false,
+      "anyTypeLimit": 10,
+      "unknownTypeLimit": 5
+    },
+    "security": {
+      "vulnerabilityLevel": "moderate",
+      "maxOutdatedPackages": 10,
+      "requireHttps": true
+    },
+    "automation": {
+      "hooks": {
+        "preCommit": ["pre-commit-introspection"],
+        "postCommit": ["auto-format"],
+        "daily": ["enforcer-daily-scan"],
+        "security": ["security-scan"],
+        "deployment": ["post-deployment-audit"]
+      },
+      "workflows": {
+        "ci": ["lint", "typecheck", "test", "security-scan"],
+        "cd": ["build", "post-deployment-audit"],
+        "daily": ["enforcer-daily-scan", "security-scan"]
+      }
+    },
+    "agents": {
+      "enforcer": {
+        "model": "opencode/grok-code",
+        "capabilities": [
+          "compliance-monitoring",
+          "threshold-enforcement",
+          "automation-orchestration"
+        ],
+        "triggers": ["file-changes", "schedule", "deployment"]
+      },
+      "architect": {
+        "model": "opencode/grok-code",
+        "capabilities": [
+          "design-review",
+          "architecture-validation",
+          "dependency-analysis"
+        ],
+        "triggers": ["code-reviews", "new-features"]
+      },
+      "orchestrator": {
+        "model": "opencode/grok-code",
+        "capabilities": [
+          "task-coordination",
+          "multi-agent-orchestration",
+          "workflow-management"
+        ],
+        "triggers": ["complex-tasks", "integration-events"]
+      },
+      "bug-triage-specialist": {
+        "model": "opencode/grok-code",
+        "capabilities": [
+          "error-analysis",
+          "root-cause-identification",
+          "fix-suggestions"
+        ],
+        "triggers": ["test-failures", "error-reports"]
+      },
+      "code-reviewer": {
+        "model": "opencode/grok-code",
+        "capabilities": [
+          "code-quality-assessment",
+          "best-practice-validation",
+          "security-review"
+        ],
+        "triggers": ["pull-requests", "code-commits"]
+      },
+      "refactorer": {
+        "model": "opencode/grok-code",
+        "capabilities": [
+          "code-modernization",
+          "debt-reduction",
+          "consolidation"
+        ],
+        "triggers": ["legacy-code-detection", "complexity-alerts"]
+      },
+      "security-auditor": {
+        "model": "opencode/grok-code",
+        "capabilities": [
+          "vulnerability-detection",
+          "threat-analysis",
+          "security-validation"
+        ],
+        "triggers": ["security-scans", "dependency-updates"]
+      },
+      "test-architect": {
+        "model": "opencode/grok-code",
+        "capabilities": [
+          "test-strategy-design",
+          "coverage-optimization",
+          "behavioral-testing"
+        ],
+        "triggers": ["new-features", "code-changes"]
+      }
+    },
+    "mcps": {
+      "project-analysis": {
+        "description": "Codebase structure and pattern analysis",
+        "capabilities": [
+          "structure-mapping",
+          "pattern-recognition",
+          "complexity-analysis"
+        ]
+      },
+      "testing-strategy": {
+        "description": "Test approach planning and coverage optimization",
+        "capabilities": [
+          "test-planning",
+          "coverage-analysis",
+          "quality-assessment"
+        ]
+      },
+      "architecture-patterns": {
+        "description": "System design guidance and pattern validation",
+        "capabilities": [
+          "design-review",
+          "pattern-matching",
+          "architecture-validation"
+        ]
+      },
+      "performance-optimization": {
+        "description": "Speed and bottleneck identification",
+        "capabilities": [
+          "performance-analysis",
+          "bottleneck-detection",
+          "optimization-suggestions"
+        ]
+      },
+      "git-workflow": {
+        "description": "Version control best practices and workflow optimization",
+        "capabilities": [
+          "commit-analysis",
+          "branch-strategy",
+          "merge-conflict-resolution"
+        ]
+      },
+      "api-design": {
+        "description": "REST/GraphQL patterns and standards validation",
+        "capabilities": [
+          "api-review",
+          "standard-compliance",
+          "endpoint-validation"
+        ]
+      }
+    },
+    "codex": {
+      "version": "1.1.1",
+      "terms": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 24, 29, 32, 38, 42, 43],
+      "principles": [
+        "progressive-prod-ready-code",
+        "no-patches-boiler-stubs",
+        "surgical-fixes-only",
+        "incremental-phases-with-tracking",
+        "resolve-all-errors",
+        "prevent-infinite-loops",
+        "single-source-of-truth",
+        "batched-introspection-cycles",
+        "zero-tolerance-code-rot",
+        "90-percent-runtime-error-prevention"
+      ]
+    },
+    "project": {
+      "name": "Credible UI",
+      "type": "React/TypeScript",
+      "framework": "Vite + React + shadcn/ui",
+      "blockchain": "Sui",
+      "testing": "Vitest + Playwright",
+      "deployment": "Vercel"
+    },
+    "optimization_recommendations": {
+      "immediate": [
+        "Increase test coverage from 0% to minimum 10% threshold",
+        "Optimize bundle size from 2.5MB toward 2MB target",
+        "Implement lazy loading for calculator components"
+      ],
+      "short_term": [
+        "Add comprehensive error boundaries (currently 0% coverage)",
+        "Implement proper test suites for all 135 TypeScript files",
+        "Reduce component sizes (39 components exceed 300-line limit)"
+      ],
+      "performance_status": "OPTIMIZATION_COMPLETE",
+      "monitoring_enabled": true
+    }
+  },
+  "disabled_agents": [
+    "frontend-ui-ux-engineer",
+    "document-writer",
+    "oracle",
+    "multimodal-looker"
+  ]
+}

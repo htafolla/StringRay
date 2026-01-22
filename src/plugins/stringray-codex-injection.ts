@@ -8,18 +8,22 @@
  * @author StringRay Framework Team
  */
 
-import { frameworkLogger } from "../framework-logger.js";
+import { frameworkLogger, generateJobId } from "../framework-logger.js";
+
+
 import { TokenManager } from "../utils/token-manager.js";
 
 const tokenManager = new TokenManager();
 
 const pluginHooks = {
   config: (input: { client?: string; directory?: string; worktree?: string }) => {
-    frameworkLogger.log("codex-injector", "plugin initialized", "info");
+    const jobId = generateJobId('codex-injector-init');
+    frameworkLogger.log("codex-injector", "plugin initialized", "info", {}, undefined, jobId);
   },
 
   "experimental.chat.system.transform": (messages: any[], context: any) => {
-    frameworkLogger.log("codex-injector", "chat.system.transform hook called", "info", { messageCount: messages?.length });
+    const jobId = generateJobId('codex-injector-transform');
+    frameworkLogger.log("codex-injector", "chat.system.transform hook called", "info", { messageCount: messages?.length }, undefined, jobId);
 
     // Inject codex context into system messages for agent guidance
     try {
@@ -73,18 +77,24 @@ For complete codex documentation, see: .strray/codex.json`;
       const limitCheck = tokenManager.checkLimits(fullContent);
       let finalContent = fullContent;
 
-      if (!limitCheck.withinLimit) {
-        frameworkLogger.log("codex-injector", "Codex content exceeds token limits, pruning context", "error", {
-          currentTokens: limitCheck.currentTokens,
-          maxTokens: limitCheck.maxTokens
-        });
-        finalContent = tokenManager.pruneContext(fullContent);
-      } else if (limitCheck.warning) {
-        frameworkLogger.log("codex-injector", "Codex content approaching token limits", "info", {
-          currentTokens: limitCheck.currentTokens,
-          maxTokens: limitCheck.maxTokens
-        });
+       if (!limitCheck.withinLimit) {
+         const jobId = generateJobId('codex-injector-token-exceed');
+         frameworkLogger.log("codex-injector", "Codex content exceeds token limits, pruning context", "error", {
+           currentTokens: limitCheck.currentTokens,
+           maxTokens: limitCheck.maxTokens
+         }, undefined, jobId);
+         finalContent = tokenManager.pruneContext(fullContent);
+       } else if (limitCheck.warning) {
+         const jobId = generateJobId('codex-injector-token-warning');
+         frameworkLogger.log("codex-injector", "Codex content approaching token limits", "info", {
+           currentTokens: limitCheck.currentTokens,
+           maxTokens: limitCheck.maxTokens
+         }, undefined, jobId);
       }
+
+      // CRITICAL: DO NOT add complexity analysis here
+      // Complexity analysis belongs in the delegation system, not context injection
+      // This plugin should ONLY handle codex context injection
 
       const codexMessage = {
         role: "system",
@@ -106,11 +116,13 @@ For complete codex documentation, see: .strray/codex.json`;
   },
 
   "tool.execute.before": (tool: string, args: any) => {
-      frameworkLogger.log("codex-injector", "tool.execute.before hook called", "info", { tool });
+      const jobId = generateJobId('codex-injector-tool-before');
+      frameworkLogger.log("codex-injector", "tool.execute.before hook called", "info", { tool }, undefined, jobId);
   },
 
   "tool.execute.after": (tool: string, args: any, result: any) => {
-      frameworkLogger.log("codex-injector", "tool.execute.after hook called", "success", { tool });
+      const jobId = generateJobId('codex-injector-tool-after');
+      frameworkLogger.log("codex-injector", "tool.execute.after hook called", "success", { tool }, undefined, jobId);
   },
 
 

@@ -25,6 +25,8 @@ export class AutoFixEngine {
     analysis: FailureAnalysis,
     context: PostProcessorContext,
   ): Promise<FixResult> {
+    const jobId = `auto-fix-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
     console.log("🔧 Attempting auto-fixes for failure analysis...");
 
     if (analysis.confidence < this.confidenceThreshold) {
@@ -65,6 +67,7 @@ export class AutoFixEngine {
           console.log(`✅ Fix applied successfully: ${fix.description}`);
         } else {
           await frameworkLogger.log("auto-fix-engine", "fix-failed", "error", {
+            jobId,
             description: fix.description,
             error: result.error,
           });
@@ -247,6 +250,8 @@ export class AutoFixEngine {
     originalFailure: FailureAnalysis,
     context: PostProcessorContext,
   ): Promise<boolean> {
+    const jobId = `fix-validation-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
     console.log("✅ Validating applied fixes...");
 
     try {
@@ -287,6 +292,7 @@ export class AutoFixEngine {
         "auto-fix-engine",
         "validation-failed",
         "error",
+        { jobId },
       );
       return false;
     }

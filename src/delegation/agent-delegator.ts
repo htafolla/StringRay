@@ -149,10 +149,7 @@ export class AgentDelegator {
     */
   async analyzeDelegation(
     request: DelegationRequest,
-  ): Promise<DelegationAnalysisResult> {
-    // Create jobId at the outset of work for tracking
-    const jobId = generateJobId('delegation');
-
+  ): Promise<DelegationResult> {
     // First, consult the enforcer for complexity analysis and orchestration decisions
     const enforcerAnalysis = await this.consultEnforcerForComplexity(request);
 
@@ -183,12 +180,9 @@ export class AgentDelegator {
     };
 
     this.updateDelegationMetrics(result);
-    await this.logDelegationDecision(result, request, jobId);
+    await this.logDelegationDecision(result, request);
 
-    return {
-      delegation: result,
-      jobId,
-    };
+    return result;
   }
 
   /**
@@ -197,7 +191,6 @@ export class AgentDelegator {
   async executeDelegation(
     delegation: DelegationResult,
     request: DelegationRequest,
-    jobId?: string,
   ): Promise<any> {
     const startTime = Date.now();
 
@@ -210,8 +203,6 @@ export class AgentDelegator {
         agentCount: delegation.agents.length,
         operation: request.operation,
       },
-      undefined, // sessionId
-      jobId,
     );
 
     try {
@@ -238,8 +229,6 @@ export class AgentDelegator {
           maxConcurrentAgents:
             config.multi_agent_orchestration.max_concurrent_agents,
         },
-        undefined, // sessionId
-        jobId,
       );
 
       // Override strategy based on configuration
@@ -269,8 +258,6 @@ export class AgentDelegator {
             {
               agent: delegation.agents[0],
             },
-            undefined, // sessionId
-            jobId,
           );
           if (delegation.agents.length > 0) {
             result = await this.executeSingleAgent(
@@ -290,8 +277,6 @@ export class AgentDelegator {
               agentCount: delegation.agents.length,
               agents: delegation.agents,
             },
-            undefined, // sessionId
-            jobId,
           );
           result = await this.executeMultiAgent(delegation.agents, request);
           break;
@@ -304,8 +289,6 @@ export class AgentDelegator {
               agentCount: delegation.agents.length,
               agents: delegation.agents,
             },
-            undefined, // sessionId
-            jobId,
           );
           result = await this.executeOrchestratorLed(
             delegation.agents,
@@ -326,8 +309,6 @@ export class AgentDelegator {
           duration,
           operation: request.operation,
         },
-        undefined, // sessionId
-        jobId,
       );
 
       return result;
@@ -1163,7 +1144,6 @@ export class AgentDelegator {
   private async logDelegationDecision(
     result: DelegationResult,
     request: DelegationRequest,
-    jobId?: string,
   ): Promise<void> {
     await frameworkLogger.log(
       "agent-delegator",
@@ -1175,8 +1155,6 @@ export class AgentDelegator {
         complexity: result.complexity.score,
         operation: request.operation,
       },
-      undefined, // sessionId
-      jobId,
     );
 
     console.log(`📋 Delegation Decision: ${result.strategy} strategy`);

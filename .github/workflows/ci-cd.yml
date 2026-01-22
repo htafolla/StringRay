@@ -1,182 +1,238 @@
-name: CI/CD Pipeline
+name: StringRay Framework CI/CD
 
 on:
   push:
-    branches: [main, master]
+    branches: [ master, main ]
   pull_request:
-    branches: [main, master]
-  workflow_dispatch:
-
-# Enable CodeQL permissions for this workflow
-permissions:
-  security-events: write
-  actions: read
-  contents: read
-
-# Disable CodeQL
-env:
-  CODEQL_ACTION_DISABLE: true
-  CODEQL_ACTION_FEATURE_MULTI_LANGUAGE: false
-  CODEQL_ACTION_FEATURE_SARIF_COMBINE: false
+    branches: [ master, main ]
 
 jobs:
-  test:
+  quality:
+    name: Code Quality
     runs-on: ubuntu-latest
     strategy:
       matrix:
         node-version: [18.x, 20.x]
+
     steps:
-      - name: Disable CodeQL
-        run: |
-          echo "CODEQL_DISABLED=true" >> $GITHUB_ENV
-          # Kill any existing CodeQL processes
-          pkill -f codeql || true
-      - name: Checkout code
-        uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v4
 
-      - name: Setup Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ matrix.node-version }}
-          cache: "npm"
+    - name: Setup Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
 
-      - name: Install dependencies
-        run: npm ci --ignore-scripts
+    - name: Install dependencies
+      run: npm ci
 
-      - name: Run postinstall configuration
-        run: npm run postinstall
+    - name: Type checking
+      run: npm run typecheck
 
-      - name: TypeScript type check
-        run: npm run typecheck
+    - name: Linting
+      run: npm run lint
 
-      - name: Lint code
-        run: npm run lint
+    - name: Security audit
+      run: npm audit --audit-level moderate
 
-      - name: Run unit tests
-        run: npm run test:unit
-
-      - name: Run integration tests
-        run: npm run test:integration
-
-      - name: Build project
-        run: npm run build:all
-
-      - name: Run comprehensive validation
-        run: npm run test:comprehensive
-
-      - name: Run security audit
-        run: npm run security-audit
-
-  build:
-    needs: test
+  test-unit:
+    name: Unit Tests
     runs-on: ubuntu-latest
+    needs: quality
+
     steps:
-      - name: Disable CodeQL
-        run: |
-          echo "CODEQL_DISABLED=true" >> $GITHUB_ENV
-          pkill -f codeql || true
+    - name: Checkout code
+      uses: actions/checkout@v4
 
-      - name: Checkout code
-        uses: actions/checkout@v4
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20.x
+        cache: 'npm'
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20.x"
-          cache: "npm"
+    - name: Install dependencies
+      run: npm ci
 
-      - name: Install dependencies
-        run: npm ci --ignore-scripts
+    - name: Build framework
+      run: npm run build:all
 
-      - name: Build plugin
-        run: npm run build:plugin
+    - name: Run unit tests
+      run: npm run test:unit
 
-      - name: Build all
-        run: npm run build:all
-
-      - name: Run e2e tests
-        run: npm run test:e2e
-
-      - name: Validate package
-        run: npm pack --dry-run
-
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: strray-ai-build
-          path: dist/
-          retention-days: 30
-
-  publish:
-    needs: build
+  test-integration:
+    name: Integration Tests
     runs-on: ubuntu-latest
-    if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master') && github.event_name == 'push'
+    needs: test-unit
+
     steps:
-      - name: Disable CodeQL
-        run: |
-          echo "CODEQL_DISABLED=true" >> $GITHUB_ENV
-          pkill -f codeql || true
+    - name: Checkout code
+      uses: actions/checkout@v4
 
-      - name: Checkout code
-        uses: actions/checkout@v4
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20.x
+        cache: 'npm'
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20.x"
-          cache: "npm"
+    - name: Install dependencies
+      run: npm ci
 
-      - name: Install dependencies
-        run: npm ci --ignore-scripts
+    - name: Build framework
+      run: npm run build:all
 
-      - name: Build for publish
-        run: npm run build:plugin
+    - name: Run integration tests
+      run: npm run test:integration
 
-      - name: Publish to npm
-        run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-  e2e-test:
-    needs: publish
+  test-e2e:
+    name: E2E Tests
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    needs: test-integration
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20.x"
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20.x
+        cache: 'npm'
 
-      - name: Create test project
-        run: |
-          mkdir test-install
-          cd test-install
-          npm init -y
+    - name: Install dependencies
+      run: npm ci
 
-      - name: Install published package
-        run: |
-          cd test-install
-          npm install strray-ai@latest
+    - name: Build framework
+      run: npm run build:all
 
-      - name: Run postinstall script
-        run: |
-          cd test-install
-          node node_modules/strray-ai/scripts/postinstall.cjs
+    - name: Run E2E tests
+      run: npm run test:e2e
 
-      - name: Validate installation
-        run: |
-          cd test-install
-          ls -la .opencode/
-          cat .opencode/oh-my-opencode.json | grep -q "strray-ai"
-          echo "Installation validation passed"
+  validate-framework:
+    name: Framework Validation
+    runs-on: ubuntu-latest
+    needs: test-e2e
 
-      - name: Run comprehensive tests
-        run: |
-          cd test-install
-          node node_modules/strray-ai/scripts/test:mcp-connectivity
-          node node_modules/strray-ai/scripts/test:oh-my-opencode-integration
-          node node_modules/strray-ai/scripts/test:postinstall-config
-          node node_modules/strray-ai/scripts/test:external-processes
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20.x
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Build framework
+      run: npm run build:all
+
+    - name: Package framework
+      run: npm pack
+
+    - name: Test package installation
+      run: |
+        mkdir test-install
+        cd test-install
+        npm init -y
+        npm install ../strray-ai-*.tgz
+        node node_modules/strray-ai/scripts/postinstall.cjs
+
+    - name: Validate framework deployment
+      run: |
+        cd test-install
+        node node_modules/strray-ai/scripts/test:postinstall-config.js
+        node node_modules/strray-ai/scripts/test:mcp-connectivity.js
+        node node_modules/strray-ai/scripts/test:oh-my-opencode-integration.js
+
+  deploy-validation:
+    name: Deployment Validation
+    runs-on: ubuntu-latest
+    needs: validate-framework
+    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20.x
+        cache: 'npm'
+
+    - name: Build and package
+      run: |
+        npm run build:all
+        npm pack
+
+    - name: Deploy to test environment
+      run: ./scripts/deploy-stringray-plugin.sh ci-deploy
+
+    - name: Run deployment tests
+      run: |
+        cd ci-deploy
+        node node_modules/strray-ai/scripts/test:mcp-connectivity.js
+        node_modules/strray-ai/scripts/test:oh-my-opencode-integration.js
+        node node_modules/strray-ai/scripts/test:postinstall-config.js
+
+  version-management:
+    name: Version Management & Publish
+    runs-on: ubuntu-latest
+    needs: deploy-validation
+    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'
+    environment: production
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20.x
+        cache: 'npm'
+        registry-url: 'https://registry.npmjs.org'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Build and test (pre-version)
+      run: |
+        npm run build:all
+        npm run test:all
+
+    - name: Deploy test (pre-version)
+      run: ./scripts/deploy-stringray-plugin.sh ci-deploy-pre-version
+
+    - name: Version bump
+      run: npm version patch --no-git-tag-version --no-commit-hooks
+
+    - name: Universal version management
+      run: node scripts/universal-version-manager.js
+
+    - name: Rebuild with new version
+      run: npm run build:all
+
+    - name: Final deployment test
+      run: ./scripts/deploy-stringray-plugin.sh ci-deploy-final
+
+    - name: Commit version updates
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add .
+        git commit -m "chore: automated version bump and standardization [ci skip]" || echo "No changes to commit"
+
+    - name: Publish to NPM
+      run: npm publish
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+    - name: Create git tag
+      run: |
+        NEW_VERSION=$(node -p "require('./package.json').version")
+        git tag "v$NEW_VERSION"
+        git push origin "v$NEW_VERSION"

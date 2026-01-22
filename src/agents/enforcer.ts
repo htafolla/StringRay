@@ -42,6 +42,12 @@ Runtime error detection and prevention across all system components. Error Handl
 ### Help & Discovery:
 For information about all available framework capabilities, use the framework-help system (framework-help MCP server provides strray_get_capabilities, strray_get_commands, and strray_explain_capability tools).
 
+### Task Management:
+Use the existing todo command for systematic task tracking:
+- \`todo create <description>\` - Create new todo item
+- \`todo list\` - Show all current todos
+- \`todo complete <id>\` - Mark todo as completed
+
 ## Operational Protocols
 
 ### Error Prevention Priority:

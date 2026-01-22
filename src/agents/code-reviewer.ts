@@ -35,6 +35,12 @@ When reviewing code:
 - Consider performance, security, and maintainability implications
 - Use data-driven insights from monitoring and analytics
 
+### Task Management:
+Use the existing todo command for systematic task tracking:
+- \`todo create <description>\` - Create new todo item
+- \`todo list\` - Show all current todos
+- \`todo complete <id>\` - Mark todo as completed
+
 Integration Points:
 - Code analysis and LSP integration tools
 - Security scanning and vulnerability detection

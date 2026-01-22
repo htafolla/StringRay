@@ -41,11 +41,14 @@ export class MCPClient {
    * Initialize MCP client by connecting to server and discovering tools
    */
   async initialize(): Promise<void> {
+    const jobId = `mcp-init-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
     try {
       frameworkLogger.log(
         "mcp-client",
         `initializing MCP client for ${this.config.serverName}`,
         "info",
+        { jobId },
       );
 
       // For now, we'll simulate tool discovery
@@ -57,12 +60,14 @@ export class MCPClient {
         "mcp-client",
         `MCP client initialized with ${this.tools.size} tools`,
         "success",
+        { jobId },
       );
     } catch (error) {
       frameworkLogger.log(
         "mcp-client",
         `failed to initialize MCP client: ${error instanceof Error ? error.message : String(error)}`,
         "error",
+        { jobId, error },
       );
       throw error;
     }
@@ -72,12 +77,14 @@ export class MCPClient {
    * Call a specific MCP server tool
    */
   async callTool(toolName: string, args: any = {}): Promise<MCPToolResult> {
+    const jobId = `mcp-call-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
     try {
       frameworkLogger.log(
         "mcp-client",
         `calling tool ${toolName} on ${this.config.serverName}`,
         "info",
-        { args },
+        { jobId, args },
       );
 
       // For now, we'll simulate tool execution
@@ -91,6 +98,7 @@ export class MCPClient {
         "mcp-client",
         `tool ${toolName} executed successfully`,
         "success",
+        { jobId },
       );
 
       return result;
@@ -99,6 +107,7 @@ export class MCPClient {
         "mcp-client",
         `tool ${toolName} execution failed: ${error instanceof Error ? error.message : String(error)}`,
         "error",
+        { jobId, error },
       );
       throw error;
     }
@@ -647,6 +656,8 @@ export class MCPClientManager {
    * Get all available MCP server tools
    */
   async getAllAvailableTools(): Promise<Record<string, MCPTool[]>> {
+    const jobId = `mcp-tools-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
     const result: Record<string, MCPTool[]> = {};
 
     for (const serverName of [
@@ -665,6 +676,7 @@ export class MCPClientManager {
           "mcp-client-manager",
           `failed to get tools for ${serverName}: ${error instanceof Error ? error.message : String(error)}`,
           "info",
+          { jobId },
         );
       }
     }

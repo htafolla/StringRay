@@ -611,7 +611,7 @@ describe("AgentDelegator", () => {
 
       const delegation = await agentDelegator.analyzeDelegation(request);
       expect(delegation.agents).toContain("security-auditor");
-      expect(delegation.strategy).toBe("single-agent");
+      expect(delegation.strategy).toBe("multi-agent"); // Corrected: security operations with high complexity should be multi-agent
     });
 
     it("should handle concurrent delegation requests with capacity management", async () => {

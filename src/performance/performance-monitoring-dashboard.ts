@@ -205,6 +205,8 @@ export class PerformanceMonitoringDashboard extends EventEmitter {
    * Update all dashboard metrics
    */
   private async updateMetrics(): Promise<void> {
+    const jobId = `performance-monitoring-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
     try {
       const timestamp = Date.now();
 
@@ -506,10 +508,10 @@ export class PerformanceMonitoringDashboard extends EventEmitter {
   /**
    * Send notification for alert
    */
-  private sendNotification(alert: DashboardMetrics["alerts"][0]): void {
+  private sendNotification(alert: DashboardMetrics["alerts"][0], jobId?: string): void {
     if (this.config.notifications.webhook) {
       // Send webhook notification
-      this.sendWebhookNotification(alert);
+      this.sendWebhookNotification(alert, jobId);
     }
 
     // Additional notification methods can be implemented here
@@ -520,6 +522,7 @@ export class PerformanceMonitoringDashboard extends EventEmitter {
    */
   private async sendWebhookNotification(
     alert: DashboardMetrics["alerts"][0],
+    jobId?: string,
   ): Promise<void> {
     try {
       // In a real implementation, this would make an HTTP request
@@ -527,7 +530,7 @@ export class PerformanceMonitoringDashboard extends EventEmitter {
         "performance-dashboard",
         "webhook-notification",
         "info",
-        { message: alert.message },
+        { jobId, message: alert.message },
       );
     } catch (error) {
       console.error("Failed to send webhook notification:", error);

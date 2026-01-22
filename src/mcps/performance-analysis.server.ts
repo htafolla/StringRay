@@ -5,7 +5,7 @@
  */
 
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
-import { frameworkLogger } from "../framework-logger.js";
+import { frameworkLogger, generateJobId } from "../framework-logger.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import {
   CallToolRequestSchema,
@@ -122,6 +122,7 @@ class StrRayPerformanceAnalysisServer {
     const duration = args.duration || 30;
     const detailed = args.detailed || false;
 
+    const jobId = generateJobId('mcp-performance-analysis');
     await frameworkLogger.log(
       "mcp-performance-analysis",
       "analysis-started",
@@ -131,6 +132,8 @@ class StrRayPerformanceAnalysisServer {
         duration,
         detailed,
       },
+      undefined, // sessionId
+      jobId,
     );
 
     const analysisResults = {
@@ -238,11 +241,14 @@ ${analysisResults.recommendations.length > 0 ? analysisResults.recommendations.m
     const operation = args.operation || "general";
     const threshold = args.threshold || 1000;
 
+    const jobId = generateJobId('mcp-performance-analysis-bottleneck');
     await frameworkLogger.log(
       "mcp-performance-analysis",
       "bottleneck-detection",
       "info",
       { operation, threshold },
+      undefined, // sessionId
+      jobId,
     );
 
     try {
@@ -649,10 +655,14 @@ ${results.recommendations.map((r) => `• 💡 ${r}`).join("\n") || "No recommen
   async run() {
     const transport = new StdioServerTransport();
     await this.server.connect(transport);
+    const jobId = generateJobId('mcp-performance-analysis-server');
     await frameworkLogger.log(
       "mcp-performance-analysis",
       "server-started",
       "success",
+      {},
+      undefined, // sessionId
+      jobId,
     );
   }
 }

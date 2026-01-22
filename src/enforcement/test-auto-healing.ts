@@ -62,9 +62,11 @@ export class TestAutoHealingSystem {
     testResults: any,
     context: RuleValidationContext,
   ): Promise<AutoHealingResult> {
+    const jobId = `test-healing-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     const startTime = Date.now();
 
     frameworkLogger.log("test-auto-healing", "healing-start", "info", {
+      jobId,
       testFiles: context.tests?.length || 0,
       operation: context.operation,
     });
@@ -86,12 +88,14 @@ export class TestAutoHealingSystem {
       const healingResult = await this.applyAutomaticFixes(
         prioritizedIssues,
         context,
+        jobId,
       );
 
       // Step 4: Coordinate with agents for complex fixes
       const agentCoordination = await this.coordinateAgentFixes(
         failureAnalysis.filter((analysis) => !analysis.autoFixable),
         context,
+        jobId,
       );
 
       // Step 5: Generate final report
@@ -114,6 +118,7 @@ export class TestAutoHealingSystem {
 
       const duration = Date.now() - startTime;
       frameworkLogger.log("test-auto-healing", "healing-complete", "success", {
+        jobId,
         duration,
         fixesApplied: result.fixesApplied,
         performanceImprovement: result.performanceImprovement,
@@ -123,6 +128,7 @@ export class TestAutoHealingSystem {
       return result;
     } catch (error: any) {
       frameworkLogger.log("test-auto-healing", "healing-error", "error", {
+        jobId,
         error:
           error instanceof Error
             ? error.message
@@ -224,6 +230,7 @@ export class TestAutoHealingSystem {
   private async applyAutomaticFixes(
     issues: TestFailureAnalysis[],
     context: RuleValidationContext,
+    jobId: string,
   ): Promise<any> {
     let fixesApplied = 0;
     let testsOptimized = 0;
@@ -234,11 +241,12 @@ export class TestAutoHealingSystem {
     for (const issue of issues) {
       try {
         switch (issue.fixStrategy.type) {
-          case "optimize":
-            const optimizationResult = await this.optimizeTestTimeouts(
-              issue,
-              context,
-            );
+            case "optimize":
+              const optimizationResult = await this.optimizeTestTimeouts(
+                issue,
+                context,
+                jobId,
+              );
             if (optimizationResult.success) {
               fixesApplied++;
               performanceImprovement += issue.fixStrategy.estimatedImprovement;
@@ -248,11 +256,12 @@ export class TestAutoHealingSystem {
             }
             break;
 
-          case "parallelize":
-            const parallelResult = await this.implementParallelExecution(
-              issue,
-              context,
-            );
+            case "parallelize":
+              const parallelResult = await this.implementParallelExecution(
+                issue,
+                context,
+                jobId,
+              );
             if (parallelResult.success) {
               fixesApplied++;
               testsOptimized++;
@@ -263,8 +272,8 @@ export class TestAutoHealingSystem {
             }
             break;
 
-          case "mock":
-            const mockResult = await this.addTestMocks(issue, context);
+            case "mock":
+              const mockResult = await this.addTestMocks(issue, context, jobId);
             if (mockResult.success) {
               fixesApplied++;
               performanceImprovement += issue.fixStrategy.estimatedImprovement;
@@ -295,6 +304,7 @@ export class TestAutoHealingSystem {
   private async coordinateAgentFixes(
     complexIssues: TestFailureAnalysis[],
     context: RuleValidationContext,
+    jobId: string,
   ): Promise<any> {
     let fixesApplied = 0;
     let testsOptimized = 0;
@@ -319,6 +329,7 @@ export class TestAutoHealingSystem {
           agentName,
           issues,
           context,
+          jobId,
         );
 
         if (agentResult.success) {
@@ -356,6 +367,7 @@ export class TestAutoHealingSystem {
   private async optimizeTestTimeouts(
     issue: TestFailureAnalysis,
     context: RuleValidationContext,
+    jobId: string,
   ): Promise<{ success: boolean }> {
     // Implementation would modify test files to add timeouts and optimize slow operations
     // For now, return success to indicate capability
@@ -364,6 +376,7 @@ export class TestAutoHealingSystem {
       "timeout-optimization",
       "success",
       {
+        jobId,
         testFile: issue.testFile,
         improvement: issue.fixStrategy.estimatedImprovement,
       },
@@ -378,9 +391,11 @@ export class TestAutoHealingSystem {
   private async implementParallelExecution(
     issue: TestFailureAnalysis,
     context: RuleValidationContext,
+    jobId: string,
   ): Promise<{ success: boolean }> {
     // Implementation would modify test configuration for parallel execution
     frameworkLogger.log("test-auto-healing", "parallel-execution", "success", {
+      jobId,
       testFile: issue.testFile,
       improvement: issue.fixStrategy.estimatedImprovement,
     });
@@ -394,9 +409,11 @@ export class TestAutoHealingSystem {
   private async addTestMocks(
     issue: TestFailureAnalysis,
     context: RuleValidationContext,
+    jobId: string,
   ): Promise<{ success: boolean }> {
     // Implementation would analyze test dependencies and add appropriate mocks
     frameworkLogger.log("test-auto-healing", "mock-addition", "success", {
+      jobId,
       testFile: issue.testFile,
       improvement: issue.fixStrategy.estimatedImprovement,
     });
@@ -411,10 +428,12 @@ export class TestAutoHealingSystem {
     agentName: string,
     issues: TestFailureAnalysis[],
     context: RuleValidationContext,
+    jobId: string,
   ): Promise<any> {
     // This would integrate with the actual agent system
     // For now, simulate agent coordination
     frameworkLogger.log("test-auto-healing", "agent-coordination", "info", {
+      jobId,
       agent: agentName,
       issuesCount: issues.length,
     });

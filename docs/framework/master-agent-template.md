@@ -47,13 +47,13 @@ The Universal Development Framework supports two implementation approaches:
 
 - 80% error prevention with 30% complexity reduction
 - Recommended for most AI-assisted development projects
-- See [FRAMEWORK_README.md](./FRAMEWORK_README.md) for adoption guidance
+- See [../README.md](./../README.md) for adoption guidance
 
 **Framework Full (v1.1.1)**: Complete 8-agent architecture for maximum safety
 
 - 90% error prevention with comprehensive validation
 - Recommended for mission-critical and enterprise applications
-- See [FRAMEWORK_README.md](./FRAMEWORK_README.md) for adoption guidance
+- See [../README.md](./../README.md) for adoption guidance
 
 ### 🎯 Core Mission (Codex Terms 1, 7, 38)
 
@@ -2687,7 +2687,7 @@ cp AGENTS_TEMPLATE.md .opencode/
 bash .opencode/init.sh
 ```
 
-**For detailed user guidance and decision frameworks, see [FRAMEWORK_README.md](./FRAMEWORK_README.md)**
+**For detailed user guidance and decision frameworks, see [../README.md](./../README.md)**
 
 ---
 
@@ -2714,10 +2714,10 @@ bash .opencode/init.sh
 
 ## 📋 See Also
 
-- **[FRAMEWORK_README.md](./FRAMEWORK_README.md)**: User guide for implementation decisions, installation instructions, and version selection guidance
+- **[../README.md](./../README.md)**: User guide for implementation decisions, installation instructions, and version selection guidance
 - **[INTEGRATION_LESSONS.md](./INTEGRATION_LESSONS.md)**: Detailed integration experiences and lessons learned
-- **[FRAMEWORK_COMPARISON_REPORT.md](./FRAMEWORK_COMPARISON_REPORT.md)**: Performance analysis and framework comparisons
-- **[FRAMEWORK_IMPLEMENTATION_SUMMARY.md](./FRAMEWORK_IMPLEMENTATION_SUMMARY.md)**: Technical implementation details and current status
+- **[../performance/ENTERPRISE_PERFORMANCE.md](./../performance/ENTERPRISE_PERFORMANCE.md)**: Performance analysis and framework comparisons
+- **[../README.md](./../README.md)**: Technical implementation details and current status
 
 ---
 
@@ -2735,4 +2735,4 @@ bash .opencode/init.sh
 
 - **Framework Lite**: v1.1.1 (4-agent consolidated implementation)
 - **Framework Full**: v1.1.1 (8-agent comprehensive implementation)
-- **FRAMEWORK_README.md**: v1.1.1 (user guidance documentation)
+- **../README.md**: v1.1.1 (user guidance documentation)

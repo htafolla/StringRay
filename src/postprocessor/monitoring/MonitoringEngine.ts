@@ -19,6 +19,7 @@ export class PostProcessorMonitoringEngine {
   }
 
   async monitorDeployment(commitSha: string): Promise<MonitoringResult> {
+    const jobId = `monitoring-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     const startTime = Date.now();
 
     // Check CI/CD status using existing github-actions-monitor

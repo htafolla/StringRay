@@ -155,6 +155,7 @@ export class SessionMonitor {
   }
 
   async performHealthCheck(sessionId: string): Promise<SessionHealth> {
+    const jobId = `session-health-check-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     const startTime = Date.now();
     const health = this.healthChecks.get(sessionId);
 
@@ -173,7 +174,7 @@ export class SessionMonitor {
           "session-monitor",
           "auto-unregister-cleaned-session",
           "info",
-          { sessionId },
+          { jobId, sessionId },
         );
         this.unregisterSession(sessionId);
         // Return a basic health status for the cleaned up session

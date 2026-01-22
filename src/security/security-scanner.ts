@@ -83,6 +83,7 @@ export class SecurityScanner {
    * Run comprehensive security scan
    */
   async runSecurityScan(): Promise<SecurityReport> {
+    const jobId = `security-scan-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     const startTime = Date.now();
 
     if (!this.config.enabled) {
@@ -90,6 +91,7 @@ export class SecurityScanner {
     }
 
     frameworkLogger.log("security-scanner", "scan-start", "info", {
+      jobId,
       tools: this.config.tools,
       severityThreshold: this.config.severityThreshold,
     });
@@ -117,7 +119,7 @@ export class SecurityScanner {
     const report = this.generateReport(tools, duration);
 
     // Save report
-    await this.saveReport(report);
+    await this.saveReport(report, jobId);
 
     // Log results
     this.logResults(report);
@@ -377,13 +379,14 @@ export class SecurityScanner {
   /**
    * Save report to file
    */
-  private async saveReport(report: SecurityReport): Promise<void> {
+  private async saveReport(report: SecurityReport, jobId: string): Promise<void> {
     try {
       await fs.writeFile(
         this.config.reportPath,
         JSON.stringify(report, null, 2),
       );
       frameworkLogger.log("security-scanner", "report-saved", "success", {
+        jobId,
         reportPath: this.config.reportPath,
       });
     } catch (error) {

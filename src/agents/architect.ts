@@ -54,6 +54,12 @@ Key Facilities Available:
 - Use "performance-optimization" for scalability analysis
 - Use "testing-strategy" for integration test planning
 
+### Task Management:
+Use the existing todo command for systematic task tracking:
+- \`todo create <description>\` - Create new todo item
+- \`todo list\` - Show all current todos
+- \`todo complete <id>\` - Mark todo as completed
+
 Integration Points:
 - **Codex Enforcement**: Direct access to Universal Development Codex v1.1.1 (50 terms)
 - **MCP Server Tools**: Direct integration with specialized analysis servers

@@ -204,10 +204,12 @@ export class SecurityAuditor {
    * Run comprehensive security audit
    */
   async auditProject(projectPath: string = "."): Promise<SecurityAuditResult> {
+    const jobId = `security-audit-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     const issues: SecurityIssue[] = [];
     const files = this.getAllFiles(projectPath);
 
     frameworkLogger.log("security-auditor", "scan-start", "info", {
+      jobId,
       filesCount: files.length,
       projectPath,
     });

@@ -248,8 +248,8 @@ npm run init
 - **[Architecture Overview](./architecture/ENTERPRISE_ARCHITECTURE.md)** - Complete 28-component system overview with testing coverage
 - **[Agent Documentation](./agents/)** - Detailed specifications for all 9 agents with operating procedures
 - **[API Reference](./api/API_REFERENCE.md)** - Developer API documentation for programmatic access
-- **[Installation Guide](./installation/INSTALLATION.md)** - Complete setup and configuration guide
-- **[Model Configuration](./MODEL_CONFIGURATION.md)** - Model setup with opencode/grok-code assignments
+- **[Installation Guide](./user-guide/installation/INSTALLATION.md)** - Complete setup and configuration guide
+- **[Model Configuration](./user-guide/configuration/model-configuration.md)** - Model setup with opencode/grok-code assignments
 - **[Troubleshooting](./troubleshooting/)** - Solutions for common issues and edge cases
 
 ### Development & Operations
@@ -257,13 +257,13 @@ npm run init
 - **[Testing Guide](./development/testing.md/TESTING.md)** - Comprehensive testing strategies and frameworks
 - **[Security Architecture](./security/SECURITY_ARCHITECTURE.md)** - Enterprise security configuration and auditing
 - **[Performance Monitoring](./performance/)** - Metrics collection and optimization tracking
-- **[Plugin Deployment](./PLUGIN_DEPLOYMENT_GUIDE.md)** - Complete plugin deployment and validation guide
-- **[Orchestrator Integration](./ORCHESTRATOR_INTEGRATION_ARCHITECTURE.md)** - Advanced orchestration and agent coordination
+- **[Plugin Deployment](./user-guide/plugin-deployment.md)** - Complete plugin deployment and validation guide
+- **[Orchestrator Integration](./architecture/orchestrator-integration.md)** - Advanced orchestration and agent coordination
 
 ### Archive & Legacy
 
 - **[Archive Documentation](./archive/)** - Historical documentation and deprecated guides
-- **[Migration Guide](./migration/FRAMEWORK_MIGRATION.md)** - Framework migration and upgrade guides
+- **[Migration Guide](./operations/migration/FRAMEWORK_MIGRATION.md)** - Framework migration and upgrade guides
 - **[Reflections](./reflections/)** - Incident analysis and framework evolution insights
 
 ## 📊 TECHNICAL SPECIFICATIONS & PERFORMANCE METRICS

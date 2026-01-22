@@ -72,6 +72,12 @@ export interface PostProcessorContext {
   author: string;
   files: string[];
   trigger: "git-hook" | "webhook" | "api" | "manual";
+  testResults?: {
+    unit?: { passed: boolean; coverage: number };
+    integration?: { passed: boolean; coverage: number };
+    e2e?: { passed: boolean; coverage: number };
+    performance?: { passed: boolean; coverage: number };
+  };
 }
 
 export interface PostProcessorResult {

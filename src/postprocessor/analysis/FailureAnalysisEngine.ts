@@ -17,6 +17,8 @@ export class FailureAnalysisEngine {
   async analyzeFailure(
     monitoringResult: MonitoringResult,
   ): Promise<FailureAnalysis> {
+    const jobId = `failure-analysis-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
     console.log("🔍 Analyzing CI/CD failure...");
 
     // Determine failure category

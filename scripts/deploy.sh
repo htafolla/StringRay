@@ -41,8 +41,22 @@ npm run typecheck
 npm audit --audit-level moderate
 log_success "Pre-deployment checks passed"
 
-# Step 2: Version management
-log_info "Step 2: Version management..."
+# Step 2: Build with current version
+log_info "Step 2: Building package..."
+npm run build:all
+log_success "Build completed"
+
+# Step 3: Test deployment
+log_info "Step 3: Testing deployment..."
+if [ "$DRY_RUN" = "true" ]; then
+    log_warning "Would test deployment with test-npm-install.sh"
+else
+    bash scripts/test-npm-install.sh
+    log_success "Deployment test passed"
+fi
+
+# Step 4: Version management (after validation)
+log_info "Step 4: Version management..."
 CURRENT_VERSION=$(node -p "require('./package.json').version")
 log_info "Current version: $CURRENT_VERSION"
 
@@ -59,14 +73,14 @@ else
     log_info "Running universal version manager..."
     node scripts/universal-version-manager.js
     log_success "Version references updated across codebase"
+
+    # Rebuild with updated versions
+    log_info "Rebuilding with updated versions..."
+    npm run build:all
+    log_success "Rebuild completed"
 fi
 
-# Step 3: Build
-log_info "Step 3: Building package..."
-npm run build:all
-log_success "Build completed"
-
-# Step 4: Test deployment
+# Step 5: Final package validation
 log_info "Step 4: Testing deployment..."
 if [ "$DRY_RUN" = "true" ]; then
     log_warning "Would test deployment with test-npm-install.sh"

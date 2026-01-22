@@ -12,7 +12,7 @@ import {
 } from "@modelcontextprotocol/sdk/types.js";
 import fs from "fs";
 import path from "path";
-import { frameworkLogger } from "../framework-logger.js";
+import { frameworkLogger, generateJobId } from "../framework-logger.js";
 
 class StrRayStateManagerServer {
   private server: Server;
@@ -43,7 +43,8 @@ class StrRayStateManagerServer {
     this.loadState();
 
     this.setupToolHandlers();
-    frameworkLogger.log("mcps/state-manager", "initialize", "info");
+    const jobId = generateJobId('mcp-state-manager-init');
+    frameworkLogger.log("mcps/state-manager", "initialize", "info", {}, undefined, jobId);
   }
 
   private ensureStateDirectory() {
@@ -59,9 +60,10 @@ class StrRayStateManagerServer {
         const data = fs.readFileSync(this.stateFile, "utf8");
         const parsed = JSON.parse(data);
         this.state = new Map(Object.entries(parsed));
+        const jobId = generateJobId('mcp-state-manager-load');
         frameworkLogger.log("mcps/state-manager", "load-state", "info", {
           stateEntries: this.state.size,
-        });
+        }, undefined, jobId);
       }
     } catch (error) {
       console.warn("Failed to load state file:", error);
@@ -698,7 +700,8 @@ ${results.repairedKeys.length > 0 ? `**Repaired Keys:**\n${results.repairedKeys.
   async run() {
     const transport = new StdioServerTransport();
     await this.server.connect(transport);
-    frameworkLogger.log("mcps/state-manager", "start", "success");
+    const jobId = generateJobId('mcp-state-manager-start');
+    frameworkLogger.log("mcps/state-manager", "start", "success", {}, undefined, jobId);
   }
 }
 

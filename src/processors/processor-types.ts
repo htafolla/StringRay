@@ -12,6 +12,9 @@ export interface PreValidateContext {
   data: any;
   syntaxCheck?: boolean;
   codexCompliance?: boolean;
+  agentName?: string;
+  filesChanged?: string[];
+  riskLevel?: "low" | "medium" | "high" | "critical";
 }
 
 export interface PostValidateContext {

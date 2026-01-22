@@ -167,6 +167,8 @@ export class SessionCleanupManager {
    * Perform cleanup of expired/idle sessions
    */
   async performCleanup(): Promise<CleanupResult> {
+    const jobId = `session-cleanup-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
     const result: CleanupResult = {
       sessionsCleaned: 0,
       sessionsExpired: 0,
@@ -215,6 +217,7 @@ export class SessionCleanupManager {
 
     if (result.sessionsCleaned > 0) {
       frameworkLogger.log("session-cleanup", "perform-cleanup", "info", {
+        jobId,
         sessionsCleaned: result.sessionsCleaned,
         sessionsExpired: result.sessionsExpired,
         sessionsIdle: result.sessionsIdle,

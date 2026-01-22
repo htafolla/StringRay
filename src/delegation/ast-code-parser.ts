@@ -249,6 +249,8 @@ export class ASTCodeParser {
    * Analyze code file using AST parsing
    */
   async analyzeFile(filePath: string): Promise<ASTAnalysis> {
+    const jobId = `ast-analysis-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
     try {
       const content = fs.readFileSync(filePath, "utf8");
       const extension = path.extname(filePath).toLowerCase();
@@ -263,6 +265,7 @@ export class ASTCodeParser {
         "file-analysis-start",
         "info",
         {
+          jobId,
           filePath,
           language,
           usingAstGrep: this.astGrepAvailable,
@@ -271,12 +274,12 @@ export class ASTCodeParser {
 
       // Choose parsing method based on ast-grep availability
       const structure = this.astGrepAvailable
-        ? await this.parseCodeStructureWithAstGrep(content, language, filePath)
-        : await this.parseCodeStructureWithRegex(content, language, filePath);
+        ? await this.parseCodeStructureWithAstGrep(content, language, filePath, jobId)
+        : await this.parseCodeStructureWithRegex(content, language, filePath, jobId);
 
       const patterns = this.astGrepAvailable
-        ? await this.detectPatternsWithAstGrep(filePath, language)
-        : await this.detectPatternsWithRegex(content, language, filePath);
+        ? await this.detectPatternsWithAstGrep(filePath, language, jobId)
+        : await this.detectPatternsWithRegex(content, language, filePath, jobId);
 
       const issues = await this.identifyIssues(structure, patterns, filePath);
       const suggestions = this.generateRefactoringSuggestions(
@@ -298,6 +301,7 @@ export class ASTCodeParser {
         "file-analysis-complete",
         "success",
         {
+          jobId,
           filePath,
           functions: structure.functions.length,
           classes: structure.classes.length,
@@ -313,6 +317,7 @@ export class ASTCodeParser {
         "file-analysis-failed",
         "error",
         {
+          jobId,
           filePath,
           error: error instanceof Error ? error.message : String(error),
         },
@@ -328,10 +333,11 @@ export class ASTCodeParser {
     content: string,
     language: string,
     filePath: string,
+    jobId: string,
   ): Promise<CodeStructure> {
     // TODO: Implement actual ast-grep parsing when ast-grep is available
     // For now, fall back to regex parsing
-    return this.parseCodeStructureWithRegex(content, language, filePath);
+    return this.parseCodeStructureWithRegex(content, language, filePath, jobId);
   }
 
   /**
@@ -341,6 +347,7 @@ export class ASTCodeParser {
     content: string,
     language: string,
     filePath: string,
+    jobId: string,
   ): Promise<CodeStructure> {
     const functions: FunctionInfo[] = [];
     const classes: ClassInfo[] = [];
@@ -353,6 +360,7 @@ export class ASTCodeParser {
       content,
       language,
       "function-definition",
+      jobId,
     );
     for (const match of functionMatches) {
       functions.push({
@@ -369,6 +377,7 @@ export class ASTCodeParser {
       content,
       language,
       "arrow-function",
+      jobId,
     );
     for (const match of arrowMatches) {
       functions.push({
@@ -385,6 +394,7 @@ export class ASTCodeParser {
       content,
       language,
       "class-definition",
+      jobId,
     );
     for (const match of classMatches) {
       classes.push({
@@ -400,6 +410,7 @@ export class ASTCodeParser {
       content,
       language,
       "import-statement",
+      jobId,
     );
     for (const match of importMatches) {
       imports.push({
@@ -415,6 +426,7 @@ export class ASTCodeParser {
       content,
       language,
       "export-statement",
+      jobId,
     );
     for (const match of exportMatches) {
       exports.push({
@@ -448,6 +460,7 @@ export class ASTCodeParser {
     content: string,
     language: string,
     patternName: string,
+    jobId: string,
   ): Promise<ASTMatch[]> {
     try {
       const pattern = this.patterns.find((p) => p.name === patternName);
@@ -479,6 +492,7 @@ export class ASTCodeParser {
         "ast-matching-failed",
         "error",
         {
+          jobId,
           patternName,
           error: error instanceof Error ? error.message : String(error),
         },
@@ -556,11 +570,12 @@ export class ASTCodeParser {
   private async detectPatternsWithAstGrep(
     filePath: string,
     language: string,
+    jobId: string,
   ): Promise<PatternInfo[]> {
     // TODO: Implement actual ast-grep pattern detection when ast-grep is available
     // For now, fall back to regex detection
     const content = fs.readFileSync(filePath, "utf8");
-    return this.detectPatternsWithRegex(content, language, filePath);
+    return this.detectPatternsWithRegex(content, language, filePath, jobId);
   }
 
   /**
@@ -570,6 +585,7 @@ export class ASTCodeParser {
     content: string,
     language: string,
     filePath: string,
+    jobId: string,
   ): Promise<PatternInfo[]> {
     const patterns: PatternInfo[] = [];
 
@@ -578,6 +594,7 @@ export class ASTCodeParser {
       content,
       language,
       "console-log",
+      jobId,
     );
     if (consoleLogs.length > 0) {
       patterns.push({
@@ -590,7 +607,7 @@ export class ASTCodeParser {
     }
 
     // Detect nested if statements
-    const nestedIfs = await this.findMatches(content, language, "nested-if");
+    const nestedIfs = await this.findMatches(content, language, "nested-if", jobId);
     if (nestedIfs.length > 0) {
       patterns.push({
         pattern: "nested-if",
@@ -603,7 +620,7 @@ export class ASTCodeParser {
 
     // Detect large functions
     const largeFunctions = (
-      await this.findMatches(content, language, "large-function")
+      await this.findMatches(content, language, "large-function", jobId)
     ).filter((match) => match.content.split("\n").length > 30);
     if (largeFunctions.length > 0) {
       patterns.push({

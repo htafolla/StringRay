@@ -1,10 +1,11 @@
 import { AgentDelegator } from "../delegation/agent-delegator.js";
-import { frameworkLogger } from "../framework-logger.js";
+import { frameworkLogger, generateJobId } from "../framework-logger.js";
 import { StringRayStateManager } from "../state/state-manager.js";
 
 async function testDelegationLogging() {
   console.log("🔄 Testing delegation logging integration...");
 
+  const jobId = generateJobId('test-delegation-logging');
   const stateManager = new StringRayStateManager();
   const delegator = new AgentDelegator(stateManager);
 
@@ -35,6 +36,9 @@ async function testDelegationLogging() {
       "test-delegation",
       "execution-completed",
       "success",
+      {},
+      undefined, // sessionId
+      jobId,
     );
   } catch (error) {
     console.log(
@@ -43,7 +47,7 @@ async function testDelegationLogging() {
     );
   }
 
-  await frameworkLogger.log("test-delegation", "test-completed", "success");
+  await frameworkLogger.log("test-delegation", "test-completed", "success", {}, undefined, jobId);
 }
 
 testDelegationLogging();

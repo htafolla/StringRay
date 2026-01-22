@@ -58,7 +58,7 @@ class ComprehensiveValidator {
   /**
    * Run linting checks
    */
-  private async runLinting(): Promise<{
+  private async runLinting(jobId: string): Promise<{
     errors: string[];
     warnings: string[];
   }> {
@@ -82,6 +82,7 @@ class ComprehensiveValidator {
             "comprehensive-validator",
             "eslint-passed",
             "success",
+            { jobId },
           );
         } catch (error: any) {
           const output =
@@ -117,6 +118,7 @@ class ComprehensiveValidator {
             "comprehensive-validator",
             "typescript-compilation-passed",
             "success",
+            { jobId },
           );
         } catch (error) {
           errors.push("TypeScript compilation failed");
@@ -132,7 +134,7 @@ class ComprehensiveValidator {
   /**
    * Run unit tests
    */
-  private async runTests(): Promise<{
+  private async runTests(jobId: string): Promise<{
     errors: string[];
     warnings: string[];
     testResults?: any;
@@ -172,7 +174,7 @@ class ComprehensiveValidator {
               "comprehensive-validator",
               "tests-passed",
               "success",
-              { testCount: passed },
+              { jobId, testCount: passed },
             );
           }
 
@@ -196,6 +198,7 @@ class ComprehensiveValidator {
             "comprehensive-validator",
             "jest-tests-completed",
             "success",
+            { jobId },
           );
         } catch (error) {
           errors.push("Jest tests failed");
@@ -211,7 +214,7 @@ class ComprehensiveValidator {
   /**
    * Run security checks
    */
-  private async runSecurityChecks(): Promise<{
+  private async runSecurityChecks(jobId: string): Promise<{
     errors: string[];
     warnings: string[];
   }> {
@@ -232,6 +235,7 @@ class ComprehensiveValidator {
             "comprehensive-validator",
             "security-audit-passed",
             "success",
+            { jobId },
           );
         } catch (error: any) {
           const output = error.stdout?.toString() || "";
@@ -278,6 +282,7 @@ class ComprehensiveValidator {
           "comprehensive-validator",
           "no-secrets-detected",
           "success",
+          { jobId },
         );
       }
     } catch (error) {
@@ -290,7 +295,7 @@ class ComprehensiveValidator {
   /**
    * Check build process
    */
-  private async runBuildCheck(): Promise<{
+  private async runBuildCheck(jobId: string): Promise<{
     errors: string[];
     warnings: string[];
   }> {
@@ -317,6 +322,7 @@ class ComprehensiveValidator {
               "comprehensive-validator",
               "build-completed",
               "success",
+              { jobId },
             );
           } catch (error) {
             errors.push("Build process failed");
@@ -334,6 +340,8 @@ class ComprehensiveValidator {
    * Run all comprehensive validation checks
    */
   async validate(): Promise<ComprehensiveValidationResult> {
+    const jobId = `comprehensive-validation-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
     const allErrors: string[] = [];
     const allWarnings: string[] = [];
     let testResults;
@@ -343,26 +351,27 @@ class ComprehensiveValidator {
         "comprehensive-validator",
         "post-push-validation-started",
         "info",
+        { jobId },
       );
 
       // Linting checks
-      const lintResults = await this.runLinting();
+      const lintResults = await this.runLinting(jobId);
       allErrors.push(...lintResults.errors);
       allWarnings.push(...lintResults.warnings);
 
       // Test execution
-      const testResults_ = await this.runTests();
+      const testResults_ = await this.runTests(jobId);
       allErrors.push(...testResults_.errors);
       allWarnings.push(...testResults_.warnings);
       testResults = testResults_.testResults;
 
       // Security checks
-      const securityResults = await this.runSecurityChecks();
+      const securityResults = await this.runSecurityChecks(jobId);
       allErrors.push(...securityResults.errors);
       allWarnings.push(...securityResults.warnings);
 
       // Build check
-      const buildResults = await this.runBuildCheck();
+      const buildResults = await this.runBuildCheck(jobId);
       allErrors.push(...buildResults.errors);
       allWarnings.push(...buildResults.warnings);
 
@@ -370,6 +379,7 @@ class ComprehensiveValidator {
         "comprehensive-validator",
         "post-push-validation-completed",
         "info",
+        { jobId },
       );
     } catch (error) {
       allErrors.push(

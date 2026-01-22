@@ -31,6 +31,7 @@ export const defaultStringRayConfig: StringRayActivationConfig = {
 export async function activateStringRayFramework(
   config: Partial<StringRayActivationConfig> = {},
 ): Promise<void> {
+  const jobId = `activation-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
   const activationConfig = { ...defaultStringRayConfig, ...config };
 
   // Banner display moved to init.sh execution in plugin
@@ -40,36 +41,36 @@ export async function activateStringRayFramework(
     "stringray-activation",
     "beginning StringRay framework activation",
     "info",
-    activationConfig,
+    { jobId, ...activationConfig },
   );
 
   try {
     if (activationConfig.enableCodexInjection) {
-      await activateCodexInjection();
+      await activateCodexInjection(jobId);
     }
 
     if (activationConfig.enableHooks) {
-      await activateHooks();
+      await activateHooks(jobId);
     }
 
     if (activationConfig.enableOrchestrator) {
-      await activateOrchestrator();
+      await activateOrchestrator(jobId);
     }
 
     if (activationConfig.enableBootOrchestrator) {
-      await activateBootOrchestrator();
+      await activateBootOrchestrator(jobId);
     }
 
     if (activationConfig.enableStateManagement) {
-      await activateStateManagement();
+      await activateStateManagement(jobId);
     }
 
     if (activationConfig.enableProcessors) {
-      await activateProcessors();
+      await activateProcessors(jobId);
     }
 
     if (activationConfig.enablePostProcessor) {
-      await activatePostProcessor();
+      await activatePostProcessor(jobId);
     }
 
     // Ensure architectural integrity - critical components must always be active
@@ -81,6 +82,7 @@ export async function activateStringRayFramework(
       "stringray-activation",
       "StringRay framework activation completed successfully",
       "success",
+      { jobId },
     );
   } catch (error) {
     console.error("❌ StringRay Framework activation failed:", error);
@@ -88,17 +90,18 @@ export async function activateStringRayFramework(
       "stringray-activation",
       "StringRay framework activation failed",
       "error",
-      error,
+      { jobId, error },
     );
     throw error;
   }
 }
 
-async function activateCodexInjection(): Promise<void> {
+async function activateCodexInjection(jobId: string): Promise<void> {
   frameworkLogger.log(
     "stringray-activation",
     "activating codex injection",
     "info",
+    { jobId },
   );
 
   const { createStringRayCodexInjectorHook } =
@@ -111,22 +114,24 @@ async function activateCodexInjection(): Promise<void> {
     "stringray-activation",
     "codex injection activated",
     "success",
+    { jobId },
   );
 }
 
-async function activateHooks(): Promise<void> {
+async function activateHooks(jobId: string): Promise<void> {
   // Temporarily disabled hooks activation to prevent import errors
-  // frameworkLogger.log("stringray-activation", "activating StringRay hooks", "info");
+  // frameworkLogger.log("stringray-activation", "activating StringRay hooks", "info", { jobId });
   // const { loadHooks } = await import("./index.js");
   // await loadHooks();
-  // frameworkLogger.log("stringray-activation", "StringRay hooks activated", "success");
+  // frameworkLogger.log("stringray-activation", "StringRay hooks activated", "success", { jobId });
 }
 
-async function activateBootOrchestrator(): Promise<void> {
+async function activateBootOrchestrator(jobId: string): Promise<void> {
   frameworkLogger.log(
     "stringray-activation",
     "activating boot orchestrator",
     "info",
+    { jobId },
   );
 
   const { bootOrchestrator } = await import("./boot-orchestrator.js");
@@ -137,14 +142,16 @@ async function activateBootOrchestrator(): Promise<void> {
     "stringray-activation",
     "boot orchestrator activated",
     "success",
+    { jobId },
   );
 }
 
-async function activateStateManagement(): Promise<void> {
+async function activateStateManagement(jobId: string): Promise<void> {
   frameworkLogger.log(
     "stringray-activation",
     "activating state management",
     "info",
+    { jobId },
   );
 
   const { StringRayStateManager } = await import("./state/state-manager.js");
@@ -157,14 +164,16 @@ async function activateStateManagement(): Promise<void> {
     "stringray-activation",
     "state management activated",
     "success",
+    { jobId },
   );
 }
 
-async function activateOrchestrator(): Promise<void> {
+async function activateOrchestrator(jobId: string): Promise<void> {
   frameworkLogger.log(
     "stringray-activation",
     "activating StringRay orchestrator",
     "info",
+    { jobId },
   );
 
   const { strRayOrchestrator } = await import("./orchestrator.js");
@@ -173,16 +182,18 @@ async function activateOrchestrator(): Promise<void> {
     "stringray-activation",
     "StringRay orchestrator activated",
     "success",
+    { jobId },
   );
 }
 
 
 
-async function activateProcessors(): Promise<void> {
+async function activateProcessors(jobId: string): Promise<void> {
   frameworkLogger.log(
     "stringray-activation",
     "activating processor pipeline",
     "info",
+    { jobId },
   );
 
   const { ProcessorManager } =
@@ -199,14 +210,16 @@ async function activateProcessors(): Promise<void> {
     "stringray-activation",
     "processor pipeline activated",
     "success",
+    { jobId },
   );
 }
 
-async function activatePostProcessor(): Promise<void> {
+async function activatePostProcessor(jobId: string): Promise<void> {
   frameworkLogger.log(
     "stringray-activation",
     "activating post-processor system",
     "info",
+    { jobId },
   );
 
   const { PostProcessor } = await import("./postprocessor/PostProcessor.js");
@@ -230,5 +243,6 @@ async function activatePostProcessor(): Promise<void> {
     "stringray-activation",
     "post-processor system activated",
     "success",
+    { jobId },
   );
 }

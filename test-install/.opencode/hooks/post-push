@@ -1,0 +1,193 @@
+#!/bin/bash
+# StrRay Post-Processor post-push Hook
+# Automatically triggers post-processor after post-push
+
+# Get hook type from script name
+HOOK_NAME=$(basename "$0")
+COMMIT_SHA=""
+
+if [ "$HOOK_NAME" = "post-commit" ]; then
+  # Light monitoring for local commits - just basic validation
+  COMMIT_SHA=$(git rev-parse HEAD)
+  MONITORING_LEVEL="basic"
+elif [ "$HOOK_NAME" = "post-push" ]; then
+  # Full monitoring for pushes - comprehensive validation
+  # For push hooks, we need to parse the pushed refs from stdin
+  while read local_ref local_sha remote_ref remote_sha; do
+    if [ "$local_sha" != "0000000000000000000000000000000000000000" ]; then
+      COMMIT_SHA=$local_sha
+      break
+    fi
+  done
+  MONITORING_LEVEL="full"
+else
+  COMMIT_SHA=$(git rev-parse HEAD)
+  MONITORING_LEVEL="basic"
+fi
+
+if [ -z "$COMMIT_SHA" ]; then
+  echo "Warning: Could not determine commit SHA for post-processor"
+  exit 0
+fi
+
+# Get repository info
+REPO="strray-framework/stringray"  # Placeholder for now
+BRANCH=$(git rev-parse --abbrev-ref HEAD)
+AUTHOR=$(git log -1 --pretty=format:'%an <%ae>')
+
+# Get changed files (different logic for commit vs push)
+if [ "$HOOK_NAME" = "post-commit" ]; then
+  FILES=$(git diff --name-only HEAD~1 2>/dev/null || git diff --name-only --cached)
+else
+  FILES=$(git log --name-only --oneline -1 $COMMIT_SHA | tail -n +2)
+fi
+
+# Trigger post-processor asynchronously (don't block git operations)
+(
+  cd "$(dirname "$0")/../.." # Navigate to project root
+
+  # Find the StrRay plugin in node_modules or current project (development)
+  STRRAY_PLUGIN=""
+  if [ -d "node_modules/strray-framework" ]; then
+    STRRAY_PLUGIN="node_modules/strray-framework"
+  elif [ -d "node_modules/@strray/strray-framework" ]; then
+    STRRAY_PLUGIN="node_modules/@strray/strray-framework"
+  elif [ -d "node_modules/oh-my-opencode/plugins/strray-framework" ]; then
+    STRRAY_PLUGIN="node_modules/oh-my-opencode/plugins/strray-framework"
+  elif [ -f "dist/postprocessor/PostProcessor.js" ]; then
+    # Development mode - use current project
+    STRRAY_PLUGIN="."
+  fi
+
+  if command -v node >/dev/null 2>&1 && [ -n "$STRRAY_PLUGIN" ]; then
+    # Call a separate script to avoid bash variable issues
+    export COMMIT_SHA="$COMMIT_SHA"
+    export REPO="$REPO"
+    export BRANCH="$BRANCH"
+    export AUTHOR="$AUTHOR"
+    export STRRAY_PLUGIN="$STRRAY_PLUGIN"
+    export MONITORING_LEVEL="$MONITORING_LEVEL"
+    export IS_FULL_MONITORING="$([ "$MONITORING_LEVEL" = "full" ] && echo "true" || echo "false")"
+
+    # Run appropriate monitoring based on hook type
+    if [ "$HOOK_NAME" = "post-commit" ]; then
+      # LIGHT MONITORING: Quick validation, don't block git workflow
+      # Timeout: 2 seconds max, log metrics for monitoring
+      START_TIME=$(date +%s)
+      timeout 2 node -e "
+      (async () => {
+        try {
+          // Use import resolver to avoid hardcoded dist paths
+          const { importResolver } = await import('./utils/import-resolver.js');
+          const { LightweightValidator } = await importResolver.importModule('postprocessor/validation/LightweightValidator');
+
+          const validator = new LightweightValidator();
+          const result = await validator.validate();
+
+          if (result.warnings.length > 0) {
+            console.log('⚠️ ' + result.warnings.length + ' warning(s) found:');
+            result.warnings.forEach(w => console.log('   ' + w));
+          }
+
+          if (!result.passed) {
+            console.log('❌ ' + result.errors.length + ' error(s) found:');
+            result.errors.forEach(e => console.log('   ' + e));
+            process.exit(1);
+          }
+
+          console.log('✅ Post-commit: Validation passed in ' + result.duration + 'ms');
+        } catch (error) {
+          console.error('❌ Post-commit validation failed:', error instanceof Error ? error.message : String(error));
+          process.exit(1);
+        }
+      })();
+      " 2>/dev/null
+      EXIT_CODE=$?
+      END_TIME=$(date +%s)
+      DURATION=$((END_TIME - START_TIME))
+
+      # Log metrics for monitoring (convert to milliseconds)
+      DURATION_MS=$((DURATION * 1000))
+      echo "HOOK_METRICS: post-commit duration=${DURATION_MS}ms exit_code=${EXIT_CODE}" >&2
+
+      # Record metrics using metrics collector (direct import for reliability)
+      node -e "
+      (async () => {
+        try {
+          const { HookMetricsCollector } = await import('./dist/postprocessor/validation/HookMetricsCollector.js');
+          const collector = new HookMetricsCollector();
+          collector.recordMetrics('post-commit', ${DURATION_MS}, ${EXIT_CODE});
+        } catch (error) {
+          // Silently fail if metrics collection fails
+        }
+      })();
+      " 2>/dev/null || true
+
+      [ $EXIT_CODE -eq 0 ] && exit 0 || exit 1
+    else
+      # FULL MONITORING: Comprehensive analysis for post-push
+      # Timeout: 5 minutes max, comprehensive CI/CD validation
+      START_TIME=$(date +%s)
+      timeout 300 node -e "
+      (async () => {
+        try {
+          console.log('🚀 Post-push: Comprehensive validation initiated');
+          // Use import resolver for environment-aware imports
+          const { importResolver } = await import('./utils/import-resolver.js');
+          const { ComprehensiveValidator } = await importResolver.importModule('postprocessor/validation/ComprehensiveValidator');
+
+          const validator = new ComprehensiveValidator();
+          const result = await validator.validate();
+
+          if (result.warnings.length > 0) {
+            console.log('⚠️ ' + result.warnings.length + ' warning(s) found:');
+            result.warnings.forEach(w => console.log('   ' + w));
+          }
+
+          if (!result.passed) {
+            console.log('❌ ' + result.errors.length + ' error(s) found:');
+            result.errors.forEach(e => console.log('   ' + e));
+            process.exit(1);
+          }
+
+          if (result.testResults) {
+            console.log('🧪 Tests: ' + result.testResults.passed + '/' + result.testResults.total + ' passed');
+          }
+
+          console.log('✅ Post-push: Comprehensive validation passed in ' + result.duration + 'ms');
+        } catch (error) {
+          console.error('❌ Post-push validation failed:', error instanceof Error ? error.message : String(error));
+          process.exit(1);
+        }
+      })();
+      " 2>/dev/null
+      EXIT_CODE=$?
+      END_TIME=$(date +%s)
+      DURATION=$((END_TIME - START_TIME))
+
+      # Log comprehensive metrics for monitoring (convert to milliseconds)
+      DURATION_MS=$((DURATION * 1000))
+      echo "HOOK_METRICS: post-push duration=${DURATION_MS}ms exit_code=${EXIT_CODE}" >&2
+
+      # Record metrics using metrics collector (direct import for reliability)
+      node -e "
+      (async () => {
+        try {
+          const { HookMetricsCollector } = await import('./dist/postprocessor/validation/HookMetricsCollector.js');
+          const collector = new HookMetricsCollector();
+          collector.recordMetrics('post-push', ${DURATION_MS}, ${EXIT_CODE});
+        } catch (error) {
+          // Silently fail if metrics collection fails
+        }
+      })();
+      " 2>/dev/null || true
+
+      [ $EXIT_CODE -eq 0 ] && exit 0 || exit 1
+    fi
+  else
+    echo "Warning: StrRay plugin not found or Node.js not available, skipping post-processor"
+  fi
+)
+
+# Don't wait for background process
+exit 0

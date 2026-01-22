@@ -64,6 +64,8 @@ export class StringRayOrchestrator {
     tasks: TaskDefinition[],
     sessionId?: string,
   ): Promise<TaskResult[]> {
+    const jobId = `complex-task-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
     // Task execution start - operational logging, keep for monitoring
 
     const results: TaskResult[] = [];
@@ -95,7 +97,7 @@ export class StringRayOrchestrator {
       const batchTasks = executableTasks.slice(0, batchSize);
 
       const batchPromises = batchTasks.map((task) =>
-        this.executeSingleTask(task),
+        this.executeSingleTask(task, jobId),
       );
 
       try {
@@ -117,7 +119,7 @@ export class StringRayOrchestrator {
   /**
    * Execute a single task by delegating to appropriate subagent
    */
-  private async executeSingleTask(task: TaskDefinition): Promise<TaskResult> {
+  private async executeSingleTask(task: TaskDefinition, jobId: string): Promise<TaskResult> {
     const startTime = Date.now();
 
     try {
@@ -133,7 +135,7 @@ export class StringRayOrchestrator {
         "orchestrator",
         "complex-task-completed",
         "success",
-        { taskExecuted: true },
+        { jobId, taskExecuted: true },
       );
 
       // Execute post-processors for agent task completion logging
@@ -153,6 +155,7 @@ export class StringRayOrchestrator {
         const globalStateManager = (globalThis as any).strRayStateManager;
         // Global state debug - remove for production
         frameworkLogger.log("orchestrator", "global-state-check", "debug", {
+          jobId,
           exists: !!globalStateManager,
           type: typeof globalStateManager,
           hasGet: typeof globalStateManager?.get === "function",
@@ -165,6 +168,7 @@ export class StringRayOrchestrator {
           "processor-manager-check",
           "debug",
           {
+            jobId,
             retrieved: !!processorManager,
             type: typeof processorManager,
             hasExecutePostProcessors:
@@ -259,6 +263,7 @@ export class StringRayOrchestrator {
     agentCoordination: string[];
     performanceImprovement: number;
   }> {
+    const jobId = `test-healing-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     const startTime = Date.now();
     console.log(
       `🔧 Orchestrator: Initiating auto-healing for ${failureContext.failedTests.length} test failures`,

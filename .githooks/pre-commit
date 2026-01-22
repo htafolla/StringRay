@@ -1,0 +1,18 @@
+#!/bin/sh
+
+# Pre-commit hook for StringRay Framework
+# Validates version consistency before allowing commits
+
+echo "🔍 Running StringRay pre-commit version validation..."
+
+# Run the version validation script
+node scripts/pre-commit-version-validation.js
+
+# If validation passes, continue with commit
+if [ $? -eq 0 ]; then
+    echo "✅ Pre-commit validation passed"
+    exit 0
+else
+    echo "❌ Pre-commit validation failed - commit blocked"
+    exit 1
+fi

@@ -11,19 +11,22 @@ import { frameworkLogger } from "./framework-logger.js";
 
 // Initialize StringRay framework when oh-my-opencode starts
 export async function initializeStringRay(): Promise<void> {
+  const jobId = `init-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
   try {
     await activateStringRayFramework();
     frameworkLogger.log(
       "stringray-init",
       "StringRay framework initialized successfully",
       "success",
+      { jobId },
     );
   } catch (error: unknown) {
     frameworkLogger.log(
       "stringray-init",
       "StringRay framework initialization failed",
       "error",
-      error,
+      { jobId, error },
     );
     // Don't throw - allow oh-my-opencode to continue without StringRay
     console.warn(

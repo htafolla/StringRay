@@ -580,6 +580,7 @@ All path violations will be automatically detected and blocked.
   async executePostProcessorLoop(
     context: PostProcessorContext,
   ): Promise<PostProcessorResult> {
+    const jobId = `post-processor-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     const startTime = Date.now();
     const sessionId = `postprocessor-${context.commitSha}-${Date.now()}`;
 
@@ -622,6 +623,7 @@ All path violations will be automatically detected and blocked.
 
       if (!complianceResult.compliant) {
         await frameworkLogger.log("codex-compliance", "validation-failed", "error", {
+          jobId,
           commitSha: context.commitSha,
           violations: complianceResult.violations,
           reason: "Codex compliance violations found - processor-manager attempted automated fixes"
@@ -647,7 +649,7 @@ All path violations will be automatically detected and blocked.
       });
 
       // Execute the monitoring → analysis → fix → redeploy loop
-      const result = await this.executeMonitoringLoop(context, sessionId);
+      const result = await this.executeMonitoringLoop(context, sessionId, jobId);
 
       // Update final status
       await this.stateManager.set(`postprocessor:${sessionId}`, {
@@ -689,6 +691,7 @@ All path violations will be automatically detected and blocked.
   private async executeMonitoringLoop(
     context: PostProcessorContext,
     sessionId: string,
+    jobId: string,
   ): Promise<PostProcessorResult> {
     let attempts = 0;
     const maxAttempts = this.config.maxAttempts || 3;
@@ -750,7 +753,7 @@ All path violations will be automatically detected and blocked.
         "postprocessor",
         "ci-cd-pipeline-failed",
         "error",
-        { action: "analyzing-issues" },
+        { jobId, action: "analyzing-issues" },
       );
 
       const analysis =
@@ -775,7 +778,7 @@ All path violations will be automatically detected and blocked.
 
         if (validationPassed) {
           console.log("✅ Fix validation passed - redeploying...");
-          await this.redeployWithFixes(context, fixResult);
+          await this.redeployWithFixes(context, fixResult, jobId);
           // Continue monitoring with next attempt
           continue;
         } else {
@@ -783,7 +786,7 @@ All path violations will be automatically detected and blocked.
             "postprocessor",
             "fix-validation-failed",
             "error",
-            { action: "rolling-back" },
+            { jobId, action: "rolling-back" },
           );
           await this.fixValidator.rollbackFixes(fixResult.appliedFixes);
         }
@@ -847,6 +850,7 @@ All path violations will be automatically detected and blocked.
   private async redeployWithFixes(
     context: PostProcessorContext,
     fixResult: any,
+    jobId: string,
   ): Promise<void> {
     console.log("🔄 Executing redeployment with fixes...");
 
@@ -862,7 +866,7 @@ All path violations will be automatically detected and blocked.
         "postprocessor",
         "redeployment-failed",
         "error",
-        { error: redeployResult.error },
+        { jobId, error: redeployResult.error },
       );
       throw new Error(`Redeployment failed: ${redeployResult.error}`);
     }

@@ -64,6 +64,7 @@ export class RedeployCoordinator {
     context: PostProcessorContext,
     fixResult: FixResult,
   ): Promise<RedeployResult> {
+    const jobId = `redeploy-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     const deploymentId = `deploy-${context.commitSha}-${Date.now()}`;
     const startTime = Date.now();
 
@@ -76,17 +77,17 @@ export class RedeployCoordinator {
       await this.validatePreDeployment(context, fixResult);
 
       // Execute deployment with retry logic
-      const deployResult = await this.deployWithRetry(context, deploymentId);
+      const deployResult = await this.deployWithRetry(context, deploymentId, jobId);
 
       // Post-deployment validation
-      const validationResult = await this.validatePostDeployment(deployResult);
+      const validationResult = await this.validatePostDeployment(deployResult, jobId);
 
       if (validationResult.success) {
         await frameworkLogger.log(
           "redeploy-coordinator",
           "deployment-completed",
           "success",
-          { deploymentId },
+          { jobId, deploymentId },
         );
         const result: RedeployResult = {
           success: true,
@@ -106,7 +107,7 @@ export class RedeployCoordinator {
             "redeploy-coordinator",
             "deployment-validation-failed",
             "error",
-            { action: "rollback-initiated" },
+            { jobId, action: "rollback-initiated" },
           );
           await this.rollbackDeployment(deploymentId, context);
           const result: RedeployResult = {
@@ -178,6 +179,7 @@ export class RedeployCoordinator {
   private async deployWithRetry(
     context: PostProcessorContext,
     deploymentId: string,
+    jobId: string,
   ): Promise<{ canaryResults?: CanaryResult[] }> {
     let attempt = 0;
     const maxRetries = this.config.maxRetries;
@@ -193,6 +195,7 @@ export class RedeployCoordinator {
           const canaryResults = await this.executeCanaryDeployment(
             context,
             deploymentId,
+            jobId,
           );
           return { canaryResults };
         } else {
@@ -206,6 +209,7 @@ export class RedeployCoordinator {
           "deployment-attempt-failed",
           "error",
           {
+            jobId,
             attempt: attempt + 1,
             error: error instanceof Error ? error.message : String(error),
           },
@@ -230,6 +234,7 @@ export class RedeployCoordinator {
   private async executeCanaryDeployment(
     context: PostProcessorContext,
     deploymentId: string,
+    jobId: string,
   ): Promise<CanaryResult[]> {
     const results: CanaryResult[] = [];
     const phases = this.config.canaryPhases;
@@ -291,6 +296,7 @@ export class RedeployCoordinator {
           "canary-phase-failed",
           "error",
           {
+            jobId,
             phase,
             error: error instanceof Error ? error.message : String(error),
           },
@@ -305,7 +311,7 @@ export class RedeployCoordinator {
       "redeploy-coordinator",
       "canary-promoted",
       "success",
-      { phase: "complete" },
+      { jobId, phase: "complete" },
     );
 
     return results;
@@ -423,6 +429,7 @@ export class RedeployCoordinator {
    */
   private async validatePostDeployment(
     deployResult: any,
+    jobId: string,
   ): Promise<{ success: boolean; error: string }> {
     console.log("🔍 Validating post-deployment health...");
 
@@ -440,6 +447,7 @@ export class RedeployCoordinator {
         "redeploy-coordinator",
         "post-deployment-validation-failed",
         "error",
+        { jobId },
       );
       return {
         success: false,

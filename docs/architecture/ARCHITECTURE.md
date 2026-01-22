@@ -34,18 +34,19 @@ StrRay Framework implements a **hybrid TypeScript/Python architecture** optimize
 #### Hybrid Architecture Diagram
 
 ```
-StrRay Framework - Hybrid TypeScript/Python Architecture
-═══════════════════════════════════════════════════════════
+StrRay Framework - Enterprise AI Orchestration Architecture
+══════════════════════════════════════════════════════════════
 
 ┌─────────────────────────────────────────────────────┐
 │                    TypeScript Layer                  │
 │                    (Primary Framework)               │
 ├─────────────────────────────────────────────────────┤
+│ • Multi-Agent Orchestration & Complexity Analysis   │
 │ • Configuration-based agents (AgentConfig)          │
 │ • Plugin system & MCP protocol integration          │
 │ • Build system & bundling (Node.js/TypeScript)      │
-│ • Testing framework (Vitest/Jest)                   │
 │ • Framework orchestration & routing                 │
+│ • Intelligent commit batching & delegation          │
 └─────────────────────────────────────────────────────┘
                               │
                               │ Integration
@@ -59,13 +60,8 @@ StrRay Framework - Hybrid TypeScript/Python Architecture
 │ • Performance monitoring & alerting                 │
 │ • Codex compliance enforcement                       │
 │ • Complex async coordination                         │
+│ • Enterprise orchestration & coordination            │
 └─────────────────────────────────────────────────────┘
-
-Integration Points:
-• TypeScript agents can invoke Python components via API
-• Shared configuration management across languages
-• Unified logging and monitoring systems
-• Common testing and validation frameworks
 ```
 
 ### Multi-Agent Orchestration
@@ -85,6 +81,58 @@ Integration Points:
 - **oh-my-opencode Extension**: Seamless integration with existing workflow
 - **Plugin Architecture**: Extensible agent system with MCP protocol support
 - **State Persistence**: Workflow state maintained across sessions
+
+## Configuration System
+
+StrRay Framework includes a comprehensive configuration system with the following key settings:
+
+### Multi-Agent Orchestration
+
+```json
+{
+  "multi_agent_orchestration": {
+    "enabled": true,
+    "max_concurrent_agents": 3,
+    "coordination_model": "async-multi-agent",
+    "conflict_resolution": "expert-priority"
+  }
+}
+```
+
+- **enabled**: Enable/disable multi-agent orchestration
+- **max_concurrent_agents**: Maximum agents running simultaneously
+- **coordination_model**: Coordination strategy (async-multi-agent)
+- **conflict_resolution**: How to resolve conflicting agent recommendations
+
+### Sisyphus Orchestrator
+
+```json
+{
+  "sisyphus_orchestrator": {
+    "enabled": true,
+    "relentless_execution": true,
+    "max_retries": 3
+  }
+}
+```
+
+- **enabled**: Enable Sisyphus persistent execution mode
+- **relentless_execution**: Never give up on task completion
+- **max_retries**: Maximum retry attempts for failed operations
+
+### Performance & Monitoring
+
+```json
+{
+  "performance_mode": "optimized",
+  "monitoring_enabled": true,
+  "plugin_security": "strict"
+}
+```
+
+- **performance_mode**: Performance optimization level (optimized/standard)
+- **monitoring_enabled**: Enable comprehensive monitoring and alerting
+- **plugin_security**: Plugin security level (strict/moderate)
 
 ### 4. No Over-engineering
 

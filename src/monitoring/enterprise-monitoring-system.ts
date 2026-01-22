@@ -258,6 +258,8 @@ export class EnterpriseMonitoringSystem extends EventEmitter {
    * Start monitoring system
    */
   async start(): Promise<void> {
+    const jobId = `monitoring-start-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
     if (this.isRunning) {
       return;
     }

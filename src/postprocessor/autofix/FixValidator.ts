@@ -15,6 +15,8 @@ export class FixValidator {
     originalFailure: FailureAnalysis,
     context: PostProcessorContext,
   ): Promise<boolean> {
+    const jobId = `fix-validator-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
     console.log("✅ Validating applied fixes...");
 
     if (fixes.length === 0) {
@@ -38,7 +40,7 @@ export class FixValidator {
           "fix-validator",
           "validation-failed",
           "error",
-          { issue: "still-exists" },
+          { jobId, issue: "still-exists" },
         );
         return false;
       }

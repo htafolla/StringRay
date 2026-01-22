@@ -96,6 +96,8 @@ export class EnhancedMultiAgentOrchestrator {
    * Enhanced agent spawning with clickable monitoring integration
    */
   async spawnAgent(request: AgentSpawnRequest): Promise<SpawnedAgent> {
+    const jobId = `spawn-agent-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
     // 🚨 SECURITY: Prevent subagents from spawning other subagents
     // This prevents infinite loops, resource exhaustion, and uncontrolled agent spawning
     if (this.isCurrentlyExecutingAsSubagent()) {
@@ -141,6 +143,7 @@ export class EnhancedMultiAgentOrchestrator {
           "orchestrator",
           `Agent ${agentId} waiting for dependencies: ${unmetDeps.join(", ")}`,
           "info",
+          { jobId },
         );
         this.state.pendingSpawns.push(request);
         return spawnedAgent;
@@ -153,6 +156,7 @@ export class EnhancedMultiAgentOrchestrator {
       `🔗 SPAWNED: ${request.agentType} agent (${agentId}) - Click to monitor`,
       "info",
       {
+        jobId,
         agentId,
         agentType: request.agentType,
         task: request.task,
@@ -162,11 +166,12 @@ export class EnhancedMultiAgentOrchestrator {
     );
 
     // Start agent execution
-    this.executeAgent(spawnedAgent, request).catch((error) => {
+    this.executeAgent(spawnedAgent, request, jobId).catch((error) => {
       frameworkLogger.log(
         "orchestrator",
         `Agent execution failed: ${error}`,
         "error",
+        { jobId },
       );
     });
 
@@ -179,13 +184,16 @@ export class EnhancedMultiAgentOrchestrator {
   private async executeAgent(
     agent: SpawnedAgent,
     request: AgentSpawnRequest,
+    jobId: string,
   ): Promise<void> {
+    const executeJobId = `execute-agent-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
     try {
       agent.status = "active";
       agent.progress = 10;
 
       // Execute agent with progress updates
-      const executionPromise = this.executeAgentWithDelegator(agent, request);
+      const executionPromise = this.executeAgentWithDelegator(agent, request, executeJobId);
 
       // Set up monitoring updates
       const monitorInterval = setInterval(() => {
@@ -213,6 +221,7 @@ export class EnhancedMultiAgentOrchestrator {
         `✅ COMPLETED: ${agent.agentType} agent (${agent.id})`,
         "info",
         {
+          executeJobId,
           agentId: agent.id,
           duration: agent.endTime - agent.startTime,
           result: typeof result,
@@ -236,6 +245,7 @@ export class EnhancedMultiAgentOrchestrator {
         `❌ FAILED: ${agent.agentType} agent (${agent.id}): ${agent.error}`,
         "error",
         {
+          executeJobId,
           agentId: agent.id,
           error: agent.error,
           duration: agent.endTime - agent.startTime,
@@ -250,6 +260,7 @@ export class EnhancedMultiAgentOrchestrator {
   private async executeAgentWithDelegator(
     agent: SpawnedAgent,
     request: AgentSpawnRequest,
+    jobId: string,
   ): Promise<any> {
     try {
       // Use the agent delegator system - first analyze, then execute
@@ -292,6 +303,7 @@ export class EnhancedMultiAgentOrchestrator {
         "orchestrator",
         `Agent delegation failed, using simulation: ${error}`,
         "info",
+        { jobId },
       );
       return this.simulateAgentExecution(agent, request);
     }

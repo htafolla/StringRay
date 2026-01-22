@@ -46,6 +46,8 @@ describe("Framework Enforcement Integration", () => {
           tool,
           args: { test: true },
         },
+        undefined,
+        `test-framework-enforcement-tool-operations-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       );
     }
 
@@ -79,6 +81,7 @@ describe("Framework Enforcement Integration", () => {
     expect(typeof hook.hooks["agent.start"]).toBe("function");
   });
   it("should validate codex compliance on critical operations", async () => {
+    const jobId = `test-codex-compliance-critical-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     const criticalTools = ["write", "edit", "multiedit", "batch"];
     const nonCriticalTools = ["read", "grep", "bash"];
 
@@ -88,6 +91,8 @@ describe("Framework Enforcement Integration", () => {
         "enforcing codex on critical tool",
         "info",
         { tool },
+        undefined,
+        jobId,
       );
     }
 
@@ -97,6 +102,8 @@ describe("Framework Enforcement Integration", () => {
         "non-critical tool allowed",
         "info",
         { tool },
+        undefined,
+        jobId,
       );
     }
 
@@ -106,6 +113,8 @@ describe("Framework Enforcement Integration", () => {
         "enforcing codex on critical tool",
         "info",
         { tool },
+        undefined,
+        jobId,
       );
     });
 
@@ -115,16 +124,25 @@ describe("Framework Enforcement Integration", () => {
         "non-critical tool allowed",
         "info",
         { tool },
+        undefined,
+        jobId,
       );
     });
   });
 
   it("should maintain framework state across operations", async () => {
+    const jobId = `test-framework-state-operations-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     await frameworkLogger.log("state-manager", "set operation", "success", {
       key: "test1",
+    },
+    undefined,
+    jobId);
     });
     await frameworkLogger.log("state-manager", "get operation", "info", {
       key: "test1",
+    },
+    undefined,
+    jobId);
       hasValue: true,
     });
     await frameworkLogger.log("state-manager", "set operation", "success", {
@@ -132,6 +150,9 @@ describe("Framework Enforcement Integration", () => {
     });
     await frameworkLogger.log("state-manager", "clear operation", "info", {
       key: "test1",
+    },
+    undefined,
+    jobId);
       existed: true,
     });
 

@@ -34,7 +34,10 @@ export async function ruleValidation(
   operation: string,
   context: RuleValidationContext,
 ): Promise<EnforcementResult> {
+  const jobId = `rule-validation-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
   await frameworkLogger.log("enforcer-tools", "rule-validation-start", "info", {
+    jobId,
     operation,
     files: context.files?.length || 0,
     hasExistingCode: !!context.existingCode,
@@ -66,6 +69,7 @@ export async function ruleValidation(
   if (!report.passed) {
     // Trigger report generation for rule violations
     await frameworkLogger.log("enforcer-tools", "reporting-triggered", "info", {
+      jobId,
       operation,
       hasViolations: report.errors.length > 0,
       hasWarnings: report.warnings.length > 0,
@@ -82,6 +86,7 @@ export async function ruleValidation(
     "rule-validation-complete",
     result.passed ? "success" : "error",
     {
+      jobId,
       operation,
       passed: result.passed,
       blocked: result.blocked,
@@ -101,11 +106,14 @@ export async function contextAnalysisValidation(
   files: string[],
   operation: string,
 ): Promise<EnforcementResult> {
+  const jobId = `context-validation-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
   await frameworkLogger.log(
     "enforcer-tools",
     "context-validation-start",
     "info",
     {
+      jobId,
       operation,
       fileCount: files.length,
     },
@@ -148,6 +156,7 @@ export async function contextAnalysisValidation(
     "context-validation-complete",
     result.passed ? "success" : "error",
     {
+      jobId,
       operation,
       fileCount: files.length,
       contextErrors: contextIssues.errors.length,
@@ -166,11 +175,14 @@ export async function codexEnforcement(
   files: string[],
   newCode?: string,
 ): Promise<EnforcementResult> {
+  const jobId = `codex-enforcement-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
   await frameworkLogger.log(
     "enforcer-tools",
     "codex-enforcement-start",
     "info",
     {
+      jobId,
       operation,
       fileCount: files.length,
       hasNewCode: !!newCode,
@@ -212,6 +224,7 @@ export async function codexEnforcement(
     "codex-enforcement-complete",
     result.passed ? "success" : "error",
     {
+      jobId,
       operation,
       codexViolations: codexReport.violations.length,
       codexWarnings: codexReport.warnings.length,
@@ -234,7 +247,10 @@ export async function qualityGateCheck(
     dependencies?: string[];
   },
 ): Promise<EnforcementResult> {
+  const jobId = `quality-gate-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
   await frameworkLogger.log("enforcer-tools", "quality-gate-start", "info", {
+    jobId,
     operation,
     files: context.files.length,
     hasTests: !!(context.tests && context.tests.length > 0),
@@ -282,6 +298,7 @@ export async function qualityGateCheck(
     "quality-gate-complete",
     passed ? "success" : "error",
     {
+      jobId,
       operation,
       passed,
       blocked: result.blocked,
@@ -516,11 +533,14 @@ export async function runPreCommitValidation(
   files: string[],
   operation: string = "commit",
 ): Promise<EnforcementResult> {
+  const jobId = `pre-commit-validation-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
   await frameworkLogger.log(
     "enforcer-tools",
     "pre-commit-validation-start",
     "info",
     {
+      jobId,
       files: files.length,
       operation,
     },
@@ -567,6 +587,7 @@ export async function runPreCommitValidation(
       "pre-commit-validation-complete",
       finalResult.passed ? "success" : "error",
       {
+        jobId,
         operation,
         passed: finalResult.passed,
         blocked: finalResult.blocked,
@@ -583,6 +604,7 @@ export async function runPreCommitValidation(
       "pre-commit-validation-failed",
       "error",
       {
+        jobId,
         operation,
         error: error instanceof Error ? error.message : String(error),
       },

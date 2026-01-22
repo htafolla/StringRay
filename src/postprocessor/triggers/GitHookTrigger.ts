@@ -38,6 +38,8 @@ interface LogCleanupConfig {
 async function archiveLogFiles(
   config: LogArchiveConfig,
 ): Promise<{ archived: number; errors: string[] }> {
+  const jobId = `log-archive-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
   const result: { archived: number; errors: string[] } = {
     archived: 0,
     errors: [],
@@ -109,6 +111,7 @@ async function archiveLogFiles(
           "activity-log-rotated",
           "success",
           {
+            jobId,
             archivePath: config.compressionEnabled
               ? `${archivePath}.gz`
               : archivePath,
@@ -129,6 +132,7 @@ async function archiveLogFiles(
     result.errors.push(errorMsg);
 
     await frameworkLogger.log("log-archiver", "archiving-error", "error", {
+      jobId,
       error: error instanceof Error ? error.message : String(error),
     });
   }
@@ -143,6 +147,8 @@ async function archiveCriticalHistoricalLogs(): Promise<{
   archived: number;
   errors: string[];
 }> {
+  const jobId = `critical-archive-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
   const result: { archived: number; errors: string[] } = {
     archived: 0,
     errors: [],
@@ -181,6 +187,7 @@ async function archiveCriticalHistoricalLogs(): Promise<{
           "refactoring-log-archived",
           "info",
           {
+            jobId,
             archivePath: monthlyArchivePath,
             size: stats.size,
             snapshotMonth: currentMonth,
@@ -197,6 +204,7 @@ async function archiveCriticalHistoricalLogs(): Promise<{
       "critical-archiving-error",
       "error",
       {
+        jobId,
         error: error instanceof Error ? error.message : String(error),
       },
     );
@@ -208,6 +216,8 @@ async function archiveCriticalHistoricalLogs(): Promise<{
 async function cleanupLogFiles(
   config: any,
 ): Promise<{ cleaned: number; errors: string[] }> {
+  const jobId = `log-cleanup-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
   const result: { cleaned: number; errors: string[] } = {
     cleaned: 0,
     errors: [],
@@ -243,6 +253,7 @@ async function cleanupLogFiles(
             result.cleaned++;
 
             await frameworkLogger.log("git-hooks", "log-file-cleaned", "info", {
+              jobId,
               file: filePath,
               age: Math.round(ageMs / (1000 * 60 * 60)), // hours
               size: stat.size,
@@ -256,6 +267,7 @@ async function cleanupLogFiles(
               "log-cleanup-error",
               "error",
               {
+                jobId,
                 file: filePath,
                 error: error instanceof Error ? error.message : String(error),
               },
@@ -272,6 +284,7 @@ async function cleanupLogFiles(
         "log-cleanup-directory-error",
         "error",
         {
+          jobId,
           directory: dir,
           error: error instanceof Error ? error.message : String(error),
         },

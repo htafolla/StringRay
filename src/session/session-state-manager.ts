@@ -485,6 +485,7 @@ export class SessionStateManager {
    * Execute session migration
    */
   async executeMigration(plan: MigrationPlan): Promise<boolean> {
+    const jobId = `migration-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     const rollbackData: any[] = [];
 
     try {
@@ -492,7 +493,7 @@ export class SessionStateManager {
         "session-state-manager",
         "migration-executing",
         "info",
-        { sessionId: plan.sessionId },
+        { jobId, sessionId: plan.sessionId },
       );
 
       for (const step of plan.migrationSteps) {
@@ -614,7 +615,7 @@ export class SessionStateManager {
         "session-state-manager",
         "migration-completed",
         "success",
-        { sessionId: plan.sessionId },
+        { jobId, sessionId: plan.sessionId },
       );
       return true;
     } catch (error) {

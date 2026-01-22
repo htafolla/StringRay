@@ -82,11 +82,14 @@ export class DependencyGraphBuilder {
    * Build comprehensive dependency graph for the codebase
    */
   async buildDependencyGraph(): Promise<DependencyAnalysis> {
+    const jobId = `dependency-graph-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
     await frameworkLogger.log(
       "dependency-graph-builder",
       "analysis-start",
       "info",
       {
+        jobId,
         message: "Building comprehensive dependency graph",
       },
     );
@@ -118,6 +121,7 @@ export class DependencyGraphBuilder {
     await this.enhanceWithASTAnalysis(
       graph,
       codebaseAnalysis.structure.fileGraph,
+      jobId,
     );
 
     // Calculate dependents (reverse dependencies)
@@ -155,6 +159,7 @@ export class DependencyGraphBuilder {
       "analysis-complete",
       "success",
       {
+        jobId,
         files: graph.size,
         dependencies: metrics.totalDependencies,
         circularDeps: metrics.circularDependencies,
@@ -171,6 +176,7 @@ export class DependencyGraphBuilder {
   private async enhanceWithASTAnalysis(
     graph: Map<string, DependencyNode>,
     fileGraph: Map<string, FileInfo>,
+    jobId: string,
   ): Promise<void> {
     for (const [filePath, fileInfo] of Array.from(fileGraph)) {
       if (this.isSourceFile(filePath)) {
@@ -200,6 +206,7 @@ export class DependencyGraphBuilder {
             "ast-enhancement-failed",
             "info",
             {
+              jobId,
               filePath,
               error: error instanceof Error ? error.message : String(error),
             },

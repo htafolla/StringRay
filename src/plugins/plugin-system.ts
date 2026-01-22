@@ -8,7 +8,7 @@
  * @since 2026-01-07
  */
 
-import { frameworkLogger } from "../framework-logger.js";
+import { frameworkLogger, generateJobId } from "../framework-logger.js";
 
 export interface PluginMetadata {
   id: string;
@@ -461,10 +461,11 @@ export class PluginRegistry {
 
       this.plugins.set(pluginInstance.metadata.id, pluginInstance);
 
+      const jobId = generateJobId('plugin-system-register');
       frameworkLogger.log("plugin-system", "plugin registered", "success", {
         name: pluginInstance.metadata.name,
         version: pluginInstance.metadata.version
-      });
+      }, undefined, jobId);
 
       return { success: true, errors: [] };
     } catch (error) {
@@ -490,9 +491,10 @@ export class PluginRegistry {
       await plugin.activate();
       this.activePlugins.add(pluginId);
 
+      const jobId = generateJobId('plugin-system-activate');
       frameworkLogger.log("plugin-system", "plugin activated", "success", {
         name: plugin.metadata.name
-      });
+      }, undefined, jobId);
       return true;
     } catch (error) {
       console.error(`❌ Plugin activation failed: ${error}`);
@@ -511,9 +513,10 @@ export class PluginRegistry {
       await plugin.deactivate();
       this.activePlugins.delete(pluginId);
 
+      const jobId = generateJobId('plugin-system-deactivate');
       frameworkLogger.log("plugin-system", "plugin deactivated", "success", {
         name: plugin.metadata.name
-      });
+      }, undefined, jobId);
       return true;
     } catch (error) {
       console.error(`❌ Plugin deactivation failed: ${error}`);
@@ -584,9 +587,10 @@ export class PluginRegistry {
     }
 
     this.plugins.delete(pluginId);
+    const jobId = generateJobId('plugin-system-unregister');
     frameworkLogger.log("plugin-system", "plugin unregistered", "success", {
       name: plugin.metadata.name
-    });
+    }, undefined, jobId);
 
     return true;
   }

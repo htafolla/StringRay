@@ -154,6 +154,8 @@ export class IntelligentCommitBatcher {
    * Commit the current batch of changes
    */
   async commitBatch(commitMessage?: string): Promise<boolean> {
+    const jobId = `commit-batch-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
     if (this.pendingChanges.length === 0) return false;
 
     if (this.pendingChanges.length < this.config.minFilesPerCommit) {
@@ -181,6 +183,7 @@ export class IntelligentCommitBatcher {
           "batch-committed",
           "success",
           {
+            jobId,
             filesCommitted: filesToStage.length,
             operations: this.getOperationSummary(),
             commitMessage: finalMessage.substring(0, 100),
@@ -201,6 +204,7 @@ export class IntelligentCommitBatcher {
         "batch-commit-failed",
         "error",
         {
+          jobId,
           error: error instanceof Error ? error.message : String(error),
           filesAttempted: this.pendingChanges.length,
         },

@@ -157,6 +157,7 @@ program
     console.log('  @security-auditor   - Vulnerability detection & compliance');
     console.log('  @refactorer         - Technical debt elimination & code consolidation');
     console.log('  @test-architect     - Testing strategy & coverage optimization');
+    console.log('  @librarian          - Codebase exploration & documentation');
     console.log('');
 
     console.log('🛠️ Framework Tools:');
@@ -184,7 +185,7 @@ program
     console.log('  - strray_explain_capability: Detailed feature explanations');
     console.log('');
 
-    console.log('📊 Enterprise Features:');
+    console.log('📊 Core Features:');
     console.log('  • 99.6% error prevention through codex compliance');
     console.log('  • 90% resource reduction (0 baseline processes)');
     console.log('  • Multi-agent orchestration with intelligent delegation');
@@ -200,17 +201,261 @@ program
     console.log('  5. Run "npx strray-ai capabilities" anytime for this overview');
   });
 
+program
+  .command('health')
+  .alias('check')
+  .description('Check framework health and system status')
+  .action(async () => {
+    console.log('🏥 StringRay Framework Health Check');
+    console.log('====================================');
+    console.log('');
+
+    try {
+      const fs = await import('fs');
+      const path = await import('path');
+
+      // Check core components
+      const checks = [
+        {
+          name: 'Package Installation',
+          check: () => fs.existsSync(path.join(packageRoot, 'package.json')),
+          success: '✅ Framework package found',
+          error: '❌ Framework package missing'
+        },
+        {
+          name: 'Configuration Files',
+          check: () => fs.existsSync(path.join(process.cwd(), '.opencode', 'oh-my-opencode.json')),
+          success: '✅ oh-my-opencode configuration found',
+          error: '⚠️ oh-my-opencode config missing (run install first)'
+        },
+        {
+          name: 'Agent System',
+          check: () => fs.existsSync(path.join(packageRoot, 'dist', 'agents')),
+          success: '✅ Agent system available',
+          error: '❌ Agent system not built'
+        },
+        {
+          name: 'MCP Servers',
+          check: () => fs.existsSync(path.join(packageRoot, 'dist', 'mcps')),
+          success: '✅ MCP servers available',
+          error: '❌ MCP servers not built'
+        }
+      ];
+
+      let allHealthy = true;
+
+      for (const check of checks) {
+        try {
+          if (check.check()) {
+            console.log(check.success);
+          } else {
+            console.log(check.error);
+            allHealthy = false;
+          }
+        } catch (error) {
+          console.log(`${check.name}: ❌ Error during check`);
+          allHealthy = false;
+        }
+      }
+
+      console.log('');
+
+      if (allHealthy) {
+        console.log('🎉 Framework is healthy and ready to use!');
+        console.log('');
+        console.log('💡 Quick commands:');
+        console.log('  • @enforcer analyze this code');
+        console.log('  • @orchestrator coordinate task');
+        console.log('  • framework-reporting-system');
+      } else {
+        console.log('⚠️ Some components need attention. Run "npx strray-ai install" to fix.');
+      }
+
+    } catch (error) {
+      console.error('❌ Health check failed:', error instanceof Error ? error.message : String(error));
+      process.exit(1);
+    }
+  });
+
+program
+  .command('report')
+  .description('Generate framework activity and health reports')
+  .option('-t, --type <type>', 'Report type (full-analysis, agent-usage, performance)', 'full-analysis')
+  .option('-o, --output <file>', 'Output file path')
+  .action(async (options) => {
+    console.log(`📊 StringRay Framework Report: ${options.type}`);
+    console.log('==========================================');
+    console.log('');
+
+    try {
+      // Check if framework-reporting-system is available
+      const reportCommand = 'framework-reporting-system';
+      const reportArgs = [`generate-report`, `--type=${options.type}`];
+
+      if (options.output && typeof options.output === 'string') {
+        reportArgs.push(`--output=${options.output}`);
+      }
+
+      console.log(`Running: ${reportCommand} ${reportArgs.join(' ')}`);
+
+      execSync(`${reportCommand} ${reportArgs.join(' ')}`, {
+        stdio: 'inherit',
+        cwd: process.cwd()
+      });
+
+      console.log('');
+      console.log('✅ Report generated successfully!');
+
+      if (options.output && typeof options.output === 'string') {
+        console.log(`📁 Report saved to: ${options.output}`);
+      }
+
+    } catch (error) {
+      console.error('❌ Report generation failed:', error instanceof Error ? error.message : String(error));
+      console.log('');
+      console.log('💡 Troubleshooting:');
+      console.log('  • Make sure oh-my-opencode is running');
+      console.log('  • Check framework installation: npx strray-ai status');
+      console.log('  • Try manual report: framework-reporting-system generate-report');
+      process.exit(1);
+    }
+  });
+
+program
+  .command('fix')
+  .description('Automatically fix common framework issues by running the postinstall setup')
+  .action(async () => {
+    console.log('🔧 StringRay Framework Fix');
+    console.log('===========================');
+    console.log('');
+
+    try {
+      console.log('Running postinstall setup to restore configuration...');
+
+      // Run the postinstaller script (same as install command)
+      const postinstallScript = join(packageRoot, 'scripts', 'postinstall.cjs');
+      execSync(`node "${postinstallScript}"`, {
+        stdio: 'inherit',
+        cwd: process.cwd()
+      });
+
+      console.log('');
+      console.log('🎉 Framework configuration restored successfully!');
+      console.log('');
+      console.log('💡 Next steps:');
+      console.log('  • Restart oh-my-opencode to load the restored configuration');
+      console.log('  • Run: npx strray-ai health (to verify everything works)');
+      console.log('  • Try: @enforcer analyze this code');
+
+    } catch (error) {
+      console.error('❌ Fix command failed:', error instanceof Error ? error.message : String(error));
+      console.log('');
+      console.log('💡 Manual fix options:');
+      console.log('  • Delete .opencode/ and .stringray/ directories');
+      console.log('  • Run: npx strray-ai install');
+      console.log('  • Or manually restore missing configuration files');
+      process.exit(1);
+    }
+  });
+
+program
+  .command('doctor')
+  .description('Diagnose framework issues (does not fix them)')
+  .action(async () => {
+    console.log('🩺 StringRay Framework Doctor');
+    console.log('===============================');
+    console.log('');
+
+    try {
+      const fs = await import('fs');
+      const path = await import('path');
+
+      const issues = [];
+      const fixes = [];
+
+      // Check Node.js version
+      const nodeVersion = process.version;
+      const versionParts = nodeVersion.slice(1).split('.');
+      const majorVersion = parseInt(versionParts[0] || '0');
+      if (majorVersion < 18) {
+        issues.push('Node.js version too old');
+        fixes.push('Upgrade to Node.js 18+');
+      } else {
+        console.log('✅ Node.js version:', nodeVersion);
+      }
+
+      // Check package installation
+      const packageExists = fs.existsSync(path.join(process.cwd(), 'node_modules', 'strray-ai'));
+      if (!packageExists) {
+        issues.push('StringRay package not installed');
+        fixes.push('Run: npm install strray-ai');
+      } else {
+        console.log('✅ StringRay package installed');
+      }
+
+      // Check configuration
+      const configExists = fs.existsSync(path.join(process.cwd(), '.opencode', 'oh-my-opencode.json'));
+      if (!configExists) {
+        issues.push('oh-my-opencode configuration missing');
+        fixes.push('Run: npx strray-ai fix');
+      } else {
+        console.log('✅ oh-my-opencode configuration found');
+      }
+
+      // Check for common issues
+      const mcpConfigExists = fs.existsSync(path.join(process.cwd(), '.mcp.json'));
+      if (mcpConfigExists) {
+        console.log('ℹ️ Found .mcp.json - may conflict with framework');
+        fixes.push('Consider removing .mcp.json or excluding framework servers');
+      }
+
+      console.log('');
+
+      if (issues.length === 0) {
+        console.log('🎉 No issues found! Framework is healthy.');
+        console.log('');
+        console.log('💡 Pro tips:');
+        console.log('  • Use @enforcer for code quality checks');
+        console.log('  • Run reports regularly: npx strray-ai report');
+        console.log('  • Check health anytime: npx strray-ai health');
+      } else {
+        console.log('⚠️ Issues found:');
+        issues.forEach((issue, i) => {
+          console.log(`  ${i + 1}. ${issue}`);
+        });
+
+        console.log('');
+        console.log('🔧 Run "npx strray-ai fix" to automatically fix these issues');
+      }
+
+    } catch (error) {
+      console.error('❌ Doctor check failed:', error instanceof Error ? error.message : String(error));
+      process.exit(1);
+    }
+  });
+
 // Add help text
 program.addHelpText('after', `
 
 Examples:
-  $ npx strray-ai install       # Install StringRay in current project
-  $ npx strray-ai init          # Initialize configuration
-  $ npx strray-ai status        # Check installation status
-  $ npx strray-ai validate      # Validate framework setup
-  $ npx strray-ai capabilities  # Show all available capabilities
+   $ npx strray-ai install       # Install StringRay in current project
+   $ npx strray-ai init          # Initialize configuration
+   $ npx strray-ai status        # Check installation status
+   $ npx strray-ai validate      # Validate framework setup
+   $ npx strray-ai capabilities  # Show all available capabilities
+   $ npx strray-ai health        # Check framework health and status
+   $ npx strray-ai report        # Generate activity and health reports
+   $ npx strray-ai fix           # Automatically restore missing config files
+   $ npx strray-ai doctor        # Diagnose issues (does not fix them)
 
-For more information, visit: https://stringray.dev
+Quick Start:
+   1. Install: npx strray-ai install
+   2. Check health: npx strray-ai health
+   3. Use agents: @enforcer analyze this code
+   4. Generate reports: npx strray-ai report
+   5. Fix issues: npx strray-ai fix
+
+For more information, visit: https://github.com/htafolla/stringray
 `);
 
 // Parse command line arguments

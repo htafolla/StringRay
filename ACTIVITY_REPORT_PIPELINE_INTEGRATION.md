@@ -1,57 +1,55 @@
-# Framework Report - 2026-01-22T03:16:19.074Z
+# Framework Report - 2026-01-22T17:57:03.847Z
 
 ## Summary
-- **Total Events**: 815
-- **Time Range**: 2026-01-22T02:32:37.606Z to 2026-01-22T02:57:47.238Z
-- **Active Components**: codex-injector, framework-activity, state-manager, boot-orchestrator, orchestrator, agent-delegator, session-monitor, session-cleanup, processor-manager, session-state-manager, performance-orchestrator, security-auditor, success-handler
-- **Health Score**: 99.5%
+- **Total Events**: 18
+- **Time Range**: 2026-01-22T16:11:49.844Z to 2026-01-22T17:42:37.378Z
+- **Active Components**: test-report-1769098309844-2z15yq, test-report-1769098309844-7abdd6, main-test, debug-comp, test-method-call, sync-test, stderr-test, flow-test, simple-test, required-test, forced-test, debug-entry, persist-test, call-test, start-test, direct-test, capture-test
+- **Health Score**: 100.0%
 
 ## Metrics
-- **Delegations**: 47
+- **Delegations**: 0
 - **Context Operations**: 0
-- **Success Rate**: 70.6%
+- **Success Rate**: 94.4%
 - **Enhancement Success**: 100.0%
 
 ## Agent Usage
-- system: 648 invocations
-- orchestrator: 162 invocations
-- security-auditor: 5 invocations
+- system: 18 invocations
 
 ## System Commands & Tools
 
 ### Tool Execution Summary
-- **Total Commands Executed**: 11
-- **Unique Tools Used**: 1
-- **Most Used Tool**: tool called
+- **Total Commands Executed**: 0
+- **Unique Tools Used**: 0
+- **Most Used Tool**: None
 
 ### Tool Success Rates
-- tool called: 11/11 (100.0% success)
+
 
 ### Command Usage Breakdown
-- tool called: 11 times
+
 
 ### System Operation Categories
 - **File Operations**: 0 (read, write, edit)
 - **Search Operations**: 0 (grep, glob)
 - **Terminal Operations**: 0 (bash commands)
 - **Analysis Operations**: 0 (code analysis)
-- **Orchestration Operations**: 47 (agent coordination)
+- **Orchestration Operations**: 0 (agent coordination)
 
 ## Insights
-- Successfully orchestrated 47 agent delegations
-- Primary agent: system (648 invocations)
+- Primary agent: system (18 invocations)
 
 ## Recommendations
 - Investigate and resolve error conditions to improve system reliability
+- Consider running delegation scenarios to test agent orchestration
 - Enable context awareness features for enhanced intelligence
 
 ## Phase 1 Completion Analysis
 
 ### Framework Health Assessment ✅
-- **System Stability**: 99.5% health score indicates robust error handling
-- **Component Activity**: 13 core components actively coordinating (codex-injector, framework-activity, state-manager, boot-orchestrator, orchestrator, agent-delegator, session-monitor, session-cleanup, processor-manager, session-state-manager, performance-orchestrator, security-auditor, success-handler)
-- **Agent Coordination**: 47 successful delegations demonstrate proper multi-agent orchestration
-- **Error Handling**: 70.6% success rate reflects expected validation and error prevention mechanisms
+- **System Stability**: 100.0% health score indicates robust error handling
+- **Component Activity**: 17 core components actively coordinating (test-report-1769098309844-2z15yq, test-report-1769098309844-7abdd6, main-test, debug-comp, test-method-call, sync-test, stderr-test, flow-test, simple-test, required-test, forced-test, debug-entry, persist-test, call-test, start-test, direct-test, capture-test)
+- **Agent Coordination**: 0 successful delegations demonstrate proper multi-agent orchestration
+- **Error Handling**: 94.4% success rate reflects expected validation and error prevention mechanisms
 
 ### Key Achievements
 1. **MCP Integration**: Framework successfully integrated 14 MCP servers at project level
@@ -61,9 +59,9 @@
 5. **Codex Enforcement**: 50 rules implemented with zero-tolerance blocking
 
 ### System Performance Metrics
-- **Event Processing**: 815 events processed over operational window
-- **Coordination Efficiency**: 47 agent delegations with 100% completion rate
-- **Component Utilization**: Balanced load across 13 framework subsystems
+- **Event Processing**: 18 events processed over operational window
+- **Coordination Efficiency**: 0 agent delegations with 100% completion rate
+- **Component Utilization**: Balanced load across 17 framework subsystems
 - **Error Prevention**: Systematic validation preventing runtime failures
 
 ### Framework Status: PRODUCTION READY 🚀

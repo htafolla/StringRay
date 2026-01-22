@@ -4,7 +4,7 @@
  * Implements orchestrator-first boot sequence with automatic enforcement activation.
  * Coordinates the initialization of all framework components in the correct order.
  *
- * @version 1.0.0
+ * @version 1.1.2
  * @since 2026-01-07
  */
 

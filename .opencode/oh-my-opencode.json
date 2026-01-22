@@ -5,6 +5,7 @@
    ],
   "disabled_agents": [
     "Sisyphus",
+    "Planner-Sisyphus",
     "oracle",
     "librarian"
   ],
@@ -16,35 +17,6 @@
     "global-git",
     "global-sqlite"
   ],
-  "agent": {
-    "strray-orchestrator": {
-      "model": "opencode/grok-code"
-    },
-    "strray-enhanced-orchestrator": {
-      "model": "opencode/grok-code"
-    },
-    "strray-enforcer": {
-      "model": "opencode/grok-code"
-    },
-    "strray-architect": {
-      "model": "opencode/grok-code"
-    },
-    "strray-test-architect": {
-      "model": "opencode/grok-code"
-    },
-    "strray-bug-triage-specialist": {
-      "model": "opencode/grok-code"
-    },
-    "strray-code-reviewer": {
-      "model": "opencode/grok-code"
-    },
-    "strray-security-auditor": {
-      "model": "opencode/grok-code"
-    },
-    "strray-refactorer": {
-      "model": "opencode/grok-code"
-    }
-  },
   "settings": {
     "multi_agent_orchestration": {
       "enabled": true,

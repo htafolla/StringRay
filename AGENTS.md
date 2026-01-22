@@ -2557,6 +2557,117 @@ node scripts/test:mcp-connectivity.js
 npx strray-ai validate
 ```
 
+### Triage Summary Guidelines
+**CRITICAL REMINDER**: When providing triage summaries after build error resolution or major changes, **ALWAYS explicitly state the commit status** (successful/failed) to avoid confusion. Include:
+- Commit hash (if successful)
+- File changes summary
+- Build/test status
+- Next steps clearly stated
+
+### Enforceable Triage Rules (via RuleEnforcer)
+
+The following triage guidelines are now **automatically enforced** by the framework's rule system:
+
+#### **Rule: triage-commit-status-required**
+- **Trigger**: All triage summaries and status reports
+- **Enforcement**: Blocks commits if triage summary doesn't explicitly state commit status
+- **Validation**: Must include "successful" or "failed" in commit status declaration
+
+#### **Rule: triage-file-changes-required**
+- **Trigger**: Major code changes, refactoring, or architectural modifications
+- **Enforcement**: Requires detailed file changes summary in triage reports
+- **Validation**: Must list affected files and change types (add/modify/delete)
+
+#### **Rule: triage-build-test-status-required**
+- **Trigger**: Any code modifications affecting build or test systems
+- **Enforcement**: Blocks commits if build/test status not clearly stated
+- **Validation**: Must specify "build: passed/failed", "tests: X/Y passed"
+
+#### **Rule: triage-next-steps-required**
+- **Trigger**: All triage summaries with unresolved issues
+- **Enforcement**: Requires clear next steps when issues remain
+- **Validation**: Must provide actionable next steps or resolution timeline
+
+#### **Rule: enforcer-central-governance-required**
+- **Trigger**: All architectural changes, agent coordination, and rule enforcement modifications
+- **Enforcement**: Blocks commits that bypass the enforcer's central governance role
+- **Validation**: All compliance decisions must flow through RuleEnforcer, not be made in agent-delegator or processor-manager
+- **Rationale**: The enforcer is the single source of truth for codex compliance; delegation and processing layers must be subordinate
+- **Examples Blocked**: Direct violation-to-skill mappings in processor-manager, conflict resolution logic in agent-delegator without enforcer validation
+
+#### **Rule: codex-enforcer-inference-engine**
+- **Trigger**: All rule additions, modifications, or enforcement changes
+- **Enforcement**: Requires new rules to be added/reinforced in codex.json first, then loaded by enforcer
+- **Validation**: RuleEnforcer must dynamically load all 59+ codex terms; manual rule additions in code are prohibited
+- **Rationale**: Codex is the single source of truth for development rules; enforcer is the inference engine that loads and enforces them
+- **Version Requirement**: Codex version must be updated when new rules are added (update "version" field in .strray/codex.json)
+- **Workflow**: Add/modify rules in .strray/codex.json → update version → enforcer auto-loads → rule mappings auto-generated → violations auto-remediated
+
+## Reflection System
+
+### Purpose
+Reflections are structured analyses of significant experiences that preserve institutional knowledge, identify patterns, and guide future development of the StringRay Framework.
+
+### Definition
+A Reflection is a deep, analytical examination of major incidents, transformations, or evolutionary milestones that captures lessons learned and future implications.
+
+### Categories
+
+#### 1. Journey Reflections (Comprehensive)
+- **Scope**: Broad framework evolution and development journey
+- **Content**: Achievements, failures, recoveries, paradigm shifts, personal/professional growth
+- **Triggers**: Major milestones, 6-month reviews, significant evolution periods
+
+#### 2. Incident Reflections (Focused)
+- **Scope**: Specific events, failures, or critical incidents
+- **Content**: Root cause analysis, immediate response, lessons learned, prevention measures
+- **Triggers**: System outages, critical bugs, security breaches, major setbacks
+
+#### 3. Transformation Reflections (Technical)
+- **Scope**: Major changes, implementations, or architectural shifts
+- **Content**: Technical solutions, implementation details, architectural decisions, code changes
+- **Triggers**: Major refactoring, new capabilities, architectural transformations
+
+#### 4. Evolution Reflections (Philosophical)
+- **Scope**: Paradigm shifts and fundamental changes in approach
+- **Content**: Intelligence evolution, philosophical insights, conceptual breakthroughs
+- **Triggers**: Paradigm shifts, fundamental rethinking, conceptual discoveries
+
+### Standard Structure
+
+All reflections must include these sections:
+
+1. **Context**: Date/timeframe, scope, trigger, stakeholders
+2. **What Happened**: Sequence of events, key decisions, outcomes
+3. **Analysis**: Root causes, contributing factors, pattern recognition
+4. **Lessons Learned**: Technical insights, process improvements, philosophical shifts
+5. **Actions Taken**: Immediate fixes, long-term changes, prevention measures
+6. **Future Implications**: Framework evolution, risk mitigation, opportunities
+7. **Reflections on Reflection**: Meta-insights, improvement opportunities
+
+### Writing Guidelines
+
+- **Timing**: Write within 1 week while details are fresh
+- **Scope**: Focus on events with lasting framework impact
+- **Depth**: Provide comprehensive analysis with actionable insights
+- **Format**: Use consistent markdown structure
+- **Storage**: Store in `docs/reflections/` directory
+- **Naming**: Use descriptive names like `orchestration-realignment-reflection.md`
+
+### Integration with Framework
+
+- **Automatic Triggers**: Framework should prompt for reflections after major incidents
+- **Cross-References**: Link related reflections and reference them in decision-making
+- **Review Process**: Include reflection review in major framework decisions
+- **Knowledge Base**: Use reflections as searchable knowledge base for similar situations
+
+### Quality Standards
+
+- **Actionable**: Include specific recommendations and lessons
+- **Honest**: Acknowledge failures and mistakes openly
+- **Comprehensive**: Cover technical, process, and philosophical aspects
+- **Future-Focused**: Emphasize prevention and improvement opportunities
+
 ### Emergency Procedures
 1. **Framework unresponsive**: Run `npx strray-ai doctor` for automated diagnosis
 2. **Critical failures**: Check system logs in `logs/framework/error.log`

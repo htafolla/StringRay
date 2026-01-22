@@ -1,6 +1,6 @@
 {
-  "version": "1.1.1",
-  "lastUpdated": "2026-01-16",
+  "version": "1.1.2",
+  "lastUpdated": "2026-01-22",
   "errorPreventionTarget": 0.996,
   "terms": {
     "1": {
@@ -472,6 +472,14 @@
       "title": "Framework Command Orchestration",
       "description": "Pipeline operations must use framework commands for orchestration: All CI/CD operations must use 'strray' framework commands, Direct AI execution outside framework is prohibited, Use 'strray release', 'strray deploy', 'strray validate' commands, Framework handles complexity analysis and agent delegation, Direct tool calls bypass orchestration and violate compliance",
       "category": "ci-cd",
+      "zeroTolerance": true,
+      "enforcementLevel": "blocking"
+    },
+    "universal-librarian-consultation": {
+      "number": 60,
+      "title": "Universal Librarian Consultation",
+      "description": "All major system actions must consult librarian for documentation review, versioning updates, and pair programming oversight. Librarian serves as universal second witness for code changes, configuration modifications, and architectural decisions to maintain documentation and version integrity",
+      "category": "architectural",
       "zeroTolerance": true,
       "enforcementLevel": "blocking"
     }

@@ -83,13 +83,21 @@ export class FrameworkUsageLogger {
       return;
     }
 
+    // Auto-generate jobId if not provided
+    const actualJobId = jobId || generateJobId('auto');
+
+    // Ensure we always have a jobId
+    if (!actualJobId) {
+      throw new Error('JobId generation failed');
+    }
+
     const entry: FrameworkLogEntry = {
       timestamp: Date.now(),
       component,
       action,
-      agent: "sisyphus",
+       agent: "orchestrator",
       sessionId,
-      jobId,
+      jobId: actualJobId,
       status,
       details,
     };
@@ -102,7 +110,7 @@ export class FrameworkUsageLogger {
 
     // Always persist to file, never output to console to avoid UI bleed-through
     try {
-      await this.persistLog(entry);
+      this.persistLog(entry);
     } catch (error) {
       // Silently fail - logging should never break the application
     }

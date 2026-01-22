@@ -20,6 +20,7 @@ export interface ReportConfig {
     | "performance"
     | "full-analysis";
   sessionId?: string;
+  jobId?: string;
   timeRange?: {
     start?: Date;
     end?: Date;
@@ -556,6 +557,11 @@ const report = await reportingSystem.generateCustomReport('${template.name}');
     // Filter by session ID if specified
     if (config.sessionId) {
       filtered = filtered.filter((log) => log.sessionId === config.sessionId);
+    }
+
+    // Filter by job ID if specified
+    if (config.jobId) {
+      filtered = filtered.filter((log) => log.jobId === config.jobId);
     }
 
     if (config.timeRange) {

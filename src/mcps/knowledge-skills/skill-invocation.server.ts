@@ -293,7 +293,7 @@ class SkillInvocationServer {
   private async handleSkillProjectAnalysis(args: any) {
     const result = await mcpClientManager.callServerTool(
       "librarian",
-      "analyze_codebase",
+      "analyze-project-health",
       args
     );
 

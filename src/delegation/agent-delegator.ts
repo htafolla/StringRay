@@ -13,6 +13,7 @@ import {
   ComplexityScore,
   ComplexityMetrics,
 } from "./complexity-analyzer.js";
+import { universalLibrarianConsultation, SystemAction } from "../universal-librarian-consultation.js";
 import {
   strRayConfigLoader,
   type MultiAgentOrchestrationConfig,
@@ -144,6 +145,39 @@ export class AgentDelegator {
   }
 
   /**
+   * Unified entry point for all agent requests - ensures consistent complexity analysis
+   * Standardizes all entry points (@enforcer, task(), call_omo_agent()) to use same analysis
+   */
+  async analyzeComplexity(request: any): Promise<{
+    strategy: "single-agent" | "multi-agent" | "orchestrator-led";
+    complexity: ComplexityScore;
+    metrics: ComplexityMetrics;
+    delegation: DelegationResult;
+  }> {
+    // Normalize request format for consistent analysis
+    const normalizedRequest: DelegationRequest = {
+      operation: request.operation || request.task || "unknown",
+      description: request.description || request.prompt || "No description",
+      context: request.context || {},
+      sessionId: request.sessionId,
+      priority: request.priority || "medium",
+      mentionAgent: request.mentionAgent,
+      forceMultiAgent: request.forceMultiAgent,
+      requiredAgents: request.requiredAgents,
+    };
+
+    // Always consult enforcer for complexity analysis and orchestration decisions
+    const delegation = await this.analyzeDelegation(normalizedRequest);
+
+    return {
+      strategy: delegation.strategy,
+      complexity: delegation.complexity,
+      metrics: delegation.metrics,
+      delegation,
+    };
+  }
+
+  /**
     * Analyze request and determine optimal delegation strategy
     * Delegates complexity analysis and orchestration decisions to the enforcer
     */
@@ -204,6 +238,49 @@ export class AgentDelegator {
         operation: request.operation,
       },
     );
+
+    // Universal consultation for major actions - includes architect
+    const systemAction: SystemAction = {
+      type: this.determineActionType(request),
+      description: request.description || `Delegating ${request.operation}`,
+      scope: this.determineActionScope(request),
+      complexity: (delegation.complexity as unknown as number) > 80 ? "high" : (delegation.complexity as unknown as number) > 50 ? "medium" : "low",
+      files: request.context?.files as string[],
+      components: request.context?.components as string[],
+    };
+
+    // Consult librarian for documentation/versioning
+    const consultationResult = await universalLibrarianConsultation.consultBeforeAction(systemAction);
+
+    if (!consultationResult.approved) {
+      await frameworkLogger.log(
+        "agent-delegator",
+        "delegation blocked by librarian consultation",
+        "error",
+        {
+          reason: "librarian consultation failed",
+          recommendations: consultationResult.recommendations,
+        },
+      );
+      throw new Error(`Delegation blocked: ${consultationResult.recommendations.join(", ")}`);
+    }
+
+    // Consult architect for major framework changes
+    if (systemAction.complexity === "high" || systemAction.scope === "framework") {
+      const architectApproval = await this.consultArchitectForApproval(systemAction);
+      if (!architectApproval.approved) {
+        await frameworkLogger.log(
+          "agent-delegator",
+          "delegation blocked by architect review",
+          "error",
+          {
+            reason: "architect review failed",
+            feedback: architectApproval.feedback,
+          },
+        );
+        throw new Error(`Delegation blocked by architect: ${architectApproval.feedback}`);
+      }
+    }
 
     try {
       console.log(
@@ -300,18 +377,21 @@ export class AgentDelegator {
       const duration = Date.now() - startTime;
       this.recordSuccessfulDelegation(delegation, duration);
 
-      await frameworkLogger.log(
-        "agent-delegator",
-        "delegation execution completed",
-        "success",
-        {
-          strategy: delegation.strategy,
-          duration,
-          operation: request.operation,
-        },
-      );
+       // Post-action librarian consultation
+       await universalLibrarianConsultation.consultAfterAction(systemAction, result);
 
-      return result;
+       await frameworkLogger.log(
+         "agent-delegator",
+         "delegation execution completed",
+         "success",
+         {
+           strategy: delegation.strategy,
+           duration,
+           operation: request.operation,
+         },
+       );
+
+       return result;
     } catch (error) {
       const duration = Date.now() - startTime;
       this.recordFailedDelegation(delegation, duration, error);
@@ -947,13 +1027,174 @@ export class AgentDelegator {
   private async executeMultiAgent(
     agentNames: string[],
     request: DelegationRequest,
-  ): Promise<any[]> {
+  ): Promise<any> {
     const promises = agentNames.map((agentName) =>
       this.executeSingleAgent(agentName, request),
     );
     const results = await Promise.all(promises);
 
-    return results;
+    // Apply conflict resolution if multiple agents were involved
+    if (results.length > 1) {
+      // Get the delegation analysis to access conflict resolution strategy
+    // Note: Conflict resolution should be determined by enforcer, not agent-delegator
+    const delegation = await this.analyzeDelegation(request);
+    const resolvedResult = this.resolveMultiAgentConflicts(results, delegation.conflictResolution || "majority_vote");
+
+      await frameworkLogger.log(
+        "agent-delegator",
+        "multi-agent conflicts resolved",
+        "info",
+        {
+          agentCount: agentNames.length,
+          conflictResolution: delegation.conflictResolution,
+          originalResults: results.length,
+          resolvedTo: resolvedResult ? 1 : results.length,
+        },
+      );
+
+      return resolvedResult;
+    }
+
+    return results[0];
+  }
+
+  /**
+   * Determine action type for librarian consultation
+   */
+  private determineActionType(request: DelegationRequest): SystemAction["type"] {
+    switch (request.operation) {
+      case "write":
+      case "create":
+        return "code-change";
+      case "architectural-review":
+        return "architectural-change";
+      case "rule-validation":
+        return "rule-modification";
+      default:
+        return "code-change";
+    }
+  }
+
+  /**
+   * Determine action scope for librarian consultation
+   */
+  private determineActionScope(request: DelegationRequest): SystemAction["scope"] {
+    const components = request.context?.components as string[] | undefined;
+    const files = request.context?.files as string[] | undefined;
+
+    if (components?.includes("framework")) {
+      return "framework";
+    }
+    if (components?.includes("agent")) {
+      return "agent";
+    }
+    if (files?.some((f: string) => f.includes("config") || f.includes(".json"))) {
+      return "configuration";
+    }
+    return "agent";
+  }
+
+  /**
+   * Consult architect for approval on major framework changes
+   */
+  private async consultArchitectForApproval(action: SystemAction): Promise<{
+    approved: boolean;
+    feedback: string;
+  }> {
+    try {
+      // This would call the architect agent for review
+      // For now, we'll simulate the architect consultation
+      await frameworkLogger.log(
+        "agent-delegator",
+        "architect consultation requested",
+        "info",
+        {
+          actionType: action.type,
+          scope: action.scope,
+          complexity: action.complexity,
+        },
+      );
+
+      // Placeholder logic - in real implementation, this would call architect agent
+      // For now, block critical framework changes until architect review is implemented
+      const approved = !(action.scope === "framework" && action.complexity === "critical");
+      const feedback = approved
+        ? "Architect review passed (placeholder)"
+        : "Critical framework changes require architect review - currently blocked until architect integration is complete";
+
+      return { approved, feedback };
+    } catch (error) {
+      await frameworkLogger.log(
+        "agent-delegator",
+        "architect consultation failed",
+        "error",
+        { error: error instanceof Error ? error.message : String(error) },
+      );
+      // Fail open for architect consultation failures
+      return { approved: true, feedback: "Architect consultation failed, proceeding" };
+    }
+  }
+
+  private resolveMultiAgentConflicts(
+    results: any[],
+    conflictResolution: string,
+  ): any {
+    if (results.length <= 1) return results[0];
+
+    switch (conflictResolution) {
+      case "majority_vote":
+        return this.resolveByMajorityVote(results);
+      case "expert_priority":
+        return this.resolveByExpertPriority(results);
+      case "consensus":
+        return this.resolveByConsensus(results);
+      default:
+        return results[0];
+    }
+  }
+
+  /**
+   * Resolve conflicts by majority vote
+   */
+  private resolveByMajorityVote(results: any[]): any {
+    // Find the result that appears most frequently
+    const counts: Record<string, number> = {};
+    results.forEach((result) => {
+      const key = JSON.stringify(result);
+      counts[key] = (counts[key] || 0) + 1;
+    });
+
+    const majorityEntry = Object.entries(counts).reduce(
+      ([keyA, countA], [keyB, countB]) =>
+        countA > countB ? [keyA, countA] : [keyB, countB],
+    );
+
+    if (majorityEntry) {
+      return JSON.parse(majorityEntry[0]);
+    }
+    return results[0];
+  }
+
+  /**
+   * Resolve conflicts by expert priority
+   */
+  private resolveByExpertPriority(results: any[]): any {
+    // Sort by expertise score (if available) or agent performance
+    return results.sort(
+      (a, b) => (b.expertiseScore || b.confidence || 0) - (a.expertiseScore || a.confidence || 0),
+    )[0];
+  }
+
+  /**
+   * Resolve conflicts by consensus
+   */
+  private resolveByConsensus(results: any[]): any {
+    // Return the result if all are identical, otherwise return first
+    const firstResult = results[0];
+    const allSame = results.every(
+      (result) => JSON.stringify(result) === JSON.stringify(firstResult),
+    );
+    return allSame ? firstResult : results[0];
   }
 
   private async executeOrchestratorLed(
@@ -1066,22 +1307,7 @@ export class AgentDelegator {
     }
   }
 
-  private resolveMultiAgentConflicts(
-    results: any[],
-    agentNames: string[],
-  ): unknown[] {
-    if (results.length <= 1) return results;
 
-    const consensusResults = results.filter((r) => r.consensus === true);
-    if (consensusResults.length > 0) return consensusResults;
-
-    const highConfidenceResults = results.filter(
-      (r) => (r.confidence || 0) > 0.8,
-    );
-    if (highConfidenceResults.length > 0) return highConfidenceResults;
-
-    return [results[0]];
-  }
 
   private consolidateOrchestratorResults(
     results: AgentExecutionResult[],

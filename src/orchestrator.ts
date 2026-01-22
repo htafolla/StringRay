@@ -10,6 +10,7 @@
 
 import { enhancedMultiAgentOrchestrator } from "./orchestrator/enhanced-multi-agent-orchestrator.js";
 import { frameworkLogger } from "./framework-logger.js";
+import { universalLibrarianConsultation, SystemAction } from "./universal-librarian-consultation.js";
 
 export interface OrchestratorConfig {
   maxConcurrentTasks: number;

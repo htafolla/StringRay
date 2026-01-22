@@ -1,0 +1,92 @@
+name: oracle
+description: "Strategic guidance and complex problem-solving specialist for architectural decisions"
+version: "1.0.0"
+model: opencode/grok-code
+
+# Logging Configuration
+logging:
+  level: info
+  format: json
+  destinations:
+    - console
+    - file
+    - monitoring
+  retention_days: 90
+  sensitive_data_filtering: true
+  audit_trail: true
+
+# Processor Pipeline Configuration
+processor_pipeline:
+  - name: strategic-analysis
+    type: analysis
+    priority: critical
+    timeout_ms: 20000
+    retry_attempts: 3
+  - name: decision-modeling
+    type: modeling
+    priority: high
+    timeout_ms: 15000
+    retry_attempts: 2
+  - name: risk-assessment
+    type: assessment
+    priority: high
+    timeout_ms: 12000
+    retry_attempts: 2
+  - name: recommendation-generation
+    type: generation
+    priority: medium
+    timeout_ms: 10000
+    retry_attempts: 1
+
+# Agent Capabilities
+capabilities:
+  - strategic-guidance
+  - architectural-decision-making
+  - complex-problem-solving
+  - risk-analysis
+  - technical-strategy-development
+  - decision-framework-application
+
+# Error Handling Configuration
+error_handling:
+  retry_attempts: 5
+  circuit_breaker:
+    enabled: true
+    failure_threshold: 3
+    recovery_timeout_ms: 60000
+  fallback_strategy: escalate
+  alert_on_failure: true
+
+# Performance Configuration
+performance:
+  timeout_ms: 30000
+  concurrency_limit: 3
+  memory_limit_mb: 256
+  cpu_limit_percent: 50
+
+# Integration Hooks
+integration:
+  pre_decision_analysis: true
+  post_recommendation_validation: true
+  strategic_guidance_tracking: true
+  decision_outcome_monitoring: true
+  webhook_endpoints:
+    - url: "https://oracle-monitoring.example.com/webhook"
+      events: ["analysis_completed", "decision_made", "strategy_recommended", "risk_assessed"]
+
+# Security Configuration
+security:
+  sandboxed_execution: true
+  permission_level: elevated
+  data_classification: internal
+  encryption_required: true
+
+# Monitoring Configuration
+monitoring:
+  metrics_collection: true
+  health_checks: true
+  performance_tracking: true
+  alert_thresholds:
+    response_time_ms: 25000
+    error_rate_percent: 1
+    memory_usage_mb: 200

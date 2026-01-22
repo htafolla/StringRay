@@ -4,7 +4,7 @@
  * Enterprise AI orchestration with systematic error prevention.
  * This plugin provides intelligent agent coordination and codex-based code quality enforcement.
  *
- * @version 1.0.0
+ * @version 1.1.2
  * @author StringRay Framework Team
  */
 
@@ -34,14 +34,11 @@ Welcome to StringRay AI! This session includes systematic error prevention and p
 ### 🚀 Available Framework Capabilities
 
 **Agent Commands (use @agent-name):**
+- **@orchestrator** - Multi-agent workflow coordination (accesses all internal agents)
 - **@enforcer** - Codex compliance & error prevention
-- **@architect** - System design & technical decisions
-- **@orchestrator** - Multi-agent workflow coordination
-- **@bug-triage-specialist** - Error investigation & surgical fixes
-- **@code-reviewer** - Quality assessment & standards validation
-- **@security-auditor** - Vulnerability detection & compliance
-- **@refactorer** - Technical debt elimination & code consolidation
-- **@test-architect** - Testing strategy & coverage optimization
+
+**Internal Agent System:**
+All 8 specialized agents (architect, bug-triage-specialist, code-reviewer, security-auditor, refactorer, test-architect, librarian) are available internally through orchestrator coordination and framework operations.
 
 **Skills System (23 lazy-loaded capabilities):**
 - project-analysis, testing-strategy, code-review, security-audit, performance-optimization

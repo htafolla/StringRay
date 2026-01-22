@@ -1,0 +1,63 @@
+{
+  "model": "opencode/grok-code",
+   "plugin": [
+     "node_modules/strray-ai/dist/plugin/plugins/stringray-codex-injection.js"
+   ],
+  "disabled_agents": [
+    "Sisyphus",
+    "oracle",
+    "librarian"
+  ],
+  "sisyphus_agent": {
+    "disabled": true
+  },
+  "disabled_mcps": [
+    "global-everything",
+    "global-git",
+    "global-sqlite"
+  ],
+  "agent": {
+    "strray-orchestrator": {
+      "model": "opencode/grok-code"
+    },
+    "strray-enhanced-orchestrator": {
+      "model": "opencode/grok-code"
+    },
+    "strray-enforcer": {
+      "model": "opencode/grok-code"
+    },
+    "strray-architect": {
+      "model": "opencode/grok-code"
+    },
+    "strray-test-architect": {
+      "model": "opencode/grok-code"
+    },
+    "strray-bug-triage-specialist": {
+      "model": "opencode/grok-code"
+    },
+    "strray-code-reviewer": {
+      "model": "opencode/grok-code"
+    },
+    "strray-security-auditor": {
+      "model": "opencode/grok-code"
+    },
+    "strray-refactorer": {
+      "model": "opencode/grok-code"
+    }
+  },
+  "settings": {
+    "multi_agent_orchestration": {
+      "enabled": true,
+      "max_concurrent_agents": 5,
+      "coordination_model": "async-multi-agent"
+    }
+  },
+  "claude_code": {
+    "mcp": false,
+    "commands": true,
+    "skills": true,
+    "agents": true,
+    "hooks": true,
+    "plugins": true
+  }
+}

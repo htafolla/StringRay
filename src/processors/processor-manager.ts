@@ -662,9 +662,9 @@ export class ProcessorManager {
 
       const result = await ruleEnforcer.validateOperation(operation, validationContext);
 
-      // If violations found, attempt to fix them with agents
+      // If violations found, delegate to enforcer for centralized remediation
       if (!result.passed && result.errors.length > 0) {
-        await this.attemptRuleViolationFixes(result.errors, validationContext);
+        await ruleEnforcer.attemptRuleViolationFixes(result.errors, validationContext);
       }
 
       return {

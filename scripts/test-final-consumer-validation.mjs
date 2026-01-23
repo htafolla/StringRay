@@ -64,7 +64,7 @@ class FinalConsumerValidation {
     if (this.isConsumerEnvironment) {
       requiredFiles.push(
         {
-          path: "node_modules/strray-ai/dist/plugin/plugins/stringray-codex-injection.js",
+          path: "node_modules/strray-ai/dist/plugin/plugins/strray-codex-injection.js",
           description: "Main plugin file",
         },
         { path: "node_modules/strray-ai/package.json", description: "Package manifest" }
@@ -72,7 +72,7 @@ class FinalConsumerValidation {
     } else {
       requiredFiles.push(
         {
-          path: "../dist/plugin/plugins/stringray-codex-injection.js",
+          path: "../dist/plugin/plugins/strray-codex-injection.js",
           description: "Main plugin file",
         },
         { path: "../package.json", description: "Package manifest" }
@@ -229,7 +229,7 @@ class FinalConsumerValidation {
         check: (module) => module.StringRayStateManager,
       },
       {
-        path: "./node_modules/strray-ai/dist/plugin/plugins/stringray-codex-injection.js",
+        path: "./node_modules/strray-ai/dist/plugin/plugins/strray-codex-injection.js",
         name: "Main Plugin",
         check: (module) => module.default,
       },
@@ -245,7 +245,7 @@ class FinalConsumerValidation {
         check: (module) => module.StringRayStateManager,
       },
       {
-        path: "../dist/plugin/plugins/stringray-codex-injection.js",
+        path: "../dist/plugin/plugins/strray-codex-injection.js",
         name: "Main Plugin",
         check: (module) => module.default,
       },

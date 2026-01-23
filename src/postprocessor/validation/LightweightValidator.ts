@@ -8,6 +8,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import { execSync } from "child_process";
+import { frameworkLogger } from "../framework-logger";
 
 interface ValidationResult {
   passed: boolean;
@@ -283,28 +284,32 @@ class LightweightValidator {
  * Main validation function
  */
 async function main(): Promise<void> {
-  console.log("⚡ Post-commit: Quick validation initiated");
+  await frameworkLogger.log('-lightweight-validator', '-post-commit-quick-validation-initiated-', 'info', { message: "⚡ Post-commit: Quick validation initiated" });
 
   const validator = new LightweightValidator();
   const result = await validator.validate();
 
   // Report results
   if (result.warnings.length > 0) {
-    console.log(`⚠️ ${result.warnings.length} warning(s) found:`);
-    result.warnings.forEach((warning) => console.log(`   ${warning}`));
+    await frameworkLogger.log('-lightweight-validator', '-result-warnings-length-warning-s-found-', 'info', { message: `⚠️ ${result.warnings.length} warning(s) found:` });
+    for (const warning of result.warnings) {
+      await frameworkLogger.log('-lightweight-validator', '-warning-', 'info', { message: `   ${warning}` });
+    }
   }
 
   if (result.errors.length > 0) {
-    console.log(`❌ ${result.errors.length} error(s) found:`);
-    result.errors.forEach((error) => console.log(`   ${error}`));
+    await frameworkLogger.log('-lightweight-validator', '-result-errors-length-error-s-found-', 'error', { message: `❌ ${result.errors.length} error(s) found:` });
+    for (const error of result.errors) {
+      await frameworkLogger.log('-lightweight-validator', '-error-', 'error', { message: `   ${error}` });
+    }
   }
 
-  console.log(`✅ Post-commit: Validation completed in ${result.duration}ms`);
+  await frameworkLogger.log('-lightweight-validator', '-post-commit-validation-completed-in-result-durati', 'success', { message: `✅ Post-commit: Validation completed in ${result.duration}ms` });
 
   if (!result.passed) {
-    console.log(
+    await frameworkLogger.log('-lightweight-validator', '-fix-the-errors-above-or-use-no-verify-to-skip-val', 'error', { message: 
       "💡 Fix the errors above or use --no-verify to skip validation",
-    );
+     });
     process.exit(1);
   }
 

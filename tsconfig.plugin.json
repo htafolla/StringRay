@@ -2,7 +2,7 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "./dist/plugin",
-    "rootDir": "./src",
+    "rootDir": "./",
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
@@ -12,7 +12,16 @@
     "skipLibCheck": true,
     "preserveSymlinks": true
   },
-  "include": ["src/**/*.ts"],
+  "include": [
+    ".opencode/plugin/strray-codex-injection.ts",
+    "src/orchestrator.ts",
+    "src/processors/**/*.ts",
+    "src/state/**/*.ts",
+    "src/agents/**/*.ts",
+    "src/codex-injector.ts",
+    "src/framework-logger.ts",
+    "src/mcp-logger.ts"
+  ],
     "exclude": [
       "node_modules",
       "src/__tests__/**/*",
@@ -24,6 +33,15 @@
       "src/distributed/**/*",
       "src/streaming/**/*",
       "src/cross-language-bridge.ts",
-      "src/security/secure-authentication-system.ts"
+      "src/security/secure-authentication-system.ts",
+      "src/security/security-hardening-system.ts",
+      "src/integrations/core/strray-integration.ts",
+      "src/infrastructure/iac-validator.ts",
+
+      "src/validation/orchestration-flow-validator.ts",
+       "src/postprocessor/**/*",
+       "src/mcps/**/*.ts",
+       "src/circuit-breaker/**/*",
+       "advanced-features/**/*"
     ]
 }

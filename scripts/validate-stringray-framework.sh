@@ -135,8 +135,8 @@ print_step() {
 
 # Function to check file exists
 check_file() {
-    if [[ ! -f "$1" ]]; then
-        echo "❌ ERROR: File not found: $1"
+    if [[ ! -e "$1" ]]; then
+        echo "❌ ERROR: File/directory not found: $1"
         exit 1
     fi
     echo "✅ Found: $1"
@@ -343,8 +343,36 @@ ls -la "$TEST_DIR" | head -20
 # 23. Verify framework components
 print_step "23" "Verify Framework Components"
 # Note: .mcp.json removed for lazy loading architecture
-check_file "$TEST_DIR/opencode.json"
-check_file "$TEST_DIR/.opencode"
+echo "Debug: Step 23 starting"
+echo "Debug: Current directory: $(pwd)"
+echo "Debug: TEST_DIR='$TEST_DIR'"
+echo "Debug: TEST_DIR type: $(declare -p TEST_DIR 2>/dev/null || echo 'not set')"
+echo "Debug: Checking if $TEST_DIR/.opencode exists"
+echo "Debug: Direct ls of TEST_DIR:"
+ls -la "$TEST_DIR" | grep -E "(\.opencode|total)" || echo "ls failed"
+
+if [[ ! -f "$TEST_DIR/opencode.json" ]]; then
+    echo "❌ ERROR: opencode.json not found: $TEST_DIR/opencode.json"
+    exit 1
+fi
+echo "✅ Found: opencode.json"
+
+if [[ ! -d "$TEST_DIR/.opencode" ]]; then
+    echo "❌ ERROR: .opencode directory not found: $TEST_DIR/.opencode"
+    echo "Debug: Current working directory: $(pwd)"
+    echo "Debug: TEST_DIR value: '$TEST_DIR'"
+    echo "Debug: Full path being checked: '$TEST_DIR/.opencode'"
+    echo "Debug: Directory listing of TEST_DIR:"
+    ls -la "$TEST_DIR" 2>&1 || echo "ls failed on TEST_DIR"
+    echo "Debug: Direct check of path:"
+    if [[ -d "$TEST_DIR/.opencode" ]]; then
+        echo "Wait, directory actually exists!"
+    else
+        echo "Directory definitely does not exist"
+    fi
+    exit 1
+fi
+echo "✅ Found: .opencode directory"
 if [[ -L "$TEST_DIR/.strray" ]]; then
     echo "✅ Symlink .strray exists"
 else

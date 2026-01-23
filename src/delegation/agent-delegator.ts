@@ -12,14 +12,14 @@ import {
   ComplexityAnalyzer,
   ComplexityScore,
   ComplexityMetrics,
-} from "./complexity-analyzer.js";
-import { universalLibrarianConsultation, SystemAction } from "../universal-librarian-consultation.js";
+} from "./complexity-analyzer";
+import { universalLibrarianConsultation, SystemAction } from "../universal-librarian-consultation";
 import {
   strRayConfigLoader,
   type MultiAgentOrchestrationConfig,
-} from "../config-loader.js";
+} from "../config-loader";
 import { StringRayStateManager } from "../state/state-manager";
-import { frameworkLogger, generateJobId } from "../framework-logger.js";
+import { frameworkLogger, generateJobId } from "../framework-logger";
 
 export interface DelegationContext {
   fileCount?: number;
@@ -135,10 +135,8 @@ export class AgentDelegator {
     let strategy: "single-agent" | "multi-agent" | "orchestrator-led";
     if (complexity.score <= 25) {
       strategy = "single-agent";  // Enforcer: Simple task, handle directly
-    } else if (complexity.score <= 95) {
-      strategy = "multi-agent";   // Enforcer: Complex task, coordinate team
     } else {
-      strategy = "orchestrator-led"; // Enforcer: Enterprise task, escalate to orchestrator
+      strategy = "multi-agent";   // Enforcer: Complex task, coordinate team (including enterprise level)
     }
 
     return { strategy, complexity, metrics };
@@ -209,7 +207,7 @@ export class AgentDelegator {
       agents: finalAgents,
       complexity: enforcerAnalysis.complexity,
       metrics: enforcerAnalysis.metrics,
-      estimatedDuration: enforcerAnalysis.metrics.estimatedDuration,
+      estimatedDuration: enforcerAnalysis.metrics.estimatedDuration || 60,
       conflictResolution,
     };
 
@@ -283,19 +281,9 @@ export class AgentDelegator {
     }
 
     try {
-      console.log(
-        `🎯 Executing delegation: ${delegation.strategy} with ${delegation.agents.length} agents`,
-      );
-
       // Check multi-agent orchestration configuration
       const config = strRayConfigLoader.loadConfig();
       const multiAgentEnabled = config.multi_agent_orchestration.enabled;
-
-      console.log("🔧 Multi-agent config loaded:", {
-        enabled: multiAgentEnabled,
-        maxConcurrent: config.multi_agent_orchestration.max_concurrent_agents,
-        model: config.multi_agent_orchestration.coordination_model,
-      });
 
       await frameworkLogger.log(
         "agent-delegator",
@@ -310,9 +298,6 @@ export class AgentDelegator {
 
       // Override strategy based on configuration
       if (!multiAgentEnabled && delegation.strategy === "multi-agent") {
-        console.log(
-          "⚠️  Multi-agent orchestration disabled, falling back to single-agent",
-        );
         delegation.strategy = "single-agent";
         delegation.agents = delegation.agents.slice(0, 1);
       }
@@ -321,7 +306,6 @@ export class AgentDelegator {
       const maxAgents =
         config.multi_agent_orchestration?.max_concurrent_agents || 5;
       if (delegation.agents.length > maxAgents) {
-        console.log(`⚠️  Limiting agents to ${maxAgents} (config limit)`);
         delegation.agents = delegation.agents.slice(0, maxAgents);
       }
       let result: unknown;
@@ -875,14 +859,14 @@ export class AgentDelegator {
       case "multi-agent":
         return this.selectMultiAgent(
           availableAgents,
-          complexity.estimatedAgents,
+          complexity.estimatedAgents || 2,
           request,
         );
 
       case "orchestrator-led":
         return this.selectOrchestratorLed(
           availableAgents,
-          complexity.estimatedAgents,
+          complexity.estimatedAgents || 3,
         );
 
       default:
@@ -926,21 +910,30 @@ export class AgentDelegator {
     const operation = (request.operation || "").toLowerCase();
     const selected: string[] = [];
 
+    // First try to match by expertise
     for (const agent of agents) {
       if (selected.length >= count) break;
-      if (agent.expertise.some((exp) => operation.includes(exp))) {
+      if (agent.expertise.some((exp) => operation.includes(exp) || exp.includes(operation))) {
         selected.push(agent.name);
       }
     }
 
-    while (selected.length < count && agents.length > selected.length) {
-      const nextAgent = agents[selected.length];
-      if (nextAgent && !selected.includes(nextAgent.name)) {
-        selected.push(nextAgent.name);
+    // Fill remaining slots with highest performance agents
+    for (const agent of agents) {
+      if (selected.length >= count) break;
+      if (!selected.includes(agent.name)) {
+        selected.push(agent.name);
       }
     }
 
-    return selected;
+    // Ensure we return at least 2 agents for multi-agent requests
+    if (selected.length < 2) {
+      selected.length = 0; // Clear and add top 2
+      selected.push(agents[0]?.name || "enforcer");
+      selected.push(agents[1]?.name || "architect");
+    }
+
+    return selected.slice(0, Math.max(count, 2));
   }
 
   private selectOrchestratorLed(
@@ -1276,7 +1269,6 @@ export class AgentDelegator {
     try {
       const mockAgent = await this.stateManager.get(`agent:${agentName}`);
       if (mockAgent && typeof (mockAgent as any).execute === "function") {
-        console.log(`🧪 Using mock agent: ${agentName}`);
         return await (mockAgent as any).execute(request);
       }
     } catch (mockError) {
@@ -1306,8 +1298,6 @@ export class AgentDelegator {
       return this.simulateAgentExecution(agentName, request);
     }
   }
-
-
 
   private consolidateOrchestratorResults(
     results: AgentExecutionResult[],
@@ -1383,14 +1373,6 @@ export class AgentDelegator {
       },
     );
 
-    console.log(`📋 Delegation Decision: ${result.strategy} strategy`);
-    console.log(`   Agents: ${result.agents.join(", ")}`);
-    console.log(
-      `   Complexity: ${result.complexity.level} (${result.complexity.score})`,
-    );
-    console.log(
-      `   Reasoning: ${result.complexity.reasoning.slice(0, 2).join("; ")}`,
-    );
   }
 
   /**

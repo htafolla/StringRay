@@ -9,28 +9,28 @@
  */
 
 import * as path from "path";
-import { frameworkLogger } from "../framework-logger.js";
-import { StringRayStateManager } from "../state/state-manager.js";
-import { SessionMonitor } from "../session/session-monitor.js";
-import { GitHookTrigger } from "./triggers/GitHookTrigger.js";
-import { WebhookTrigger } from "./triggers/WebhookTrigger.js";
-import { APITrigger } from "./triggers/APITrigger.js";
-import { PostProcessorMonitoringEngine } from "./monitoring/MonitoringEngine.js";
-import { FailureAnalysisEngine } from "./analysis/FailureAnalysisEngine.js";
-import { AutoFixEngine } from "./autofix/AutoFixEngine.js";
-import { FixValidator } from "./autofix/FixValidator.js";
-import { mcpClientManager } from "../mcp-client.js";
-import { RedeployCoordinator } from "./redeploy/RedeployCoordinator.js";
-import { EscalationEngine } from "./escalation/EscalationEngine.js";
-import { SuccessHandler } from "./success/SuccessHandler.js";
+import { frameworkLogger } from "../framework-logger";
+import { StringRayStateManager } from "../state/state-manager";
+import { SessionMonitor } from "../session/session-monitor";
+import { GitHookTrigger } from "./triggers/GitHookTrigger";
+import { WebhookTrigger } from "./triggers/WebhookTrigger";
+import { APITrigger } from "./triggers/APITrigger";
+import { PostProcessorMonitoringEngine } from "./monitoring/MonitoringEngine";
+import { FailureAnalysisEngine } from "./analysis/FailureAnalysisEngine";
+import { AutoFixEngine } from "./autofix/AutoFixEngine";
+import { FixValidator } from "./autofix/FixValidator";
+import { mcpClientManager } from "../mcp-client";
+import { RedeployCoordinator } from "./redeploy/RedeployCoordinator";
+import { EscalationEngine } from "./escalation/EscalationEngine";
+import { SuccessHandler } from "./success/SuccessHandler";
 import {
   PostProcessorConfig,
   PostProcessorResult,
   PostProcessorContext,
-} from "./types.js";
-import { defaultConfig } from "./config.js";
-import { frameworkReportingSystem } from "../reporting/framework-reporting-system.js";
-import { ReportContentValidator } from "../validation/report-content-validator.js";
+} from "./types";
+import { defaultConfig } from "./config";
+import { frameworkReportingSystem } from "../reporting/framework-reporting-system";
+import { ReportContentValidator } from "../validation/report-content-validator";
 
 export class PostProcessor {
   private config: PostProcessorConfig;
@@ -98,14 +98,20 @@ export class PostProcessor {
 
     // Only generate report if complexity score meets threshold
     if (complexityScore < this.config.reporting.reportThreshold) {
-      console.log(
-        `📊 Complexity score ${complexityScore} below threshold ${this.config.reporting.reportThreshold} - skipping report generation`,
+      await frameworkLogger.log(
+        'postprocessor',
+        'report-skipped-low-complexity',
+        'info',
+        {
+          complexityScore,
+          threshold: this.config.reporting.reportThreshold
+        }
       );
       return null;
     }
 
     try {
-      console.log("📊 Generating automated framework report...");
+      await frameworkLogger.log('-post-processor', '-generating-automated-framework-report-', 'info', { message: "📊 Generating automated framework report..." });
 
       const reportConfig = {
         type: "full-analysis" as const,
@@ -121,7 +127,7 @@ export class PostProcessor {
 
       await frameworkReportingSystem.generateReport(reportConfig);
 
-      console.log(`✅ Framework report generated: ${reportConfig.outputPath}`);
+      await frameworkLogger.log('-post-processor', '-framework-report-generated-reportconfig-outputpat', 'success', { message: `✅ Framework report generated: ${reportConfig.outputPath}` });
 
       // Clean up old reports
       await this.cleanupOldReports();
@@ -159,7 +165,7 @@ export class PostProcessor {
             );
           }
         } else {
-          console.log(`✅ Report validation passed for ${reportPath}`);
+          await frameworkLogger.log('-post-processor', '-report-validation-passed-for-reportpath-', 'success', { message: `✅ Report validation passed for ${reportPath}` });
         }
       }
     } catch (error) {
@@ -188,7 +194,7 @@ export class PostProcessor {
 
         if (stats.mtime.getTime() < cutoffTime) {
           fs.unlinkSync(filePath);
-          console.log(`🗑️ Cleaned up old report: ${file}`);
+          await frameworkLogger.log('-post-processor', '-cleaned-up-old-report-file-', 'info', { message: `🗑️ Cleaned up old report: ${file}` });
         }
       }
     } catch (error) {
@@ -200,7 +206,7 @@ export class PostProcessor {
    * Initialize the post-processor system
    */
   async initialize(): Promise<void> {
-    console.log("🚀 Initializing StringRay Post-Processor...");
+    await frameworkLogger.log('-post-processor', '-initializing-stringray-post-processor-', 'info', { message: "🚀 Initializing StringRay Post-Processor..." });
 
     // Initialize monitoring
     if (this.config.monitoring.enabled) {
@@ -224,7 +230,7 @@ export class PostProcessor {
       // API triggers initialization - removed unnecessary startup logging
     }
 
-    console.log("🎯 Post-Processor initialization complete");
+    await frameworkLogger.log('-post-processor', '-post-processor-initialization-complete-', 'info', { message: "🎯 Post-Processor initialization complete" });
   }
 
   /**
@@ -234,12 +240,12 @@ export class PostProcessor {
     context: PostProcessorContext,
   ): Promise<boolean> {
     try {
-      console.log("🏗️ Validating architectural compliance...");
+      await frameworkLogger.log('-post-processor', '-validating-architectural-compliance-', 'info', { message: "🏗️ Validating architectural compliance..." });
 
       // Rule 46: System Integrity Cross-Check
       const integrityCheck = await this.checkSystemIntegrity(context);
       if (!integrityCheck.passed) {
-        console.log(`❌ System integrity violation: ${integrityCheck.message}`);
+        await frameworkLogger.log('-post-processor', '-system-integrity-violation-integritycheck-message', 'error', { message: `❌ System integrity violation: ${integrityCheck.message}` });
 
         // Call librarian agent to analyze system components
         const fixed = await this.callAgentForArchitecturalFix(
@@ -258,9 +264,9 @@ export class PostProcessor {
       // Rule 47: Integration Testing Mandate
       const integrationCheck = await this.checkIntegrationTesting(context);
       if (!integrationCheck.passed) {
-        console.log(
+        await frameworkLogger.log('-post-processor', '-integration-testing-violation-integrationcheck-me', 'error', { message: 
           `❌ Integration testing violation: ${integrationCheck.message}`,
-        );
+         });
 
         // Call test-architect agent for testing strategy
         const fixed = await this.callAgentForArchitecturalFix(
@@ -279,7 +285,7 @@ export class PostProcessor {
       // Rule 48: Path Resolution Abstraction
       const pathCheck = await this.checkPathResolution(context);
       if (!pathCheck.passed) {
-        console.log(`❌ Path resolution violation: ${pathCheck.message}`);
+        await frameworkLogger.log('-post-processor', '-path-resolution-violation-pathcheck-message-', 'error', { message: `❌ Path resolution violation: ${pathCheck.message}` });
 
         // Call librarian + refactorer for path analysis and fixes
         const fixed = await this.callAgentForArchitecturalFix(
@@ -298,9 +304,9 @@ export class PostProcessor {
       // Rule 49: Feature Completeness Validation
       const completenessCheck = await this.checkFeatureCompleteness(context);
       if (!completenessCheck.passed) {
-        console.log(
+        await frameworkLogger.log('-post-processor', '-feature-completeness-violation-completenesscheck-', 'error', { message: 
           `❌ Feature completeness violation: ${completenessCheck.message}`,
-        );
+         });
 
         // Call architect agent for system design analysis
         const fixed = await this.callAgentForArchitecturalFix(
@@ -320,9 +326,9 @@ export class PostProcessor {
       const pathGuidelinesCheck =
         await this.checkPathAnalysisGuidelines(context);
       if (!pathGuidelinesCheck.passed) {
-        console.log(
+        await frameworkLogger.log('-post-processor', '-path-analysis-guidelines-violation-pathguidelines', 'error', { message: 
           `❌ Path analysis guidelines violation: ${pathGuidelinesCheck.message}`,
-        );
+         });
 
         // Call refactorer agent for code refactoring
         const fixed = await this.callAgentForArchitecturalFix(
@@ -338,12 +344,12 @@ export class PostProcessor {
         }
       }
 
-      console.log("✅ All architectural compliance checks passed");
+      await frameworkLogger.log('-post-processor', '-all-architectural-compliance-checks-passed-', 'success', { message: "✅ All architectural compliance checks passed" });
       return true;
     } catch (error) {
-      console.log(
+      await frameworkLogger.log('-post-processor', '-architectural-compliance-validation-failed-error-', 'error', { message: 
         `❌ Architectural compliance validation failed: ${error instanceof Error ? error.message : String(error)}`,
-      );
+       });
       return false;
     }
   }
@@ -463,8 +469,8 @@ MANDATORY COMPLIANCE REQUIRED - VIOLATIONS WILL BLOCK COMMITS
 ❌ NEVER use hardcoded 'dist/' paths in source code:
 \`\`\`typescript
 // WRONG - Breaks across environments (actual violations found)
-import { RuleEnforcer } from "../dist/enforcement/rule-enforcer.js";
-import { ProcessorManager } from "./dist/processors/processor-manager.js";
+import { RuleEnforcer } from "../dist/enforcement/rule-enforcer";
+import { ProcessorManager } from "./dist/processors/processor-manager";
 \`\`\`
 
 ✅ CORRECT - Use import resolver for environment awareness:
@@ -481,15 +487,15 @@ const { RuleEnforcer } = await importResolver.importModule('enforcement/rule-enf
 ❌ Directory structure assumptions that break across environments:
 \`\`\`typescript
 // WRONG - Assumes specific deployment structure
-import { Agent } from "../agents/enforcer.js"; // May break if directories move
-import { Utils } from "../../../shared/utils.js"; // Fragile deep navigation
+import { Agent } from "../agents/enforcer"; // May break if directories move
+import { Utils } from "../../../shared/utils"; // Fragile deep navigation
 \`\`\`
 
 ✅ CORRECT - Use stable relative imports within modules:
 \`\`\`typescript
 // Stable within src/ directory structure
-import { Agent } from "../agents/enforcer.js"; // OK within same project
-import { Utils } from "../../shared/utils.js"; // Prefer shallower paths
+import { Agent } from "../agents/enforcer"; // OK within same project
+import { Utils } from "../../shared/utils"; // Prefer shallower paths
 \`\`\`
 
 ═══════════════════════════════════════════════════════════════
@@ -499,18 +505,18 @@ import { Utils } from "../../shared/utils.js"; // Prefer shallower paths
 ❌ Local file assumptions that break when files move:
 \`\`\`typescript
 // WRONG - Assumes file exists in specific location
-import { Config } from "./config.js"; // May not exist in built version
-import { Utils } from "./utils/helpers.js"; // Breaks if directory reorganized
+import { Config } from "./config"; // May not exist in built version
+import { Utils } from "./utils/helpers"; // Breaks if directory reorganized
 \`\`\`
 
 ✅ CORRECT - Use proper module resolution:
 \`\`\`typescript
 // Prefer named imports from index files
-import { Config } from "./config/index.js";
-import { helpers } from "./utils/index.js";
+import { Config } from "./config/index";
+import { helpers } from "./utils/index";
 
 // Or use full relative paths when necessary
-import { Config } from "./config/config.js";
+import { Config } from "./config/config";
 \`\`\`
 
 ═══════════════════════════════════════════════════════════════
@@ -556,7 +562,7 @@ All path violations will be automatically detected and blocked.
 `;
 
     // Log the comprehensive guidelines notification for AIs
-    console.log(guidelinesMessage);
+    await frameworkLogger.log('-post-processor', 'guidelinesmessage', 'info', { message: guidelinesMessage });
 
     // In a full implementation, we would:
     // 1. Scan actual file contents for violations
@@ -584,17 +590,17 @@ All path violations will be automatically detected and blocked.
     const startTime = Date.now();
     const sessionId = `postprocessor-${context.commitSha}-${Date.now()}`;
 
-    console.log(
+    await frameworkLogger.log('-post-processor', '-starting-post-processor-loop-for-commit-context-c', 'info', { message: 
       `🔄 Starting post-processor loop for commit: ${context.commitSha}`,
-    );
+     });
 
     // Validate architectural compliance before processing
     const compliancePassed =
       await this.validateArchitecturalCompliance(context);
     if (!compliancePassed) {
-      console.log(
+      await frameworkLogger.log('-post-processor', '-architectural-compliance-validation-failed-blocki', 'error', { message: 
         "❌ Architectural compliance validation failed - blocking post-processing",
-      );
+       });
       return {
         success: false,
         commitSha: context.commitSha,
@@ -629,14 +635,14 @@ All path violations will be automatically detected and blocked.
           reason: "Codex compliance violations found - processor-manager attempted automated fixes"
         });
 
-        console.log(
+        await frameworkLogger.log('-post-processor', '-codex-compliance-violations-detected-processor-ma', 'info', { message: 
           "⚠️ Codex compliance violations detected - processor-manager handled automated fixes",
-        );
+         });
       }
     } catch (error) {
-      console.log(
+      await frameworkLogger.log('-post-processor', '-codex-compliance-check-failed-continuing-with-com', 'error', { message: 
         "⚠️ Codex compliance check failed - continuing with commit",
-      );
+       });
     }
 
     try {
@@ -658,9 +664,9 @@ All path violations will be automatically detected and blocked.
         duration: Date.now() - startTime,
       });
 
-      console.log(
+      await frameworkLogger.log('-post-processor', '-post-processor-loop-completed-result-success-succ', 'success', { message: 
         `✅ Post-processor loop completed: ${result.success ? "SUCCESS" : "FAILED"}`,
-      );
+       });
       return result;
     } catch (error) {
       console.error("❌ Post-processor loop failed:", error);
@@ -700,9 +706,9 @@ All path violations will be automatically detected and blocked.
     while (attempts < maxAttempts) {
       attempts++;
 
-      console.log(
+      await frameworkLogger.log('-post-processor', '-monitoring-attempt-attempts-maxattempts-for-conte', 'info', { message: 
         `🔍 Monitoring attempt ${attempts}/${maxAttempts} for ${context.commitSha}`,
-      );
+       });
 
       // Monitor CI/CD status
       const monitoringResult = await this.monitoringEngine.monitorDeployment(
@@ -712,7 +718,7 @@ All path violations will be automatically detected and blocked.
       monitoringResults.push(monitoringResult);
 
       if (monitoringResult.overallStatus === "success") {
-        console.log("✅ CI/CD pipeline successful - post-processor complete");
+        await frameworkLogger.log('-post-processor', '-ci-cd-pipeline-successful-post-processor-complete', 'success', { message: "✅ CI/CD pipeline successful - post-processor complete" });
 
         const result = {
           success: true,
@@ -758,16 +764,16 @@ All path violations will be automatically detected and blocked.
 
       const analysis =
         await this.failureAnalysisEngine.analyzeFailure(monitoringResult);
-      console.log(
+      await frameworkLogger.log('-post-processor', '-analysis-complete-analysis-category-analysis-seve', 'info', { message: 
         `🔍 Analysis complete: ${analysis.category} (${analysis.severity}) - ${analysis.rootCause}`,
-      );
+       });
 
       const fixResult = await this.autoFixEngine.applyFixes(analysis, context);
 
       if (fixResult.success && fixResult.appliedFixes.length > 0) {
-        console.log(
+        await frameworkLogger.log('-post-processor', '-fixresult-appliedfixes-length-fix-es-applied-succ', 'success', { message: 
           `🔧 ${fixResult.appliedFixes.length} fix(es) applied successfully`,
-        );
+         });
 
         // Validate that fixes resolve the issue
         const validationPassed = await this.fixValidator.validateFixes(
@@ -777,7 +783,7 @@ All path violations will be automatically detected and blocked.
         );
 
         if (validationPassed) {
-          console.log("✅ Fix validation passed - redeploying...");
+          await frameworkLogger.log('-post-processor', '-fix-validation-passed-redeploying-', 'success', { message: "✅ Fix validation passed - redeploying..." });
           await this.redeployWithFixes(context, fixResult, jobId);
           // Continue monitoring with next attempt
           continue;
@@ -801,8 +807,8 @@ All path violations will be automatically detected and blocked.
       );
 
       if (escalationResult) {
-        console.log(`🚨 Escalation triggered: ${escalationResult.level}`);
-        console.log(`   Reason: ${escalationResult.reason}`);
+        await frameworkLogger.log('-post-processor', '-escalation-triggered-escalationresult-level-', 'info', { message: `🚨 Escalation triggered: ${escalationResult.level}` });
+        await frameworkLogger.log('-post-processor', '-reason-escalationresult-reason-', 'info', { message: `   Reason: ${escalationResult.reason}` });
 
         // For emergency/rollback levels, stop the loop
         if (
@@ -852,7 +858,7 @@ All path violations will be automatically detected and blocked.
     fixResult: any,
     jobId: string,
   ): Promise<void> {
-    console.log("🔄 Executing redeployment with fixes...");
+    await frameworkLogger.log('-post-processor', '-executing-redeployment-with-fixes-', 'info', { message: "🔄 Executing redeployment with fixes..." });
 
     const redeployResult = await this.redeployCoordinator.executeRedeploy(
       context,
@@ -860,7 +866,7 @@ All path violations will be automatically detected and blocked.
     );
 
     if (redeployResult.success) {
-      console.log(`✅ Redeployment successful: ${redeployResult.deploymentId}`);
+      await frameworkLogger.log('-post-processor', '-redeployment-successful-redeployresult-deployment', 'success', { message: `✅ Redeployment successful: ${redeployResult.deploymentId}` });
     } else {
       await frameworkLogger.log(
         "postprocessor",
@@ -891,7 +897,7 @@ All path violations will be automatically detected and blocked.
     monitoringResult: any,
     attempts: number,
   ): Promise<void> {
-    console.log("🚨 Escalating to manual intervention");
+    await frameworkLogger.log('-post-processor', '-escalating-to-manual-intervention-', 'info', { message: "🚨 Escalating to manual intervention" });
 
     // Create detailed incident report
     const report = {
@@ -911,7 +917,7 @@ All path violations will be automatically detected and blocked.
     await this.stateManager.set(`escalation:${context.commitSha}`, report);
 
     // TODO: Send notifications to development team
-    console.log("📋 Escalation report created:", report);
+    await frameworkLogger.log('-post-processor', '-escalation-report-created-report', 'info', { message: "📋 Escalation report created:", report });
   }
 
   /**
@@ -921,7 +927,7 @@ All path violations will be automatically detected and blocked.
     const baseDelay = this.config.retryDelay || 30000; // 30 seconds
     const delay = baseDelay * Math.pow(2, attempt - 1);
 
-    console.log(`⏳ Waiting ${delay}ms before retry attempt ${attempt + 1}`);
+    await frameworkLogger.log('-post-processor', '-waiting-delay-ms-before-retry-attempt-attempt-1-', 'info', { message: `⏳ Waiting ${delay}ms before retry attempt ${attempt + 1}` });
     await new Promise((resolve) => setTimeout(resolve, delay));
   }
 
@@ -947,7 +953,7 @@ All path violations will be automatically detected and blocked.
     violationMessage: string
   ): Promise<boolean> {
     try {
-      console.log(`🔧 Calling ${agentName} (${skillName}) to fix: ${violationType}`);
+      await frameworkLogger.log('-post-processor', '-calling-agentname-skillname-to-fix-violationtype-', 'info', { message: `🔧 Calling ${agentName} (${skillName}) to fix: ${violationType}` });
 
       // Call the skill invocation MCP server to delegate to the appropriate agent/skill
       const result = await mcpClientManager.callServerTool(
@@ -971,19 +977,19 @@ All path violations will be automatically detected and blocked.
         }
       );
 
-      console.log(`✅ Agent ${agentName} completed fix attempt for ${violationType}`);
+      await frameworkLogger.log('-post-processor', '-agent-agentname-completed-fix-attempt-for-violati', 'success', { message: `✅ Agent ${agentName} completed fix attempt for ${violationType}` });
 
       // Check if the fix was successful by re-running the validation
       const fixed = await this.revalidateAfterFix(violationType, context);
       if (fixed) {
-        console.log(`🎉 ${violationType} violation fixed by ${agentName}`);
+        await frameworkLogger.log('-post-processor', '-violationtype-violation-fixed-by-agentname-', 'info', { message: `🎉 ${violationType} violation fixed by ${agentName}` });
         return true;
       } else {
-        console.log(`❌ ${violationType} violation not fixed by ${agentName}`);
+        await frameworkLogger.log('-post-processor', '-violationtype-violation-not-fixed-by-agentname-', 'error', { message: `❌ ${violationType} violation not fixed by ${agentName}` });
         return false;
       }
     } catch (error) {
-      console.log(`❌ Failed to call agent ${agentName} for ${violationType}: ${error instanceof Error ? error.message : String(error)}`);
+      await frameworkLogger.log('-post-processor', '-failed-to-call-agent-agentname-for-violationtype-', 'error', { message: `❌ Failed to call agent ${agentName} for ${violationType}: ${error instanceof Error ? error.message : String(error)}` });
       return false;
     }
   }

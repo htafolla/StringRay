@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { orchestrator } from "../../agents/orchestrator.js";
-import type { AgentConfig } from "../../agents/types.js";
+import { orchestrator } from "../../agents/orchestrator";
+import type { AgentConfig } from "../../agents/types";
 
 describe("Orchestrator Agent Configuration", () => {
   it("should be a valid AgentConfig object", () => {

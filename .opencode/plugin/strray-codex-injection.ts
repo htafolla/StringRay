@@ -22,13 +22,14 @@ async function loadStrRayComponents() {
 
   try {
     // Try relative import first (development)
-    ({ ProcessorManager } =
-      await import("../../dist/processors/processor-manager.js"));
-    ({ StrRayStateManager } =
-      await import("../../dist/state/state-manager.js"));
+    const procModule = await import("../../dist/processors/processor-manager.js" as any);
+    const stateModule = await import("../../dist/state/state-manager.js" as any);
+    ProcessorManager = procModule.ProcessorManager;
+    StrRayStateManager = stateModule.StrRayStateManager;
   } catch (error) {
     // Silently fail for plugin compatibility - components may not be available
     // This prevents console bleed-through in oh-my-opencode UI
+    console.debug?.("StrRay: Optional components not available in this environment");
     return;
     // Fallback for npm deployment - find plugin in node_modules
     const pluginPaths = [
@@ -192,7 +193,7 @@ function extractCodexMetadata(content: string): {
   termCount: number;
 } {
   const versionMatch = content.match(/\*\*Version\*\*:\s*(\d+\.\d+\.\d+)/);
-  const version = versionMatch ? versionMatch[1] : "1.2.20";
+  const version = versionMatch && versionMatch[1] ? versionMatch[1] : "1.2.20";
 
   const termMatches = content.match(/####\s*\d+\.\s/g);
   const termCount = termMatches ? termMatches.length : 0;
@@ -356,7 +357,7 @@ export default async function strrayCodexPlugin(input: {
           });
 
           if (!result.success) {
-            logger.error(`Pre-processor execution failed: ${result.results.find(r => !r.success)?.error || 'Unknown error'}`);
+            logger.error(`Pre-processor execution failed: ${result.results.find((r: any) => !r.success)?.error || 'Unknown error'}`);
             // Continue with operation despite processor failure
           } else {
             logger.log(`Pre-processor execution completed successfully (${result.results.length} processors)`);

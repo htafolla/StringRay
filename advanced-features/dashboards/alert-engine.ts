@@ -12,8 +12,8 @@ import { EventEmitter } from "events";
 import {
   liveMetricsCollector,
   CollectedMetric,
-} from "./live-metrics-collector.js";
-import { realTimeStreamingService } from "../streaming/real-time-streaming-service.js";
+} from "./live-metrics-collector";
+import { realTimeStreamingService } from "../streaming/real-time-streaming-service";
 
 export interface AlertRule {
   id: string;

@@ -116,7 +116,7 @@ if (isConsumerEnvironment) {
     // Convert development plugin path to consumer path
     opencodeContent = opencodeContent.replace(
       /"dist\/plugin\/plugins\/stringray-codex-injection\.js"/g,
-      '"../../../node_modules/strray-ai/dist/plugin/plugins/stringray-codex-injection.js"'
+      '"../../../node_modules/strray-ai/dist/plugin/plugins/strray-codex-injection.js"'
     );
     fs.writeFileSync(opencodePath, opencodeContent, "utf8");
     console.log("✅ Updated plugin path");

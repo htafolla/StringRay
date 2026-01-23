@@ -9,6 +9,7 @@
  */
 
 import { EventEmitter } from "events";
+import { frameworkLogger } from "../framework-logger";
 
 export enum CircuitState {
   CLOSED = "closed", // Normal operation
@@ -186,9 +187,9 @@ export class CircuitBreaker extends EventEmitter {
         this.failures = 0;
         this.consecutiveFailures = 0;
         this.emit("stateChanged", CircuitState.CLOSED);
-        console.log(
+        await frameworkLogger.log('circuit-breaker', '-circuit-breaker-this-config-name-closed-recovered', 'info', { message: 
           `🔄 Circuit Breaker ${this.config.name}: CLOSED (recovered)`,
-        );
+         });
       }
     } else if (this.state === CircuitState.CLOSED) {
       // Reset consecutive failures on success
@@ -226,18 +227,18 @@ export class CircuitBreaker extends EventEmitter {
         this.state = CircuitState.OPEN;
         this.nextAttemptTime = Date.now() + this.config.recoveryTimeout;
         this.emit("stateChanged", CircuitState.OPEN);
-        console.log(
+        await frameworkLogger.log('circuit-breaker', '-circuit-breaker-this-config-name-open-failure-thr', 'info', { message: 
           `🔴 Circuit Breaker ${this.config.name}: OPEN (failure threshold exceeded)`,
-        );
+         });
       }
     } else if (this.state === CircuitState.HALF_OPEN) {
       // Failed in half-open state, go back to open
       this.state = CircuitState.OPEN;
       this.nextAttemptTime = Date.now() + this.config.recoveryTimeout;
       this.emit("stateChanged", CircuitState.OPEN);
-      console.log(
+      await frameworkLogger.log('circuit-breaker', '-circuit-breaker-this-config-name-open-half-open-f', 'info', { message: 
         `🔴 Circuit Breaker ${this.config.name}: OPEN (half-open failure)`,
-      );
+       });
     }
 
     this.emit("failure", result);
@@ -260,9 +261,9 @@ export class CircuitBreaker extends EventEmitter {
       this.state = CircuitState.OPEN;
       this.nextAttemptTime = Date.now() + this.config.recoveryTimeout;
       this.emit("stateChanged", CircuitState.OPEN);
-      console.log(
+      await frameworkLogger.log('circuit-breaker', '-circuit-breaker-this-config-name-open-manually-tr', 'info', { message: 
         `🔴 Circuit Breaker ${this.config.name}: OPEN (manually tripped)`,
-      );
+       });
     }
   }
 
@@ -277,9 +278,9 @@ export class CircuitBreaker extends EventEmitter {
       this.consecutiveSuccesses = 0;
       this.failureWindow = [];
       this.emit("stateChanged", CircuitState.CLOSED);
-      console.log(
+      await frameworkLogger.log('circuit-breaker', '-circuit-breaker-this-config-name-closed-manually-', 'info', { message: 
         `🟢 Circuit Breaker ${this.config.name}: CLOSED (manually reset)`,
-      );
+       });
     }
   }
 

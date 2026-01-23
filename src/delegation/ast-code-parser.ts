@@ -11,7 +11,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import { execSync } from "child_process";
-import { frameworkLogger } from "../framework-logger.js";
+import { frameworkLogger } from "../framework-logger";
 
 export interface ASTPattern {
   name: string;

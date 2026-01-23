@@ -1,1 +1,1 @@
-{"version":3,"file":"framework-hooks.d.ts","sourceRoot":"","sources":["../../src/hooks/framework-hooks.ts"],"names":[],"mappings":"AAAA,MAAM,WAAW,cAAc;IAC7B,MAAM,EAAE,MAAM,IAAI,CAAC;IACnB,SAAS,EAAE,MAAM,IAAI,CAAC;CACvB;AAED,eAAO,MAAM,0BAA0B,QAAO,cAW7C,CAAC"}
+{"version":3,"file":"framework-hooks.d.ts","sourceRoot":"","sources":["../../src/hooks/framework-hooks.ts"],"names":[],"mappings":"AAAA,MAAM,WAAW,cAAc;IAC7B,MAAM,EAAE,MAAM,IAAI,CAAC;IACnB,SAAS,EAAE,MAAM,IAAI,CAAC;CACvB;AAED,eAAO,MAAM,0BAA0B,QAAO,cAS7C,CAAC"}

@@ -509,10 +509,7 @@ export class AdvancedMonitor {
       this.collectAndAnalyzeMetrics();
     }, intervalMs);
 
-    console.log(
-      `🔍 Advanced Monitor: Started monitoring with ${intervalMs}ms interval`,
-    );
-  }
+    }
 
   /**
    * Stop monitoring
@@ -522,8 +519,7 @@ export class AdvancedMonitor {
       clearInterval(this.monitoringInterval);
       this.monitoringInterval = undefined;
     }
-    console.log("🔍 Advanced Monitor: Stopped monitoring");
-  }
+    }
 
   /**
    * Manually collect and analyze metrics

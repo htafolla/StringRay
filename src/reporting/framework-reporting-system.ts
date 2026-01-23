@@ -8,7 +8,7 @@
  * @since 2026-01-11
  */
 
-import { frameworkLogger } from "../framework-logger.js";
+import { frameworkLogger } from "../framework-logger";
 import * as fs from "fs";
 import * as path from "path";
 
@@ -129,7 +129,12 @@ export class FrameworkReportingSystem {
 
         try {
           await this.generateReport(config);
-          console.log(`✅ Automated ${type} report generated`);
+          await frameworkLogger.log(
+            'framework-reporting-system',
+            'automated-report-generated',
+            'success',
+            { reportType: type, outputPath: config.outputPath }
+          );
         } catch (error) {
           console.error(
             `❌ Failed to generate automated ${type} report:`,
@@ -1120,12 +1125,12 @@ if (import.meta.url === `file://${process.argv[1]}`) {
 
   frameworkReportingSystem
     .generateReport(config)
-    .then((result) => {
-      console.log("✅ Report generated successfully!");
+    .then(async (result) => {
+      await frameworkLogger.log('framework-reporting-system', '-report-generated-successfully-', 'success', { message: "✅ Report generated successfully!" });
       if (config.outputPath) {
-        console.log(`📄 Saved to: ${config.outputPath}`);
+        await frameworkLogger.log('framework-reporting-system', '-saved-to-config-outputpath-', 'info', { message: `📄 Saved to: ${config.outputPath}` });
       } else {
-        console.log(result);
+        await frameworkLogger.log('framework-reporting-system', 'result', 'info', { message: result });
       }
     })
     .catch((error) => {

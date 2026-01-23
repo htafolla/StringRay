@@ -2,7 +2,7 @@
  * Quick Report Generation Test
  */
 
-import { frameworkReportingSystem } from "./src/reporting/framework-reporting-system.js";
+import { frameworkReportingSystem } from "./src/reporting/framework-reporting-system";
 
 async function testReport() {
   console.log("🧪 TESTING ENHANCED REPORTING SYSTEM");

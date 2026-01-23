@@ -101,8 +101,6 @@ export class SessionMonitor {
   }
 
   private initialize(): void {
-    console.log("📊 Session Monitor: Initializing...");
-
     this.loadPersistedData();
 
     if (this.config.enableAlerts) {
@@ -113,8 +111,7 @@ export class SessionMonitor {
       this.startMetricsCollection();
     }
 
-    console.log("✅ Session Monitor: Initialized");
-  }
+    }
 
   registerSession(sessionId: string): void {
     const health: SessionHealth = {

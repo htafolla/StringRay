@@ -302,7 +302,7 @@ class ConsumerValidator {
         description: "oh-my-opencode main config",
       },
       {
-        path: "node_modules/strray-ai/dist/plugin/plugins/stringray-codex-injection.js",
+        path: "node_modules/strray-ai/dist/plugin/plugins/strray-codex-injection.js",
         description: "Main plugin file",
       },
       {
@@ -370,7 +370,7 @@ class ConsumerValidator {
         export: "StringRayStateManager",
       },
       {
-        path: "../dist/plugin/plugins/stringray-codex-injection.js",
+        path: "../dist/plugin/plugins/strray-codex-injection.js",
         export: "default",
       },
     ];
@@ -427,7 +427,7 @@ class ConsumerValidator {
       () => fs.existsSync(".opencode/oh-my-opencode.json"),
       () =>
         fs.existsSync(
-          "node_modules/strray-ai/dist/plugin/plugins/stringray-codex-injection.js",
+          "node_modules/strray-ai/dist/plugin/plugins/strray-codex-injection.js",
         ),
       () => fs.existsSync("node_modules/strray-ai/dist/cli/index.js"),
 

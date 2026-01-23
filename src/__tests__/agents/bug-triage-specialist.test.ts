@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { bugTriageSpecialist } from "../../agents/bug-triage-specialist.js";
-import type { AgentConfig } from "../../agents/types.js";
+import { bugTriageSpecialist } from "../../agents/bug-triage-specialist";
+import type { AgentConfig } from "../../agents/types";
 
 describe("Bug Triage Specialist Agent Configuration", () => {
   it("should be a valid AgentConfig object", () => {

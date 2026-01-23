@@ -1,4 +1,4 @@
-import { strRayOrchestrator } from './node_modules/strray-ai/dist/plugin/orchestrator.js';
+import { strRayOrchestrator } from './node_modules/strray-ai/dist/plugin/src/orchestrator.js';
 
 console.log('=== MANUAL ORCHESTRATOR TRIGGER TEST ===');
 console.log('Initial status:', strRayOrchestrator.getStatus());

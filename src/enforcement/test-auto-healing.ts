@@ -5,12 +5,12 @@
  * Implements intelligent test optimization and refactoring for enterprise reliability
  */
 
-import { frameworkLogger } from "../framework-logger.js";
+import { frameworkLogger } from "../framework-logger";
 import {
   RuleValidationContext,
   RuleValidationResult,
   RuleFix,
-} from "./rule-enforcer.js";
+} from "./rule-enforcer";
 
 export interface TestFailureAnalysis {
   testFile: string;

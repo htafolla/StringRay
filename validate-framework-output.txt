@@ -1,0 +1,402 @@
+🎯 StringRay Framework - Production Validation Script
+==================================================
+🚀 Modular Validation System
+   ├── Phase 1: Build & Packaging Validation
+   ├── Phase 2: Comprehensive Test Suite
+   └── Phase 3: Final Integration Verification
+
+📋 Configuration:
+   Project Directory: /Users/blaze/dev/stringray
+   Package Version: 1.1.2
+   Package File: strray-ai-1.1.2.tgz
+   Test Directory: /tmp/strray-test2
+   Extended Tests: false
+   Script Directory: /Users/blaze/dev/stringray/scripts
+
+🚀 Validation Phase: COMPLETE (Build + Tests)
+   - Sequential execution: Build → Tests
+
+📦 Phase 1: Build & Packaging Validation
+========================================
+🏗️  StringRay Framework - Build & Packaging Validation
+====================================================
+📋 Configuration:
+   Project Directory: /Users/blaze/dev/stringray
+   Package Version: 1.1.2
+   Package File: strray-ai-1.1.2.tgz
+   Test Directory: /tmp/strray-test2
+   Script Directory: /Users/blaze/dev/stringray/scripts
+
+
+🔧 Step 1: Verify Project Structure
+----------------------------------------
+✅ Found: /Users/blaze/dev/stringray/package.json
+✅ Found: /Users/blaze/dev/stringray/tsconfig.json
+✅ Found: /Users/blaze/dev/stringray/src/plugins/stringray-codex-injection.ts
+✅ Project structure verified
+
+🔧 Step 2: Clean Previous Builds
+----------------------------------------
+▶️  cd '/Users/blaze/dev/stringray' && rm -rf dist *.tgz
+✅ Build artifacts cleaned
+
+🔧 Step 3: Install Dependencies
+----------------------------------------
+▶️  cd '/Users/blaze/dev/stringray' && npm ci
+npm warn deprecated whatwg-encoding@3.1.1: Use @exodus/bytes instead for a more spec-conformant and faster implementation
+
+> strray-ai@1.1.2 postinstall
+> node scripts/postinstall.cjs
+
+🔧 StrRay Postinstall: Script starting...
+🔧 StrRay Postinstall: Copying configuration files...
+📍 Package root: /Users/blaze/dev/stringray
+📍 Target directory: /Users/blaze/dev/stringray
+✅ Copied opencode.json
+✅ Copied directory .opencode
+🔧 StrRay Postinstall: Consumer installation complete - all paths are correctly configured.
+✅ .strray directory symlinked
+🎉 StrRay Postinstall: Configuration complete!
+📋 Next steps:
+1. Restart oh-my-opencode to load the plugin
+2. Run 'opencode agent list' to see StrRay agents
+3. Try '@enforcer analyze this code' to test the plugin
+
+added 436 packages, and audited 437 packages in 33s
+
+108 packages are looking for funding
+  run `npm fund` for details
+
+6 moderate severity vulnerabilities
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+✅ Dependencies installed
+
+🔧 Step 4: TypeScript Type Checking
+----------------------------------------
+▶️  cd '/Users/blaze/dev/stringray' && npm run typecheck
+
+> strray-ai@1.1.2 typecheck
+> tsc --noEmit
+
+✅ Type checking passed
+
+🔧 Step 5: Code Linting
+----------------------------------------
+▶️  Code Linting
+----------------------------------------
+▶️  cd '/Users/blaze/dev/stringray' && npm run lint
+
+> strray-ai@1.1.2 lint
+> eslint src
+
+✅ Linting passed
+
+🔧 Step 6: Build TypeScript
+----------------------------------------
+▶️  cd '/Users/blaze/dev/stringray' && npm run build:all
+
+> strray-ai@1.1.2 build:all
+> npm run build && npm run build:plugin
+
+
+> strray-ai@1.1.2 build
+> tsc
+
+
+> strray-ai@1.1.2 build:plugin
+> tsc --project tsconfig.plugin.json && mkdir -p dist/plugin/plugins && cp .opencode/plugin/strray-codex-injection.ts dist/plugin/plugins/ && cp .opencode/plugin/strray-codex-injection.js dist/plugin/plugins/ 2>/dev/null || echo 'JS file not found, will be compiled'
+
+JS file not found, will be compiled
+✅ TypeScript compiled successfully
+
+🔧 Step 7: Create NPM Package
+----------------------------------------
+▶️  cd '/Users/blaze/dev/stringray' && npm pack --silent
+strray-ai-1.1.2.tgz
+✅ Package created successfully
+
+🔧 Step 8: Verify Package Contents
+----------------------------------------
+▶️  cd '/Users/blaze/dev/stringray' && npm pack --dry-run | head -20
+npm notice
+npm notice 📦  strray-ai@1.1.2
+npm notice Tarball Contents
+npm notice 635B .opencode/.strray/workflow_state.json
+npm notice 0B .opencode/agents/.gitkeep
+npm notice 2.2kB .opencode/agents/analyzer.yml
+npm notice 598B .opencode/agents/architect.md
+npm notice 2.6kB .opencode/agents/architect.yml
+npm notice 592B .opencode/agents/bug-triage-specialist.md
+npm notice 2.6kB .opencode/agents/bug-triage-specialist.yml
+npm notice 652B .opencode/agents/code-reviewer.md
+npm notice 2.0kB .opencode/agents/code-reviewer.yml
+npm notice 2.5kB .opencode/agents/document-writer.md
+npm notice 2.2kB .opencode/agents/document-writer.yml
+npm notice 721B .opencode/agents/enforcer.md
+npm notice 2.0kB .opencode/agents/enforcer.yml
+npm notice 2.1kB .opencode/agents/explore.md
+npm notice 2.1kB .opencode/agents/explore.yml
+npm notice 2.5kB .opencode/agents/frontend-ui-ux-engineer.md
+npm notice 2.2kB .opencode/agents/frontend-ui-ux-engineer.yml
+npm notice 2.5kB .opencode/agents/librarian.md
+npm notice 2.0kB .opencode/agents/librarian.yml
+npm notice 2.4kB .opencode/agents/multimodal-looker.md
+npm notice 2.2kB .opencode/agents/multimodal-looker.yml
+npm notice 2.5kB .opencode/agents/oracle.md
+npm notice 2.1kB .opencode/agents/oracle.yml
+npm notice 619B .opencode/agents/orchestrator.md
+npm notice 2.6kB .opencode/agents/orchestrator.yml
+npm notice 674B .opencode/agents/refactorer.md
+npm notice 2.7kB .opencode/agents/refactorer.yml
+npm notice 648B .opencode/agents/security-auditor.md
+npm notice 2.1kB .opencode/agents/security-auditor.yml
+npm notice 741B .opencode/agents/test-architect.md
+npm notice 2.0kB .opencode/agents/test-architect.yml
+npm notice 204B .opencode/codex.codex
+npm notice 4.4kB .opencode/command/dependency-audit.md
+npm notice 148B .opencode/command/lint.md
+npm notice 2.5kB .opencode/commands/auto-format.md
+npm notice 2.2kB .opencode/commands/auto-summary-capture.md
+npm notice 3.8kB .opencode/commands/enforcer-daily-scan.md
+npm notice 6.2kB .opencode/commands/framework-compliance-audit.md
+npm notice 2.6kB .opencode/commands/interactive-validator.md
+npm notice 1.8kB .opencode/commands/job-summary-logger.md
+npm notice 3.2kB .opencode/commands/mode-switch.md
+npm notice 5.0kB .opencode/commands/model-health-check.md
+npm notice 4.3kB .opencode/commands/performance-analysis.md
+npm notice 4.9kB .opencode/commands/pre-commit-introspection.md
+npm notice 3.8kB .opencode/commands/pre-commit-introspection.sh
+npm notice 4.5kB .opencode/commands/security-scan.md
+npm notice 3.8kB .opencode/commands/sisyphus-validation.md
+npm notice 2.2kB .opencode/commands/summary-logger.md
+npm notice 0B .opencode/commands/tree
+npm notice 6.7kB .opencode/enforcer-config.json
+npm notice 7.2kB .opencode/hook-metrics.json
+npm notice 7.4kB .opencode/hooks/post-commit
+npm notice 7.4kB .opencode/hooks/post-push
+npm notice 8.0kB .opencode/init.sh
+npm notice 2.2kB .opencode/logs/strray-init-20260123-151125.log
+npm notice 171.0kB .opencode/logs/strray-plugin-2026-01-23.log
+npm notice 680B .opencode/oh-my-opencode.json
+npm notice 630B .opencode/package-lock.json
+npm notice 10.9kB .opencode/plugin/strray-codex-injection.ts
+npm notice 4.8kB .opencode/scripts/config-integration-tests.sh
+npm notice 4.2kB .opencode/scripts/config-loader.sh
+npm notice 5.5kB .opencode/scripts/hook-consolidation-tests.sh
+npm notice 345B .opencode/scripts/job-summary-logger.sh
+npm notice 4.8kB .opencode/scripts/model-validator.sh
+npm notice 2.6kB .opencode/scripts/simple-validation.sh
+npm notice 2.1kB .opencode/scripts/validate-codex.py
+npm notice 655B .opencode/skills/api-design/SKILL.md
+npm notice 708B .opencode/skills/architect-tools/SKILL.md
+npm notice 761B .opencode/skills/architecture-patterns/SKILL.md
+npm notice 686B .opencode/skills/auto-format/SKILL.md
+npm notice 732B .opencode/skills/boot-orchestrator/SKILL.md
+npm notice 1.1kB .opencode/skills/code-review/SKILL.md
+npm notice 670B .opencode/skills/enforcer/SKILL.md
+npm notice 795B .opencode/skills/enhanced-orchestrator/SKILL.md
+npm notice 785B .opencode/skills/framework-compliance-audit/SKILL.md
+npm notice 718B .opencode/skills/git-workflow/SKILL.md
+npm notice 763B .opencode/skills/librarian/SKILL.md
+npm notice 592B .opencode/skills/lint/SKILL.md
+npm notice 733B .opencode/skills/model-health-check/SKILL.md
+npm notice 722B .opencode/skills/orchestrator/SKILL.md
+npm notice 771B .opencode/skills/performance-analysis/SKILL.md
+npm notice 799B .opencode/skills/performance-optimization/SKILL.md
+npm notice 714B .opencode/skills/processor-pipeline/SKILL.md
+npm notice 1.3kB .opencode/skills/project-analysis/SKILL.md
+npm notice 792B .opencode/skills/refactoring-strategies/SKILL.md
+npm notice 702B .opencode/skills/security-audit/SKILL.md
+npm notice 710B .opencode/skills/security-scan/SKILL.md
+npm notice 708B .opencode/skills/session-management/SKILL.md
+npm notice 716B .opencode/skills/state-manager/SKILL.md
+npm notice 757B .opencode/skills/testing-best-practices/SKILL.md
+npm notice 1.1kB .opencode/skills/testing-strategy/SKILL.md
+npm notice 684B .opencode/skills/ui-ux-design/SKILL.md
+npm notice 1.9MB .opencode/state/state.json
+npm notice 4.2kB .opencode/workflows/post-deployment-audit.yml
+npm notice 48.2kB .strray/agents_template.md
+npm notice 29.2kB .strray/codex.json
+npm notice 2.3kB .strray/config.json
+npm notice 1.1kB LICENSE
+npm notice 27.7kB README.md
+npm notice 17.7kB dist/cli/index.js
+npm notice 1.1kB dist/plugin/plugins/strray-codex-injection.d.ts
+npm notice 587B dist/plugin/plugins/strray-codex-injection.d.ts.map
+npm notice 10.8kB dist/plugin/plugins/strray-codex-injection.js
+npm notice 8.8kB dist/plugin/plugins/strray-codex-injection.js.map
+npm notice 10.9kB dist/plugin/plugins/strray-codex-injection.ts
+npm notice 4.7kB opencode.json
+npm notice 5.1kB package.json
+npm notice 5.6kB scripts/postinstall.cjs
+npm notice Tarball Details
+npm notice name: strray-ai
+npm notice version: 1.1.2
+npm notice filename: strray-ai-1.1.2.tgz
+npm notice package size: 145.9 kB
+npm notice unpacked size: 2.4 MB
+npm notice shasum: ca1c7234eafc5fbca03359dd1b21e7b87a5a3f3b
+npm notice integrity: sha512-ZsSsR/KwnhPYE[...]bYTRiOP4gv+GA==
+npm notice total files: 108
+npm notice
+strray-ai-1.1.2.tgz
+✅ Package contents verified
+
+🔧 Step 9: Test Package Installation
+----------------------------------------
+▶️  mkdir -p '/tmp/strray-build-test-11917'
+▶️  cd '/tmp/strray-build-test-11917' && npm init -y >/dev/null 2>&1
+▶️  cd '/tmp/strray-build-test-11917' && npm install '/Users/blaze/dev/stringray/strray-ai-1.1.2.tgz' >/dev/null 2>&1
+▶️  cd '/tmp/strray-build-test-11917' && ls node_modules/strray-ai/package.json >/dev/null 2>&1
+▶️  rm -rf '/tmp/strray-build-test-11917'
+✅ Package installation verified
+
+🎉 StringRay Framework Build & Packaging Validation Complete!
+============================================================
+
+✅ Build Phase: SUCCESS
+   • TypeScript compilation: PASSED
+   • Type checking: PASSED
+   • Linting: PASSED
+   • Package creation: PASSED
+   • Package installation: PASSED
+
+📦 Ready for testing phase!
+   Run: VALIDATION_PHASE=test-only ./scripts/validate-stringray-framework.sh
+
+🏗️  Build artifacts preserved at: /Users/blaze/dev/stringray
+   (Package: /Users/blaze/dev/stringray/strray-ai-1.1.2.tgz)
+
+🧪 Phase 2: Comprehensive Test Suite
+====================================
+🧪 StringRay Framework - Comprehensive Test Suite
+=================================================
+📋 Test Configuration:
+   Project Directory: /Users/blaze/dev/stringray
+   Package Version: 1.1.2
+   Package File: strray-ai-1.1.2.tgz
+   Test Directory: /tmp/strray-test2
+
+🧪 Test Suite: STANDARD (13 tests)
+   Skills Tests: 2 (configuration & MCP integration)
+   Core Tests: 6 (complexity analysis)
+   Integration Tests: 5 (orchestrator, consumer)
+
+
+🔧 Step 1: Verify Package Exists
+----------------------------------------
+✅ Found: /Users/blaze/dev/stringray/strray-ai-1.1.2.tgz
+✅ Package verified
+
+🔧 Step 2: Clean Up Test Environment
+----------------------------------------
+
+🔧 Step 3: Create Fresh Test Environment
+----------------------------------------
+▶️  mkdir -p '/tmp/strray-test2'
+▶️  cd '/tmp/strray-test2'
+
+🔧 Step 4: Initialize NPM Project
+----------------------------------------
+▶️  cd '/tmp/strray-test2' && npm init -y
+Wrote to /private/tmp/strray-test2/package.json:
+
+{
+  "name": "strray-test2",
+  "version": "1.1.1",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}
+
+
+
+
+🔧 Step 5: Install StringRay Package
+----------------------------------------
+▶️  cd '/tmp/strray-test2' && npm install '/Users/blaze/dev/stringray/strray-ai-1.1.2.tgz'
+
+added 125 packages, and audited 126 packages in 33s
+
+33 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+
+🔧 Step 6: Run Postinstall Configuration
+----------------------------------------
+▶️  cd '/tmp/strray-test2' && node node_modules/strray-ai/scripts/postinstall.cjs
+🔧 StrRay Postinstall: Script starting...
+🔧 StrRay Postinstall: Copying configuration files...
+📍 Package root: /private/tmp/strray-test2/node_modules/strray-ai
+📍 Target directory: /private/tmp/strray-test2
+✅ Copied opencode.json
+✅ Copied directory .opencode
+🔧 StrRay Postinstall: Consumer installation complete - all paths are correctly configured.
+✅ .strray directory symlinked
+🎉 StrRay Postinstall: Configuration complete!
+📋 Next steps:
+1. Restart oh-my-opencode to load the plugin
+2. Run 'opencode agent list' to see StrRay agents
+3. Try '@enforcer analyze this code' to test the plugin
+
+🔧 Step 6: Copy Integration Test Files
+----------------------------------------
+✅ Found: /Users/blaze/dev/stringray/src/__tests__/integration/test-complexity-analysis.mjs
+▶️  cp '/Users/blaze/dev/stringray/src/__tests__/integration/test-complexity-analysis.mjs' '/tmp/strray-test2/'
+✅ Found: /Users/blaze/dev/stringray/src/__tests__/integration/test-manual-orchestrator.mjs
+▶️  cp '/Users/blaze/dev/stringray/src/__tests__/integration/test-manual-orchestrator.mjs' '/tmp/strray-test2/'
+✅ Found: /Users/blaze/dev/stringray/src/__tests__/integration/test-orchestrator-led.mjs
+▶️  cp '/Users/blaze/dev/stringray/src/__tests__/integration/test-orchestrator-led.mjs' '/tmp/strray-test2/'
+✅ Found: /Users/blaze/dev/stringray/src/__tests__/integration/test-corrected-max.mjs
+▶️  cp '/Users/blaze/dev/stringray/src/__tests__/integration/test-corrected-max.mjs' '/tmp/strray-test2/'
+✅ Found: /Users/blaze/dev/stringray/src/__tests__/integration/test-max-complexity.mjs
+▶️  cp '/Users/blaze/dev/stringray/src/__tests__/integration/test-max-complexity.mjs' '/tmp/strray-test2/'
+✅ Found: /Users/blaze/dev/stringray/src/__tests__/integration/test-ultra-complex.mjs
+▶️  cp '/Users/blaze/dev/stringray/src/__tests__/integration/test-ultra-complex.mjs' '/tmp/strray-test2/'
+✅ Found: /Users/blaze/dev/stringray/scripts/test-consumer-readiness.mjs
+▶️  cp '/Users/blaze/dev/stringray/scripts/test-consumer-readiness.mjs' '/tmp/strray-test2/'
+✅ Found: /Users/blaze/dev/stringray/scripts/test-skills-mcp-integration.mjs
+▶️  cp '/Users/blaze/dev/stringray/scripts/test-skills-mcp-integration.mjs' '/tmp/strray-test2/'
+✅ Found: /Users/blaze/dev/stringray/scripts/test-skills-comprehensive.mjs
+▶️  cp '/Users/blaze/dev/stringray/scripts/test-skills-comprehensive.mjs' '/tmp/strray-test2/'
+✅ Found: /Users/blaze/dev/stringray/scripts/test-postinstall-files.mjs
+▶️  cp '/Users/blaze/dev/stringray/scripts/test-postinstall-files.mjs' '/tmp/strray-test2/'
+✅ Found: /Users/blaze/dev/stringray/scripts/test-orchestrator-simple.mjs
+▶️  cp '/Users/blaze/dev/stringray/scripts/test-orchestrator-simple.mjs' '/tmp/strray-test2/'
+✅ Found: /Users/blaze/dev/stringray/scripts/test-orchestrator-complex.mjs
+▶️  cp '/Users/blaze/dev/stringray/scripts/test-orchestrator-complex.mjs' '/tmp/strray-test2/'
+✅ All test files copied
+
+🔧 Step 7: Run Complexity Analysis Test
+----------------------------------------
+▶️  cd '/tmp/strray-test2' && node test-complexity-analysis.mjs
+node:internal/modules/esm/resolve:283
+    throw new ERR_MODULE_NOT_FOUND(
+          ^
+
+Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/private/tmp/strray-test2/node_modules/strray-ai/dist/plugin/delegation/complexity-analyzer.js' imported from /private/tmp/strray-test2/test-complexity-analysis.mjs
+    at finalizeResolution (node:internal/modules/esm/resolve:283:11)
+    at moduleResolve (node:internal/modules/esm/resolve:952:10)
+    at defaultResolve (node:internal/modules/esm/resolve:1188:11)
+    at ModuleLoader.defaultResolve (node:internal/modules/esm/loader:708:12)
+    at #cachedDefaultResolve (node:internal/modules/esm/loader:657:25)
+    at ModuleLoader.resolve (node:internal/modules/esm/loader:640:38)
+    at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:264:38)
+    at ModuleJob._link (node:internal/modules/esm/module_job:168:49) {
+  code: 'ERR_MODULE_NOT_FOUND',
+  url: 'file:///private/tmp/strray-test2/node_modules/strray-ai/dist/plugin/delegation/complexity-analyzer.js'
+}
+
+Node.js v20.19.6
+❌ ERROR: Command failed: cd '/tmp/strray-test2' && node test-complexity-analysis.mjs
+❌ Test phase failed!

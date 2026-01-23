@@ -9,8 +9,8 @@
  */
 
 import { StringRayStateManager } from "../state/state-manager";
-import { frameworkLogger } from "../framework-logger.js";
-import { ProcessorRegistration } from "./processor-types.js";
+import { frameworkLogger } from "../framework-logger";
+import { ProcessorRegistration } from "./processor-types";
 
 export interface ProcessorConfig {
   name: string;
@@ -272,8 +272,6 @@ export class ProcessorManager {
     const preProcessors = Array.from(this.processors.values())
       .filter((p) => p.type === "pre" && p.enabled)
       .sort((a, b) => a.priority - b.priority);
-
-
 
     const results: ProcessorResult[] = [];
 
@@ -763,11 +761,11 @@ export class ProcessorManager {
   ): Promise<void> {
     for (const violation of violations) {
       try {
-        console.log(`🔧 Attempting to fix rule violation: ${violation.rule}`);
+        await frameworkLogger.log('processor-manager', '-attempting-to-fix-rule-violation-violation-rule-', 'info', { message: `🔧 Attempting to fix rule violation: ${violation.rule}` });
 
         const agentSkill = this.getAgentForRule(violation.rule);
         if (!agentSkill) {
-          console.log(`❌ No agent/skill mapping found for rule: ${violation.rule}`);
+          await frameworkLogger.log('processor-manager', '-no-agent-skill-mapping-found-for-rule-violation-r', 'error', { message: `❌ No agent/skill mapping found for rule: ${violation.rule}` });
           continue;
         }
 
@@ -794,10 +792,10 @@ export class ProcessorManager {
           }
         );
 
-        console.log(`✅ Agent ${agent} attempted fix for rule: ${violation.rule}`);
+        await frameworkLogger.log('processor-manager', '-agent-agent-attempted-fix-for-rule-violation-rule', 'success', { message: `✅ Agent ${agent} attempted fix for rule: ${violation.rule}` });
 
       } catch (error) {
-        console.log(`❌ Failed to call agent for rule ${violation.rule}: ${error instanceof Error ? error.message : String(error)}`);
+        await frameworkLogger.log('processor-manager', '-failed-to-call-agent-for-rule-violation-rule-erro', 'error', { message: `❌ Failed to call agent for rule ${violation.rule}: ${error instanceof Error ? error.message : String(error)}` });
       }
     }
   }

@@ -41,7 +41,7 @@ export function setupStandardMocks() {
   vi.mock("path", () => mockPath);
 
   // Set up framework logger mock
-  vi.mock("../framework-logger.js", () => ({
+  vi.mock("../framework-logger", () => ({
     frameworkLogger: mockFrameworkLogger,
   }));
 

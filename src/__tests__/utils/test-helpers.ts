@@ -9,8 +9,8 @@ import { CodexContext, CodexTerm } from "../../context-loader";
  * Mock file system utilities for testing
  */
 export class MockFileSystem {
-  private files: Map<string, string> = new Map();
-  private directories: Set<string> = new Set();
+  public files: Map<string, string> = new Map();
+  public directories: Set<string> = new Set();
 
   constructor() {
     this.reset();
@@ -62,6 +62,20 @@ export class MockFileSystem {
       mkdirSync: vi.fn(),
       rmSync: vi.fn(),
     } as any;
+  }
+
+  /**
+   * Get files map (for test mocking)
+   */
+  getFiles(): Map<string, string> {
+    return this.files;
+  }
+
+  /**
+   * Get directories set (for test mocking)
+   */
+  getDirectories(): Set<string> {
+    return this.directories;
   }
 
   /**

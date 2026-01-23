@@ -64,14 +64,21 @@ console.log("Script location:", import.meta.url);
 (async () => {
   try {
     // Import the plugin using relative path for consumer compatibility
-    const { stringrayPlugin } =
-      await import("../dist/plugin/plugins/stringray-codex-injection.js");
-    const plugin = stringrayPlugin({});
+    const pluginModule =
+      await import("../dist/plugin/plugins/strray-codex-injection.js");
+    const plugin = pluginModule.default;
     console.log("✅ Plugin loaded successfully");
 
     // Test the system transform hook
     const testOutput = { system: [] };
-    await plugin["experimental.chat.system.transform"]({}, testOutput);
+    if (plugin && plugin["experimental.chat.system.transform"]) {
+      await plugin["experimental.chat.system.transform"]({}, testOutput);
+      console.log("✅ System transform hook executed");
+      console.log("📝 System messages added:", testOutput.system.length);
+    } else {
+      console.log("❌ System transform hook not found");
+      console.log("Plugin object:", typeof plugin, plugin ? Object.keys(plugin) : "null/undefined");
+    }
 
     console.log("✅ System transform hook executed");
     console.log(`📝 System messages added: ${testOutput.system?.length || 0}`);

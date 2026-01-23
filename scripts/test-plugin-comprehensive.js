@@ -38,7 +38,7 @@ async function runComprehensiveTests() {
     console.log('📦 1. Testing plugin file...');
     const pluginPath = DEV_ENV
       ? './.opencode/plugin/stringray-codex-injection.mjs'
-      : path.resolve('./.opencode', '../node_modules/strray-ai/dist/plugin/plugins/stringray-codex-injection.js');
+      : path.resolve('./.opencode', '../node_modules/strray-ai/dist/plugin/plugins/strray-codex-injection.js');
 
     if (fs.existsSync(pluginPath)) {
       results.pluginFileExists = true;
@@ -117,11 +117,11 @@ async function runComprehensiveTests() {
               console.log(`❌ Dev environment: Expected './plugin/stringray-codex-injection.mjs', got '${pluginEntry}'`);
             }
             } else {
-              if (pluginEntry.includes('stringray-codex-injection.js')) {
+              if (pluginEntry.includes('strray-codex-injection.js')) {
                 results.pluginPathsCorrect = true;
                 console.log('✅ Consumer environment: Plugin path is correctly set to local file');
               } else {
-                console.log(`❌ Consumer environment: Expected path with stringray-codex-injection.js, got '${pluginEntry}'`);
+                console.log(`❌ Consumer environment: Expected path with strray-codex-injection.js, got '${pluginEntry}'`);
               }
             }
         }

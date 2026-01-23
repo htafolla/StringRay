@@ -1,22 +1,22 @@
 {
   "name": "strray-ai",
-  "version": "1.1.2",
+  "version": "1.1.1",
   "description": "⚡ StringRay ⚡: Bulletproof AI orchestration with systematic error prevention. Zero dead ends. Ship clean, tested, optimized code — every time.",
   "type": "module",
-  "main": "./dist/plugin/plugins/stringray-codex-injection.js",
-  "types": "./dist/plugin/plugins/stringray-codex-injection.d.ts",
+  "main": "./dist/plugin/plugins/strray-codex-injection.js",
+  "types": "./dist/plugin/plugins/strray-codex-injection.d.ts",
   "bin": {
     "strray-ai": "./dist/cli/index.js"
   },
     "oh-my-opencode": {
-      "plugin": "./dist/plugin/plugins/stringray-codex-injection.js",
+      "plugin": "./dist/plugin/plugins/strray-codex-injection.js",
       "mcps": "./dist/plugin/mcps/"
     },
 
   "scripts": {
     "build": "tsc",
     "build:all": "npm run build && npm run build:plugin",
-    "build:plugin": "tsc --project tsconfig.plugin.json",
+    "build:plugin": "tsc --project tsconfig.plugin.json && mkdir -p dist/plugin/plugins && cp .opencode/plugin/strray-codex-injection.ts dist/plugin/plugins/ && cp .opencode/plugin/strray-codex-injection.js dist/plugin/plugins/ 2>/dev/null || echo 'JS file not found, will be compiled'",
     "clean": "rm -rf dist",
     "prepublishOnly": "npm run prepare-consumer && npm run build:all",
     "postinstall": "node scripts/postinstall.cjs",
@@ -108,9 +108,9 @@
       "types": "./dist/plugin/index.d.ts",
       "import": "./dist/plugin/index.js"
     },
-    "./dist/plugin/orchestrator.js": "./dist/plugin/orchestrator.js",
-    "./dist/plugin/processors/processor-manager.js": "./dist/plugin/processors/processor-manager.js",
-    "./dist/plugin/state/state-manager.js": "./dist/plugin/state/state-manager.js",
+    "./dist/plugin/orchestrator.js": "./dist/plugin/src/orchestrator.js",
+    "./dist/plugin/processors/processor-manager.js": "./dist/plugin/src/processors/processor-manager.js",
+    "./dist/plugin/state/state-manager.js": "./dist/plugin/src/state/state-manager.js",
     "./dist/plugin/agents/index.js": "./dist/plugin/agents/index.js",
     "./dist/plugin/*": "./dist/plugin/*",
     "./agents": {

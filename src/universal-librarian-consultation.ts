@@ -3,8 +3,8 @@
  * Ensures librarian is involved in all major system actions for documentation and versioning
  */
 
-import { frameworkLogger } from "./framework-logger.js";
-import { RuleEnforcer } from "./enforcement/rule-enforcer.js";
+import { frameworkLogger } from "./framework-logger";
+import { RuleEnforcer } from "./enforcement/rule-enforcer";
 
 export interface SystemAction {
   type: "code-change" | "rule-modification" | "architectural-change" | "configuration-update" | "documentation-update";

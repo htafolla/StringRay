@@ -14,7 +14,7 @@ import {
   createSessionPool,
   createMetricsPool,
   createAlertPool,
-} from "../utils/memory-pool.js";
+} from "../utils/memory-pool";
 
 /**
  * LRU Cache with automatic eviction policies for performance optimization

@@ -9,7 +9,8 @@
  */
 
 import { StringRayStateManager } from "../state/state-manager";
-import { DelegationResult } from "./agent-delegator.js";
+import { DelegationResult } from "./agent-delegator";
+import { frameworkLogger } from "../framework-logger";
 
 export interface SessionContext {
   sessionId: string;
@@ -128,10 +129,6 @@ export class SessionCoordinator {
 
     this.sessions.set(sessionId, context);
     this.stateManager.set(`session:${sessionId}:coordinator`, context);
-
-    console.log(
-      `📋 Session Coordinator: Initialized session ${sessionId} with ${defaultAgents.length} agents`,
-    );
     return {
       sessionId,
       createdAt: new Date(context.startTime),
@@ -163,9 +160,7 @@ export class SessionCoordinator {
       `session:${sessionId}:delegations:${delegationId}`,
       delegation,
     );
-    console.log(
-      `📋 Session Coordinator: Registered delegation ${delegationId} in session ${sessionId}`,
-    );
+
   }
 
   /**
@@ -235,9 +230,6 @@ export class SessionCoordinator {
       success: true,
     });
 
-    console.log(
-      `💬 Session Coordinator: Message from ${fromAgent} to ${toAgent} in session ${sessionId}`,
-    );
   }
 
   /**
@@ -313,9 +305,6 @@ export class SessionCoordinator {
       // Continue operation despite recording failure
     }
 
-    console.log(
-      `🔗 Session Coordinator: ${fromAgent} shared context '${key}' in session ${sessionId}`,
-    );
   }
 
   /**
@@ -372,9 +361,6 @@ export class SessionCoordinator {
       session.conflictHistory,
     );
 
-    console.log(
-      `⚖️ Session Coordinator: Conflict resolved via ${resolution} in session ${sessionId}`,
-    );
   }
 
   /**
@@ -400,9 +386,6 @@ export class SessionCoordinator {
         completedAt: Date.now(),
       });
 
-      console.log(
-        `✅ Session Coordinator: Completed delegation ${delegationId} in session ${sessionId}`,
-      );
     }
   }
 
@@ -513,9 +496,6 @@ export class SessionCoordinator {
     // Clear from state manager
     this.stateManager.clear(`session:${sessionId}:coordinator`);
 
-    console.log(
-      `🧹 Session Coordinator: Cleaned up session ${sessionId} (removed)`,
-    );
   }
 
   // Private methods

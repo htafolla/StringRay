@@ -8,7 +8,7 @@
  * @since 2026-01-07
  */
 
-import { frameworkLogger, generateJobId } from "../framework-logger.js";
+import { frameworkLogger, generateJobId } from "../framework-logger";
 
 export interface PluginMetadata {
   id: string;
@@ -372,7 +372,7 @@ export class PluginSandbox {
 
     const context = vm.createContext({
       console: {
-        log: (...args: any[]) => console.log("[PLUGIN]", ...args),
+        log: async (...args: any[]) => await frameworkLogger.log('plugin-system', '-plugin-args-error-args-any-console-error-plugin-a', 'error', { message: "[PLUGIN]", ...args }),
         error: (...args: any[]) => console.error("[PLUGIN]", ...args),
         warn: (...args: any[]) => console.warn("[PLUGIN]", ...args),
       },

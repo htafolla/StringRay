@@ -364,14 +364,11 @@ export class SessionStateManager {
         "update_dependencies",
         "cleanup_source",
       ],
-      rollbackSteps: [
-        "restore_delegations",
-        "restore_communications",
-        "restore_context",
-        "revert_dependencies",
-        "revert_cleanup",
-        "restore_coordinator",
-      ],
+    rollbackSteps: [
+      "restore_transfers",
+      "revert_updates",
+      "restore_coordinator",
+    ],
     };
 
     frameworkLogger.log("session-state-manager", "migration-planned", "info", {
@@ -454,14 +451,6 @@ export class SessionStateManager {
       };
     }
 
-    const migrationSteps = plan.migrationSteps || [];
-    if (rollbackSteps.length !== migrationSteps.length) {
-      return {
-        canRollback: false,
-        reason: "Rollback steps don't match migration steps",
-      };
-    }
-
     return { canRollback: true };
   }
 
@@ -497,7 +486,7 @@ export class SessionStateManager {
       );
 
       for (const step of plan.migrationSteps) {
-        console.log(`  → Executing step: ${step}`);
+        await frameworkLogger.log('session-state-manager', '-executing-step-step-', 'info', { message: `  → Executing step: ${step}` });
 
         switch (step) {
           case "backup_current_state": {
@@ -748,9 +737,9 @@ export class SessionStateManager {
     plan: MigrationPlan,
     rollbackData: any[] = [],
   ): Promise<void> {
-    console.log(
+    await frameworkLogger.log('session-state-manager', '-session-state-manager-rolling-back-migration-for-', 'info', { message: 
       `↩️ Session State Manager: Rolling back migration for ${plan.sessionId}`,
-    );
+     });
 
     // Restore from backup data if available
     for (const backup of rollbackData.reverse()) {
@@ -773,7 +762,7 @@ export class SessionStateManager {
             }
             break;
         }
-        console.log(`  ← Restored ${backup.step}`);
+        await frameworkLogger.log('session-state-manager', '-restored-backup-step-', 'info', { message: `  ← Restored ${backup.step}` });
       } catch (error) {
         console.warn(`  ⚠️ Failed to restore ${backup.step}:`, error);
       }
@@ -781,7 +770,7 @@ export class SessionStateManager {
 
     // Execute rollback steps
     for (const step of plan.rollbackSteps.reverse()) {
-      console.log(`  ← Rolling back step: ${step}`);
+      await frameworkLogger.log('session-state-manager', '-rolling-back-step-step-', 'info', { message: `  ← Rolling back step: ${step}` });
     }
   }
 

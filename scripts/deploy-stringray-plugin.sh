@@ -82,7 +82,7 @@ build_framework() {
 
     # Verify build artifacts
     log_info "Checking for plugin file..."
-    ls -la "dist/plugin/plugins/stringray-codex-injection.js" 2>/dev/null && log_success "Plugin file exists" || (log_error "Plugin file missing" && exit 1)
+    ls -la "dist/plugin/plugins/strray-codex-injection.js" 2>/dev/null && log_success "Plugin file exists" || (log_error "Plugin file missing" && exit 1)
 
     if ! test -f "dist/index.js"; then
         log_error "Framework build failed - missing dist/index.js"
@@ -202,12 +202,12 @@ run_tests() {
       try {
         const path = require('path');
         const fs = require('fs');
-        const pluginPath = path.join(process.cwd(), 'node_modules/strray-ai/dist/plugin/plugins/stringray-codex-injection.js');
+        const pluginPath = path.join(process.cwd(), 'node_modules/strray-ai/dist/plugin/plugins/strray-codex-injection.js');
         if (fs.existsSync(pluginPath)) {
           console.log('✅ Plugin file accessible');
           // Check file syntax by reading and parsing (ES modules can't be required in CommonJS)
           const content = fs.readFileSync(pluginPath, 'utf8');
-          if (content.includes('export') && content.includes('StringRay')) {
+          if (content.includes('export') && content.includes('strray')) {
             console.log('✅ Plugin file contains expected exports');
           } else {
             console.error('❌ Plugin file missing expected content');
@@ -237,7 +237,7 @@ run_tests() {
       const fs = require('fs');
       const path = require('path');
       const requiredFiles = [
-        'dist/plugin/plugins/stringray-codex-injection.js',
+        'dist/plugin/plugins/strray-codex-injection.js',
         'dist/cli/index.js',
         'package.json'
       ];

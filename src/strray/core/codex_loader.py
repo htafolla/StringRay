@@ -666,15 +666,16 @@ class CodexLoader:
         rules = {}
 
         for term_id in term_ids:
-
-
+            try:
                 rule = self._load_codex_rule(term_id)
 
                 rules[term_id] = rule
 
                 self._loaded_terms.add(term_id)
-
-
+            except CodexError:
+                # Skip invalid terms but continue loading others
+                logger.warning(f"Skipping invalid codex term: {term_id}")
+                continue
 
         # Update cache and hash
 
@@ -952,14 +953,11 @@ class CodexLoader:
         """
 
         if term_id in self._codex_cache:
-
             return self._codex_cache[term_id]
 
-
+        try:
             return self._load_codex_rule(term_id)
-
         except CodexError:
-
             return None
 
     def get_rules_by_category(self, category: str) -> List[CodexRule]:
@@ -1053,7 +1051,7 @@ class CodexLoader:
 
         # Sort keys for consistent hashing
 
-
+        try:
             content = json.dumps(context, sort_keys=True)
 
             return hashlib.sha256(content.encode()).hexdigest()

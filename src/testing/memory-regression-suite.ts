@@ -282,8 +282,7 @@ export const memoryTestTemplates = {
     description: `Test memory usage during ${sessionCount} session operations`,
     setup: async () => {
       // Setup would initialize session manager
-      console.log(`Setting up ${sessionCount} sessions for testing...`);
-    },
+      },
     execute: async () => {
       // Simulate session operations
       const operations = [];
@@ -297,8 +296,7 @@ export const memoryTestTemplates = {
     },
     cleanup: async () => {
       // Cleanup sessions
-      console.log("Cleaning up test sessions...");
-    },
+      },
     expectedMemoryDelta: {
       maxIncrease: sessionCount * 0.01, // ~10KB per session
       acceptableLeak: 0.1, // 0.1MB per minute

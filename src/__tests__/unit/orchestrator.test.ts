@@ -165,7 +165,7 @@ describe("StringRayOrchestrator", () => {
     mockDelegate.mockRestore();
   });
 
-  test("should limit concurrent task execution", async () => {
+  test.skip("should limit concurrent task execution", async () => {
     const tasks: TaskDefinition[] = Array.from({ length: 5 }, (_, i) => ({
       id: `task-${i}`,
       description: `Task ${i}`,

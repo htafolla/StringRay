@@ -344,4 +344,4 @@ export async function runSessionPersistenceSimulation(): Promise<PersistenceSimu
 
   return simulateSessionPersistence(config);
 }
-import { frameworkLogger } from "../framework-logger.js";
+import { frameworkLogger } from "../framework-logger";

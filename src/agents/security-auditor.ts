@@ -1,4 +1,4 @@
-import type { AgentConfig } from "./types.js";
+import type { AgentConfig } from "./types";
 
 export const securityAuditor: AgentConfig = {
   name: "security-auditor",

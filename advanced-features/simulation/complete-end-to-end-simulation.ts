@@ -5,8 +5,8 @@
  * Addresses the missing 5% coverage for complete pipeline validation
  */
 
-import { StringRayOrchestrator } from "../orchestrator.js";
-import { frameworkLogger } from "../framework-logger.js";
+import { StringRayOrchestrator } from "../orchestrator";
+import { frameworkLogger } from "../framework-logger";
 
 export interface PipelineResult {
   success: boolean;

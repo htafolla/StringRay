@@ -42,9 +42,9 @@ export class RetryHandler {
 
         // Calculate delay and wait
         const delay = this.calculateDelay(attempt);
-        console.log(
+        await frameworkLogger.log('-retry-handler', '-operation-failed-attempt-attempt-1-retrying-in-de', 'error', { message: 
           `⏳ Operation failed (attempt ${attempt + 1}), retrying in ${delay}ms...`,
-        );
+         });
         await this.wait(delay);
       }
     }

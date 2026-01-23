@@ -27,7 +27,7 @@ import {
   RegressionTestResult,
   PerformanceBaseline,
   RegressionTestSuite,
-} from "./performance-regression-tester.js";
+} from "./performance-regression-tester";
 
 export interface StatisticalAnalysis {
   mean: number;
@@ -718,10 +718,7 @@ export class AdvancedRegressionTestingSystem extends EventEmitter {
         const data = JSON.parse(fs.readFileSync(this.baselineFile, "utf8"));
         this.baselines = new Map(Object.entries(data.baselines || {}));
         this.historicalData = new Map(Object.entries(data.historical || {}));
-        console.log(
-          `📊 Loaded advanced baselines for ${this.baselines.size} tests`,
-        );
-      }
+        }
     } catch (error) {
       console.warn("⚠️ Could not load advanced baselines:", error);
     }

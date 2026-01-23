@@ -3,7 +3,7 @@ import type {
   ToolConfig,
   PermissionConfig,
   AgentConfig,
-} from "../../agents/types.js";
+} from "../../agents/types";
 
 describe("Agent Types", () => {
   describe("ToolConfig", () => {

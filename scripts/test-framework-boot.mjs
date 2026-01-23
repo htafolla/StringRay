@@ -168,7 +168,7 @@ class FrameworkBootTest {
     try {
       // Test importing the main plugin
       const pluginModule =
-        await import("../dist/plugin/plugins/stringray-codex-injection.js");
+        await import("../dist/plugin/plugins/strray-codex-injection.js");
 
       if (pluginModule && typeof pluginModule.default === "function") {
         console.log("  ✅ Main plugin imported successfully");

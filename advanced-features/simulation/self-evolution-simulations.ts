@@ -15,7 +15,7 @@
 
 // Stubbed imports for v1.1.1 - self-evolution features are experimental v2.0
 // import { metaAnalysisEngine } from '../self-evolution/meta-analysis-engine';
-import { frameworkLogger } from "../framework-logger.js";
+import { frameworkLogger } from "../framework-logger";
 // import {
 //   ruleEvolutionSystem,
 //   safeRuleEvolutionSystem,

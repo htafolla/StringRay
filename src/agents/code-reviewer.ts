@@ -1,4 +1,4 @@
-import type { AgentConfig } from "./types.js";
+import type { AgentConfig } from "./types";
 
 export const codeReviewer: AgentConfig = {
   name: "code-reviewer",

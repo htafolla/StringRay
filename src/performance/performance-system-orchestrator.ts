@@ -9,11 +9,11 @@
  */
 
 import { EventEmitter } from "events";
-import { PerformanceBudgetEnforcer } from "./performance-budget-enforcer.js";
-import { PerformanceRegressionTester } from "./performance-regression-tester.js";
-import { PerformanceMonitoringDashboard } from "./performance-monitoring-dashboard.js";
-import { PerformanceCIGates } from "./performance-ci-gates.js";
-import { frameworkLogger } from "../framework-logger.js";
+import { PerformanceBudgetEnforcer } from "./performance-budget-enforcer";
+import { PerformanceRegressionTester } from "./performance-regression-tester";
+import { PerformanceMonitoringDashboard } from "./performance-monitoring-dashboard";
+import { PerformanceCIGates } from "./performance-ci-gates";
+import { frameworkLogger } from "../framework-logger";
 
 export interface PerformanceSystemConfig {
   budgetEnforcement: {
@@ -139,7 +139,7 @@ export class PerformanceSystemOrchestrator extends EventEmitter {
         "info",
       );
       // Initialization details kept as console.log for user feedback
-      console.log("   📊 Initializing performance components...");
+      await frameworkLogger.log('performance-system-orchestrator', '-initializing-performance-components-', 'info', { message: "   📊 Initializing performance components..." });
 
       // Initialize components
       this.components = {
@@ -182,12 +182,12 @@ export class PerformanceSystemOrchestrator extends EventEmitter {
       await this.initialize();
     }
 
-    console.log("▶️ Starting performance monitoring");
+    await frameworkLogger.log('performance-system-orchestrator', '-starting-performance-monitoring-', 'info', { message: "▶️ Starting performance monitoring" });
 
     if (this.components.dashboard && this.config.monitoring.enabled) {
       this.components.dashboard.start();
       this.status.monitoringActive = true;
-      console.log("   📊 Dashboard monitoring started");
+      await frameworkLogger.log('performance-system-orchestrator', '-dashboard-monitoring-started-', 'info', { message: "   📊 Dashboard monitoring started" });
     }
 
     this.emit("started");
@@ -197,7 +197,7 @@ export class PerformanceSystemOrchestrator extends EventEmitter {
    * Stop the performance monitoring system
    */
   async stop(): Promise<void> {
-    console.log("⏹️ Stopping performance monitoring");
+    await frameworkLogger.log('performance-system-orchestrator', '-stopping-performance-monitoring-', 'info', { message: "⏹️ Stopping performance monitoring" });
 
     if (this.components.dashboard) {
       // Note: Dashboard doesn't have a stop method, just disable monitoring
@@ -325,7 +325,7 @@ export class PerformanceSystemOrchestrator extends EventEmitter {
    * Cleanup and shutdown
    */
   async shutdown(): Promise<void> {
-    console.log("🔌 Shutting down performance system");
+    await frameworkLogger.log('performance-system-orchestrator', '-shutting-down-performance-system-', 'info', { message: "🔌 Shutting down performance system" });
 
     this.stop();
 
@@ -334,7 +334,7 @@ export class PerformanceSystemOrchestrator extends EventEmitter {
     this.initialized = false;
     this.status.initialized = false;
 
-    console.log("✅ Performance system shutdown complete");
+    await frameworkLogger.log('performance-system-orchestrator', '-performance-system-shutdown-complete-', 'success', { message: "✅ Performance system shutdown complete" });
   }
 }
 

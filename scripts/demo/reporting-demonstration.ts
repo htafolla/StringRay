@@ -3,10 +3,10 @@
  * Shows the on-demand reporting system with actual framework activity
  */
 
-import { frameworkLogger } from "./src/framework-logger.js";
-import { frameworkReportingSystem } from "./src/reporting/framework-reporting-system.js";
-import { AgentDelegator } from "./src/delegation/agent-delegator.js";
-import { StrRayStateManager } from "./src/state/state-manager.js";
+import { frameworkLogger } from "./src/framework-logger";
+import { frameworkReportingSystem } from "./src/reporting/framework-reporting-system";
+import { AgentDelegator } from "./src/delegation/agent-delegator";
+import { StrRayStateManager } from "./src/state/state-manager";
 
 async function demonstrateReportingSystem() {
   console.log("🎯 STRRAY FRAMEWORK ON-DEMAND REPORTING SYSTEM DEMONSTRATION");

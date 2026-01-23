@@ -48,7 +48,7 @@ if (isDeployed) {
 
   // Check if the plugin files exist
   const pluginExists = fs.existsSync(
-    "node_modules/strray-ai/dist/plugin/plugins/stringray-codex-injection.js",
+    "node_modules/strray-ai/dist/plugin/plugins/strray-codex-injection.js",
   );
   console.log("DEBUG: plugin file exists:", pluginExists);
   if (!pluginExists) {

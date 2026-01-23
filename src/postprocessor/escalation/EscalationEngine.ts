@@ -8,7 +8,7 @@ import {
   EscalationResult,
   IncidentReport,
   EventTimeline,
-} from "../types.js";
+} from "../types";
 
 export interface EscalationConfig {
   manualInterventionThreshold: number;
@@ -50,10 +50,6 @@ export class EscalationEngine {
     error: string,
     monitoringResults: any[],
   ): Promise<EscalationResult | null> {
-    console.log(
-      `🔍 Evaluating escalation: ${attempts} attempts, error: ${error}`,
-    );
-
     let escalationLevel: "manual-intervention" | "rollback" | "emergency";
     let reason: string;
     let recommendations: string[];
@@ -160,10 +156,8 @@ export class EscalationEngine {
     this.incidents.set(incidentId, incidentReport);
 
     if (this.config.incidentReporting) {
-      console.log(`📋 Incident Report Created: ${incidentId}`);
-      console.log(`   Severity: ${incidentReport.severity}`);
-      console.log(`   Root Cause: ${incidentReport.rootCause}`);
-      console.log(`   Impact: ${incidentReport.impact}`);
+      // TODO: Implement incident reporting to external systems
+      console.log(`Incident reported: ${incidentId}`);
     }
 
     return incidentReport;
@@ -206,19 +200,13 @@ export class EscalationEngine {
 
     switch (channel) {
       case "console":
-        console.log(`${emoji} ${alert.title}`);
-        console.log(`   Commit: ${alert.context.commitSha}`);
-        console.log(`   Message: ${alert.message}`);
         if (alert.metadata?.reason) {
-          console.log(`   Reason: ${alert.metadata.reason}`);
+          console.log(`${emoji} ${alert.message} - ${alert.metadata.reason}`);
         }
         break;
 
       case "log":
         // In a real system, this would write to a logging service
-        console.log(
-          `[ALERT-${alert.level.toUpperCase()}] ${JSON.stringify(alert)}`,
-        );
         break;
 
       default:
@@ -306,7 +294,6 @@ export class EscalationEngine {
         event: "Incident Resolved",
         details: resolution,
       });
-      console.log(`✅ Incident ${incidentId} resolved: ${resolution}`);
       return true;
     }
     return false;

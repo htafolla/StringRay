@@ -3,7 +3,7 @@ import {
   PostValidateContext,
   ProcessorHook,
 } from "../processors/processor-types";
-import { frameworkLogger } from "../framework-logger.js";
+import { frameworkLogger } from "../framework-logger";
 import * as fs from "fs/promises";
 
 export interface ValidationHooks {

@@ -3,11 +3,11 @@
  * Debug the context enhancement process to see why it's failing
  */
 
-import { frameworkLogger } from "./src/framework-logger.js";
-import { ComplexityAnalyzer } from "./src/delegation/complexity-analyzer.js";
-import { CodebaseContextAnalyzer } from "./src/delegation/codebase-context-analyzer.js";
-import { ASTCodeParser } from "./src/delegation/ast-code-parser.js";
-import { DependencyGraphBuilder } from "./src/delegation/dependency-graph-builder.js";
+import { frameworkLogger } from "./src/framework-logger";
+import { ComplexityAnalyzer } from "./src/delegation/complexity-analyzer";
+import { CodebaseContextAnalyzer } from "./src/delegation/codebase-context-analyzer";
+import { ASTCodeParser } from "./src/delegation/ast-code-parser";
+import { DependencyGraphBuilder } from "./src/delegation/dependency-graph-builder";
 
 async function debugContextEnhancement() {
   console.log("🔧 DEBUGGING CONTEXT ENHANCEMENT PROCESS");

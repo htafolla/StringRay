@@ -319,4 +319,4 @@ export async function runDistributedSessionSimulation(): Promise<DistributedSimu
 
   return simulateDistributedSessions(config);
 }
-import { frameworkLogger } from "../framework-logger.js";
+import { frameworkLogger } from "../framework-logger";

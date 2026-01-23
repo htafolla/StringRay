@@ -141,9 +141,7 @@ export class ComplexityAnalyzer {
   }
 
   updateThresholds(performanceData: any): void {
-    console.log(
-      "🔄 Updating complexity thresholds based on performance data...",
-    );
+    // Implementation would update thresholds based on performance data
   }
 
   /**
@@ -158,7 +156,6 @@ export class ComplexityAnalyzer {
    */
   setThresholds(thresholds: Partial<ComplexityThresholds>): void {
     this.thresholds = { ...this.thresholds, ...thresholds };
-    console.log("✅ Complexity thresholds updated:", this.thresholds);
   }
 
   // Private helper methods

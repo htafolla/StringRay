@@ -12,8 +12,8 @@ import { WebSocketServer, WebSocket } from "ws";
 import { EventEmitter } from "events";
 import { IncomingMessage } from "http";
 import * as zlib from "zlib";
-import { performanceDashboard } from "../performance/performance-monitoring-dashboard.js";
-import { enterpriseMonitoringSystem } from "../monitoring/enterprise-monitoring-system.js";
+import { performanceDashboard } from "../performance/performance-monitoring-dashboard";
+import { enterpriseMonitoringSystem } from "../monitoring/enterprise-monitoring-system";
 
 export interface StreamingConfig {
   port: number;

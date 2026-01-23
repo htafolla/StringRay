@@ -1,0 +1,1 @@
+{"version":3,"file":"architectural-integrity.d.ts","sourceRoot":"","sources":["architectural-integrity.ts"],"names":[],"mappings":"AAAA;;;;;;GAMG;AAYH;;GAEG;AACH,wBAAsB,4BAA4B,IAAI,OAAO,CAAC;IAC5D,SAAS,EAAE,OAAO,CAAC;IACnB,MAAM,EAAE,MAAM,EAAE,CAAC;IACjB,eAAe,EAAE,MAAM,EAAE,CAAC;CAC3B,CAAC,CAuDD;AAED;;;GAGG;AACH,wBAAsB,wBAAwB,IAAI,OAAO,CAAC,IAAI,CAAC,CAoB9D"}

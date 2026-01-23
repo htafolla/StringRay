@@ -13,12 +13,12 @@ import { EventEmitter } from "events";
 import WebSocket from "ws";
 import { IncomingMessage } from "http";
 import * as zlib from "zlib";
-import { realTimeStreamingService } from "../streaming/real-time-streaming-service.js";
+import { realTimeStreamingService } from "../streaming/real-time-streaming-service";
 import {
   liveMetricsCollector,
   CollectedMetric,
-} from "./live-metrics-collector.js";
-import { alertEngine, Alert } from "./alert-engine.js";
+} from "./live-metrics-collector";
+import { alertEngine, Alert } from "./alert-engine";
 
 export interface DashboardConnection {
   id: string;

@@ -169,7 +169,7 @@ check_mcp_servers() {
     log_info "Configured MCP servers: $server_count"
 
     # Test one StrRay server
-    local test_server="$PROJECT_ROOT/dist/mcps/knowledge-skills/project-analysis.server.js"
+    local test_server="$PROJECT_ROOT/dist/plugin/mcps/knowledge-skills/project-analysis.server.js"
     if [[ -f "$test_server" ]]; then
         log_info "Testing MCP server execution..."
         timeout 5s node "$test_server" > /dev/null 2>&1 &

@@ -47,17 +47,13 @@ export class SecurityHardener {
     const appliedFixes: string[] = [];
     const remainingIssues: SecurityIssue[] = [];
 
-    console.log("🔒 Security Hardener: Applying security fixes...");
-
     for (const issue of auditResult.issues) {
       const fix = await this.applyFixForIssue(issue);
       if (fix.applied) {
         appliedFixes.push(fix.description);
-        console.log(`✅ Applied fix: ${fix.description}`);
-      } else {
+        } else {
         remainingIssues.push(issue);
-        console.log(`⚠️ Could not apply fix for: ${issue.description}`);
-      }
+        }
     }
 
     return { appliedFixes, remainingIssues };
@@ -89,9 +85,6 @@ export class SecurityHardener {
     description: string;
   }> {
     // This would require manual intervention, but we can suggest the fix
-    console.log(`🔧 Manual fix needed for hardcoded secrets in ${issue.file}`);
-    console.log(`💡 Recommendation: Move secrets to environment variables`);
-
     return {
       applied: false,
       description: `Manual intervention required for hardcoded secrets in ${issue.file}`,
@@ -122,13 +115,6 @@ export class SecurityHardener {
     description: string;
   }> {
     // This requires manual intervention for dependency updates
-    console.log(
-      `🔧 Manual fix needed for dependency management in ${issue.file}`,
-    );
-    console.log(
-      `💡 Recommendation: Update dependencies to specific versions and use lockfiles`,
-    );
-
     return {
       applied: false,
       description: `Manual intervention required for dependency management in ${issue.file}`,
@@ -140,13 +126,6 @@ export class SecurityHardener {
     description: string;
   }> {
     // This would require code analysis and modification
-    console.log(
-      `🔧 Code modification needed for input validation in ${issue.file}:${issue.line}`,
-    );
-    console.log(
-      `💡 Recommendation: Add comprehensive input validation and sanitization`,
-    );
-
     return {
       applied: false,
       description: `Code modification required for input validation in ${issue.file}`,
@@ -244,11 +223,6 @@ export class SecurityHardener {
       timestamp: new Date().toISOString(),
       ...event,
     };
-
-    console.log(
-      `🔒 SECURITY EVENT [${event.severity.toUpperCase()}]:`,
-      JSON.stringify(logEntry),
-    );
 
     // In production, this would write to secure audit logs
   }

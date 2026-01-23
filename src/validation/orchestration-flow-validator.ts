@@ -3,11 +3,11 @@
  * Validates the complete end-to-end orchestration pipeline
  */
 
-import { StringRayOrchestrator } from "../orchestrator.js";
-import { enhancedMultiAgentOrchestrator } from "../orchestrator/enhanced-multi-agent-orchestrator.js";
-import { createAgentDelegator } from "../delegation/agent-delegator.js";
-import { StringRayStateManager } from "../state/state-manager.js";
-import { frameworkLogger } from "../framework-logger.js";
+import { StringRayOrchestrator } from "../orchestrator";
+import { enhancedMultiAgentOrchestrator } from "../orchestrator/enhanced-multi-agent-orchestrator";
+import { createAgentDelegator } from "../delegation/agent-delegator";
+import { StringRayStateManager } from "../state/state-manager";
+import { frameworkLogger } from "../framework-logger";
 
 interface TestResult {
   testName: string;
@@ -598,10 +598,10 @@ class OrchestrationFlowValidator {
    * Run all orchestration flow validations
    */
   async runCompleteValidationSuite(): Promise<ValidationSuiteResults> {
-    console.log(
+    await frameworkLogger.log('orchestration-flow-validator', '-starting-comprehensive-orchestration-flow-validat', 'info', { message: 
       "🚀 STARTING COMPREHENSIVE ORCHESTRATION FLOW VALIDATION SUITE\n",
-    );
-    console.log("=".repeat(70));
+     });
+    await frameworkLogger.log('orchestration-flow-validator', '-repeat-70-', 'info', { message: "=".repeat(70) });
 
     const tests = [
       this.testBasicOrchestrationFlow(),
@@ -657,22 +657,22 @@ class OrchestrationFlowValidator {
       const agents = result.metrics.agentsSpawned;
 
       // Test result details - kept as console.log for readability
-      console.log(
+      await frameworkLogger.log('orchestration-flow-validator', '-index-1-result-testname-status-duration-ms-agents', 'info', { message: 
         `${index + 1}. ${result.testName} - ${status} (${duration}ms, ${agents} agents)`,
-      );
+       });
 
       // Show key metrics
-      console.log(
+      await frameworkLogger.log('orchestration-flow-validator', '-metrics-result-metrics-agentscompleted-result-met', 'info', { message: 
         `   Metrics: ${result.metrics.agentsCompleted}/${result.metrics.agentsSpawned} completed, ${result.metrics.dependenciesResolved} deps resolved`,
-      );
+       });
 
       // Show validation steps
       result.validationSteps.forEach((step) => {
         const stepStatus = step.success ? "✓" : "✗";
-        console.log(`     ${stepStatus} ${step.step}`);
+        await frameworkLogger.log('orchestration-flow-validator', '-stepstatus-step-step-', 'info', { message: `     ${stepStatus} ${step.step}` });
       });
 
-      console.log("");
+      await frameworkLogger.log('orchestration-flow-validator', '-', 'info', { message: "" });
     });
 
     // Cleanup

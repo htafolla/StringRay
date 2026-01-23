@@ -78,7 +78,7 @@ if (!fs.existsSync(opencodeDir)) {
 const ohMyOpencodeConfig = {
   plugin: [
     "oh-my-opencode",
-    "stringray-ai/dist/plugin/stringray-codex-injection.js",
+    "stringray-ai/dist/plugin/strray-codex-injection.js",
   ],
 };
 ```

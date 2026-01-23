@@ -5,8 +5,8 @@
  * Exposes key performance and health metrics
  */
 
-import { performanceSystem } from "../performance/index.js";
-import { strRayOrchestrator } from "../orchestrator.js";
+import { performanceSystem } from "../performance/index";
+import { strRayOrchestrator } from "../orchestrator";
 
 export class MetricsEndpoint {
   private metrics: Map<string, number> = new Map();

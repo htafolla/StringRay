@@ -12,9 +12,9 @@ import { EventEmitter } from "events";
 import {
   liveMetricsCollector,
   CollectedMetric,
-} from "./live-metrics-collector.js";
-import { alertEngine, Alert } from "./alert-engine.js";
-import { webSocketGateway } from "./websocket-gateway.js";
+} from "./live-metrics-collector";
+import { alertEngine, Alert } from "./alert-engine";
+import { webSocketGateway } from "./websocket-gateway";
 
 export interface DashboardWidget {
   id: string;

@@ -11,23 +11,23 @@
 export {
   PerformanceSystemOrchestrator,
   performanceSystem,
-} from "./performance-system-orchestrator.js";
+} from "./performance-system-orchestrator";
 
 // Individual performance components
 export {
   PerformanceBudgetEnforcer,
   performanceBudgetEnforcer,
   PERFORMANCE_BUDGET,
-} from "./performance-budget-enforcer.js";
+} from "./performance-budget-enforcer";
 export {
   PerformanceRegressionTester,
   performanceRegressionTester,
-} from "./performance-regression-tester.js";
+} from "./performance-regression-tester";
 export {
   PerformanceMonitoringDashboard,
   performanceDashboard,
-} from "./performance-monitoring-dashboard.js";
+} from "./performance-monitoring-dashboard";
 export {
   PerformanceCIGates,
   performanceCIGates,
-} from "./performance-ci-gates.js";
+} from "./performance-ci-gates";

@@ -499,8 +499,6 @@ export class PerformanceBudgetEnforcer extends EventEmitter {
     }
 
     this.monitoringActive = true;
-    console.log("🔍 Started performance monitoring");
-
     const monitor = async () => {
       if (!this.monitoringActive) {
         return;
@@ -524,8 +522,7 @@ export class PerformanceBudgetEnforcer extends EventEmitter {
    */
   stopMonitoring(): void {
     this.monitoringActive = false;
-    console.log("🛑 Stopped performance monitoring");
-  }
+    }
 
   /**
    * Get historical performance reports

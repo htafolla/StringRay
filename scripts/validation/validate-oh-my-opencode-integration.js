@@ -77,7 +77,7 @@ class OhMyOpenCodeIntegrationValidator {
       if (
         ohMyOpencodeConfig.plugin &&
         ohMyOpencodeConfig.plugin.some((p) =>
-          p.includes("stringray-codex-injection.js"),
+          p.includes("strray-codex-injection.js"),
         )
       ) {
         console.log("  ✅ StringRay plugin registered in oh-my-opencode");

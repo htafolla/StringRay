@@ -79,14 +79,6 @@ export class PathResolver {
    * Resolve agent import path for current environment
    */
   resolveAgentPath(agentName: string): string {
-    console.log("🔍 PathResolver diagnostics:", {
-      currentDir: this.currentDir,
-      isDevelopment: this.isDevelopment,
-      isBuilt: this.isBuilt,
-      isInstalled: this.isInstalled,
-      agentName,
-    });
-
     if (this.isDevelopment) {
       // In src/, agents are at ./agents/
       return `./agents/${agentName}.js`;

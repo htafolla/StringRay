@@ -2,7 +2,7 @@
  * Post-Processor Configuration
  */
 
-import { PostProcessorConfig } from "./types.js";
+import { PostProcessorConfig } from "./types";
 
 export const defaultConfig: PostProcessorConfig = {
   triggers: {

@@ -2,8 +2,8 @@
  * Redeploy Coordinator for Post-Processor
  */
 
-import { FixResult, PostProcessorContext } from "../types.js";
-import { frameworkLogger } from "../../framework-logger.js";
+import { FixResult, PostProcessorContext } from "../types";
+import { frameworkLogger } from "../../framework-logger";
 import { execSync } from "child_process";
 
 export interface RedeployResult {
@@ -68,9 +68,9 @@ export class RedeployCoordinator {
     const deploymentId = `deploy-${context.commitSha}-${Date.now()}`;
     const startTime = Date.now();
 
-    console.log(
+    await frameworkLogger.log('-redeploy-coordinator', '-starting-redeployment-deploymentid-for-commit-con', 'info', { message: 
       `🚀 Starting redeployment ${deploymentId} for commit ${context.commitSha}`,
-    );
+     });
 
     try {
       // Pre-deployment validation
@@ -151,7 +151,7 @@ export class RedeployCoordinator {
     context: PostProcessorContext,
     fixResult: FixResult,
   ): Promise<void> {
-    console.log("🔍 Validating pre-deployment requirements...");
+    await frameworkLogger.log('-redeploy-coordinator', '-validating-pre-deployment-requirements-', 'info', { message: "🔍 Validating pre-deployment requirements..." });
 
     // Ensure all fixes were successfully applied
     if (!fixResult.success) {
@@ -170,7 +170,7 @@ export class RedeployCoordinator {
 
     // Check if deployment environment is available
     // This would integrate with actual deployment infrastructure
-    console.log("✅ Pre-deployment validation passed");
+    await frameworkLogger.log('-redeploy-coordinator', '-pre-deployment-validation-passed-', 'success', { message: "✅ Pre-deployment validation passed" });
   }
 
   /**
@@ -186,9 +186,9 @@ export class RedeployCoordinator {
 
     while (attempt < maxRetries) {
       try {
-        console.log(
+        await frameworkLogger.log('-redeploy-coordinator', '-deployment-attempt-attempt-1-maxretries-for-deplo', 'info', { message: 
           `🔄 Deployment attempt ${attempt + 1}/${maxRetries} for ${deploymentId}`,
-        );
+         });
 
         if (this.config.canaryEnabled) {
           // Execute canary deployment
@@ -239,7 +239,7 @@ export class RedeployCoordinator {
     const results: CanaryResult[] = [];
     const phases = this.config.canaryPhases;
 
-    console.log(`🎯 Executing canary deployment with ${phases} phases`);
+    await frameworkLogger.log('-redeploy-coordinator', '-executing-canary-deployment-with-phases-phases-', 'info', { message: `🎯 Executing canary deployment with ${phases} phases` });
 
     for (let phase = 1; phase <= phases; phase++) {
       const trafficPercentage = Math.min(
@@ -247,9 +247,9 @@ export class RedeployCoordinator {
         100,
       );
 
-      console.log(
+      await frameworkLogger.log('-redeploy-coordinator', '-canary-phase-phase-phases-trafficpercentage-traff', 'info', { message: 
         `📊 Canary Phase ${phase}/${phases}: ${trafficPercentage}% traffic`,
-      );
+       });
 
       const phaseStartTime = Date.now();
 
@@ -282,9 +282,9 @@ export class RedeployCoordinator {
           throw new Error(`Canary phase ${phase} failed health checks`);
         }
 
-        console.log(
+        await frameworkLogger.log('-redeploy-coordinator', '-canary-phase-phase-successful-phaseresult-duratio', 'success', { message: 
           `✅ Canary Phase ${phase} successful (${phaseResult.duration}ms)`,
-        );
+         });
 
         // Wait between phases for observation
         if (phase < phases) {
@@ -324,7 +324,7 @@ export class RedeployCoordinator {
     context: PostProcessorContext,
     deploymentId: string,
   ): Promise<void> {
-    console.log(`🚀 Executing direct deployment for ${deploymentId}`);
+    await frameworkLogger.log('-redeploy-coordinator', '-executing-direct-deployment-for-deploymentid-', 'info', { message: `🚀 Executing direct deployment for ${deploymentId}` });
 
     // For this implementation, we'll simulate deployment by pushing to trigger CI/CD
     // In a real system, this would integrate with deployment APIs
@@ -335,7 +335,7 @@ export class RedeployCoordinator {
         stdio: "pipe",
         timeout: 30000,
       });
-      console.log("✅ Deployment triggered via git push");
+      await frameworkLogger.log('-redeploy-coordinator', '-deployment-triggered-via-git-push-', 'success', { message: "✅ Deployment triggered via git push" });
     } catch (error) {
       throw new Error(`Deployment trigger failed: ${error}`);
     }
@@ -352,9 +352,9 @@ export class RedeployCoordinator {
   ): Promise<void> {
     // Placeholder for canary deployment logic
     // In a real system, this would integrate with load balancers, service meshes, etc.
-    console.log(
+    await frameworkLogger.log('-redeploy-coordinator', '-deploying-trafficpercentage-traffic-to-canary-for', 'info', { message: 
       `🚢 Deploying ${trafficPercentage}% traffic to canary for phase ${phase}`,
-    );
+     });
 
     // Simulate deployment time
     await new Promise((resolve) => setTimeout(resolve, 2000));
@@ -367,9 +367,9 @@ export class RedeployCoordinator {
     phase: number,
     timeout: number,
   ): Promise<CanaryResult["metrics"]> {
-    console.log(
+    await frameworkLogger.log('-redeploy-coordinator', '-monitoring-canary-health-for-phase-phase-timeout-', 'info', { message: 
       `📊 Monitoring canary health for phase ${phase} (${timeout}ms timeout)`,
-    );
+     });
 
     // Placeholder for health monitoring
     // In a real system, this would check metrics from monitoring systems
@@ -406,7 +406,7 @@ export class RedeployCoordinator {
    */
   private async waitBetweenPhases(): Promise<void> {
     const waitTime = 10000; // 10 seconds
-    console.log(`⏳ Waiting ${waitTime}ms between canary phases...`);
+    await frameworkLogger.log('-redeploy-coordinator', '-waiting-waittime-ms-between-canary-phases-', 'info', { message: `⏳ Waiting ${waitTime}ms between canary phases...` });
     await new Promise((resolve) => setTimeout(resolve, waitTime));
   }
 
@@ -417,7 +417,7 @@ export class RedeployCoordinator {
     context: PostProcessorContext,
     deploymentId: string,
   ): Promise<void> {
-    console.log("🎯 Promoting canary deployment to production");
+    await frameworkLogger.log('-redeploy-coordinator', '-promoting-canary-deployment-to-production-', 'info', { message: "🎯 Promoting canary deployment to production" });
 
     // Placeholder for production promotion
     // In a real system, this would route 100% traffic to the new version
@@ -431,7 +431,7 @@ export class RedeployCoordinator {
     deployResult: any,
     jobId: string,
   ): Promise<{ success: boolean; error: string }> {
-    console.log("🔍 Validating post-deployment health...");
+    await frameworkLogger.log('-redeploy-coordinator', '-validating-post-deployment-health-', 'info', { message: "🔍 Validating post-deployment health..." });
 
     try {
       // Run post-deployment health checks
@@ -440,7 +440,7 @@ export class RedeployCoordinator {
       // For now, simulate a basic health check
       await new Promise((resolve) => setTimeout(resolve, 2000));
 
-      console.log("✅ Post-deployment validation passed");
+      await frameworkLogger.log('-redeploy-coordinator', '-post-deployment-validation-passed-', 'success', { message: "✅ Post-deployment validation passed" });
       return { success: true, error: "" };
     } catch (error) {
       await frameworkLogger.log(
@@ -463,7 +463,7 @@ export class RedeployCoordinator {
     deploymentId: string,
     context: PostProcessorContext,
   ): Promise<void> {
-    console.log(`🔄 Rolling back deployment ${deploymentId}`);
+    await frameworkLogger.log('-redeploy-coordinator', '-rolling-back-deployment-deploymentid-', 'info', { message: `🔄 Rolling back deployment ${deploymentId}` });
 
     try {
       // Placeholder for rollback logic
@@ -475,7 +475,7 @@ export class RedeployCoordinator {
         timeout: 10000,
       });
 
-      console.log("✅ Deployment rolled back successfully");
+      await frameworkLogger.log('-redeploy-coordinator', '-deployment-rolled-back-successfully-', 'success', { message: "✅ Deployment rolled back successfully" });
     } catch (error) {
       console.error("❌ Rollback failed:", error);
       throw new Error(`Rollback failed: ${error}`);
@@ -498,7 +498,7 @@ export class RedeployCoordinator {
     // Cap maximum delay at 5 minutes
     delay = Math.min(delay, 300000);
 
-    console.log(`⏳ Waiting ${delay}ms before retry (attempt ${attempt + 1})`);
+    await frameworkLogger.log('-redeploy-coordinator', '-waiting-delay-ms-before-retry-attempt-attempt-1-', 'info', { message: `⏳ Waiting ${delay}ms before retry (attempt ${attempt + 1})` });
     await new Promise((resolve) => setTimeout(resolve, delay));
   }
 }

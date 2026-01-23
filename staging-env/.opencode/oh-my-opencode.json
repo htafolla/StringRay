@@ -1,7 +1,7 @@
 {
   "model": "opencode/grok-code",
    "plugin": [
-     "node_modules/strray-ai/dist/plugin/plugins/stringray-codex-injection.js"
+     "node_modules/strray-ai/dist/plugin/plugins/strray-codex-injection.js"
    ],
   "disabled_agents": [
     "Sisyphus",

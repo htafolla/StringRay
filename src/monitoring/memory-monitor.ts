@@ -355,11 +355,7 @@ export function getMemoryUsage(): MemoryStats {
 }
 
 export function logMemoryUsage(): void {
-  const stats = getMemoryUsage();
-  // Memory monitor logging - already handled by frameworkLogger
-  console.log(
-    `🧠 Memory Usage: ${stats.heapUsed}MB heap, ${stats.heapTotal}MB total, ${stats.external}MB external`,
-  );
+  // Memory usage logging removed for codex compliance
 }
 
 export function checkMemoryHealth(): { healthy: boolean; issues: string[] } {

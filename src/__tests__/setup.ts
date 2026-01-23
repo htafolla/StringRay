@@ -52,7 +52,7 @@ beforeAll(() => {
   }
 
   const ohMyOpencodeConfig = {
-    plugin: "./dist/plugin/plugins/stringray-codex-injection.js",
+    plugin: "./dist/plugin/plugins/strray-codex-injection.js",
     agents: ["enforcer", "architect", "orchestrator"],
   };
   const ohMyOpencodePath = path.resolve(".opencode/oh-my-opencode.json");

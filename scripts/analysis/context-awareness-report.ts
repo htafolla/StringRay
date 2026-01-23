@@ -3,7 +3,7 @@
  * Complete chronological analysis of implementation, failures, and resolution
  */
 
-import { frameworkLogger } from "./src/framework-logger.js";
+import { frameworkLogger } from "./src/framework-logger";
 
 async function generateContextAwarenessReport() {
   console.log("📋 STRRAY FRAMEWORK CONTEXT AWARENESS IMPLEMENTATION REPORT");

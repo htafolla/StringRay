@@ -11,9 +11,9 @@
 export {
   SecurityMiddleware,
   securityMiddleware,
-} from "./security-middleware.js";
-export { SecurityScanner, securityScanner } from "./security-scanner.js";
+} from "./security-middleware";
+export { SecurityScanner, securityScanner } from "./security-scanner";
 export {
   PromptSecurityValidator,
   promptSecurityValidator,
-} from "./prompt-security-validator.js";
+} from "./prompt-security-validator";

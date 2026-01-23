@@ -8,7 +8,12 @@
  * @since 2026-01-08
  */
 
-import Redis from "ioredis";
+let Redis: any;
+try {
+  Redis = require("ioredis");
+} catch {
+  // Redis not available, distributed features will be disabled
+}
 import { EventEmitter } from "events";
 import { v4 as uuidv4 } from "uuid";
 import { RaftConsensus } from "./raft-consensus";

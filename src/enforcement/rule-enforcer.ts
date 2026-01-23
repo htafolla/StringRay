@@ -3,7 +3,7 @@
  * Enforces development rules and validates component creation
  */
 
-import { frameworkLogger } from "../framework-logger.js";
+import { frameworkLogger } from "../framework-logger";
 
 export interface RuleDefinition {
   id: string;
@@ -80,27 +80,34 @@ export interface RuleFix {
 export class RuleEnforcer {
   private rules: Map<string, RuleDefinition> = new Map();
   private ruleHierarchy: Map<string, string[]> = new Map();
+  private initialized = false;
 
   constructor() {
-    this.loadAllRules();
+    // Initialize synchronously first
+    this.initializeRules();
     this.initializeRuleHierarchy();
+    // Load async rules in background
+    this.loadAsyncRules();
   }
 
   /**
-   * Load all rules from all sources
+   * Load async rules in background
    */
-  private async loadAllRules(): Promise<void> {
-    // Load built-in framework rules
-    this.initializeRules();
+  private async loadAsyncRules(): Promise<void> {
+    try {
+      // Load codex terms as rules
+      await this.loadCodexRules();
 
-    // Load codex terms as rules
-    await this.loadCodexRules();
+      // Load agent triage rules from AGENTS.md
+      await this.loadAgentTriageRules();
 
-    // Load agent triage rules from AGENTS.md
-    await this.loadAgentTriageRules();
+      // Load processor-specific rules
+      await this.loadProcessorRules();
 
-    // Load processor-specific rules
-    await this.loadProcessorRules();
+      this.initialized = true;
+    } catch (error) {
+      console.warn('Failed to load async rules:', error);
+    }
   }
 
   /**
@@ -131,7 +138,7 @@ export class RuleEnforcer {
         }
       }
 
-      console.log(`Loaded ${Object.keys(codexData).length} codex rules`);
+      await frameworkLogger.log('rule-enforcer', '-loaded-object-keys-codexdata-length-codex-rules-', 'info', { message: `Loaded ${Object.keys(codexData).length} codex rules` });
     } catch (error) {
       console.warn('Failed to load codex rules:', error);
     }
@@ -162,7 +169,7 @@ export class RuleEnforcer {
           validator: this.validateTriageReporting.bind(this),
         });
 
-        console.log('Loaded agent triage rules');
+        await frameworkLogger.log('rule-enforcer', '-loaded-agent-triage-rules-', 'info', { message: 'Loaded agent triage rules' });
       }
     } catch (error) {
       console.warn('Failed to load agent triage rules:', error);
@@ -175,7 +182,7 @@ export class RuleEnforcer {
   private async loadProcessorRules(): Promise<void> {
     // Processor-specific rules would be loaded here
     // For now, this is a placeholder for future expansion
-    console.log('Processor rules loading placeholder');
+    await frameworkLogger.log('rule-enforcer', '-processor-rules-loading-placeholder-', 'info', { message: 'Processor rules loading placeholder' });
   }
 
   /**
@@ -574,7 +581,6 @@ export class RuleEnforcer {
    * Get rule count
    */
   getRuleCount(): number {
-    console.log(`RuleEnforcer: getRuleCount called, returning ${this.rules.size}`);
     return this.rules.size;
   }
 
@@ -610,22 +616,37 @@ export class RuleEnforcer {
   }
 
   /**
+   * Check if rule enforcer is fully initialized
+   */
+  isInitialized(): boolean {
+    return this.initialized;
+  }
+
+  /**
    * Validate operation against all applicable rules
    */
   async validateOperation(
     operation: string,
     context: RuleValidationContext,
   ): Promise<ValidationReport> {
+    // Ensure async rules are loaded
+    if (!this.initialized) {
+      await this.loadAsyncRules();
+    }
+
     const applicableRules = this.getApplicableRules(operation, context);
-    console.log(
+    await frameworkLogger.log('rule-enforcer', '-debug-applicablerules-length-applicable-rules-for', 'info', { message: 
       `🔍 DEBUG: ${applicableRules.length} applicable rules for operation '${operation}': ${applicableRules.map((r) => r.id).join(", ")}`,
-    );
+     });
     const results: RuleValidationResult[] = [];
     const errors: string[] = [];
     const warnings: string[] = [];
 
     for (const rule of applicableRules) {
       try {
+        if (rule.id === 'resolve-all-errors') {
+          await frameworkLogger.log('rule-enforcer', 'APPLYING resolve-all-errors rule', 'info');
+        }
         const result = await rule.validator(context);
 
         const validationResult = result as RuleValidationResult;
@@ -681,11 +702,11 @@ export class RuleEnforcer {
 
     for (const violation of violations) {
       try {
-        console.log(`🔧 Enforcer: Attempting to fix rule violation: ${violation.rule}`);
+        await frameworkLogger.log('rule-enforcer', '-enforcer-attempting-to-fix-rule-violation-violati', 'info', { message: `🔧 Enforcer: Attempting to fix rule violation: ${violation.rule}` });
 
         const agentSkill = this.getAgentForRule(violation.rule);
         if (!agentSkill) {
-          console.log(`❌ Enforcer: No agent/skill mapping found for rule: ${violation.rule}`);
+          await frameworkLogger.log('rule-enforcer', '-enforcer-no-agent-skill-mapping-found-for-rule-vi', 'error', { message: `❌ Enforcer: No agent/skill mapping found for rule: ${violation.rule}` });
           fixes.push({
             ruleId: violation.rule,
             agent: '',
@@ -720,7 +741,7 @@ export class RuleEnforcer {
           }
         );
 
-        console.log(`✅ Enforcer: Agent ${agent} attempted fix for rule: ${violation.rule}`);
+        await frameworkLogger.log('rule-enforcer', '-enforcer-agent-agent-attempted-fix-for-rule-viola', 'success', { message: `✅ Enforcer: Agent ${agent} attempted fix for rule: ${violation.rule}` });
 
         fixes.push({
           ruleId: violation.rule,
@@ -732,7 +753,7 @@ export class RuleEnforcer {
         });
 
       } catch (error) {
-        console.log(`❌ Enforcer: Failed to call agent for rule ${violation.rule}: ${error instanceof Error ? error.message : String(error)}`);
+        await frameworkLogger.log('rule-enforcer', '-enforcer-failed-to-call-agent-for-rule-violation-', 'error', { message: `❌ Enforcer: Failed to call agent for rule ${violation.rule}: ${error instanceof Error ? error.message : String(error)}` });
         fixes.push({
           ruleId: violation.rule,
           agent: '',
@@ -1709,6 +1730,8 @@ export class RuleEnforcer {
       suggestions.push(
         "Replace console.log with proper logging framework (frameworkLogger)",
       );
+      // Force failure for testing
+      violations.push("TEST: Console.log detected - blocking for codex compliance");
     }
 
     // Check for unhandled promise rejections
@@ -2147,10 +2170,10 @@ export class RuleEnforcer {
     }
 
     // Check for console.log usage
-    if (newCode.includes("console.log(")) {
+    if (newCode.includes("await frameworkLogger.log('rule-enforcer', '-return-passed-false-message-console-log-', 'info', { message: ")) {
       return {
         passed: false,
-        message: "console.log() detected - use frameworkLogger for production logs or remove for debugging",
+        message: "await frameworkLogger.log('rule-enforcer', '-', 'info', { message:  } }); detected - use frameworkLogger for production logs or remove for debugging",
       };
     }
 

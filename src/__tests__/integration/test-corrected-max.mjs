@@ -1,4 +1,4 @@
-import { complexityAnalyzer } from './node_modules/strray-ai/dist/plugin/delegation/complexity-analyzer.js';
+import { complexityAnalyzer } from './node_modules/strray-ai/dist/plugin/src/delegation/complexity-analyzer.js';
 
 console.log('=== CORRECTED MAXIMUM COMPLEXITY - ORCHESTRATOR TRIGGER ===');
 

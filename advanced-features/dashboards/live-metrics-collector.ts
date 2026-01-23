@@ -11,9 +11,9 @@
 import { EventEmitter } from "events";
 import { performance } from "perf_hooks";
 import * as os from "os";
-import { performanceDashboard } from "../performance/performance-monitoring-dashboard.js";
-import { enterpriseMonitoringSystem } from "../monitoring/enterprise-monitoring-system.js";
-import { realTimeStreamingService } from "../streaming/real-time-streaming-service.js";
+import { performanceDashboard } from "../performance/performance-monitoring-dashboard";
+import { enterpriseMonitoringSystem } from "../monitoring/enterprise-monitoring-system";
+import { realTimeStreamingService } from "../streaming/real-time-streaming-service";
 
 export interface MetricSource {
   id: string;

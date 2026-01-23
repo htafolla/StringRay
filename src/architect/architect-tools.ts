@@ -3,10 +3,10 @@
  * Provides tools for codebase intelligence, architectural assessment, and design planning
  */
 
-import { createCodebaseContextAnalyzer } from "../delegation/codebase-context-analyzer.js";
-import { ASTCodeParser } from "../delegation/ast-code-parser.js";
-import { DependencyGraphBuilder } from "../delegation/dependency-graph-builder.js";
-import { frameworkLogger } from "../framework-logger.js";
+import { createCodebaseContextAnalyzer } from "../delegation/codebase-context-analyzer";
+import { ASTCodeParser } from "../delegation/ast-code-parser";
+import { DependencyGraphBuilder } from "../delegation/dependency-graph-builder";
+import { frameworkLogger } from "../framework-logger";
 import * as fs from "fs";
 import * as path from "path";
 

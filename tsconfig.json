@@ -34,6 +34,15 @@
     "src/cross-language-bridge.ts",
     "src/dashboards/**/*",
     "src/distributed/**/*",
-    "src/streaming/**/*"
+    "src/streaming/**/*",
+    "src/mcps/**/*",
+    "src/plugins/**/*",
+    "src/postprocessor/**/*",
+    "src/integrations/**/*",
+    "src/circuit-breaker/**/*",
+    "src/enterprise-monitoring.ts",
+    "src/infrastructure/**/*",
+    "src/reporting/**/*",
+    "src/validation/**/*"
   ]
 }

@@ -2,11 +2,11 @@
  * Git Hook Trigger for Post-Processor
  */
 
-import { PostProcessor } from "../PostProcessor.js";
-import { PostProcessorContext } from "../types.js";
+import { PostProcessor } from "../PostProcessor";
+import { PostProcessorContext } from "../types";
 import * as fs from "fs";
 import * as path from "path";
-import { frameworkLogger } from "../../framework-logger.js";
+import { frameworkLogger } from "../../framework-logger";
 
 interface LogArchiveConfig {
   archiveDirectory: string;
@@ -326,7 +326,7 @@ export class GitHookTrigger {
     this.installHook(postPushHook, "post-push");
 
     // Create symlinks in .git/hooks to activate them
-    this.activateGitHooks(gitHooksDir, postCommitHook, postPushHook);
+    await this.activateGitHooks(gitHooksDir, postCommitHook, postPushHook);
 
     this.initialized = true;
   }
@@ -438,17 +438,17 @@ fi
           const result = await validator.validate();
 
           if (result.warnings.length > 0) {
-            console.log('⚠️ ' + result.warnings.length + ' warning(s) found:');
-            result.warnings.forEach(w => console.log('   ' + w));
+            await frameworkLogger.log('-git-hook-trigger', '-result-warnings-length-warning-s-found-', 'info', { message: '⚠️ ' + result.warnings.length + ' warning(s) found:' });
+            result.warnings.forEach(w => await frameworkLogger.log('-git-hook-trigger', '-w-', 'info', { message: '   ' + w) });
           }
 
           if (!result.passed) {
-            console.log('❌ ' + result.errors.length + ' error(s) found:');
-            result.errors.forEach(e => console.log('   ' + e));
+            await frameworkLogger.log('-git-hook-trigger', '-result-errors-length-error-s-found-', 'error', { message: '❌ ' + result.errors.length + ' error(s) found:' });
+            result.errors.forEach(e => await frameworkLogger.log('-git-hook-trigger', '-e-', 'info', { message: '   ' + e) });
             process.exit(1);
           }
 
-          console.log('✅ Post-commit: Validation passed in ' + result.duration + 'ms');
+          await frameworkLogger.log('-git-hook-trigger', '-post-commit-validation-passed-in-result-duration-', 'success', { message: '✅ Post-commit: Validation passed in ' + result.duration + 'ms' });
         } catch (error) {
           console.error('❌ Post-commit validation failed:', error instanceof Error ? error.message : String(error));
           process.exit(1);
@@ -473,7 +473,7 @@ fi
             enabled: true
           });
           if (result.cleaned > 0) {
-            console.log(\`🧹 Cleaned \${result.cleaned} old log files\`);
+            await frameworkLogger.log('-git-hook-trigger', '-cleaned-result-cleaned-old-log-files-', 'info', { message: \`🧹 Cleaned \${result.cleaned} old log files\` });
           }
           if (result.errors.length > 0) {
             console.error('Log cleanup errors:', result.errors);
@@ -520,11 +520,11 @@ exit 0
 `;
   }
 
-  private activateGitHooks(
+  private async activateGitHooks(
     gitHooksDir: string,
     postCommitHook: string,
     postPushHook: string,
-  ): void {
+  ): Promise<void> {
     try {
       // Define the target hook paths in .git/hooks
       const gitPostCommitHook = path.join(gitHooksDir, "post-commit");
@@ -543,13 +543,13 @@ exit 0
       fs.symlinkSync(relativePostPush, gitPostPushHook);
     } catch (error) {
       console.error("❌ Failed to activate git hooks:", error);
-      console.log("💡 To activate manually, run:");
-      console.log(
+      await frameworkLogger.log('-git-hook-trigger', '-to-activate-manually-run-', 'info', { message: "💡 To activate manually, run:" });
+      await frameworkLogger.log('-git-hook-trigger', '-ln-s-opencode-hooks-post-commit-git-hooks-post-co', 'info', { message: 
         `   ln -s "../../.opencode/hooks/post-commit" ".git/hooks/post-commit"`,
-      );
-      console.log(
+       });
+      await frameworkLogger.log('-git-hook-trigger', '-ln-s-opencode-hooks-post-push-git-hooks-post-push', 'info', { message: 
         `   ln -s "../../.opencode/hooks/post-push" ".git/hooks/post-push"`,
-      );
+       });
     }
   }
 

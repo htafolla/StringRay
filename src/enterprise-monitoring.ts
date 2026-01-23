@@ -19,6 +19,7 @@ import {
 } from "./monitoring/advanced-monitor";
 import { SessionMonitor } from "./session/session-monitor";
 import { PerformanceSystemOrchestrator } from "./performance/performance-system-orchestrator";
+import { frameworkLogger } from "./framework-logger";
 
 // =============================================================================
 // ARCHITECTURE OVERVIEW
@@ -276,7 +277,7 @@ class DistributedMonitoringCoordinator extends EventEmitter {
     };
   }
 
-  private startDistributedMonitoring(): void {
+  private async startDistributedMonitoring(): Promise<void> {
     // Register this instance
     this.registerInstance(this.config.distributed.instanceId);
 
@@ -288,10 +289,10 @@ class DistributedMonitoringCoordinator extends EventEmitter {
       this.performClusterHealthCheck();
     }, this.config.distributed.leaderElectionInterval);
 
-    console.log("🔄 Enterprise Monitor: Started distributed coordination");
+    await frameworkLogger.log('enterprise-monitoring', '-enterprise-monitor-started-distributed-coordinati', 'info', { message: "🔄 Enterprise Monitor: Started distributed coordination" });
   }
 
-  registerInstance(instanceId: string): void {
+  async registerInstance(instanceId: string): Promise<void> {
     const instance: InstanceHealth = {
       instanceId,
       status: "healthy",
@@ -303,10 +304,10 @@ class DistributedMonitoringCoordinator extends EventEmitter {
     this.instances.set(instanceId, instance);
     this.updateClusterHealth();
 
-    console.log(`📊 Enterprise Monitor: Registered instance ${instanceId}`);
+    await frameworkLogger.log('enterprise-monitoring', '-enterprise-monitor-registered-instance-instanceid', 'info', { message: `📊 Enterprise Monitor: Registered instance ${instanceId}` });
   }
 
-  unregisterInstance(instanceId: string): void {
+  async unregisterInstance(instanceId: string): Promise<void> {
     this.instances.delete(instanceId);
     this.updateClusterHealth();
 
@@ -315,7 +316,7 @@ class DistributedMonitoringCoordinator extends EventEmitter {
       this.consensusManager.startElection();
     }
 
-    console.log(`📊 Enterprise Monitor: Unregistered instance ${instanceId}`);
+    await frameworkLogger.log('enterprise-monitoring', '-enterprise-monitor-unregistered-instance-instance', 'info', { message: `📊 Enterprise Monitor: Unregistered instance ${instanceId}` });
   }
 
   updateInstanceHealth(
@@ -402,13 +403,13 @@ class DistributedMonitoringCoordinator extends EventEmitter {
     this.emit("instance-failure", { instanceId, timestamp: Date.now() });
   }
 
-  shutdown(): void {
+  async shutdown(): Promise<void> {
     if (this.healthCheckInterval) {
       clearInterval(this.healthCheckInterval);
     }
 
     this.consensusManager.shutdown();
-    console.log("🛑 Enterprise Monitor: Distributed coordinator shutdown");
+    await frameworkLogger.log('enterprise-monitoring', '-enterprise-monitor-distributed-coordinator-shutdo', 'info', { message: "🛑 Enterprise Monitor: Distributed coordinator shutdown" });
   }
 }
 
@@ -464,7 +465,7 @@ class LoadBalancerIntegration extends EventEmitter {
     };
   }
 
-  private startLoadBalancerMonitoring(): void {
+  private async startLoadBalancerMonitoring(): Promise<void> {
     // Start health checks
     this.healthCheckInterval = setInterval(() => {
       this.performEndpointHealthChecks();
@@ -475,7 +476,7 @@ class LoadBalancerIntegration extends EventEmitter {
       this.analyzeTrafficDistribution();
     }, this.config.loadBalancing.trafficAnalysisInterval);
 
-    console.log("🔄 Enterprise Monitor: Started load balancer integration");
+    await frameworkLogger.log('enterprise-monitoring', '-enterprise-monitor-started-load-balancer-integrat', 'info', { message: "🔄 Enterprise Monitor: Started load balancer integration" });
   }
 
   private async performEndpointHealthChecks(): Promise<void> {
@@ -573,9 +574,9 @@ class LoadBalancerIntegration extends EventEmitter {
     // Update load balancer configuration
     await this.updateLoadBalancerConfig();
 
-    console.log(
+    await frameworkLogger.log('enterprise-monitoring', '-enterprise-monitor-updated-newendpoints-length-lo', 'info', { message: 
       `📊 Enterprise Monitor: Updated ${newEndpoints.length} load balancer endpoints`,
-    );
+     });
   }
 
   private async updateLoadBalancerConfig(): Promise<void> {
@@ -607,7 +608,7 @@ class LoadBalancerIntegration extends EventEmitter {
     }));
   }
 
-  shutdown(): void {
+  async shutdown(): Promise<void> {
     if (this.healthCheckInterval) {
       clearInterval(this.healthCheckInterval);
     }
@@ -615,7 +616,7 @@ class LoadBalancerIntegration extends EventEmitter {
       clearInterval(this.trafficAnalysisInterval);
     }
 
-    console.log("🛑 Enterprise Monitor: Load balancer integration shutdown");
+    await frameworkLogger.log('enterprise-monitoring', '-enterprise-monitor-load-balancer-integration-shut', 'info', { message: "🛑 Enterprise Monitor: Load balancer integration shutdown" });
   }
 }
 
@@ -657,8 +658,8 @@ class AutoScalingIntegration extends EventEmitter {
     }
   }
 
-  private startAutoScaling(): void {
-    console.log("🔄 Enterprise Monitor: Started auto-scaling integration");
+  private async startAutoScaling(): Promise<void> {
+    await frameworkLogger.log('enterprise-monitoring', '-enterprise-monitor-started-auto-scaling-integrati', 'info', { message: "🔄 Enterprise Monitor: Started auto-scaling integration" });
   }
 
   async evaluateScaling(metrics: MonitoringMetrics): Promise<ScalingDecision> {
@@ -806,9 +807,9 @@ class AutoScalingIntegration extends EventEmitter {
     }
 
     try {
-      console.log(
+      await frameworkLogger.log('enterprise-monitoring', '-enterprise-monitor-executing-scaling-action-decis', 'info', { message: 
         `🔄 Enterprise Monitor: Executing scaling action: ${decision.action} ${decision.instances} instances`,
-      );
+       });
 
       const result = await this.scaler.scale(decision);
       this.currentInstances = result.newInstanceCount;
@@ -857,8 +858,8 @@ class AutoScalingIntegration extends EventEmitter {
     };
   }
 
-  shutdown(): void {
-    console.log("🛑 Enterprise Monitor: Auto-scaling integration shutdown");
+  async shutdown(): Promise<void> {
+    await frameworkLogger.log('enterprise-monitoring', '-enterprise-monitor-auto-scaling-integration-shutd', 'info', { message: "🛑 Enterprise Monitor: Auto-scaling integration shutdown" });
   }
 }
 
@@ -894,7 +895,7 @@ class HighAvailabilityManager extends EventEmitter {
     }
   }
 
-  private initializeHighAvailability(): void {
+  private async initializeHighAvailability(): Promise<void> {
     for (let i = 0; i < this.config.highAvailability.redundancyLevel; i++) {
       this.backupMonitors.push(new AdvancedMonitor());
     }
@@ -903,9 +904,9 @@ class HighAvailabilityManager extends EventEmitter {
       this.monitorAvailability();
     }, 30000);
 
-    console.log(
+    await frameworkLogger.log('enterprise-monitoring', '-enterprise-monitor-initialized-high-availability-', 'info', { message: 
       `🔄 Enterprise Monitor: Initialized high availability with ${this.backupMonitors.length} backup monitors`,
-    );
+     });
   }
 
   private async monitorAvailability(): Promise<void> {
@@ -933,7 +934,7 @@ class HighAvailabilityManager extends EventEmitter {
   }
 
   private async initiateFailover(): Promise<void> {
-    console.log("🚨 Enterprise Monitor: Initiating failover");
+    await frameworkLogger.log('enterprise-monitoring', '-enterprise-monitor-initiating-failover-', 'info', { message: "🚨 Enterprise Monitor: Initiating failover" });
 
     this.failoverActive = true;
     this.lastFailover = Date.now();
@@ -949,7 +950,7 @@ class HighAvailabilityManager extends EventEmitter {
         this.backupMonitors.splice(i, 1);
         this.backupMonitors.push(new AdvancedMonitor());
 
-        console.log("✅ Enterprise Monitor: Failover completed");
+        await frameworkLogger.log('enterprise-monitoring', '-enterprise-monitor-failover-completed-', 'success', { message: "✅ Enterprise Monitor: Failover completed" });
         this.emit("failover-completed", {
           timestamp: Date.now(),
           newPrimaryIndex: i,
@@ -989,12 +990,12 @@ class HighAvailabilityManager extends EventEmitter {
     return this.getAvailabilityStatus();
   }
 
-  shutdown(): void {
+  async shutdown(): Promise<void> {
     if (this.healthCheckInterval) {
       clearInterval(this.healthCheckInterval);
     }
 
-    console.log("🛑 Enterprise Monitor: High availability manager shutdown");
+    await frameworkLogger.log('enterprise-monitoring', '-enterprise-monitor-high-availability-manager-shut', 'info', { message: "🛑 Enterprise Monitor: High availability manager shutdown" });
   }
 }
 
@@ -1363,9 +1364,9 @@ class AlertManagementSystem extends EventEmitter {
     this.escalationManager = new AlertEscalationManager(config.alerting);
   }
 
-  createAlert(
+  async createAlert(
     alert: Omit<Alert, "id" | "timestamp" | "acknowledged" | "resolved">,
-  ): Alert {
+  ): Promise<Alert> {
     const newAlert: Alert = {
       id: `alert_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       timestamp: Date.now(),
@@ -1385,12 +1386,12 @@ class AlertManagementSystem extends EventEmitter {
 
     this.emit("alert-created", newAlert);
 
-    console.log(`🚨 Alert created: ${newAlert.title} (${newAlert.severity})`);
+    await frameworkLogger.log('enterprise-monitoring', '-alert-created-newalert-title-newalert-severity-', 'info', { message: `🚨 Alert created: ${newAlert.title} (${newAlert.severity})` });
 
     return newAlert;
   }
 
-  acknowledgeAlert(alertId: string, acknowledgedBy: string): boolean {
+  async acknowledgeAlert(alertId: string, acknowledgedBy: string): Promise<boolean> {
     const alert = this.activeAlerts.get(alertId);
     if (!alert) return false;
 
@@ -1400,12 +1401,12 @@ class AlertManagementSystem extends EventEmitter {
 
     this.emit("alert-acknowledged", alert);
 
-    console.log(`✅ Alert acknowledged: ${alert.title} by ${acknowledgedBy}`);
+    await frameworkLogger.log('enterprise-monitoring', '-alert-acknowledged-alert-title-by-acknowledgedby-', 'success', { message: `✅ Alert acknowledged: ${alert.title} by ${acknowledgedBy}` });
 
     return true;
   }
 
-  resolveAlert(alertId: string): boolean {
+  async resolveAlert(alertId: string): Promise<boolean> {
     const alert = this.activeAlerts.get(alertId);
     if (!alert) return false;
 
@@ -1416,7 +1417,7 @@ class AlertManagementSystem extends EventEmitter {
 
     this.emit("alert-resolved", alert);
 
-    console.log(`✅ Alert resolved: ${alert.title}`);
+    await frameworkLogger.log('enterprise-monitoring', '-alert-resolved-alert-title-', 'success', { message: `✅ Alert resolved: ${alert.title}` });
 
     return true;
   }
@@ -1442,8 +1443,8 @@ class AlertManagementSystem extends EventEmitter {
     );
   }
 
-  shutdown(): void {
-    console.log("🛑 Alert Management: Shutdown complete");
+  async shutdown(): Promise<void> {
+    await frameworkLogger.log('enterprise-monitoring', '-alert-management-shutdown-complete-', 'info', { message: "🛑 Alert Management: Shutdown complete" });
   }
 }
 
@@ -1518,12 +1519,12 @@ class RealTimeDashboard extends EventEmitter {
     };
   }
 
-  private startDashboard(): void {
+  private async startDashboard(): Promise<void> {
     this.updateInterval = setInterval(() => {
       this.updateMetrics();
     }, this.config.dashboards.realTimeUpdateInterval);
 
-    console.log("📊 Enterprise Monitor: Started real-time dashboard");
+    await frameworkLogger.log('enterprise-monitoring', '-enterprise-monitor-started-real-time-dashboard-', 'info', { message: "📊 Enterprise Monitor: Started real-time dashboard" });
   }
 
   private updateMetrics(): void {
@@ -1590,12 +1591,12 @@ class RealTimeDashboard extends EventEmitter {
     };
   }
 
-  shutdown(): void {
+  async shutdown(): Promise<void> {
     if (this.updateInterval) {
       clearInterval(this.updateInterval);
     }
 
-    console.log("🛑 Enterprise Monitor: Dashboard shutdown");
+    await frameworkLogger.log('enterprise-monitoring', '-enterprise-monitor-dashboard-shutdown-', 'info', { message: "🛑 Enterprise Monitor: Dashboard shutdown" });
   }
 }
 
@@ -1639,75 +1640,75 @@ class EnterpriseMonitoringOrchestrator extends EventEmitter {
   }
 
   private async initializeEnterpriseMonitoring(): Promise<void> {
-    console.log("🚀 Initializing StringRay Enterprise Monitoring System");
+    await frameworkLogger.log('enterprise-monitoring', '-initializing-stringray-enterprise-monitoring-syst', 'info', { message: "🚀 Initializing StringRay Enterprise Monitoring System" });
 
     try {
       if (this.config.distributed.enabled) {
         this.components.distributedCoordinator =
           new DistributedMonitoringCoordinator(this.config);
-        console.log("   ✅ Distributed coordinator initialized");
+        await frameworkLogger.log('enterprise-monitoring', '-distributed-coordinator-initialized-', 'success', { message: "   ✅ Distributed coordinator initialized" });
       }
 
       if (this.config.loadBalancing.enabled) {
         this.components.loadBalancerIntegration = new LoadBalancerIntegration(
           this.config,
         );
-        console.log("   ✅ Load balancer integration initialized");
+        await frameworkLogger.log('enterprise-monitoring', '-load-balancer-integration-initialized-', 'success', { message: "   ✅ Load balancer integration initialized" });
       }
 
       if (this.config.autoScaling.enabled) {
         this.components.autoScalingIntegration = new AutoScalingIntegration(
           this.config,
         );
-        console.log("   ✅ Auto-scaling integration initialized");
+        await frameworkLogger.log('enterprise-monitoring', '-auto-scaling-integration-initialized-', 'success', { message: "   ✅ Auto-scaling integration initialized" });
       }
 
       if (this.config.highAvailability.enabled) {
         this.components.highAvailabilityManager = new HighAvailabilityManager(
           this.config,
         );
-        console.log("   ✅ High availability manager initialized");
+        await frameworkLogger.log('enterprise-monitoring', '-high-availability-manager-initialized-', 'success', { message: "   ✅ High availability manager initialized" });
       }
 
       if (this.config.integrations.prometheus.enabled) {
         this.components.prometheusIntegration = new PrometheusIntegration(
           this.config.integrations.prometheus,
         );
-        console.log("   ✅ Prometheus integration initialized");
+        await frameworkLogger.log('enterprise-monitoring', '-prometheus-integration-initialized-', 'success', { message: "   ✅ Prometheus integration initialized" });
       }
 
       if (this.config.integrations.datadog.enabled) {
         this.components.datadogIntegration = new DataDogIntegration(
           this.config.integrations.datadog,
         );
-        console.log("   ✅ DataDog integration initialized");
+        await frameworkLogger.log('enterprise-monitoring', '-datadog-integration-initialized-', 'success', { message: "   ✅ DataDog integration initialized" });
       }
 
       if (this.config.integrations.newrelic.enabled) {
         this.components.newrelicIntegration = new NewRelicIntegration(
           this.config.integrations.newrelic,
         );
-        console.log("   ✅ New Relic integration initialized");
+        await frameworkLogger.log('enterprise-monitoring', '-new-relic-integration-initialized-', 'success', { message: "   ✅ New Relic integration initialized" });
       }
 
       this.components.healthCheckSystem = new HealthCheckSystem(this.config);
-      console.log("   ✅ Health check system initialized");
+      await frameworkLogger.log('enterprise-monitoring', '-health-check-system-initialized-', 'success', { message: "   ✅ Health check system initialized" });
 
       if (this.config.alerting.enabled) {
         this.components.alertManagementSystem = new AlertManagementSystem(
           this.config,
         );
-        console.log("   ✅ Alert management system initialized");
+        await frameworkLogger.log('enterprise-monitoring', '-alert-management-system-initialized-', 'success', { message: "   ✅ Alert management system initialized" });
       }
 
       if (this.config.dashboards.enabled) {
         this.components.realTimeDashboard = new RealTimeDashboard(this.config);
-        console.log("   ✅ Real-time dashboard initialized");
+        await frameworkLogger.log('enterprise-monitoring', '-real-time-dashboard-initialized-', 'success', { message: "   ✅ Real-time dashboard initialized" });
       }
 
       this.setupEventForwarding();
 
-      console.log("✅ Enterprise monitoring system initialized successfully");
+      await frameworkLogger.log('enterprise-monitoring', '-enterprise-monitoring-system-initialized-successf', 'success', { message: "✅ Enterprise monitoring system initialized successfully" });
     } catch (error) {
       console.error(
         "❌ Failed to initialize enterprise monitoring system:",
@@ -1888,7 +1889,7 @@ class EnterpriseMonitoringOrchestrator extends EventEmitter {
   }
 
   async shutdown(): Promise<void> {
-    console.log("🔌 Shutting down enterprise monitoring system");
+    await frameworkLogger.log('enterprise-monitoring', '-shutting-down-enterprise-monitoring-system-', 'info', { message: "🔌 Shutting down enterprise monitoring system" });
 
     for (const component of Object.values(this.components)) {
       if (component && typeof component.shutdown === "function") {
@@ -1896,7 +1897,7 @@ class EnterpriseMonitoringOrchestrator extends EventEmitter {
       }
     }
 
-    console.log("✅ Enterprise monitoring system shutdown complete");
+    await frameworkLogger.log('enterprise-monitoring', '-enterprise-monitoring-system-shutdown-complete-', 'success', { message: "✅ Enterprise monitoring system shutdown complete" });
   }
 }
 

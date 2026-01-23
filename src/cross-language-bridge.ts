@@ -10,7 +10,7 @@
 
 import WebSocket from "ws";
 import { EventEmitter } from "events";
-import { frameworkLogger } from "./framework-logger.js";
+import { frameworkLogger } from "./framework-logger";
 
 export interface RPCRequest {
   jsonrpc: "2.0";

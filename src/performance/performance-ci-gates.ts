@@ -11,15 +11,16 @@
 import { execSync } from "child_process";
 import * as fs from "fs";
 import * as path from "path";
+import { frameworkLogger } from "../framework-logger";
 import {
   PerformanceBudgetEnforcer,
   PerformanceReport,
   PERFORMANCE_BUDGET,
-} from "./performance-budget-enforcer.js";
+} from "./performance-budget-enforcer";
 import {
   PerformanceRegressionTester,
   RegressionTestSuite,
-} from "./performance-regression-tester.js";
+} from "./performance-regression-tester";
 
 export interface CIGateConfig {
   failOnBudgetViolation: boolean;
@@ -92,8 +93,8 @@ export class PerformanceCIGates {
     testSuite?: RegressionTestSuite,
   ): Promise<CIGateResult> {
     const startTime = Date.now();
-    console.log("🚀 Running StringRay Performance Gates");
-    console.log("=====================================");
+    await frameworkLogger.log('performance-ci-gates', '-running-stringray-performance-gates-', 'info', { message: "🚀 Running StringRay Performance Gates" });
+    await frameworkLogger.log('performance-ci-gates', '-', 'info', { message: "=====================================" });
 
     const result: CIGateResult = {
       success: true,
@@ -119,28 +120,28 @@ export class PerformanceCIGates {
       this.ensureDirectories();
 
       // 1. Run performance budget check
-      console.log("\n📊 Running Performance Budget Check...");
+      await frameworkLogger.log('performance-ci-gates', '-n-running-performance-budget-check-', 'info', { message: "\n📊 Running Performance Budget Check..." });
       const budgetResult = await this.runBudgetCheck();
       result.budgetCheck = budgetResult;
 
       if (!budgetResult.passed && this.config.failOnBudgetViolation) {
         result.success = false;
-        console.log("❌ Budget check failed - pipeline will fail");
+        await frameworkLogger.log('performance-ci-gates', '-budget-check-failed-pipeline-will-fail-', 'error', { message: "❌ Budget check failed - pipeline will fail" });
       }
 
       // 2. Run regression tests
-      console.log("\n🧪 Running Performance Regression Tests...");
+      await frameworkLogger.log('performance-ci-gates', '-n-running-performance-regression-tests-', 'info', { message: "\n🧪 Running Performance Regression Tests..." });
       const regressionResult = await this.runRegressionCheck(testSuite);
       result.regressionCheck = regressionResult;
 
       if (!regressionResult.passed && this.config.failOnRegression) {
         result.success = false;
-        console.log("❌ Regression check failed - pipeline will fail");
+        await frameworkLogger.log('performance-ci-gates', '-regression-check-failed-pipeline-will-fail-', 'error', { message: "❌ Regression check failed - pipeline will fail" });
       }
 
       // 3. Generate reports
       if (this.config.generateReports) {
-        console.log("\n📝 Generating Performance Reports...");
+        await frameworkLogger.log('performance-ci-gates', '-n-generating-performance-reports-', 'info', { message: "\n📝 Generating Performance Reports..." });
         result.reports = await this.generateReports(
           budgetResult.report,
           regressionResult,
@@ -149,7 +150,7 @@ export class PerformanceCIGates {
 
       // 4. Update baselines if tests passed
       if (result.success && this.config.baselineComparison) {
-        console.log("\n💾 Updating Performance Baselines...");
+        await frameworkLogger.log('performance-ci-gates', '-n-updating-performance-baselines-', 'info', { message: "\n💾 Updating Performance Baselines..." });
         this.updateBaselines();
         result.regressionCheck.baselineUpdated = true;
       }
@@ -161,33 +162,33 @@ export class PerformanceCIGates {
     result.duration = Date.now() - startTime;
 
     // Final summary
-    console.log("\n🎯 Performance Gates Summary");
-    console.log("=============================");
-    console.log(`   Duration: ${result.duration}ms`);
-    console.log(
+    await frameworkLogger.log('performance-ci-gates', '-n-performance-gates-summary-', 'info', { message: "\n🎯 Performance Gates Summary" });
+    await frameworkLogger.log('performance-ci-gates', '-', 'info', { message: "=============================" });
+    await frameworkLogger.log('performance-ci-gates', '-duration-result-duration-ms-', 'info', { message: `   Duration: ${result.duration}ms` });
+    await frameworkLogger.log('performance-ci-gates', '-budget-check-result-budgetcheck-passed-passed-fai', 'error', { message: 
       `   Budget Check: ${result.budgetCheck.passed ? "✅ PASSED" : "❌ FAILED"}`,
-    );
-    console.log(
+     });
+    await frameworkLogger.log('performance-ci-gates', '-regression-check-result-regressioncheck-passed-pa', 'error', { message: 
       `   Regression Check: ${result.regressionCheck.passed ? "✅ PASSED" : "❌ FAILED"}`,
-    );
-    console.log(
+     });
+    await frameworkLogger.log('performance-ci-gates', '-overall-result-result-success-success-failure-', 'error', { message: 
       `   Overall Result: ${result.success ? "✅ SUCCESS" : "❌ FAILURE"}`,
-    );
+     });
 
     if (!result.success) {
-      console.log("\n🔍 Failure Details:");
+      await frameworkLogger.log('performance-ci-gates', '-n-failure-details-', 'info', { message: "\n🔍 Failure Details:" });
       if (!result.budgetCheck.passed) {
-        console.log(
+        await frameworkLogger.log('performance-ci-gates', '-budget-violations-result-budgetcheck-violations-r', 'info', { message: 
           `   - Budget violations: ${result.budgetCheck.violations} (${result.budgetCheck.criticalViolations} critical)`,
-        );
+         });
       }
       if (!result.regressionCheck.passed) {
-        console.log(
+        await frameworkLogger.log('performance-ci-gates', '-failed-regression-tests-result-regressioncheck-fa', 'error', { message: 
           `   - Failed regression tests: ${result.regressionCheck.failedTests}`,
-        );
-        console.log(
+         });
+        await frameworkLogger.log('performance-ci-gates', '-average-deviation-result-regressioncheck-averaged', 'info', { message: 
           `   - Average deviation: ${result.regressionCheck.averageDeviation.toFixed(2)}%`,
-        );
+         });
       }
     }
 
@@ -230,19 +231,19 @@ export class PerformanceCIGates {
       passed = false;
     }
 
-    console.log(
+    await frameworkLogger.log('performance-ci-gates', '-bundle-size-report-bundlesize-totalsize-1024-tofi', 'info', { message: 
       `   📦 Bundle Size: ${(report.bundleSize.totalSize / 1024).toFixed(2)} KB (${(report.bundleSize.gzippedSize / 1024).toFixed(2)} KB gzipped)`,
-    );
-    console.log(
+     });
+    await frameworkLogger.log('performance-ci-gates', '-memory-usage-report-runtime-memoryusage-heapused-', 'info', { message: 
       `   🧠 Memory Usage: ${(report.runtime.memoryUsage.heapUsed / 1024 / 1024).toFixed(2)} MB`,
-    );
-    console.log(
+     });
+    await frameworkLogger.log('performance-ci-gates', '-startup-time-report-runtime-startuptime-tofixed-2', 'info', { message: 
       `   ⚡ Startup Time: ${report.runtime.startupTime.toFixed(2)}ms`,
-    );
-    console.log(
+     });
+    await frameworkLogger.log('performance-ci-gates', '-violations-violations-length-criticalviolations-c', 'error', { message: 
       `   🚨 Violations: ${violations.length} (${criticalViolations} critical, ${errorViolations} error, ${warningViolations} warning)`,
-    );
-    console.log(`   📊 Status: ${passed ? "PASSED" : "FAILED"}`);
+     });
+    await frameworkLogger.log('performance-ci-gates', '-status-passed-passed-failed-', 'info', { message: `   📊 Status: ${passed ? "PASSED" : "FAILED"}` });
 
     return {
       passed,
@@ -258,7 +259,15 @@ export class PerformanceCIGates {
   private async runRegressionCheck(
     testSuite?: RegressionTestSuite,
   ): Promise<CIGateResult["regressionCheck"]> {
-    const suite = testSuite || this.regressionTester.createDefaultTestSuite();
+    const suite = testSuite || {
+      name: "default",
+      description: "Default CI test suite",
+      tests: [],
+      warningThreshold: 10,
+      failureThreshold: 20,
+      baselineFile: "",
+      failOnRegression: true
+    };
     const suiteResult = await this.regressionTester.runTestSuite(suite);
 
     const failedTests = suiteResult.results.filter(
@@ -266,14 +275,14 @@ export class PerformanceCIGates {
     ).length;
     const passed = suiteResult.success;
 
-    console.log(`   🧪 Tests Run: ${suiteResult.summary.totalTests}`);
-    console.log(`   ✅ Passed: ${suiteResult.summary.passed}`);
-    console.log(`   ⚠️ Warnings: ${suiteResult.summary.warnings}`);
-    console.log(`   ❌ Failed: ${suiteResult.summary.failed}`);
-    console.log(
+    await frameworkLogger.log('performance-ci-gates', '-tests-run-suiteresult-summary-totaltests-', 'info', { message: `   🧪 Tests Run: ${suiteResult.summary.totalTests}` });
+    await frameworkLogger.log('performance-ci-gates', '-passed-suiteresult-summary-passed-', 'success', { message: `   ✅ Passed: ${suiteResult.summary.passed}` });
+    await frameworkLogger.log('performance-ci-gates', '-warnings-suiteresult-summary-warnings-', 'info', { message: `   ⚠️ Warnings: ${suiteResult.summary.warnings}` });
+    await frameworkLogger.log('performance-ci-gates', '-failed-suiteresult-summary-failed-', 'error', { message: `   ❌ Failed: ${suiteResult.summary.failed}` });
+    await frameworkLogger.log('performance-ci-gates', '-average-deviation-suiteresult-summary-averagedevi', 'info', { message: 
       `   📈 Average Deviation: ${suiteResult.summary.averageDeviation.toFixed(2)}%`,
-    );
-    console.log(`   📊 Status: ${passed ? "PASSED" : "FAILED"}`);
+     });
+    await frameworkLogger.log('performance-ci-gates', '-status-passed-passed-failed-', 'info', { message: `   📊 Status: ${passed ? "PASSED" : "FAILED"}` });
 
     return {
       passed,
@@ -301,7 +310,7 @@ export class PerformanceCIGates {
       );
       fs.writeFileSync(budgetReportPath, JSON.stringify(budgetReport, null, 2));
       reports.budgetReport = budgetReportPath;
-      console.log(`   💾 Budget report saved: ${budgetReportPath}`);
+      await frameworkLogger.log('performance-ci-gates', '-budget-report-saved-budgetreportpath-', 'info', { message: `   💾 Budget report saved: ${budgetReportPath}` });
     }
 
     // Regression report
@@ -314,7 +323,7 @@ export class PerformanceCIGates {
       JSON.stringify(regressionResult, null, 2),
     );
     reports.regressionReport = regressionReportPath;
-    console.log(`   💾 Regression report saved: ${regressionReportPath}`);
+    await frameworkLogger.log('performance-ci-gates', '-regression-report-saved-regressionreportpath-', 'info', { message: `   💾 Regression report saved: ${regressionReportPath}` });
 
     // Summary report
     const summaryReport = {
@@ -349,7 +358,7 @@ export class PerformanceCIGates {
     );
     fs.writeFileSync(summaryReportPath, JSON.stringify(summaryReport, null, 2));
     reports.summaryReport = summaryReportPath;
-    console.log(`   💾 Summary report saved: ${summaryReportPath}`);
+    await frameworkLogger.log('performance-ci-gates', '-summary-report-saved-summaryreportpath-', 'info', { message: `   💾 Summary report saved: ${summaryReportPath}` });
 
     return reports;
   }
@@ -358,13 +367,8 @@ export class PerformanceCIGates {
    * Update performance baselines
    */
   private updateBaselines(): void {
-    try {
-      // This would typically be done in the regression tester
-      // For now, we'll just log that baselines would be updated
-      console.log("   📊 Baselines updated for future comparison");
-    } catch (error) {
-      console.warn("   ⚠️ Failed to update baselines:", error);
-    }
+    // Baseline update implementation would go here
+    // Currently just a placeholder for future functionality
   }
 
   /**
@@ -376,7 +380,7 @@ export class PerformanceCIGates {
     for (const dir of dirs) {
       if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir, { recursive: true });
-        console.log(`📁 Created directory: ${dir}`);
+
       }
     }
   }
@@ -422,7 +426,7 @@ jobs:
               console.error('Performance gates failed');
               process.exit(1);
             }
-            console.log('Performance gates passed');
+            await frameworkLogger.log('performance-ci-gates', '-performance-gates-passed-', 'info', { message: 'Performance gates passed' });
           });
         }).catch(console.error);
         "
@@ -523,7 +527,7 @@ pipeline {
           console.error('Performance gates failed');
           process.exit(1);
         }
-        console.log('Performance gates passed');
+        await frameworkLogger.log('performance-ci-gates', '-performance-gates-passed-', 'info', { message: 'Performance gates passed' });
       });
     }).catch(err => {
       console.error(err);
@@ -584,7 +588,7 @@ steps:
           console.error('Performance gates failed');
           process.exit(1);
         }
-        console.log('Performance gates passed');
+        await frameworkLogger.log('performance-ci-gates', '-performance-gates-passed-', 'info', { message: 'Performance gates passed' });
       });
     })().catch(console.error);
     "

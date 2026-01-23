@@ -7,9 +7,9 @@ import {
   ruleEnforcer,
   RuleValidationContext,
   ValidationReport,
-} from "./rule-enforcer.js";
-import { frameworkLogger } from "../framework-logger.js";
-import { frameworkReportingSystem } from "../reporting/framework-reporting-system.js";
+} from "./rule-enforcer";
+import { frameworkLogger } from "../framework-logger";
+import { frameworkReportingSystem } from "../reporting/framework-reporting-system";
 import * as fs from "fs";
 import * as path from "path";
 

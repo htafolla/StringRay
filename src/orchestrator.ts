@@ -8,9 +8,11 @@
  * @since 2026-01-07
  */
 
-import { enhancedMultiAgentOrchestrator } from "./orchestrator/enhanced-multi-agent-orchestrator.js";
-import { frameworkLogger } from "./framework-logger.js";
-import { universalLibrarianConsultation, SystemAction } from "./universal-librarian-consultation.js";
+import { EnhancedMultiAgentOrchestrator } from "./orchestrator/enhanced-multi-agent-orchestrator";
+import { frameworkLogger } from "./framework-logger";
+import { universalLibrarianConsultation, SystemAction } from "./universal-librarian-consultation";
+
+const enhancedMultiAgentOrchestrator = new EnhancedMultiAgentOrchestrator();
 
 export interface OrchestratorConfig {
   maxConcurrentTasks: number;
@@ -124,10 +126,6 @@ export class StringRayOrchestrator {
     const startTime = Date.now();
 
     try {
-      console.log(
-        `🔄 Orchestrator: Executing task ${task.id} with ${task.subagentType}`,
-      );
-
       // Delegate to subagent (this would integrate with the actual agent system)
       const result = await this.delegateToSubagent(task);
 
@@ -140,17 +138,6 @@ export class StringRayOrchestrator {
       );
 
       // Execute post-processors for agent task completion logging
-      console.log(
-        "🎯 Agent task completed successfully, checking post-processors",
-      );
-      console.log("📊 Result details:", {
-        success: result.success,
-        hasAgentName: !!result.agentName,
-        hasTask: !!result.task,
-        agentName: result.agentName,
-        taskLength: result.task?.length,
-      });
-
       try {
         // Get processor manager from global state
         const globalStateManager = (globalThis as any).strRayStateManager;
@@ -266,10 +253,6 @@ export class StringRayOrchestrator {
   }> {
     const jobId = `test-healing-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     const startTime = Date.now();
-    console.log(
-      `🔧 Orchestrator: Initiating auto-healing for ${failureContext.failedTests.length} test failures`,
-    );
-
     try {
       // Step 1: Analyze failure patterns and create healing strategy
       const healingStrategy =
@@ -525,6 +508,33 @@ export class StringRayOrchestrator {
    * Delegate task to appropriate subagent using enhanced orchestration
    */
   private async delegateToSubagent(task: TaskDefinition): Promise<any> {
+    // Import complexity analyzer for delegation decisions
+    const { complexityAnalyzer } = await import("./delegation/complexity-analyzer");
+
+    // Analyze task complexity to determine delegation strategy
+    const complexityMetrics = complexityAnalyzer.analyzeComplexity("task-execution", {
+      description: task.description,
+      operation: "delegate",
+      agentType: task.subagentType,
+      priority: task.priority,
+      dependencies: task.dependencies,
+    });
+
+    const complexityScore = complexityAnalyzer.calculateComplexityScore(complexityMetrics);
+
+    // Log complexity analysis for monitoring
+    await frameworkLogger.log(
+      "orchestrator",
+      "task-complexity-analyzed",
+      "info",
+      {
+        taskId: task.id,
+        agentType: task.subagentType,
+        complexityScore: complexityScore.score,
+        recommendedStrategy: complexityScore.recommendedStrategy,
+      },
+    );
+
     // Convert task dependencies to agent IDs
     const agentDependencies: string[] = [];
     if (task.dependencies) {
@@ -544,6 +554,8 @@ export class StringRayOrchestrator {
         taskId: task.id,
         priority: task.priority || "medium",
         orchestratorSession: "main-orchestrator",
+        complexityScore: complexityScore.score,
+        recommendedStrategy: complexityScore.recommendedStrategy,
       },
       priority: (task.priority as "low" | "medium" | "high") || "medium",
       dependencies: agentDependencies,

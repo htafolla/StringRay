@@ -10,8 +10,8 @@
  * 3. EDGE case simulations
  */
 
-import { ruleEnforcer } from "../enforcement/rule-enforcer.js";
-import { frameworkLogger } from "../framework-logger.js";
+import { ruleEnforcer } from "../enforcement/rule-enforcer";
+import { frameworkLogger } from "../framework-logger";
 
 export interface RuleSimulation {
   ruleId: string;
@@ -583,17 +583,17 @@ export function calculateTotal(price: number, taxRate: number): number {
       pass: [
         {
           name: "Proper relative imports with extensions",
-          code: `import { UserService } from '../services/user-service.js';
-import { validateEmail } from './utils/validation.js';
-import * as config from '../config/index.js';`,
+          code: `import { UserService } from '../services/user-service';
+import { validateEmail } from './utils/validation';
+import * as config from '../config/index';`,
           description: "Proper relative imports with .js extensions",
         },
       ],
       fail: [
         {
           name: "Import from src/ directory",
-          code: `import { helper } from '../src/utils/helper.js'; // ❌ Wrong - imports from src/
-import { config } from './dist/config.js'; // ❌ Wrong - imports from dist/ in source`,
+          code: `import { helper } from '../src/utils/helper'; // ❌ Wrong - imports from src/
+import { config } from './dist/config'; // ❌ Wrong - imports from dist/ in source`,
           description: "Imports from wrong directories",
           expectedViolations: ["src/", "dist/"],
         },
@@ -601,8 +601,8 @@ import { config } from './dist/config.js'; // ❌ Wrong - imports from dist/ in 
       edge: [
         {
           name: "Type-only imports",
-          code: `import type { User, Profile } from '../types/user.js';
-import { createUser } from '../services/user-service.js';`,
+          code: `import type { User, Profile } from '../types/user';
+import { createUser } from '../services/user-service';`,
           description: "Type-only imports should be allowed",
           expectedResult: "pass",
         },

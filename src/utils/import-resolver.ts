@@ -146,7 +146,6 @@ export class ImportResolver {
 
     // Try primary path first
     try {
-      console.log(`🔗 Importing ${moduleName} from: ${primaryPath}`);
       return await import(primaryPath);
     } catch (error) {
       console.warn(
@@ -158,7 +157,6 @@ export class ImportResolver {
 
       for (const altPath of altPaths) {
         try {
-          console.log(`🔄 Trying alternative path: ${altPath}`);
           return await import(altPath);
         } catch (altError) {
           continue;
@@ -173,7 +171,6 @@ export class ImportResolver {
           subPath,
           `${moduleName}.js`,
         );
-        console.log(`🏠 Trying project root path: ${rootPath}`);
         return await import(rootPath);
       } catch (rootError) {
         throw new Error(

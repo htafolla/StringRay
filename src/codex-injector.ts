@@ -10,7 +10,7 @@
 
 import * as fs from "fs";
 import * as path from "path";
-import { frameworkLogger } from "./framework-logger.js";
+import { frameworkLogger } from "./framework-logger";
 // Dynamic imports for cross-environment compatibility
 let extractCodexMetadata: any;
 let StringRayContextLoader: any;
@@ -186,9 +186,9 @@ export function createStringRayCodexInjectorHook() {
           const stats = getCodexStats(sessionId);
 
           if (stats.loaded) {
-            console.log(
+            await frameworkLogger.log('codex-injector', '-stringray-codex-loaded-stats-totalterms-terms-sta', 'success', { message: 
               `✅ StringRay Codex loaded: ${stats.totalTerms} terms, ${stats.fileCount} sources`,
-            );
+             });
             await frameworkLogger.log(
               "codex-injector",
               "codex context loaded successfully",
@@ -196,9 +196,9 @@ export function createStringRayCodexInjectorHook() {
               { jobId, ...stats },
             );
           } else {
-            console.log(
+            await frameworkLogger.log('codex-injector', '-no-codex-files-found-checked-strray-codex-json-co', 'info', { message: 
               "⚠️  No codex files found. Checked: .strray/codex.json, codex.json, src/codex.json, docs/agents/codex.json",
-            );
+             });
             await frameworkLogger.log(
               "codex-injector",
               "no codex files found",
@@ -280,9 +280,9 @@ export function createStringRayCodexInjectorHook() {
           // Load codex context for validation
           const codexContexts = await loadCodexContext(sessionId);
           if (codexContexts.length === 0) {
-            console.log(
+            await frameworkLogger.log('codex-injector', '-no-codex-loaded-allowing-action-but-enforcement-d', 'info', { message: 
               "⚠️  No codex loaded - allowing action but enforcement disabled",
-            );
+             });
             await frameworkLogger.log(
               "codex-injector",
               "no codex context available",
@@ -345,13 +345,13 @@ export function createStringRayCodexInjectorHook() {
             }
 
             // Log non-blocking violations but allow action
-            console.log(`⚠️  Codex warnings detected:`);
-            validation.violations.forEach((v: any) => {
-              console.log(`   • ${v.reason}`);
-            });
-            console.log(
+            await frameworkLogger.log('codex-injector', '-codex-warnings-detected-', 'info', { message: `⚠️  Codex warnings detected:` });
+            for (const v of validation.violations) {
+              await frameworkLogger.log('codex-injector', '-v-reason-', 'info', { message: `   • ${v.reason}` });
+            }
+            await frameworkLogger.log('codex-injector', '-recommendations-validation-recommendations-join-', 'info', { message: 
               `💡 Recommendations: ${validation.recommendations.join(", ")}`,
-            );
+             });
             frameworkLogger.log(
               "codex-injector",
               "non-blocking codex warnings",
@@ -437,13 +437,13 @@ export function createStringRayCodexInjectorHook() {
             return output;
           }
 
-          console.log(
+          await frameworkLogger.log('codex-injector', '-stringray-tool-execution-hook-triggered-for-input', 'info', { message: 
             `🔧 StringRay: Tool execution hook triggered for ${input.tool}`,
-          );
+           });
           const codexContexts = await loadCodexContext(sessionId);
-          console.log(
+          await frameworkLogger.log('codex-injector', '-stringray-loaded-codexcontexts-length-codex-conte', 'info', { message: 
             `📚 StringRay: Loaded ${codexContexts.length} codex contexts`,
-          );
+           });
 
           frameworkLogger.log(
             "codex-injector",

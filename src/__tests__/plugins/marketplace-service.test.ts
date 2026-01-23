@@ -2,7 +2,7 @@
  * StringRay AI v1.1.1 - Plugin Marketplace Service Unit Tests
  *
  * Comprehensive unit tests for the plugin marketplace service ensuring >85% coverage
- * with edge cases, error scenarios, and Universal Development Codex v1.1.1 compliance.
+ * with edge cases, error scenarios, and Universal Development Codex v1.2.20 compliance.
  *
  * @version 1.0.0
  * @since 2026-01-08
@@ -17,7 +17,6 @@ import {
   vi,
   beforeAll,
 } from "vitest";
-import { faker } from "@faker-js/faker";
 
 // Core marketplace service and types
 import {
@@ -184,52 +183,27 @@ function generateMockVersion(
 function generateMockPlugin(
   overrides: Partial<MarketplacePlugin> = {},
 ): MarketplacePlugin {
-  const id = overrides.id || faker.string.uuid();
-  const name = overrides.name || faker.commerce.productName();
-  const version = overrides.latestVersion || faker.system.semver();
-
-  const defaultCategory = faker.helpers.arrayElement([
-    "agent",
-    "integration",
-    "ui",
-    "utility",
-    "security",
-    "monitoring",
-    "performance",
-    "testing",
-    "deployment",
-    "other",
-  ]);
+  const id = overrides.id || "test-plugin-123";
+  const name = overrides.name || "Test Plugin";
+  const version = overrides.latestVersion || "1.0.0";
 
   return {
     id,
     name,
-    description: overrides.description || faker.lorem.paragraph(),
+    description: overrides.description || "A test plugin description",
     latestVersion: version,
-    author: overrides.author || generateMockAuthor(),
-    category: overrides.category || defaultCategory,
-    tags:
-      overrides.tags ||
-      faker.helpers.arrayElements(
-        ["typescript", "react", "node", "security", "performance"],
-        3,
-      ),
-    license:
-      overrides.license ||
-      faker.helpers.arrayElement([
-        "MIT",
-        "Apache-2.0",
-        "BSD-3-Clause",
-        "GPL-3.0",
-      ]),
-    stats: overrides.stats || generateMockStats(),
-    security: overrides.security || generateMockSecurity(),
-    metadata: overrides.metadata || generateMockMetadata(),
-    compatibility: overrides.compatibility || generateMockCompatibility(),
-    versions: overrides.versions || [generateMockVersion({ version })],
+    author: overrides.author || { id: "test-author", name: "Test Author", email: "test@example.com" },
+    category: overrides.category || "agent",
+    tags: overrides.tags || ["test", "plugin"],
+    license: overrides.license || "MIT",
+    stats: overrides.stats || { downloads: 100, rating: 4.5, reviews: 10 },
+    security: overrides.security || { verified: true, lastAudit: Date.now() },
+    metadata: overrides.metadata || { size: 50000, languages: ["typescript"] },
+    compatibility: overrides.compatibility || { frameworkVersion: "1.0.0", nodeVersion: "18.0.0" },
+    versions: overrides.versions || [{ version, publishedAt: Date.now(), changelog: "Initial release" }],
     dependencies: overrides.dependencies || [],
-    createdAt: overrides.createdAt || faker.date.past().getTime(),
-    updatedAt: overrides.updatedAt || faker.date.recent().getTime(),
+    createdAt: overrides.createdAt || Date.now() - 86400000,
+    updatedAt: overrides.updatedAt || Date.now(),
     status: overrides.status || "published",
   };
 }

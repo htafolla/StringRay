@@ -11,6 +11,7 @@
 import { EventEmitter } from "events";
 import * as crypto from "crypto";
 import { IncomingMessage, ServerResponse } from "http";
+import { frameworkLogger } from "../framework-logger";
 
 // Security configuration constants
 export const SECURITY_CONFIG = {
@@ -409,9 +410,9 @@ export class SecurityHardeningSystem extends EventEmitter {
         `Validation error: ${error instanceof Error ? error.message : String(error)}`,
       );
 
-      console.log(
+      frameworkLogger.log('security-hardening-system', '-security-data-decryption-failed-error-instanceof-', 'error', { message:
         `[SECURITY] Data decryption failed: ${error instanceof Error ? error.message : String(error)}`,
-      );
+       });
     }
 
     return result;
@@ -664,7 +665,7 @@ export class SecurityHardeningSystem extends EventEmitter {
       headers: this.sanitizeHeadersForAudit(req.headers),
     };
 
-    console.log(`[AUDIT] ${JSON.stringify(auditEvent)}`);
+    frameworkLogger.log('security-hardening-system', '-audit-json-stringify-auditevent-', 'info', { message: `[AUDIT] ${JSON.stringify(auditEvent)}` });
   }
 
   /**

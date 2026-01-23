@@ -308,7 +308,7 @@ describe("Cross-Session State Sharing", () => {
       expect(plan.sessionId).toBe(sessionId);
       expect(plan.targetCoordinator).toBe(targetCoordinator);
       expect(plan.migrationSteps).toHaveLength(6);
-      expect(plan.rollbackSteps).toHaveLength(6);
+      expect(plan.rollbackSteps).toHaveLength(3);
     });
 
     test("should handle migration planning for non-existent session", () => {

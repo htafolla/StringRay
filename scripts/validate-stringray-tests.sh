@@ -38,8 +38,8 @@ print_step() {
 
 # Function to check file exists
 check_file() {
-    if [[ ! -f "$1" ]]; then
-        echo "❌ ERROR: File not found: $1"
+    if [[ ! -e "$1" ]]; then
+        echo "❌ ERROR: File/directory not found: $1"
         exit 1
     fi
     echo "✅ Found: $1"

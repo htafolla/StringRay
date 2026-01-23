@@ -3,10 +3,10 @@
  * Analyzes StrRay framework logs to understand flow, agents, and usage patterns
  */
 
-import { frameworkLogger } from "./src/framework-logger.js";
-import { strRayConfigLoader } from "./src/config-loader.js";
-import { AgentDelegator } from "./src/delegation/agent-delegator.js";
-import { StrRayStateManager } from "./src/state/state-manager.js";
+import { frameworkLogger } from "./src/framework-logger";
+import { strRayConfigLoader } from "./src/config-loader";
+import { AgentDelegator } from "./src/delegation/agent-delegator";
+import { StrRayStateManager } from "./src/state/state-manager";
 
 async function analyzeFrameworkUsage() {
   console.log("🔍 ANALYZING STRRAY FRAMEWORK USAGE PATTERNS");

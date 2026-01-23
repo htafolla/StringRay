@@ -3,13 +3,13 @@
  * Integrates subagent spawning visibility and lifecycle management
  */
 
-import { StringRayStateManager } from "../state/state-manager.js";
-import { frameworkLogger } from "../framework-logger.js";
+import { StringRayStateManager } from "../state/state-manager";
+import { frameworkLogger } from "../framework-logger";
 import {
   ComplexityAnalyzer,
   ComplexityMetrics,
-} from "../delegation/complexity-analyzer.js";
-import { createAgentDelegator } from "../delegation/agent-delegator.js";
+} from "../delegation/complexity-analyzer";
+import { createAgentDelegator } from "../delegation/agent-delegator";
 
 export interface AgentSpawnRequest {
   agentType: string;

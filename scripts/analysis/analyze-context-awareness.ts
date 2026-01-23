@@ -3,7 +3,7 @@
  * Analyzes what actually happened with the context awareness features
  */
 
-import { frameworkLogger } from "./src/framework-logger.js";
+import { frameworkLogger } from "./src/framework-logger";
 
 async function analyzeContextAwarenessImplementation() {
   console.log("🔍 CONTEXT AWARENESS IMPLEMENTATION ANALYSIS");

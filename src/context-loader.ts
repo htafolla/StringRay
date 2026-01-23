@@ -10,10 +10,11 @@
 
 import * as fs from "fs";
 import * as path from "path";
+
 import {
   parseCodexContent,
   detectContentFormat,
-} from "./utils/codex-parser.js";
+} from "./utils/codex-parser";
 
 /**
  * Codex term structure
@@ -165,16 +166,11 @@ export class StringRayContextLoader {
     // Detect format before parsing
     const formatResult = detectContentFormat(content);
 
-    if (formatResult.format === "unknown") {
+    if (formatResult.format === "unknown" as any) {
       throw new Error(
         `Unable to detect content format for ${sourcePath}. Content appears to be neither valid JSON nor Markdown.`,
       );
     }
-
-    // Log format detection for debugging
-    console.log(
-      `StringRay: Detected ${formatResult.format} format for ${sourcePath} (confidence: ${formatResult.confidence})`,
-    );
 
     const result = parseCodexContent(content, sourcePath);
 
@@ -269,18 +265,16 @@ export class StringRayContextLoader {
     }> = [];
     const recommendations: string[] = [];
 
-    if (actionDetails.includesAny) {
-      const dangerousPatterns = ["any", "@ts-ignore", "@ts-expect-error"];
-      if (dangerousPatterns.some((pattern) => action.includes(pattern))) {
-        const term11 = context.terms.get(11);
-        if (term11) {
-          violations.push({
-            term: term11,
-            reason:
-              'Type safety violation detected - using "any" or type suppression',
-            severity: term11.enforcementLevel || "high",
-          });
-        }
+    const dangerousPatterns = ["any", "@ts-ignore", "@ts-expect-error"];
+    if (dangerousPatterns.some((pattern) => action.includes(pattern))) {
+      const term11 = context.terms.get(11);
+      if (term11) {
+        violations.push({
+          term: term11,
+          reason:
+            'Type safety violation detected - using "any" or type suppression',
+          severity: term11.enforcementLevel || "high",
+        });
       }
     }
 

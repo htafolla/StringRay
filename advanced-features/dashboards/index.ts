@@ -12,10 +12,10 @@
 export {
   liveMetricsCollector,
   LiveMetricsCollector,
-} from "./live-metrics-collector.js";
-export { alertEngine, AlertEngine } from "./alert-engine.js";
-export { webSocketGateway, WebSocketGateway } from "./websocket-gateway.js";
-export { dashboardUIEngine, DashboardUIEngine } from "./dashboard-ui-engine.js";
+} from "./live-metrics-collector";
+export { alertEngine, AlertEngine } from "./alert-engine";
+export { webSocketGateway, WebSocketGateway } from "./websocket-gateway";
+export { dashboardUIEngine, DashboardUIEngine } from "./dashboard-ui-engine";
 
 // Types
 export type {
@@ -23,7 +23,7 @@ export type {
   CollectedMetric,
   MetricsCollectionConfig,
   CollectionStats,
-} from "./live-metrics-collector.js";
+} from "./live-metrics-collector";
 
 export type {
   AlertRule,
@@ -33,7 +33,7 @@ export type {
   AlertEngineConfig,
   NotificationChannel,
   AlertStats,
-} from "./alert-engine.js";
+} from "./alert-engine";
 
 export type {
   DashboardConnection,
@@ -41,7 +41,7 @@ export type {
   DashboardMessage,
   WebSocketGatewayConfig,
   GatewayStats,
-} from "./websocket-gateway.js";
+} from "./websocket-gateway";
 
 export type {
   DashboardWidget,
@@ -49,13 +49,13 @@ export type {
   DashboardState,
   DashboardConfig,
   RenderContext,
-} from "./dashboard-ui-engine.js";
+} from "./dashboard-ui-engine";
 
 // Convenience exports for common use cases
-import { liveMetricsCollector } from "./live-metrics-collector.js";
-import { alertEngine } from "./alert-engine.js";
-import { webSocketGateway } from "./websocket-gateway.js";
-import { dashboardUIEngine } from "./dashboard-ui-engine.js";
+import { liveMetricsCollector } from "./live-metrics-collector";
+import { alertEngine } from "./alert-engine";
+import { webSocketGateway } from "./websocket-gateway";
+import { dashboardUIEngine } from "./dashboard-ui-engine";
 
 export const dashboards = {
   metrics: liveMetricsCollector,

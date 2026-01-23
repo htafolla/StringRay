@@ -8,11 +8,11 @@ import {
   RuleEnforcer,
   ruleEnforcer,
   RuleValidationContext,
-} from "../../enforcement/rule-enforcer.js";
-import { frameworkLogger } from "../../framework-logger.js";
+} from "../../enforcement/rule-enforcer";
+import { frameworkLogger } from "../../framework-logger";
 
 // Mock framework logger
-vi.mock("../../framework-logger.js");
+vi.mock("../../framework-logger");
 
 describe("RuleEnforcer", () => {
   let enforcer: RuleEnforcer;
@@ -234,7 +234,7 @@ describe("RuleEnforcer", () => {
   });
 
   describe("rule enforcement statistics", () => {
-    it.skip("should provide enforcement statistics", () => {
+    it("should provide enforcement statistics", () => {
       const stats = enforcer.getRuleStats();
 
       expect(stats).toBeDefined();
@@ -244,7 +244,7 @@ describe("RuleEnforcer", () => {
       expect(typeof stats.ruleCategories).toBe("object");
     });
 
-    it.skip("should track different rule categories", () => {
+    it("should track different rule categories", () => {
       const stats = enforcer.getRuleStats();
 
       expect(stats.ruleCategories).toHaveProperty("code-quality");
@@ -308,7 +308,7 @@ describe("RuleEnforcer", () => {
         operation: "create",
         files: ["src/delegation/new-context.ts"],
         newCode: `
-          import { CodebaseContextAnalyzer } from './codebase-context-analyzer.js';
+          import { CodebaseContextAnalyzer } from './codebase-context-analyzer';
           new CodebaseContextAnalyzer(projectRoot, { maxFileSizeBytes: 1024 * 1024 });
         `,
       };

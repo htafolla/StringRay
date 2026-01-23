@@ -2,8 +2,8 @@
  * Failure Analysis Engine for Post-Processor
  */
 
-import { FailureAnalysis, SuggestedFix, MonitoringResult } from "../types.js";
-import { frameworkLogger } from "../../framework-logger.js";
+import { FailureAnalysis, SuggestedFix, MonitoringResult } from "../types";
+import { frameworkLogger } from "../../framework-logger";
 
 export class FailureAnalysisEngine {
   constructor() {
@@ -19,7 +19,7 @@ export class FailureAnalysisEngine {
   ): Promise<FailureAnalysis> {
     const jobId = `failure-analysis-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
-    console.log("🔍 Analyzing CI/CD failure...");
+    await frameworkLogger.log('-failure-analysis-engine', '-analyzing-ci-cd-failure-', 'info', { message: "🔍 Analyzing CI/CD failure..." });
 
     // Determine failure category
     const category = this.classifyFailure(monitoringResult);

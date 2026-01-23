@@ -3,6 +3,6 @@
       "version": "1.1.1",
       "description": "StringRay Plugin Test Environment",
       "dependencies": {
-            "strray-ai": "file:../strray-ai-1.1.1.tgz"
+            "strray-ai": "file:../strray-ai-1.1.2.tgz"
       }
 }

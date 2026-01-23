@@ -1,16 +1,17 @@
 /**
  * Success Handler for Post-Processor
- * Handles successful completion, cleanup, and success confirmation
+ *
+ * Handles successful post-processor operations including metrics collection,
+ * notifications, cleanup, and reporting.
  */
 
-import { PostProcessorContext, PostProcessorResult } from "../types.js";
-import { frameworkLogger } from "../../framework-logger.js";
+import { frameworkLogger } from "../../framework-logger";
 
-export interface SuccessConfig {
-  successConfirmation: boolean;
-  cleanupEnabled: boolean;
-  notificationEnabled: boolean;
-  metricsCollection: boolean;
+export interface SuccessHandlerConfig {
+  successConfirmation?: boolean;
+  cleanupEnabled?: boolean;
+  notificationEnabled?: boolean;
+  metricsCollection?: boolean;
 }
 
 export interface SuccessMetrics {
@@ -22,10 +23,36 @@ export interface SuccessMetrics {
   timestamp: Date;
 }
 
-export class SuccessHandler {
-  private config: SuccessConfig;
+export interface PostProcessorContext {
+  commitSha: string;
+  repository: string;
+  branch: string;
+  author: string;
+  files: string[];
+  trigger: "git-hook" | "webhook" | "api" | "manual";
+  testResults?: {
+    unit?: { passed: boolean; coverage: number };
+    integration?: { passed: boolean; coverage: number };
+    e2e?: { passed: boolean; coverage: number };
+    performance?: { passed: boolean; coverage: number };
+  };
+}
 
-  constructor(config: Partial<SuccessConfig> = {}) {
+export interface PostProcessorResult {
+  success: boolean;
+  commitSha: string;
+  sessionId: string;
+  attempts: number;
+  monitoringResults?: any[];
+  fixesApplied?: any[];
+  error?: string;
+  duration?: number;
+}
+
+export class SuccessHandler {
+  private config: SuccessHandlerConfig;
+
+  constructor(config: SuccessHandlerConfig = {}) {
     this.config = {
       successConfirmation: true,
       cleanupEnabled: true,
@@ -36,7 +63,7 @@ export class SuccessHandler {
   }
 
   /**
-   * Handle successful completion of the post-processor loop
+   * Handle successful post-processor completion
    */
   async handleSuccess(
     context: PostProcessorContext,
@@ -45,37 +72,46 @@ export class SuccessHandler {
   ): Promise<SuccessMetrics> {
     const jobId = `success-handler-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
-    console.log(
-      `🎉 Post-processor completed successfully for commit ${context.commitSha}`,
+    await frameworkLogger.log(
+      "success-handler",
+      "handling successful post-processor completion",
+      "info",
+      { jobId, commitSha: context.commitSha, sessionId: result.sessionId },
     );
 
-    const metrics = this.collectSuccessMetrics(result, monitoringResults);
-
-    // Success confirmation
+    // Perform success confirmation if enabled
     if (this.config.successConfirmation) {
       await this.confirmSuccess(context, result);
     }
 
-    // Send success notifications
+    // Send notifications if enabled
     if (this.config.notificationEnabled) {
-      await this.sendSuccessNotifications(context, result, metrics);
+      await this.sendNotifications(context, result);
     }
 
-    // Cleanup resources
+    // Perform cleanup if enabled
     if (this.config.cleanupEnabled) {
-      await this.performCleanup(context, jobId);
+      await this.performCleanup(context);
     }
 
-    // Log success metrics
+    // Collect and log metrics if enabled
+    const metrics = this.collectMetrics(context, result, monitoringResults);
     if (this.config.metricsCollection) {
-      this.logSuccessMetrics(metrics);
+      await this.logMetrics(metrics);
     }
+
+    await frameworkLogger.log(
+      "success-handler",
+      "success handling completed",
+      "success",
+      { jobId, metrics },
+    );
 
     return metrics;
   }
 
   /**
-   * Confirm that the success is legitimate
+   * Confirm deployment success
    */
   private async confirmSuccess(
     context: PostProcessorContext,
@@ -83,14 +119,8 @@ export class SuccessHandler {
   ): Promise<void> {
     console.log("🔍 Confirming deployment success...");
 
-    // In a real system, this would perform additional health checks
-    // - API endpoint availability
-    // - Database connectivity
-    // - Performance metrics validation
-    // - User acceptance testing
-
-    // For now, simulate confirmation
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    // Simulate confirmation checks
+    await new Promise(resolve => setTimeout(resolve, 100));
 
     console.log("✅ Deployment success confirmed");
   }
@@ -98,91 +128,64 @@ export class SuccessHandler {
   /**
    * Send success notifications
    */
-  private async sendSuccessNotifications(
+  private async sendNotifications(
     context: PostProcessorContext,
     result: PostProcessorResult,
-    metrics: SuccessMetrics,
   ): Promise<void> {
-    const message = {
-      title: "CI/CD Pipeline Success",
-      commit: context.commitSha,
-      attempts: result.attempts,
-      duration: metrics.totalDuration,
-      fixesApplied: metrics.fixesApplied,
-      timestamp: new Date().toISOString(),
-    };
-
-    console.log("📢 Success Notification:", JSON.stringify(message, null, 2));
-
-    // In a real system, this would send notifications to:
-    // - Slack/Teams channels
-    // - Email notifications
-    // - Dashboard updates
-    // - Monitoring systems
+    const notification = `Deployment successful: ${context.commitSha} by ${context.author} in ${context.repository}`;
+    console.log("📢 Success Notification:", notification);
   }
 
   /**
-   * Perform cleanup after successful completion
+   * Perform post-success cleanup
    */
-  private async performCleanup(context: PostProcessorContext, jobId: string): Promise<void> {
+  private async performCleanup(context: PostProcessorContext): Promise<void> {
     console.log("🧹 Performing post-success cleanup...");
 
-    // In a real system, this would:
-    // - Clean up temporary files
-    // - Reset monitoring states
-    // - Archive logs
-    // - Update deployment records
-    // - Notify downstream systems
+    // Simulate cleanup operations
+    await new Promise(resolve => setTimeout(resolve, 50));
 
     console.log("✅ Cleanup completed");
-    await frameworkLogger.log(
-      "success-handler",
-      "cleanup-completed",
-      "success",
-      { jobId },
-    );
   }
 
   /**
-   * Collect comprehensive success metrics
+   * Collect success metrics
    */
-  private collectSuccessMetrics(
+  private collectMetrics(
+    context: PostProcessorContext,
     result: PostProcessorResult,
     monitoringResults: any[],
   ): SuccessMetrics {
+    const totalDuration = result.duration || 0;
+    const attempts = result.attempts;
     const fixesApplied = result.fixesApplied?.length || 0;
     const monitoringChecks = monitoringResults.length;
-    const redeployments = result.attempts - 1; // First attempt is initial, rest are redeploys
+    const redeployments = Math.max(0, attempts - 1);
 
     return {
-      totalDuration: result.duration || 0,
-      attempts: result.attempts,
+      totalDuration,
+      attempts,
       fixesApplied,
       monitoringChecks,
-      redeployments: Math.max(0, redeployments),
+      redeployments,
       timestamp: new Date(),
     };
   }
 
   /**
-   * Log success metrics for analysis
+   * Log success metrics
    */
-  private logSuccessMetrics(metrics: SuccessMetrics): void {
+  private async logMetrics(metrics: SuccessMetrics): Promise<void> {
     console.log("📊 Success Metrics:");
     console.log(`   Total Duration: ${metrics.totalDuration}ms`);
     console.log(`   Attempts: ${metrics.attempts}`);
     console.log(`   Fixes Applied: ${metrics.fixesApplied}`);
     console.log(`   Monitoring Checks: ${metrics.monitoringChecks}`);
     console.log(`   Redeployments: ${metrics.redeployments}`);
-
-    // In a real system, this would send metrics to:
-    // - Prometheus/Grafana
-    // - Application monitoring
-    // - Business intelligence systems
   }
 
   /**
-   * Generate success summary report
+   * Generate comprehensive success report
    */
   generateSuccessReport(
     context: PostProcessorContext,
@@ -197,28 +200,28 @@ Commit: ${context.commitSha}
 Repository: ${context.repository}
 Branch: ${context.branch}
 Author: ${context.author}
+Trigger: ${context.trigger}
 
 Results:
-- Status: SUCCESS
-- Attempts: ${result.attempts}
-- Duration: ${metrics.totalDuration}ms
+- Success: ${result.success}
+- Session ID: ${result.sessionId}
+- Attempts: ${metrics.attempts}
 - Fixes Applied: ${metrics.fixesApplied}
 - Monitoring Checks: ${metrics.monitoringChecks}
 - Redeployments: ${metrics.redeployments}
+- Total Duration: ${metrics.totalDuration}ms
+
+Files Processed: ${context.files.length}
+${context.files.map(f => `  - ${f}`).join('\n')}
 
 Timestamp: ${metrics.timestamp.toISOString()}
-`;
+`.trim();
   }
 
   /**
-   * Get success statistics
+   * Get current configuration stats
    */
-  getStats(): {
-    successConfirmation: boolean;
-    cleanupEnabled: boolean;
-    notificationEnabled: boolean;
-    metricsCollection: boolean;
-  } {
+  getStats(): SuccessHandlerConfig {
     return { ...this.config };
   }
 }

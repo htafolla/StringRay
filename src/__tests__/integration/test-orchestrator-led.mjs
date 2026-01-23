@@ -1,4 +1,4 @@
-import { strRayOrchestrator } from './node_modules/strray-ai/dist/plugin/orchestrator.js';
+import { strRayOrchestrator } from './node_modules/strray-ai/dist/plugin/src/orchestrator.js';
 
 console.log('=== ORCHESTRATOR-LED EXECUTION TEST ===');
 console.log('Testing enterprise-level complexity that triggers orchestrator-led strategy...');

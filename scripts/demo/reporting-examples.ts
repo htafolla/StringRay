@@ -5,7 +5,7 @@
  */
 
 // Example 1: Generate a comprehensive orchestration report
-import { frameworkReportingSystem } from "./src/reporting/framework-reporting-system.js";
+import { frameworkReportingSystem } from "./src/reporting/framework-reporting-system";
 
 async function generateOrchestrationReport() {
   const report = await frameworkReportingSystem.generateReport({

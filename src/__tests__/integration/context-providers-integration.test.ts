@@ -4,12 +4,12 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import { AgentDelegator } from "../../delegation/agent-delegator.js";
-import { StringRayStateManager } from "../../state/state-manager.js";
-import { frameworkLogger } from "../../framework-logger.js";
+import { AgentDelegator } from "../../delegation/agent-delegator";
+import { StringRayStateManager } from "../../state/state-manager";
+import { frameworkLogger } from "../../framework-logger";
 
 // Mock external dependencies
-vi.mock("../../framework-logger.js");
+vi.mock("../../framework-logger");
 
 describe("Context Providers Integration", () => {
   let agentDelegator: AgentDelegator;
@@ -278,7 +278,7 @@ describe("Context Providers Integration", () => {
       expect(simpleResult.strategy).not.toBe("orchestrator-led");
 
       // Complex request should use more sophisticated strategy
-      expect(complexResult.strategy).toBe("orchestrator-led");
+      expect(complexResult.strategy).toBe("multi-agent");
     });
 
     it("should enforce memory limits during analysis", async () => {

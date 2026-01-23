@@ -208,7 +208,7 @@ Then manually add to your development configuration (example for oh-my-opencode)
 
 ```json
 {
-  "plugin": ["stringray-ai/dist/plugin/stringray-codex-injection.js"],
+  "plugin": ["stringray-ai/dist/plugin/strray-codex-injection.js"],
   "agent": {
     "orchestrator": { "model": "opencode/grok-code" },
     "enforcer": { "model": "opencode/grok-code" },

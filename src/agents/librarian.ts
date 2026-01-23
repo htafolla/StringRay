@@ -1,5 +1,5 @@
-import { AgentConfig } from "./types.js";
-import { createCodebaseContextAnalyzer } from "../delegation/codebase-context-analyzer.js";
+import { AgentConfig } from "./types";
+import { createCodebaseContextAnalyzer } from "../delegation/codebase-context-analyzer";
 
 export const librarian: AgentConfig = {
   name: "librarian",

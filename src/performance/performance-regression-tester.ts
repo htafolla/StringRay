@@ -16,7 +16,7 @@ import {
   PerformanceBudgetEnforcer,
   PerformanceReport,
   PERFORMANCE_BUDGET,
-} from "./performance-budget-enforcer.js";
+} from "./performance-budget-enforcer";
 
 export interface PerformanceRegressionTest {
   name: string;
@@ -77,14 +77,9 @@ export class PerformanceRegressionTester {
         const data = fs.readFileSync(baselineFile, "utf8");
         const baselines = JSON.parse(data);
         this.baselines = new Map(Object.entries(baselines));
-        console.log(
-          `📊 Loaded ${this.baselines.size} performance baselines from ${baselineFile}`,
-        );
-      } else {
-        console.log(
-          `📝 No baseline file found at ${baselineFile}, will create new baselines`,
-        );
-      }
+        } else {
+          // No existing baselines found, will use defaults
+        }
     } catch (error) {
       console.error(`Failed to load baselines from ${baselineFile}:`, error);
     }
@@ -97,10 +92,7 @@ export class PerformanceRegressionTester {
     try {
       const baselines = Object.fromEntries(this.baselines);
       fs.writeFileSync(baselineFile, JSON.stringify(baselines, null, 2));
-      console.log(
-        `💾 Saved ${this.baselines.size} performance baselines to ${baselineFile}`,
-      );
-    } catch (error) {
+      } catch (error) {
       console.error(`Failed to save baselines to ${baselineFile}:`, error);
     }
   }
@@ -197,14 +189,6 @@ export class PerformanceRegressionTester {
     budgetReport?: PerformanceReport;
     success: boolean;
   }> {
-    console.log(
-      `\n🧪 Running performance regression test suite: ${suite.name}`,
-    );
-    console.log(`📝 ${suite.description}`);
-    console.log(
-      `🎯 Tests: ${suite.tests.length}, Warning: ${suite.warningThreshold}%, Failure: ${suite.failureThreshold}%\n`,
-    );
-
     // Load baselines
     this.loadBaselines(suite.baselineFile);
 
@@ -213,7 +197,6 @@ export class PerformanceRegressionTester {
 
     // Run all tests
     for (const test of suite.tests) {
-      console.log(`⏳ Running test: ${test.name}`);
       const result = await this.runRegressionTest(test);
       results.push(result);
 
@@ -229,12 +212,8 @@ export class PerformanceRegressionTester {
         ? result.expectedDuration.toFixed(2)
         : "N/A";
 
-      console.log(
-        `   ${statusIcon} ${result.testName}: ${durationStr}ms (expected: ${expectedStr}ms, deviation: ${deviationStr}%)`,
-      );
-
       if (result.error) {
-        console.log(`   ❌ Error: ${result.error}`);
+        console.error(`Test ${result.testName} failed:`, result.error);
       }
     }
 
@@ -253,28 +232,11 @@ export class PerformanceRegressionTester {
     const summary = this.generateSummary(results, suiteDuration);
 
     // Display summary
-    console.log(`\n📊 Test Suite Summary:`);
-    console.log(`   Total Tests: ${summary.totalTests}`);
-    console.log(`   ✅ Passed: ${summary.passed}`);
-    console.log(`   ⚠️ Warnings: ${summary.warnings}`);
     // Test failure count - kept as console.log for CI visibility
-    console.log(
-      `   📈 Average Deviation: ${summary.averageDeviation.toFixed(2)}%`,
-    );
-    console.log(`   📊 Max Deviation: ${summary.maxDeviation.toFixed(2)}%`);
-    console.log(`   ⏱️ Suite Duration: ${summary.duration.toFixed(2)}ms`);
-
     if (budgetReport) {
-      console.log(
-        `\n💰 Performance Budget Status: ${budgetReport.overallStatus.toUpperCase()}`,
-      );
       if (budgetReport.violations.length > 0) {
-        console.log(`   🚨 Violations: ${budgetReport.violations.length}`);
         budgetReport.violations.forEach((v) => {
-          console.log(
-            `      - ${v.metric}: ${v.percentage.toFixed(1)}% of budget`,
-          );
-        });
+          });
       }
     }
 
@@ -288,9 +250,9 @@ export class PerformanceRegressionTester {
         (budgetReport && budgetReport.overallStatus === "fail"));
 
     if (shouldFail) {
-      console.log(`\n❌ Performance regression test suite FAILED`);
+      throw new Error("Performance regression test suite failed");
     } else {
-      console.log(`\n✅ Performance regression test suite PASSED`);
+      console.log("Performance regression test suite passed");
     }
 
     const result: any = {

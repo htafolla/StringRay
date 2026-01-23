@@ -1,4 +1,4 @@
-import { isLoggingEnabled } from "./logging-config.js";
+import { isLoggingEnabled } from "./logging-config";
 
 // Framework-aware console logging that respects logging configuration
 export const frameworkConsole = {

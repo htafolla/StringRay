@@ -7,12 +7,12 @@
 
 import { exec } from "child_process";
 import { promises as fs } from "fs";
-import { frameworkLogger } from "../framework-logger.js";
+import { frameworkLogger } from "../framework-logger";
 import { promisify } from "util";
 import {
   promptSecurityValidator,
   PromptSecurityValidator,
-} from "./prompt-security-validator.js";
+} from "./prompt-security-validator";
 
 const execAsync = promisify(exec);
 
@@ -122,7 +122,7 @@ export class SecurityScanner {
     await this.saveReport(report, jobId);
 
     // Log results
-    this.logResults(report);
+    await this.logResults(report);
 
     return report;
   }
@@ -399,25 +399,27 @@ export class SecurityScanner {
   /**
    * Log security scan results
    */
-  private logResults(report: SecurityReport): void {
-    console.log(`\n🔒 Security Scan Complete (${report.duration}ms)`);
-    console.log(
+  private async logResults(report: SecurityReport): Promise<void> {
+    await frameworkLogger.log('security-scanner', '-n-security-scan-complete-report-duration-ms-', 'info', { message: `\n🔒 Security Scan Complete (${report.duration}ms)` });
+    await frameworkLogger.log('security-scanner', '-total-vulnerabilities-report-summary-totalvulnera', 'info', { message: 
       `📊 Total vulnerabilities: ${report.summary.totalVulnerabilities}`,
-    );
+     });
 
-    console.log("\n📈 By Severity:");
-    Object.entries(report.summary.bySeverity).forEach(([severity, count]) => {
-      console.log(`  ${severity}: ${count}`);
-    });
+    await frameworkLogger.log('security-scanner', '-n-by-severity-', 'info', { message: "\n📈 By Severity:" });
+    for (const [severity, count] of Object.entries(report.summary.bySeverity)) {
+      await frameworkLogger.log('security-scanner', '-severity-count-', 'info', { message: `  ${severity}: ${count}` });
+    }
 
-    console.log("\n🛠️ By Tool:");
-    Object.entries(report.summary.byTool).forEach(([tool, count]) => {
-      console.log(`  ${tool}: ${count}`);
-    });
+    await frameworkLogger.log('security-scanner', '-n-by-tool-', 'info', { message: "\n🛠️ By Tool:" });
+    for (const [tool, count] of Object.entries(report.summary.byTool)) {
+      await frameworkLogger.log('security-scanner', '-tool-count-', 'info', { message: `  ${tool}: ${count}` });
+    }
 
     if (report.recommendations.length > 0) {
-      console.log("\n💡 Recommendations:");
-      report.recommendations.forEach((rec) => console.log(`  • ${rec}`));
+      await frameworkLogger.log('security-scanner', '-n-recommendations-', 'info', { message: "\n💡 Recommendations:" });
+      for (const rec of report.recommendations) {
+        await frameworkLogger.log('security-scanner', '-rec-', 'info', { message: `  • ${rec}` });
+      }
     }
 
     if (report.compliant) {

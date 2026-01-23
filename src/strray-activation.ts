@@ -5,8 +5,8 @@
  * during oh-my-opencode initialization.
  */
 
-import { frameworkLogger } from "./framework-logger.js";
-import { ensureCriticalComponents } from "./architectural-integrity.js";
+import { frameworkLogger } from "./framework-logger";
+import { ensureCriticalComponents } from "./architectural-integrity";
 
 export interface StringRayActivationConfig {
   enableOrchestrator: boolean;
@@ -178,15 +178,16 @@ async function activateOrchestrator(jobId: string): Promise<void> {
 
   const { strRayOrchestrator } = await import("./orchestrator.js");
 
+  // Also activate the multi-agent orchestration coordinator
+  const { multiAgentOrchestrationCoordinator } = await import("./orchestrator/multi-agent-orchestration-coordinator.js");
+
   frameworkLogger.log(
     "stringray-activation",
-    "StringRay orchestrator activated",
+    "StringRay orchestrator and multi-agent coordination activated",
     "success",
     { jobId },
   );
 }
-
-
 
 async function activateProcessors(jobId: string): Promise<void> {
   frameworkLogger.log(

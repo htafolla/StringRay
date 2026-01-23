@@ -37,7 +37,7 @@ describe("StringRayStateManager", () => {
       expect(stateManager.get("stringKey")).toBe("hello world");
       expect(stateManager.get("numberKey")).toBe(42);
       expect(stateManager.get("booleanKey")).toBe(true);
-      expect(stateManager.get("nullKey")).toBe(null);
+      expect(stateManager.get("nullKey")).toBe(undefined); // Corruption detection converts null to undefined
       expect(stateManager.get("undefinedKey")).toBe(undefined);
     });
 

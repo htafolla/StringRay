@@ -29,10 +29,10 @@ import {
   WebVitalsMetrics,
   RuntimePerformanceMetrics,
   PerformanceBudgetViolation,
-} from "./performance-budget-enforcer.js";
-import { PerformanceRegressionTester } from "./performance-regression-tester.js";
-import { PerformanceMonitoringDashboard } from "./performance-monitoring-dashboard.js";
-import { PerformanceCIGates } from "./performance-ci-gates.js";
+} from "./performance-budget-enforcer";
+import { PerformanceRegressionTester } from "./performance-regression-tester";
+import { PerformanceMonitoringDashboard } from "./performance-monitoring-dashboard";
+import { PerformanceCIGates } from "./performance-ci-gates";
 
 export interface BenchmarkingConfig {
   continuous: {

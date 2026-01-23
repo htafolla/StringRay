@@ -1,4 +1,4 @@
-import { ReportContentValidator } from "../../dist/validation/report-content-validator.js";
+import { ReportContentValidator } from "../../dist/validation/report-content-validator";
 
 async function validateAllReports() {
   console.log("🔍 Validating All Generated Reports for Hidden Issues...\n");

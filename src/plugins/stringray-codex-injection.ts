@@ -8,10 +8,9 @@
  * @author StringRay Framework Team
  */
 
-import { frameworkLogger, generateJobId } from "../framework-logger.js";
+import { frameworkLogger, generateJobId } from "../framework-logger";
 
-
-import { TokenManager } from "../utils/token-manager.js";
+import { TokenManager } from "../utils/token-manager";
 
 const tokenManager = new TokenManager();
 
@@ -122,10 +121,7 @@ For complete codex documentation, see: .strray/codex.json`;
       frameworkLogger.log("codex-injector", "tool.execute.after hook called", "success", { tool }, undefined, jobId);
   },
 
-
 };
-
-
 
 // Export a function that returns the plugin hooks object
 export function stringrayPlugin(input: any) {

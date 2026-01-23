@@ -4,15 +4,15 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import { ASTCodeParser } from "../../delegation/ast-code-parser.js";
+import { ASTCodeParser } from "../../delegation/ast-code-parser";
 import * as fs from "fs";
 import * as path from "path";
-import { frameworkLogger } from "../../framework-logger.js";
+import { frameworkLogger } from "../../framework-logger";
 
 // Mock external dependencies
 vi.mock("fs");
 vi.mock("path");
-vi.mock("../../framework-logger.js");
+vi.mock("../../framework-logger");
 
 describe("ASTCodeParser", () => {
   let parser: ASTCodeParser;

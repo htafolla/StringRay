@@ -2,8 +2,8 @@
  * API Trigger for Post-Processor
  */
 
-import { PostProcessor } from "../PostProcessor.js";
-import { PostProcessorContext } from "../types.js";
+import { PostProcessor } from "../PostProcessor";
+import { PostProcessorContext } from "../types";
 
 export class APITrigger {
   private initialized = false;

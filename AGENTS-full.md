@@ -2,7 +2,7 @@
 
 **Version**: 1.1.1
 **Purpose**: Enterprise AI orchestration with systematic error prevention
-**Last Updated**: 2026-01-22
+**Last Updated**: 2026-01-23
 **System Complexity**: 51 core files, 8 interconnected pipelines, 338 logging points
 
 ## Table of Contents
@@ -49,10 +49,10 @@
 StringRay Framework v1.1.1 is a comprehensive enterprise AI orchestration platform with **systematic error prevention** and **complexity-based task routing**. The system consists of **8 interconnected pipelines** spanning **51 core files** with **338 logging points** for complete traceability.
 
 #### Core System Components:
-- **9 Specialized AI Agents** with automatic delegation
-- **28 MCP Servers** providing tool integration
+- **12 Specialized AI Agents** (10 active, 2 disabled) with automatic delegation
+- **29 MCP Server implementations** providing tool integration
 - **8 Major Pipelines** for complete workflow coverage
-- **Universal Development Codex** (59 mandatory rules)
+- **Universal Development Codex** (55-60 mandatory rules)
 - **JobId Logging System** for complete traceability
 - **Console.log Enforcement** for production hygiene
 
@@ -493,19 +493,24 @@ Data Flow: User Input → Framework Processing → Agent Execution → Validatio
 
 ### 5.1 Agent Matrix
 
-**9 Specialized AI Agents with Automatic Complexity-Based Routing:**
+**12 Specialized AI Agents (10 active, 2 disabled) with Automatic Complexity-Based Routing:**
 
-| Agent | Role | Complexity Threshold | Primary Pipeline | Key Tools | Conflict Strategy |
-|-------|------|---------------------|------------------|-----------|-------------------|
-| **enforcer** | Codex compliance & error prevention | All operations | Rule Enforcement | `read`, `grep`, `lsp_*`, `bash` | Block on violations |
-| **architect** | System design & technical decisions | High complexity | Agent Delegation | `read`, `grep`, `lsp_*`, `bash`, `background_task` | Expert priority |
-| **orchestrator** | Multi-agent workflow coordination | Enterprise | Agent Delegation | `read`, `grep`, `lsp_*`, `bash`, `background_task`, `call_omo_agent` | Consensus |
-| **bug-triage-specialist** | Error investigation & fixes | Debug operations | Agent Delegation | `read`, `grep`, `lsp_*`, `bash`, `ast_grep_*` | Majority vote |
-| **code-reviewer** | Quality assessment & standards | All code changes | Rule Enforcement | `read`, `grep`, `lsp_*`, `bash`, `lsp_diagnostics` | Expert priority |
-| **security-auditor** | Vulnerability detection | Security operations | Security & Monitoring | `read`, `grep`, `lsp_*`, `bash`, `grep_app_searchGitHub` | Block critical |
-| **refactorer** | Technical debt elimination | Refactor operations | Agent Delegation | `read`, `grep`, `lsp_*`, `bash`, `ast_grep_*`, `lsp_rename` | Majority vote |
-| **test-architect** | Testing strategy & coverage | Test operations | Rule Enforcement | `read`, `grep`, `lsp_*`, `bash` | Expert priority |
-| **librarian** | Codebase exploration & documentation | Analysis operations | Agent Delegation | `project-analysis_*` | N/A (solo agent) |
+| Agent | Role | Complexity Threshold | Primary Pipeline | Key Tools | Status | Conflict Strategy |
+|-------|------|---------------------|------------------|-----------|--------|-------------------|
+| **enforcer** | Codex compliance & error prevention | All operations | Rule Enforcement | `read`, `grep`, `lsp_*`, `bash` | Active | Block on violations |
+| **architect** | System design & technical decisions | High complexity | Agent Delegation | `read`, `grep`, `lsp_*`, `bash`, `background_task` | Active | Expert priority |
+| **orchestrator** | Multi-agent workflow coordination | Enterprise | Agent Delegation | `read`, `grep`, `lsp_*`, `bash`, `background_task`, `call_omo_agent` | Active | Consensus |
+| **bug-triage-specialist** | Error investigation & fixes | Debug operations | Agent Delegation | `read`, `grep`, `lsp_*`, `bash`, `ast_grep_*` | Active | Majority vote |
+| **code-reviewer** | Quality assessment & standards | All code changes | Rule Enforcement | `read`, `grep`, `lsp_*`, `bash`, `lsp_diagnostics` | Active | Expert priority |
+| **security-auditor** | Vulnerability detection | Security operations | Security & Monitoring | `read`, `grep`, `lsp_*`, `bash`, `grep_app_searchGitHub` | Active | Block critical |
+| **refactorer** | Technical debt elimination | Refactor operations | Agent Delegation | `read`, `grep`, `lsp_*`, `bash`, `ast_grep_*`, `lsp_rename` | Active | Majority vote |
+| **test-architect** | Testing strategy & coverage | Test operations | Rule Enforcement | `read`, `grep`, `lsp_*`, `bash` | Active | Expert priority |
+| **librarian** | Codebase exploration & documentation | Analysis operations | Agent Delegation | `project-analysis_*` | Disabled | N/A (solo agent) |
+| **oracle** | Strategic guidance & complex problem-solving | High complexity | Agent Delegation | `read`, `grep`, `lsp_*`, `background_task` | Disabled | Expert priority |
+| **multimodal-looker** | Media file analysis & interpretation | Analysis operations | Agent Delegation | `project-analysis_*` | Active | N/A (solo agent) |
+| **frontend-ui-ux-engineer** | Frontend development & UI/UX implementation | Medium complexity | Agent Delegation | `read`, `grep`, `lsp_*`, `bash` | Active | Expert priority |
+| **document-writer** | Technical documentation & content creation | Medium complexity | Agent Delegation | `read`, `grep`, `lsp_*` | Active | Expert priority |
+| **explore** | Codebase exploration & pattern analysis | Analysis operations | Agent Delegation | `read`, `grep`, `ast_grep_*` | Active | N/A (solo agent) |
 
 ### 5.2 Pipeline Integration Points
 
@@ -522,6 +527,11 @@ Data Flow: User Input → Framework Processing → Agent Execution → Validatio
 | **refactorer** | Refactoring requests OR code quality issues | `agent-delegator.ts`, `dependency-graph-builder.ts` | Agent delegation pipeline |
 | **test-architect** | Test generation/validation needs | `test-auto-healing.ts`, `rule-enforcer.ts` | Rule enforcement pipeline |
 | **librarian** | Analysis/documentation requests | `codebase-context-analyzer.ts`, `project-analysis.server.ts` | Agent delegation pipeline |
+| **oracle** | Strategic guidance requests | `agent-delegator.ts`, `universal-librarian-consultation.ts` | Agent delegation pipeline |
+| **multimodal-looker** | Media file analysis requests | `codebase-context-analyzer.ts`, `project-analysis.server.ts` | Agent delegation pipeline |
+| **frontend-ui-ux-engineer** | Frontend/UI development requests | `agent-delegator.ts`, `complexity-analyzer.ts` | Agent delegation pipeline |
+| **document-writer** | Documentation generation requests | `agent-delegator.ts`, `universal-librarian-consultation.ts` | Agent delegation pipeline |
+| **explore** | Codebase exploration requests | `codebase-context-analyzer.ts`, `ast-code-parser.ts` | Agent delegation pipeline |
 
 ### Practical Agent Usage Examples
 
@@ -1366,7 +1376,7 @@ npm publish --tag latest
 | **3. Plugin Discovery**     | Plugin System    | `.opencode/plugins/`               | Scan for StrRay plugin                 | Plugin detected       | oh-my-opencode     |
 | **4. Plugin Loading**       | Codex Injection  | `plugin/strray-codex-injection.ts` | Load plugin with codex injection       | Plugin active         | Plugin discovery   |
 | **5. Claude Override**      | MCP Exclusion    | `.claude/.mcp.json`                | Disable problematic global MCP servers | Clean MCP environment | Plugin loading     |
-| **6. MCP Registration**     | Server Registry  | `.mcp.json`                        | Register 28 MCP servers                | Servers available     | Claude override    |
+| **6. MCP Registration**     | Server Registry  | `oh-my-opencode.json`              | Register MCP servers via plugin        | Servers available     | Claude override    |
 | **7. Agent Initialization** | Agent System     | `src/agents/`                      | Load 8 specialized agents              | Agents ready          | Plugin loading     |
 | **8. Context Loading**      | Codex System     | `.strray/codex.json`               | Load 59 codex terms                    | Validation active     | Plugin loading     |
 | **9. State Manager**        | Persistence      | `src/state/state-manager.ts`       | Initialize state management            | State ready           | Context loading    |
@@ -2293,7 +2303,7 @@ node -e "const {TokenManager} = require('./dist/utils/token-manager.js'); consol
 - **Framework Config**: `.strray/config.json` - Framework settings and thresholds
 - **Agent Templates**: `.strray/agents_template.md` - Agent documentation templates
 - **OpenCode Config**: `.opencode/oh-my-opencode.json` - oh-my-opencode plugin configuration
-- **MCP Registry**: `.mcp.json` - MCP server registration (28 servers)
+- **MCP Registry**: `oh-my-opencode.json` - MCP server registration via plugin
 - **Claude Override**: `.claude/.mcp.json` - MCP server exclusions
 
 **Core Source Directories**:

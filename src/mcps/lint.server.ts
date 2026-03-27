@@ -308,8 +308,8 @@ ${checkResults.details.map((d) => `• ${d}`).join("\n")}
           // JSON parse failed — fall back to regex-based parsing
           const errorMatches = output.match(/(\d+)\s+errors?/);
           const warningMatches = output.match(/(\d+)\s+warnings?/);
-          if (errorMatches) errorCount = parseInt(errorMatches[1]);
-          if (warningMatches) warningCount = parseInt(warningMatches[1]);
+          if (errorMatches?.[1]) errorCount = parseInt(errorMatches[1]);
+          if (warningMatches?.[1]) warningCount = parseInt(warningMatches[1]);
         }
 
         results.issues.errors = errorCount;
@@ -356,8 +356,8 @@ ${checkResults.details.map((d) => `• ${d}`).join("\n")}
         if (!parsedJson) {
           const errorMatches = errorOutput.match(/(\d+)\s+errors?/);
           const warningMatches = errorOutput.match(/(\d+)\s+warnings?/);
-          if (errorMatches) results.issues.errors = parseInt(errorMatches[1]);
-          if (warningMatches) results.issues.warnings = parseInt(warningMatches[1]);
+          if (errorMatches?.[1]) results.issues.errors = parseInt(errorMatches[1]);
+          if (warningMatches?.[1]) results.issues.warnings = parseInt(warningMatches[1]);
         }
 
         results.details.push(

@@ -15,7 +15,7 @@ export interface OrchestrationTask {
   description: string;
   type: string;
   priority?: 'critical' | 'high' | 'medium' | 'low';
-  dependencies?: string[];
+  dependencies?: string[] | number;
   estimatedComplexity?: number;
 }
 

@@ -138,10 +138,11 @@ class StrRaySecurityScanServer {
     try {
       // 1. Dependency Vulnerability Scanning
       if (scope === "dependencies" || scope === "full") {
+        const detectedPm = this.detectPackageManager("auto");
         const depResults = await this.scanDependencies(
           auditLevel,
           includeOutdated,
-          "npm",
+          detectedPm,
         );
         results.vulnerabilities.push(...depResults.vulnerabilities);
         results.recommendations.push(...depResults.recommendations);

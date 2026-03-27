@@ -20,7 +20,7 @@ vi.mock("child_process", () => ({
   })),
 }));
 
-vi.mock("../mcps/agent-resolver.js", () => ({
+vi.mock("../../mcps/agent-resolver.js", () => ({
   resolveAgent: vi.fn().mockResolvedValue({
     name: "enforcer",
     system: "You are a code quality enforcer...",

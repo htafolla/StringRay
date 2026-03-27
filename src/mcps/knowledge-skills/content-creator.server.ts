@@ -100,7 +100,7 @@ class SEOCopywriterServer {
 
   constructor() {
     this.server = new Server(
-      { name: "content-creator", version: "1.15.1" },
+      { name: "content-creator", version: "1.15.6" },
       { capabilities: { tools: {} } },
     );
 

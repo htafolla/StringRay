@@ -1,6 +1,6 @@
 {
   "framework": "StringRay 1.0.0",
-  "version": "1.15.1",
+  "version": "1.15.6",
   "description": "Codex-compliant framework configuration for Credible UI project",
   "thresholds": {
     "bundleSize": {
@@ -220,7 +220,7 @@
       }
     },
     "codex": {
-      "version": "1.15.1",
+      "version": "1.15.6",
       "terms": [
         1,
         2,

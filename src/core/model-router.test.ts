@@ -10,7 +10,6 @@ import {
   getModelForTask,
   getModelForTaskType,
   getValidatedModel,
-  modelRouter,
 } from "./model-router";
 
 describe("model-router", () => {

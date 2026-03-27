@@ -59,7 +59,7 @@ class StrRayRefactoringStrategiesServer {
   constructor() {
     this.server = new Server(
       {
-        name: "refactoring-strategies", version: "1.15.1",
+        name: "refactoring-strategies", version: "1.15.6",
       },
       {
         capabilities: {

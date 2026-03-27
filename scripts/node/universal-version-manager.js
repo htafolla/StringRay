@@ -78,8 +78,8 @@ const CALCULATED_COUNTS = calculateCounts();
 const OFFICIAL_VERSIONS = {
   // Framework version
   framework: {
-    version: "1.15.1",
-    displayName: "StringRay AI v1.15.1",
+    version: "1.15.6",
+    displayName: "StringRay AI v1.15.6",
     lastUpdated: "2026-03-26",
     // Counts (auto-calculated, but can be overridden)
     ...CALCULATED_COUNTS,
@@ -226,7 +226,7 @@ const UPDATE_PATTERNS = [
       pattern: /StrRay v[0-9]+\.[0-9]+\.[0-9]+/g,
       replacement: OFFICIAL_VERSIONS.framework.displayName,
     },
-    // Standalone version in docs (v1.15.1, v1.15.1 patterns)
+    // Standalone version in docs (v1.15.6, v1.15.6 patterns)
     {
       pattern: /v1\.14\.[0-9]+/g,
       replacement: `v${OFFICIAL_VERSIONS.framework.version}`,

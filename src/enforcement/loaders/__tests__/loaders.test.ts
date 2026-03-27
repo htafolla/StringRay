@@ -145,7 +145,7 @@ describe("Rule Loaders", () => {
 
     it("should load codex rules from valid codex.json", async () => {
       const mockCodexData = {
-        version: "1.15.1",
+        version: "1.15.6",
         lastUpdated: "2024-01-01",
         errorPreventionTarget: 0.99,
         terms: {
@@ -181,7 +181,7 @@ describe("Rule Loaders", () => {
 
     it("should skip invalid terms", async () => {
       const mockCodexData = {
-        version: "1.15.1",
+        version: "1.15.6",
         terms: {
           "1": {
             number: 1,
@@ -377,12 +377,12 @@ Complex: orchestrator
     });
 
     it("should validate AGENTS.md currency correctly", async () => {
-      // Setup mocks - file exists and has old date
+      // Setup mocks - file exists and has old date (> 30 days)
       vi.mocked(fs.promises.access).mockResolvedValue(undefined);
       vi.mocked(fs.promises.readFile).mockImplementation(async () => {
-        const thirtyOneDaysAgo = new Date();
-        thirtyOneDaysAgo.setDate(thirtyOneDaysAgo.getDate() - 31);
-        const dateStr = thirtyOneDaysAgo.toISOString().split("T")[0];
+        const fortyDaysAgo = new Date();
+        fortyDaysAgo.setDate(fortyDaysAgo.getDate() - 40);
+        const dateStr = fortyDaysAgo.toISOString().split("T")[0];
         return `**Updated**: ${dateStr}\nContent`;
       });
 

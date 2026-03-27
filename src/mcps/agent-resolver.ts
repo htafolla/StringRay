@@ -44,6 +44,7 @@ const DEFAULT_AGENT_CONFIG: AgentConfig = {
   name: "unknown",
   description: "Default agent configuration",
   capabilities: ["general-purpose"],
+  system: "You are a helpful AI assistant.",
   tools: {
     include: ["read", "grep", "edit", "bash"],
   },

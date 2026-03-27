@@ -114,7 +114,7 @@ class SEOSpecialistServer {
 
   constructor() {
     this.server = new Server(
-      { name: "seo-consultant", version: "1.15.1" },
+      { name: "seo-consultant", version: "1.15.6" },
       { capabilities: { tools: {} } },
     );
 

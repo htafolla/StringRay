@@ -973,7 +973,7 @@ export class BootOrchestrator {
     try {
       // Load StringRay configuration directly (no Python dependency)
       const stringRayConfig = {
-        version: "1.15.1",
+        version: "1.15.6",
         codex_enabled: true,
         codex_version: "v1.7.5",
         codex_terms: [

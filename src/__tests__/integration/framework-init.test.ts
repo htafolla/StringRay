@@ -239,7 +239,7 @@ describe("StringRay Framework Initialization Integration", () => {
       expect(checkDir(".opencode/skills")).toBe(true);
       const skillDirs = fs.readdirSync(".opencode/skills");
 
-      // At least 30 skills should be registered (based on current implementation)
+      // At least 260 skills should be registered (based on current implementation)
       expect(skillDirs.length).toBeGreaterThanOrEqual(15);
     });
   });

@@ -8,7 +8,7 @@
 
 ## Executive Summary
 
-This reflection documents the implementation of a comprehensive 5-phase skills routing architecture that transformed StringRay from a framework with static agent definitions into a dynamic, routing-driven system capable of intelligently matching tasks to the right skills. The journey spanned Phase 1 (Skill Registry Foundation), Phase 2 (Routing Enhancement), Phase 3 (Agent Config Integration), Phase 4 (Processor Pipeline), and Phase 5 (Hot Reload). We discovered 30 skills from `.opencode/skills/`, built a multi-layered system with registry, matcher, resolver, pipeline, and watcher components, and integrated it all into the boot orchestrator and plugin system.
+This reflection documents the implementation of a comprehensive 5-phase skills routing architecture that transformed StringRay from a framework with static agent definitions into a dynamic, routing-driven system capable of intelligently matching tasks to the right skills. The journey spanned Phase 1 (Skill Registry Foundation), Phase 2 (Routing Enhancement), Phase 3 (Agent Config Integration), Phase 4 (Processor Pipeline), and Phase 5 (Hot Reload). We discovered 260 skills from `.opencode/skills/`, built a multi-layered system with registry, matcher, resolver, pipeline, and watcher components, and integrated it all into the boot orchestrator and plugin system.
 
 The technical challenges we faced were significant: YAML parsing for nested objects required building a custom parser with proper indentation handling, TypeScript's `exactOptionalPropertyTypes` forced explicit `undefined` types throughout the codebase, OpenCode's sandboxing created visibility issues between Node.js and shell contexts, and circular dependencies between registry and matcher components required careful architectural separation.
 
@@ -70,7 +70,7 @@ The boot orchestrator integration was tricky. We had to add skill discovery to t
 
 ### Phase 2: Making It Smart - The Routing Enhancement
 
-With 30 skills in hand, we faced a new problem: how do we match a task to the right skill?
+With 260 skills in hand, we faced a new problem: how do we match a task to the right skill?
 
 Simple keyword matching would work for obvious cases. If a task mentioned "security", route to the security-audit skill. But what about more nuanced requests? What about tasks that mentioned "vulnerability" instead of "security"? What about tasks that implied a skill need without stating it explicitly?
 

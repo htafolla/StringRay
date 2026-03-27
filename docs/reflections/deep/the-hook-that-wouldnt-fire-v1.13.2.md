@@ -20,7 +20,7 @@ The first sign of trouble was subtle. Activity reports showed activity, but the 
 
 ```
 ✅ 26 agents configured
-✅ 30 skills available  
+✅ 260 skills available  
 ✅ Codex enforcement active
 ```
 

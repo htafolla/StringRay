@@ -51,7 +51,7 @@ The investigation uncovered extensive framework operations:
 - **No Spawn Limits**: System lacked any governance over agent instantiation
 
 **Contributing Factors:**
-- **Complex Multi-Agent Architecture**: 26 agents, 30 skills, 56+ possible agent pairings without controls
+- **Complex Multi-Agent Architecture**: 26 agents, 260 skills, 56+ possible agent pairings without controls
 - **Event-Driven Recursion**: Consultation system triggered by its own operations
 - **Insufficient Testing**: Bug existed despite comprehensive test suite (1044/1114 tests passing)
 - **Documentation Automation**: Universal researcher involvement in ALL major actions created feedback loops

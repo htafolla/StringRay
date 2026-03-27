@@ -55,7 +55,7 @@ It's just... files. Scattered. Waiting to drift.
 
 Looking back at the commits, I realize this wasn't one fix. This was a 5-version odyssey - your vision unfolding in layers:
 
-**v1.6.7** - "Let's integrate Antigravity!" (30 skills, MIT licensed, amazing!)
+**v1.6.7** - "Let's integrate Antigravity!" (260 skills, MIT licensed, amazing!)
 **v1.6.8** - "Wait, only 15 MCP servers are registered, not 38?"
 **v1.6.9** - "We need to add the missing MCP aliases"
 **v1.6.10** - "Some agents aren't in setup.cjs. Let me add them."

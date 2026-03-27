@@ -10,7 +10,7 @@
 
 This reflection documents one of the most technically challenging and architecturally significant implementations in the StringRay framework's history: the Skills Routing Architecture. What began as a seemingly straightforward request to inventory available skills evolved into a five-phase initiative that transformed how the framework discovers, matches, routes, and executes skills.
 
-We discovered 30 skills in `.opencode/skills/` that had existed largely dormant—29 of which had associated MCP configurations but no unified mechanism to leverage them. The implementation built a complete skills ecosystem: SkillRegistry for discovery and caching, SkillDiscoveryService for filesystem scanning, SkillMatcher for capability-based routing, SkillResolver for agent-skill bindings, SkillPipeline for execution orchestration, and SkillWatcher for hot reload.
+We discovered 260 skills in `.opencode/skills/` that had existed largely dormant—29 of which had associated MCP configurations but no unified mechanism to leverage them. The implementation built a complete skills ecosystem: SkillRegistry for discovery and caching, SkillDiscoveryService for filesystem scanning, SkillMatcher for capability-based routing, SkillResolver for agent-skill bindings, SkillPipeline for execution orchestration, and SkillWatcher for hot reload.
 
 But the journey was far from linear. We encountered a critical context preservation bug that caused the original user message to be lost between the `chat.message` hook and the `tool.execute.before` hook. We discovered that OpenCode's sandboxing created visibility issues between Node.js execution and shell commands. We wrestled with TypeScript's `exactOptionalPropertyTypes` flag that required explicit `undefined` typing throughout the codebase. We built a custom YAML parser from scratch because standard libraries couldn't track indentation levels properly for nested agent configurations.
 
@@ -99,7 +99,7 @@ Here's the full list we discovered:
 - **Health**: model-health-check
 - **Enforcement**: enforcer
 
-Of these 30 skills, 29 had MCP server configurations defined in their SKILL.md frontmatter. They had all the infrastructure needed to be invoked—they just needed a system to discover and route to them.
+Of these 260 skills, 29 had MCP server configurations defined in their SKILL.md frontmatter. They had all the infrastructure needed to be invoked—they just needed a system to discover and route to them.
 
 This was the spark for Phase 1: Skill Registry Foundation.
 
@@ -118,7 +118,7 @@ We also discovered the first major technical challenge: the YAML parser needed t
 
 ### Session 4-5: Phase 2 - Making It Smart
 
-With 30 skills in hand, we faced a new problem: how do we match a task to the right skill?
+With 260 skills in hand, we faced a new problem: how do we match a task to the right skill?
 
 Simple keyword matching would work for obvious cases. If a task mentioned "security", route to the security-audit skill. But what about more nuanced requests? What about tasks that mentioned "vulnerability" instead of "security"? What about tasks that implied a skill need without stating it explicitly?
 

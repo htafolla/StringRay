@@ -54,7 +54,7 @@ Three bug triage specialists tested and fixed all scripts in the StringRay frame
 **Verified Working:**
 - `scripts/triage/dependency-failure-triage.mjs` - All 5 test scenarios PASS
 - `scripts/integrations/install-claude-seo.js` - Working
-- `scripts/integrations/install-antigravity-skills.js.mjs` - 14/30 skills installed
+- `scripts/integrations/install-antigravity-skills.js.mjs` - 14/260 skills installed
 
 **Status:** All integration scripts working ✅
 

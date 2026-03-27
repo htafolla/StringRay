@@ -1,0 +1,11 @@
+name: strray-hermes
+version: 1.0.0
+description: StringRay AI integration plugin — auto-enforcement hooks, quality gates, and tool awareness for Hermes Agent
+author: StringRay AI
+provides_tools:
+  - strray_validate
+  - strray_codex_check
+  - strray_health
+provides_hooks:
+  - post_tool_call
+  - pre_tool_call

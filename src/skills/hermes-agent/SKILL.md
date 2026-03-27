@@ -243,6 +243,37 @@ CLI commands = framework management (install, configure, report, publish)
 | "Publish agent X" | `npx strray-ai publish-agent --agent X` |
 | "Set up MCP in Hermes" | Add config to `~/.hermes/config.yaml` (see above) |
 
+## Native Hermes Plugin
+
+StringRay ships a native Hermes Agent plugin (`src/integrations/hermes-agent/`) that provides:
+
+**3 Tools:**
+| Tool | Purpose |
+|------|---------|
+| `strray_validate` | Pre-commit validation on files — codex, rules, quality gates |
+| `strray_codex_check` | Validate code against the 60-term Universal Development Codex |
+| `strray_health` | Framework health check — version, agents, MCP status |
+
+**2 Hooks:**
+| Hook | Purpose |
+|------|---------|
+| `pre_tool_call` | Tracks stats, nudges when native tools used instead of StringRay MCP equivalents |
+| `post_tool_call` | Logs tool usage, tracks file operations for enforcement context |
+
+**Slash Command:**
+- `/strray status` — Plugin and MCP health
+- `/strray stats` — Session tool usage statistics
+- `/strray help` — Show available commands
+
+**Install:**
+```bash
+# Copy plugin to Hermes plugins directory
+cp -r src/integrations/hermes-agent ~/.hermes/plugins/strray-hermes/
+# Restart Hermes — plugin auto-loads
+```
+
+The plugin works alongside the MCP servers. The MCP servers provide deep analysis tools (linting, security scanning, architecture assessment, orchestration), while the native plugin provides quick CLI-based health/validate/codex tools and enforcement hooks.
+
 ## Pitfalls
 
 - `install` is heavyweight — detects and may install OpenCode. Use `init` for config-only.
@@ -253,3 +284,5 @@ CLI commands = framework management (install, configure, report, publish)
 - Orchestrator MCP server path is nested: `dist/mcps/orchestrator/server.js` (not `orchestrator.server.js`).
 - Use absolute paths in MCP args if Hermes CWD differs from project root.
 - Increase timeout to 60s for orchestrator and researcher — they do heavier analysis.
+- Plugin hooks use `logger.info` for nudges — these show as `[strray] Tip: ...` in Hermes logs.
+- `strray_codex_check` with `code` parameter does lightweight local check. For full validation, use MCP server `mcp_strray_enforcer_codex_enforcement`.

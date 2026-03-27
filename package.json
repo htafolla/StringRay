@@ -117,6 +117,7 @@
     ".opencode/commands/",
     ".opencode/hooks/",
     "src/skills/",
+    "src/integrations/hermes-agent/",
     ".opencode/strray/",
     ".opencode/workflows/",
     ".opencode/state/",

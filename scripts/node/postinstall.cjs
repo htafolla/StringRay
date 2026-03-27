@@ -440,6 +440,58 @@ if (fs.existsSync(hermesSkillSource)) {
   }
 }
 
+// Install hermes-agent PLUGIN to ~/.hermes/plugins/strray-hermes/ if Hermes is present
+const hermesPluginSource = path.join(packageRoot, 'src', 'integrations', 'hermes-agent');
+
+if (fs.existsSync(hermesPluginSource)) {
+  try {
+    const homeDir = process.env.HOME || process.env.USERPROFILE || require('os').homedir();
+    const hermesDir = path.join(homeDir, '.hermes');
+
+    if (fs.existsSync(hermesDir)) {
+      const targetPluginDir = path.join(hermesDir, 'plugins', 'strray-hermes');
+      const pluginFiles = ['__init__.py', 'tools.py', 'schemas.py', 'plugin.yaml',
+                           'bridge.mjs', 'conftest.py', 'after-install.md'];
+
+      // Check if any file needs updating
+      let needsUpdate = false;
+      if (!fs.existsSync(targetPluginDir)) {
+        needsUpdate = true;
+      } else {
+        for (const file of pluginFiles) {
+          const src = path.join(hermesPluginSource, file);
+          const dst = path.join(targetPluginDir, file);
+          if (fs.existsSync(src) && (!fs.existsSync(dst) ||
+              fs.statSync(src).mtime > fs.statSync(dst).mtime)) {
+            needsUpdate = true;
+            break;
+          }
+        }
+      }
+
+      if (needsUpdate) {
+        if (!fs.existsSync(targetPluginDir)) {
+          fs.mkdirSync(targetPluginDir, { recursive: true });
+        }
+        let copied = 0;
+        for (const file of pluginFiles) {
+          const src = path.join(hermesPluginSource, file);
+          const dst = path.join(targetPluginDir, file);
+          if (fs.existsSync(src)) {
+            fs.copyFileSync(src, dst);
+            copied++;
+          }
+        }
+        console.log(`✅ Installed strray-hermes plugin → ~/.hermes/plugins/strray-hermes/ (${copied} files)`);
+      } else {
+        console.log("ℹ️ strray-hermes plugin already up to date");
+      }
+    }
+  } catch (error) {
+    console.warn("⚠️ Could not install Hermes plugin:", error.message);
+  }
+}
+
 console.log("📋 Next steps:");
 console.log("1. Restart OpenCode to load the plugin");
 console.log("2. Run 'opencode agent list' to see StrRay agents");

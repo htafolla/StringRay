@@ -413,7 +413,35 @@ if (fs.existsSync(distSource)) {
   }
 }
 
+// Install hermes-agent skill to ~/.hermes/skills/ if Hermes is present
+const hermesSkillSource = path.join(packageRoot, 'src', 'skills', 'hermes-agent', 'SKILL.md');
+
+if (fs.existsSync(hermesSkillSource)) {
+  try {
+    const homeDir = process.env.HOME || process.env.USERPROFILE || require('os').homedir();
+    const targetHermesSkills = path.join(homeDir, '.hermes', 'skills', 'hermes-agent');
+
+    if (fs.existsSync(path.join(homeDir, '.hermes'))) {
+      if (!fs.existsSync(targetHermesSkills)) {
+        fs.mkdirSync(targetHermesSkills, { recursive: true });
+      }
+      const destSkill = path.join(targetHermesSkills, 'SKILL.md');
+      const shouldCopySkill = !fs.existsSync(destSkill) ||
+        fs.statSync(hermesSkillSource).mtime > fs.statSync(destSkill).mtime;
+      if (shouldCopySkill) {
+        fs.copyFileSync(hermesSkillSource, destSkill);
+        console.log("✅ Installed hermes-agent skill → ~/.hermes/skills/hermes-agent/");
+      } else {
+        console.log("ℹ️ hermes-agent skill already up to date");
+      }
+    }
+  } catch (error) {
+    console.warn("⚠️ Could not install Hermes skill:", error.message);
+  }
+}
+
 console.log("📋 Next steps:");
 console.log("1. Restart OpenCode to load the plugin");
 console.log("2. Run 'opencode agent list' to see StrRay agents");
 console.log("3. Try '@enforcer analyze this code' to test the plugin");
+console.log("4. Hermes Agent users: restart Hermes to load MCP tools and hermes-agent skill");

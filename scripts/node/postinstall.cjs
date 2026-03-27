@@ -451,7 +451,8 @@ if (fs.existsSync(hermesPluginSource)) {
     if (fs.existsSync(hermesDir)) {
       const targetPluginDir = path.join(hermesDir, 'plugins', 'strray-hermes');
       const pluginFiles = ['__init__.py', 'tools.py', 'schemas.py', 'plugin.yaml',
-                           'bridge.mjs', 'conftest.py', 'after-install.md'];
+                           'bridge.mjs', 'conftest.py', 'after-install.md',
+                           'test_plugin.py'];
 
       // Check if any file needs updating
       let needsUpdate = false;

@@ -46,8 +46,8 @@ export class ExecutionPlanner {
         errors.push(`Task ${i}: Missing required field 'type'`);
       }
 
-      // Check dependencies exist
-      if (task.dependencies && task.id) {
+      // Check dependencies exist (only for string[] dependency IDs)
+      if (task.dependencies && task.id && Array.isArray(task.dependencies)) {
         const taskIds = new Set(tasks.map(t => t.id).filter((id): id is string => !!id));
         for (const depId of task.dependencies) {
           if (!taskIds.has(depId)) {
@@ -145,7 +145,10 @@ export class ExecutionPlanner {
     const dependentTasks: OrchestrationTask[] = [];
 
     for (const task of sortedTasks) {
-      if (!task.dependencies || task.dependencies.length === 0) {
+      const hasDeps = task.dependencies
+        ? (Array.isArray(task.dependencies) ? task.dependencies.length : Number(task.dependencies)) > 0
+        : false;
+      if (!hasDeps) {
         independentTasks.push(task);
       } else {
         dependentTasks.push(task);
@@ -171,7 +174,7 @@ export class ExecutionPlanner {
       if (visited.has(task.id)) return;
       visited.add(task.id);
 
-      if (task.dependencies) {
+      if (task.dependencies && Array.isArray(task.dependencies)) {
         for (const depId of task.dependencies) {
           const depTask = taskMap.get(depId);
           if (depTask) visit(depTask);
@@ -314,9 +317,12 @@ export class ExecutionPlanner {
       complexity = (complexity + task.estimatedComplexity) / 2;
     }
 
-    // Adjust based on dependencies
+    // Adjust based on dependencies (handles both string[] and number)
     if (task.dependencies) {
-      complexity += task.dependencies.length * 5;
+      const depCount = Array.isArray(task.dependencies)
+        ? task.dependencies.length
+        : Number(task.dependencies) || 0;
+      complexity += depCount * 5;
     }
 
     return Math.min(Math.max(Math.round(complexity), 1), 100);
@@ -337,8 +343,11 @@ export class ExecutionPlanner {
    */
   private calculateParallelPotential(tasks: OrchestrationTask[]): number {
     // Tasks without dependencies can run in parallel
-    const independent = tasks.filter(t => !t.dependencies || t.dependencies.length === 0);
-    return independent.length / tasks.length;
+    const independent = tasks.filter(
+      t => !t.dependencies ||
+        (Array.isArray(t.dependencies) ? t.dependencies.length : Number(t.dependencies)) === 0
+    );
+    return tasks.length > 0 ? independent.length / tasks.length : 0;
   }
 }
 

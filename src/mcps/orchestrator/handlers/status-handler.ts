@@ -258,14 +258,14 @@ ${optimizations.map((o) => `• ${o}`).join('\n')}
   private formatStatusResponse(status: unknown, detailed: boolean): string {
     const statusAny = status as Record<string, unknown>;
 
-    // Check if it's a completed session
-    if (statusAny.completed) {
+    // Check if it's a completed session (supports both 'completed' boolean and status: 'completed')
+    if (statusAny.completed || statusAny.status === 'completed') {
       const result = statusAny as { success: boolean; duration: number; completedTasks: number; failedTasks: number };
       return `📊 Session Status: COMPLETED
 
 **Success:** ${result.success ? '✅ Yes' : '❌ No'}
 **Duration:** ${result.duration}ms
-**Tasks:** ${result.completedTasks + result.failedTasks} (${result.completedTasks} ✅, ${result.failedTasks} ❌)`;
+**Tasks:** ${(result.completedTasks ?? 0) + (result.failedTasks ?? 0)} (${result.completedTasks ?? 0} ✅, ${result.failedTasks ?? 0} ❌)`;
     }
 
     // Overall status
@@ -273,19 +273,21 @@ ${optimizations.map((o) => `• ${o}`).join('\n')}
     
     let response = `📊 Orchestration Status
 
-**Active Sessions:** ${orchStatus.activeSessions}
-**Total Tasks Executed:** ${orchStatus.totalTasks}`;
+**Active Sessions:** ${orchStatus.activeSessions ?? 0}
+**Total Tasks Executed:** ${orchStatus.totalTasks ?? 0}`;
 
-    if (Object.keys(orchStatus.agentUtilization).length > 0) {
+    const agentUtil = orchStatus.agentUtilization || {};
+    if (Object.keys(agentUtil).length > 0) {
       response += `\n\n**Agent Utilization:**`;
-      for (const [agent, count] of Object.entries(orchStatus.agentUtilization)) {
+      for (const [agent, count] of Object.entries(agentUtil)) {
         response += `\n• ${agent}: ${count} tasks`;
       }
     }
 
-    if (detailed && orchStatus.recentSessions.length > 0) {
+    const sessions = orchStatus.recentSessions || [];
+    if (detailed && sessions.length > 0) {
       response += `\n\n**Recent Sessions:**`;
-      for (const session of orchStatus.recentSessions) {
+      for (const session of sessions) {
         response += `\n• ${session.sessionId}: ${session.tasks} tasks, ${session.duration}ms`;
       }
     }

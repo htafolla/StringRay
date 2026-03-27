@@ -57,7 +57,7 @@ export class OrchestratorServer {
     this.server = new Server(
       {
         name: 'orchestrator',
-        version: '1.10.0',
+        version: '1.14.1',
       },
       {
         capabilities: {
@@ -69,7 +69,7 @@ export class OrchestratorServer {
     this.initializeTools();
     this.setupToolHandlers();
 
-    void frameworkLogger.log('orchestrator.server', 'initialize', 'info', {
+    frameworkLogger.log('orchestrator.server', 'initialize', 'info', {
       message: 'StringRay Orchestrator MCP Server initialized',
     });
   }
@@ -199,44 +199,53 @@ export class OrchestratorServer {
    */
   private setupToolHandlers(): void {
     this.server.setRequestHandler(CallToolRequestSchema, async (request) => {
-      const { name, arguments: args } = request.params;
+      try {
+        const { name, arguments: args } = request.params;
 
-      switch (name) {
-        case 'orchestrate-task':
-          return await this.taskHandler.handleOrchestrateTask(args as {
-            description: string;
-            tasks?: OrchestrationTask[];
-            sessionId?: string;
-            executionMode?: string;
-            timeout?: number;
-          }, { taskHistory: this.taskHistory, activeTasks: this.activeTasks });
-          
-        case 'analyze-complexity':
-          return await this.complexityHandler.handleAnalyzeComplexity(args as {
-            tasks: OrchestrationTask[];
-          });
-          
-        case 'get-orchestration-status':
-          return await this.statusHandler.handleGetOrchestrationStatus(args as {
-            sessionId?: string;
-            detailed?: boolean;
-          }, { taskHistory: this.taskHistory, activeTasks: this.activeTasks });
-          
-        case 'cancel-orchestration':
-          return await this.statusHandler.handleCancelOrchestration(args as {
-            sessionId?: string;
-            taskId?: string;
-            force?: boolean;
-          }, { taskHistory: this.taskHistory, activeTasks: this.activeTasks });
-          
-        case 'optimize-orchestration':
-          return await this.statusHandler.handleOptimizeOrchestration(args as {
-            history?: boolean;
-            recommendations?: boolean;
-          });
-          
-        default:
-          throw new Error(`Unknown tool: ${name}`);
+        switch (name) {
+          case 'orchestrate-task':
+            return await this.taskHandler.handleOrchestrateTask(args as {
+              description: string;
+              tasks?: OrchestrationTask[];
+              sessionId?: string;
+              executionMode?: string;
+              timeout?: number;
+            }, { taskHistory: this.taskHistory, activeTasks: this.activeTasks });
+            
+          case 'analyze-complexity':
+            return await this.complexityHandler.handleAnalyzeComplexity(args as {
+              tasks: OrchestrationTask[];
+            });
+            
+          case 'get-orchestration-status':
+            return await this.statusHandler.handleGetOrchestrationStatus(args as {
+              sessionId?: string;
+              detailed?: boolean;
+            }, { taskHistory: this.taskHistory, activeTasks: this.activeTasks });
+            
+          case 'cancel-orchestration':
+            return await this.statusHandler.handleCancelOrchestration(args as {
+              sessionId?: string;
+              taskId?: string;
+              force?: boolean;
+            }, { taskHistory: this.taskHistory, activeTasks: this.activeTasks });
+            
+          case 'optimize-orchestration':
+            return await this.statusHandler.handleOptimizeOrchestration(args as {
+              history?: boolean;
+              recommendations?: boolean;
+            });
+            
+          default:
+            throw new Error(`Unknown tool: ${name}`);
+        }
+      } catch (error) {
+        return {
+          content: [{
+            type: 'text' as const,
+            text: `Error handling tool '${request.params.name}': ${error instanceof Error ? error.message : String(error)}`,
+          }],
+        };
       }
     });
   }
@@ -260,6 +269,7 @@ export class OrchestratorServer {
     await frameworkLogger.log('orchestrator.server', 'shutdown', 'info', {
       message: 'StringRay Orchestrator MCP Server shutting down',
     });
+    await this.server.close();
   }
 }
 
@@ -277,7 +287,7 @@ export function createOrchestratorServer(): OrchestratorServer {
 if (import.meta.url === `file://${process.argv[1]}`) {
   const server = createOrchestratorServer();
   server.start().catch((error) => {
-    void frameworkLogger.log('orchestrator.server', 'fatal-error', 'error', {
+    frameworkLogger.log('orchestrator.server', 'fatal-error', 'error', {
       message: error instanceof Error ? error.message : String(error),
     });
     process.exit(1);

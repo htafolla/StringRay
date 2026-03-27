@@ -100,23 +100,36 @@ class EstimationServer {
 
     // Handle tool calls
     this.server.setRequestHandler(CallToolRequestSchema, async (request) => {
-      const { name, arguments: args } = request.params;
+      try {
+        const { name, arguments: args } = request.params;
 
-      switch (name) {
-        case "validate-estimate":
-          return this.handleValidateEstimate(args as { category: string; estimate: number; description?: string });
-        
-        case "start-tracking":
-          return this.handleStartTracking(args as { taskId: string; category: string; estimate: number; description?: string });
-        
-        case "complete-tracking":
-          return this.handleCompleteTracking(args as { taskId: string });
-        
-        case "get-accuracy-report":
-          return this.handleGetReport();
-        
-        default:
-          throw new Error(`Unknown tool: ${name}`);
+        if (args == null) {
+          throw new Error(`Tool '${name}' called with no arguments`);
+        }
+
+        switch (name) {
+          case "validate-estimate":
+            return this.handleValidateEstimate(args as { category: string; estimate: number; description?: string });
+          
+          case "start-tracking":
+            return this.handleStartTracking(args as { taskId: string; category: string; estimate: number; description?: string });
+          
+          case "complete-tracking":
+            return this.handleCompleteTracking(args as { taskId: string });
+          
+          case "get-accuracy-report":
+            return this.handleGetReport();
+          
+          default:
+            throw new Error(`Unknown tool: ${name}`);
+        }
+      } catch (error) {
+        return {
+          content: [{
+            type: "text" as const,
+            text: `Error handling tool '${request.params.name}': ${error instanceof Error ? error.message : String(error)}`,
+          }],
+        };
       }
     });
   }
@@ -201,7 +214,7 @@ class EstimationServer {
     const transport = new StdioServerTransport();
     await this.server.connect(transport);
     
-    void frameworkLogger.log("estimation-server", "start", "info", {
+    frameworkLogger.log("estimation-server", "start", "info", {
       message: "Estimation Validator Server started",
     });
   }

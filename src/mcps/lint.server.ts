@@ -10,7 +10,7 @@ import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
-import { execSync } from "child_process";
+import { execFileSync } from "child_process";
 import fs from "fs";
 import { frameworkLogger } from "../core/framework-logger.js";
 
@@ -97,13 +97,24 @@ class StrRayLintServer {
     this.server.setRequestHandler(CallToolRequestSchema, async (request) => {
       const { name, arguments: args } = request.params;
 
-      switch (name) {
-        case "lint":
-          return await this.handleLint(args);
-        case "lint-check":
-          return await this.handleLintCheck(args);
-        default:
-          throw new Error(`Unknown tool: ${name}`);
+      try {
+        switch (name) {
+          case "lint":
+            return await this.handleLint(args);
+          case "lint-check":
+            return await this.handleLintCheck(args);
+          default:
+            throw new Error(`Unknown tool: ${name}`);
+        }
+      } catch (error) {
+        return {
+          content: [
+            {
+              type: "text",
+              text: `❌ Tool execution failed: ${error instanceof Error ? error.message : String(error)}`,
+            },
+          ],
+        };
       }
     });
   }
@@ -228,12 +239,14 @@ ${checkResults.details.map((d) => `• ${d}`).join("\n")}
         return results;
       }
 
-      // Check for ESLint configuration
+      // Check for ESLint configuration (including ESLint 9+ flat config)
       const hasEslintConfig =
         fs.existsSync(".eslintrc.js") ||
         fs.existsSync(".eslintrc.json") ||
         fs.existsSync(".eslintrc.yml") ||
         fs.existsSync(".eslintrc.yaml") ||
+        fs.existsSync("eslint.config.js") ||
+        fs.existsSync("eslint.config.mjs") ||
         (fs.existsSync("package.json") &&
           JSON.parse(fs.readFileSync("package.json", "utf8")).eslintConfig);
 
@@ -246,44 +259,57 @@ ${checkResults.details.map((d) => `• ${d}`).join("\n")}
       const packageJson = JSON.parse(fs.readFileSync("package.json", "utf8"));
       const scripts = packageJson.scripts || {};
 
-      // Determine which script to run
-      let scriptCommand = "npx eslint";
+      // Determine command and arguments (using args array to prevent command injection)
+      let command: string;
+      let args: string[];
+      const fileArgs = files.length > 0 ? files : ["."];
+
       if (fix && scripts["lint:fix"]) {
-        scriptCommand = "npm run lint:fix";
+        command = "npm";
+        args = ["run", "lint:fix", "--", ...fileArgs];
       } else if (!fix && scripts.lint) {
-        scriptCommand = "npm run lint";
-      }
-
-      // Add file arguments if specified
-      if (files.length > 0) {
-        scriptCommand += ` ${files.join(" ")}`;
+        command = "npm";
+        args = ["run", "lint", "--", ...fileArgs];
       } else {
-        scriptCommand += " .";
+        command = "npx";
+        args = ["eslint", ...fileArgs, "--format", "json"];
       }
 
-      // Add strict flag if requested
       if (strict) {
-        scriptCommand += " --max-warnings 0";
+        args.push("--max-warnings", "0");
       }
+
+      const execOptions = {
+        encoding: "utf8" as const,
+        cwd: process.cwd(),
+        stdio: "pipe" as const,
+        timeout: 30000,
+      };
 
       try {
-        const output = execSync(scriptCommand, {
-          encoding: "utf8",
-          cwd: process.cwd(),
-          stdio: "pipe",
-        });
+        const output = execFileSync(command, args, execOptions);
 
         // Parse ESLint output
-        const lines = output.split("\n").filter((line) => line.trim());
         results.files = files.length > 0 ? files : ["All files"];
 
-        // Count issues from output
+        // Parse ESLint JSON output for accurate counts
         let errorCount = 0;
         let warningCount = 0;
 
-        for (const line of lines) {
-          if (line.includes("error")) errorCount++;
-          if (line.includes("warning")) warningCount++;
+        try {
+          const jsonResults = JSON.parse(output);
+          if (Array.isArray(jsonResults)) {
+            for (const fileResult of jsonResults) {
+              errorCount += fileResult.errorCount || 0;
+              warningCount += fileResult.warningCount || 0;
+            }
+          }
+        } catch {
+          // JSON parse failed — fall back to regex-based parsing
+          const errorMatches = output.match(/(\d+)\s+errors?/);
+          const warningMatches = output.match(/(\d+)\s+warnings?/);
+          if (errorMatches) errorCount = parseInt(errorMatches[1]);
+          if (warningMatches) warningCount = parseInt(warningMatches[1]);
         }
 
         results.issues.errors = errorCount;
@@ -308,17 +334,31 @@ ${checkResults.details.map((d) => `• ${d}`).join("\n")}
       } catch (error) {
         const errorOutput =
           error instanceof Error
-            ? (error as any).stdout?.toString() || error.message
+            ? ((error as any).stdout?.toString() || (error as any).stderr?.toString() || error.message)
             : String(error);
         results.success = false;
 
-        // Parse error output for issue counts
-        const errorMatches = errorOutput.match(/(\d+) errors?/);
-        const warningMatches = errorOutput.match(/(\d+) warnings?/);
+        // Try JSON parsing of error output first for accurate counts
+        let parsedJson = false;
+        try {
+          const jsonResults = JSON.parse(errorOutput);
+          if (Array.isArray(jsonResults)) {
+            for (const fileResult of jsonResults) {
+              results.issues.errors += fileResult.errorCount || 0;
+              results.issues.warnings += fileResult.warningCount || 0;
+            }
+            parsedJson = true;
+          }
+        } catch {
+          // Fall back to regex
+        }
 
-        if (errorMatches) results.issues.errors = parseInt(errorMatches[1]);
-        if (warningMatches)
-          results.issues.warnings = parseInt(warningMatches[1]);
+        if (!parsedJson) {
+          const errorMatches = errorOutput.match(/(\d+)\s+errors?/);
+          const warningMatches = errorOutput.match(/(\d+)\s+warnings?/);
+          if (errorMatches) results.issues.errors = parseInt(errorMatches[1]);
+          if (warningMatches) results.issues.warnings = parseInt(warningMatches[1]);
+        }
 
         results.details.push(
           `ESLint found ${results.issues.errors} errors, ${results.issues.warnings} warnings`,
@@ -354,15 +394,18 @@ ${checkResults.details.map((d) => `• ${d}`).join("\n")}
           `General compliance: ${results.violations === 0 ? "PASS" : "FAIL"}`,
         );
       } else {
-        // Check specific rules
+        // Check specific rules (using args array to prevent command injection)
+        const fileArgs = files.length > 0 ? files : ["."];
         for (const rule of rules) {
           try {
-            const ruleOutput = execSync(
-              `npx eslint --rule "${rule}:error" ${files.join(" ")}`,
+            execFileSync(
+              "npx",
+              ["eslint", ...fileArgs, "--rule", `${rule}:error`, "--format", "json"],
               {
                 encoding: "utf8",
                 cwd: process.cwd(),
                 stdio: "pipe",
+                timeout: 30000,
               },
             );
 
@@ -370,8 +413,12 @@ ${checkResults.details.map((d) => `• ${d}`).join("\n")}
             results.details.push(`Rule ${rule}: PASS`);
           } catch (error) {
             results.violations++;
+            const errorOutput =
+              error instanceof Error
+                ? ((error as any).stdout?.toString() || error.message)
+                : String(error);
             results.details.push(
-              `Rule ${rule}: FAIL - ${error instanceof Error ? error.message : String(error)}`,
+              `Rule ${rule}: FAIL - ${errorOutput.substring(0, 200)}`,
             );
           }
         }

@@ -98,15 +98,26 @@ class FrameworkHelpServer {
     this.server.setRequestHandler(CallToolRequestSchema, async (request) => {
       const { name, arguments: args } = request.params;
 
-      switch (name) {
-        case "strray_get_capabilities":
-          return this.handleGetCapabilities(args);
-        case "strray_get_commands":
-          return this.handleGetCommands(args);
-        case "strray_explain_capability":
-          return this.handleExplainCapability(args);
-        default:
-          throw new McpError(ErrorCode.MethodNotFound, `Unknown tool: ${name}`);
+      try {
+        switch (name) {
+          case "strray_get_capabilities":
+            return this.handleGetCapabilities(args);
+          case "strray_get_commands":
+            return this.handleGetCommands(args);
+          case "strray_explain_capability":
+            return this.handleExplainCapability(args);
+          default:
+            throw new McpError(ErrorCode.MethodNotFound, `Unknown tool: ${name}`);
+        }
+      } catch (error) {
+        if (error instanceof McpError) {
+          throw error;
+        }
+        frameworkLogger.log("mcps/framework-help", "tool-call", "error", { tool: name, error: String(error) });
+        throw new McpError(
+          ErrorCode.InternalError,
+          `Tool "${name}" execution failed: ${error instanceof Error ? error.message : String(error)}`,
+        );
       }
     });
   }
@@ -249,6 +260,10 @@ Test Coverage - Automated testing analysis
 - Monitor error rates through automated tracking
         `.trim();
         break;
+
+      default:
+        commands = `Error: Unknown command type "${type}". Valid types: agent-commands, system-commands, reporting-commands`;
+        break;
     }
 
     return {
@@ -265,20 +280,16 @@ Test Coverage - Automated testing analysis
     const capability = args?.capability;
 
     if (!capability) {
-      return {
-        content: [
-          {
-            type: "text",
-            text: "Error: capability parameter is required",
-          },
-        ],
-      };
+      throw new McpError(
+        ErrorCode.InvalidParams,
+        "capability parameter is required",
+      );
     }
 
     const explanations: { [key: string]: string } = {
       enforcer: `
 **Enforcer Agent**
-Automatically validates code against the Universal Development Codex (46 mandatory terms).
+Automatically validates code against the Universal Development Codex (60 mandatory terms).
 Prevents common errors, enforces coding standards, and ensures production-ready code.
 
 **Capabilities:**
@@ -424,7 +435,7 @@ ${Object.entries(capabilities.reporting)
       return `
 **StringRay Framework Capabilities:**
 
-**8 Agents:** enforcer, architect, orchestrator, bug-triage-specialist, code-reviewer, security-auditor, refactorer, testing-lead
+**26 Agents:** enforcer, architect, orchestrator, bug-triage-specialist, code-reviewer, security-auditor, refactorer, testing-lead, researcher, strategist, seo-consultant, content-creator, growth-strategist, multimodal-looker, frontend-ui-ux-engineer, tech-writer, log-monitor, explore, analyzer, backend-engineer, performance-engineer, database-engineer, devops-engineer, mobile-developer
 
 **23 Skills:** project-analysis, testing-strategy, code-review, security-audit, performance-optimization, refactoring-strategies, ui-ux-design, documentation-generation, and more
 

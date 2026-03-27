@@ -32,7 +32,7 @@ class StrRayArchitectToolsServer {
     );
 
     this.setupToolHandlers();
-    console.log("StrRay Architect Tools MCP Server initialized");
+    frameworkLogger.log("mcps/architect-tools", "init", "info", { message: "StrRay Architect Tools MCP Server initialized" });
   }
 
   private setupToolHandlers() {
@@ -310,7 +310,14 @@ class StrRayArchitectToolsServer {
       fileTypes: this.groupByExtension(files),
       directoryDepth: this.calculateMaxDepth(directories),
       largestFiles: files
-        .map((f) => ({ path: f, size: fs.statSync(f).size }))
+        .map((f) => {
+          try {
+            return { path: f, size: fs.statSync(f).size };
+          } catch {
+            return null;
+          }
+        })
+        .filter((f): f is { path: string; size: number } => f !== null)
         .sort((a, b) => b.size - a.size)
         .slice(0, 5),
     };
@@ -381,8 +388,10 @@ class StrRayArchitectToolsServer {
       dependencyMap: dependencies,
       totalDependencies: Object.values(dependencies).flat().length,
       averageDependenciesPerFile:
-        Object.values(dependencies).flat().length /
-        Object.keys(dependencies).length,
+        Object.keys(dependencies).length > 0
+          ? Object.values(dependencies).flat().length /
+            Object.keys(dependencies).length
+          : 0,
     };
   }
 
@@ -432,14 +441,23 @@ class StrRayArchitectToolsServer {
   private async calculateStructureMetrics(projectRoot: string): Promise<any> {
     const files = await this.getProjectFiles(projectRoot);
 
+    const fileSizes = files
+      .map((f) => {
+        try {
+          return { path: f, size: fs.statSync(f).size };
+        } catch {
+          return null;
+        }
+      })
+      .filter((f): f is { path: string; size: number } => f !== null);
+
+    const totalSize = fileSizes.reduce((sum, f) => sum + f.size, 0);
+
     return {
       totalFiles: files.length,
       fileTypeDistribution: this.groupByExtension(files),
-      averageFileSize:
-        files.reduce((sum, f) => sum + fs.statSync(f).size, 0) / files.length,
-      largestFile: files
-        .map((f) => ({ path: f, size: fs.statSync(f).size }))
-        .sort((a, b) => b.size - a.size)[0],
+      averageFileSize: fileSizes.length > 0 ? totalSize / fileSizes.length : 0,
+      largestFile: fileSizes.sort((a, b) => b.size - a.size)[0],
     };
   }
 
@@ -627,7 +645,9 @@ class StrRayArchitectToolsServer {
   }
 
   private calculateMaxDepth(directories: string[]): number {
-    return Math.max(...directories.map((dir) => dir.split("/").length));
+    return directories.length === 0
+      ? 0
+      : Math.max(...directories.map((dir) => dir.split("/").length));
   }
 
   private extractImports(content: string): string[] {
@@ -727,9 +747,6 @@ class StrRayArchitectToolsServer {
       frameworkLogger.log("mcps/architect-tools", "unhandledRejection", "error", { error: String(reason) });
       cleanup("unhandledRejection");
     });
-
-    process.on("SIGINT", cleanup);
-    process.on("SIGTERM", cleanup);
   }
 }
 

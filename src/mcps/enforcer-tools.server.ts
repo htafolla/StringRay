@@ -16,7 +16,7 @@ import * as path from "path";
 import { frameworkLogger } from "../core/framework-logger.js";
 
 // Import actual enforcer-tools functions
-import { ruleValidation, getTaskRoutingRecommendation } from "../enforcement/enforcer-tools.js";
+import { ruleValidation as runRuleValidation, getTaskRoutingRecommendation } from "../enforcement/enforcer-tools.js";
 import { RuleValidationContext } from "../enforcement/rule-enforcer.js";
 
 class StrRayEnforcerToolsServer {
@@ -286,7 +286,7 @@ class StrRayEnforcerToolsServer {
     };
 
     // Call actual rule validation from enforcer-tools
-    const validationResult = await ruleValidation(operation, context);
+    const validationResult = await runRuleValidation(operation, context);
 
     return {
       content: [
@@ -335,7 +335,7 @@ class StrRayEnforcerToolsServer {
             {
               operation,
               codexCheck,
-              termsValidated: 43, // All Universal Development Codex terms
+              termsValidated: 55, // All Universal Development Codex terms
               complianceScore: codexCheck.score,
               violations: codexCheck.violations.length,
               timestamp: new Date().toISOString(),
@@ -349,7 +349,8 @@ class StrRayEnforcerToolsServer {
   }
 
   private async contextAnalysisValidation(args: any): Promise<any> {
-    const { files, operation, checkPatterns } = args;
+    const files = args.files || [];
+    const { operation, checkPatterns } = args;
 
     // Context analysis - no logging to console (results returned to agent)
 
@@ -609,7 +610,7 @@ class StrRayEnforcerToolsServer {
     }
 
     // Simulate codex term checking
-    const totalTerms = 43;
+    const totalTerms = 55;
     const violationsCount = violations.length;
     const warningsCount = warnings.length;
 
@@ -700,7 +701,7 @@ class StrRayEnforcerToolsServer {
     strictMode: boolean,
   ): Promise<any> {
     // Run all quality checks using actual functions
-    const ruleCheckResult = await ruleValidation(operation, {
+    const ruleCheckResult = await runRuleValidation(operation, {
       operation,
       files: context.files || [],
       newCode: context.newCode,
@@ -752,7 +753,13 @@ class StrRayEnforcerToolsServer {
         "codex-enforcement",
         "context-analysis-validation",
       ],
-      overallScore: 85, // Default score since ruleCheckResult may not have score
+      overallScore: Math.round(
+        (
+          (ruleCheckResult.errors?.length === 0 && ruleCheckResult.warnings?.length === 0 ? 100 : Math.max(0, 100 - (ruleCheckResult.errors?.length || 0) * 20 - (ruleCheckResult.warnings?.length || 0) * 5))
+          + codexCheck.score
+          + contextCheck.score
+        ) / 3
+      ),
     };
   }
 
@@ -914,9 +921,6 @@ class StrRayEnforcerToolsServer {
       frameworkLogger.log("mcps/enforcer", "unhandledRejection", "error", { error: String(reason) });
       cleanup("unhandledRejection");
     });
-
-    process.on("SIGINT", cleanup);
-    process.on("SIGTERM", cleanup);
   }
 }
 

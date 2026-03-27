@@ -11,7 +11,7 @@ import {
   ListToolsRequestSchema,
   type CallToolRequest,
 } from "@modelcontextprotocol/sdk/types.js";
-import { execSync } from "child_process";
+import { execFileSync } from "child_process";
 import fs from "fs";
 import path from "path";
 import { frameworkLogger } from "../core/framework-logger.js";
@@ -95,13 +95,29 @@ class StrRayAutoFormatServer {
       async (request: CallToolRequest) => {
         const { name, arguments: args } = request.params;
 
-        switch (name) {
-          case "auto-format":
-            return await this.handleAutoFormat(args);
-          case "format-check":
-            return await this.handleFormatCheck(args);
-          default:
-            throw new Error(`Unknown tool: ${name}`);
+        try {
+          switch (name) {
+            case "auto-format":
+              return await this.handleAutoFormat(args);
+            case "format-check":
+              return await this.handleFormatCheck(args);
+            default:
+              throw new Error(`Unknown tool: ${name}`);
+          }
+        } catch (error) {
+          frameworkLogger.log("mcps/auto-format", "tool-call", "error", {
+            tool: name,
+            error: String(error),
+          });
+          return {
+            content: [
+              {
+                type: "text",
+                text: `Error executing tool '${name}': ${error instanceof Error ? error.message : String(error)}`,
+              },
+            ],
+            isError: true,
+          };
         }
       },
     );
@@ -254,17 +270,17 @@ ${checkResults.details.map((d) => `• ${d}`).join("\n")}
         files.length > 0 ? files : ["**/*.{js,jsx,ts,tsx,json,css,scss,md}"];
 
       // Run prettier
-      const command = checkOnly
-        ? "npx prettier --check"
-        : "npx prettier --write";
-      const fullCommand = `${command} ${patterns.join(" ")} --ignore-path .gitignore`;
+      const prettierArgs = checkOnly
+        ? ["prettier", "--check", ...patterns, "--ignore-path", ".gitignore"]
+        : ["prettier", "--write", ...patterns, "--ignore-path", ".gitignore"];
 
       try {
-        const output = execSync(fullCommand, {
+        const output = execFileSync("npx", prettierArgs, {
           encoding: "utf8",
           cwd: process.cwd(),
-          stdio: checkOnly ? "pipe" : "inherit",
-        });
+          stdio: "pipe",
+          timeout: 30000,
+        }) as string;
 
         if (checkOnly) {
           // Parse check output to see what needs formatting
@@ -275,8 +291,11 @@ ${checkResults.details.map((d) => `• ${d}`).join("\n")}
             (line) => !line.includes("error") && !line.includes("Error"),
           );
         } else {
-          // For write mode, assume all patterns were processed
-          results.formatted = patterns;
+          // Parse write output to get actual file names
+          const lines = output
+            .split("\n")
+            .filter((line: string) => line.trim());
+          results.formatted = lines;
         }
       } catch (error) {
         const errorOutput =
@@ -323,10 +342,11 @@ ${checkResults.details.map((d) => `• ${d}`).join("\n")}
       const scriptName = scripts["lint:fix"] ? "lint:fix" : "lint";
 
       try {
-        execSync(`npm run ${scriptName}`, {
+        execFileSync("npm", ["run", scriptName], {
           encoding: "utf8",
           cwd: process.cwd(),
           stdio: "pipe",
+          timeout: 30000,
         });
 
         results.formatted.push("ESLint auto-fix applied to applicable files");
@@ -369,10 +389,11 @@ ${checkResults.details.map((d) => `• ${d}`).join("\n")}
       const scriptName = scripts.typecheck ? "typecheck" : "type-check";
 
       try {
-        execSync(`npm run ${scriptName}`, {
+        execFileSync("npm", ["run", scriptName], {
           encoding: "utf8",
           cwd: process.cwd(),
           stdio: "pipe",
+          timeout: 30000,
         });
 
         results.formatted.push("TypeScript compilation successful");
@@ -407,12 +428,14 @@ ${checkResults.details.map((d) => `• ${d}`).join("\n")}
         files.length > 0 ? files : ["**/*.{js,jsx,ts,tsx,json,css,scss,md}"];
 
       try {
-        execSync(
-          `npx prettier --check ${patterns.join(" ")} --ignore-path .gitignore`,
+        execFileSync(
+          "npx",
+          ["prettier", "--check", ...patterns, "--ignore-path", ".gitignore"],
           {
             encoding: "utf8",
             cwd: process.cwd(),
             stdio: "pipe",
+            timeout: 30000,
           },
         );
 

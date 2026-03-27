@@ -3,6 +3,9 @@
  *
  * Knowledge skill for codebase documentation lookup, implementation examples,
  * and multi-repo analysis - serves as the universal documentation reference
+ *
+ * NOTE: Class is named StrRayLibrarianServer but the MCP server name is
+ * "researcher" for backwards compatibility with existing tool references.
  */
 
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
@@ -141,7 +144,13 @@ class StrRayLibrarianServer {
 
         if (!fs.existsSync(dir)) return;
 
-        const entries = fs.readdirSync(dir, { withFileTypes: true });
+        let entries: fs.Dirent[];
+        try {
+          entries = fs.readdirSync(dir, { withFileTypes: true });
+        } catch (err) {
+          frameworkLogger.log("mcps/researcher", "searchCodebase", "warning", { message: `Failed to read directory: ${dir}`, error: String(err) });
+          return;
+        }
 
         for (const entry of entries) {
           if (results.length >= maxResults) break;
@@ -161,7 +170,13 @@ class StrRayLibrarianServer {
           if (entry.isDirectory()) {
             searchFiles(fullPath, depth + 1);
           } else if (entry.isFile() && entry.name.endsWith(fileExtension)) {
-            const content = fs.readFileSync(fullPath, "utf-8");
+            let content: string;
+            try {
+              content = fs.readFileSync(fullPath, "utf-8");
+            } catch (err) {
+              frameworkLogger.log("mcps/researcher", "searchCodebase", "warning", { message: `Failed to read file: ${fullPath}`, error: String(err) });
+              continue;
+            }
             const lines = content.split("\n");
 
             const matches: string[] = [];
@@ -185,7 +200,7 @@ class StrRayLibrarianServer {
         }
       };
 
-      searchFiles(path.join(searchDir, "src"));
+      searchFiles(searchDir);
 
       if (results.length === 0) {
         return {
@@ -241,7 +256,13 @@ class StrRayLibrarianServer {
         if (depth > 5 || implementations.length >= 5) return;
         if (!fs.existsSync(dir)) return;
 
-        const entries = fs.readdirSync(dir, { withFileTypes: true });
+        let entries: fs.Dirent[];
+        try {
+          entries = fs.readdirSync(dir, { withFileTypes: true });
+        } catch (err) {
+          frameworkLogger.log("mcps/researcher", "findImplementation", "warning", { message: `Failed to read directory: ${dir}`, error: String(err) });
+          return;
+        }
 
         for (const entry of entries) {
           if (implementations.length >= 5) break;
@@ -262,7 +283,13 @@ class StrRayLibrarianServer {
             entry.isFile() &&
             (entry.name.endsWith(".ts") || entry.name.endsWith(".js"))
           ) {
-            const content = fs.readFileSync(fullPath, "utf-8");
+            let content: string;
+            try {
+              content = fs.readFileSync(fullPath, "utf-8");
+            } catch (err) {
+              frameworkLogger.log("mcps/researcher", "findImplementation", "warning", { message: `Failed to read file: ${fullPath}`, error: String(err) });
+              continue;
+            }
 
             // Look for the feature in content
             if (content.toLowerCase().includes(feature.toLowerCase())) {
@@ -289,7 +316,7 @@ class StrRayLibrarianServer {
         }
       };
 
-      searchIn(path.join(searchDir, "src"));
+      searchIn(searchDir);
 
       if (implementations.length === 0) {
         return {
@@ -337,23 +364,41 @@ class StrRayLibrarianServer {
       const searchDir = process.cwd();
       let documentation = "";
 
-      // Search for README or docs
-      const docFiles = ["README.md", "docs/README.md", "DOCS.md"];
+      // Search for documentation - any .md files in project root and docs/ directory
+      const docSearchDirs = [searchDir, path.join(searchDir, "docs")];
+      const docFiles: string[] = [];
 
-      for (const docFile of docFiles) {
-        const docPath = path.join(searchDir, docFile);
-        if (fs.existsSync(docPath)) {
-          const content = fs.readFileSync(docPath, "utf-8");
-          // Look for target in docs
-          const lines = content.split("\n");
-          const targetLines = lines.filter((line) =>
-            line.toLowerCase().includes(target.toLowerCase()),
-          );
-
-          if (targetLines.length > 0) {
-            documentation = targetLines.slice(0, 10).join("\n");
-            break;
+      for (const docDir of docSearchDirs) {
+        try {
+          if (!fs.existsSync(docDir)) continue;
+          const entries = fs.readdirSync(docDir, { withFileTypes: true });
+          for (const entry of entries) {
+            if (entry.isFile() && entry.name.endsWith(".md")) {
+              docFiles.push(path.join(docDir, entry.name));
+            }
           }
+        } catch (err) {
+          frameworkLogger.log("mcps/researcher", "getDocumentation", "warning", { message: `Failed to scan docs directory: ${docDir}`, error: String(err) });
+        }
+      }
+
+      for (const docPath of docFiles) {
+        let content: string;
+        try {
+          content = fs.readFileSync(docPath, "utf-8");
+        } catch (err) {
+          frameworkLogger.log("mcps/researcher", "getDocumentation", "warning", { message: `Failed to read doc file: ${docPath}`, error: String(err) });
+          continue;
+        }
+        // Look for target in docs
+        const lines = content.split("\n");
+        const targetLines = lines.filter((line) =>
+          line.toLowerCase().includes(target.toLowerCase()),
+        );
+
+        if (targetLines.length > 0) {
+          documentation = targetLines.slice(0, 10).join("\n");
+          break;
         }
       }
 
@@ -393,7 +438,15 @@ class StrRayLibrarianServer {
   async run(): Promise<void> {
     const transport = new StdioServerTransport();
     await this.server.connect(transport);
+
+    let parentCheckTimer: ReturnType<typeof setTimeout> | null = null;
+
     const cleanup = async (signal: string) => {
+      if (parentCheckTimer !== null) {
+        clearTimeout(parentCheckTimer);
+        parentCheckTimer = null;
+      }
+
       const timeout = setTimeout(() => {
         frameworkLogger.log("mcps/researcher", "shutdown", "error", { message: "Graceful shutdown timeout, forcing exit..." });
         process.exit(1);
@@ -419,13 +472,14 @@ class StrRayLibrarianServer {
     const checkParent = () => {
       try {
         process.kill(process.ppid, 0);
-        setTimeout(checkParent, 1000);
+        parentCheckTimer = setTimeout(checkParent, 1000);
       } catch (error) {
+        parentCheckTimer = null;
         cleanup("parent-process-death");
       }
     };
 
-    setTimeout(checkParent, 2000);
+    parentCheckTimer = setTimeout(checkParent, 2000);
 
     process.on("uncaughtException", (error) => {
       frameworkLogger.log("mcps/researcher", "uncaughtException", "error", { message: `Uncaught Exception: ${String(error)}` });
@@ -436,9 +490,6 @@ class StrRayLibrarianServer {
       frameworkLogger.log("mcps/researcher", "unhandledRejection", "error", { message: `Unhandled Rejection: ${String(reason)}` });
       cleanup("unhandledRejection");
     });
-
-    process.on("SIGINT", cleanup);
-    process.on("SIGTERM", cleanup);
   }
 }
 

@@ -87,7 +87,7 @@ Four new MCP servers joined the fleet:
 
 ### Curating Excellence
 
-Rather than blindly importing 30 skills, we curated 17 high-value additions:
+Rather than blindly importing 260 skills, we curated 17 high-value additions:
 
 | Category | Skills |
 |----------|--------|

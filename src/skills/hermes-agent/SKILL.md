@@ -137,7 +137,7 @@ npx strray-ai inference:tuner
 
 ## MCP Server Integration with Hermes
 
-StringRay ships 10 MCP servers that Hermes can connect to. Each exposes tools Hermes calls directly — no prompts, no proxies.
+StringRay ships 15 MCP servers that Hermes can connect to. Each exposes tools Hermes calls directly — no prompts, no proxies.
 
 ### Server Overview
 

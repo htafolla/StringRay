@@ -235,7 +235,7 @@ class StrRay<SkillName>Server {
 
   constructor() {
     this.server = new Server(
-      { name: "<skill-name>", version: "1.14.1" },
+      { name: "<skill-name>", version: "1.14.10" },
       { capabilities: { tools: {} } }
     );
     this.setupToolHandlers();
@@ -382,7 +382,7 @@ npx strray-ai status
 
 ### Skills
 - Location: `.opencode/skills/*/SKILL.md`
-- Count: 30 skills
+- Count: 260 skills
 
 ### Agents
 - Location: `.opencode/agents/*.yml`

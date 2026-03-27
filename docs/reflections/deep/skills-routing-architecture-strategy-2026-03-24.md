@@ -214,7 +214,7 @@ mcp:
 {
   "$schema": "./schemas/skill-manifest.schema.json",
   "name": "code-review",
-  "version": "1.2.0",
+  "version": "1.14.10",
   "schema_version": "2.0",
   "description": "Comprehensive code review and quality analysis",
   
@@ -444,7 +444,7 @@ class SkillNameServer {
 
   constructor() {
     this.server = new Server(
-      { name: "skill-name", version: "1.0.0" },
+      { name: "skill-name", version: "1.14.10" },
       { capabilities: { tools: {} } }
     );
     this.setupToolHandlers();
@@ -573,15 +573,15 @@ const VERSION_RULES = {
 ```yaml
 # In SKILL.md for skills with migrations
 migrations:
-  - from_version: "1.0.0"
-    to_version: "2.0.0"
+  - from_version: "1.14.10"
+    to_version: "1.14.10"
     breaking_changes:
       - "Removed 'analyze_code' tool, use 'analyze_code_quality'"
       - "Changed input schema for 'scan_security'"
     automated_migration: true
     
-  - from_version: "2.0.0"
-    to_version: "2.1.0"
+  - from_version: "1.14.10"
+    to_version: "1.14.10"
     breaking_changes: []
     notes: "Added new 'generate_report' tool"
 ```
@@ -681,7 +681,7 @@ migrations:
 │  │                                                                      │   │
 │  │   SkillPipelineStage                                                │   │
 │  │   ├── skill: "code-review"                                         │   │
-│  │   ├── version: "1.2.0"                                             │   │
+│  │   ├── version: "1.14.10"                                             │   │
 │  │   ├── tool: "analyze_code_quality"                                 │   │
 │  │   └── timeout: 30000ms                                             │   │
 │  └──────────────────────────────────────────────────────────────────────┘   │

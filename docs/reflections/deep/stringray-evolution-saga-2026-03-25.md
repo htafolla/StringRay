@@ -182,7 +182,7 @@ The registry was the heart of it. A `Map<string, SkillManifest>` that could be i
 
 The discovery service scans two directories: `.opencode/skills/` and `.opencode/integrations/`. For each subdirectory that contains a `SKILL.md` file, it parses the YAML frontmatter and creates a `SkillManifest` object. The manifest captures everything: name, version, description, capabilities, dependencies, MCP configuration, agent bindings, pipeline config.
 
-When we first ran the discovery, it found 30 skills. Twenty-nine of them had MCP configurations. Zero of them were being used at runtime. Thirty skills, sitting there, fully documented, completely dormant.
+When we first ran the discovery, it found 260 skills. Twenty-nine of them had MCP configurations. Zero of them were being used at runtime. Thirty skills, sitting there, fully documented, completely dormant.
 
 The boot orchestrator integration was the key moment. By adding `initializeSkillDiscovery()` as Phase 1.5 of the boot sequence - right after delegation system initialization and before session management - we ensured that every time StringRay starts, it discovers all available skills and makes them available through the state manager.
 
@@ -600,7 +600,7 @@ I want to acknowledge something that doesn't show up in commit messages or code 
 
 There were moments of genuine frustration. The YAML parser that kept producing `{_items: [...]}` instead of arrays. The context files that existed in Node.js but not in the shell. The test suite that needed three iterations before it could tell us anything useful. Each of these was a small obstacle that consumed a session's worth of attention.
 
-But there were also moments of genuine satisfaction. When the matcher first matched "review this code" to code-review with 100% confidence. When `npx strray-ai skill:list` first showed all 30 skills with their capabilities. When the agent:skills command showed the bindings working. These were small victories, but they felt like proof that the architecture was sound.
+But there were also moments of genuine satisfaction. When the matcher first matched "review this code" to code-review with 100% confidence. When `npx strray-ai skill:list` first showed all 260 skills with their capabilities. When the agent:skills command showed the bindings working. These were small victories, but they felt like proof that the architecture was sound.
 
 The deep reflections we wrote alongside the code are unusual. Most open-source projects don't document their development journey in narrative form. They have changelogs, architecture decision records, and API documentation. They don't have "sagas." But we wrote them because the journey matters, not just the destination. The YAML parser isn't just a parser - it's a story about why simple things aren't simple. The context preservation fix isn't just a bug fix - it's a story about assumptions and sandboxing. Documenting these stories means that the next developer (or our future selves) can learn from them without repeating the investigation.
 

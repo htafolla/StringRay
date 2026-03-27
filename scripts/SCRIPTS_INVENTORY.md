@@ -98,7 +98,7 @@ This document provides a complete inventory of all scripts in the `scripts/` dir
 | `test-mcp-registration.mjs` | ⚠️ Partial | MCP registration tests | 4/6 tests pass (timeout property issue) |
 | `test-skill-routing.mjs` | ⚠️ Partial | Skill routing tests | 8/26 tests pass (routing mismatch - design decision) |
 | `test-skills-coverage.mjs` | ✅ Working | Skills coverage tests | 85/85 tests passed |
-| `test-skills-comprehensive.mjs` | ✅ Working | Comprehensive skills tests | 5/30 skills validated |
+| `test-skills-comprehensive.mjs` | ✅ Working | Comprehensive skills tests | 5/260 skills validated |
 | `test-skills-mcp-integration.mjs` | ✅ Working | Skills-MCP integration | Plugin loading confirmed |
 | `test-consumer-readiness.mjs` | ✅ Working | Consumer readiness | 4/4 checks passed |
 | `test-consumer-validation.mjs` | ⚠️ Partial | Consumer validation | 10/23 tests pass (expected - dev environment) |

@@ -126,7 +126,7 @@ StringRay Framework automatically configures itself based on your installation m
 - Loads the Universal Development Codex v1.1.1
 - Enables enterprise CI/CD automation with post-processor
 - Registers all 13 autonomous agents
-- Sets up 11 MCP servers for agent communication
+- Sets up 15 MCP servers for agent communication
 - Configures automated deployment pipelines
 
 #### OpenCode Integration
@@ -202,7 +202,7 @@ Update your `.opencode/OpenCode.json`:
   },
   "framework": {
     "name": "strray",
-    "version": "1.14.1"
+    "version": "1.14.10"
   }
 }
 ```
@@ -473,7 +473,7 @@ Update your `.opencode/OpenCode.json` for enterprise deployment:
   },
   "framework": {
     "name": "strray",
-    "version": "1.14.1",
+    "version": "1.14.10",
     "performance_mode": "optimized",
     "monitoring_enabled": true,
     "plugin_security": "strict"

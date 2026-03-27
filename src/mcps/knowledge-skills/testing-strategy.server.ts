@@ -44,7 +44,7 @@ class StrRayTestingStrategyServer {
   constructor() {
     this.server = new Server(
       {
-        name: "testing-strategy", version: "1.14.1",
+        name: "testing-strategy", version: "1.14.10",
       },
       {
         capabilities: {

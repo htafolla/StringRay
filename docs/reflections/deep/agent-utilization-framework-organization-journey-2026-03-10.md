@@ -23,7 +23,7 @@ This deep reflection documents a pivotal day in StringRay's evolution where we a
 - Default routing falls back to @enforcer when no keywords match
 - Complexity thresholds were too conservative: simple=20, moderate=35, complex=75
 - Enforcer was getting routing recommendations but NOT acting on them - logging but not delegating
-- 30 skills were missing from skill invocation enum (testing-lead, backend-engineer, etc.)
+- 260 skills were missing from skill invocation enum (testing-lead, backend-engineer, etc.)
 
 **What I Tried:**
 - Reviewed task-skill-router.ts keyword mappings - found 30+ keywords for some agents but not enough

@@ -1,7 +1,7 @@
 {
   "framework": {
     "name": "StringRay Framework",
-    "version": "1.14.1",
+    "version": "1.14.10",
     "buildMode": "production",
     "logLevel": "info"
   },

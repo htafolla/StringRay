@@ -18,7 +18,7 @@ export const codeReviewer: AgentConfig = {
 
 ## Framework Context
 - Universal Development Codex v1.2.0
-- Validate against all 43 codex terms
+- Validate against all 60 codex terms
 
 ## Rules (STRICT)
 - MAX 3 file reads, then review

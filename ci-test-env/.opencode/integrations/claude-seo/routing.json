@@ -1,0 +1,103 @@
+{
+  "name": "claude-seo-routing",
+  "description": "SEO routing configuration for Claude SEO integration",
+  "routes": [
+    {
+      "pattern": "/seo audit",
+      "skill": "seo-audit",
+      "agents": [
+        "seo-consultant"
+      ]
+    },
+    {
+      "pattern": "/seo page",
+      "skill": "seo-page",
+      "agents": [
+        "seo-consultant"
+      ]
+    },
+    {
+      "pattern": "/seo sitemap",
+      "skill": "seo-sitemap",
+      "agents": [
+        "seo-consultant"
+      ]
+    },
+    {
+      "pattern": "/seo schema",
+      "skill": "seo-schema",
+      "agents": [
+        "seo-consultant"
+      ]
+    },
+    {
+      "pattern": "/seo technical",
+      "skill": "seo-technical",
+      "agents": [
+        "seo-consultant"
+      ]
+    },
+    {
+      "pattern": "/seo content",
+      "skill": "seo-content",
+      "agents": [
+        "seo-consultant"
+      ]
+    },
+    {
+      "pattern": "/seo geo",
+      "skill": "seo-geo",
+      "agents": [
+        "seo-consultant"
+      ]
+    },
+    {
+      "pattern": "/seo plan",
+      "skill": "seo-plan",
+      "agents": [
+        "seo-consultant"
+      ]
+    },
+    {
+      "pattern": "/seo programmatic",
+      "skill": "seo-programmatic",
+      "agents": [
+        "seo-consultant"
+      ]
+    },
+    {
+      "pattern": "/seo competitor",
+      "skill": "seo-competitor-pages",
+      "agents": [
+        "seo-consultant"
+      ]
+    },
+    {
+      "pattern": "/seo hreflang",
+      "skill": "seo-hreflang",
+      "agents": [
+        "seo-consultant"
+      ]
+    },
+    {
+      "pattern": "/seo images",
+      "skill": "seo-images",
+      "agents": [
+        "seo-consultant"
+      ]
+    }
+  ],
+  "keywords": [
+    "seo audit",
+    "seo analysis",
+    "technical seo",
+    "on-page seo",
+    "schema markup",
+    "sitemap",
+    "core web vitals",
+    "e-e-a-t",
+    "ai search",
+    "geo optimization",
+    "programmatic seo"
+  ]
+}

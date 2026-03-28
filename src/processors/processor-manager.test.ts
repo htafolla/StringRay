@@ -6,11 +6,12 @@
 
 import { describe, it, expect } from "vitest";
 import { ProcessorManager } from "./processor-manager";
+import { StringRayStateManager } from "../state/state-manager.js";
 
 describe("processor-manager", () => {
   describe("ProcessorManager", () => {
     it("should instantiate", () => {
-      const instance = new ProcessorManager();
+      const instance = new ProcessorManager(new StringRayStateManager());
       expect(instance).toBeInstanceOf(ProcessorManager);
     });
   });

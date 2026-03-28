@@ -291,7 +291,7 @@ function calculateDistributedMetrics(
 }
 
 function generateRandomAgents(): string[] {
-  const agentCount = Math.floor(Math.random() * 5) + 3; // 3-27 agents
+  const agentCount = Math.floor(Math.random() * 5) + 3; // 3-25 agents
   const agents: string[] = [];
 
   for (let i = 0; i < agentCount; i++) {

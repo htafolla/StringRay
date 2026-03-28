@@ -8,7 +8,7 @@
  * Ensures single source of truth for all version information.
  *
  * WHAT IT UPDATES:
- * - Framework version (1.7.5)
+ * - Framework version (1.14.1)
  * - Codex version and terms count
  * - Framework counts (agents, skills, MCP servers)
  * - Test counts in README
@@ -39,18 +39,20 @@ function calculateCounts() {
   };
 
   try {
-    // Count agents
-    const agentsDir = ".opencode/agents";
-    if (fs.existsSync(agentsDir)) {
-      counts.agents = fs.readdirSync(agentsDir).filter(f => f.endsWith(".yml")).length;
+    // Count agents from src/agents (source of truth for all agents)
+    const srcAgentsDir = "src/agents";
+    if (fs.existsSync(srcAgentsDir)) {
+      counts.agents = fs.readdirSync(srcAgentsDir).filter(f => 
+        f.endsWith(".ts") && !f.includes(".test.") && f !== "index.ts" && f !== "types.ts"
+      ).length;
     }
 
-    // Count skills
-    const skillsDir = ".opencode/skills";
-    if (fs.existsSync(skillsDir)) {
-      counts.skills = fs.readdirSync(skillsDir).filter(f => {
-        const stat = fs.statSync(path.join(skillsDir, f));
-        return stat.isDirectory();
+    // Count skills from src/skills (source of truth for framework skills)
+    const srcSkillsDir = "src/skills";
+    if (fs.existsSync(srcSkillsDir)) {
+      counts.skills = fs.readdirSync(srcSkillsDir).filter(f => {
+        const fullPath = path.join(srcSkillsDir, f);
+        return fs.statSync(fullPath).isDirectory();
       }).length;
     }
 
@@ -76,20 +78,20 @@ const CALCULATED_COUNTS = calculateCounts();
 const OFFICIAL_VERSIONS = {
   // Framework version
   framework: {
-    version: "1.7.5",
-    displayName: "StringRay AI v1.7.5",
-    lastUpdated: "2026-03-09",
+    version: "1.15.6",
+    displayName: "StringRay AI v1.15.6",
+    lastUpdated: "2026-03-26",
     // Counts (auto-calculated, but can be overridden)
     ...CALCULATED_COUNTS,
   },
 
   // Codex version
   codex: {
-    version: "v1.3.0",
+    version: "v1.7.5",
     termsCount: 60,        // Total terms defined (including new governance terms 46-60)
     termsDefined: 60,       // All terms in codex.json
     termsTarget: 60,       // Future goal (now achieved)
-    lastUpdated: "2026-03-09",
+    lastUpdated: "2026-03-23",
   },
 
   // External dependencies
@@ -224,6 +226,15 @@ const UPDATE_PATTERNS = [
       pattern: /StrRay v[0-9]+\.[0-9]+\.[0-9]+/g,
       replacement: OFFICIAL_VERSIONS.framework.displayName,
     },
+    // Standalone version in docs (v1.15.6, v1.15.6 patterns)
+    {
+      pattern: /v1\.14\.[0-9]+/g,
+      replacement: `v${OFFICIAL_VERSIONS.framework.version}`,
+    },
+    {
+      pattern: /v1\.9\.[0-9]+/g,
+      replacement: `v${OFFICIAL_VERSIONS.framework.version}`,
+    },
 
     // Pre-commit introspection patterns
     {
@@ -259,78 +270,9 @@ const UPDATE_PATTERNS = [
       replacement: `"strray:version": "${OFFICIAL_VERSIONS.framework.version}"`,
     },
 
-    // === FRAMEWORK COUNTS (auto-update in README, docs) ===
-    // Codex terms count
-    {
-      pattern: /Codex \((\d+|\d+-\d+|\d+\+?)\) terms/g,
-      replacement: `Codex (${OFFICIAL_VERSIONS.codex.termsCount}) terms`,
-    },
-    {
-      pattern: /\((\d+|\d+-\d+|\d+\+?)\) terms/g,
-      replacement: `(${OFFICIAL_VERSIONS.codex.termsCount}) terms`,
-    },
-    // Agents count
-    {
-      pattern: /(\d+)\+? Specialized Agents/g,
-      replacement: `${OFFICIAL_VERSIONS.framework.agents} Specialized Agents`,
-    },
-    {
-      pattern: /(\d+) agents/g,
-      replacement: `${OFFICIAL_VERSIONS.framework.agents} agents`,
-    },
-    // Skills count
-    {
-      pattern: /(\d+)\+? Lazy-Loading Skills/g,
-      replacement: `${OFFICIAL_VERSIONS.framework.skills} Lazy-Loading Skills`,
-    },
-    {
-      pattern: /(\d+) skills/g,
-      replacement: `${OFFICIAL_VERSIONS.framework.skills} skills`,
-    },
-    // MCP servers count
-    {
-      pattern: /(\d+) MCP servers/g,
-      replacement: `${OFFICIAL_VERSIONS.framework.mcpServers} MCP servers`,
-    },
-    // Tests count (look for patterns like "XXXX tests passed")
-    {
-      pattern: /tests-(\d+%?)\s+passed/g,
-      replacement: `tests-${OFFICIAL_VERSIONS.framework.tests || 1608} passed`,
-    },
-
-    // === AGENT NAME RENAMES (v1.6.17+) ===
-    {
-      pattern: /testing-lead/g,
-      replacement: "testing-lead",
-    },
-    {
-      pattern: /researcher/g,
-      replacement: "researcher",
-    },
-    {
-      pattern: /strategist(?![-:])/g,
-      replacement: "strategist",
-    },
-    {
-      pattern: /seo-consultant/g,
-      replacement: "seo-consultant",
-    },
-    {
-      pattern: /content-creator/g,
-      replacement: "content-creator",
-    },
-    {
-      pattern: /growth-strategist/g,
-      replacement: "growth-strategist",
-    },
-    {
-      pattern: /tech-writer/g,
-      replacement: "tech-writer",
-    },
-
   ];
 
-// Additional patterns for bash scripts (STRRAY_VERSION)
+  // Additional patterns for bash scripts (STRRAY_VERSION)
   const BASH_VERSION_PATTERNS = [
     {
       pattern: /STRRAY_VERSION="[0-9]+\.[0-9]+\.[0-9]+"/g,
@@ -484,7 +426,24 @@ const UPDATE_PATTERNS = [
       }
     }
 
-    // 5. Check that no files reference old versions
+    // 5. Check agent counts in MCP servers match actual count (from CALCULATED_COUNTS)
+    const mcpServerFiles = ["src/mcps/framework-help.server.ts"];
+    for (const mcpFile of mcpServerFiles) {
+      if (fs.existsSync(mcpFile)) {
+        const content = fs.readFileSync(mcpFile, "utf8");
+        const match = content.match(/\*\*(\d+)\s+Agents?:\*\*/);
+        if (match) {
+          const reportedCount = parseInt(match[1]);
+          if (reportedCount !== CALCULATED_COUNTS.agents) {
+            validationErrors.push(
+              `${mcpFile} reports ${reportedCount} agents but src/agents/ has ${CALCULATED_COUNTS.agents}`
+            );
+          }
+        }
+      }
+    }
+
+    // 7. Check that no files reference old versions
     const extensions = [".ts", ".js", ".md", ".json", ".txt", ".sh"];
     const files = findFiles(".", extensions);
     let oldVersionCount = 0;
@@ -603,13 +562,16 @@ const UPDATE_PATTERNS = [
     console.log(`✅ Updated ${configFilesUpdated} critical config files`);
   }
 
-  // Phase 2: Update documentation files (AGENTS.md, AGENTS-consumer.md, etc.)
+  // Phase 2: Update documentation files (AGENTS.md, etc.)
   console.log("\n📁 Phase 2: Updating documentation files...");
   const documentationFiles = [
     "AGENTS.md",
-    "AGENTS-consumer.md",
-    "docs/framework/agents_template.md",
-    "docs/internal/architecture/ENTERPRISE_ARCHITECTURE.md",
+    ".opencode/AGENTS-consumer.md",
+    ".opencode/strray/agents_template.md",
+    "docs/reference/templates/agents_template.md",
+    "docs/reference/templates/master-agent-template.md",
+    "docs/reference/templates/agent-template-dev.md",
+    "docs/README.md",
   ];
 
   let docsUpdated = 0;

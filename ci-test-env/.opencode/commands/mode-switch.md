@@ -1,6 +1,6 @@
 ---
 name: mode-switch
-description: Switch between full (27 agents) and lite (27 agents) modes dynamically
+description: Switch between full (25 agents) and lite (25 agents) modes dynamically
 ---
 
 #!/bin/bash
@@ -20,7 +20,7 @@ DISABLED_COUNT=$(jq '.agent | map(select(.disable == true)) | length' opencode.j
         if [ "$DISABLED_COUNT" -eq 0 ] || [ -z "$DISABLED_COUNT" ]; then
 CURRENT_MODE="full"
 echo "🎯 Current Mode: $CURRENT_MODE"
-            echo "📝 Description: All 27 agents active for comprehensive development support"
+            echo "📝 Description: All 25 agents active for comprehensive development support"
             echo "🤖 Active Agents: 8"
             echo "   enforcer architect orchestrator bug-triage-specialist code-reviewer security-auditor refactorer testing-lead"
         elif [ "$DISABLED_COUNT" -eq 4 ]; then
@@ -62,7 +62,7 @@ local new_mode="$1"
             jq '.disabled_agents = []' "$ENFORCER_CONFIG_FILE" > "${ENFORCER_CONFIG_FILE}.tmp" && mv "${ENFORCER_CONFIG_FILE}.tmp" "$ENFORCER_CONFIG_FILE"
         fi
     else
-        # Set disabled_agents for lite mode (27 agents disabled)
+        # Set disabled_agents for lite mode (25 agents disabled)
         jq '.disabled_agents = ["security-auditor", "refactorer", "testing-lead", "bug-triage-specialist"]' "$CONFIG_FILE" > "${CONFIG_FILE}.tmp" && mv "${CONFIG_FILE}.tmp" "$CONFIG_FILE"
         if [ -f "$ENFORCER_CONFIG_FILE" ]; then
             jq '.disabled_agents = ["security-auditor", "refactorer", "testing-lead", "bug-triage-specialist"]' "$ENFORCER_CONFIG_FILE" > "${ENFORCER_CONFIG_FILE}.tmp" && mv "${ENFORCER_CONFIG_FILE}.tmp" "$ENFORCER_CONFIG_FILE"
@@ -81,7 +81,7 @@ case "$1" in
 "")
 show_current_mode
 echo "Usage: mode-switch [full|lite]"
-echo " full - All 27 agents active"
+echo " full - All 25 agents active"
 echo " lite - 4 core agents active"
 ;;
 "full"|"lite")

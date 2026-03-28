@@ -1,0 +1,46 @@
+name: growth-strategist
+description: "Marketing expert agent for strategy and campaigns"
+version: "1.0.0"
+mode: subagent
+
+# =============================================================================
+# CODEX COMPLIANCE
+# =============================================================================
+# Growth strategy must follow these Codex rules:
+# - Term 18: Meaningful Naming - clear strategy names and metrics
+# - Term 34: Documentation Updates - document strategy and results
+# - Term 20: Consistent Code Style - consistent framework for analysis
+# - Term 3: Do Not Over-Engineer - simple strategies over complex
+# - Term 17: YAGNI - focus on current growth needs
+# - Term 6: Batched Introspection Cycles - group analysis into cycles
+
+# Logging Configuration
+logging:
+  level: warn
+  format: json
+  destinations:
+    - console
+    - file
+  retention_days: 30
+
+# Agent Capabilities
+capabilities:
+  - marketing-strategy
+  - campaign-analysis
+  - audience-insights
+  - content-strategy
+
+# Error Handling Configuration
+error_handling:
+  retry_attempts: 2
+  circuit_breaker:
+    enabled: true
+    failure_threshold: 3
+    recovery_timeout_ms: 15000
+  fallback_strategy: graceful
+
+# Performance Configuration
+performance:
+  timeout_ms: 25000
+  concurrency_limit: 3
+  memory_limit_mb: 64

@@ -5,15 +5,21 @@
 import { describe, test, expect, beforeEach, afterEach } from "vitest";
 import { ConsentManager, ConsentConfiguration, ConsentCategory } from "../../../analytics/consent-manager.js";
 import * as fs from "fs/promises";
+import * as fsSync from "fs";
 import * as path from "path";
+import * as os from "os";
 
 describe("ConsentManager", () => {
   let consentManager: ConsentManager;
   let testConfigPath: string;
 
   beforeEach(() => {
-    // Use a test-specific config path
-    testConfigPath = path.join(process.cwd(), "test-consent.json");
+    // Use unique temp directory per test to ensure isolation
+    const testDir = path.join(os.tmpdir(), "strray-consent-tests", `test-${Date.now()}-${Math.random().toString(36).slice(2)}`);
+    if (!fsSync.existsSync(testDir)) {
+      fsSync.mkdirSync(testDir, { recursive: true });
+    }
+    testConfigPath = path.join(testDir, "test-consent.json");
     consentManager = new ConsentManager(testConfigPath);
   });
 
@@ -28,8 +34,10 @@ describe("ConsentManager", () => {
     }
   });
 
-  // Skipping due to pre-existing test isolation issues
-  test.skip("should create default config when not exists", async () => {
+  test("should create default config when not exists", async () => {
+    // Clean up any existing config to ensure test isolation
+    try { await fs.unlink(testConfigPath).catch(() => {}); } catch {}
+    
     const config = await consentManager.initialize();
     
     expect(config.analyticsEnabled).toBe(false);
@@ -40,7 +48,7 @@ describe("ConsentManager", () => {
     expect(config.projectId).toMatch(/^project-/);
   });
 
-  test.skip("should load existing config", async () => {
+  test("should load existing config", async () => {
     // Create existing config
     const existingConfig: ConsentConfiguration = {
       analyticsEnabled: true,
@@ -82,7 +90,7 @@ describe("ConsentManager", () => {
     expect(config.projectId).toBeDefined();
   });
 
-  test.skip("should enable consent with specific categories", async () => {
+  test("should enable consent with specific categories", async () => {
     await consentManager.enableConsent(["reflections", "metrics"]);
     
     const config = await consentManager.getStatus();

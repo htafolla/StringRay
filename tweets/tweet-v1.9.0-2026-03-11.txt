@@ -1,0 +1,11 @@
+🚀 StringRay v1.15.1 released!
+
+✨ Complete Codex alignment for all 25 agents
+📊 100% role-specific compliance coverage
+🧪 1610 tests passing
+🎯 Zero critical gaps
+
+Every agent now enforces role-specific Codex rules!
+
+#StringRay #AI #DevTools #CodeQuality
+🔗 https://github.com/htafolla/stringray

@@ -76,7 +76,7 @@ Transform StringRay into an **enterprise-grade AI orchestration platform** that:
 - **Automatic System Prompts**: Framework capabilities injected into every agent session
 - **CLI Capabilities Command**: `npx strray-ai capabilities` for manual discovery
 - **MCP Help Server**: Programmatic access to all framework documentation
-- **Comprehensive Documentation**: 46 skills, 27 agents, all tools documented
+- **Comprehensive Documentation**: 44 skills, 25 agents, all tools documented
 
 **User Experience Transformation**:
 - **Before**: "What can this framework do?" → Silence

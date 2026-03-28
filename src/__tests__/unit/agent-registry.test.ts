@@ -10,7 +10,6 @@
 
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { builtinAgents } from "../../agents/index.js";
-import { multimodalLooker } from "../../agents/multimodal-looker.js";
 import { analyzer } from "../../agents/analyzer.js";
 
 // Mock model router
@@ -26,11 +25,6 @@ describe("Agent Registry Integration", () => {
   });
 
   describe("New Agent Registration", () => {
-    it("should register multimodal-looker in builtin agents", () => {
-      expect(builtinAgents["multimodal-looker"]).toBeDefined();
-      expect(builtinAgents["multimodal-looker"].name).toBe("multimodal-looker");
-    });
-
     it("should register code-analyzer in builtin agents", () => {
       expect(builtinAgents["code-analyzer"]).toBeDefined();
       expect(builtinAgents["code-analyzer"].name).toBe("code-analyzer");
@@ -46,21 +40,6 @@ describe("Agent Registry Integration", () => {
   });
 
   describe("Agent Configuration Consistency", () => {
-    it("should have consistent structure for multimodal-looker", () => {
-      const agent = builtinAgents["multimodal-looker"];
-
-      expect(agent).toHaveProperty("name");
-      expect(agent).toHaveProperty("capabilities");
-      expect(agent).toHaveProperty("maxComplexity");
-      expect(agent).toHaveProperty("enabled");
-      expect(agent).toHaveProperty("description");
-      expect(agent).toHaveProperty("mode");
-      expect(agent).toHaveProperty("system");
-      expect(agent).toHaveProperty("temperature");
-      expect(agent).toHaveProperty("tools");
-      expect(agent).toHaveProperty("permission");
-    });
-
     it("should have consistent structure for analyzer", () => {
       const agent = builtinAgents["code-analyzer"];
 
@@ -78,22 +57,6 @@ describe("Agent Registry Integration", () => {
   });
 
   describe("Agent Capabilities", () => {
-    it("should load multimodal-looker capabilities", () => {
-      const agent = builtinAgents["multimodal-looker"];
-      const expectedCapabilities = [
-        "media-file-analysis",
-        "image-interpretation",
-        "diagram-analysis",
-        "pdf-content-extraction",
-        "visual-content-understanding",
-        "multimodal-data-processing",
-        "technical-diagram-parsing",
-        "screenshot-analysis",
-        "chart-and-graph-interpretation",
-      ];
-      expect(agent.capabilities).toEqual(expectedCapabilities);
-    });
-
     it("should load analyzer capabilities", () => {
       const agent = builtinAgents["code-analyzer"];
       const expectedCapabilities = [
@@ -112,15 +75,6 @@ describe("Agent Registry Integration", () => {
   });
 
   describe("Agent Models", () => {
-    it("should provide model getter for multimodal-looker", () => {
-      const agent = builtinAgents["multimodal-looker"];
-      // Model is optional - only check if defined
-      if (agent.model) {
-        expect(typeof agent.model).toBe("string");
-        expect(agent.model).toContain("multimodal-looker");
-      }
-    });
-
     it("should provide model getter for analyzer", () => {
       const agent = builtinAgents["code-analyzer"];
       // Model is optional - only check if defined
@@ -132,16 +86,6 @@ describe("Agent Registry Integration", () => {
   });
 
   describe("Tool Permissions", () => {
-    it("should restrict multimodal-looker tools appropriately", () => {
-      const agent = builtinAgents["multimodal-looker"];
-
-      expect(agent.tools?.include).toContain("read");
-      expect(agent.tools?.include).toContain("webfetch");
-      expect(agent.tools?.exclude).toContain("background_task");
-      expect(agent.permission?.edit).toBe("deny");
-      expect(agent.permission?.bash).toBe("ask");
-    });
-
     it("should restrict analyzer tools appropriately", () => {
       const agent = builtinAgents["code-analyzer"];
 
@@ -155,11 +99,6 @@ describe("Agent Registry Integration", () => {
   });
 
   describe("Agent Modes", () => {
-    it("should have correct mode for multimodal-looker", () => {
-      const agent = builtinAgents["multimodal-looker"];
-      expect(agent.mode).toBe("subagent");
-    });
-
     it("should have correct mode for analyzer", () => {
       const agent = builtinAgents["code-analyzer"];
       expect(agent.mode).toBe("subagent");
@@ -167,12 +106,6 @@ describe("Agent Registry Integration", () => {
   });
 
   describe("Complexity Settings", () => {
-    it("should have appropriate complexity for multimodal-looker", () => {
-      const agent = builtinAgents["multimodal-looker"];
-      expect(agent.maxComplexity).toBe(80);
-      expect(agent.enabled).toBe(true);
-    });
-
     it("should have appropriate complexity for analyzer", () => {
       const agent = builtinAgents["code-analyzer"];
       expect(agent.maxComplexity).toBe(100);
@@ -181,11 +114,6 @@ describe("Agent Registry Integration", () => {
   });
 
   describe("Temperature Settings", () => {
-    it("should have appropriate temperature for multimodal-looker", () => {
-      const agent = builtinAgents["multimodal-looker"];
-      expect(agent.temperature).toBe(0.3);
-    });
-
     it("should have appropriate temperature for analyzer", () => {
       const agent = builtinAgents["code-analyzer"];
       expect(agent.temperature).toBe(0.2);
@@ -193,14 +121,6 @@ describe("Agent Registry Integration", () => {
   });
 
   describe("System Prompts", () => {
-    it("should have comprehensive system prompt for multimodal-looker", () => {
-      const agent = builtinAgents["multimodal-looker"];
-
-      expect(agent.system).toContain("Multimodal Looker subagent");
-      expect(agent.system).toContain("StringRay");
-      expect(agent.system).toContain("visual and multimedia content");
-    });
-
     it("should have comprehensive system prompt for code-analyzer", () => {
       const agent = builtinAgents["code-analyzer"];
 
@@ -236,11 +156,6 @@ describe("Agent Registry Integration", () => {
   });
 
   describe("Direct Import Access", () => {
-    it("should allow direct import of multimodal-looker", () => {
-      expect(multimodalLooker).toBeDefined();
-      expect(multimodalLooker.name).toBe("multimodal-looker");
-    });
-
     it("should allow direct import of analyzer", () => {
       expect(analyzer).toBeDefined();
       expect(analyzer.name).toBe("code-analyzer");
@@ -248,13 +163,6 @@ describe("Agent Registry Integration", () => {
   });
 
   describe("Configuration Values", () => {
-    it("should have correct description for multimodal-looker", () => {
-      const agent = builtinAgents["multimodal-looker"];
-
-      expect(agent.description).toContain("Media file analysis");
-      expect(agent.description).toContain("visual content");
-    });
-
     it("should have correct description for analyzer", () => {
       const agent = builtinAgents["code-analyzer"];
 

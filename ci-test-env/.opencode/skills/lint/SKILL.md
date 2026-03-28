@@ -8,7 +8,7 @@ tags: [quality, lint]
 mcp:
   lint:
     command: node
-    args: [node_modules/strray-ai/dist/plugin/mcps/dist/plugin/mcps/lint.server.js]
+    args: [node_modules/strray-ai/dist/mcps/lint.server.js]
 ---
 
 # Lint Skill

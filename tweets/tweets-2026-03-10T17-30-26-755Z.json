@@ -1,0 +1,31 @@
+{
+  "generated": "2026-03-10T17-30-26-755Z",
+  "version": "1.15.1",
+  "releases": [
+    {
+      "version": "v1.7.5",
+      "commitCount": 3,
+      "tweet": "🚀 StringRay v1.7.10 released!\n\n🐛 Add hard stop rule for release workflow\n\n\n📊 1 fixes\n\n\n#StringRay #AI #DevTools\n\n🔗 https://github.com/htafolla/stringray",
+      "commits": [
+        {
+          "message": "refactor: Clean up and organize root directory",
+          "hash": "b9dcae46"
+        },
+        {
+          "message": "fix: Add hard stop rule for release workflow",
+          "hash": "3ccc1c2c"
+        },
+        {
+          "message": "release: v1.7.10 - Add automated release workflow",
+          "hash": "471ea251"
+        }
+      ]
+    },
+    {
+      "version": "v1.7.5",
+      "commitCount": 0,
+      "tweet": "🚀 StringRay v1.7.8 released!\n\n✅ Ready for production!\n\n\n#StringRay #AI #DevTools\n\n🔗 https://github.com/htafolla/stringray",
+      "commits": []
+    }
+  ]
+}

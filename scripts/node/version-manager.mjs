@@ -6,19 +6,21 @@
  * Updates version in:
  * - package.json
  * - init.sh
- * - CHANGELOG.md (auto-generates entry)
+ * - CHANGELOG.md (auto-generates from git commits since last tag)
  * - README.md (updates agent/MCP/skill counts)
  * - AGENTS.md (updates agent/MCP/skill counts)
  * 
+ * Auto-generates changelog from git commits using conventional commit format.
  * Usage:
  *   node scripts/node/version-manager.mjs [major|minor|patch]
- *   node scripts/node/version-manager.mjs 1.6.9
- *   node scripts/node/version-manager.mjs patch "Added new feature"
+ *   node scripts/node/version-manager.mjs [major|minor|patch] "Custom description"
+ *   node scripts/node/version-manager.mjs [major|minor|patch] --tag
  */
 
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { execSync } from 'child_process';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, '../..');
@@ -28,6 +30,135 @@ const VERSION_FILES = [
   { file: 'package.json', field: 'version', pattern: /"version":\s*"[^"]+"/ },
   { file: 'init.sh', field: 'STRRAY_VERSION', pattern: /STRRAY_VERSION="[^"]+"/ }
 ];
+
+// Commit types for changelog grouping
+const COMMIT_TYPES = {
+  feat: { emoji: '✨', title: 'Features', prefix: 'feat:' },
+  fix: { emoji: '🐛', title: 'Bug Fixes', prefix: 'fix:' },
+  docs: { emoji: '📚', title: 'Documentation', prefix: 'docs:' },
+  chore: { emoji: '🔧', title: 'Maintenance', prefix: 'chore:' },
+  refactor: { emoji: '♻️', title: 'Refactoring', prefix: 'refactor:' },
+  perf: { emoji: '⚡', title: 'Performance', prefix: 'perf:' },
+  test: { emoji: '🧪', title: 'Tests', prefix: 'test:' },
+  style: { emoji: '💎', title: 'Styles', prefix: 'style:' },
+  ci: { emoji: '👷', title: 'CI/CD', prefix: 'ci:' },
+  build: { emoji: '📦', title: 'Builds', prefix: 'build:' },
+  revert: { emoji: '⏪', title: 'Reverts', prefix: 'revert:' }
+};
+
+/**
+ * Get the last git tag (most recent version)
+ */
+function getLastGitTag() {
+  try {
+    const tag = execSync('git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0"', {
+      cwd: rootDir,
+      encoding: 'utf-8'
+    }).trim();
+    return tag || 'v0.0.0';
+  } catch {
+    return 'v0.0.0';
+  }
+}
+
+/**
+ * Extract commits since the last tag
+ */
+function getCommitsSinceLastTag() {
+  const lastTag = getLastGitTag();
+  console.log(`📊 Found last tag: ${lastTag}`);
+  
+  try {
+    // Get commits since last tag with conventional format
+    const commits = execSync(
+      `git log ${lastTag}..HEAD --oneline --format="%s||%h"`,
+      { cwd: rootDir, encoding: 'utf-8' }
+    ).trim().split('\n').filter(Boolean);
+    
+    return commits.map(commit => {
+      const [message, hash] = commit.split('||');
+      return { message: message.trim(), hash: hash.trim() };
+    });
+  } catch (error) {
+    // If no tags or error, get all commits from initial commit
+    console.log('⚠️  Could not get commits from tag, using all commits');
+    const commits = execSync(
+      `git log --oneline --format="%s||%h" -n 50`,
+      { cwd: rootDir, encoding: 'utf-8' }
+    ).trim().split('\n').filter(Boolean);
+    
+    return commits.map(commit => {
+      const [message, hash] = commit.split('||');
+      return { message: message.trim(), hash: hash.trim() };
+    });
+  }
+}
+
+/**
+ * Parse commits and group by type
+ */
+function parseCommitsByType(commits) {
+  const grouped = {
+    feat: [],
+    fix: [],
+    docs: [],
+    chore: [],
+    refactor: [],
+    perf: [],
+    test: [],
+    style: [],
+    ci: [],
+    build: [],
+    revert: [],
+    other: []
+  };
+  
+  for (const commit of commits) {
+    const message = commit.message.toLowerCase();
+    let matched = false;
+    
+    for (const [type, config] of Object.entries(COMMIT_TYPES)) {
+      if (message.startsWith(config.prefix)) {
+        grouped[type].push(commit);
+        matched = true;
+        break;
+      }
+    }
+    
+    if (!matched) {
+      grouped.other.push(commit);
+    }
+  }
+  
+  return grouped;
+}
+
+/**
+ * Generate changelog content from commits
+ */
+function generateChangelogFromCommits(commits) {
+  const grouped = parseCommitsByType(commits);
+  const sections = [];
+  
+  // Build sections in preferred order
+  const typeOrder = ['feat', 'fix', 'perf', 'refactor', 'docs', 'test', 'style', 'ci', 'build', 'chore', 'revert'];
+  
+  for (const type of typeOrder) {
+    if (grouped[type].length > 0) {
+      const config = COMMIT_TYPES[type];
+      const items = grouped[type].map(c => `- ${c.message} (${c.hash})`).join('\n');
+      sections.push(`### ${config.emoji} ${config.title}\n${items}`);
+    }
+  }
+  
+  // Add other/unclassified if any
+  if (grouped.other.length > 0 && grouped.other.length <= 5) {
+    const items = grouped.other.map(c => `- ${c.message} (${c.hash})`).join('\n');
+    sections.push(`### 🔎 Other Changes\n${items}`);
+  }
+  
+  return sections.join('\n\n') || '- Version bump';
+}
 
 /**
  * Count actual framework components
@@ -63,11 +194,12 @@ function getFrameworkCounts() {
     }
   }
   
-  // Count skills (directories in .opencode/skills/)
-  const skillsDir = path.join(rootDir, '.opencode/skills');
+  // Count skills (directories in src/skills/ with SKILL.md)
+  const skillsDir = path.join(rootDir, 'src/skills');
   if (fs.existsSync(skillsDir)) {
     counts.skills = fs.readdirSync(skillsDir)
       .filter(f => fs.statSync(path.join(skillsDir, f)).isDirectory())
+      .filter(f => fs.existsSync(path.join(skillsDir, f, 'SKILL.md')))
       .length;
   }
   
@@ -77,13 +209,23 @@ function getFrameworkCounts() {
 function getChangelogEntry(newVersion, changeDescription) {
   const date = new Date().toISOString().split('T')[0];
   
-  let content = changeDescription || '';
+  // If manual description provided, use it; otherwise auto-generate from commits
+  let content;
+  if (changeDescription) {
+    content = changeDescription;
+  } else {
+    // Auto-generate from git commits
+    console.log('📝 No description provided, auto-generating from git commits...');
+    const commits = getCommitsSinceLastTag();
+    console.log(`📊 Found ${commits.length} commits since last release`);
+    content = generateChangelogFromCommits(commits);
+  }
   
   return `## [${newVersion}] - ${date}
 
 ### 🔄 Changes
 
-${content ? content : '- Version bump'}
+${content}
 
 ---
 
@@ -234,36 +376,31 @@ function updateVersion(newVersion, changeDescription = '') {
   fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n');
   console.log(`✅ Updated package.json`);
   
-  // Update init.sh
+  // Update init.sh if it exists
   const initPath = path.join(rootDir, 'init.sh');
-  let initContent = fs.readFileSync(initPath, 'utf-8');
-  initContent = initContent.replace(
-    /STRRAY_VERSION="[^"]+"/,
-    `STRRAY_VERSION="${newVersion}"`
-  );
-  fs.writeFileSync(initPath, initContent);
-  console.log(`✅ Updated init.sh`);
-/**
- * Update docs/README.md version badge
- */
-function updateDocsReadme(newVersion) {
-  const docsReadmePath = path.join(rootDir, 'docs/README.md');
-  if (!fs.existsSync(docsReadmePath)) {
-    console.log(`⚠️  docs/README.md not found, skipping`);
-    return;
+  if (fs.existsSync(initPath)) {
+    let initContent = fs.readFileSync(initPath, 'utf-8');
+    initContent = initContent.replace(
+      /STRRAY_VERSION="[^"]+"/,
+      `STRRAY_VERSION="${newVersion}"`
+    );
+    fs.writeFileSync(initPath, initContent);
+    console.log(`✅ Updated init.sh`);
+  } else {
+    console.log(`⚠️  init.sh not found, skipping`);
   }
   
-  let readme = fs.readFileSync(docsReadmePath, 'utf-8');
-  
-  // Update version badge: [![Version](https://img.shields.io/badge/version-1.6.x-blue...)]
-  readme = readme.replace(
-    /img.shields.io\/badge\/version-[\d.]+/,
-    `img.shields.io/badge/version-${newVersion}`
-  );
-  
-  fs.writeFileSync(docsReadmePath, readme);
-  console.log(`✅ Updated docs/README.md (version: ${newVersion})`);
-}
+  // Update docs/README.md version badge
+  const docsReadmePath = path.join(rootDir, 'docs/README.md');
+  if (fs.existsSync(docsReadmePath)) {
+    let readme = fs.readFileSync(docsReadmePath, 'utf-8');
+    readme = readme.replace(
+      /img.shields.io\/badge\/version-[\d.]+/,
+      `img.shields.io/badge/version-${newVersion}`
+    );
+    fs.writeFileSync(docsReadmePath, readme);
+    console.log(`✅ Updated docs/README.md (version: ${newVersion})`);
+  }
   
   // Update CHANGELOG.md
   updateChangelog(newVersion, changeDescription);
@@ -274,39 +411,81 @@ function updateDocsReadme(newVersion) {
   
   updateReadme(counts, newVersion);
   updateAgentsMd(counts);
-  updateDocsReadme(newVersion);
   
   console.log(`\n🎉 Version updated to ${newVersion}\n`);
+}
+
+function createGitTag(version, message) {
+  try {
+    // Create annotated tag
+    const tagName = `v${version}`;
+    const tagMessage = message || `Release ${version}`;
+    
+    execSync(`git tag -a ${tagName} -m "${tagMessage}"`, { cwd: rootDir, stdio: 'inherit' });
+    console.log(`✅ Created git tag: ${tagName}`);
+    
+    // Push tag to remote
+    execSync(`git push origin ${tagName}`, { cwd: rootDir, stdio: 'inherit' });
+    console.log(`✅ Pushed tag to origin: ${tagName}`);
+    
+    return true;
+  } catch (error) {
+    console.log(`⚠️  Failed to create git tag: ${error.message}`);
+    return false;
+  }
 }
 
 function main() {
   const args = process.argv.slice(2);
   
-  if (args.length === 0) {
+  // Handle --help flag first
+  if (args.includes('--help') || args.includes('-h')) {
     const current = getCurrentVersion();
     console.log(`\n📌 Current version: ${current}`);
     console.log(`\nUsage:`);
     console.log(`  node scripts/node/version-manager.mjs [major|minor|patch] [description]`);
     console.log(`  node scripts/node/version-manager.mjs 1.6.9 "Description of changes"`);
+    console.log(`  node scripts/node/version-manager.mjs patch --tag  # auto-changelog + git tag`);
     console.log(`\nExamples:`);
-    console.log(`  node scripts/node/version-manager.mjs patch  # 1.6.8 -> 1.6.9`);
+    console.log(`  node scripts/node/version-manager.mjs patch  # 1.6.8 -> 1.6.9 (auto-generates changelog from git)`);
     console.log(`  node scripts/node/version-manager.mjs minor  # 1.6.8 -> 1.7.0`);
     console.log(`  node scripts/node/version-manager.mjs major  # 1.6.8 -> 2.0.0`);
-    console.log(`  node scripts/node/version-manager.mjs patch "Added new MCP server"  # with changelog entry`);
+    console.log(`  node scripts/node/version-manager.mjs patch "Manual description"  # use custom changelog`);
+    console.log(`  node scripts/node/version-manager.mjs patch --tag  # changelog + git tag`);
     process.exit(0);
   }
   
+  // Parse arguments
+  let type = args[0];
+  let changeDescription = '';
+  let createTag = false;
+  
+  for (let i = 1; i < args.length; i++) {
+    if (args[i] === '--tag' || args[i] === '-t') {
+      createTag = true;
+    } else {
+      changeDescription = args[i];
+    }
+  }
+  
   const current = getCurrentVersion();
-  const type = args[0];
-  const changeDescription = args[1] || '';  const newVersion = bumpVersion(current, type);
+  const newVersion = bumpVersion(current, type);
   
   console.log(`\n📌 Current version: ${current}`);
   console.log(`📌 Bumping: ${type}`);
   if (changeDescription) {
     console.log(`📌 Changes: ${changeDescription}`);
   }
+  if (createTag) {
+    console.log(`📌 Will create git tag`);
+  }
   
   updateVersion(newVersion, changeDescription);
+  
+  // Create git tag if requested
+  if (createTag) {
+    createGitTag(newVersion, changeDescription);
+  }
 }
 
 main();

@@ -14,7 +14,7 @@ class SkillInvocationServer {
   constructor() {
     this.server = new Server(
       {
-        name: "strray/skill-invocation", version: "1.7.5",
+        name: "strray/skill-invocation", version: "1.15.6",
       },
       {
         capabilities: {
@@ -41,10 +41,16 @@ class SkillInvocationServer {
                 skillName: {
                   type: "string",
                   enum: [
+                    // Core skills
                     "code-review",
+                    "code-reviewer",
                     "security-audit",
+                    "security-auditor",
+                    "security-scan",
                     "performance-optimization",
                     "testing-strategy",
+                    "testing-lead",
+                    "testing-best-practices",
                     "project-analysis",
                     "database-design",
                     "devops-deployment",
@@ -53,18 +59,11 @@ class SkillInvocationServer {
                     "documentation-generation",
                     "refactoring-strategies",
                     "architecture-patterns",
-                    // ========== ADDED MISSING SKILLS ==========
-                    "strategist",
+                    // Additional skills
                     "bug-triage-specialist",
                     "log-monitor",
-                    "multimodal-looker",
-                    "seo-consultant",
-                    "content-creator",
-                    "growth-strategist",
                     "mobile-development",
                     "git-workflow",
-                    "testing-best-practices",
-                    "security-scan",
                     "state-manager",
                     "session-management",
                     "boot-orchestrator",
@@ -74,7 +73,6 @@ class SkillInvocationServer {
                     "auto-format",
                     "model-health-check",
                     "framework-compliance-audit",
-                    // ========== END ADDED SKILLS ==========
                   ],
                   description: "Name of the skill to invoke",
                 },

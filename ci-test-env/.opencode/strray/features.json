@@ -1,20 +1,20 @@
 {
   "$schema": "./features.schema.json",
-  "version": "1.7.5",
+  "version": "1.15.6",
   "description": "StringRay Framework - Unified Feature Configuration",
   "token_optimization": {
     "enabled": true,
-    "max_context_tokens": 50000,
+    "max_context_tokens": 20000,
     "prune_after_task": true,
     "summarize_tool_outputs": true,
     "context_compression": {
       "enabled": true,
-      "threshold_tokens": 40000,
-      "compression_ratio": 0.5
+      "threshold_tokens": 15000,
+      "compression_ratio": 0.4
     }
   },
   "model_routing": {
-    "enabled": false
+    "enabled": true
   },
   "batch_operations": {
     "enabled": true,
@@ -33,9 +33,9 @@
     "session_persistence": true
   },
   "autonomous_reporting": {
-    "enabled": false,
+    "enabled": true,
     "interval_minutes": 60,
-    "auto_schedule": false,
+    "auto_schedule": true,
     "include_health_assessment": true,
     "include_agent_activities": true,
     "include_pipeline_operations": true,
@@ -48,7 +48,8 @@
   },
   "agent_management": {
     "disabled_agents": [],
-    "agent_models": {},
+    "agent_models": {
+    },
     "performance_limits": {
       "max_task_duration_ms": 30000,
       "max_memory_usage_mb": 512,
@@ -67,9 +68,9 @@
     "enabled": true,
     "level": "info",
     "include_performance_metrics": true,
-    "include_agent_states": true,
+    "include_agent_states": false,
     "include_token_usage": true,
-    "retention_days": 7,
+    "retention_days": 3,
     "log_to_file": true,
     "log_path": ".opencode/logs"
   },
@@ -97,7 +98,23 @@
     "enabled": true,
     "file_content_cache": true,
     "search_result_cache": true,
-    "cache_ttl_seconds": 300,
-    "max_cache_size_mb": 50
+    "cache_ttl_seconds": 60,
+    "max_cache_size_mb": 25
+  },
+  "agent_spawn": {
+    "max_concurrent": 8,
+    "max_per_type": 3,
+    "spawn_cooldown_ms": 500,
+    "rate_limit_per_minute": 20
+  },
+  "delegation": {
+    "confidence_threshold": 0.50,
+    "enable_intelligent_routing": true
+  },
+  "complexity_thresholds": {
+    "simple": 15,
+    "moderate": 25,
+    "complex": 50,
+    "enterprise": 100
   }
 }

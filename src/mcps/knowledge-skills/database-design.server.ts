@@ -14,6 +14,7 @@ import {
 import * as fs from "fs";
 import * as path from "path";
 import { frameworkLogger } from "../../core/framework-logger.js";
+import { createGracefulShutdown } from "../../utils/shutdown-handler.js";
 
 interface DatabaseSchema {
   tables: TableSchema[];
@@ -79,7 +80,7 @@ class StrRayDatabaseDesignServer {
   constructor() {
     this.server = new Server(
       {
-        name: "database-design", version: "1.7.5",
+        name: "database-design", version: "1.15.6",
       },
       {
         capabilities: {
@@ -1143,87 +1144,12 @@ class StrRayDatabaseDesignServer {
   async run(): Promise<void> {
     const transport = new StdioServerTransport();
     await this.server.connect(transport);
-    await frameworkLogger.log(
-      "database-design.server",
-      "-strray-database-design-mcp-server-running-",
-      "info",
-      { message: "StrRay Database Design MCP Server running..." },
-    );
-
-    const cleanup = async (signal: string) => {
-      await frameworkLogger.log(
-        "database-design.server",
-        "-received-signal-shutting-down-gracefully-",
-        "info",
-        { message: `Received ${signal}, shutting down gracefully...` },
-      );
-
-      // Set a timeout to force exit if graceful shutdown fails
-      const timeout = setTimeout(() => {
-        console.error("Graceful shutdown timeout, forcing exit...");
-        process.exit(1);
-      }, 5000); // 5 second timeout
-
-      try {
-        if (this.server && typeof this.server.close === "function") {
-          await this.server.close();
-        }
-        clearTimeout(timeout);
-        await frameworkLogger.log(
-          "database-design.server",
-          "-strray-mcp-server-shut-down-gracefully-",
-          "info",
-          { message: "StrRay MCP Server shut down gracefully" },
-        );
-        process.exit(0);
-      } catch (error) {
-        clearTimeout(timeout);
-        console.error("Error during server shutdown:", error);
-        process.exit(1);
-      }
-    };
-
-    // Handle multiple shutdown signals
-    process.on("SIGINT", () => cleanup("SIGINT"));
-    process.on("SIGTERM", () => cleanup("SIGTERM"));
-    process.on("SIGHUP", () => cleanup("SIGHUP"));
-
-    // Monitor parent process (opencode) and shutdown if it dies
-    const checkParent = async () => {
-      try {
-        process.kill(process.ppid, 0); // Check if parent is alive
-        setTimeout(checkParent, 1000); // Check again in 1 second
-      } catch (error) {
-        // Parent process died, shut down gracefully
-        await frameworkLogger.log(
-          "database-design.server",
-          "-parent-process-opencode-died-shutting-down-mcp-se",
-          "info",
-          {
-            message:
-              "Parent process (opencode) died, shutting down MCP server...",
-          },
-        );
-        cleanup("parent-process-death");
-      }
-    };
-
-    // Start monitoring parent process
-    setTimeout(checkParent, 2000); // Start checking after 2 seconds
-
-    // Handle uncaught exceptions and unhandled rejections
-    process.on("uncaughtException", (error) => {
-      console.error("Uncaught Exception:", error);
-      cleanup("uncaughtException");
+    
+    // Use centralized shutdown handler
+    createGracefulShutdown({
+      serverName: "database-design.server",
+      server: this.server,
     });
-
-    process.on("unhandledRejection", (reason, promise) => {
-      console.error("Unhandled Rejection at:", promise, "reason:", reason);
-      cleanup("unhandledRejection");
-    });
-
-    process.on("SIGINT", cleanup);
-    process.on("SIGTERM", cleanup);
   }
 }
 

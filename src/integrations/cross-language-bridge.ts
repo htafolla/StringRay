@@ -8,9 +8,12 @@
  * @since 2026-01-09
  */
 
-import WebSocket from "ws";
-import { EventEmitter } from "events";
-import { frameworkLogger } from "../core/framework-logger.js";
+import { WebSocket } from 'ws';
+import {
+  BaseIntegration,
+  type IntegrationConfig,
+  type HealthResult,
+} from "./base/index.js";
 
 export interface RPCRequest {
   jsonrpc: "2.0";
@@ -79,7 +82,12 @@ export interface BaseAgentCapabilities {
   }>;
 }
 
-export class CrossLanguageBridge extends EventEmitter {
+export interface CrossLanguageBridgeConfig extends Partial<IntegrationConfig> {
+  pythonServerUrl?: string;
+  connectionTimeout?: number;
+}
+
+export class CrossLanguageBridge extends BaseIntegration {
   private ws: WebSocket | null = null;
   private connected = false;
   private pendingRequests = new Map<
@@ -95,27 +103,60 @@ export class CrossLanguageBridge extends EventEmitter {
   private maxReconnectAttempts = 5;
   private reconnectDelay = 1000;
 
-  constructor(
-    private pythonServerUrl = "ws://localhost:8765",
-    private connectionTimeout = 5000,
-  ) {
-    super();
-    this.connect();
+  private pythonServerUrl: string;
+  private connectionTimeout: number;
+
+  constructor(config?: CrossLanguageBridgeConfig) {
+    super("cross-language-bridge", "1.0.0", config);
+
+    this.pythonServerUrl = config?.pythonServerUrl ?? "ws://localhost:8765";
+    this.connectionTimeout = config?.connectionTimeout ?? 5000;
+  }
+
+  protected async performInitialization(): Promise<void> {
+    await this.log("info", "Initializing CrossLanguageBridge...");
+    await this.connect();
+  }
+
+  protected async performShutdown(): Promise<void> {
+    await this.log("info", "Shutting down CrossLanguageBridge...");
+    await this.disconnect();
+  }
+
+  protected async performHealthCheck(): Promise<HealthResult> {
+    if (this.connected) {
+      return {
+        healthy: true,
+        message: "Connected to Python server",
+        details: {
+          pendingRequests: this.pendingRequests.size,
+          reconnectAttempts: this.reconnectAttempts,
+        },
+      };
+    }
+
+    return {
+      healthy: false,
+      message: "Not connected to Python server",
+      details: {
+        pendingRequests: this.pendingRequests.size,
+        reconnectAttempts: this.reconnectAttempts,
+      },
+    };
   }
 
   private async connect(): Promise<void> {
     if (this.connected) return;
 
     try {
-      await frameworkLogger.log(
-        "cross-lang-bridge",
-        `connecting to Python server: ${this.pythonServerUrl}`,
+      await this.log(
         "info",
+        `Connecting to Python server: ${this.pythonServerUrl}`,
       );
 
       this.ws = new WebSocket(this.pythonServerUrl, {
         handshakeTimeout: this.connectionTimeout,
-      });
+      } as any);
 
       return new Promise((resolve, reject) => {
         const timeout = setTimeout(() => {
@@ -130,11 +171,7 @@ export class CrossLanguageBridge extends EventEmitter {
           this.connected = true;
           this.reconnectAttempts = 0;
           this.emit("connected");
-          frameworkLogger.log(
-            "cross-lang-bridge",
-            "connected to Python server",
-            "success",
-          );
+          this.log("success", "Connected to Python server");
           resolve();
         });
 
@@ -142,24 +179,16 @@ export class CrossLanguageBridge extends EventEmitter {
           this.handleMessage(data);
         });
 
-        this.ws!.on("error", (error) => {
+        this.ws!.on("error", (error: Error) => {
           clearTimeout(timeout);
-          frameworkLogger.log(
-            "cross-lang-bridge",
-            `connection error: ${error.message}`,
-            "error",
-          );
+          this.log("error", `Connection error: ${error.message}`);
           reject(error);
         });
 
         this.ws!.on("close", () => {
           this.connected = false;
           this.emit("disconnected");
-          frameworkLogger.log(
-            "cross-lang-bridge",
-            "disconnected from Python server",
-            "info",
-          );
+          this.log("info", "Disconnected from Python server");
 
           // CRITICAL FIX: Remove all listeners to prevent memory leaks
           this.ws!.removeAllListeners();
@@ -177,10 +206,9 @@ export class CrossLanguageBridge extends EventEmitter {
         });
       });
     } catch (error) {
-      frameworkLogger.log(
-        "cross-lang-bridge",
-        `connection failed: ${(error as Error).message}`,
+      this.log(
         "error",
+        `Connection failed: ${(error as Error).message}`,
       );
       throw error;
     }
@@ -218,10 +246,9 @@ export class CrossLanguageBridge extends EventEmitter {
         this.emit("notification", message.method, message.params);
       }
     } catch (error) {
-      frameworkLogger.log(
-        "cross-lang-bridge",
-        `message handling error: ${(error as Error).message}`,
+      this.log(
         "error",
+        `Message handling error: ${(error as Error).message}`,
       );
     }
   }

@@ -13,9 +13,10 @@ import {
 } from "@modelcontextprotocol/sdk/types.js";
 import * as fs from "fs";
 import * as path from "path";
+import { frameworkLogger } from "../core/framework-logger.js";
 
 // Import actual enforcer-tools functions
-import { ruleValidation, getTaskRoutingRecommendation } from "../enforcement/enforcer-tools.js";
+import { ruleValidation as runRuleValidation, getTaskRoutingRecommendation } from "../enforcement/enforcer-tools.js";
 import { RuleValidationContext } from "../enforcement/rule-enforcer.js";
 
 class StrRayEnforcerToolsServer {
@@ -24,7 +25,7 @@ class StrRayEnforcerToolsServer {
   constructor() {
     this.server = new Server(
       {
-        name: "enforcer", version: "1.7.5",
+        name: "enforcer", version: "1.15.6",
       },
       {
         capabilities: {
@@ -82,7 +83,7 @@ class StrRayEnforcerToolsServer {
           {
             name: "codex-enforcement",
             description:
-              "Enforce all 55 Universal Development Codex terms with comprehensive compliance validation and actionable remediation",
+              "Enforce all Universal Development Codex terms with comprehensive compliance validation and actionable remediation",
             inputSchema: {
               type: "object",
               properties: {
@@ -260,7 +261,7 @@ class StrRayEnforcerToolsServer {
             throw new Error(`Unknown tool: ${name}`);
         }
       } catch (error) {
-        console.error(`Error in enforcer tool ${name}:`, error);
+        frameworkLogger.log("mcps/enforcer", "tool", "error", { tool: name, error: String(error) });
         throw error;
       }
     });
@@ -285,7 +286,7 @@ class StrRayEnforcerToolsServer {
     };
 
     // Call actual rule validation from enforcer-tools
-    const validationResult = await ruleValidation(operation, context);
+    const validationResult = await runRuleValidation(operation, context);
 
     return {
       content: [
@@ -334,7 +335,7 @@ class StrRayEnforcerToolsServer {
             {
               operation,
               codexCheck,
-              termsValidated: 43, // All Universal Development Codex terms
+              termsValidated: this.getCodexTermCount(), // All Universal Development Codex terms
               complianceScore: codexCheck.score,
               violations: codexCheck.violations.length,
               timestamp: new Date().toISOString(),
@@ -348,7 +349,8 @@ class StrRayEnforcerToolsServer {
   }
 
   private async contextAnalysisValidation(args: any): Promise<any> {
-    const { files, operation, checkPatterns } = args;
+    const files = args.files || [];
+    const { operation, checkPatterns } = args;
 
     // Context analysis - no logging to console (results returned to agent)
 
@@ -501,6 +503,21 @@ class StrRayEnforcerToolsServer {
     };
   }
 
+  private getCodexTermCount(): number {
+    try {
+      const codexPath = path.join(process.cwd(), ".opencode", "strray", "codex.json");
+      if (fs.existsSync(codexPath)) {
+        const codex = JSON.parse(fs.readFileSync(codexPath, "utf8"));
+        if (codex.terms && Array.isArray(codex.terms)) {
+          return codex.terms.length;
+        }
+      }
+    } catch {
+      // Fall back to default if unable to read
+    }
+    return 60; // Default fallback
+  }
+
   // Simulation methods (would integrate with actual enforcer-tools logic)
 
   private async simulateRuleValidation(context: any): Promise<any> {
@@ -608,7 +625,7 @@ class StrRayEnforcerToolsServer {
     }
 
     // Simulate codex term checking
-    const totalTerms = 43;
+    const totalTerms = this.getCodexTermCount();
     const violationsCount = violations.length;
     const warningsCount = warnings.length;
 
@@ -699,7 +716,7 @@ class StrRayEnforcerToolsServer {
     strictMode: boolean,
   ): Promise<any> {
     // Run all quality checks using actual functions
-    const ruleCheckResult = await ruleValidation(operation, {
+    const ruleCheckResult = await runRuleValidation(operation, {
       operation,
       files: context.files || [],
       newCode: context.newCode,
@@ -751,7 +768,13 @@ class StrRayEnforcerToolsServer {
         "codex-enforcement",
         "context-analysis-validation",
       ],
-      overallScore: 85, // Default score since ruleCheckResult may not have score
+      overallScore: Math.round(
+        (
+          (ruleCheckResult.errors?.length === 0 && ruleCheckResult.warnings?.length === 0 ? 100 : Math.max(0, 100 - (ruleCheckResult.errors?.length || 0) * 20 - (ruleCheckResult.warnings?.length || 0) * 5))
+          + codexCheck.score
+          + contextCheck.score
+        ) / 3
+      ),
     };
   }
 
@@ -831,14 +854,12 @@ class StrRayEnforcerToolsServer {
               fix.applied = true;
               fix.result = result;
             } else {
-              console.error(
-                `Auto-fix failed: ${result.error || "Unknown error"}`,
-              );
+              frameworkLogger.log("mcps/enforcer", "auto-fix", "error", { error: result.error || "Unknown error" });
               fix.applied = false;
               fix.error = result.error;
             }
           } catch (error) {
-            console.error(`Auto-fix execution failed:`, error);
+            frameworkLogger.log("mcps/enforcer", "auto-fix", "error", { error: String(error) });
             fix.applied = false;
             fix.error = error instanceof Error ? error.message : String(error);
           }
@@ -869,7 +890,7 @@ class StrRayEnforcerToolsServer {
     const cleanup = async (signal: string) => {
       // Set a timeout to force exit if graceful shutdown fails
       const timeout = setTimeout(() => {
-        console.error("Graceful shutdown timeout, forcing exit...");
+        frameworkLogger.log("mcps/enforcer", "shutdown", "error", { message: "Graceful shutdown timeout, forcing exit..." });
         process.exit(1);
       }, 5000); // 5 second timeout
 
@@ -881,7 +902,7 @@ class StrRayEnforcerToolsServer {
         process.exit(0);
       } catch (error) {
         clearTimeout(timeout);
-        console.error("Error during server shutdown:", error);
+        frameworkLogger.log("mcps/enforcer", "shutdown", "error", { message: `Error during server shutdown: ${String(error)}` });
         process.exit(1);
       }
     };
@@ -907,23 +928,20 @@ class StrRayEnforcerToolsServer {
 
     // Handle uncaught exceptions and unhandled rejections
     process.on("uncaughtException", (error) => {
-      console.error("Uncaught Exception:", error);
+      frameworkLogger.log("mcps/enforcer", "uncaughtException", "error", { error: String(error) });
       cleanup("uncaughtException");
     });
 
     process.on("unhandledRejection", (reason, promise) => {
-      console.error("Unhandled Rejection at:", promise, "reason:", reason);
+      frameworkLogger.log("mcps/enforcer", "unhandledRejection", "error", { error: String(reason) });
       cleanup("unhandledRejection");
     });
-
-    process.on("SIGINT", cleanup);
-    process.on("SIGTERM", cleanup);
   }
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {
   const server = new StrRayEnforcerToolsServer();
-  server.run().catch(console.error);
+  server.run().catch((error) => frameworkLogger.log("mcps/enforcer", "run", "error", { error: String(error) }));
 }
 
 export default StrRayEnforcerToolsServer;

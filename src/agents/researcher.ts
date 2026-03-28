@@ -1,5 +1,4 @@
 import { AgentConfig } from "./types.js";
-import { createCodebaseContextAnalyzer } from "../delegation/codebase-context-analyzer.js";
 
 export const researcher: AgentConfig = {
   name: "researcher",

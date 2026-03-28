@@ -66,6 +66,7 @@ export class StringRayStateManager implements StateManager {
 
       // Process any early operations that were queued
       if (this.persistenceEnabled && this.earlyOperationsQueue.length > 0) {
+        const pendingOps = this.earlyOperationsQueue.length;
         for (const key of this.earlyOperationsQueue) {
           this.schedulePersistence(key);
         }
@@ -75,7 +76,7 @@ export class StringRayStateManager implements StateManager {
           "processed queued early operations",
           "info",
           {
-            operationsProcessed: this.earlyOperationsQueue.length,
+            operationsProcessed: pendingOps,
           },
         );
       }

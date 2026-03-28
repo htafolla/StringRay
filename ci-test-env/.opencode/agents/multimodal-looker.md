@@ -1,7 +1,6 @@
 ---
 name: multimodal-looker
 description: Media file analysis and interpretation specialist. Expert in analyzing images, diagrams, PDFs, and other media files for technical content.
-model: openrouter/xai-grok-2-1212-fast-1
 temperature: 0.3
 maxSteps: 25
 mode: subagent

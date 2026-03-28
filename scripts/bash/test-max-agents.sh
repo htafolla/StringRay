@@ -1,14 +1,14 @@
 #!/bin/bash
 
-# Test Max Concurrent Agents Limit (27 agents)
+# Test Max Concurrent Agents Limit (25 agents)
 
-echo "🧪 Testing Max Concurrent Agents Limit (27 agents)"
+echo "🧪 Testing Max Concurrent Agents Limit (25 agents)"
 echo "================================================="
 
 # Test 1: Verify configuration
 echo ""
 echo "1. Configuration Check:"
-max_agents=$(jq '.multi_agent_orchestration.max_concurrent_agents' .strray/config.json)
+max_agents=$(jq '.multi_agent_orchestration.max_concurrent_agents' .opencode/strray/config.json)
 if [ "$max_agents" = "7" ]; then
     echo "✅ Max concurrent agents set to 7"
 else

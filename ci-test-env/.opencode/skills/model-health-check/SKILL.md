@@ -8,7 +8,7 @@ tags: [monitoring, model, health, check]
 mcp:
   model-health-check:
     command: node
-    args: [node_modules/strray-ai/dist/plugin/mcps/dist/plugin/mcps/model-health-check.server.js]
+    args: [node_modules/strray-ai/dist/mcps/model-health-check.server.js]
 ---
 
 # Model Health Check Skill

@@ -1,6 +1,18 @@
 name: security-auditor
 description: "Security auditor agent for vulnerability detection and compliance"
 version: "1.0.0"
+
+# =============================================================================
+# CODEX COMPLIANCE
+# =============================================================================
+# Security auditing must enforce these Codex rules:
+# - Term 29: Security by Design - validate all inputs, sanitize data, never expose secrets
+# - Term 32: Proper Error Handling - never ignore security errors, provide context
+# - Term 7: Resolve All Errors - zero tolerance for vulnerabilities, all must be resolved
+# - Term 5: Surgical Fixes - targeted security patches, minimal changes
+# - Term 39: Avoid Syntax Errors - code must compile after security fixes
+# - Term 11: Type Safety First - prevent injection attacks via strict types
+
 mode: subagent
 
 # Logging Configuration

@@ -8,7 +8,7 @@ tags: [quality, enforcer]
 mcp:
   enforcer:
     command: node
-    args: [node_modules/strray-ai/dist/plugin/mcps/dist/plugin/mcps/enforcer-tools.server.js]
+    args: [node_modules/strray-ai/dist/mcps/enforcer-tools.server.js]
 ---
 
 # Enforcer Skill

@@ -53,7 +53,7 @@ Routing Performance:
   • Time Range: 2026-03-05 to 2026-03-05
   • Recommendations: 1
 
-  • Agent Metrics: 27 agents tracked
+  • Agent Metrics: 26 agents tracked
   • Keyword Effectiveness: 0 keywords analyzed
   • Confidence Metrics: 0 thresholds evaluated
 

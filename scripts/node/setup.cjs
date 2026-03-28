@@ -87,7 +87,7 @@ function configureStrRayPlugin() {
     "refactorer", "researcher", "log-monitor", "strategist",
     "tech-writer", "code-analyzer", "frontend-ui-ux-engineer",
     "seo-consultant", "content-creator", "growth-strategist",
-    "general", "multimodal-looker"
+    "multimodal-looker"
   ];
 
   let agentsAdded = 0;

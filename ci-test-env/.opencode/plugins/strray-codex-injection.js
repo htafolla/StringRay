@@ -150,11 +150,11 @@ function getFrameworkIdentity() {
 ╠══════════════════════════════════════════════════════════════╣
 ║  You are running under StringRay AI Orchestration Framework  ║
 ║                                                              ║
-║  🔹 27 Specialized Agents: enforcer, architect, orchestrator ║
+║  🔹 25 Specialized Agents: enforcer, architect, orchestrator ║
 ║     bug-triage-specialist, code-reviewer, security-auditor  ║
 ║     refactorer, testing-lead, researcher                    ║
 ║                                                              ║
-║  🔹 28 MCP Servers: Skill servers, framework tools          ║
+║  🔹 15 MCP Servers: Skill servers, framework tools          ║
 ║                                                              ║
 ║  🔹 59-Term Universal Development Codex (99.6% prevention)  ║
 ║                                                              ║
@@ -231,7 +231,7 @@ let cachedCodexContexts = null;
 const CODEX_FILE_LOCATIONS = [
     ".opencode/strray/codex.json",
     ".opencode/codex.codex",
-    ".strray/agents_template.md",
+    ".opencode/strray/agents_template.md",
     "AGENTS.md"
 ];
 /**

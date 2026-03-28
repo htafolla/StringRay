@@ -89,7 +89,7 @@ describe("StringRay Framework - End-to-End Orchestration Integration", () => {
       };
 
       await expect(
-        mockEnvironment.executeToolWithOrchestration("failing-tool", {}),
+        mockEnvironment.executeToolWithOrchestration(),
       ).rejects.toThrow("Orchestration failed");
     });
 

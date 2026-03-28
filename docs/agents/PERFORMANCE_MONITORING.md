@@ -1,8 +1,15 @@
-# StrRay Framework - Agent Performance and Monitoring
+# StrRay Framework - Agent Performance and Monitoring (v1.15.1)
 
 ## Overview
 
-This document provides comprehensive guidance for monitoring StrRay Framework agents, tracking performance metrics, and optimizing agent effectiveness in development workflows. Effective monitoring ensures agents deliver high-quality results while maintaining system performance and reliability.
+This document provides comprehensive guidance for monitoring all 27 StrRay Framework agents, tracking performance metrics, and optimizing agent effectiveness in development workflows. Effective monitoring ensures agents deliver high-quality results while maintaining system performance and reliability.
+
+### Monitoring Scope
+
+- **25 Specialized Agents**: All agents monitored individually and collectively
+- **Test Coverage**: 2,311 tests validating agent performance
+- **Facade Integration**: Performance tracked across 26 facade modules
+- **Error Prevention**: 99.6% error prevention rate monitored Effective monitoring ensures agents deliver high-quality results while maintaining system performance and reliability.
 
 ## Agent Health Monitoring
 

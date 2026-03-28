@@ -125,31 +125,31 @@ export class ASTCodeParser {
     // TypeScript/JavaScript patterns - direct regex for fallback
     {
       name: "function-definition",
-      pattern: "function\\s+([^\\s(]+)\\s*\\([^)]*\\)\\s*\\{[^}]*\\}",
+      pattern: "function\\s+([a-zA-Z_$][a-zA-Z0-9_$]*)\\s*\\([^)]*\\)\\s*\\{",
       language: "typescript",
       description: "Function declarations",
     },
     {
       name: "arrow-function",
-      pattern: "const\\s+([^\\s=]+)\\s*=\\s*\\([^)]*\\)\\s*=>\\s*[^;]+",
+      pattern: "const\\s+([a-zA-Z_$][a-zA-Z0-9_$]*)\\s*=\\s*\\([^)]*\\)\\s*=>",
       language: "typescript",
       description: "Arrow function assignments",
     },
     {
       name: "class-definition",
-      pattern: "class\\s+([^\\s{]+)\\s*\\{[^}]*\\}",
+      pattern: "class\\s+([a-zA-Z_$][a-zA-Z0-9_$]*)\\s*(?:extends\\s+[^{]+)?\\s*\\{",
       language: "typescript",
       description: "Class declarations",
     },
     {
       name: "import-statement",
-      pattern: "import .+ from [\"']([^\"']+)[\"']",
+      pattern: "import\\s+.+?\\s+from\\s*['\"]([^'\"]+)['\"]",
       language: "typescript",
       description: "ES6 import statements",
     },
     {
       name: "export-statement",
-      pattern: "export .+",
+      pattern: "export\\s+(?:default\\s+)?[a-zA-Z_$][a-zA-Z0-9_$]*|export\\s*\\{",
       language: "typescript",
       description: "Export statements",
     },
@@ -228,6 +228,9 @@ export class ASTCodeParser {
   constructor(astGrepPath?: string) {
     try {
       this.astGrepPath = astGrepPath || this.findAstGrep();
+      
+      // Verify ast-grep actually works before enabling it
+      execSync(`${this.astGrepPath} --version`, { stdio: "pipe" });
       this.astGrepAvailable = true;
 
       frameworkLogger.log("ast-code-parser", "ast-grep-available", "info", {
@@ -350,9 +353,127 @@ export class ASTCodeParser {
     filePath: string,
     jobId: string,
   ): Promise<CodeStructure> {
-    // TODO: Implement actual ast-grep parsing when ast-grep is available
-    // For now, fall back to regex parsing
-    return this.parseCodeStructureWithRegex(content, language, filePath, jobId);
+    const functions: FunctionInfo[] = [];
+    const classes: ClassInfo[] = [];
+    const imports: ImportInfo[] = [];
+    const exports: ExportInfo[] = [];
+    const patterns: PatternInfo[] = [];
+    let allPatternsFailed = true;
+
+    try {
+      const tempFile = `${filePath}.tmp.${Date.now()}`;
+      fs.writeFileSync(tempFile, content);
+
+      const langFlag = this.getAstGrepLanguageFlag(language);
+
+      const patternsToParse = [
+        { name: "function-definition", astPattern: "function $NAME($$$PARAMS) { $$$BODY }" },
+        { name: "arrow-function", astPattern: "const $NAME = ($$$PARAMS) => $BODY" },
+        { name: "class-definition", astPattern: "class $NAME { $$$BODY }" },
+        { name: "import-statement", astPattern: "import $IMPORTS from $MODULE" },
+      ];
+
+      for (const { name, astPattern } of patternsToParse) {
+        try {
+          const output = execSync(
+            `${this.astGrepPath} print --json --pattern '${astPattern}' --lang ${langFlag} "${tempFile}"`,
+            { encoding: "utf8", timeout: 10000 }
+          );
+
+          allPatternsFailed = false;
+          const matches = JSON.parse(output);
+          for (const match of matches) {
+            if (name === "function-definition") {
+              functions.push({
+                name: match.captures?.NAME || "anonymous",
+                line: match.range?.start_line || 1,
+                parameters: this.parseParameters(match.captures?.PARAMS || ""),
+                complexity: this.calculateFunctionComplexity(match.text || ""),
+                lines: (match.text || "").split("\n").length,
+              });
+            } else if (name === "arrow-function") {
+              functions.push({
+                name: match.captures?.NAME || "anonymous",
+                line: match.range?.start_line || 1,
+                parameters: this.parseParameters(match.captures?.PARAMS || ""),
+                complexity: 1,
+                lines: 1,
+              });
+            } else if (name === "class-definition") {
+              classes.push({
+                name: match.captures?.NAME || "anonymous",
+                line: match.range?.start_line || 1,
+                methods: [],
+                properties: [],
+              });
+            } else if (name === "import-statement") {
+              imports.push({
+                module: match.captures?.MODULE || "",
+                names: this.parseImportNames(match.captures?.IMPORTS || ""),
+                line: match.range?.start_line || 1,
+                type: this.determineImportType(match.text || ""),
+                file: filePath,
+              });
+            }
+          }
+        } catch (astError) {
+          await frameworkLogger.log(
+            "ast-code-parser",
+            "ast-grep-pattern-failed",
+            "warning",
+            { jobId, pattern: name, error: String(astError) }
+          );
+        }
+      }
+
+      fs.unlinkSync(tempFile);
+
+      // Fall back to regex if all patterns failed
+      if (allPatternsFailed) {
+        await frameworkLogger.log(
+          "ast-code-parser",
+          "ast-grep-all-failed",
+          "warning",
+          { jobId, fallback: "Using regex fallback" }
+        );
+        return this.parseCodeStructureWithRegex(content, language, filePath, jobId);
+      }
+
+      const complexity = {
+        cyclomatic: this.calculateCyclomaticComplexity(content),
+        cognitive: this.calculateCognitiveComplexity(functions),
+        nesting: this.calculateMaxNesting(content),
+      };
+
+      return { functions, classes, imports, exports, patterns, complexity };
+
+    } catch (error) {
+      await frameworkLogger.log(
+        "ast-code-parser",
+        "ast-grep-fallback",
+        "warning",
+        { jobId, error: String(error) }
+      );
+      return this.parseCodeStructureWithRegex(content, language, filePath, jobId);
+    }
+  }
+
+  /**
+   * Get ast-grep language flag for a language
+   */
+  private getAstGrepLanguageFlag(language: string): string {
+    const langMap: Record<string, string> = {
+      typescript: "ts",
+      javascript: "js",
+      python: "py",
+      java: "java",
+      cpp: "cpp",
+      c: "c",
+      csharp: "cs",
+      go: "go",
+      rust: "rs",
+    };
+    return langMap[language] || language;
   }
 
   /**
@@ -587,10 +708,112 @@ export class ASTCodeParser {
     language: string,
     jobId: string,
   ): Promise<PatternInfo[]> {
-    // TODO: Implement actual ast-grep pattern detection when ast-grep is available
-    // For now, fall back to regex detection
-    const content = fs.readFileSync(filePath, "utf8");
-    return this.detectPatternsWithRegex(content, language, filePath, jobId);
+    const patterns: PatternInfo[] = [];
+
+    try {
+      const langFlag = this.getAstGrepLanguageFlag(language);
+
+      const antiPatternRules = [
+        { name: "console-log", astPattern: "console.log($$$ARGS)", severity: "medium" as const },
+        { name: "nested-if", astPattern: "if ($COND) { if ($INNER) { $$$BODY } }", severity: "medium" as const },
+        { name: "eval-usage", astPattern: "eval($CODE)", severity: "high" as const },
+        { name: "inner-html", astPattern: "innerHTML = $VAL", severity: "high" as const },
+      ];
+
+      for (const rule of antiPatternRules) {
+        try {
+          const output = execSync(
+            `${this.astGrepPath} scan --json --pattern '${rule.astPattern}' --lang ${langFlag} "${filePath}"`,
+            { encoding: "utf8", timeout: 10000 }
+          );
+
+          const matches = JSON.parse(output || "[]");
+          if (matches.length > 0) {
+            patterns.push({
+              pattern: rule.name,
+              occurrences: matches.length,
+              files: [filePath],
+              type: rule.name.includes("console") || rule.name.includes("eval") || rule.name.includes("inner")
+                ? "anti-pattern"
+                : "refactoring-opportunity",
+              severity: rule.severity,
+            });
+          }
+        } catch (astError) {
+          await frameworkLogger.log(
+            "ast-code-parser",
+            "ast-grep-pattern-scan-failed",
+            "warning",
+            { jobId, pattern: rule.name, error: String(astError) }
+          );
+        }
+      }
+
+      await this.detectCodeSmellsWithAstGrep(filePath, language, jobId, patterns);
+
+    } catch (error) {
+      await frameworkLogger.log(
+        "ast-code-parser",
+        "ast-grep-detection-fallback",
+        "warning",
+        { jobId, error: String(error) }
+      );
+    }
+
+    if (patterns.length === 0) {
+      const content = fs.readFileSync(filePath, "utf8");
+      return this.detectPatternsWithRegex(content, language, filePath, jobId);
+    }
+
+    return patterns;
+  }
+
+  /**
+   * Detect code smells using ast-grep rules
+   */
+  private async detectCodeSmellsWithAstGrep(
+    filePath: string,
+    language: string,
+    jobId: string,
+    patterns: PatternInfo[],
+  ): Promise<void> {
+    try {
+      const langFlag = this.getAstGrepLanguageFlag(language);
+
+      const smellRules = [
+        { name: "long-function", astPattern: "function $NAME($$$PARAMS) { $$$BODY }", minLines: 50 },
+        { name: "complex-function", astPattern: "function $NAME($$$PARAMS) { if ($COND) { if ($INNER) { return; } } }", minLines: 10 },
+      ];
+
+      for (const rule of smellRules) {
+        try {
+          const output = execSync(
+            `${this.astGrepPath} print --json --pattern '${rule.astPattern}' --lang ${langFlag} "${filePath}"`,
+            { encoding: "utf8", timeout: 10000 }
+          );
+
+          const matches = JSON.parse(output || "[]");
+          const largeFunctions = matches.filter((m: any) => {
+            const lines = (m.text || "").split("\n").length;
+            return lines >= rule.minLines;
+          });
+
+          if (largeFunctions.length > 0) {
+            patterns.push({
+              pattern: rule.name,
+              occurrences: largeFunctions.length,
+              files: [filePath],
+              type: "refactoring-opportunity",
+              severity: largeFunctions.length > 3 ? "high" : "medium",
+            });
+          }
+        } catch {
+          // Ignore individual rule failures
+        }
+      }
+    } catch {
+      // Ignore code smell detection failures
+    }
   }
 
   /**

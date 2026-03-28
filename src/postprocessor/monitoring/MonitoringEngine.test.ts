@@ -6,11 +6,12 @@
 
 import { describe, it, expect } from "vitest";
 import { PostProcessorMonitoringEngine } from "./MonitoringEngine";
+import { StringRayStateManager } from "../../state/state-manager.js";
 
 describe("MonitoringEngine", () => {
   describe("PostProcessorMonitoringEngine", () => {
     it("should instantiate", () => {
-      const instance = new PostProcessorMonitoringEngine();
+      const instance = new PostProcessorMonitoringEngine(new StringRayStateManager());
       expect(instance).toBeInstanceOf(PostProcessorMonitoringEngine);
     });
   });

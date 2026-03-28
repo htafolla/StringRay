@@ -1,0 +1,8 @@
+{
+  "boot:initializing": true,
+  "boot:config:loaded": true,
+  "boot:orchestrator:ready": true,
+  "boot:session:ready": true,
+  "boot:processors:ready": true,
+  "boot:complete": true
+}

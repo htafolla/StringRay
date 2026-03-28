@@ -1,7 +1,6 @@
 ---
 name: frontend-ui-ux-engineer
 description: Frontend development and UI/UX implementation specialist. Expert in React, TypeScript, and modern frontend technologies.
-model: openrouter/xai-grok-2-1212-fast-1
 temperature: 0.5
 maxSteps: 35
 mode: subagent

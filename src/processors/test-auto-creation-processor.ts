@@ -248,7 +248,7 @@ export const testAutoCreationProcessor = {
       );
 
       // Check if test file already exists (use language-appropriate extension)
-      let testFilePath = getTestFilePath(
+      const testFilePath = getTestFilePath(
         filePath,
         (langConfig?.language as any) || "TypeScript",
       );

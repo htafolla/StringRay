@@ -25,10 +25,10 @@
   },
   "test-execution-performance": {
     "testName": "test-execution-performance",
-    "averageDuration": 0.10153957215619741,
-    "standardDeviation": 0.009297251458309156,
-    "sampleCount": 1178,
-    "lastUpdated": 1774725818851,
+    "averageDuration": 0.10154903898305133,
+    "standardDeviation": 0.009293079854063448,
+    "sampleCount": 1180,
+    "lastUpdated": 1774728143664,
     "tolerance": 10
   }
 }

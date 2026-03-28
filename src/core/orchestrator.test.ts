@@ -5,13 +5,13 @@
  */
 
 import { describe, it, expect } from "vitest";
-import { StringRayOrchestrator, strRayOrchestrator } from "./orchestrator";
+import { KernelOrchestrator, strRayOrchestrator } from "./orchestrator";
 
 describe("orchestrator", () => {
-  describe("StringRayOrchestrator", () => {
+  describe("KernelOrchestrator", () => {
     it("should instantiate", () => {
-      const instance = new StringRayOrchestrator();
-      expect(instance).toBeInstanceOf(StringRayOrchestrator);
+      const instance = new KernelOrchestrator();
+      expect(instance).toBeInstanceOf(KernelOrchestrator);
     });
   });
 

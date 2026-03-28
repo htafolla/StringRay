@@ -1,0 +1,37 @@
+---
+source: framework
+name: testing-best-practices
+description: Testing best practices and quality assurance
+author: StrRay Framework
+version: 1.0.0
+schema_version: "1.0"
+tags: [testing, testing, best, practices]
+capabilities:
+  - write_unit_tests
+  - write_integration_tests
+  - analyze_coverage
+dependencies: []
+
+mcp:
+  testing-best-practices:
+    command: node
+    args: [node_modules/strray-ai/dist/mcps/knowledge-skills/testing-best-practices.server.js]
+---
+
+# Testing Best Practices Skill
+
+Testing best practices and quality assurance.
+
+## Tools Available
+
+- **testing_practices**: Testing practices
+- **quality_assurance**: Quality assurance
+- **best_practices**: Best practices
+
+## Usage
+
+This skill provides testing capabilities for testing best practices functionality.
+
+## Integration
+
+Activated when testing capabilities are requested through the skills system.

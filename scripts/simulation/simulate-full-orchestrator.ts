@@ -9,7 +9,7 @@ const isTestEnvironment =
   process.cwd().includes("stringray-") || process.cwd().includes("final-");
 const basePath = isTestEnvironment ? "../../dist" : "../../dist";
 
-const ORCHESTRATOR_PATH = process.env.STRRAY_ORCHESTRATOR_PATH || `${basePath}`;
+const ORCHESTRATOR_PATH = process.env.STRRAY_ORCHESTRATOR_PATH || `${basePath}/orchestrator`;
 const DELEGATION_PATH =
   process.env.STRRAY_DELEGATION_PATH || `${basePath}/delegation`;
 const STATE_PATH = process.env.STRRAY_STATE_PATH || `${basePath}/state`;
@@ -21,7 +21,7 @@ const { StringRayOrchestrator } = await import(
   ORCHESTRATOR_PATH + "/orchestrator.js"
 );
 const { enhancedMultiAgentOrchestrator } = await import(
-  ORCHESTRATOR_PATH + "/orchestrator/enhanced-multi-agent-orchestrator.js"
+  ORCHESTRATOR_PATH + "/enhanced-multi-agent-orchestrator.js"
 );
 const { createAgentDelegator } = await import(
   DELEGATION_PATH + "/agent-delegator.js"

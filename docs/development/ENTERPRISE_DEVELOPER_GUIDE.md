@@ -67,7 +67,7 @@ npm install
   },
   "framework": {
     "name": "strray",
-    "version": "1.7.5"
+    "version": "1.15.1"
   }
 }
 ```
@@ -373,7 +373,7 @@ strray/
 
 #### Agent System
 
-- **`src/agents/`**: Individual agent implementations (8 specialized agents)
+- **`src/agents/`**: Individual agent implementations (25 specialized agents)
 - **`src/orchestrator.ts`**: Multi-agent coordination and task delegation
 - **`src/boot-orchestrator.ts`**: Framework initialization sequence
 
@@ -1259,7 +1259,7 @@ export class CustomPlugin implements Plugin {
 ```typescript
 // Plugin manifest with security declarations
 export const manifest = {
-  name: "custom-plugin", version: "1.7.5",
+  name: "custom-plugin", version: "1.15.1",
   permissions: ["read:filesystem", "network:http", "storage:local"],
   sandbox: {
     memoryLimit: "50MB",

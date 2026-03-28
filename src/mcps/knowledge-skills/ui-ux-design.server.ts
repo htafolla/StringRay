@@ -98,7 +98,7 @@ class StrRayUIUXDesignServer {
   constructor() {
     this.server = new Server(
       {
-        name: "ui-ux-design", version: "1.7.5",
+        name: "ui-ux-design", version: "1.15.6",
       },
       {
         capabilities: {
@@ -1906,7 +1906,7 @@ Available: ${Object.keys(system.components).length} component types
 
       // Set a timeout to force exit if graceful shutdown fails
       const timeout = setTimeout(() => {
-        console.error("Graceful shutdown timeout, forcing exit...");
+        frameworkLogger.log("mcps/ui-ux-design", "shutdown", "error", { message: "Graceful shutdown timeout, forcing exit..." });
         process.exit(1);
       }, 5000); // 5 second timeout
 
@@ -1924,7 +1924,7 @@ Available: ${Object.keys(system.components).length} component types
         process.exit(0);
       } catch (error) {
         clearTimeout(timeout);
-        console.error("Error during server shutdown:", error);
+        frameworkLogger.log("mcps/ui-ux-design", "shutdown", "error", { message: `Error during server shutdown: ${String(error)}` });
         process.exit(1);
       }
     };
@@ -1959,12 +1959,12 @@ Available: ${Object.keys(system.components).length} component types
 
     // Handle uncaught exceptions and unhandled rejections
     process.on("uncaughtException", (error) => {
-      console.error("Uncaught Exception:", error);
+      frameworkLogger.log("mcps/ui-ux-design", "uncaughtException", "error", { error: String(error) });
       cleanup("uncaughtException");
     });
 
     process.on("unhandledRejection", (reason, promise) => {
-      console.error("Unhandled Rejection at:", promise, "reason:", reason);
+      frameworkLogger.log("mcps/ui-ux-design", "unhandledRejection", "error", { error: String(reason) });
       cleanup("unhandledRejection");
     });
 
@@ -1976,7 +1976,7 @@ Available: ${Object.keys(system.components).length} component types
 // Run the server if this file is executed directly
 if (import.meta.url === `file://${process.argv[1]}`) {
   const server = new StrRayUIUXDesignServer();
-  server.run().catch(console.error);
+  server.run().catch((error) => frameworkLogger.log("mcps/ui-ux-design", "run", "error", { error: String(error) }));
 }
 
 export { StrRayUIUXDesignServer };

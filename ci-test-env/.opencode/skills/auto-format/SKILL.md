@@ -8,7 +8,7 @@ tags: [formatting, auto, format]
 mcp:
   auto-format:
     command: node
-    args: [node_modules/strray-ai/dist/plugin/mcps/dist/plugin/mcps/auto-format.server.js]
+    args: [node_modules/strray-ai/dist/mcps/auto-format.server.js]
 ---
 
 # Auto Format Skill

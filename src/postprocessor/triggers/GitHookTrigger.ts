@@ -6,6 +6,7 @@ import { PostProcessor } from "../PostProcessor.js";
 import { PostProcessorContext } from "../types.js";
 import * as fs from "fs";
 import * as path from "path";
+import { pipeline } from "stream/promises";
 import { frameworkLogger } from "../../core/framework-logger.js";
 
 interface LogArchiveConfig {
@@ -20,6 +21,7 @@ interface LogArchiveConfig {
 
 // Re-export for backwards compatibility and external usage
 export { cleanupLogFiles };
+export { archiveLogFiles };  // Export for use in hooks
 import { execSync } from "child_process";
 
 /**
@@ -69,8 +71,9 @@ async function archiveLogFiles(
           config.rotationIntervalHours * 60 * 60 * 1000; // Time-based
 
       if (shouldArchive) {
-        const timestamp = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
-        const archiveName = `framework-activity-${timestamp}.log`; // Match existing naming convention
+        // Use full timestamp to prevent overwriting same-day archives
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-'); // YYYY-MM-DDTHH-MM-SS-mmm
+        const archiveName = `framework-activity-${timestamp}.log`; // Unique per run
         const archivePath = path.join(
           process.cwd(),
           "logs",
@@ -78,33 +81,84 @@ async function archiveLogFiles(
           archiveName,
         ); // Archive in same directory
 
-        // Copy current log to archive
-        fs.copyFileSync(activityLogPath, archivePath);
+        let archiveSuccess = false;
+        let finalArchivePath = archivePath;
 
-        // Compress if enabled
-        if (config.compressionEnabled) {
-          const compressedPath = `${archivePath}.gz`;
-          const gzip = zlib.createGzip();
-          const input = fs.createReadStream(archivePath);
-          const output = fs.createWriteStream(compressedPath);
+        try {
+          // Copy current log to archive
+          fs.copyFileSync(activityLogPath, archivePath);
 
-          await new Promise((resolve, reject) => {
-            input
-              .pipe(gzip)
-              .pipe(output)
-              .on("finish", () => {
+          // Compress if enabled
+          if (config.compressionEnabled) {
+            const compressedPath = `${archivePath}.gz`;
+            const gzip = zlib.createGzip();
+            const input = fs.createReadStream(archivePath);
+            const output = fs.createWriteStream(compressedPath);
+
+            // Use pipeline for proper error handling
+            await pipeline(input, gzip, output);
+
+            // Verify compression succeeded
+            if (fs.existsSync(compressedPath)) {
+              const compressedStats = fs.statSync(compressedPath);
+              if (compressedStats.size > 0) {
                 fs.unlinkSync(archivePath); // Remove uncompressed
-                resolve(void 0);
-              })
-              .on("error", reject);
-          });
+                archiveSuccess = true;
+                finalArchivePath = compressedPath;
+              }
+            }
+          } else {
+            // Verify uncompressed archive
+            const archiveStats = fs.statSync(archivePath);
+            archiveSuccess = archiveStats.size > 0;
+          }
+
+          // ONLY reset if archive was created successfully
+          if (archiveSuccess) {
+            const header = `# Log rotated on ${new Date().toISOString()}\n`;
+            fs.writeFileSync(activityLogPath, header);
+            result.archived++;
+          } else {
+            // Archive failed - don't reset the log, leave it intact
+            result.errors.push(`Archive creation failed for ${archivePath} - log left intact`);
+            await frameworkLogger.log(
+              "log-archiver",
+              "archive-failed-log-intact",
+              "error",
+              {
+                jobId,
+                reason: "Archive creation failed, log not reset",
+                activityLogPath,
+              },
+            );
+            return result; // Exit early, log not modified
+          }
+        } catch (archiveError) {
+          // Archive failed - don't reset the log, leave it intact
+          const errorMsg = archiveError instanceof Error ? archiveError.message : String(archiveError);
+          result.errors.push(`Archive failed: ${errorMsg} - log left intact`);
+          
+          // Clean up partial archive if it exists
+          if (fs.existsSync(archivePath)) {
+            try { fs.unlinkSync(archivePath); } catch { /* ignore cleanup error */ }
+          }
+          const compressedPath = `${archivePath}.gz`;
+          if (fs.existsSync(compressedPath)) {
+            try { fs.unlinkSync(compressedPath); } catch { /* ignore cleanup error */ }
+          }
+          
+          await frameworkLogger.log(
+            "log-archiver",
+            "archive-error-log-intact",
+            "error",
+            {
+              jobId,
+              error: errorMsg,
+              activityLogPath,
+            },
+          );
+          return result; // Exit early, log not modified
         }
-
-        // Reset current log (keep a small header)
-        const header = `# Log rotated on ${new Date().toISOString()}\n`;
-        fs.writeFileSync(activityLogPath, header);
-
-        result.archived++;
 
         await frameworkLogger.log(
           "log-archiver",
@@ -315,8 +369,11 @@ export class GitHookTrigger {
 
     // Ensure .git/hooks directory exists (should exist in git repo)
     if (!fs.existsSync(gitHooksDir)) {
-      console.warn(
-        "⚠️ .git/hooks directory not found - not a git repository or hooks disabled",
+      await frameworkLogger.log(
+        "git-hook-trigger",
+        "git-hooks-directory-not-found",
+        "warning",
+        { gitHooksDir },
       );
       return;
     }
@@ -450,7 +507,7 @@ fi
 
           await frameworkLogger.log('-git-hook-trigger', '-post-commit-validation-passed-in-result-duration-', 'success', { message: '✅ Post-commit: Validation passed in ' + result.duration + 'ms' });
         } catch (error) {
-          console.error('❌ Post-commit validation failed:', error instanceof Error ? error.message : String(error));
+          await frameworkLogger.log('git-hook-trigger', 'post-commit-validation-failed', 'error', { error: error instanceof Error ? error.message : String(error) });
           process.exit(1);
         }
       })();
@@ -468,16 +525,72 @@ fi
         try {
           // Use dynamic import that works in both dev and consumer
           const basePath = process.env.STRRAY_BASE_PATH || '.';
+          // First archive logs (compress and rotate) before cleanup
+          const { archiveLogFiles } = await import(basePath + '/dist/postprocessor/triggers/GitHookTrigger.js');
+          const archiveResult = await archiveLogFiles({
+            archiveDirectory: 'logs/framework',
+            maxFileSizeMB: 10,  // Archive if > 10MB
+            rotationIntervalHours: 24,  // Archive if > 24 hours old
+            compressionEnabled: true,
+            maxAgeHours: 168,  // Keep archives for 7 days
+            directories: ['logs/framework'],
+            excludePatterns: []
+          });
+          if (archiveResult.archived > 0) {
+            await frameworkLogger.log('-git-hook-trigger', '-archived-log-files-', 'info', { message: \`📦 Archived \${archiveResult.archived} log files\` });
+          }
+
+          // Then cleanup old files
           const { cleanupLogFiles } = await import(basePath + '/dist/postprocessor/triggers/GitHookTrigger.js');
           const result = await cleanupLogFiles({
             maxAgeHours: 24,
-            excludePatterns: ['logs/framework/activity.log', 'logs/agents/refactoring-log.md', 'current-session.log'],
+            excludePatterns: [
+              // Core inference/logging - NEVER DELETE
+              'activity.log',           
+              'framework-activity-',
+              'strray-plugin-',
+              
+              // Analysis & reflections - Contains inference data
+              'kernel-',
+              'reflection-',
+              
+              // Documentation & plans - Important artifacts
+              '.md',
+              'AUTOMATED_',
+              'REFACTORING-',
+              'release-',
+              
+              // Subdirectories with important data (but test-activity should be cleaned)
+              'deployment/',
+              'monitoring/',
+              'reports/',
+              'reflections/',
+              
+              // Init logs can be cleaned but keep recent
+              'strray-init-2026-01-2',   // Keep Jan 20s
+              'strray-init-2026-01-3',   // Keep Jan 30s
+              
+              // Other important files
+              'current-session.log',
+              'full-test-run.log',
+              'kernel-codex',
+              'kernel-methodology',
+              'kernel-status',
+              'kernel-update',
+              'kernel-v2',
+            ],
             directories: ['logs/'],
             enabled: true
           });
           if (result.cleaned > 0) {
-            await frameworkLogger.log('-git-hook-trigger', '-cleaned-result-cleaned-old-log-files-', 'info', { message: \`🧹 Cleaned \${result.cleaned} old log files\` });
+            await frameworkLogger.log('-git-hook-trigger', '-cleaned-result-cleaned-old-log-files-', 'info', { message: '🧹 Cleaned ' + result.cleaned + ' old log files' });
           }
+          if (result.errors.length > 0) {
+            await frameworkLogger.log('git-hook-trigger', 'log-cleanup-errors', 'error', { errors: result.errors });
+          }
+        } catch (error) {
+          await frameworkLogger.log('git-hook-trigger', 'log-cleanup-failed', 'error', { error: error instanceof Error ? error.message : String(error) });
+        }
           if (result.errors.length > 0) {
             console.error('Log cleanup errors:', result.errors);
           }
@@ -548,24 +661,29 @@ exit 0
       fs.symlinkSync(relativePostCommit, gitPostCommitHook);
       fs.symlinkSync(relativePostPush, gitPostPushHook);
     } catch (error) {
-      console.error("❌ Failed to activate git hooks:", error);
       await frameworkLogger.log(
-        "-git-hook-trigger",
-        "-to-activate-manually-run-",
+        "git-hook-trigger",
+        "git-hooks-activation-failed",
+        "error",
+        { error: String(error) },
+      );
+      await frameworkLogger.log(
+        "git-hook-trigger",
+        "manual-activation-hint",
         "info",
         { message: "💡 To activate manually, run:" },
       );
       await frameworkLogger.log(
-        "-git-hook-trigger",
-        "-ln-s-opencode-hooks-post-commit-git-hooks-post-co",
+        "git-hook-trigger",
+        "manual-activation-command-1",
         "info",
         {
           message: `   ln -s "../../.opencode/hooks/post-commit" ".git/hooks/post-commit"`,
         },
       );
       await frameworkLogger.log(
-        "-git-hook-trigger",
-        "-ln-s-opencode-hooks-post-push-git-hooks-post-push",
+        "git-hook-trigger",
+        "manual-activation-command-2",
         "info",
         {
           message: `   ln -s "../../.opencode/hooks/post-push" ".git/hooks/post-push"`,

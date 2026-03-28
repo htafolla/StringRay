@@ -9,11 +9,11 @@
  */
 
 import { EventEmitter } from "events";
-import { StringRayOrchestrator, TaskDefinition } from "../../orchestrator.js";
+import { StringRayOrchestrator, TaskDefinition } from "../../orchestrator/orchestrator.js";
 import { securityHardeningSystem } from "../../security/security-hardening-system.js";
 import { enterpriseMonitoringSystem } from "../../monitoring/enterprise-monitoring-system.js";
 import { performanceSystem } from "../../performance/performance-system-orchestrator.js";
-import { frameworkLogger } from "../core/framework-logger.js";
+import { frameworkLogger } from "../../core/framework-logger.js";
 
 // Framework detection and capabilities
 export enum SupportedFramework {
@@ -612,7 +612,7 @@ export class StringRayIntegration extends EventEmitter {
   /**
    * Event handlers
    */
-  private handleFrameworkInitialized(event: IntegrationEvent): void {
+  private async handleFrameworkInitialized(event: IntegrationEvent): Promise<void> {
     await frameworkLogger.log(
       "strray-integration",
       "-framework-integration-initialized-event-framework",
@@ -623,7 +623,7 @@ export class StringRayIntegration extends EventEmitter {
     );
   }
 
-  private handleFrameworkDestroyed(event: IntegrationEvent): void {
+  private async handleFrameworkDestroyed(event: IntegrationEvent): Promise<void> {
     await frameworkLogger.log(
       "strray-integration",
       "-framework-integration-destroyed-event-framework-",
@@ -697,7 +697,7 @@ export const createStringRayIntegration = (
 // Export default integration for auto-detection
 export const strRayIntegration = new StringRayIntegration({
   framework: StringRayIntegration.detectFramework(),
-  version: "1.7.5",
+  version: "1.15.6",
   features: {
     agents: true,
     codex: true,

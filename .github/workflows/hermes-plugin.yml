@@ -1,0 +1,129 @@
+name: Hermes Plugin Tests
+
+on:
+  push:
+    paths:
+      - "src/integrations/hermes-agent/**"
+      - "hooks/**"
+      - "scripts/hooks/**"
+  pull_request:
+    paths:
+      - "src/integrations/hermes-agent/**"
+      - "hooks/**"
+      - "scripts/hooks/**"
+
+jobs:
+  plugin-python-tests:
+    name: Python Plugin Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20.x"
+          cache: "npm"
+
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build:all
+
+      - name: Run Hermes plugin tests
+        run: python3 -m pytest src/integrations/hermes-agent/test_plugin.py -v
+
+  git-hook-scripts:
+    name: Git Hook Scripts Validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20.x"
+          cache: "npm"
+
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build:all
+
+      - name: Verify hook scripts exist and are executable
+        run: |
+          for hook in pre-commit post-commit pre-push post-push; do
+            if [ ! -f "hooks/$hook" ]; then
+              echo "ERROR: hooks/$hook is missing"
+              exit 1
+            fi
+            if [ ! -x "hooks/$hook" ]; then
+              echo "ERROR: hooks/$hook is not executable"
+              exit 1
+            fi
+            echo "OK: hooks/$hook exists and is executable"
+          done
+
+      - name: Verify hook runner script exists
+        run: |
+          if [ ! -f "scripts/hooks/run-hook.js" ]; then
+            echo "ERROR: scripts/hooks/run-hook.js is missing"
+            exit 1
+          fi
+          echo "OK: scripts/hooks/run-hook.js exists"
+
+      - name: Validate hook scripts pass bash syntax check
+        run: |
+          for hook in hooks/pre-commit hooks/post-commit hooks/pre-push hooks/post-push; do
+            bash -n "$hook"
+            echo "OK: $hook passes bash syntax check"
+          done
+
+      - name: Test hook runner help
+        run: |
+          node scripts/hooks/run-hook.js 2>&1 || true
+          # Should print usage info for unknown hook type
+
+  bridge-hooks-command:
+    name: Bridge Hooks Command
+    runs-on: ubuntu-latest
+    needs: plugin-python-tests
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20.x"
+          cache: "npm"
+
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build:all
+
+      - name: Test bridge hooks list command
+        run: |
+          RESULT=$(echo '{"command":"hooks","action":"list"}' | node src/integrations/hermes-agent/bridge.mjs --cwd .)
+          echo "$RESULT"
+          echo "$RESULT" | python3 -c "import json,sys; d=json.load(sys.stdin); assert d['status']=='ok', f'Expected ok, got {d}'; print('OK: hooks list works')"
+
+      - name: Test bridge hooks status command
+        run: |
+          RESULT=$(echo '{"command":"hooks","action":"status"}' | node src/integrations/hermes-agent/bridge.mjs --cwd .)
+          echo "$RESULT"
+          echo "$RESULT" | python3 -c "import json,sys; d=json.load(sys.stdin); assert d['status']=='ok', f'Expected ok, got {d}'; print('OK: hooks status works')"
+
+      - name: Test bridge hooks positional mode
+        run: |
+          RESULT=$(node src/integrations/hermes-agent/bridge.mjs hooks --cwd .)
+          echo "$RESULT"
+          echo "$RESULT" | python3 -c "import json,sys; d=json.load(sys.stdin); assert 'status' in d, f'Missing status in {d}'; print('OK: hooks positional mode works')"

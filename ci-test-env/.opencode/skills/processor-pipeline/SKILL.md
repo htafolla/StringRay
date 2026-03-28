@@ -8,7 +8,7 @@ tags: [processing, processor, pipeline]
 mcp:
   processor-pipeline:
     command: node
-    args: [node_modules/strray-ai/dist/plugin/mcps/dist/plugin/mcps/processor-pipeline.server.js]
+    args: [node_modules/strray-ai/dist/mcps/processor-pipeline.server.js]
 ---
 
 # Processor Pipeline Skill

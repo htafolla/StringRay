@@ -20,7 +20,7 @@ class StrRayFrameworkComplianceAuditServer {
   constructor() {
     this.server = new Server(
       {
-        name: "framework-compliance-audit", version: "1.7.5",
+        name: "framework-compliance-audit", version: "1.15.6",
       },
       {
         capabilities: {
@@ -176,7 +176,7 @@ class StrRayFrameworkComplianceAuditServer {
       // Generate summary
       auditResults.summary = this.generateAuditSummary(auditResults);
     } catch (error) {
-      console.error("Compliance audit error:", error);
+      frameworkLogger.log("mcps/framework-compliance-audit", "audit", "error", { error: String(error) });
       auditResults.passed = false;
       auditResults.criticalIssues.push(
         `Audit error: ${error instanceof Error ? error.message : String(error)}`,
@@ -625,7 +625,7 @@ ${results.recommendations.map((r) => `• 💡 ${r}`).join("\n")}
 // Start the server if run directly
 if (import.meta.url === `file://${process.argv[1]}`) {
   const server = new StrRayFrameworkComplianceAuditServer();
-  server.run().catch(console.error);
+  server.run().catch((error) => frameworkLogger.log("mcps/framework-compliance-audit", "run", "error", { error: String(error) }));
 }
 
 export { StrRayFrameworkComplianceAuditServer };

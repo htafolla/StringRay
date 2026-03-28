@@ -13,6 +13,7 @@ import {
 } from "@modelcontextprotocol/sdk/types.js";
 import * as fs from "fs";
 import * as path from "path";
+import { createGracefulShutdown } from "../../utils/shutdown-handler.js";
 
 interface CodeReviewResult {
   file: string;
@@ -47,7 +48,7 @@ class StrRayCodeReviewServer {
   constructor() {
     this.server = new Server(
       {
-        name: "code-review", version: "1.7.5",
+        name: "code-review", version: "1.15.6",
       },
       {
         capabilities: {
@@ -1013,66 +1014,12 @@ class StrRayCodeReviewServer {
   async run(): Promise<void> {
     const transport = new StdioServerTransport();
     await this.server.connect(transport);
-    console.log("StrRay Code Review MCP Server running...");
-
-    const cleanup = async (signal: string) => {
-      console.log(`Received ${signal}, shutting down gracefully...`);
-
-      // Set a timeout to force exit if graceful shutdown fails
-      const timeout = setTimeout(() => {
-        console.error("Graceful shutdown timeout, forcing exit...");
-        process.exit(1);
-      }, 5000); // 5 second timeout
-
-      try {
-        if (this.server && typeof this.server.close === "function") {
-          await this.server.close();
-        }
-        clearTimeout(timeout);
-        console.log("StrRay MCP Server shut down gracefully");
-        process.exit(0);
-      } catch (error) {
-        clearTimeout(timeout);
-        console.error("Error during server shutdown:", error);
-        process.exit(1);
-      }
-    };
-
-    // Handle multiple shutdown signals
-    process.on("SIGINT", () => cleanup("SIGINT"));
-    process.on("SIGTERM", () => cleanup("SIGTERM"));
-    process.on("SIGHUP", () => cleanup("SIGHUP"));
-
-    // Monitor parent process (opencode) and shutdown if it dies
-    const checkParent = () => {
-      try {
-        process.kill(process.ppid, 0); // Check if parent is alive
-        setTimeout(checkParent, 1000); // Check again in 1 second
-      } catch (error) {
-        // Parent process died, shut down gracefully
-        console.log(
-          "Parent process (opencode) died, shutting down MCP server...",
-        );
-        cleanup("parent-process-death");
-      }
-    };
-
-    // Start monitoring parent process
-    setTimeout(checkParent, 2000); // Start checking after 2 seconds
-
-    // Handle uncaught exceptions and unhandled rejections
-    process.on("uncaughtException", (error) => {
-      console.error("Uncaught Exception:", error);
-      cleanup("uncaughtException");
+    
+    // Use centralized shutdown handler
+    createGracefulShutdown({
+      serverName: "code-review.server",
+      server: this.server,
     });
-
-    process.on("unhandledRejection", (reason, promise) => {
-      console.error("Unhandled Rejection at:", promise, "reason:", reason);
-      cleanup("unhandledRejection");
-    });
-
-    process.on("SIGINT", cleanup);
-    process.on("SIGTERM", cleanup);
   }
 }
 

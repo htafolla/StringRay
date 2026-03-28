@@ -1,20 +1,45 @@
+#!/usr/bin/env node
+
 /**
- * Comprehensive Reporting System Demonstration
- * Shows the on-demand reporting system with actual framework activity
+ * StringRay Framework - Comprehensive Reporting System Demonstration
+ * 
+ * Purpose: Demonstrates the on-demand reporting system with actual framework activity
+ * by simulating real agent delegations and context operations.
+ * 
+ * Features:
+ * - Simulates comprehensive framework activity across multiple agents
+ * - Generates orchestration, agent-usage, and full-analysis reports
+ * - Demonstrates integration between logging, delegation, and reporting systems
+ * - Provides detailed insights into framework operations
+ * 
+ * Usage:
+ *   npx tsx scripts/demo/reporting-demonstration.ts
+ * 
+ * Expected Output:
+ * - Console output showing simulation progress
+ * - Generated reports with comprehensive analysis
+ * - Framework health assessment and recommendations
+ * 
+ * Components Demonstrated:
+ * - AgentDelegator: Routes tasks to appropriate agents
+ * - FrameworkLogger: Logs all framework activities
+ * - FrameworkReportingSystem: Generates comprehensive reports
+ * - StringRayStateManager: Manages framework state
  */
 
-import { frameworkLogger } from "../src/core/framework-logger";
-import { frameworkReportingSystem } from "../src/reporting/framework-reporting-system";
-import { AgentDelegator } from "../src/delegation/agent-delegator";
-import { StrRayStateManager } from "../src/state/state-manager";
+import { frameworkLogger } from "../../src/core/framework-logger.js";
+import { frameworkReportingSystem } from "../../src/reporting/framework-reporting-system.js";
+import { AgentDelegator } from "../../src/delegation/agent-delegator.js";
+import { StringRayStateManager } from "../../src/state/index.js";
+import { strRayConfigLoader } from "../../src/core/config-loader.js";
 
 async function demonstrateReportingSystem() {
   console.log("🎯 STRRAY FRAMEWORK ON-DEMAND REPORTING SYSTEM DEMONSTRATION");
   console.log("============================================================");
 
   console.log("\n🏗️ Phase 1: Setting up framework components...");
-  const stateManager = new StrRayStateManager();
-  const delegator = new AgentDelegator(stateManager);
+  const stateManager = new StringRayStateManager();
+  const delegator = new AgentDelegator(stateManager, strRayConfigLoader);
 
   console.log("✅ Framework components initialized");
 
@@ -61,24 +86,34 @@ async function demonstrateReportingSystem() {
   for (const scenario of testScenarios) {
     console.log(`   Processing: ${scenario.description}`);
 
-    const result = await delegator.analyzeDelegation({
-      operation: scenario.operation,
-      description: scenario.description,
-      context: scenario.context,
-      sessionId: `demo-session-${Date.now()}`,
-    });
+    try {
+      const result = await delegator.analyzeDelegation({
+        operation: scenario.operation,
+        description: scenario.description,
+        context: scenario.context,
+        sessionId: `demo-session-${Date.now()}`,
+      });
 
-    // Log the delegation result
-    await frameworkLogger.log(
-      "demo-runner",
-      `delegated-${scenario.operation}`,
-      "success",
-      {
-        agent: result.agents[0],
-        strategy: result.strategy,
-        complexity: result.complexity.score,
-      },
-    );
+      // Log the delegation result
+      await frameworkLogger.log(
+        "demo-runner",
+        `delegated-${scenario.operation}`,
+        "success",
+        {
+          agent: result.agents[0],
+          strategy: result.strategy,
+          complexity: result.complexity.score,
+        },
+      );
+    } catch (error) {
+      console.error(`   ❌ Error delegating ${scenario.operation}:`, error);
+      await frameworkLogger.log(
+        "demo-runner",
+        `delegated-${scenario.operation}`,
+        "error",
+        { error: String(error) },
+      );
+    }
   }
 
   // Simulate context awareness operations
@@ -126,30 +161,51 @@ async function demonstrateReportingSystem() {
 
   // Generate orchestration report
   console.log("📋 Generating orchestration report...");
-  const orchestrationReport = await frameworkReportingSystem.generateReport({
-    type: "orchestration",
-    timeRange: { lastHours: 1 },
-    outputFormat: "markdown",
-    detailedMetrics: true,
-  });
+  let orchestrationReport: string;
+  try {
+    orchestrationReport = await frameworkReportingSystem.generateReport({
+      type: "orchestration",
+      timeRange: { lastHours: 1 },
+      outputFormat: "markdown",
+      detailedMetrics: true,
+    });
+    console.log("✅ Orchestration report generated");
+  } catch (error) {
+    console.error("❌ Failed to generate orchestration report:", error);
+    orchestrationReport = "Error generating report";
+  }
 
   // Generate agent usage report
   console.log("🤖 Generating agent usage report...");
-  const agentReport = await frameworkReportingSystem.generateReport({
-    type: "agent-usage",
-    timeRange: { lastHours: 1 },
-    outputFormat: "markdown",
-    detailedMetrics: true,
-  });
+  let agentReport: string;
+  try {
+    agentReport = await frameworkReportingSystem.generateReport({
+      type: "agent-usage",
+      timeRange: { lastHours: 1 },
+      outputFormat: "markdown",
+      detailedMetrics: true,
+    });
+    console.log("✅ Agent usage report generated");
+  } catch (error) {
+    console.error("❌ Failed to generate agent report:", error);
+    agentReport = "Error generating report";
+  }
 
   // Generate full analysis report
   console.log("🔍 Generating full analysis report...");
-  const fullReport = await frameworkReportingSystem.generateReport({
-    type: "full-analysis",
-    timeRange: { lastHours: 1 },
-    outputFormat: "markdown",
-    detailedMetrics: true,
-  });
+  let fullReport: string;
+  try {
+    fullReport = await frameworkReportingSystem.generateReport({
+      type: "full-analysis",
+      timeRange: { lastHours: 1 },
+      outputFormat: "markdown",
+      detailedMetrics: true,
+    });
+    console.log("✅ Full analysis report generated");
+  } catch (error) {
+    console.error("❌ Failed to generate full report:", error);
+    fullReport = "Error generating report";
+  }
 
   console.log("\n🎉 REPORTS GENERATED SUCCESSFULLY!");
   console.log("===================================");
@@ -181,4 +237,7 @@ async function demonstrateReportingSystem() {
 }
 
 // Run the demonstration
-demonstrateReportingSystem().catch(console.error);
+demonstrateReportingSystem().catch((error) => {
+  console.error("❌ Demonstration failed:", error);
+  process.exit(1);
+});

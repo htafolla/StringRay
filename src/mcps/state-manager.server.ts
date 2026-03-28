@@ -23,7 +23,7 @@ class StrRayStateManagerServer {
   constructor() {
     this.server = new Server(
       {
-        name: "state-manager", version: "1.7.5",
+        name: "state-manager", version: "1.15.6",
       },
       {
         capabilities: {
@@ -79,7 +79,12 @@ class StrRayStateManagerServer {
         );
       }
     } catch (error) {
-      console.warn("Failed to load state file:", error);
+      frameworkLogger.log(
+        "state-manager",
+        "state-file-load-failed",
+        "warning",
+        { error: String(error) },
+      );
     }
   }
 
@@ -88,7 +93,13 @@ class StrRayStateManagerServer {
       const data = Object.fromEntries(this.state);
       fs.writeFileSync(this.stateFile, JSON.stringify(data, null, 2));
     } catch (error) {
-      console.error("Failed to save state:", error);
+      frameworkLogger.log(
+        "state-manager",
+        "state-save-failed",
+        "error",
+        { error: String(error) },
+      );
+      throw error;
     }
   }
 
@@ -207,25 +218,34 @@ class StrRayStateManagerServer {
 
     // Handle tool calls
     this.server.setRequestHandler(CallToolRequestSchema, async (request) => {
-      const { name, arguments: args } = request.params;
+      try {
+        const { name, arguments: args } = request.params;
 
-      switch (name) {
-        case "get-state":
-          return await this.handleGetState(args);
-        case "set-state":
-          return await this.handleSetState(args);
-        case "delete-state":
-          return await this.handleDeleteState(args);
-        case "list-state":
-          return await this.handleListState(args);
-        case "backup-state":
-          return await this.handleBackupState(args);
-        case "restore-state":
-          return await this.handleRestoreState(args);
-        case "validate-state":
-          return await this.handleValidateState(args);
-        default:
-          throw new Error(`Unknown tool: ${name}`);
+        switch (name) {
+          case "get-state":
+            return await this.handleGetState(args);
+          case "set-state":
+            return await this.handleSetState(args);
+          case "delete-state":
+            return await this.handleDeleteState(args);
+          case "list-state":
+            return await this.handleListState(args);
+          case "backup-state":
+            return await this.handleBackupState(args);
+          case "restore-state":
+            return await this.handleRestoreState(args);
+          case "validate-state":
+            return await this.handleValidateState(args);
+          default:
+            throw new Error(`Unknown tool: ${name}`);
+        }
+      } catch (error) {
+        return {
+          content: [{
+            type: "text" as const,
+            text: `Error handling tool '${request.params.name}': ${error instanceof Error ? error.message : String(error)}`,
+          }],
+        };
       }
     });
   }
@@ -617,10 +637,10 @@ ${results.repairedKeys.length > 0 ? `**Repaired Keys:**\n${results.repairedKeys.
   } {
     try {
       // Basic validation - check for circular references, etc.
-      JSON.stringify(value);
+      const serialized = JSON.stringify(value);
 
       // Check for reasonable size
-      const size = JSON.stringify(value).length;
+      const size = serialized.length;
       if (size > 1024 * 1024) {
         // 1MB limit
         return {
@@ -676,11 +696,12 @@ ${results.repairedKeys.length > 0 ? `**Repaired Keys:**\n${results.repairedKeys.
 
   private findDependentKeys(key: string): string[] {
     const dependents: string[] = [];
-
+    const quotedKey = `"${key}"`;
     for (const [otherKey, value] of this.state) {
       if (otherKey !== key && typeof value === "object" && value !== null) {
         const valueStr = JSON.stringify(value);
-        if (valueStr.includes(key) || valueStr.includes(`"${key}"`)) {
+        // Only match the key as a quoted string value (not substrings in URLs, etc.)
+        if (valueStr.includes(quotedKey)) {
           dependents.push(otherKey);
         }
       }
@@ -707,7 +728,7 @@ ${results.repairedKeys.length > 0 ? `**Repaired Keys:**\n${results.repairedKeys.
 // Start the server if run directly
 if (import.meta.url === `file://${process.argv[1]}`) {
   const server = new StrRayStateManagerServer();
-  server.run().catch(console.error);
+  server.run().catch((error) => frameworkLogger.log("mcps/state-manager", "run", "error", { error: String(error) }));
 }
 
 export { StrRayStateManagerServer };

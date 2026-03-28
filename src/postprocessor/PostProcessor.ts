@@ -18,6 +18,7 @@ import { APITrigger } from "./triggers/APITrigger.js";
 import { PostProcessorMonitoringEngine } from "./monitoring/MonitoringEngine.js";
 import { FailureAnalysisEngine } from "./analysis/FailureAnalysisEngine.js";
 import { AutoFixEngine } from "./autofix/AutoFixEngine.js";
+import { activity } from "../core/activity-logger.js";
 import { FixValidator } from "./autofix/FixValidator.js";
 import { mcpClientManager } from "../mcps/mcp-client.js";
 import { RedeployCoordinator } from "./redeploy/RedeployCoordinator.js";
@@ -146,8 +147,12 @@ export class PostProcessor {
 
       return reportConfig.outputPath;
     } catch (error) {
-      console.warn("⚠️ Framework report generation failed:", error);
-      // Don't fail the post-processor for report generation issues
+      await frameworkLogger.log(
+        "postprocessor",
+        "framework-report-generation-failed",
+        "warning",
+        { error: String(error) },
+      );
       return null;
     }
   }
@@ -167,26 +172,37 @@ export class PostProcessor {
         );
 
         if (!validation.valid) {
-          console.warn(`⚠️ Report validation failed for ${reportPath}:`);
-          validation.issues.forEach((issue) => console.warn(`   • ${issue}`));
+          await frameworkLogger.log(
+            "postprocessor",
+            "report-validation-failed",
+            "warning",
+            { reportPath, issues: validation.issues },
+          );
 
           if (validation.details.criticalErrors.length > 0) {
-            console.error(`🚨 Critical errors found in report:`);
-            validation.details.criticalErrors.forEach((err) =>
-              console.error(`   • ${err}`),
+            await frameworkLogger.log(
+              "postprocessor",
+              "critical-errors-in-report",
+              "error",
+              { reportPath, criticalErrors: validation.details.criticalErrors },
             );
           }
         } else {
           await frameworkLogger.log(
-            "-post-processor",
-            "-report-validation-passed-for-reportpath-",
+            "postprocessor",
+            "report-validation-passed",
             "success",
-            { message: `✅ Report validation passed for ${reportPath}` },
+            { reportPath },
           );
         }
       }
     } catch (error) {
-      console.warn(`⚠️ Report validation failed: ${error}`);
+      await frameworkLogger.log(
+        "postprocessor",
+        "report-validation-failed",
+        "warning",
+        { error: String(error) },
+      );
     }
   }
 
@@ -212,15 +228,20 @@ export class PostProcessor {
         if (stats.mtime.getTime() < cutoffTime) {
           fs.unlinkSync(filePath);
           await frameworkLogger.log(
-            "-post-processor",
-            "-cleaned-up-old-report-file-",
+            "postprocessor",
+            "cleaned-up-old-report",
             "info",
-            { message: `🗑️ Cleaned up old report: ${file}` },
+            { file },
           );
         }
       }
     } catch (error) {
-      console.warn("⚠️ Report cleanup failed:", error);
+      await frameworkLogger.log(
+        "postprocessor",
+        "report-cleanup-failed",
+        "warning",
+        { error: String(error) },
+      );
     }
   }
 
@@ -679,7 +700,7 @@ MANDATORY COMPLIANCE REQUIRED - VIOLATIONS WILL BLOCK COMMITS
 ❌ NEVER use hardcoded 'dist/' paths in source code:
 \`\`\`typescript
 // WRONG - Breaks across environments (actual violations found)
-import { RuleEnforcer } from "../dist/enforcement/rule-enforcer.js";
+import { RuleEnforcer } from "../enforcement/rule-enforcer.js";
 import { ProcessorManager } from "./dist/processors/processor-manager.js";
 \`\`\`
 
@@ -1007,7 +1028,12 @@ All path violations will be automatically detected and blocked.
       );
       return result;
     } catch (error) {
-      console.error("❌ Post-processor loop failed:", error);
+      await frameworkLogger.log(
+        "postprocessor",
+        "post-processor-loop-failed",
+        "error",
+        { error: String(error) },
+      );
 
       const failureResult: PostProcessorResult = {
         success: false,
@@ -1083,18 +1109,50 @@ All path violations will be automatically detected and blocked.
           monitoringResults,
         );
 
-        // ⚠️ AGENTS.md auto-update is DISABLED by default
-        // It overwrites ALL manual content - only enable for specific use cases
-        // To enable: set env var ENABLE_AGENTS_AUTO_UPDATE=true
-        if (process.env.ENABLE_AGENTS_AUTO_UPDATE === "true") {
+        // AGENTS.md auto-update with smart triggers
+        // Only updates when agent-related files have changed
+        const agentChangePatterns = [
+          /\.opencode\/agents\//,
+          /\/agents\//,
+          /AGENTS\.md$/,
+        ];
+
+        const changedFiles = context.files || [];
+        const hasAgentChanges = changedFiles.some((file: string) =>
+          agentChangePatterns.some((pattern) => pattern.test(file))
+        );
+
+        if (hasAgentChanges || process.env.ENABLE_AGENTS_AUTO_UPDATE === "always") {
           try {
             const { researcherAgentsUpdater } =
               await import("../agents/librarian-agents-updater.js");
+            
+            activity.script("docs-sync-started", "AGENTS.md auto-sync triggered", {
+              reason: hasAgentChanges ? "agent-files-changed" : "always-enabled",
+              changedFiles: changedFiles.filter((f: string) =>
+                agentChangePatterns.some((p) => p.test(f))
+              ).length
+            });
+            
             await researcherAgentsUpdater.updateAgentsMd(process.cwd());
+            
+            activity.success("development", "docs-sync-complete", "AGENTS.md auto-sync completed");
+            
+            await frameworkLogger.log(
+              "postprocessor",
+              "agents-md-auto-updated",
+              "info",
+              { 
+                message: "AGENTS.md updated due to agent-related changes",
+                changedFiles: changedFiles.filter((f: string) =>
+                  agentChangePatterns.some((p) => p.test(f))
+                ).length
+              },
+            );
           } catch (error) {
             await frameworkLogger.log(
-              "-post-processor",
-              "-agents-md-update-failed",
+              "postprocessor",
+              "agents-md-update-failed",
               "info",
               { message: `AGENTS.md auto-update failed: ${error}` },
             );

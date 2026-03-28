@@ -64,7 +64,7 @@ export class AgentSpawnGovernor {
 
   private readonly defaultLimits: SpawnLimits = {
     perAgentType: {
-      researcher: 1, // Solo agent - only 1 instance allowed
+      researcher: 1,
       orchestrator: 3,
       enforcer: 2,
       architect: 2,
@@ -74,10 +74,6 @@ export class AgentSpawnGovernor {
       refactorer: 2,
       "testing-lead": 2,
       explore: 1,
-      strategist: 1,
-      "multimodal-looker": 1,
-      "frontend-ui-ux-engineer": 1,
-      "tech-writer": 1,
     },
     totalConcurrent: 8, // System-wide concurrent limit
     spawnRateLimit: {

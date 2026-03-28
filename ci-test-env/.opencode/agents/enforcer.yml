@@ -1,6 +1,18 @@
 name: enforcer
 description: "Enforcer agent for codex compliance and error prevention"
 version: "1.0.0"
+
+# =============================================================================
+# CODEX COMPLIANCE
+# =============================================================================
+# Enforcement must apply these Codex rules:
+# - Term 7: Resolve All Errors - zero tolerance blocking
+# - Term 29: Security by Design - validate all inputs
+# - Term 39: Avoid Syntax Errors - blocking
+# - Term 11: Type Safety First - blocking
+# - Term 46: Import Consistency - blocking
+# - Term 47: Module System Consistency - no mixing ESM/CJS
+
 mode: subagent
 
 # Logging Configuration

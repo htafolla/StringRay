@@ -259,7 +259,7 @@ function findRecentTsFiles(dir: string, maxAgeSeconds: number): string[] {
 
 ---
 
-#### 2.3.27 agents-md-validation-processor.ts
+#### 2.3.25 agents-md-validation-processor.ts
 
 **Purpose**: Validates AGENTS.md exists and is up-to-date
 

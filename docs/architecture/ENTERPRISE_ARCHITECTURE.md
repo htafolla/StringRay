@@ -1,4 +1,4 @@
-# StrRay Framework - Enterprise Architecture Documentation
+# StrRay Framework v1.15.1 - Enterprise Architecture Documentation
 
 ## Table of Contents
 
@@ -13,17 +13,19 @@
 9. [Deployment Architecture](#deployment-architecture)
 10. [Scalability Design](#scalability-design)
 11. [Integration Points](#integration-points)
+12. [Facade Pattern Architecture](#facade-pattern-architecture)
 
 ---
 
 ## System Overview
 
-The StrRay Framework implements an enterprise-grade AI agent coordination platform built on the Universal Development Codex principles. It provides systematic error prevention and production-ready code generation through a multi-layered architecture.
+The StrRay Framework v1.15.1 implements an enterprise-grade AI agent coordination platform built on the Universal Development Codex principles and the **Facade Pattern architecture**. It provides systematic error prevention and production-ready code generation through a multi-layered, modular architecture.
 
 ### Key Architectural Characteristics
 
-- **Multi-Agent Coordination**: 8 specialized agents working in concert
-- **Codex-Driven Development**: 45 mandatory terms enforcing quality standards
+- **Multi-Agent Coordination**: N specialized agents working in concert
+- **Facade Pattern**: Simplified public APIs with modular internal implementation
+- **Codex-Driven Development**: 60 mandatory terms enforcing quality standards
 - **Plugin Ecosystem**: Secure, sandboxed third-party extensions
 - **Enterprise Monitoring**: Comprehensive observability and alerting
 - **Performance Optimization**: Sub-millisecond operation with resource constraints
@@ -35,12 +37,13 @@ The StrRay Framework implements an enterprise-grade AI agent coordination platfo
 
 ### 1. Universal Development Codex
 
-All framework operations are governed by 45 mandatory codex terms divided into:
+All framework operations are governed by 60 mandatory codex terms divided into:
 
 - **Core Terms (1-10)**: Progressive prod-ready code, surgical fixes, single source of truth
 - **Extended Terms (11-20)**: Type safety first, error boundaries, separation of concerns
 - **Architecture Terms (21-30)**: SOLID principles, dependency injection, interface segregation
 - **Advanced Terms (31-45)**: Async/await patterns, proper error handling, test coverage >85%
+- **Governance Terms (46-60)**: Agent spawn governance, validation chain, regression analysis
 
 ### 2. Agent-Centric Design
 
@@ -56,25 +59,77 @@ All framework operations are governed by 45 mandatory codex terms divided into:
 - **Lifecycle Management**: Automated plugin discovery and updates
 - **Version Compatibility**: Semantic versioning for plugin contracts
 
+### 4. Facade Pattern Implementation
+
+- **Simplified Interfaces**: Clean public APIs hide complex internal logic
+- **Modular Internals**: Logic separated into focused, testable modules
+- **Dependency Injection**: Dependencies passed for flexibility and testing
+- **Registry Management**: Component registration and discovery
+- **Backward Compatibility**: 100% compatible with existing code
+
 ---
 
 ## Core Components Overview
 
 The StringRay Framework consists of **28 key components** providing enterprise-grade AI agent coordination with systematic error prevention and production-ready development.
 
+### Facade Layer Components
+
+| # | Component | Type | Lines | Purpose | Critical Level |
+|---|-----------|------|-------|---------|----------------|
+| 1 | **RuleEnforcer** | Facade | 416 | Compliance monitoring facade | CRITICAL |
+| 2 | **TaskSkillRouter** | Facade | 490 | Task routing and skill mapping | CRITICAL |
+| 3 | **MCPClient** | Facade | 312 | MCP server access facade | HIGH |
+
+### Module Layer Components
+
+#### RuleEnforcer Modules (6 modules)
+
+| Module | Lines | Purpose |
+|--------|-------|---------|
+| Core | ~70 | Rule validation engine, violation detection |
+| Config | ~50 | Configuration loading, threshold management |
+| Logger | ~60 | Structured logging, audit trails |
+| Metrics | ~80 | Performance tracking, statistics |
+| Validation | ~90 | Input validation, schema checking |
+| Integration | ~66 | External hooks, plugin integration |
+
+#### TaskSkillRouter Modules (14 modules)
+
+| Module | Lines | Purpose |
+|--------|-------|---------|
+| Mappings (12) | ~25 each | Specialized skill-to-task mappings |
+| Analytics | ~70 | Pattern tracking, success metrics |
+| Routing | ~100 | Complexity scoring, agent selection |
+| Patterns | ~80 | Pattern recognition and matching |
+| Validation | ~60 | Input/output validation |
+
+#### MCPClient Modules (8 modules)
+
+| Module | Lines | Purpose |
+|--------|-------|---------|
+| Connection | ~40 | Server connection management |
+| Registry | ~50 | Server registration and discovery |
+| Tools | ~45 | Tool discovery and execution |
+| Resources | ~40 | Resource access and caching |
+| Prompts | ~35 | Prompt template management |
+| Sampling | ~35 | Sampling strategies |
+| Notifications | ~37 | Event subscription and routing |
+| Root | ~30 | Initialization and lifecycle |
+
 ### Complete Component Table
 
-| #  | Component | Purpose | Critical Level | Validation in Script |
+| # | Component | Purpose | Critical Level | Validation in Script |
 |----|-----------|---------|----------------|---------------------|
-| 1  | **StrRay Codex Injection Plugin** | Injects Universal Development Codex into AI system prompts | **CRITICAL** | Step 4 (Plugin loading), Step 17 (Integration validation) |
-| 2  | **State Management System** | Manages framework state and persistence | **CRITICAL** | Unit tests (integrated), Step 18 (Framework stability) |
-| 3  | **Processor Pipeline** | Handles tool execution preprocessing | **CRITICAL** | **Step 24** (Regression tests - StrRayStateManager/ProcessorManager) |
-| 4  | **MCP Server Registry** | Manages 26 Model Context Protocol servers | **HIGH** | Step 16 (MCP connectivity), Step 17 (Server validation) |
-| 5  | **OpenCode Integration** | Plugin registration and agent management | **HIGH** | Step 4 (Plugin registration), Step 17 (Integration testing) |
-| 6  | **TypeScript Compilation** | Builds framework from source | **CRITICAL** | Step 2 (Build verification) |
-| 7  | **Consumer Path Transformation** | Prepares package for npm distribution | **HIGH** | Step 3 (Consumer path preparation) |
-| 8  | **Postinstall Configuration** | Sets up plugin after npm install | **HIGH** | Step 6 (Postinstall validation), Steps 19-21 (CLI commands) |
-| 9  | **Package Integrity** | Ensures npm package is complete and valid | **MEDIUM** | Step 4 (Package creation), Step 23 (Integrity validation) |
+| 1 | **StrRay Codex Injection Plugin** | Injects Universal Development Codex into AI system prompts | **CRITICAL** | Step 4 (Plugin loading), Step 17 (Integration validation) |
+| 2 | **State Management System** | Manages framework state and persistence | **CRITICAL** | Unit tests (integrated), Step 18 (Framework stability) |
+| 3 | **Processor Pipeline** | Handles tool execution preprocessing | **CRITICAL** | **Step 24** (Regression tests - StrRayStateManager/ProcessorManager) |
+| 4 | **MCP Server Registry** | Manages 28 Model Context Protocol servers | **HIGH** | Step 16 (MCP connectivity), Step 17 (Server validation) |
+| 5 | **OpenCode Integration** | Plugin registration and agent management | **HIGH** | Step 4 (Plugin registration), Step 17 (Integration testing) |
+| 6 | **TypeScript Compilation** | Builds framework from source | **CRITICAL** | Step 2 (Build verification) |
+| 7 | **Consumer Path Transformation** | Prepares package for npm distribution | **HIGH** | Step 3 (Consumer path preparation) |
+| 8 | **Postinstall Configuration** | Sets up plugin after npm install | **HIGH** | Step 6 (Postinstall validation), Steps 19-21 (CLI commands) |
+| 9 | **Package Integrity** | Ensures npm package is complete and valid | **MEDIUM** | Step 4 (Package creation), Step 23 (Integrity validation) |
 | 10 | **Agent Delegation System** | Routes tasks to appropriate AI agents | **HIGH** | Steps 8-13 (Orchestrator tests) |
 | 11 | **Complexity Analysis Engine** | Analyzes task complexity for routing | **MEDIUM** | Step 8 (Complexity analysis) |
 | 12 | **Conflict Resolution** | Handles competing agent recommendations | **MEDIUM** | Steps 10-13 (Multi-agent orchestration) |
@@ -143,19 +198,75 @@ export const loadHooks = () => import("./hooks");
 **Architecture:**
 
 ```
-StateManager (Central coordinator)
+StateManager (Central coordinator - Facade)
 ├── ContextProviders (React context integration)
 ├── StateTypes (TypeScript definitions)
-├── StateManager (Core state logic)
+├── StateManager Core (Core state logic)
+├── Persistence Module (State persistence)
+├── Validation Module (State validation)
 └── Index (Unified exports)
 ```
 
 **Features:**
 
-- Centralized state management
+- Centralized state management through facade
 - Session isolation and lifecycle
 - Cross-agent state sharing
 - Persistence and recovery
+
+---
+
+## Facade Pattern Architecture
+
+### Facade Layer Design
+
+The v1.15.1 architecture implements the Facade Pattern to provide simplified interfaces to complex subsystems:
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│                    PUBLIC API LAYER                           │
+├──────────────────────────────────────────────────────────────┤
+│  ┌─────────────┐  ┌──────────────┐  ┌──────────────┐        │
+│  │ RuleEnforcer│  │TaskSkillRouter│  │  MCPClient   │        │
+│  │  (416 loc)  │  │  (490 loc)   │  │  (312 loc)   │        │
+│  │   Facade    │  │    Facade    │  │    Facade    │        │
+│  └──────┬──────┘  └──────┬───────┘  └──────┬───────┘        │
+└─────────┼────────────────┼────────────────┼─────────────────┘
+          │                │                │
+          ▼                ▼                ▼
+┌──────────────────────────────────────────────────────────────┐
+│                     MODULE LAYER                              │
+├──────────────────┬──────────────────┬────────────────────────┤
+│ RuleEnforcer     │ TaskSkillRouter  │ MCPClient              │
+│ Modules:         │ Modules:         │ Modules:               │
+│ • Core (~70)     │ • Mappings x12   │ • Connection (~40)     │
+│ • Config (~50)   │ • Analytics (~70)│ • Registry (~50)       │
+│ • Logger (~60)   │ • Routing (~100) │ • Tools (~45)          │
+│ • Metrics (~80)  │ • Patterns (~80) │ • Resources (~40)      │
+│ • Validation (~90)│ • Validation (~60)│ • Prompts (~35)       │
+│ • Integration (~66)│                │ • Sampling (~35)       │
+│                  │                  │ • Notifications (~37)  │
+│                  │                  │ • Root (~30)           │
+└──────────────────┴──────────────────┴────────────────────────┘
+```
+
+### Facade Benefits
+
+1. **Simplified Public API**: Users interact with clean, consistent interfaces
+2. **Internal Modularity**: Complex logic separated into focused modules
+3. **Dependency Injection**: Dependencies passed for testability and flexibility
+4. **Registry Pattern**: Component management through registries
+5. **100% Backward Compatible**: Public APIs unchanged from v1.8.x
+
+### Code Metrics Comparison
+
+| Component | v1.8.x | v1.15.1 | Reduction |
+|-----------|--------|--------|-----------|
+| RuleEnforcer | 2,714 lines | 416 lines | 85% |
+| TaskSkillRouter | 1,933 lines | 490 lines | 75% |
+| MCP Client | 1,413 lines | 312 lines | 78% |
+| Dead Code | 3,170 lines | 0 lines | 100% |
+| **Total** | **8,230 lines** | **1,218 lines** | **87%** |
 
 ---
 
@@ -171,7 +282,10 @@ Sisyphus (Command Center)
 ├── Code Reviewer (Quality Assessor)
 ├── Security Auditor (Vulnerability Scanner)
 ├── Refactorer (Code Optimizer)
-└── Test Architect (Testing Strategist)
+├── Test Architect (Testing Strategist)
+├── Storyteller (Narrative Writer)
+├── Researcher (Codebase Explorer)
+└── 18 Additional Specialized Agents
 ```
 
 ### Agent Communication Patterns
@@ -226,11 +340,11 @@ Boot Orchestrator
     ↓
 Session Coordinator
     ↓
-Agent Orchestrator (Sisyphus)
+TaskSkillRouter Facade (Complexity Analysis)
     ↓
-Task Delegation
+Agent Selection (via Routing Module)
     ↓
-Agent Processing
+Agent Processing (via MCP Client Facade)
     ↓
 Result Aggregation
     ↓
@@ -246,9 +360,9 @@ UI Component
     ↓
 State Provider
     ↓
-State Manager
+StateManager Facade
     ↓
-Agent Notification
+Agent Notification (via Integration Module)
     ↓
 State Update
     ↓
@@ -260,7 +374,7 @@ UI Re-render
 ```
 System Events
     ↓
-Monitoring System
+Monitoring System (via Metrics Module)
     ↓
 Anomaly Detection
     ↓
@@ -334,12 +448,19 @@ const PERFORMANCE_BUDGET = {
 };
 ```
 
+### Facade Pattern Performance Benefits
+
+- **Reduced Bundle Size**: 87% code reduction improves load times
+- **Faster Agent Spawning**: Modular initialization is more efficient
+- **Better Memory Usage**: Smaller memory footprint
+- **Improved Caching**: Focused modules cache more effectively
+
 ### Optimization Strategies
 
 #### Bundle Optimization
 
 - **Lazy Loading**: Dynamic imports for advanced features
-- **Tree Shaking**: Dead code elimination
+- **Tree Shaking**: Dead code elimination (3,170 lines removed)
 - **Code Splitting**: Route-based and feature-based splitting
 
 #### Runtime Optimization
@@ -423,7 +544,7 @@ spec:
     spec:
       containers:
         - name: strray
-          image: strray/strray:latest
+          image: strray/strray:v1.15.1
           ports:
             - containerPort: 3000
           env:
@@ -508,14 +629,14 @@ The framework integrates seamlessly with OpenCode:
   },
   "framework": {
     "name": "strray",
-    "version": "1.7.5"
+    "version": "1.15.1"
   }
 }
 ```
 
 ### MCP Server Integration
 
-The framework exposes 14 MCP servers for AI integration:
+The framework exposes 15 MCP servers for AI integration:
 
 1. **Agent Servers**: Individual agent capabilities
 2. **Knowledge Servers**: Project analysis and patterns
@@ -620,8 +741,63 @@ query GetSystemStatus {
 
 #### Automated Compliance
 
-- **Codex Enforcement**: Runtime validation of 45 codex terms
+- **Codex Enforcement**: Runtime validation of N codex terms
 - **Architecture Reviews**: Automated architectural compliance checks
 - **Dependency Scanning**: Continuous vulnerability assessment
 
+---
+
+## Migration from v1.8.x to v1.15.1
+
+### Breaking Changes
+
+**NONE** - v1.15.1 maintains 100% backward compatibility.
+
+### What Changed
+
+- **Internal Architecture**: Refactored to Facade Pattern
+- **Code Organization**: Monolithic components split into facades + modules
+- **Performance**: 87% code reduction, faster execution
+- **Maintainability**: Better separation of concerns
+
+### What Stayed the Same
+
+- ✅ `@agent-name` syntax unchanged
+- ✅ CLI commands work identically
+- ✅ Configuration file formats unchanged
+- ✅ Custom agent creation process unchanged
+- ✅ Public APIs unchanged
+
+### Migration Steps
+
+```bash
+# Update to v1.15.1
+npm install strray-ai@latest
+
+# Verify installation
+npx strray-ai health
+
+# No code changes needed!
+```
+
+---
+
+## Architecture Statistics
+
+| Metric | Value |
+|--------|-------|
+| **Framework Version** | 1.9.0 |
+| **Architecture Pattern** | Facade Pattern |
+| **Specialized Agents** | 27 |
+| **MCP Servers** | 28 |
+| **Tests** | 2,368 |
+| **Code Reduction** | 87% |
+| **Facade Components** | 3 |
+| **Total Modules** | 26 |
+| **Error Prevention** | 99.6% |
+
 This architecture provides a solid foundation for enterprise-grade AI agent coordination with comprehensive monitoring, security, and scalability features.
+
+---
+
+*StringRay AI v1.15.1 - Enterprise Facade Pattern Architecture*

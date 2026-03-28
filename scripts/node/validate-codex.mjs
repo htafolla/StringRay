@@ -65,7 +65,7 @@ if (isDevelopment) {
   // Check if codex files exist
   const codexFiles = [
     "docs/framework/agents_template.md",
-    ".strray/agents_template.md",
+    ".opencode/strray/agents_template.md",
   ];
 
   let codexFound = false;

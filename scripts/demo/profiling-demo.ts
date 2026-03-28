@@ -1,5 +1,31 @@
-import { advancedProfiler } from "./src/monitoring/advanced-profiler";
-import { enterpriseMonitoringSystem } from "./src/monitoring/enterprise-monitoring-system";
+#!/usr/bin/env node
+
+/**
+ * StringRay Framework - Profiling Demo Script
+ * 
+ * Purpose: Demonstrates the advanced profiling and monitoring capabilities
+ * of the StringRay framework by simulating various agent operations.
+ * 
+ * Features:
+ * - Simulates agent operations with realistic timing
+ * - Collects performance metrics across all agent types
+ * - Displays real-time profiling statistics
+ * - Integrates with enterprise monitoring system
+ * 
+ * Usage:
+ *   npx tsx scripts/demo/profiling-demo.ts
+ * 
+ * Expected Output:
+ * - Console output showing operation progress
+ * - Performance metrics for each agent
+ * - System-wide aggregated statistics
+ * - Monitoring system status
+ * 
+ * Note: This script takes ~65 seconds to complete due to report generation
+ */
+
+import { advancedProfiler } from "../../src/monitoring/advanced-profiler.js";
+import { enterpriseMonitoringSystem } from "../../src/monitoring/enterprise-monitoring-system.js";
 
 // Simulate agent operations with profiling
 async function simulateAgentOperations() {
@@ -13,6 +39,7 @@ async function simulateAgentOperations() {
   await enterpriseMonitoringSystem.start();
   console.log("📈 Enterprise monitoring system started\n");
 
+  // Define agent operations to simulate
   const operations = [
     { agent: "enforcer", operation: "codex-validation", duration: 150 },
     { agent: "architect", operation: "design-review", duration: 300 },

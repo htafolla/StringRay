@@ -1,13 +1,23 @@
-# StrRay Framework - Intelligent Commit Batching Strategy
+# StrRay Framework - Intelligent Commit Batching Strategy (v1.15.1)
 
 ## 🎯 **Problem: Too Many Micro-Commits**
 
-Currently, the framework commits **every individual change**, creating:
+The framework previously committed **every individual change**, creating:
 
 - ❌ Noisy commit history with micro-changes
 - ❌ Non-atomic commits (related changes split across multiple commits)
 - ❌ Difficult to understand development flow
 - ❌ Hard to revert logical units of work
+
+## ✅ **Solution: Intelligent Commit Batching with 27-Agent Coordination**
+
+**Batch related changes together based on configurable metrics** rather than committing every individual change, with coordination across all 25 specialized agents.
+
+### Agent Integration
+- **Orchestrator**: Coordinates commit batching across all 25 agents
+- **Enforcer**: Validates batched commits against all 60 Codex terms
+- **Code Reviewer**: Reviews batched changes for quality
+- **Documentation**: All agents document their contributions to batches
 
 ## ✅ **Solution: Intelligent Commit Batching**
 

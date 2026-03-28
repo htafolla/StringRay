@@ -7,7 +7,7 @@
 
 ## 1. EXECUTIVE SUMMARY
 
-This reflection documents the debugging session where we discovered that our extensive test suite (374+ tests passing) completely failed to catch two critical agent configuration issues: (1) `ProviderModelNotFoundError` caused by `model:` fields in `.yml` files, and (2) `Unknown agent type` errors caused by missing agents in `opencode.json`. We fixed 27 agents, created a pre-publish guard, updated version manager, and documented troubleshooting - but the core lesson is devastating: **our tests verify code correctness, not configuration correctness**. The 99.6% error prevention claim is a lie when the tests don't run in the actual execution environment.
+This reflection documents the debugging session where we discovered that our extensive test suite (374+ tests passing) completely failed to catch two critical agent configuration issues: (1) `ProviderModelNotFoundError` caused by `model:` fields in `.yml` files, and (2) `Unknown agent type` errors caused by missing agents in `opencode.json`. We fixed 25 agents, created a pre-publish guard, updated version manager, and documented troubleshooting - but the core lesson is devastating: **our tests verify code correctness, not configuration correctness**. The 99.6% error prevention claim is a lie when the tests don't run in the actual execution environment.
 
 ---
 
@@ -19,14 +19,14 @@ This reflection documents the debugging session where we discovered that our ext
 I believed that because our test suite showed 374 passing tests, the codebase was fundamentally sound. The StringRay Framework claimed 99.6% error prevention through "systematic validation" - surely our infrastructure was robust.
 
 **The Reality:**
-- 27 agents missing from `opencode.json` (database-engineer, devops-engineer, backend-engineer, frontend-engineer, performance-engineer, mobile-developer)
-- 27 agents causing `ProviderModelNotFoundError` due to `model: default` in `.yml` files
+- 25 agents missing from `opencode.json` (database-engineer, devops-engineer, backend-engineer, frontend-engineer, performance-engineer, mobile-developer)
+- 25 agents causing `ProviderModelNotFoundError` due to `model: default` in `.yml` files
 - No tests existed to verify `opencode.json` completeness
 - No tests existed to verify `.yml` files lacked model fields
 - The "99.6% error prevention" only applied to TypeScript compilation and unit test assertions - not to runtime configuration
 
 **The Struggle:**
-I spent 2+ hours manually testing each agent with `@agent hello` commands, one by one. The build passed. All unit tests passed. But 9 out of 27 agents failed when actually invoked. This felt like trusting a car's safety rating but discovering the airbags only work if you manually pull the lever.
+I spent 2+ hours manually testing each agent with `@agent hello` commands, one by one. The build passed. All unit tests passed. But 9 out of 25 agents failed when actually invoked. This felt like trusting a car's safety rating but discovering the airbags only work if you manually pull the lever.
 
 **Time/Resources:**
 - 2+ hours of manual agent testing
@@ -111,7 +111,7 @@ We would have "successfully published v1.6.21" but the real cost would have been
 
 ### Phase 2: Manual Agent Testing (12:35 - 13:00)
 **What I Did:** Started testing agents one by one with Task tool
-**What Happened:** First 27 agents worked. Then researcher failed with ProviderModelNotFoundError.
+**What Happened:** First 25 agents worked. Then researcher failed with ProviderModelNotFoundError.
 **Emotional State:** Confusion, then alarm
 **INNER DIALOGUE:** "Wait, the tests pass but agents don't work? How?"
 
@@ -129,7 +129,7 @@ We would have "successfully published v1.6.21" but the real cost would have been
 
 ### Phase 5: The Fixes (13:30 - 14:00)
 **What I Did:** Added agents to opencode.json, removed model: from yml files, added code-analyzer alias
-**What Happened:** All 27 agents eventually worked
+**What Happened:** All 25 agents eventually worked
 **Emotional State:** Exhausted but accomplished
 **INNER DIALOGUE:** "Now we need to make sure this never happens again."
 
@@ -151,14 +151,14 @@ We would have "successfully published v1.6.21" but the real cost would have been
 **Fix Applied:** Documented in troubleshooting, but no automated test yet
 
 ### Root Cause 2: No opencode.json Completeness Check
-**Symptom:** 27 agents missing from opencode.json
+**Symptom:** 25 agents missing from opencode.json
 **Root Cause:** No validation that `builtinAgents` keys match `opencode.json` agent keys
 **Why I Thought I Was Right:** Assumed manual configuration was correct
 **Why It Was Wrong:** Manual configuration is error-prone with 24+ agents
 **Fix Applied:** Added missing agents to opencode.json
 
 ### Root Cause 3: YML Files Have model: Field
-**Symptom:** ProviderModelNotFoundError on 27 agents
+**Symptom:** ProviderModelNotFoundError on 25 agents
 **Root Cause:** `.yml` files in `.opencode/agents/` had `model: default` which references unavailable model
 **Why I Thought I Was Right:** Assumed yml templates were correct
 **Why It Was Wrong:** Templates had deprecated/incorrect configuration
@@ -233,7 +233,7 @@ We would have "successfully published v1.6.21" but the real cost would have been
 ### Lesson 3: Manual Testing Still Required
 **Pitfall:** Assumed automated tests could replace manual verification
 **The Illusion:** Test suite should catch all issues
-**Ah-Ha Moment:** Had to manually invoke each of 27 agents to find issues
+**Ah-Ha Moment:** Had to manually invoke each of 25 agents to find issues
 **Deep Learning:** Integration testing requires the actual execution environment
 **Why I Didn't See It:** We have so many tests, surely they cover this
 **Observation:** The gap between "code works" and "system works" is massive
@@ -256,11 +256,11 @@ I fought against the assumption that "tests pass = ready to publish." When I man
 The emotional low point was realizing we'd been claiming "99.6% error prevention" while 25% of our agents were completely non-functional. The number was a lie we'd told ourselves.
 
 ### My Triumph
-We fixed all 27 agents. We created a pre-publish guard. We documented the troubleshooting. We now understand the gap between code testing and configuration testing. The victory isn't perfect - the guard still doesn't test agents - but we've closed the first gap.
+We fixed all 25 agents. We created a pre-publish guard. We documented the troubleshooting. We now understand the gap between code testing and configuration testing. The victory isn't perfect - the guard still doesn't test agents - but we've closed the first gap.
 
 ### My Dichotomy
 - I wanted to trust our test suite, but the evidence said don't
-- I wanted to believe our 99.6% claim, but 6/27 agents didn't work
+- I wanted to believe our 99.6% claim, but 6/25 agents didn't work
 - I wanted configuration to be "just config" but it caused 100% failure rate
 - I wanted automated tests to catch this, but manual testing was the only way
 

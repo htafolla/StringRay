@@ -1,0 +1,100 @@
+name: Processor Tests
+
+on:
+  push:
+    paths:
+      - "src/processors/**"
+      - "tests/**"
+  pull_request:
+    paths:
+      - "src/processors/**"
+      - "tests/**"
+
+jobs:
+  validate-processor-mocks:
+    name: Validate Processor Mock Coverage
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run mock coverage validator
+        run: node tests/validators/processor-mock-validator.cjs
+
+  processor-tests:
+    name: Processor Tests
+    runs-on: ubuntu-latest
+    needs: validate-processor-mocks
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run processor tests
+        run: |
+          npx vitest run \
+            src/processors/implementations/implementations.test.ts \
+            --reporter=verbose \
+            --coverage \
+            --outputFile=./vitest-report.json
+
+      - name: Analyze test timing
+        run: npx ts-node tests/validators/test-timing-validator.ts ./vitest-report.json
+        continue-on-error: true
+
+      - name: Upload coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: processor-coverage
+          path: coverage/
+
+      - name: Upload test report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: processor-test-report
+          path: vitest-report.json
+
+      - name: Check test execution time
+        run: |
+          # Get total test time from report
+          TIME=$(cat vitest-report.json | jq '[.testResults[].assertions[]?.duration // 0] | add')
+          echo "Total test execution time: ${TIME}ms"
+          
+          if (( $(echo "$TIME > 60000" | bc -l) )); then
+            echo "Warning: Tests took longer than 60 seconds"
+            echo "This may indicate missing mocks or performance issues"
+          fi
+
+  lint-processor-tests:
+    name: Lint Processor Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ESLint on processor tests
+        run: npx eslint src/processors/**/*.test.ts --config tests/config/processor-test-rules.js

@@ -1,0 +1,23 @@
+#!/bin/bash
+# StringRay Post-Commit Hook
+# Runs activity logging, analytics, and log cleanup after commit
+# Does NOT block — runs in background
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+
+COMMIT_SHA=$(git rev-parse HEAD)
+BRANCH=$(git rev-parse --abbrev-ref HEAD)
+
+# Run in background — never block git operations
+(
+  if command -v node >/dev/null 2>&1; then
+    export HOOK_TYPE="post-commit"
+    export COMMIT_SHA="$COMMIT_SHA"
+    export BRANCH="$BRANCH"
+    export PROJECT_ROOT="$PROJECT_ROOT"
+    node "$PROJECT_ROOT/scripts/hooks/run-hook.js" post-commit 2>/dev/null || true
+  fi
+) &
+
+exit 0

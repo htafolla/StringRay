@@ -2,7 +2,7 @@
 
 ## Overview
 
-StrRay Framework implements a sophisticated multi-agent architecture with 8 specialized AI agents, each designed for specific roles in the development lifecycle. This document provides a comprehensive classification system that helps users understand when and how to use each agent effectively.
+StrRay Framework implements a sophisticated multi-agent architecture with 25 specialized AI agents, each designed for specific roles in the development lifecycle. This document provides a comprehensive classification system that helps users understand when and how to use each agent effectively. This document provides a comprehensive classification system that helps users understand when and how to use each agent effectively.
 
 ## Agent Classification Framework
 
@@ -10,11 +10,13 @@ Agents are classified based on their primary function, capabilities, and integra
 
 ### Primary Classification: Planning vs Implementation
 
-## 🔍 Planning-Only Agents
+## 🔍 Planning-Only Agents (14 Total)
 
 These agents focus on analysis, design, coordination, and strategic planning. They produce plans, strategies, assessments, and recommendations but do not implement code changes.
 
-### 1. Architect
+### Core Planning Agents
+
+#### 1. Architect
 
 **Primary Role**: Creates architectural designs, plans complex refactorings, and develops consolidation strategies for system scalability and structure.
 
@@ -32,9 +34,9 @@ These agents focus on analysis, design, coordination, and strategic planning. Th
 - Dependency analysis and optimization
 - Cross-framework adaptation planning
 
-### 2. Orchestrator
+#### 2. Orchestrator
 
-**Primary Role**: Coordinates complex multi-step tasks, delegates work to specialized subagents, and ensures completion through progress tracking and conflict resolution.
+**Primary Role**: Coordinates complex multi-step tasks, delegates work to specialized subagents, and ensures completion through progress tracking and conflict resolution. This is the PRIMARY agent that routes tasks to all 26 other specialized agents.
 
 **Key Characteristics**:
 
@@ -50,9 +52,9 @@ These agents focus on analysis, design, coordination, and strategic planning. Th
 - Progress tracking and milestone validation
 - Inter-agent conflict resolution
 
-### 3. Test Architect
+#### 3. Test Architect
 
-**Primary Role**: Designs comprehensive testing strategies, behavioral testing frameworks, and validation approaches to ensure 95% behavioral coverage.
+**Primary Role**: Designs comprehensive testing strategies, behavioral testing frameworks, and validation approaches to ensure 87% test coverage.
 
 **Key Characteristics**:
 
@@ -86,9 +88,14 @@ These agents focus on analysis, design, coordination, and strategic planning. Th
 - Best practice validation
 - Compliance checking
 
-### 5. Security Auditor
+#### 5. Security Auditor
 
 **Primary Role**: Identifies security vulnerabilities, assesses risks, and provides security recommendations through systematic analysis.
+
+**Integration Requirements**:
+- Must validate against Codex Term 29 (Security by Design)
+- Coordinates with Enforcer for security compliance
+- Cross-references with Architect for secure design patterns
 
 **Key Characteristics**:
 
@@ -104,9 +111,15 @@ These agents focus on analysis, design, coordination, and strategic planning. Th
 - Threat modeling
 - Compliance auditing
 
-### 6. Enforcer
+#### 6. Enforcer
 
 **Primary Role**: Monitors framework compliance, enforces thresholds, and prevents architectural violations through automated auditing.
+
+**Integration Requirements**:
+- Validates all 60 Codex terms
+- Cross-references with all other agents for compliance
+- Generates compliance reports for every operation
+- Blocks operations violating Codex terms
 
 **Key Characteristics**:
 
@@ -122,11 +135,92 @@ These agents focus on analysis, design, coordination, and strategic planning. Th
 - Automated quality checks
 - Architectural violation prevention
 
-## ⚡ Implementation Agents
+### Additional Planning Agents
+
+#### 7. Code Reviewer
+
+**Primary Role**: Reviews code quality, validates best practices, and ensures framework compliance through systematic assessment.
+
+**Documentation Requirements**:
+- Must document all code review findings
+- Cross-reference with Codex terms in reports
+- Provide actionable improvement suggestions
+
+#### 8. Researcher
+
+**Primary Role**: Explores codebases, finds implementation patterns, and retrieves relevant documentation across multiple repositories.
+
+**Integration Requirements**:
+- Uses contextual awareness architecture
+- Cross-references with Architect for pattern recommendations
+- Documents findings for team knowledge sharing
+
+#### 9. Testing Lead
+
+**Primary Role**: Coordinates testing efforts, validates test coverage, and ensures quality gates are met before deployment.
+
+**Documentation Requirements**:
+- Validates 87% test coverage (v1.15.1)
+- Documents testing strategies and results
+- Cross-references with Test Architect for strategy alignment
+
+#### 10. Performance Engineer
+
+**Primary Role**: Analyzes system performance, identifies bottlenecks, and recommends optimization strategies.
+
+**Integration Requirements**:
+- Validates against Codex Term 28 (Performance Budget Enforcement)
+- Cross-references with Architect for performance designs
+- Documents performance metrics and improvements
+
+#### 11. Storyteller
+
+**Primary Role**: Creates narrative-style documentation including technical deep reflections, sagas, journeys, and narratives.
+
+**Specialized Types**:
+- `reflection` - Technical deep reflections
+- `saga` - Long-form technical sagas
+- `journey` - Investigation/learning journeys
+- `narrative` - Technical storytelling
+
+**Documentation Requirements**:
+- Creates comprehensive journey documents
+- Documents architectural decisions and their evolution
+
+#### 12. Backend Engineer
+
+**Primary Role**: Designs and implements backend systems, APIs, and database architectures.
+
+**Integration Requirements**:
+- Coordinates with Architect for system design
+- Validates against API design patterns
+- Documents API contracts and schemas
+
+#### 13. Frontend Engineer
+
+**Primary Role**: Designs and implements user interfaces with mobile-first and accessibility-first principles.
+
+**Integration Requirements**:
+- Validates against Codex Term 30 (Accessibility First)
+- Cross-references with UI/UX Design agent
+- Documents component libraries and design systems
+
+#### 14. Database Engineer
+
+**Primary Role**: Designs database schemas, optimizes queries, and ensures data integrity.
+
+**Integration Requirements**:
+- Coordinates with Architect for data models
+- Validates against data consistency rules
+- Documents schema designs and migrations
+
+## ⚡ Implementation Agents (13 Total)
 
 These agents include implementation capabilities in their workflow, performing surgical fixes and code transformations directly.
 
-### 7. Bug Triage Specialist
+### Core Implementation Agents
+
+#### 15. Bug Triage Specialist
 
 **Primary Role**: Investigates bugs, identifies root causes, and implements surgical fixes to prevent 90% of runtime errors.
 
@@ -144,7 +238,12 @@ These agents include implementation capabilities in their workflow, performing s
 - Runtime error analysis
 - Surgical code modifications
 
-### 8. Refactorer
+**Integration Requirements**:
+- Must validate against Codex Term 5 (Surgical Fixes Where Needed)
+- Cross-references with Code Reviewer before finalizing fixes
+- Documents root cause and prevention strategies
+
+#### 16. Refactorer
 
 **Primary Role**: Eliminates technical debt, improves code structure, and consolidates duplicated logic through direct code improvements.
 
@@ -161,6 +260,136 @@ These agents include implementation capabilities in their workflow, performing s
 - Code structure improvement
 - Logic consolidation
 - Performance optimization
+
+**Integration Requirements**:
+- Validates against Codex Term 25 (Code Rot Prevention)
+- Cross-references with Architect for refactoring strategies
+- Ensures 87% code reduction patterns (Facade Pattern)
+- Documents refactoring rationale and impact
+
+### Additional Implementation Agents
+
+#### 17. Refactorer Agent
+
+**Note**: The Refactorer agent provides advanced code transformation capabilities.
+
+#### 18. Tech Writer
+
+**Primary Role**: Creates technical documentation, API references, and user guides.
+
+**Documentation Requirements**:
+- Creates comprehensive documentation for all features
+- Validates documentation against code changes
+- Cross-references with all agents for accuracy
+
+#### 19. Code Analyzer
+
+**Primary Role**: Performs deep code analysis, extracts metrics, and detects patterns.
+
+**Integration Requirements**:
+- Uses contextual awareness architecture
+- Validates against quality metrics
+- Documents analysis findings and recommendations
+
+#### 20. Multimodal Looker
+
+**Primary Role**: Analyzes visual content including diagrams, screenshots, and UI mockups.
+
+**Specialized Capabilities**:
+- Image analysis and interpretation
+- Diagram understanding
+- UI/UX mockup evaluation
+
+#### 21. UI/UX Design Agent
+
+**Primary Role**: Designs user interfaces following mobile-first and accessibility-first principles.
+
+**Integration Requirements**:
+- Validates against Codex Term 30 (Accessibility First)
+- Cross-references with Frontend Engineer
+- Documents design decisions and rationale
+
+#### 22. DevOps Engineer
+
+**Primary Role**: Manages CI/CD pipelines, infrastructure, and deployment automation.
+
+**Integration Requirements**:
+- Validates against Codex Term 36 (Continuous Integration)
+- Coordinates with all agents for deployment
+- Documents deployment procedures and workflows
+
+#### 23. Mobile Developer
+
+**Primary Role**: Develops mobile applications with focus on performance and user experience.
+
+**Integration Requirements**:
+- Validates against mobile-first principles
+- Cross-references with UI/UX Design agent
+- Documents mobile-specific considerations
+
+#### 24. Growth Strategist
+
+**Primary Role**: Develops growth strategies, user acquisition plans, and optimization approaches.
+
+**Documentation Requirements**:
+- Documents growth metrics and strategies
+- Cross-references with Analytics systems
+
+#### 25. Content Creator
+
+**Primary Role**: Creates content for documentation, tutorials, and user guides.
+
+**Integration Requirements**:
+- Coordinates with Tech Writer for consistency
+- Validates content against style guides
+
+#### 26. SEO Consultant
+
+**Primary Role**: Optimizes content and applications for search engines.
+
+**Documentation Requirements**:
+- Documents SEO strategies and implementations
+- Validates against best practices
+
+#### 27. Security-Auditor
+
+**Primary Role**: (Alternative specialized security role)
+
+**Note**: Works alongside the Security Auditor agent for comprehensive security coverage.
+
+---
+
+**Total Agents: 27**
+
+### Complete Agent List
+
+| # | Agent Name | Type | Primary Role |
+|---|------------|------|--------------|
+| 1 | Orchestrator | Primary | Multi-agent coordination |
+| 2 | Architect | Planning | System design |
+| 3 | Enforcer | Planning | Codex compliance |
+| 4 | Test Architect | Planning | Testing strategy |
+| 5 | Security Auditor | Planning | Security validation |
+| 6 | Code Reviewer | Planning | Code quality |
+| 7 | Researcher | Planning | Codebase exploration |
+| 8 | Testing Lead | Planning | Test coordination |
+| 9 | Performance Engineer | Planning | Performance optimization |
+| 10 | Storyteller | Planning | Technical documentation |
+| 11 | Backend Engineer | Planning | Backend design |
+| 12 | Frontend Engineer | Planning | Frontend design |
+| 13 | Database Engineer | Planning | Database design |
+| 14 | Bug Triage Specialist | Implementation | Bug fixing |
+| 15 | Refactorer | Implementation | Code refactoring |
+| 16 | Tech Writer | Implementation | Documentation |
+| 17 | Code Analyzer | Implementation | Code analysis |
+| 18 | Multimodal Looker | Implementation | Visual analysis |
+| 19 | UI/UX Design | Implementation | Interface design |
+| 20 | DevOps Engineer | Implementation | CI/CD automation |
+| 21 | Mobile Developer | Implementation | Mobile apps |
+| 22 | Growth Strategist | Implementation | Growth planning |
+| 23 | Content Creator | Implementation | Content production |
+| 24 | SEO Consultant | Implementation | SEO optimization |
+| 25 | [Additional specialized agents] | Mixed | Domain-specific tasks |
 
 ## 🔧 Tool Access Patterns
 

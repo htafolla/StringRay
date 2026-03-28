@@ -46,7 +46,7 @@ bash .opencode-lite/init-lite.sh
 | ------------------------ | -------------- | -------------- | ------------------- |
 | **Setup Time**           | 30 minutes     | 5 minutes      | **83% faster**      |
 | **Configuration Files**  | 15+ files      | 2 files        | **87% reduction**   |
-| **Agent Count**          | 27 agents       | 27 agents       | **50% reduction**   |
+| **Agent Count**          | 25 agents       | 25 agents       | **50% reduction**   |
 | **Error Prevention**     | 90%            | 80%            | **11% reduction**   |
 | **Maintenance Overhead** | High           | Low            | **70% reduction**   |
 | **Development Velocity** | Moderate       | High           | **60% improvement** |

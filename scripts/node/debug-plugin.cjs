@@ -10,7 +10,7 @@ const path = require('path');
 console.log('🔍 Debugging StringRay Plugin Loading...\n');
 
 // Path to the plugin
-const pluginPath = path.join(__dirname, 'dist', 'plugin', 'plugins', 'stringray-codex-injection.cjs');
+const pluginPath = path.join(__dirname, '..', '..', 'dist', 'plugin', 'strray-codex-injection.js');
 
 console.log(`📂 Plugin path: ${pluginPath}`);
 console.log(`📂 Plugin exists: ${require('fs').existsSync(pluginPath)}\n`);
@@ -33,9 +33,9 @@ console.log(`📂 Plugin exists: ${require('fs').existsSync(pluginPath)}\n`);
 
     console.log('✅ Plugin is a function (factory)\n');
 
-    // Try to call the plugin factory
+    // Try to call the plugin factory (it's async)
     console.log('🏭 Calling plugin factory...');
-    const pluginInstance = plugin();
+    const pluginInstance = await plugin({ directory: process.cwd() });
 
     console.log('✅ Plugin factory executed\n');
 

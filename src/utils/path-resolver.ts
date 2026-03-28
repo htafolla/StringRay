@@ -5,6 +5,7 @@
 
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
+import { frameworkLogger } from "../core/framework-logger.js";
 
 export class PathResolver {
   private static instance: PathResolver;
@@ -80,15 +81,15 @@ export class PathResolver {
    */
   resolveAgentPath(agentName: string): string {
     if (this.isDevelopment) {
-      // In src/, agents are at ./agents/
       return `./agents/${agentName}.js`;
     } else if (this.isBuilt || this.isInstalled) {
-      // In dist/ or installed, agents are at ../agents/
       return `../agents/${agentName}.js`;
     } else {
-      // Fallback - assume built environment
-      console.warn(
-        "⚠️ PathResolver: Unknown environment, using built path fallback",
+      frameworkLogger.log(
+        "path-resolver",
+        "unknown-environment-fallback",
+        "warning",
+        { agentName },
       );
       return `../agents/${agentName}.js`;
     }
@@ -98,21 +99,20 @@ export class PathResolver {
    * Resolve any module path for current environment
    */
   resolveModulePath(modulePath: string): string {
-    // Remove leading ./ if present
     const cleanPath = modulePath.startsWith("./")
       ? modulePath.slice(2)
       : modulePath;
 
     if (this.isDevelopment) {
-      // In src/, modules are at ./
       return `./${cleanPath}`;
     } else if (this.isBuilt || this.isInstalled) {
-      // In dist/ or installed, modules are relative to dist/
       return `./${cleanPath}`;
     } else {
-      // Fallback
-      console.warn(
-        "⚠️ PathResolver: Unknown environment for module path, using as-is",
+      frameworkLogger.log(
+        "path-resolver",
+        "unknown-module-environment",
+        "warning",
+        { modulePath },
       );
       return modulePath;
     }

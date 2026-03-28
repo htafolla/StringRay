@@ -10,6 +10,8 @@
 
 import { frameworkLogger } from "../core/framework-logger.js";
 import type { PatternDriftInfo, AdaptiveThresholds } from "../core/kernel-patterns.js";
+import * as fs from "fs";
+import * as path from "path";
 
 export interface PatternMetrics {
   patternId: string;
@@ -64,6 +66,7 @@ export class PatternPerformanceTracker {
       success: boolean;
       confidence: number;
       responseTime?: number;
+      complexity?: number;
     }
   ): void {
     const existing = this.patternMetrics.get(patternId);
@@ -133,6 +136,9 @@ export class PatternPerformanceTracker {
       },
       undefined
     );
+
+    // Persist to disk
+    this.saveToDisk();
   }
 
   /**
@@ -379,6 +385,53 @@ export class PatternPerformanceTracker {
       {},
       undefined
     );
+  }
+
+  /**
+   * Save metrics to disk for persistence
+   */
+  saveToDisk(): void {
+    try {
+      const cwd = process.cwd() || '.';
+      const filePath = path.join(cwd, 'logs', 'framework', 'pattern-metrics.json');
+      
+      // Ensure directory exists
+      const dir = path.dirname(filePath);
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
+      
+      // Convert Map to object for JSON serialization
+      const metricsObj: Record<string, PatternMetrics> = {};
+      for (const [key, value] of this.patternMetrics.entries()) {
+        metricsObj[key] = value;
+      }
+      
+      fs.writeFileSync(filePath, JSON.stringify(metricsObj, null, 2));
+    } catch (error) {
+      // Silent fail - don't break tracking
+    }
+  }
+
+  /**
+   * Load metrics from disk
+   */
+  loadFromDisk(): void {
+    try {
+      const cwd = process.cwd() || '.';
+      const filePath = path.join(cwd, 'logs', 'framework', 'pattern-metrics.json');
+      
+      if (fs.existsSync(filePath)) {
+        const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+        
+        // Convert object back to Map
+        for (const [key, value] of Object.entries(data)) {
+          this.patternMetrics.set(key, value as PatternMetrics);
+        }
+      }
+    } catch (error) {
+      // Silent fail - start fresh
+    }
   }
 }
 

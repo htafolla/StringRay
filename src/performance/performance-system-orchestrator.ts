@@ -212,6 +212,13 @@ export class PerformanceSystemOrchestrator extends EventEmitter {
    * Stop the performance monitoring system
    */
   async stop(): Promise<void> {
+    // Set monitoring inactive immediately before any async operations
+    this.status.monitoringActive = false;
+
+    if (this.components.dashboard) {
+      this.components.dashboard.stop();
+    }
+
     await frameworkLogger.log(
       "performance-system-orchestrator",
       "-stopping-performance-monitoring-",
@@ -219,15 +226,11 @@ export class PerformanceSystemOrchestrator extends EventEmitter {
       { message: "⏹️ Stopping performance monitoring" },
     );
 
-    if (this.components.dashboard) {
-      // Note: Dashboard doesn't have a stop method, just disable monitoring
-      this.status.monitoringActive = false;
-      frameworkLogger.log(
-        "performance-orchestrator",
-        "dashboard-stopped",
-        "info",
-      );
-    }
+    frameworkLogger.log(
+      "performance-orchestrator",
+      "dashboard-stopped",
+      "info",
+    );
 
     this.emit("stopped");
   }

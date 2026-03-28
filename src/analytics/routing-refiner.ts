@@ -12,8 +12,8 @@ import type {
   RoutingOutcome,
   PromptDataPoint,
   RoutingDecision,
-} from "../delegation/task-skill-router.js";
-import { routingOutcomeTracker } from "../delegation/task-skill-router.js";
+} from "../delegation/config/types.js";
+import { routingOutcomeTracker } from "../delegation/analytics/outcome-tracker.js";
 import {
   type PromptComparisonResult,
   promptPatternAnalyzer,
@@ -120,7 +120,7 @@ class RoutingRefiner {
     const warnings = this.generateWarnings(newMappings, optimizations);
 
     return {
-      version: "1.7.5",
+      version: "1.15.6",
       generatedAt: new Date(),
       summary: {
         newMappings: newMappings.length,

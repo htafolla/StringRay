@@ -236,7 +236,7 @@ describe("Performance System Orchestrator", () => {
     expect(status.components.ciGates).toBe(true);
   });
 
-  it.skip("should start and stop monitoring", async () => {
+  it("should start and stop monitoring", async () => {
     await performanceSystem.initialize();
     await performanceSystem.start();
 

@@ -8,6 +8,8 @@
  * @since 2026-01-07
  */
 
+import { frameworkLogger } from "../core/framework-logger.js";
+
 export interface BenchmarkResult {
   operation: string;
   startTime: number;
@@ -102,7 +104,12 @@ export class StringRayPerformanceBenchmark {
   ): BenchmarkResult | null {
     const activeBenchmark = this.activeBenchmarks.get(benchmarkId);
     if (!activeBenchmark) {
-      console.warn(`Benchmark ${benchmarkId} not found`);
+      frameworkLogger.log(
+        "performance-benchmark",
+        "benchmark-not-found",
+        "warning",
+        { benchmarkId },
+      );
       return null;
     }
 
@@ -145,7 +152,7 @@ export class StringRayPerformanceBenchmark {
     };
 
     const bootStartTime = performance.now();
-    let peakMemory = 0;
+    const peakMemory = 0;
 
     try {
       // Measure initial memory
@@ -333,7 +340,12 @@ export class StringRayPerformanceBenchmark {
       }
     } catch (error) {
       result.overallSuccess = false;
-      console.error("Orchestrator benchmarking failed:", error);
+      await frameworkLogger.log(
+        "performance-benchmark",
+        "orchestrator-benchmarking-failed",
+        "error",
+        { error: String(error) },
+      );
     }
 
     return result;
@@ -420,7 +432,12 @@ export class StringRayPerformanceBenchmark {
         result.migrationTimes.push(migrationResult.duration);
       }
     } catch (error) {
-      console.error("Session benchmarking failed:", error);
+      await frameworkLogger.log(
+        "performance-benchmark",
+        "session-benchmarking-failed",
+        "error",
+        { error: String(error) },
+      );
     }
 
     return result;

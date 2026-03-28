@@ -19,6 +19,7 @@ import {
 import * as fs from "fs";
 import * as path from "path";
 import { frameworkLogger } from "../../core/framework-logger.js";
+import { createGracefulShutdown } from "../../utils/shutdown-handler.js";
 
 interface Tool {
   name: string;
@@ -265,7 +266,7 @@ class CodeAnalyzerServer {
 
   constructor() {
     this.server = new Server(
-      { name: "code-analyzer", version: "1.7.5" },
+      { name: "code-analyzer", version: "1.15.6" },
       { capabilities: { tools: {} } },
     );
 
@@ -540,15 +541,12 @@ class CodeAnalyzerServer {
   async run(): Promise<void> {
     const transport = new StdioServerTransport();
     await this.server.connect(transport);
-    await frameworkLogger.log("mcp-code-analyzer", "server-started", "success");
-    const cleanup = async (signal: string) => {
-      console.log(`Received ${signal}, shutting down...`);
-      const t = setTimeout(() => process.exit(1), 5000);
-      try { if (this.server?.close) await this.server.close(); clearTimeout(t); process.exit(0); } catch (e) { clearTimeout(t); process.exit(1); }
-    };
-    process.on("SIGINT", () => cleanup("SIGINT"));
-    process.on("SIGTERM", () => cleanup("SIGTERM"));
-    setTimeout(() => { try { process.kill(process.ppid, 0); setTimeout(() => cleanup("parent-death"), 1000); } catch { cleanup("parent-death"); } }, 2000);
+    
+    // Use centralized shutdown handler
+    createGracefulShutdown({
+      serverName: "code-analyzer.server",
+      server: this.server,
+    });
   }
 }
 

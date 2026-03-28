@@ -25,30 +25,6 @@ describe("MCP Server Files", () => {
     expect(fs.existsSync(serverPath)).toBe(true);
   });
 
-  it("should have multimodal-looker server file", () => {
-    const serverPath = path.join(
-      process.cwd(),
-      "src/mcps/knowledge-skills/multimodal-looker.server.ts",
-    );
-    expect(fs.existsSync(serverPath)).toBe(true);
-  });
-
-  it("should have seo-consultant server file", () => {
-    const serverPath = path.join(
-      process.cwd(),
-      "src/mcps/knowledge-skills/seo-consultant.server.ts",
-    );
-    expect(fs.existsSync(serverPath)).toBe(true);
-  });
-
-  it("should have strategist server file", () => {
-    const serverPath = path.join(
-      process.cwd(),
-      "src/mcps/knowledge-skills/strategist.server.ts",
-    );
-    expect(fs.existsSync(serverPath)).toBe(true);
-  });
-
   it("should have session-management server file", () => {
     const serverPath = path.join(
       process.cwd(),
@@ -64,44 +40,29 @@ describe("MCP Server Files", () => {
     );
     expect(fs.existsSync(serverPath)).toBe(true);
   });
-
-  it("should have growth-strategist server file", () => {
-    const serverPath = path.join(
-      process.cwd(),
-      "src/mcps/knowledge-skills/growth-strategist.server.ts",
-    );
-    expect(fs.existsSync(serverPath)).toBe(true);
-  });
 });
 
 describe("Antigravity Skills Integration", () => {
-  it("should have Antigravity integration script", () => {
-    // Check for both .js and .mjs extensions (ESM scripts use .mjs)
+  it("should have removed Antigravity integration script (migrated to skill:install)", () => {
     const scriptPath = path.join(
       process.cwd(),
       "scripts/integrations/install-antigravity-skills.js",
     );
-    const scriptPathMjs = path.join(
-      process.cwd(),
-      "scripts/integrations/install-antigravity-skills.js.mjs",
-    );
-    expect(fs.existsSync(scriptPath) || fs.existsSync(scriptPathMjs)).toBe(
-      true,
-    );
+    expect(fs.existsSync(scriptPath)).toBe(false);
   });
 
   it("should have Antigravity documentation", () => {
-    const docPath = path.join(process.cwd(), "docs/ANTIGRAVITY_INTEGRATION.md");
+    const docPath = path.join(process.cwd(), "docs/superseded/legacy/ANTIGRAVITY_INTEGRATION.md");
     expect(fs.existsSync(docPath)).toBe(true);
   });
 
   it("should have Antigravity license file", () => {
-    const licensePath = path.join(process.cwd(), "LICENSE.antigravity");
+    const licensePath = path.join(process.cwd(), "licenses/skills/LICENSE.antigravity");
     expect(fs.existsSync(licensePath)).toBe(true);
   });
 
   it("should list curated skills in documentation", () => {
-    const docPath = path.join(process.cwd(), "docs/ANTIGRAVITY_INTEGRATION.md");
+    const docPath = path.join(process.cwd(), "docs/superseded/legacy/ANTIGRAVITY_INTEGRATION.md");
     const content = fs.readFileSync(docPath, "utf-8");
 
     expect(content).toContain("typescript-expert");
@@ -126,14 +87,13 @@ describe("Agent Configuration", () => {
 
 describe("MCP Client Configuration", () => {
   it("should have MCP client with new server configs", () => {
-    const mcpPath = path.join(process.cwd(), "src/mcps/mcp-client.ts");
-    expect(fs.existsSync(mcpPath)).toBe(true);
-    const content = fs.readFileSync(mcpPath, "utf-8");
+    const configPath = path.join(process.cwd(), "src/mcps/config/server-config-registry.ts");
+    expect(fs.existsSync(configPath)).toBe(true);
+    const content = fs.readFileSync(configPath, "utf-8");
 
-    // Check for new MCP configs
+    // Check for new MCP configs in registry (refactored location)
     expect(content).toContain("bug-triage-specialist");
     expect(content).toContain("log-monitor");
-    expect(content).toContain("multimodal-looker");
     expect(content).toContain("code-analyzer");
   });
 });

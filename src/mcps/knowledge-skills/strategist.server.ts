@@ -92,7 +92,7 @@ class StrategistServer {
   constructor() {
     this.server = new Server(
       {
-        name: "strray/strategist", version: "1.7.5",
+        name: "strray/strategist", version: "1.15.6",
       },
       {
         capabilities: {
@@ -241,4 +241,4 @@ class StrategistServer {
 }
 
 const server = new StrategistServer();
-server.start().catch(console.error);
+server.start().catch((error) => frameworkLogger.log("mcps/strategist", "run", "error", { error: String(error) }));

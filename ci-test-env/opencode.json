@@ -13,43 +13,51 @@
   },
   "agent": {
     "orchestrator": {
-      "temperature": 1,
+      "temperature": 1.0,
       "mode": "subagent"
     },
     "enforcer": {
-      "temperature": 1,
+      "temperature": 1.0,
       "mode": "primary"
     },
     "architect": {
-      "temperature": 1,
+      "temperature": 1.0,
       "mode": "subagent"
     },
     "testing-lead": {
-      "temperature": 1,
+      "temperature": 1.0,
       "mode": "subagent"
     },
     "bug-triage-specialist": {
-      "temperature": 1,
+      "temperature": 1.0,
       "mode": "subagent"
     },
     "code-reviewer": {
-      "temperature": 1,
+      "temperature": 1.0,
       "mode": "subagent"
     },
     "security-auditor": {
-      "temperature": 1,
+      "temperature": 1.0,
       "mode": "subagent"
     },
     "refactorer": {
-      "temperature": 1,
+      "temperature": 1.0,
       "mode": "subagent"
     },
     "researcher": {
-      "temperature": 1,
+      "temperature": 1.0,
       "mode": "subagent"
     },
     "log-monitor": {
-      "temperature": 1,
+      "temperature": 1.0,
+      "mode": "subagent"
+    },
+    "explore": {
+      "temperature": 1.0,
+      "mode": "subagent"
+    },
+    "code-analyzer": {
+      "temperature": 1.0,
       "mode": "subagent"
     },
     "sisyphus": {
@@ -136,6 +144,10 @@
     "strray-project-analysis": {
       "disable": true
     },
+    "project-analysis": {
+      "disable": true,
+      "note": "This is a skill/MCP, not an agent. Use as tool: call the project-analysis skill instead of @mention"
+    },
     "strray-performance-optimization": {
       "disable": true
     },
@@ -162,6 +174,50 @@
     },
     "strray-enforcer-tools": {
       "disable": true
+    },
+    "project-analysis": {
+      "disable": true,
+      "note": "SKILL - Use as tool, not @mention"
+    },
+    "testing-strategy": {
+      "disable": true,
+      "note": "SKILL - Use as tool, not @mention"
+    },
+    "performance-optimization": {
+      "disable": true,
+      "note": "SKILL - Use as tool, not @mention"
+    },
+    "code-review": {
+      "disable": true,
+      "note": "SKILL - Use as tool, not @mention"
+    },
+    "security-audit": {
+      "disable": true,
+      "note": "SKILL - Use as tool, not @mention"
+    },
+    "architecture-patterns": {
+      "disable": true,
+      "note": "SKILL - Use as tool, not @mention"
+    },
+    "git-workflow": {
+      "disable": true,
+      "note": "SKILL - Use as tool, not @mention"
+    },
+    "api-design": {
+      "disable": true,
+      "note": "SKILL - Use as tool, not @mention"
+    },
+    "ui-ux-design": {
+      "disable": true,
+      "note": "SKILL - Use as tool, not @mention"
+    },
+    "documentation-generation": {
+      "disable": true,
+      "note": "SKILL - Use as tool, not @mention"
+    },
+    "refactoring-strategies": {
+      "disable": true,
+      "note": "SKILL - Use as tool, not @mention"
     }
   }
 }

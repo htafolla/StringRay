@@ -1,0 +1,15 @@
+🚀 StringRay v1.15.1 MAJOR RELEASE!
+
+✨ 100% Codex alignment - all 25 agents now enforce role-specific rules
+🎭 New @storyteller agent with Hero's Journey & narrative frameworks
+🔄 Improved skill routing with outcome tracking & analytics
+⚡ Enhanced enforcer routing with automated workflows
+🔒 Fixed critical security/performance agent gaps
+📋 Added integration rules - agents MUST update docs
+🧪 All 1610 tests passing
+📊 53 commits, 99 files, +9,077 lines
+
+Framework is production-ready!
+
+#AI #DevTools #CodeQuality #StringRay
+🔗 https://github.com/htafolla/stringray

@@ -10,7 +10,7 @@
 
 import { frameworkLogger } from "../core/framework-logger.js";
 import type { EmergentPattern } from "../core/kernel-patterns.js";
-import type { RoutingOutcome } from "../delegation/task-skill-router.js";
+import type { RoutingOutcome } from "../delegation/config/types.js";
 
 export interface ClusterResult {
   clusterId: string;

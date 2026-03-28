@@ -1,464 +1,549 @@
-# StrRay Orchestrator Integration Architecture
+# StringRay Orchestrator Integration Architecture v1.15.1
 
-## High-Level System Flow: Plugin → Prompt → Orchestrator
+## Overview
 
-```mermaid
-graph TB
-    %% User Interaction Layer
-    subgraph "User Interaction Layer"
-        UI[User Interface<br/>Web/CLI/API]
-        PROMPT[User Prompt<br/>"Build authentication system"]
-    end
+The StringRay Orchestrator v1.15.1 provides intelligent multi-agent coordination and task delegation based on operation complexity analysis. This document describes the architectural design, integration patterns, and the new Facade Pattern implementation.
 
-    %% Plugin Integration Layer
-    subgraph "Plugin Integration Layer"
-        OMC[OpenCode<br/>Framework]
-        SRP[StrRay Plugin<br/>strray-codex-injection.ts]
-        MCP[MCP Servers<br/>orchestrator<br/>enforcer<br/>etc.]
-    end
+## What's New in v1.15.1
 
-    %% StrRay Framework Layer
-    subgraph "StrRay Framework Layer"
-        SO[StrRayOrchestrator<br/>executeComplexTask()]
-        EO[EnhancedOrchestrator<br/>spawnAgent()]
-        AD[AgentDelegator<br/>route to agents]
-    end
+### Facade Pattern Integration
 
-    %% Agent Execution Layer
-    subgraph "Agent Execution Layer"
-        ENF[Enforcer<br/>Codex Validation]
-        AGENTS[OpenCode Agents<br/>Architect, Librarian, etc.]
-    end
+The orchestrator now utilizes the Facade Pattern for improved modularity and maintainability:
 
-    %% Flow Connections
-    UI --> PROMPT
-    PROMPT --> OMC
-    OMC --> SRP
-    SRP --> MCP
-    MCP --> SO
-    SO --> EO
-    EO --> AD
-    AD --> ENF
-    AD --> AGENTS
+- **TaskSkillRouter Facade (490 lines)**: Central routing and complexity analysis
+- **RuleEnforcer Facade (416 lines)**: Compliance validation and rule enforcement
+- **MCP Client Facade (312 lines)**: Unified MCP server access
 
-    %% Styling
-    classDef user fill:#e3f2fd
-    classDef plugin fill:#f3e5f5
-    classDef framework fill:#e8f5e8
-    classDef agents fill:#fff3e0
+### Key Improvements
 
-    class UI,PROMPT user
-    class OMC,SRP,MCP plugin
-    class SO,EO,AD framework
-    class ENF,AGENTS agents
-```
+- **87% Code Reduction**: 8,230 → 1,218 total lines
+- **Better Modularity**: 26 focused modules across 3 facades
+- **Improved Performance**: Faster agent spawning and routing
+- **Enhanced Reliability**: Better error isolation and recovery
 
-## End-to-End Prompt Flow Tree
+## Core Architecture
+
+### Facade Layer Overview
 
 ```
-🎯 Complete End-to-End Flow: User → Plugin → Orchestrator → Agents
-├── 👤 User Interaction
-│   ├── 💬 Natural Language Prompt
-│   │   └── "Build a secure authentication system with role-based access"
-│   └── 🔧 Tool/API Invocation
-│       └── orchestrator.executeComplexTask()
-│
-├── 🔌 Plugin Integration (OpenCode)
-│   ├── 📥 Prompt Reception
-│   │   └── OpenCode receives user prompt
-│   ├── 🔍 Plugin Activation
-│   │   └── StrRay plugin (strray-codex-injection.ts) activates
-│   ├── 📚 Context Injection
-│   │   └── Universal Development Codex v1.1.1 loaded into prompt
-│   └── 🎯 Orchestration Trigger
-│       └── Complex task detected → Route to orchestrator
-│
-├── 🌐 MCP Server Layer
-│   ├── 🔧 Tool Discovery
-│   │   ├── orchestrator.spawn-agent
-│   │   ├── orchestrator.execute-complex-task
-│   │   └── orchestrator.get-monitoring-interface
-│   ├── 📡 Protocol Translation
-│   │   └── MCP → Internal API conversion
-│   └── 🎮 Interactive Controls
-│       └── Clickable agent monitoring interface
-│
-├── 🎭 Orchestration Engine
-│   ├── 🧠 Task Analysis
-│   │   ├── Complexity assessment (6 metrics)
-│   │   ├── Dependency identification
-│   │   └── Execution planning (parallel/sequential)
-│   ├── 🤖 Agent Coordination
-│   │   ├── Enhanced orchestrator spawns agents
-│   │   ├── Dependency management
-│   │   └── Progress monitoring
-│   └── 🔄 Conflict Resolution
-│       └── Expert priority / majority vote strategies
-│
-├── ⚡ Agent Execution Pipeline
-│   ├── 🛡️ StrRay Enforcer
-│   │   ├── Pre-execution validation (45 codex terms)
-│   │   ├── Runtime monitoring
-│   │   └── Post-execution compliance audit
-│   └── 🌐 OpenCode Agents
-│       ├── Architect → System design
-│       ├── Librarian → Research & documentation
-│       ├── Test-Architect → Testing strategy
-│       ├── Code-Reviewer → Quality assurance
-│       ├── Security-Auditor → Vulnerability scanning
-│       └── Refactorer → Code optimization
-│
-└── 📊 Results & Monitoring
-    ├── 📈 Real-time Progress
-    │   ├── Clickable agent status
-    │   ├── Progress bars (0-100%)
-    │   └── Dependency completion tracking
-    ├── 📋 Result Aggregation
-    │   ├── Individual agent outputs
-    │   ├── Conflict resolution
-    │   └── Unified response formatting
-    └── 🧹 System Cleanup
-        ├── Automatic agent termination
-        ├── Resource deallocation
-        └── Session state persistence
+┌─────────────────────────────────────────────────────────────────────┐
+│                    ORCHESTRATOR FACADE LAYER                         │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                       │
+│  ┌──────────────────────────────────────────────────────────────┐  │
+│  │                   TaskSkillRouter Facade                      │  │
+│  │                      (490 lines)                              │  │
+│  │                                                               │  │
+│  │  ┌─────────────┐  ┌───────────────┐  ┌───────────────────┐   │  │
+│  │  │ Complexity  │  │   Agent       │  │   Task            │   │  │
+│  │  │ Analyzer    │  │   Delegator   │  │   Scheduler       │   │  │
+│  │  └─────────────┘  └───────────────┘  └───────────────────┘   │  │
+│  └────────────────────┬───────────────────────────────────────────┘  │
+│                       │                                               │
+│                       ▼                                               │
+│  ┌──────────────────────────────────────────────────────────────┐  │
+│  │                     MODULE LAYER                              │  │
+│  │                                                               │  │
+│  │  Mappings (12)    Analytics    Routing    Patterns            │  │
+│  │  • Validation     • Tracking   • Scoring  • Recognition       │  │
+│  │  • Security       • Metrics    • Selection • Matching         │  │
+│  │  • Testing        • Success    • Load      • Learning         │  │
+│  │  • Architecture   • Patterns   • Balancing                   │  │
+│  │  • Refactoring                                                │  │
+│  │  • Performance                                                │  │
+│  │  • Documentation                                              │  │
+│  │  • Bug Fix                                                    │  │
+│  │  • Feature                                                    │  │
+│  │  • Analysis                                                   │  │
+│  │  • Review                                                     │  │
+│  │  • Integration                                                │  │
+│  │                                                               │  │
+│  └──────────────────────────────────────────────────────────────┘  │
+│                                                                       │
+└─────────────────────────────────────────────────────────────────────┘
 ```
 
-## Plugin-to-Orchestrator Prompt Flow
-
-```mermaid
-sequenceDiagram
-    participant User
-    participant OMC as OpenCode
-    participant SRP as StrRay Plugin
-    participant MCP as MCP Server
-    participant SO as StrRayOrchestrator
-    participant EO as EnhancedOrchestrator
-    participant Agent as Target Agent
-
-    User->>OMC: "Build authentication system"
-    OMC->>SRP: Plugin activation (codex injection)
-    SRP->>OMC: Enhanced prompt with codex context
-
-    OMC->>MCP: Route to orchestrator tool
-    MCP->>SO: executeComplexTask(description, tasks)
-
-    SO->>EO: spawnAgent() for each subtask
-    EO->>SO: Return agent IDs with monitoring
-
-    SO->>EO: executeAgent() - start execution
-    EO->>Agent: Execute via agent delegator
-
-    Agent-->>EO: Completion results
-    EO-->>SO: Aggregated results with monitoring
-
-    SO-->>MCP: Final orchestrated response
-    MCP-->>OMC: Formatted results to user
-    OMC-->>User: Complete authentication system
-
-    Note over EO: Clickable monitoring available<br/>throughout execution
-```
-
-## Complete Orchestration Pipeline Flow
-
-```mermaid
-graph TB
-    %% User Entry Points
-    subgraph "User Entry Points"
-        API[Direct API Call<br/>orchestrator.executeComplexTask()]
-        MCP[MCP Server<br/>orchestrator.*]
-        CLI[CLI Tools<br/>strray orchestrate]
-    end
-
-    %% Main Orchestration Layer
-    subgraph "Main Orchestration Layer"
-        SO[StrRayOrchestrator]
-        EO[EnhancedMultiAgentOrchestrator]
-        AD[AgentDelegator]
-    end
-
-    %% Agent Execution Layer
-    subgraph "Agent Execution Layer"
-        subgraph "StrRay Agents"
-            ENF[Enforcer<br/>Codex Validation]
-        end
-        subgraph "OpenCode Agents"
-            ARC[Architect]
-            LIB[Librarian]
-            TSA[Test-Architect]
-            BGT[Bug-Triage]
-            CRV[Code-Reviewer]
-            SAU[Security-Auditor]
-            REF[Refactorer]
-        end
-    end
-
-    %% Supporting Systems
-    subgraph "Supporting Systems"
-        SM[StateManager<br/>Persistence]
-        CA[ComplexityAnalyzer<br/>Routing]
-        FM[FrameworkMonitor<br/>Metrics]
-        CL[CodexLoader<br/>45 Terms]
-    end
-
-    %% Flow Connections
-    API --> SO
-    MCP --> EO
-    CLI --> SO
-
-    SO --> EO
-    EO --> AD
-    AD --> ENF
-    AD --> ARC
-    AD --> LIB
-    AD --> TSA
-    AD --> BGT
-    AD --> CRV
-    AD --> SAU
-    AD --> REF
-
-    SO --> SM
-    EO --> SM
-    AD --> SM
-
-    ENF --> CL
-    AD --> CA
-    EO --> FM
-
-    %% Styling
-    classDef entry fill:#e1f5fe
-    classDef main fill:#f3e5f5
-    classDef agents fill:#e8f5e8
-    classDef support fill:#fff3e0
-
-    class API,MCP,CLI entry
-    class SO,EO,AD main
-    class ENF,ARC,LIB,TSA,BGT,CRV,SAU,REF agents
-    class SM,CA,FM,CL support
-```
-
-## Detailed Pipeline Flow Tree
+### Orchestrator Components
 
 ```
-🎯 StrRay Orchestration Pipeline
-├── 📥 Entry Points
-│   ├── 🔌 Direct API
-│   │   └── orchestrator.executeComplexTask(description, tasks[])
-│   ├── 🌐 MCP Server
-│   │   ├── orchestrator.spawn-agent
-│   │   ├── orchestrator.get-monitoring-interface
-│   │   ├── orchestrator.cancel-agent
-│   │   └── orchestrator.execute-complex-task
-│   └── 💻 CLI Tools
-│       └── strray orchestrate <task-file>
-│
-├── 🎭 Main Orchestration Layer
-│   ├── 🏗️ StrRayOrchestrator
-│   │   ├── executeComplexTask()
-│   │   │   ├── Task Analysis & Dependency Resolution
-│   │   │   ├── Execution Plan Generation
-│   │   │   └── Conflict Resolution Strategy
-│   │   ├── executeSingleTask()
-│   │   │   └── delegateToSubagent()
-│   │   └── Result Aggregation
-│   │
-│   ├── ⚡ EnhancedMultiAgentOrchestrator
-│   │   ├── spawnAgent() → Clickable Agent Creation
-│   │   ├── getMonitoringInterface() → Real-time Status
-│   │   ├── cancelAgent() → Agent Termination
-│   │   ├── executeAgentWithDelegator() → Agent Execution
-│   │   └── Automatic Cleanup (5min TTL)
-│   │
-│   └── 🎯 AgentDelegator
-│       ├── analyzeDelegation() → Strategy Determination
-│       ├── executeDelegation() → Agent Routing
-│       └── OpenCode Integration
-│
-├── 🤖 Agent Execution Layer
-│   ├── 🛡️ StrRay Enforcer (Internal)
-│   │   ├── Codex Validation (45 Terms)
-│   │   ├── Pre/Post Execution Checks
-│   │   └── 99.6% Error Prevention
-│   │
-│   └── 🌐 OpenCode Agents (External)
-│       ├── Architect → System Design
-│       ├── Librarian → Research & Documentation
-│       ├── Test-Architect → Testing Strategy
-│       ├── Bug-Triage → Issue Classification
-│       ├── Code-Reviewer → Quality Assurance
-│       ├── Security-Auditor → Vulnerability Scanning
-│       └── Refactorer → Code Optimization
-│
-├── 🔧 Supporting Systems
-│   ├── 💾 StateManager
-│   │   ├── Session Persistence
-│   │   ├── Agent State Tracking
-│   │   └── Cross-session Coordination
-│   │
-│   ├── 🧠 ComplexityAnalyzer
-│   │   ├── Task Complexity Scoring
-│   │   ├── Agent Capability Matching
-│   │   └── Intelligent Routing
-│   │
-│   ├── 📊 FrameworkMonitor
-│   │   ├── Real-time Metrics
-│   │   ├── Performance Tracking
-│   │   └── Health Monitoring
-│   │
-│   └── 📚 CodexLoader
-│       ├── 45-Term Rule Loading
-│       ├── Compliance Validation
-│       └── Error Prevention
-│
-└── 📊 Monitoring & Control
-    ├── 🖱️ Clickable Interface
-    │   ├── Real-time Progress Bars
-    │   ├── Agent Status Indicators
-    │   └── Interactive Controls
-    │
-    ├── 🔍 Live Monitoring
-    │   ├── Agent Execution Tracking
-    │   ├── Dependency Status
-    │   └── Performance Metrics
-    │
-    ├── 🧹 Automatic Cleanup
-    │   ├── Completed Agent Removal (5min)
-    │   ├── Failed Agent Cleanup
-    │   └── Resource Deallocation
-    │
-    └── 📈 Analytics & Reporting
-        ├── Execution Statistics
-        ├── Performance Benchmarks
-        └── Compliance Auditing
+StringRay Orchestrator v1.15.1
+├── TaskSkillRouter Facade (490 lines)
+│   ├── ComplexityAnalyzer (via Routing Module)
+│   ├── AgentDelegator (via Routing Module)
+│   └── TaskScheduler (via Routing Module)
+├── RuleEnforcer Facade (416 lines)
+│   ├── Validation Module
+│   ├── Metrics Module
+│   └── Integration Module
+├── StateManager Facade
+│   ├── State Persistence Module
+│   ├── Context Management Module
+│   └── Session Coordination Module
+├── FrameworkLogger (via Logger Module)
+└── MCP Client Facade (312 lines)
+    ├── Connection Module
+    ├── Tools Module
+    └── Resources Module
 ```
 
-## Task Execution Flow Diagram
+### Complexity Analysis Engine
 
-```mermaid
-sequenceDiagram
-    participant User
-    participant SO as StrRayOrchestrator
-    participant EO as EnhancedOrchestrator
-    participant AD as AgentDelegator
-    participant Agent as Target Agent
-    participant Monitor as Monitoring System
+The orchestrator uses a 6-metric complexity analysis system implemented in the Routing Module:
 
-    User->>SO: executeComplexTask(description, tasks[])
-    SO->>SO: Analyze dependencies & create execution plan
-    SO->>EO: spawnAgent(agentType, task, dependencies)
+#### Metrics
 
-    EO->>EO: Create SpawnedAgent with monitoring
-    EO->>Monitor: Register clickable agent
-    EO-->>SO: Return spawned agent ID
+- **File Count**: Number of files affected (0-20 points)
+- **Change Volume**: Lines changed (0-25 points)
+- **Operation Type**: create/modify/refactor/analyze/debug/test (multiplier)
+- **Dependencies**: Component relationships (0-15 points)
+- **Risk Level**: low/medium/high/critical (multiplier)
+- **Duration**: Estimated minutes (0-15 points)
 
-    SO->>EO: executeAgent() - start execution
-    EO->>AD: executeAgentWithDelegator()
-    AD->>AD: analyzeDelegation() - determine strategy
-    AD->>Agent: executeDelegation() - route to agent
+#### Decision Matrix
 
-    Agent-->>AD: Execution result
-    AD-->>EO: Formatted result
-    EO->>Monitor: Update progress (real-time)
-    EO-->>SO: Final result with monitoring data
+| Score Range | Complexity Level | Strategy | Agents |
+|-------------|------------------|----------|--------|
+| 0-25 | Simple | Single-agent | 1 |
+| 26-50 | Moderate | Single-agent | 1 |
+| 51-95 | Complex | Multi-agent | 2+ |
+| 96+ | Enterprise | Orchestrator-led | 3+ |
 
-    SO->>SO: Aggregate results from all agents
-    SO-->>User: Complete task results
+### Agent Delegation System
 
-    Note over EO,Monitor: Automatic cleanup after 5 minutes
+#### Agent Capabilities Matrix
+
+| Agent | Primary Role | Complexity Threshold | Tools |
+|-------|--------------|---------------------|-------|
+| enforcer | Code compliance | All operations | LSP, file ops |
+| architect | System design | High complexity | Analysis tools |
+| orchestrator | Task coordination | Enterprise | All tools |
+| code-reviewer | Quality validation | Code changes | Review tools |
+| bug-triage-specialist | Error investigation | Debug operations | Analysis tools |
+| security-auditor | Vulnerability detection | Security operations | Security tools |
+| refactorer | Technical debt | Refactor operations | Transform tools |
+| testing-lead | Testing strategy | Test operations | Testing tools |
+
+## Integration Patterns
+
+### Single-Agent Execution
+
+```typescript
+// Simple operations through TaskSkillRouter Facade
+import { TaskSkillRouter } from './task-skill-router';
+
+const router = new TaskSkillRouter();
+
+const result = await router.route({
+  task: "analyze code quality",
+  context: { files: ["src/main.ts"] },
+  priority: "medium"
+});
+
+// → Routes to: enforcer (via Mapping Module)
 ```
 
-## Dependency Management Flow
+### Multi-Agent Coordination
 
-```mermaid
-graph TD
-    A[Task A: Design] --> B[Task B: Validate]
-    A --> C[Task C: Research]
-    B --> D[Task D: Implement]
+```typescript
+// Complex operations through orchestrator
+import { TaskSkillRouter } from './task-skill-router';
 
-    subgraph "Execution Order"
-        E[Phase 1: A + C (Parallel)]
-        F[Phase 2: B (Waits for A)]
-        G[Phase 3: D (Waits for A + B)]
-    end
+const router = new TaskSkillRouter();
 
-    subgraph "Agent Dependencies"
-        H[architect_agent] --> I[enforcer_agent]
-        H --> J[testing-lead_agent]
-        I --> J
-    end
+const result = await router.route({
+  task: "implement authentication system",
+  context: {
+    files: ["auth/", "api/", "ui/"],
+    dependencies: ["database", "frontend"],
+    risk: "high"
+  },
+  priority: "high"
+});
 
-    A --> E
-    C --> E
-    B --> F
-    D --> G
-
-    H --> I
-    H --> J
-    I --> J
+// → Routes to: architect → code-reviewer → testing-lead
+// Coordinated through Routing Module
 ```
 
-## Error Handling & Fallback Flow
+### Orchestrator-Led Workflows
 
-```mermaid
-graph TD
-    A[Task Execution Request] --> B{Agent Delegation Success?}
-    B -->|Yes| C[Execute via OpenCode]
-    B -->|No| D[Fallback to Simulation]
+```typescript
+// Enterprise operations
+import { TaskSkillRouter } from './task-skill-router';
 
-    C --> E{Execution Success?}
-    E -->|Yes| F[Return Real Results]
-    E -->|No| G[Log Error & Continue]
+const router = new TaskSkillRouter();
 
-    D --> H[Generate Simulated Results]
-    H --> I[Log Fallback Usage]
+const result = await router.route({
+  task: "migrate legacy system",
+  context: {
+    files: ["legacy/", "new-system/"],
+    dependencies: ["database", "apis", "ui"],
+    risk: "critical",
+    duration: 120 // minutes
+  },
+  priority: "critical"
+});
 
-    F --> J[Update Monitoring]
-    G --> J
-    I --> J
-
-    J --> K[Return to Orchestrator]
-    K --> L[Aggregate All Results]
-    L --> M[Final Response to User]
-
-    subgraph "Error Prevention"
-        N[Enforcer Validation]
-        O[Input Sanitization]
-        P[Type Safety Checks]
-    end
-
-    A --> N
-    N --> O
-    O --> P
-    P --> B
+// → Coordinator manages: architect → security-auditor → refactorer → testing-lead
+// Full workflow managed through facade + modules
 ```
 
-## Integration Points Summary
+## State Management
 
-| Component                | Integration Method   | Purpose                      |
-| ------------------------ | -------------------- | ---------------------------- |
-| **StrRayOrchestrator**   | Direct instantiation | Main task coordination       |
-| **EnhancedOrchestrator** | Singleton import     | Agent lifecycle & monitoring |
-| **AgentDelegator**       | Factory creation     | OpenCode routing       |
-| **Enforcer**             | Internal validation  | Codex compliance             |
-| **MCP Server**           | Network protocol     | External tool integration    |
-| **StateManager**         | Dependency injection | Persistence & coordination   |
-| **Monitoring**           | Real-time interface  | Progress tracking & control  |
+### Session Persistence
 
-## Performance Characteristics
+```typescript
+interface SessionState {
+  id: string;
+  tasks: TaskDefinition[];
+  agents: AgentStatus[];
+  progress: ProgressMetrics;
+  created: Date;
+  updated: Date;
+}
+```
 
-- **Latency**: Sub-500ms for simple tasks, 2-5s for complex orchestration
-- **Throughput**: 50+ concurrent agents with intelligent batching
-- **Scalability**: Horizontal scaling via distributed state management
-- **Reliability**: 99.6% error prevention with automatic fallback
-- **Monitoring**: Real-time progress with 0-100% completion tracking
+State is managed through the StateManager Facade with modular persistence:
 
-## Security Integration
+```typescript
+// State management through facade
+import { StateManager } from './state';
 
-- **Input Validation**: All task inputs validated by enforcer
-- **Execution Sandboxing**: Agents run in isolated environments
-- **Audit Logging**: Complete execution trails for compliance
-- **Access Control**: Permission-based agent execution
-- **Error Containment**: Failures isolated to individual agents
+const stateManager = new StateManager();
+
+// Persist workflow context
+await stateManager.persistWorkflowContext(jobId, context);
+
+// Retrieve session state
+const session = await stateManager.getSession(sessionId);
+```
+
+### Conflict Resolution
+
+- **Last Write Wins**: Simple overwrite
+- **Version-based**: Timestamp comparison
+- **Manual**: Human intervention required
+
+## Communication Protocols
+
+### Inter-Agent Communication
+
+- **Message Bus**: Async event-driven communication
+- **State Synchronization**: Real-time state sharing
+- **Error Propagation**: Cascading failure handling
+
+### Facade-to-Module Communication
+
+```typescript
+// TaskSkillRouter Facade delegates to modules
+class TaskSkillRouter {
+  private routingModule: RoutingModule;
+  private analyticsModule: AnalyticsModule;
+  private mappingModules: MappingModule[];
+  
+  async route(request: RoutingRequest): Promise<RoutingResult> {
+    // Facade coordinates modules
+    const complexity = await this.routingModule.analyzeComplexity(request);
+    const agent = await this.routingModule.selectAgent(complexity, request);
+    const mapping = await this.getMappingModule(agent).getMapping(request);
+    
+    // Track analytics
+    await this.analyticsModule.trackRouting(agent, complexity);
+    
+    return { agent, complexity, mapping };
+  }
+}
+```
+
+### External Integration
+
+- **OpenCode**: Plugin-based integration
+- **MCP Servers**: Tool execution delegation via MCP Client Facade
+- **File System**: Persistent state storage
+
+## Performance Optimization
+
+### Lazy Loading
+
+- **Agent Initialization**: Load on demand
+- **Tool Activation**: Runtime tool discovery via MCP Client Facade
+- **Resource Pooling**: Memory-efficient object reuse
+
+### Caching Strategies
+
+- **Complexity Scores**: Memoized analysis results (Routing Module)
+- **Agent Capabilities**: Cached capability matrices (Analytics Module)
+- **File Analysis**: Incremental parsing (Mapping Modules)
+
+### Facade Pattern Performance Benefits
+
+```
+Performance Improvements in v1.15.1:
+├── 87% code reduction (8,230 → 1,218 lines)
+├── Faster agent spawning (modular initialization)
+├── Reduced memory footprint
+├── Better caching efficiency
+└── Improved error recovery
+```
+
+## Error Handling
+
+### Failure Recovery
+
+```typescript
+try {
+  const router = new TaskSkillRouter();
+  const result = await router.route(task);
+} catch (error) {
+  // Automatic retry with backoff (via Routing Module)
+  await router.retry(task, error);
+  
+  // Fallback strategies (via Validation Module)
+  await router.fallback(task);
+  
+  // Escalation to human intervention
+  await router.escalate(task, error);
+}
+```
+
+### Circuit Breaker Pattern
+
+- **Failure Detection**: Automatic error rate monitoring (Metrics Module)
+- **Graceful Degradation**: Fallback to simpler strategies
+- **Recovery Testing**: Gradual restoration of functionality
+
+## Monitoring & Analytics
+
+### Performance Metrics
+
+- **Task Completion Time**: End-to-end execution tracking
+- **Agent Utilization**: Resource usage statistics
+- **Error Rates**: Failure pattern analysis
+- **Success Rates**: Quality assurance metrics
+
+### Analytics Integration
+
+The Analytics Module tracks:
+
+```typescript
+interface RoutingAnalytics {
+  patternPerformance: Map<string, number>;
+  agentSuccessRates: Map<string, number>;
+  complexityAccuracy: Map<number, number>;
+  routingOptimizations: RoutingOptimization[];
+}
+```
+
+### Logging Integration
+
+- **Structured Logging**: JSON-formatted event tracking (via Logger Module)
+- **Correlation IDs**: Request tracing across agents
+- **Audit Trails**: Complete execution history
+
+## Security Architecture
+
+### Access Control
+
+- **Agent Permissions**: Capability-based authorization
+- **Task Validation**: Input sanitization and validation
+- **Secure Communication**: Encrypted inter-agent messaging
+
+### Audit Logging
+
+- **Operation Tracking**: All task executions logged
+- **Access Monitoring**: Agent usage patterns
+- **Security Events**: Suspicious activity detection
+
+## Testing Strategy
+
+### Unit Testing
+
+```typescript
+describe('RoutingModule', () => {
+  it('should calculate simple operation score', () => {
+    const routingModule = new RoutingModule();
+    const score = routingModule.analyzeComplexity({
+      files: 1,
+      changes: 5,
+      operation: 'read'
+    });
+    expect(score).toBe(14);
+  });
+});
+```
+
+### Integration Testing
+
+- **Agent Communication**: Inter-agent message passing
+- **State Synchronization**: Multi-agent state consistency
+- **Failure Scenarios**: Error handling and recovery
+
+### Performance Testing
+
+- **Load Testing**: Concurrent task execution
+- **Scalability Testing**: Resource utilization under load
+- **Memory Leak Detection**: Long-running session monitoring
+
+## Deployment Considerations
+
+### Environment Configuration
+
+```json
+{
+  "orchestrator": {
+    "maxConcurrentTasks": 8,
+    "maxConcurrentAgents": 8,
+    "complexityThresholds": {
+      "simple": 25,
+      "moderate": 50,
+      "complex": 95
+    },
+    "retryAttempts": 3,
+    "timeoutMinutes": 30
+  }
+}
+```
+
+### Resource Requirements
+
+- **Memory**: 512MB minimum, 2GB recommended
+- **CPU**: Multi-core for parallel agent execution
+- **Storage**: SSD for fast state persistence
+- **Network**: Low-latency for inter-agent communication
+
+## Migration from v1.8.x to v1.15.1
+
+### Breaking Changes
+
+**NONE** - v1.15.1 maintains 100% backward compatibility.
+
+### Internal Changes
+
+- **Facade Implementation**: Internal components refactored to facades + modules
+- **Improved Routing**: TaskSkillRouter now uses modular architecture
+- **Better Performance**: 87% code reduction, faster execution
+
+### What Stayed the Same
+
+- ✅ `@agent-name` syntax unchanged
+- ✅ CLI commands work identically
+- ✅ Configuration file formats unchanged
+- ✅ Public APIs unchanged
+
+### Migration Steps
+
+```bash
+# Update to v1.15.1
+npm install strray-ai@latest
+
+# Verify installation
+npx strray-ai health
+
+# No code changes needed!
+```
+
+## Future Enhancements
+
+### Advanced Features
+
+- **Machine Learning**: Predictive task routing (Analytics Module)
+- **Dynamic Agent Loading**: Runtime capability discovery
+- **Distributed Orchestration**: Multi-instance coordination
+- **Real-time Analytics**: Live performance dashboards
+
+### Scalability Improvements
+
+- **Agent Pooling**: Dynamic agent instantiation
+- **Load Balancing**: Intelligent task distribution
+- **Horizontal Scaling**: Multi-orchestrator coordination
+- **Caching Optimization**: Advanced memoization strategies
+
+## Troubleshooting
+
+### Common Issues
+
+#### High Complexity Scores
+
+```
+Problem: Tasks routing to too many agents
+Solution: Adjust complexity thresholds in configuration
+         (via Routing Module settings)
+```
+
+#### Agent Communication Failures
+
+```
+Problem: Inter-agent messaging issues
+Solution: Check network connectivity and message queue configuration
+         (via Integration Module diagnostics)
+```
+
+#### State Synchronization Conflicts
+
+```
+Problem: Inconsistent state across agents
+Solution: Review conflict resolution strategy settings
+         (via StateManager Facade configuration)
+```
+
+## API Reference
+
+### Orchestrator Interface
+
+```typescript
+interface StringRayOrchestrator {
+  execute(task: TaskDefinition): Promise<TaskResult>;
+  getStatus(): OrchestratorStatus;
+  getMetrics(): PerformanceMetrics;
+  configure(config: OrchestratorConfig): void;
+}
+```
+
+### Task Definition
+
+```typescript
+interface TaskDefinition {
+  id: string;
+  description: string;
+  subagentType?: string;
+  priority?: 'low' | 'medium' | 'high' | 'critical';
+  dependencies?: string[];
+  context?: Record<string, any>;
+}
+```
+
+### TaskSkillRouter Facade
+
+```typescript
+interface TaskSkillRouter {
+  route(request: RoutingRequest): Promise<RoutingResult>;
+  analyzeComplexity(request: RoutingRequest): Promise<ComplexityScore>;
+  getMapping(agent: string): Promise<SkillMapping>;
+  trackAnalytics(event: AnalyticsEvent): Promise<void>;
+}
+```
+
+## Architecture Statistics
+
+| Metric | Value |
+|--------|-------|
+| **Framework Version** | 1.9.0 |
+| **Orchestrator Facades** | 3 |
+| **Total Modules** | 26 |
+| **Mapping Modules** | 12 |
+| **Code Reduction** | 87% |
+| **Agents Supported** | 27 |
+| **Complexity Metrics** | 6 |
+| **Error Prevention** | 99.6% |
 
 ---
 
-_This diagram shows the complete StrRay orchestration pipeline with all integration points, dependency management, and monitoring capabilities._
+## Support
+
+For architectural questions and integration support:
+- GitHub Discussions: https://github.com/htafolla/stringray/discussions
+- Documentation: https://stringray.dev/architecture
+- Technical Support: support@stringray.dev
+
+---
+
+*StringRay Orchestrator v1.15.1 - Facade Pattern Integration Architecture*

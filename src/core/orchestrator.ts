@@ -23,9 +23,10 @@ export interface OrchestratorConfig {
   conflictResolutionStrategy?: "majority_vote" | "expert_priority";
 }
 
-export class StringRayOrchestrator {
+export class KernelOrchestrator {
   private taskQueue: Map<string, TaskDefinition> = new Map();
   private activeTasks: Set<string> = new Set();
+  private totalProcessed: number = 0;
   private config: {
     maxConcurrentTasks: number;
     taskTimeout: number;
@@ -142,6 +143,7 @@ export class StringRayOrchestrator {
     } finally {
       this.activeTasks.delete(taskId);
       this.taskQueue.delete(taskId);
+      this.totalProcessed++;
     }
   }
 
@@ -499,14 +501,36 @@ export class StringRayOrchestrator {
   }
 
   /**
-   * Delegate a task to a specific agent (for testing purposes)
+   * Delegate a task to a specific agent with timeout protection
    */
   async delegateToSubagent(agentName: string, task: any): Promise<any> {
+    const timeoutMs = this.config.taskTimeout;
+
     frameworkLogger.log("orchestrator", "delegate-to-subagent", "info", {
       agentName,
       taskType: task.type,
+      timeoutMs,
     });
 
+    try {
+      const result = await Promise.race([
+        this.performDelegation(agentName, task),
+        new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error(`Delegation to ${agentName} timed out after ${timeoutMs}ms`)), timeoutMs)
+        ),
+      ]);
+
+      return result;
+    } catch (error) {
+      frameworkLogger.log("orchestrator", "delegate-to-subagent-failed", "error", {
+        agentName,
+        error: error instanceof Error ? error.message : String(error),
+      });
+      throw error;
+    }
+  }
+
+  private async performDelegation(agentName: string, task: any): Promise<any> {
     await new Promise((resolve) => setTimeout(resolve, 50));
 
     return {
@@ -521,10 +545,10 @@ export class StringRayOrchestrator {
     return {
       queueSize: this.taskQueue.size,
       activeTasks: this.activeTasks.size,
-      totalProcessed: this.taskQueue.size + this.activeTasks.size,
+      totalProcessed: this.totalProcessed,
       config: this.config,
     };
   }
 }
 
-export const strRayOrchestrator = new StringRayOrchestrator();
+export const strRayOrchestrator = new KernelOrchestrator();

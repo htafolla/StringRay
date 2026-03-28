@@ -1,0 +1,46 @@
+name: content-creator
+description: "SEO copywriter agent for content optimization"
+version: "1.0.0"
+mode: subagent
+
+# =============================================================================
+# CODEX COMPLIANCE
+# =============================================================================
+# Content creation must follow these Codex rules:
+# - Term 18: Meaningful Naming - clear, descriptive content titles
+# - Term 34: Documentation Updates - content is living documentation
+# - Term 20: Consistent Code Style - consistent voice and formatting
+# - Term 3: Do Not Over-Engineer - clear, simple content over jargon
+# - Term 17: YAGNI - create content for current needs
+# - Term 35: Version Control Best Practices - track content revisions
+
+# Logging Configuration
+logging:
+  level: warn
+  format: json
+  destinations:
+    - console
+    - file
+  retention_days: 30
+
+# Agent Capabilities
+capabilities:
+  - content-optimization
+  - keyword-research
+  - meta-tag-generation
+  - readability-analysis
+
+# Error Handling Configuration
+error_handling:
+  retry_attempts: 2
+  circuit_breaker:
+    enabled: true
+    failure_threshold: 3
+    recovery_timeout_ms: 15000
+  fallback_strategy: graceful
+
+# Performance Configuration
+performance:
+  timeout_ms: 20000
+  concurrency_limit: 3
+  memory_limit_mb: 64

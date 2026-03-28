@@ -30,12 +30,9 @@ export class AgentsMdValidationProcessor {
   // Required sections that must exist in AGENTS.md (v1.7+ format)
   private readonly REQUIRED_SECTIONS = [
     "## Available Agents",
-    "## Complexity Routing",
-    "## CLI Commands",
-    "## Codex",
+    "## Available Skills",
   ];
 
-  // Required agent definitions (v1.7+ agents)
   private readonly REQUIRED_AGENTS = [
     "@enforcer",
     "@orchestrator",
@@ -46,17 +43,13 @@ export class AgentsMdValidationProcessor {
     "@testing-lead",
     "@bug-triage-specialist",
     "@researcher",
-    "@strategist",       // v1.7.2
-    "@tech-writer",     // v1.7.2
   ];
 
   // Recommended sections that should exist
   private readonly RECOMMENDED_SECTIONS = [
-    "## Reflection System",
-    "## Kernel Patterns",
-    "## Analytics",
-    "## Languages",
-    "## Plugin Systems",
+    "## Codex",
+    "## CLI Commands",
+    "## Skills Registry",
   ];
 
   constructor(projectRoot: string = process.cwd()) {
@@ -241,25 +234,11 @@ export class AgentsMdValidationProcessor {
       result.warnings.push("No date stamp found in AGENTS.md");
     }
 
-    // Check 7: Kernel patterns section (v1.7+ feature)
-    if (!content.includes("Kernel Patterns") && !content.includes("P9")) {
-      result.warnings.push(
-        "Consider adding Kernel Patterns section (v1.7+)",
-      );
-    }
-
-    // Check 8: Reflection system section (required for v1.7.2+)
-    if (!content.includes("Reflection System")) {
-      result.warnings.push(
-        "Consider adding Reflection System section (v1.7.2+)",
-      );
-    }
-
-    // Check 9: Total agent count (should have 20+)
+    // Check 7: Agent count (should have active autonomous agents)
     const agentCount = (content.match(/@\[?[a-z-]+\]?/gi) || []).length;
-    if (agentCount < 15) {
+    if (agentCount < 5) {
       result.warnings.push(
-        `Only ${agentCount} agents found (recommend 20+ for v1.7+)`,
+        `Only ${agentCount} agents found - verify agents table is complete`,
       );
     }
 

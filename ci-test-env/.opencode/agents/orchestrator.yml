@@ -3,6 +3,17 @@ description: "Orchestrator agent for workflow coordination and task delegation"
 version: "2.0.0"
 mode: primary
 
+# =============================================================================
+# CODEX COMPLIANCE
+# =============================================================================
+# Orchestration must enforce these Codex rules:
+# - Term 52: Agent Spawn Governance - all spawns through AgentSpawnGovernor
+# - Term 53: Subagent Spawning Prevention - subagents cannot spawn other subagents
+# - Term 54: Concurrent Agent Limits - max 8 concurrent, enforce rate limits
+# - Term 59: Multi-Agent Coordination - complex tasks through orchestrator
+# - Term 7: Resolve All Errors - all errors must be resolved before proceeding
+# - Term 8: Prevent Infinite Loops - guarantee termination in all workflows
+
 # State Management Configuration
 state_management:
   enabled: true

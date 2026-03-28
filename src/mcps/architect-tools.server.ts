@@ -22,7 +22,7 @@ class StrRayArchitectToolsServer {
   constructor() {
     this.server = new Server(
       {
-        name: "architect-tools", version: "1.7.5",
+        name: "architect-tools", version: "1.15.6",
       },
       {
         capabilities: {
@@ -32,7 +32,7 @@ class StrRayArchitectToolsServer {
     );
 
     this.setupToolHandlers();
-    console.log("StrRay Architect Tools MCP Server initialized");
+    frameworkLogger.log("mcps/architect-tools", "init", "info", { message: "StrRay Architect Tools MCP Server initialized" });
   }
 
   private setupToolHandlers() {
@@ -173,7 +173,7 @@ class StrRayArchitectToolsServer {
               throw new Error(`Unknown tool: ${name}`);
           }
         } catch (error) {
-          console.error(`Error in architect tool ${name}:`, error);
+          frameworkLogger.log("mcps/architect-tools", "tool", "error", { tool: name, error: String(error) });
           throw error;
         }
       },
@@ -185,9 +185,7 @@ class StrRayArchitectToolsServer {
   private async contextAnalysis(args: any): Promise<any> {
     const { projectRoot, depth = "detailed", includeFiles } = args;
 
-    console.log(
-      `🏗️ Architect Tool: Performing context analysis on ${projectRoot}`,
-    );
+    frameworkLogger.log("mcps/architect-tools", "context-analysis", "info", { projectRoot });
 
     // This would integrate with the actual architect-tools.ts functions
     // For now, providing a simplified implementation
@@ -217,9 +215,7 @@ class StrRayArchitectToolsServer {
   private async codebaseStructure(args: any): Promise<any> {
     const { projectRoot, includeMetrics = true, maxDepth = 10 } = args;
 
-    console.log(
-      `🏗️ Architect Tool: Analyzing codebase structure for ${projectRoot}`,
-    );
+    frameworkLogger.log("mcps/architect-tools", "codebase-structure", "info", { projectRoot });
 
     const structure = {
       projectRoot,
@@ -243,9 +239,7 @@ class StrRayArchitectToolsServer {
   private async dependencyAnalysis(args: any): Promise<any> {
     const { projectRoot, focusAreas, includeGraphs = true } = args;
 
-    console.log(
-      `🏗️ Architect Tool: Performing dependency analysis on ${projectRoot}`,
-    );
+    frameworkLogger.log("mcps/architect-tools", "dependency-analysis", "info", { projectRoot });
 
     const analysis = {
       projectRoot,
@@ -277,9 +271,7 @@ class StrRayArchitectToolsServer {
       focusMetrics,
     } = args;
 
-    console.log(
-      `🏗️ Architect Tool: Performing architecture assessment on ${projectRoot}`,
-    );
+    frameworkLogger.log("mcps/architect-tools", "architecture-assessment", "info", { projectRoot });
 
     const assessment = {
       projectRoot,
@@ -318,7 +310,14 @@ class StrRayArchitectToolsServer {
       fileTypes: this.groupByExtension(files),
       directoryDepth: this.calculateMaxDepth(directories),
       largestFiles: files
-        .map((f) => ({ path: f, size: fs.statSync(f).size }))
+        .map((f) => {
+          try {
+            return { path: f, size: fs.statSync(f).size };
+          } catch {
+            return null;
+          }
+        })
+        .filter((f): f is { path: string; size: number } => f !== null)
         .sort((a, b) => b.size - a.size)
         .slice(0, 5),
     };
@@ -389,8 +388,10 @@ class StrRayArchitectToolsServer {
       dependencyMap: dependencies,
       totalDependencies: Object.values(dependencies).flat().length,
       averageDependenciesPerFile:
-        Object.values(dependencies).flat().length /
-        Object.keys(dependencies).length,
+        Object.keys(dependencies).length > 0
+          ? Object.values(dependencies).flat().length /
+            Object.keys(dependencies).length
+          : 0,
     };
   }
 
@@ -440,14 +441,23 @@ class StrRayArchitectToolsServer {
   private async calculateStructureMetrics(projectRoot: string): Promise<any> {
     const files = await this.getProjectFiles(projectRoot);
 
+    const fileSizes = files
+      .map((f) => {
+        try {
+          return { path: f, size: fs.statSync(f).size };
+        } catch {
+          return null;
+        }
+      })
+      .filter((f): f is { path: string; size: number } => f !== null);
+
+    const totalSize = fileSizes.reduce((sum, f) => sum + f.size, 0);
+
     return {
       totalFiles: files.length,
       fileTypeDistribution: this.groupByExtension(files),
-      averageFileSize:
-        files.reduce((sum, f) => sum + fs.statSync(f).size, 0) / files.length,
-      largestFile: files
-        .map((f) => ({ path: f, size: fs.statSync(f).size }))
-        .sort((a, b) => b.size - a.size)[0],
+      averageFileSize: fileSizes.length > 0 ? totalSize / fileSizes.length : 0,
+      largestFile: fileSizes.sort((a, b) => b.size - a.size)[0],
     };
   }
 
@@ -459,7 +469,7 @@ class StrRayArchitectToolsServer {
 
     // Simple dependency analysis
     const dependencies: Record<string, string[]> = {};
-    let circularDeps = 0;
+    const circularDeps = 0;
 
     for (const file of files.slice(0, 10)) {
       try {
@@ -635,7 +645,9 @@ class StrRayArchitectToolsServer {
   }
 
   private calculateMaxDepth(directories: string[]): number {
-    return Math.max(...directories.map((dir) => dir.split("/").length));
+    return directories.length === 0
+      ? 0
+      : Math.max(...directories.map((dir) => dir.split("/").length));
   }
 
   private extractImports(content: string): string[] {
@@ -680,14 +692,14 @@ class StrRayArchitectToolsServer {
   async run(): Promise<void> {
     const transport = new StdioServerTransport();
     await this.server.connect(transport);
-    console.log("StrRay Architect Tools MCP Server started");
+    frameworkLogger.log("mcps/architect-tools", "start", "info");
 
     const cleanup = async (signal: string) => {
-      console.log(`Received ${signal}, shutting down gracefully...`);
+      frameworkLogger.log("mcps/architect-tools", "shutdown", "info", { signal });
 
       // Set a timeout to force exit if graceful shutdown fails
       const timeout = setTimeout(() => {
-        console.error("Graceful shutdown timeout, forcing exit...");
+        frameworkLogger.log("mcps/architect-tools", "shutdown", "error", { message: "Graceful shutdown timeout, forcing exit..." });
         process.exit(1);
       }, 5000); // 5 second timeout
 
@@ -696,11 +708,11 @@ class StrRayArchitectToolsServer {
           await this.server.close();
         }
         clearTimeout(timeout);
-        console.log("StrRay MCP Server shut down gracefully");
+        frameworkLogger.log("mcps/architect-tools", "shutdown", "success");
         process.exit(0);
       } catch (error) {
         clearTimeout(timeout);
-        console.error("Error during server shutdown:", error);
+        frameworkLogger.log("mcps/architect-tools", "shutdown", "error", { message: `Error during server shutdown: ${String(error)}` });
         process.exit(1);
       }
     };
@@ -717,9 +729,7 @@ class StrRayArchitectToolsServer {
         setTimeout(checkParent, 1000); // Check again in 1 second
       } catch (error) {
         // Parent process died, shut down gracefully
-        console.log(
-          "Parent process (opencode) died, shutting down MCP server...",
-        );
+        frameworkLogger.log("mcps/architect-tools", "parent-death", "info");
         cleanup("parent-process-death");
       }
     };
@@ -729,23 +739,20 @@ class StrRayArchitectToolsServer {
 
     // Handle uncaught exceptions and unhandled rejections
     process.on("uncaughtException", (error) => {
-      console.error("Uncaught Exception:", error);
+      frameworkLogger.log("mcps/architect-tools", "uncaughtException", "error", { error: String(error) });
       cleanup("uncaughtException");
     });
 
     process.on("unhandledRejection", (reason, promise) => {
-      console.error("Unhandled Rejection at:", promise, "reason:", reason);
+      frameworkLogger.log("mcps/architect-tools", "unhandledRejection", "error", { error: String(reason) });
       cleanup("unhandledRejection");
     });
-
-    process.on("SIGINT", cleanup);
-    process.on("SIGTERM", cleanup);
   }
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {
   const server = new StrRayArchitectToolsServer();
-  server.run().catch(console.error);
+  server.run().catch((error) => frameworkLogger.log("mcps/architect-tools", "run", "error", { error: String(error) }));
 }
 
 export default StrRayArchitectToolsServer;

@@ -32,11 +32,12 @@ async function main() {
 
   try {
     // Import and run the processor - use file URL for ESM compatibility
-    // The path needs to resolve from project root, not scripts/node/
-    const projectRoot = path.join(__dirname, '..', '..');
+    // __dirname is the script's directory (scripts/node/), go up 2 levels to project root
+    const scriptDir = path.join(__dirname);
+    const projectRoot = path.join(scriptDir, '..', '..');
     const processorPath = path.join(projectRoot, 'dist', 'processors', 'version-compliance-processor.js');
     const { VersionComplianceProcessor } = await import(`file://${processorPath}`);
-    const processor = new VersionComplianceProcessor(process.cwd());
+    const processor = new VersionComplianceProcessor(projectRoot);
     
     const result = await processor.validateVersionCompliance();
 

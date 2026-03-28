@@ -6,7 +6,7 @@
  */
 
 import * as fs from "fs";
-import { frameworkLogger } from "../../framework-logger.js";
+import { frameworkLogger } from "../../core/framework-logger.js";
 import * as path from "path";
 import { execSync } from "child_process";
 

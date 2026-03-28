@@ -32,8 +32,9 @@ describe("SuccessHandler", () => {
       monitoringResults: [],
     };
 
-    // Mock console methods
-    vi.spyOn(console, "log").mockImplementation(() => {});
+    // Mock console methods - use mockClear to reset call history each test
+    const consoleSpy = vi.spyOn(console, "log").mockImplementation(() => {});
+    consoleSpy.mockClear();
   });
 
   describe("handleSuccess", () => {
@@ -116,8 +117,7 @@ describe("SuccessHandler", () => {
       );
     });
 
-    // Skipped - console logging behavior inconsistent with beforeEach mock
-    it.skip("should skip success confirmation when disabled", async () => {
+    it("should skip success confirmation when disabled", async () => {
       const customHandler = new SuccessHandler({ successConfirmation: false });
 
       // Track calls specifically - restore first to allow tracking
@@ -155,8 +155,7 @@ describe("SuccessHandler", () => {
       );
     });
 
-    // Skipped - console logging behavior inconsistent
-    it.skip("should skip notifications when disabled", async () => {
+    it("should skip notifications when disabled", async () => {
       const customHandler = new SuccessHandler({ notificationEnabled: false });
       const consoleSpy = vi.spyOn(console, "log");
 
@@ -182,8 +181,7 @@ describe("SuccessHandler", () => {
       expect(consoleSpy).toHaveBeenCalledWith("✅ Cleanup completed");
     });
 
-    // Skipped - console logging behavior inconsistent
-    it.skip("should skip cleanup when disabled", async () => {
+    it("should skip cleanup when disabled", async () => {
       const customHandler = new SuccessHandler({ cleanupEnabled: false });
       const consoleSpy = vi.spyOn(console, "log");
 
@@ -208,8 +206,7 @@ describe("SuccessHandler", () => {
       );
     });
 
-    // Skipped - console logging behavior inconsistent
-    it.skip("should skip metrics collection when disabled", async () => {
+    it("should skip metrics collection when disabled", async () => {
       const customHandler = new SuccessHandler({ metricsCollection: false });
       const consoleSpy = vi.spyOn(console, "log");
 

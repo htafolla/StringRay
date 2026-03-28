@@ -8,7 +8,7 @@ tags: [refactoring, refactoring, strategies]
 mcp:
   refactoring-strategies:
     command: node
-    args: [node_modules/strray-ai/dist/plugin/mcps/dist/mcps/knowledge-skills/refactoring-strategies.server.js]
+    args: [node_modules/strray-ai/dist/mcps/knowledge-skills/refactoring-strategies.server.js]
 ---
 
 # Refactoring Strategies Skill

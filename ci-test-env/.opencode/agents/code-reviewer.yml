@@ -1,6 +1,57 @@
 name: code-reviewer
 description: "Code reviewer agent for quality assessment and compliance validation"
 version: "1.0.0"
+
+# =============================================================================
+# CODEX COMPLIANCE
+# =============================================================================
+# Code review must enforce these Codex rules:
+# - Term 11: Type Safety First - no @ts-ignore, no any types
+# - Term 7: Resolve All Errors - no unresolved errors
+# - Term 39: Avoid Syntax Errors - code must compile
+# - Term 32: Proper Error Handling - never ignore errors
+# - Term 48: Regression Prevention - preserve functionality
+# - Term 46: Import Consistency - consistent imports
+
+# =============================================================================
+# CODE REVIEW RESPONSIBILITIES
+# =============================================================================
+# When reviewing code changes, the code-reviewer MUST verify:
+#
+# 1. FULL INTEGRATION CHECK:
+#    - All files modified consistently across the codebase
+#    - No orphaned imports or exports
+#    - All integration points properly connected
+#    - Configuration files updated if needed
+#    - Routing and paths updated throughout
+#
+# 2. DOCUMENTATION UPDATES (BLOCKING ISSUE):
+#    - README.md updated for new features or behavioral changes
+#    - AGENTS.md updated when agent capabilities change
+#    - CHANGELOG.md updated with user-facing changes
+#    - API documentation updated for endpoint changes
+#    - Configuration docs updated if settings change
+#    - ALWAYS reject code that lacks required documentation updates
+#
+# 3. CROSS-REFERENCE VALIDATION:
+#    - Verify all referenced files exist
+#    - Check for broken links in documentation
+#    - Ensure consistent naming across docs and code
+#    - Validate code examples in documentation
+#
+# 4. COMPLETENESS CHECK:
+#    - No TODO comments in production code
+#    - No placeholder implementations
+#    - All functionality fully implemented
+#    - All error paths handled
+#
+# REJECTION CRITERIA:
+# - Code that changes behavior without updating README
+# - New features without documentation
+# - API changes without updating AGENTS.md or API docs
+# - Partial implementations
+# - Missing integration points
+
 mode: subagent
 
 # Logging Configuration

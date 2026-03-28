@@ -10,7 +10,10 @@
  * @since 2026-03-08
  */
 
-import { PostProcessor } from '../PostProcessor.js';
+import { PostProcessor } from './PostProcessor.js';
+
+import type { WebhookConfig, WebhookEvent } from './triggers/WebhookTrigger.js';
+import type { APIConfig, APIRequest } from './triggers/APITrigger.js';
 
 export { WebhookTrigger } from './triggers/WebhookTrigger.js';
 export { APITrigger } from './triggers/APITrigger.js';

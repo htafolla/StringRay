@@ -53,7 +53,7 @@ describe("Orchestrator Dependency Handling", () => {
     expect(results.every((r) => r.success)).toBe(true);
 
     // Verify execution order (task-1 before task-2 before task-3)
-    const taskOrder = results.map((r) => r.result.id);
+    const taskOrder = results.map((r) => r.result?.id);
     expect(taskOrder.indexOf("task-1")).toBeLessThan(
       taskOrder.indexOf("task-2"),
     );

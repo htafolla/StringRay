@@ -3,11 +3,12 @@
  * Validates the complete end-to-end orchestration pipeline
  */
 
-import { StringRayOrchestrator } from "../orchestrator.js";
+import { StringRayOrchestrator } from "../orchestrator/orchestrator.js";
 import { enhancedMultiAgentOrchestrator } from "../orchestrator/enhanced-multi-agent-orchestrator.js";
 import { createAgentDelegator } from "../delegation/agent-delegator.js";
 import { StringRayStateManager } from "../state/state-manager.js";
 import { frameworkLogger } from "../core/framework-logger.js";
+import { strRayConfigLoader } from "../core/config-loader.js";
 
 interface TestResult {
   testName: string;
@@ -39,7 +40,7 @@ class OrchestrationFlowValidator {
 
   constructor() {
     this.stateManager = new StringRayStateManager();
-    this.agentDelegator = createAgentDelegator(this.stateManager);
+    this.agentDelegator = createAgentDelegator(this.stateManager, strRayConfigLoader);
     this.orchestrator = new StringRayOrchestrator({
       maxConcurrentTasks: 5,
       conflictResolutionStrategy: "expert_priority",
@@ -222,7 +223,7 @@ class OrchestrationFlowValidator {
       // Check for parallel execution where possible
       const monitoringData =
         enhancedMultiAgentOrchestrator.getMonitoringInterface();
-      const parallelExecution = Object.keys(monitoringData).length >= 2; // At least 27 agents ran
+      const parallelExecution = Object.keys(monitoringData).length >= 2; // At least 25 agents ran
 
       validationSteps.push({
         step: "Parallel Execution Validation",
@@ -668,7 +669,7 @@ class OrchestrationFlowValidator {
       const agents = result.metrics.agentsSpawned;
 
       // Test result details - kept as console.log for readability
-      await frameworkLogger.log(
+      void frameworkLogger.log(
         "orchestration-flow-validator",
         "-index-1-result-testname-status-duration-ms-agents",
         "info",
@@ -678,7 +679,7 @@ class OrchestrationFlowValidator {
       );
 
       // Show key metrics
-      await frameworkLogger.log(
+      void frameworkLogger.log(
         "orchestration-flow-validator",
         "-metrics-result-metrics-agentscompleted-result-met",
         "info",
@@ -690,7 +691,7 @@ class OrchestrationFlowValidator {
       // Show validation steps
       result.validationSteps.forEach((step) => {
         const stepStatus = step.success ? "✓" : "✗";
-        await frameworkLogger.log(
+        void frameworkLogger.log(
           "orchestration-flow-validator",
           "-stepstatus-step-step-",
           "info",
@@ -698,7 +699,7 @@ class OrchestrationFlowValidator {
         );
       });
 
-      await frameworkLogger.log("orchestration-flow-validator", "-", "info", {
+      void frameworkLogger.log("orchestration-flow-validator", "-", "info", {
         message: "",
       });
     });

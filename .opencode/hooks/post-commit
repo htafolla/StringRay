@@ -97,7 +97,7 @@ fi
 
           await frameworkLogger.log('-git-hook-trigger', '-post-commit-validation-passed-in-result-duration-', 'success', { message: '✅ Post-commit: Validation passed in ' + result.duration + 'ms' });
         } catch (error) {
-          console.error('❌ Post-commit validation failed:', error instanceof Error ? error.message : String(error));
+          await frameworkLogger.log('git-hook-trigger', 'post-commit-validation-failed', 'error', { error: error instanceof Error ? error.message : String(error) });
           process.exit(1);
         }
       })();
@@ -115,16 +115,72 @@ fi
         try {
           // Use dynamic import that works in both dev and consumer
           const basePath = process.env.STRRAY_BASE_PATH || '.';
+          // First archive logs (compress and rotate) before cleanup
+          const { archiveLogFiles } = await import(basePath + '/dist/postprocessor/triggers/GitHookTrigger.js');
+          const archiveResult = await archiveLogFiles({
+            archiveDirectory: 'logs/framework',
+            maxFileSizeMB: 10,  // Archive if > 10MB
+            rotationIntervalHours: 24,  // Archive if > 24 hours old
+            compressionEnabled: true,
+            maxAgeHours: 168,  // Keep archives for 7 days
+            directories: ['logs/framework'],
+            excludePatterns: []
+          });
+          if (archiveResult.archived > 0) {
+            await frameworkLogger.log('-git-hook-trigger', '-archived-log-files-', 'info', { message: `📦 Archived ${archiveResult.archived} log files` });
+          }
+
+          // Then cleanup old files
           const { cleanupLogFiles } = await import(basePath + '/dist/postprocessor/triggers/GitHookTrigger.js');
           const result = await cleanupLogFiles({
             maxAgeHours: 24,
-            excludePatterns: ['logs/framework/activity.log', 'logs/agents/refactoring-log.md', 'current-session.log'],
+            excludePatterns: [
+              // Core inference/logging - NEVER DELETE
+              'activity.log',           
+              'framework-activity-',
+              'strray-plugin-',
+              
+              // Analysis & reflections - Contains inference data
+              'kernel-',
+              'reflection-',
+              
+              // Documentation & plans - Important artifacts
+              '.md',
+              'AUTOMATED_',
+              'REFACTORING-',
+              'release-',
+              
+              // Subdirectories with important data (but test-activity should be cleaned)
+              'deployment/',
+              'monitoring/',
+              'reports/',
+              'reflections/',
+              
+              // Init logs can be cleaned but keep recent
+              'strray-init-2026-01-2',   // Keep Jan 20s
+              'strray-init-2026-01-3',   // Keep Jan 30s
+              
+              // Other important files
+              'current-session.log',
+              'full-test-run.log',
+              'kernel-codex',
+              'kernel-methodology',
+              'kernel-status',
+              'kernel-update',
+              'kernel-v2',
+            ],
             directories: ['logs/'],
             enabled: true
           });
           if (result.cleaned > 0) {
-            await frameworkLogger.log('-git-hook-trigger', '-cleaned-result-cleaned-old-log-files-', 'info', { message: `🧹 Cleaned ${result.cleaned} old log files` });
+            await frameworkLogger.log('-git-hook-trigger', '-cleaned-result-cleaned-old-log-files-', 'info', { message: '🧹 Cleaned ' + result.cleaned + ' old log files' });
           }
+          if (result.errors.length > 0) {
+            await frameworkLogger.log('git-hook-trigger', 'log-cleanup-errors', 'error', { errors: result.errors });
+          }
+        } catch (error) {
+          await frameworkLogger.log('git-hook-trigger', 'log-cleanup-failed', 'error', { error: error instanceof Error ? error.message : String(error) });
+        }
           if (result.errors.length > 0) {
             console.error('Log cleanup errors:', result.errors);
           }

@@ -161,7 +161,7 @@ class SessionManagementServer {
 
   constructor() {
     this.server = new Server(
-      { name: "session-management", version: "1.7.5" },
+      { name: "session-management", version: "1.15.6" },
       { capabilities: { tools: {} } },
     );
 
@@ -514,10 +514,10 @@ class SessionManagementServer {
     await frameworkLogger.log("mcp-session-management", "server-started", "success");
 
     const cleanup = async (signal: string) => {
-      console.log(`Received ${signal}, shutting down gracefully...`);
+      frameworkLogger.log("mcps/session-management", "shutdown", "info", { signal });
 
       const timeout = setTimeout(() => {
-        console.error("Graceful shutdown timeout, forcing exit...");
+        frameworkLogger.log("mcps/session-management", "shutdown", "error", { message: "Graceful shutdown timeout, forcing exit..." });
         process.exit(1);
       }, 5000);
 
@@ -526,11 +526,11 @@ class SessionManagementServer {
           await this.server.close();
         }
         clearTimeout(timeout);
-        console.log("Session Management MCP Server shut down gracefully");
+        frameworkLogger.log("mcps/session-management", "shutdown", "success");
         process.exit(0);
       } catch (error) {
         clearTimeout(timeout);
-        console.error("Error during server shutdown:", error);
+        frameworkLogger.log("mcps/session-management", "shutdown", "error", { message: `Error during server shutdown: ${String(error)}` });
         process.exit(1);
       }
     };
@@ -544,7 +544,7 @@ class SessionManagementServer {
         process.kill(process.ppid, 0);
         setTimeout(checkParent, 1000);
       } catch {
-        console.log("Parent process died, shutting down MCP server...");
+        frameworkLogger.log("mcps/session-management", "parent-death", "info");
         cleanup("parent-process-death");
       }
     };
@@ -552,12 +552,12 @@ class SessionManagementServer {
     setTimeout(checkParent, 2000);
 
     process.on("uncaughtException", (error) => {
-      console.error("Uncaught Exception:", error);
+      frameworkLogger.log("mcps/session-management", "uncaughtException", "error", { error: String(error) });
       cleanup("uncaughtException");
     });
 
     process.on("unhandledRejection", (reason, promise) => {
-      console.error("Unhandled Rejection at:", promise, "reason:", reason);
+      frameworkLogger.log("mcps/session-management", "unhandledRejection", "error", { error: String(reason) });
       cleanup("unhandledRejection");
     });
   }
@@ -565,7 +565,7 @@ class SessionManagementServer {
 
 if (import.meta.url === `file://${process.argv[1]}`) {
   const server = new SessionManagementServer();
-  server.run().catch(console.error);
+  server.run().catch((error) => frameworkLogger.log("mcps/session-management", "run", "error", { error: String(error) }));
 }
 
 export default SessionManagementServer;

@@ -1,0 +1,21 @@
+🚀 StringRay v1.15.1 - Inference Pipeline is LIVE! 🎉
+
+Self-improving AI orchestration that learns from every task.
+
+✅ 📊 6-layer pipeline: Routing → Analytics → Learning → Autonomous
+✅ 🎯 92% avg routing confidence
+✅ 🎯 100% routing accuracy on common patterns  
+✅ 🧠 Autonomous keyword mapping suggestions
+
+🔄 "@architect design API" → routes correctly
+🔧 "fix bug" → goes to bug-triage
+🔒 "@security-auditor scan" → security-audit
+
+The framework now learns from usage patterns and continuously improves routing decisions 📈
+
+Built with 2,521 tests passing ✅
+
+Try it:
+npx strray-ai inference:tuner --run-once
+
+#AI #OpenCode #StringRay #AIAgents #MachineLearning

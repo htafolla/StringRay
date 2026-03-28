@@ -17,15 +17,7 @@ export {
   SessionCoordinator,
   createSessionCoordinator,
 } from "./session-coordinator.js";
-export {
-  TaskSkillRouter,
-  taskSkillRouter,
-  createTaskSkillRouter,
-  routeTaskToAgent,
-  preprocessTask,
-} from "./task-skill-router.js";
 
-// Re-export types
 export type {
   ComplexityMetrics,
   ComplexityScore,
@@ -47,5 +39,3 @@ export type {
   Communication,
   SessionMetrics,
 } from "./session-coordinator.js";
-
-// Types are exported from task-skill-router.d.ts declaration file

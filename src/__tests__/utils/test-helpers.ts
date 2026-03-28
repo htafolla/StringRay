@@ -3,7 +3,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import { vi } from "vitest";
-import { CodexContext, CodexTerm } from "../../context-loader.js";
+import { CodexContext, CodexTerm } from "../../core/context-loader.js";
 
 /**
  * Mock file system utilities for testing
@@ -260,7 +260,7 @@ export class MockCodexGenerator {
    */
   static createMinimalCodex(): string {
     return JSON.stringify({
-      version: "1.7.5",
+      version: "1.15.6",
       lastUpdated: "2026-01-06",
       errorPreventionTarget: 0.996,
       terms: {
@@ -303,7 +303,7 @@ export class MockCodexGenerator {
    */
   static createCodexWithViolations(): string {
     return JSON.stringify({
-      version: "1.7.5",
+      version: "1.15.6",
       lastUpdated: "2026-01-06",
       errorPreventionTarget: 0.996,
       terms: {
@@ -373,7 +373,7 @@ export class MockContextFactory {
     overrides: Partial<CodexContext> = {},
   ): CodexContext {
     const defaultContext: CodexContext = {
-      version: "1.7.5",
+      version: "1.15.6",
       lastUpdated: new Date().toISOString(),
       terms: new Map([
         [

@@ -59,29 +59,66 @@ export interface PatternInsights {
 
 export class SimplePatternAnalyzer {
   private logPath: string;
+  private outcomesPath: string;
 
   constructor(logPath?: string) {
     const cwd = process.cwd();
     this.logPath =
       logPath || path.join(cwd, "logs", "framework", "activity.log");
+    // Only use outcomes path when using default log path
+    this.outcomesPath = logPath ? "" : path.join(cwd, "logs", "framework", "routing-outcomes.json");
   }
 
   /**
    * Main analysis method - reads log and returns insights
    */
   async analyze(limit?: number): Promise<PatternInsights> {
-    if (!fs.existsSync(this.logPath)) {
-      return this.emptyInsights();
+    const entries: ParsedLogEntry[] = [];
+
+    // Try to read from routing-outcomes.json first (has more complete data)
+    // Only when using default paths
+    if (this.outcomesPath && fs.existsSync(this.outcomesPath)) {
+      try {
+        const outcomes = JSON.parse(fs.readFileSync(this.outcomesPath, "utf-8"));
+        const outcomesToAnalyze = limit ? outcomes.slice(-limit) : outcomes;
+        
+        for (const outcome of outcomesToAnalyze) {
+          entries.push({
+            timestamp: outcome.timestamp || new Date().toISOString(),
+            jobId: outcome.taskId || "",
+            component: outcome.routedAgent || "unknown",
+            action: "routing-outcome",
+            status: outcome.success ? "success" : "error",
+            agentUsed: outcome.routedAgent,
+            operationType: outcome.routedSkill,
+            outcome: outcome.success ? "success" : "fail",
+            complexityScore: outcome.complexity,
+          });
+        }
+      } catch {
+        // Fall back to activity log parsing
+      }
     }
 
-    const content = fs.readFileSync(this.logPath, "utf-8");
-    const lines = content.split("\n").filter((l) => l.trim());
+    // Fall back to activity log parsing if no outcomes
+    if (entries.length === 0 && fs.existsSync(this.logPath)) {
+      const content = fs.readFileSync(this.logPath, "utf-8");
+      const lines = content.split("\n").filter((l) => l.trim());
+      
+      // Filter to task completion entries
+      const completionLines = lines.filter(
+        (line) => line.includes("complex-task-completed") || 
+                  line.includes("job-completed") ||
+                  line.includes("task-completed")
+      );
 
-    // Parse entries (newest first if no limit, otherwise get last N)
-    const entriesToAnalyze = limit ? lines.slice(-limit) : lines;
-    const entries = entriesToAnalyze
-      .map((line) => this.parseLine(line))
-      .filter((e): e is ParsedLogEntry => e !== null);
+      const entriesToAnalyze = limit ? completionLines.slice(-limit) : completionLines;
+      const parsedEntries = entriesToAnalyze
+        .map((line) => this.parseLine(line))
+        .filter((e): e is ParsedLogEntry => e !== null);
+      
+      entries.push(...parsedEntries);
+    }
 
     if (entries.length === 0) {
       return this.emptyInsights();
@@ -94,20 +131,30 @@ export class SimplePatternAnalyzer {
    * Parse a single log line
    */
   private parseLine(line: string): ParsedLogEntry | null {
-    // Format: 2026-02-24T10:30:00.000Z [job-123-abc] [component] action - STATUS
+    // Format: 2026-02-24T10:30:00.000Z [job-123-abc] [component] action - STATUS | {"details": "..."}
     const match = line.match(
-      /^(\d{4}-\d{2}-\d{2}T[\d:.]+Z)\s+\[([^\]]+)\]\s+\[([^\]]+)\]\s+(.+?)\s+-\s+(\w+)$/,
+      /^(\d{4}-\d{2}-\d{2}T[\d:.]+Z)\s+\[([^\]]+)\]\s+\[([^\]]+)\]\s+(.+?)\s+-\s+(\w+)(?:\s*\|\s*(.+))?$/,
     );
 
     if (!match) {
       return null;
     }
 
-    const [, timestamp, jobId, component, actionRaw, statusRaw] = match;
+    const [, timestamp, jobId, component, actionRaw, statusRaw, detailsRaw] = match;
 
     // Parse action and any embedded details
     const action = actionRaw?.trim() || "unknown";
     const status = statusRaw?.toLowerCase() || "info";
+
+    // Parse JSON details if present
+    let details: Record<string, any> = {};
+    if (detailsRaw) {
+      try {
+        details = JSON.parse(detailsRaw.trim());
+      } catch {
+        // Not JSON, ignore
+      }
+    }
 
     return {
       timestamp: timestamp || "",
@@ -115,6 +162,12 @@ export class SimplePatternAnalyzer {
       component: component || "unknown",
       action,
       status,
+      duration: details.duration,
+      complexityScore: details.complexityScore,
+      agentUsed: details.agentUsed || details.agent || details.taskType,
+      operationType: details.operationType || details.taskType,
+      outcome: details.outcome,
+      complexityAccuracy: details.complexityAccuracy,
     };
   }
 
@@ -131,12 +184,15 @@ export class SimplePatternAnalyzer {
       total: 0,
     };
 
-    // Filter to job-completed entries (they have the analytics data)
-    const completedEntries = entries.filter(
-      (e) => e.action === "job-completed" || e.action.includes("completed"),
+    // Filter to entries with analytics data (task completions or routing outcomes)
+    const relevantEntries = entries.filter(
+      (e) => e.action === "job-completed" || 
+             e.action === "routing-outcome" ||
+             e.action.includes("completed") ||
+             e.outcome !== undefined
     );
 
-    for (const entry of completedEntries) {
+    for (const entry of relevantEntries) {
       const agent = entry.agentUsed || entry.component || "unknown";
 
       // Agent stats

@@ -8,7 +8,7 @@ tags: [infrastructure, state, manager]
 mcp:
   state-manager:
     command: node
-    args: [node_modules/strray-ai/dist/plugin/mcps/dist/plugin/mcps/state-manager.server.js]
+    args: [node_modules/strray-ai/dist/mcps/state-manager.server.js]
 ---
 
 # State Manager Skill

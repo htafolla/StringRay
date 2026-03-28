@@ -2,7 +2,6 @@
 
 **Role**: System design & technical decisions
 **Mode**: Subagent
-**Model**: openrouter/xai-grok-2-1212-fast-1
 
 ## Purpose
 

@@ -8,7 +8,7 @@
  * @since 2026-01-23
  */
 
-import { StringRayOrchestrator } from "../core/orchestrator.js";
+import { KernelOrchestrator } from "../core/orchestrator.js";
 import { TaskDefinition } from "../agents/types.js";
 import { EnhancedMultiAgentOrchestrator } from "./enhanced-multi-agent-orchestrator.js";
 import { createAgentDelegator } from "../delegation/agent-delegator.js";
@@ -54,7 +54,7 @@ export interface CoordinationMetrics {
 }
 
 export class MultiAgentOrchestrationCoordinator {
-  private strRayOrchestrator: StringRayOrchestrator;
+  private strRayOrchestrator: KernelOrchestrator;
   private enhancedOrchestrator: EnhancedMultiAgentOrchestrator;
   private agentDelegator: any;
   private stateManager: StringRayStateManager;
@@ -63,7 +63,7 @@ export class MultiAgentOrchestrationCoordinator {
 
   constructor(stateManager?: StringRayStateManager) {
     this.stateManager = stateManager || new StringRayStateManager();
-    this.strRayOrchestrator = new StringRayOrchestrator();
+    this.strRayOrchestrator = new KernelOrchestrator();
     this.enhancedOrchestrator = new EnhancedMultiAgentOrchestrator();
     this.agentDelegator = createAgentDelegator(
       this.stateManager,
@@ -601,34 +601,15 @@ export class MultiAgentOrchestrationCoordinator {
       "security-auditor",
       "refactorer",
       "testing-lead",
-      "researcher", // formerly librarian
-      "strategist", // formerly oracle
-      "seo-consultant", // formerly seo-specialist
-      "content-creator", // formerly seo-copywriter
-      "growth-strategist", // formerly marketing-expert
-      "tech-writer", // formerly documentation-writer
+      "researcher",
       "log-monitor",
-      "multimodal-looker",
       "analyzer",
-      "code-analyzer", // alias for analyzer
-      "database-engineer",
-      "devops-engineer",
-      "backend-engineer",
-      "frontend-engineer",
-      "frontend-ui-ux-engineer",
-      "performance-engineer",
-      "mobile-developer",
+      "code-analyzer",
     ];
 
-    // Legacy agent name aliases (map old names to new)
     const agentAliasMap: Record<string, string> = {
       researcher: "researcher",
-      oracle: "strategist",
       "test-architect": "testing-lead",
-      "seo-specialist": "seo-consultant",
-      "seo-copywriter": "content-creator",
-      "marketing-expert": "growth-strategist",
-      "documentation-writer": "tech-writer",
       "testing-lead": "testing-lead",
       analyzer: "code-analyzer",
     };

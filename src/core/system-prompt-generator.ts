@@ -77,8 +77,37 @@ const ESSENTIAL_TERMS = [
     description: "Never use `any`, `@ts-ignore`, or `@ts-expect-error`.",
     zeroTolerance: true,
     enforcementLevel: "blocking" as const
+  },
+  {
+    number: 5,
+    title: "Surgical Changes Only",
+    description: "Read first. Understand context. Fix root cause only. Minimal changes. Never refactor unless asked.",
+    zeroTolerance: false,
+    enforcementLevel: "critical" as const
   }
 ];
+
+/**
+ * Rules for code-writing agents (surgical changes)
+ */
+const SURGICAL_CHANGE_RULES = `
+## Surgical Change Rules (Code Writers)
+When writing or fixing code:
+1. READ the entire file before making any changes
+2. UNDERSTAND the existing code - trace logic, understand patterns
+3. FIX only the root cause - never rewrite working code
+4. PRESERVE existing functionality - never simplify logic
+5. If a fix is complex: mark as TODO with explanation, do not skip
+6. ALWAYS attempt to fix - never simplify to "make it work"
+7. Tests: attempt fix first, only skip if truly blocked, return to later
+
+## Test Fixing Rules
+When fixing tests:
+1. NEVER simplify tests to make them pass
+2. If test is wrong: fix the code, not the test
+3. If blocked: add TODO comment, return to later
+4. Only skip tests with explicit TODO and reason
+`;
 
 /**
  * Lean welcome banner (minimal version)

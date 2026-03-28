@@ -16,6 +16,16 @@ export interface EscalationConfig {
   emergencyThreshold: number;
   alertChannels: string[];
   incidentReporting: boolean;
+  reportingEndpoints?: ReportingEndpoint[];
+}
+
+export interface ReportingEndpoint {
+  name: string;
+  url: string;
+  type: "webhook" | "pagerduty" | "slack" | "email" | "custom";
+  enabled: boolean;
+  priorityThreshold?: "low" | "medium" | "high" | "critical";
+  headers?: Record<string, string>;
 }
 
 export interface AlertMessage {
@@ -26,9 +36,23 @@ export interface AlertMessage {
   metadata?: any;
 }
 
+export interface IncidentReportPayload {
+  incident: IncidentReport;
+  formattedMessage: string;
+  affectedSystems: string[];
+  recommendedActions: string[];
+}
+
 export class EscalationEngine {
   private config: EscalationConfig;
   private incidents: Map<string, IncidentReport> = new Map();
+  private reportingHistory: Array<{
+    incidentId: string;
+    endpoint: string;
+    success: boolean;
+    timestamp: number;
+    response?: string;
+  }> = [];
 
   constructor(config: Partial<EscalationConfig> = {}) {
     this.config = {
@@ -156,11 +180,292 @@ export class EscalationEngine {
     this.incidents.set(incidentId, incidentReport);
 
     if (this.config.incidentReporting) {
-      // TODO: Implement incident reporting to external systems
-      console.log(`Incident reported: ${incidentId}`);
+      await this.reportIncidentToExternalSystems(incidentReport);
     }
 
     return incidentReport;
+  }
+
+  /**
+   * Report incident to configured external systems
+   */
+  private async reportIncidentToExternalSystems(incident: IncidentReport): Promise<void> {
+    const endpoints = this.config.reportingEndpoints || [];
+
+    if (endpoints.length === 0) {
+      console.log(`[EscalationEngine] Incident ${incident.id} created (no external endpoints configured)`);
+      return;
+    }
+
+    const severityLevel = incident.severity;
+    const priorityOrder = ["low", "medium", "high", "critical"];
+    const incidentPriorityIndex = priorityOrder.indexOf(severityLevel);
+
+    for (const endpoint of endpoints) {
+      if (!endpoint.enabled) continue;
+
+      const thresholdIndex = priorityOrder.indexOf(endpoint.priorityThreshold || "low");
+      if (incidentPriorityIndex < thresholdIndex) continue;
+
+      try {
+        const success = await this.sendToEndpoint(endpoint, incident);
+        this.reportingHistory.push({
+          incidentId: incident.id,
+          endpoint: endpoint.name,
+          success,
+          timestamp: Date.now(),
+        });
+
+        if (success) {
+          console.log(`[EscalationEngine] Incident ${incident.id} reported to ${endpoint.name}`);
+        }
+      } catch (error) {
+        this.reportingHistory.push({
+          incidentId: incident.id,
+          endpoint: endpoint.name,
+          success: false,
+          timestamp: Date.now(),
+          response: String(error),
+        });
+        console.error(`[EscalationEngine] Failed to report incident to ${endpoint.name}:`, error);
+      }
+    }
+  }
+
+  /**
+   * Send incident to a specific endpoint
+   */
+  private async sendToEndpoint(endpoint: ReportingEndpoint, incident: IncidentReport): Promise<boolean> {
+    const payload = this.buildIncidentPayload(incident);
+
+    switch (endpoint.type) {
+      case "slack":
+        return this.sendToSlack(endpoint, payload);
+      case "pagerduty":
+        return this.sendToPagerDuty(endpoint, payload);
+      case "webhook":
+        return this.sendWebhook(endpoint, payload);
+      case "email":
+        return this.sendEmail(endpoint, payload);
+      default:
+        return this.sendWebhook(endpoint, payload);
+    }
+  }
+
+  /**
+   * Build incident payload for reporting
+   */
+  private buildIncidentPayload(incident: IncidentReport): IncidentReportPayload {
+    return {
+      incident,
+      formattedMessage: this.formatIncidentMessage(incident),
+      affectedSystems: incident.affectedSystems,
+      recommendedActions: this.getRecommendedActions(incident.severity),
+    };
+  }
+
+  /**
+   * Format incident message for external systems
+   */
+  private formatIncidentMessage(incident: IncidentReport): string {
+    const lines = [
+      `🚨 Incident Report: ${incident.id}`,
+      `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+      `Severity: ${incident.severity.toUpperCase()}`,
+      `Time: ${incident.timestamp instanceof Date ? incident.timestamp.toISOString() : incident.timestamp}`,
+      `Commit: ${incident.commitSha}`,
+      ``,
+      `Impact: ${incident.impact}`,
+      `Root Cause: ${incident.rootCause}`,
+      ``,
+      `Timeline:`,
+      ...incident.timeline.map(
+        (t) =>
+          `  • ${t.timestamp instanceof Date ? t.timestamp.toISOString() : t.timestamp} - ${t.event}: ${t.details}`
+      ),
+      ``,
+      `Resolution: ${incident.resolution}`,
+    ];
+
+    return lines.join("\n");
+  }
+
+  /**
+   * Get recommended actions based on severity
+   */
+  private getRecommendedActions(severity: string): string[] {
+    switch (severity) {
+      case "critical":
+        return [
+          "Immediately notify on-call engineer",
+          "Begin incident response procedure",
+          "Consider rolling back to last stable version",
+          "Notify engineering leadership",
+        ];
+      case "high":
+        return [
+          "Notify development team lead",
+          "Begin root cause analysis",
+          "Prepare rollback plan if needed",
+          "Schedule post-mortem review",
+        ];
+      case "medium":
+        return [
+          "Add to sprint backlog",
+          "Assign to appropriate developer",
+          "Schedule code review",
+        ];
+      default:
+        return [
+          "Document in issue tracker",
+          "Review during next sprint planning",
+        ];
+    }
+  }
+
+  /**
+   * Send to Slack webhook
+   */
+  private async sendToSlack(endpoint: ReportingEndpoint, payload: IncidentReportPayload): Promise<boolean> {
+    const body = {
+      text: payload.formattedMessage,
+      attachments: [
+        {
+          color: this.getSeverityColor(payload.incident.severity),
+          fields: [
+            { title: "Severity", value: payload.incident.severity, short: true },
+            { title: "Commit", value: payload.incident.commitSha, short: true },
+          ],
+        },
+      ],
+    };
+
+    return this.sendWebhook(endpoint, body);
+  }
+
+  /**
+   * Send to PagerDuty
+   */
+  private async sendToPagerDuty(endpoint: ReportingEndpoint, payload: IncidentReportPayload): Promise<boolean> {
+    const body = {
+      routing_key: endpoint.headers?.["routing-key"] || "",
+      event_action: "trigger",
+      payload: {
+        summary: `[${payload.incident.severity.toUpperCase()}] ${payload.incident.impact}`,
+        severity: payload.incident.severity === "critical" ? "critical" : "error",
+        source: "StringRay EscalationEngine",
+        timestamp: payload.incident.timestamp instanceof Date
+          ? payload.incident.timestamp.toISOString()
+          : new Date().toISOString(),
+        custom_details: {
+          incident_id: payload.incident.id,
+          commit_sha: payload.incident.commitSha,
+          root_cause: payload.incident.rootCause,
+          affected_systems: payload.incident.affectedSystems.join(", "),
+          recommended_actions: payload.recommendedActions.join("\n"),
+        },
+      },
+    };
+
+    return this.sendWebhook(endpoint, body);
+  }
+
+  /**
+   * Send generic webhook
+   */
+  private async sendWebhook(endpoint: ReportingEndpoint, payload: any): Promise<boolean> {
+    try {
+      const response = await fetch(endpoint.url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...endpoint.headers,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      return response.ok;
+    } catch (error) {
+      console.error(`Webhook failed: ${error}`);
+      return false;
+    }
+  }
+
+  /**
+   * Send email notification (placeholder - would need SMTP configuration)
+   */
+  private async sendEmail(endpoint: ReportingEndpoint, payload: IncidentReportPayload): Promise<boolean> {
+    console.log(`[EscalationEngine] Email notification would be sent to ${endpoint.url}`);
+    console.log(`Subject: [${payload.incident.severity.toUpperCase()}] Incident ${payload.incident.id}`);
+    console.log(`Body: ${payload.formattedMessage}`);
+
+    return true;
+  }
+
+  /**
+   * Get color for severity level (for Slack attachments)
+   */
+  private getSeverityColor(severity: string): string {
+    switch (severity) {
+      case "critical":
+        return "#FF0000";
+      case "high":
+        return "#FFA500";
+      case "medium":
+        return "#FFFF00";
+      default:
+        return "#00FF00";
+    }
+  }
+
+  /**
+   * Get reporting history
+   */
+  getReportingHistory(): ReadonlyArray<{
+    incidentId: string;
+    endpoint: string;
+    success: boolean;
+    timestamp: number;
+    response?: string;
+  }> {
+    return [...this.reportingHistory];
+  }
+
+  /**
+   * Clear reporting history
+   */
+  clearReportingHistory(): void {
+    this.reportingHistory = [];
+  }
+
+  /**
+   * Add reporting endpoint dynamically
+   */
+  addReportingEndpoint(endpoint: ReportingEndpoint): void {
+    if (!this.config.reportingEndpoints) {
+      this.config.reportingEndpoints = [];
+    }
+    this.config.reportingEndpoints.push(endpoint);
+  }
+
+  /**
+   * Remove reporting endpoint
+   */
+  removeReportingEndpoint(name: string): boolean {
+    if (!this.config.reportingEndpoints) return false;
+    const index = this.config.reportingEndpoints.findIndex((e) => e.name === name);
+    if (index >= 0) {
+      this.config.reportingEndpoints.splice(index, 1);
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Get configured reporting endpoints
+   */
+  getReportingEndpoints(): ReportingEndpoint[] {
+    return [...(this.config.reportingEndpoints || [])];
   }
 
   /**

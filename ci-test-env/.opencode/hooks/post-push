@@ -1,5 +1,5 @@
 #!/bin/bash
-# StrRay Post-Processor post-push Hook
+# StringRay Post-Processor post-push Hook
 # Automatically triggers post-processor after post-push
 
 # Get hook type from script name
@@ -46,25 +46,17 @@ fi
 (
   cd "$(dirname "$0")/../.." # Navigate to project root
 
-  # Find the StrRay plugin in node_modules or current project (development)
+  # Find the StringRay plugin in node_modules or current project (development)
   STRRAY_PLUGIN=""
-  STRRAY_DIST=""
   if [ -d "node_modules/strray-framework" ]; then
     STRRAY_PLUGIN="node_modules/strray-framework"
-    STRRAY_DIST="node_modules/strray-framework/dist"
-  elif [ -d "node_modules/strray-ai" ]; then
-    STRRAY_PLUGIN="node_modules/strray-ai"
-    STRRAY_DIST="node_modules/strray-ai/dist"
   elif [ -d "node_modules/@strray/strray-framework" ]; then
     STRRAY_PLUGIN="node_modules/@strray/strray-framework"
-    STRRAY_DIST="node_modules/@strray/strray-framework/dist"
-  elif [ -d "node_modules/oh-my-opencode/plugins/strray-framework" ]; then
-    STRRAY_PLUGIN="node_modules/oh-my-opencode/plugins/strray-framework"
-    STRRAY_DIST="node_modules/oh-my-opencode/plugins/strray-framework/dist"
+  elif [ -d "node_modules/OpenCode/plugins/strray-framework" ]; then
+    STRRAY_PLUGIN="node_modules/OpenCode/plugins/strray-framework"
   elif [ -f "dist/postprocessor/PostProcessor.js" ]; then
     # Development mode - use current project
     STRRAY_PLUGIN="."
-    STRRAY_DIST="dist"
   fi
 
   if command -v node >/dev/null 2>&1 && [ -n "$STRRAY_PLUGIN" ]; then
@@ -74,7 +66,6 @@ fi
     export BRANCH="$BRANCH"
     export AUTHOR="$AUTHOR"
     export STRRAY_PLUGIN="$STRRAY_PLUGIN"
-    export STRRAY_DIST="$STRRAY_DIST"
     export MONITORING_LEVEL="$MONITORING_LEVEL"
     export IS_FULL_MONITORING="$([ "$MONITORING_LEVEL" = "full" ] && echo "true" || echo "false")"
 
@@ -94,17 +85,17 @@ fi
           const result = await validator.validate();
 
           if (result.warnings.length > 0) {
-            console.log('⚠️ ' + result.warnings.length + ' warning(s) found:');
-            result.warnings.forEach(w => console.log('   ' + w));
+            await frameworkLogger.log('-git-hook-trigger', '-result-warnings-length-warning-s-found-', 'info', { message: '⚠️ ' + result.warnings.length + ' warning(s) found:' });
+            result.warnings.forEach(w => await frameworkLogger.log('-git-hook-trigger', '-w-', 'info', { message: '   ' + w) });
           }
 
           if (!result.passed) {
-            console.log('❌ ' + result.errors.length + ' error(s) found:');
-            result.errors.forEach(e => console.log('   ' + e));
+            await frameworkLogger.log('-git-hook-trigger', '-result-errors-length-error-s-found-', 'error', { message: '❌ ' + result.errors.length + ' error(s) found:' });
+            result.errors.forEach(e => await frameworkLogger.log('-git-hook-trigger', '-e-', 'info', { message: '   ' + e) });
             process.exit(1);
           }
 
-          console.log('✅ Post-commit: Validation passed in ' + result.duration + 'ms');
+          await frameworkLogger.log('-git-hook-trigger', '-post-commit-validation-passed-in-result-duration-', 'success', { message: '✅ Post-commit: Validation passed in ' + result.duration + 'ms' });
         } catch (error) {
           console.error('❌ Post-commit validation failed:', error instanceof Error ? error.message : String(error));
           process.exit(1);
@@ -117,56 +108,34 @@ fi
 
       # Log metrics for monitoring (convert to milliseconds)
       DURATION_MS=$((DURATION * 1000))
-      echo "HOOK_METRICS: post-commit duration=${DURATION_MS}ms exit_code=${EXIT_CODE}" >&2
-
-      # Record metrics using metrics collector (direct import for reliability)
+      # LOG CLEANUP: Remove old log files after validation
+      # Use relative path from CWD - works in both dev and consumer
       node -e "
       (async () => {
         try {
-          const { HookMetricsCollector } = await import('./dist/postprocessor/validation/HookMetricsCollector.js');
-          const collector = new HookMetricsCollector();
-          collector.recordMetrics('post-commit', ${DURATION_MS}, ${EXIT_CODE});
-        } catch (error) {
-          // Silently fail if metrics collection fails
-        }
-      })();
-      " 2>/dev/null || true
-
-      [ $EXIT_CODE -eq 0 ] && exit 0 || exit 1
-    else
-      # FULL MONITORING: Comprehensive analysis for post-push
-      # Timeout: 5 minutes max, comprehensive CI/CD validation
-      START_TIME=$(date +%s)
-      timeout 300 node -e "
-      (async () => {
-        try {
-          console.log('🚀 Post-push: Comprehensive validation initiated');
-          
-          // Use PostProcessor from environment variable
-          const STRRAY_DIST = process.env.STRRAY_DIST || './dist';
-          const { PostProcessor } = await import(STRRAY_DIST + '/postprocessor/PostProcessor.js');
-          const { StrRayStateManager } = await import(STRRAY_DIST + '/state/state-manager.js');
-          
-          const stateManager = new StrRayStateManager();
-          const postProcessor = new PostProcessor(stateManager, null, {
-            reporting: { enabled: true, autoGenerate: true, reportThreshold: 10 }
+          // Use dynamic import that works in both dev and consumer
+          const basePath = process.env.STRRAY_BASE_PATH || '.';
+          const { cleanupLogFiles } = await import(basePath + '/dist/postprocessor/triggers/GitHookTrigger.js');
+          const result = await cleanupLogFiles({
+            maxAgeHours: 24,
+            excludePatterns: ['logs/framework/activity.log', 'logs/agents/refactoring-log.md', 'current-session.log'],
+            directories: ['logs/'],
+            enabled: true
           });
-          
-          // Run full post-processor loop
-          const context = {
-            commitSha: process.env.COMMIT_SHA || 'unknown',
-            branch: process.env.BRANCH || 'main',
-            files: [],
-            timestamp: Date.now()
-          };
-          
-          await postProcessor.executePostProcessorLoop(context);
-          console.log('✅ Post-push: Comprehensive validation passed');
+          if (result.cleaned > 0) {
+            await frameworkLogger.log('-git-hook-trigger', '-cleaned-result-cleaned-old-log-files-', 'info', { message: `🧹 Cleaned ${result.cleaned} old log files` });
+          }
+          if (result.errors.length > 0) {
+            console.error('Log cleanup errors:', result.errors);
+          }
         } catch (error) {
-          // Don't fail the push for validation errors
-          console.log('⚠️ Post-push: Validation skipped (' + (error instanceof Error ? error.message : 'error') + ')');
+          console.error('Log cleanup failed:', error.message);
         }
       })();
+      "
+
+      echo "HOOK_METRICS: post-commit duration=${DURATION_MS}ms exit_code=${EXIT_CODE}" >&2
+      collector.recordMetrics('post-commit', ${DURATION_MS}, ${EXIT_CODE});
       " 2>/dev/null
       EXIT_CODE=$?
       END_TIME=$(date +%s)
@@ -176,12 +145,26 @@ fi
       DURATION_MS=$((DURATION * 1000))
       echo "HOOK_METRICS: post-push duration=${DURATION_MS}ms exit_code=${EXIT_CODE}" >&2
 
-      # Metrics collection - simplified, don't fail if unavailable
-      echo "✅ Post-push hook completed in ${DURATION}s"
+      # Record metrics using metrics collector (direct import for reliability)
+      # Use environment variable for base path - works in both dev and consumer
+      node -e "
+      (async () => {
+        try {
+          const basePath = process.env.STRRAY_BASE_PATH || '.';
+          const distPath = process.env.STRRAY_DIST_PATH || 'dist';
+          const { HookMetricsCollector } = await import(basePath + '/' + distPath + '/postprocessor/validation/HookMetricsCollector.js');
+          const collector = new HookMetricsCollector();
+          collector.recordMetrics('post-push', ${DURATION_MS}, ${EXIT_CODE});
+        } catch (error) {
+          // Silently fail if metrics collection fails
+        }
+      })();
+      " 2>/dev/null || true
+
       [ $EXIT_CODE -eq 0 ] && exit 0 || exit 1
     fi
   else
-    echo "Warning: StrRay plugin not found or Node.js not available, skipping post-processor"
+    echo "Warning: StringRay plugin not found or Node.js not available, skipping post-processor"
   fi
 )
 

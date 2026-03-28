@@ -14,6 +14,7 @@ import {
   universalLibrarianConsultation,
   SystemAction,
 } from "./universal-librarian-consultation.js";
+import { routingOutcomeTracker } from "../delegation/analytics/outcome-tracker.js";
 
 const enhancedMultiAgentOrchestrator = new EnhancedMultiAgentOrchestrator();
 
@@ -33,9 +34,17 @@ export interface TaskDefinition {
 
 export interface TaskResult {
   success: boolean;
-  result?: any;
+  result?: TaskExecutionResult;
   error?: string;
   duration: number;
+}
+
+export interface TaskExecutionResult {
+  fixesApplied?: number;
+  testsOptimized?: number;
+  performanceImprovement?: number;
+  recommendations?: string[];
+  [key: string]: unknown;
 }
 
 export interface TestFailureContext {
@@ -46,6 +55,23 @@ export interface TestFailureContext {
   errorLogs: string[];
   testExecutionTime: number;
   sessionId?: string;
+}
+
+export interface HealingStrategy {
+  priorityLevel: "low" | "medium" | "high" | "critical";
+  agentsNeeded: string[];
+  estimatedTime: number;
+  complexityScore: number;
+  healingApproach: "simple" | "coordinated" | "enterprise";
+}
+
+export interface ConsolidationResult {
+  success: boolean;
+  fixesApplied: number;
+  testsOptimized: number;
+  performanceImprovement: number;
+  recommendations: string[];
+  summary: string;
 }
 
 export class StringRayOrchestrator {
@@ -113,7 +139,12 @@ export class StringRayOrchestrator {
         // Mark tasks as completed
         batchTasks.forEach((task) => completedTasks.add(task.id));
       } catch (error) {
-        console.error("❌ Orchestrator: Batch execution failed:", error);
+        await frameworkLogger.log(
+          "orchestrator",
+          "batch-execution-failed",
+          "error",
+          { error: String(error) },
+        );
         throw error;
       }
     }
@@ -136,11 +167,31 @@ export class StringRayOrchestrator {
       const result = await this.delegateToSubagent(task);
 
       const duration = Date.now() - startTime;
+      
+      // Track routing outcome for analytics
+      const resultObj = result as { error?: string } | null | undefined;
+      const success = !resultObj?.error;
+      routingOutcomeTracker.recordOutcome({
+        taskId: task.id,
+        taskDescription: task.description,
+        routedAgent: task.subagentType,
+        routedSkill: task.subagentType.replace("-", "_") + "_skill",
+        confidence: 0.8,
+        success,
+      });
+      
       await frameworkLogger.log(
         "orchestrator",
         "complex-task-completed",
         "success",
-        { jobId, taskExecuted: true },
+        { 
+          jobId, 
+          taskExecuted: true,
+          taskId: task.id,
+          taskType: task.subagentType,
+          duration,
+          success,
+        },
       );
 
       // Execute post-processors for agent task completion logging
@@ -189,22 +240,26 @@ export class StringRayOrchestrator {
           );
         }
       } catch (processorError) {
-        console.warn(
-          `⚠️ Post-processor execution failed for task ${task.id}:`,
-          processorError,
+        await frameworkLogger.log(
+          "orchestrator",
+          "post-processor-execution-failed",
+          "warning",
+          { taskId: task.id, error: String(processorError) },
         );
       }
 
       return {
         success: true,
-        result: { ...result, id: task.id },
+        result: { ...(result as Record<string, unknown>), id: task.id },
         duration,
       };
     } catch (error) {
       const duration = Date.now() - startTime;
-      console.error(
-        `❌ Orchestrator: Task ${task.id} failed after ${duration}ms:`,
-        error,
+      await frameworkLogger.log(
+        "orchestrator",
+        "task-execution-failed",
+        "error",
+        { taskId: task.id, duration, error: String(error) },
       );
 
       // Execute post-processors even on failure for error logging
@@ -231,9 +286,11 @@ export class StringRayOrchestrator {
           );
         }
       } catch (processorError) {
-        console.warn(
-          `⚠️ Post-processor execution failed for failed task ${task.id}:`,
-          processorError,
+        await frameworkLogger.log(
+          "orchestrator",
+          "post-processor-execution-failed-on-error",
+          "warning",
+          { taskId: task.id, error: String(processorError) },
         );
       }
 
@@ -293,9 +350,11 @@ export class StringRayOrchestrator {
         performanceImprovement: consolidationResult.performanceImprovement,
       };
     } catch (error) {
-      console.error(
-        `❌ Orchestrator: Auto-healing orchestration failed:`,
-        error,
+      await frameworkLogger.log(
+        "orchestrator",
+        "auto-healing-orchestration-failed",
+        "error",
+        { error: String(error) },
       );
       return {
         success: false,
@@ -381,7 +440,7 @@ export class StringRayOrchestrator {
    * Create task definitions for healing orchestration
    */
   private createHealingTaskDefinitions(
-    strategy: any,
+    strategy: HealingStrategy,
     failureContext: TestFailureContext,
   ): TaskDefinition[] {
     const tasks: TaskDefinition[] = [];
@@ -462,14 +521,7 @@ export class StringRayOrchestrator {
   private async consolidateHealingResults(
     taskResults: TaskResult[],
     originalContext: TestFailureContext,
-  ): Promise<{
-    success: boolean;
-    fixesApplied: number;
-    testsOptimized: number;
-    performanceImprovement: number;
-    recommendations: string[];
-    summary: string;
-  }> {
+  ): Promise<ConsolidationResult> {
     const successfulTasks = taskResults.filter((r) => r.success);
     const failedTasks = taskResults.filter((r) => !r.success);
 
@@ -513,7 +565,7 @@ export class StringRayOrchestrator {
   /**
    * Delegate task to appropriate subagent using enhanced orchestration
    */
-  private async delegateToSubagent(task: TaskDefinition): Promise<any> {
+  private async delegateToSubagent(task: TaskDefinition): Promise<unknown> {
     // Import complexity analyzer for delegation decisions
     const { complexityAnalyzer } =
       await import("../delegation/complexity-analyzer.js");

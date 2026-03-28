@@ -1,0 +1,34 @@
+#!/bin/bash
+# StringRay Post-Push Hook
+# Runs comprehensive monitoring and reporting after push
+# Does NOT block — runs in background
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+
+COMMIT_SHA=""
+while read local_ref local_sha remote_ref remote_sha; do
+  if [ "$local_sha" != "0000000000000000000000000000000000000000" ]; then
+    COMMIT_SHA=$local_sha
+    break
+  fi
+done
+
+if [ -z "$COMMIT_SHA" ]; then
+  exit 0
+fi
+
+BRANCH=$(git rev-parse --abbrev-ref HEAD)
+
+# Run in background — never block git operations
+(
+  if command -v node >/dev/null 2>&1; then
+    export HOOK_TYPE="post-push"
+    export COMMIT_SHA="$COMMIT_SHA"
+    export BRANCH="$BRANCH"
+    export PROJECT_ROOT="$PROJECT_ROOT"
+    node "$PROJECT_ROOT/scripts/hooks/run-hook.js" post-push 2>/dev/null || true
+  fi
+) &
+
+exit 0

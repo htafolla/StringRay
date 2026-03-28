@@ -9,10 +9,10 @@ import {
   ruleEnforcer,
   RuleValidationContext,
 } from "../../enforcement/rule-enforcer.js";
-import { frameworkLogger } from "../../framework-logger.js";
+import { frameworkLogger } from "../../core/framework-logger.js";
 
 // Mock framework logger
-vi.mock("../../framework-logger");
+vi.mock("../../core/framework-logger");
 
 describe("RuleEnforcer", () => {
   let enforcer: RuleEnforcer;

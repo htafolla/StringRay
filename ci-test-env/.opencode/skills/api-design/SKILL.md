@@ -8,7 +8,7 @@ tags: [design, api, design]
 mcp:
   api-design:
     command: node
-    args: [node_modules/strray-ai/dist/plugin/mcps/dist/mcps/knowledge-skills/api-design.server.js]
+    args: [node_modules/strray-ai/dist/mcps/knowledge-skills/api-design.server.js]
 ---
 
 # Api Design Skill

@@ -1,4 +1,6 @@
 // This test should be BLOCKED by codex enforcement due to TODO comment
+import { describe, test, expect } from "vitest";
+
 describe("Codex Enforcement Blocking Test", () => {
   test("should block TODO comments", () => {
     // TODO: This should be blocked by enforcement

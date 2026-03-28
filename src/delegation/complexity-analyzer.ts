@@ -4,75 +4,58 @@
  * Assesses operation complexity to determine optimal agent delegation strategy.
  * Implements metrics-based complexity scoring for intelligent task distribution.
  *
- * @version 1.0.0
+ * REFACTORED: Now uses complexity-core.ts for shared logic
+ * @version 1.1.0
  * @since 2026-01-07
  */
 
-export interface ComplexityMetrics {
-  fileCount: number;
-  changeVolume: number; // lines changed/added/deleted
-  operationType:
-    | "create"
-    | "modify"
-    | "refactor"
-    | "analyze"
-    | "debug"
-    | "test";
-  dependencies: number;
-  riskLevel: "low" | "medium" | "high" | "critical";
-  estimatedDuration: number; // minutes
-}
+import {
+  ComplexityMetrics,
+  ComplexityScore,
+  ComplexityThresholds,
+  ComplexityLevel,
+  DelegationStrategy,
+  DEFAULT_THRESHOLDS,
+  OPERATION_WEIGHTS,
+  RISK_MULTIPLIERS,
+  getLevelFromScore,
+  getStrategyForLevel,
+  getAgentCountForLevel,
+  generateReasoning,
+} from "./complexity-core.js";
 
-export interface ComplexityScore {
-  score: number; // 0-100
-  level: "simple" | "moderate" | "complex" | "enterprise";
-  recommendedStrategy: "single-agent" | "multi-agent" | "orchestrator-led";
-  estimatedAgents: number;
-  reasoning: string[];
-}
+// Re-export types for backward compatibility
+export type {
+  ComplexityMetrics,
+  ComplexityScore,
+  ComplexityThresholds,
+  ComplexityLevel,
+  DelegationStrategy,
+};
 
-export interface ComplexityThresholds {
-  simple: number; // score <= 25
-  moderate: number; // score <= 50
-  complex: number; // score <= 95
-  enterprise: number; // score > 95
-}
-
+/**
+ * Complexity Analyzer
+ * Analyzes operations and calculates complexity scores
+ */
 export class ComplexityAnalyzer {
+  private static readonly MAX_CALIBRATION_HISTORY = 1000;
+
   /**
    * CALIBRATED: Adjusted thresholds for balanced orchestration utilization
-   * - simple: 20 (was 25) - only truly trivial tasks
-   * - moderate: 35 (was 50) - medium complexity triggers earlier
-   * - complex: 75 (was 95) - complex tasks get multi-agent coordination
-   * - enterprise: 100 (unchanged) - maximum complexity (only extreme cases)
+   * - simple: 15 - most tasks trigger single-agent
+   * - moderate: 25 - tasks start triggering additional agents
+   * - complex: 50 - complex tasks get multi-agent coordination
+   * - enterprise: 100 - maximum complexity (only extreme cases)
    */
-  private thresholds: ComplexityThresholds = {
-    simple: 20,
-    moderate: 35,
-    complex: 75,
-    enterprise: 100,
-  };
+  private thresholds: ComplexityThresholds = { ...DEFAULT_THRESHOLDS };
 
-  private operationWeights = {
-    create: 1.0,
-    modify: 1.2,
-    refactor: 1.8,
-    analyze: 1.5,
-    debug: 2.0,
-    test: 1.3,
-  };
-
-  private riskMultipliers = {
-    low: 0.8,
-    medium: 1.0,
-    high: 1.3,
-    critical: 1.6,
-  };
+  private operationWeights = { ...OPERATION_WEIGHTS };
+  private riskMultipliers = { ...RISK_MULTIPLIERS };
 
   /**
    * Analyze operation complexity and return detailed metrics
    */
-  analyzeComplexity(operation: string, context: any): ComplexityMetrics {
+  analyzeComplexity(operation: string, context: unknown): ComplexityMetrics {
     const metrics: ComplexityMetrics = {
       fileCount: this.calculateFileCount(context),
       changeVolume: this.calculateChangeVolume(context),
@@ -97,16 +80,16 @@ export class ComplexityAnalyzer {
     // Base score calculation
     let score = 0;
 
-    // File count contribution (0-40 points) - INCREASED from 0-20
+    // File count contribution (0-40 points)
     score += Math.min(metrics.fileCount * 4, 40);
 
-    // Change volume contribution (0-50 points) - INCREASED from 0-25
+    // Change volume contribution (0-50 points)
     score += Math.min(metrics.changeVolume / 5, 50);
 
-    // Dependencies contribution (0-25 points) - INCREASED from 0-15
+    // Dependencies contribution (0-25 points)
     score += Math.min(metrics.dependencies * 5, 25);
 
-    // Duration contribution (0-15 points) - BEFORE multipliers for consistency
+    // Duration contribution (0-15 points)
     score += Math.min(metrics.estimatedDuration / 10, 15);
 
     // Operation type weight (multiplier)
@@ -118,30 +101,13 @@ export class ComplexityAnalyzer {
     // Normalize to 0-100
     score = Math.min(Math.max(score, 0), 100);
 
-    // Determine level and strategy
-    let level: ComplexityScore["level"];
-    let recommendedStrategy: ComplexityScore["recommendedStrategy"];
-    let estimatedAgents: number;
+    // Determine level and strategy using core functions
+    const level = getLevelFromScore(score, this.thresholds);
+    const recommendedStrategy = getStrategyForLevel(level);
+    const estimatedAgents = getAgentCountForLevel(level);
 
-    if (score <= this.thresholds.simple) {
-      level = "simple";
-      recommendedStrategy = "single-agent";
-      estimatedAgents = 1;
-    } else if (score <= this.thresholds.moderate) {
-      level = "moderate";
-      recommendedStrategy = "single-agent";
-      estimatedAgents = 1;
-    } else if (score <= this.thresholds.complex) {
-      level = "complex";
-      recommendedStrategy = "multi-agent";
-      estimatedAgents = 2;
-    } else {
-      level = "enterprise";
-      recommendedStrategy = "orchestrator-led";
-      estimatedAgents = 3;
-    }
-
-    const reasoning = this.generateReasoning(metrics, score, level);
+    // Generate reasoning using core function
+    const reasoning = generateReasoning(metrics, score, level);
 
     return {
       score: Math.round(score),
@@ -153,16 +119,129 @@ export class ComplexityAnalyzer {
   }
 
   /**
-   * Update thresholds based on historical performance data
-   * TODO: Implement calibration based on actual task completion times
-   *
-   * This would analyze completed tasks and their scores vs actual duration
-   * to automatically calibrate thresholds for optimal routing.
+   * Performance data structure for calibration
    */
-  updateThresholds(performanceData: any): void {
-    // Placeholder for future calibration implementation
-    // Would analyze: task score vs completion time vs success rate
-    // to automatically adjust thresholds
+  private calibrationHistory: Array<{
+    complexityScore: number;
+    actualDuration: number;
+    estimatedDuration: number;
+    success: boolean;
+    timestamp: number;
+  }> = [];
+
+  /**
+   * Update thresholds based on historical performance data
+   * Analyzes: task score vs completion time vs success rate
+   * to automatically adjust thresholds for better accuracy
+   */
+  updateThresholds(performanceData: unknown): void {
+    if (!performanceData || typeof performanceData !== "object") {
+      return;
+    }
+
+    const data = performanceData as {
+      complexityScore?: number;
+      actualDuration?: number;
+      estimatedDuration?: number;
+      success?: boolean;
+      timestamp?: number;
+    };
+
+    if (data.complexityScore === undefined) {
+      return;
+    }
+
+    this.calibrationHistory.push({
+      complexityScore: data.complexityScore,
+      actualDuration: data.actualDuration || 0,
+      estimatedDuration: data.estimatedDuration || 30,
+      success: data.success !== false,
+      timestamp: data.timestamp || Date.now(),
+    });
+
+    if (this.calibrationHistory.length > ComplexityAnalyzer.MAX_CALIBRATION_HISTORY) {
+      const removeCount = this.calibrationHistory.length - ComplexityAnalyzer.MAX_CALIBRATION_HISTORY + 100;
+      this.calibrationHistory = this.calibrationHistory.slice(removeCount);
+    }
+
+    if (this.calibrationHistory.length < 10) {
+      return;
+    }
+
+    const analysis = this.analyzeCalibrationData();
+    this.applyCalibrationAnalysis(analysis);
+  }
+
+  /**
+   * Analyze calibration data to find patterns
+   */
+  private analyzeCalibrationData(): {
+    underestimated: boolean;
+    overestimated: boolean;
+    adjustmentFactor: number;
+  } {
+    let underestimated = 0;
+    let overestimated = 0;
+    let totalAdjustmentFactor = 0;
+
+    for (const entry of this.calibrationHistory) {
+      if (entry.actualDuration > entry.estimatedDuration * 1.5) {
+        underestimated++;
+        totalAdjustmentFactor += 0.05;
+      } else if (entry.actualDuration < entry.estimatedDuration * 0.5) {
+        overestimated++;
+        totalAdjustmentFactor -= 0.05;
+      }
+    }
+
+    return {
+      underestimated: underestimated > this.calibrationHistory.length * 0.3,
+      overestimated: overestimated > this.calibrationHistory.length * 0.3,
+      adjustmentFactor: totalAdjustmentFactor / this.calibrationHistory.length,
+    };
+  }
+
+  /**
+   * Apply calibration analysis to adjust thresholds
+   */
+  private applyCalibrationAnalysis(analysis: {
+    underestimated: boolean;
+    overestimated: boolean;
+    adjustmentFactor: number;
+  }): void {
+    const maxAdjustment = 10;
+
+    if (analysis.underestimated) {
+      const adjustment = Math.min(maxAdjustment, Math.abs(analysis.adjustmentFactor) * 100);
+      this.thresholds.simple = Math.max(10, this.thresholds.simple - adjustment);
+      this.thresholds.moderate = Math.max(20, this.thresholds.moderate - adjustment);
+      this.thresholds.complex = Math.max(40, this.thresholds.complex - adjustment);
+    } else if (analysis.overestimated) {
+      const adjustment = Math.min(maxAdjustment, Math.abs(analysis.adjustmentFactor) * 100);
+      this.thresholds.simple = Math.min(40, this.thresholds.simple + adjustment);
+      this.thresholds.moderate = Math.min(60, this.thresholds.moderate + adjustment);
+      this.thresholds.complex = Math.min(90, this.thresholds.complex + adjustment);
+    }
+  }
+
+  /**
+   * Get calibration history for diagnostics
+   */
+  getCalibrationHistory(): ReadonlyArray<{
+    complexityScore: number;
+    actualDuration: number;
+    estimatedDuration: number;
+    success: boolean;
+    timestamp: number;
+  }> {
+    return [...this.calibrationHistory];
+  }
+
+  /**
+   * Reset calibration history
+   */
+  resetCalibration(): void {
+    this.calibrationHistory = [];
   }
 
   /**
@@ -185,278 +264,106 @@ export class ComplexityAnalyzer {
   setOperationWeights(weights: Partial<Record<string, number>>): void {
     for (const [key, value] of Object.entries(weights)) {
       if (typeof value === "number") {
-        (this.operationWeights as any)[key] = value;
+        (this.operationWeights as Record<string, number>)[key] = value;
       }
     }
   }
 
   /**
-   * Set risk multipliers (from calibrator)
+   * Set risk level multipliers (from calibrator)
    */
   setRiskMultipliers(multipliers: Partial<Record<string, number>>): void {
     for (const [key, value] of Object.entries(multipliers)) {
       if (typeof value === "number") {
-        (this.riskMultipliers as any)[key] = value;
+        (this.riskMultipliers as Record<string, number>)[key] = value;
       }
     }
   }
 
   /**
-   * Apply calibration results from ComplexityCalibrator
+   * Calibrate analyzer based on calibrator recommendations
    */
-  applyCalibration(calibrationResult: {
-    adjustedWeights: {
-      operationType: Record<string, number>;
-      riskLevel: Record<string, number>;
-    };
-    adjustedThresholds: ComplexityThresholds;
+  calibrate(settings: {
+    thresholds?: Partial<ComplexityThresholds>;
+    operationWeights?: Partial<Record<string, number>>;
+    riskMultipliers?: Partial<Record<string, number>>;
   }): void {
-    if (calibrationResult.adjustedWeights.operationType) {
-      this.setOperationWeights(calibrationResult.adjustedWeights.operationType);
+    if (settings.thresholds) {
+      this.setThresholds(settings.thresholds);
     }
-    if (calibrationResult.adjustedWeights.riskLevel) {
-      this.setRiskMultipliers(calibrationResult.adjustedWeights.riskLevel);
+    if (settings.operationWeights) {
+      this.setOperationWeights(settings.operationWeights);
     }
-    if (calibrationResult.adjustedThresholds) {
-      this.setThresholds(calibrationResult.adjustedThresholds);
+    if (settings.riskMultipliers) {
+      this.setRiskMultipliers(settings.riskMultipliers);
     }
   }
 
   // Private helper methods
-
-  /**
-   * Calculate file count from context
-   * FIXED: Handle empty arrays by falling back to description inference
-   */
-  private calculateFileCount(context: any): number {
-    if (
-      context.files &&
-      Array.isArray(context.files) &&
-      context.files.length > 0
-    ) {
-      return context.files.length;
-    }
-    if (context.fileCount) {
-      return context.fileCount;
-    }
-
-    const description = context.description || "";
-    const desc = description.toLowerCase();
-
-    // Enhanced inference with more patterns
-    if (desc.includes("single file") || desc.includes("one file")) return 1;
-    if (desc.includes("couple files") || desc.includes("few files")) return 2;
-    if (desc.includes("several files")) return 4;
-    if (desc.includes("multiple files") || desc.includes("various files"))
-      return 5;
-    if (desc.includes("many files")) return 8;
-    if (desc.includes("entire module") || desc.includes("whole module"))
-      return 10;
-    if (desc.includes("system-wide") || desc.includes("across system"))
-      return 20;
-
-    // Default: assume single file for safety
-    return 1;
+  private calculateFileCount(context: unknown): number {
+    const ctx = context as { files?: string[] };
+    return ctx?.files?.length || 1;
   }
 
-  /**
-   * Calculate change volume from context
-   * ENHANCED: Better defaults based on operation type and description
-   */
-  private calculateChangeVolume(context: any): number {
-    if (context.changeVolume) {
-      return context.changeVolume;
+  private calculateChangeVolume(context: unknown): number {
+    const ctx = context as {
+      changes?: { added?: number; deleted?: number; modified?: number };
+      linesChanged?: number;
+      changeVolume?: number;
+    };
+    // Support both formats: context.changes or context.linesChanged
+    if (ctx?.linesChanged !== undefined) {
+      return ctx.linesChanged;
     }
-    if (context.linesChanged) {
-      return context.linesChanged;
+    if (ctx?.changeVolume !== undefined) {
+      return ctx.changeVolume;
     }
-
-    const operation = context.operation || "";
-    const desc = (context.description || "").toLowerCase();
-    const opLower = operation.toLowerCase();
-
-    // Size indicators in description
-    if (desc.includes("large") || desc.includes("extensive")) return 500;
-    if (desc.includes("medium") || desc.includes("significant")) return 200;
-    if (desc.includes("small") || desc.includes("minor")) return 50;
-    if (desc.includes("tiny") || desc.includes("trivial")) return 10;
-
-    // Operation-based defaults
-    if (opLower.includes("create")) return 100; // Creating new code
-    if (opLower.includes("modify")) return 75; // Modifying existing
-    if (opLower.includes("refactor")) return 150; // Refactoring tends to be larger
-    if (opLower.includes("analyze")) return 25; // Analysis may involve some changes
-    if (opLower.includes("debug")) return 50; // Debugging fixes
-    if (opLower.includes("test")) return 80; // Tests can be substantial
-    if (opLower.includes("documentation")) return 30; // Docs
-
-    return 50; // default
+    const changes = ctx?.changes || {};
+    return (changes.added || 0) + (changes.deleted || 0) + (changes.modified || 0);
   }
 
-  private determineOperationType(
-    operation: string,
-  ): ComplexityMetrics["operationType"] {
+  private determineOperationType(operation: string): ComplexityMetrics["operationType"] {
     const op = operation.toLowerCase();
-    if (op.includes("create") || op.includes("add") || op.includes("new"))
-      return "create";
-    if (op.includes("refactor") || op.includes("restructure"))
-      return "refactor";
-    if (
-      op.includes("analyze") ||
-      op.includes("review") ||
-      op.includes("examine")
-    )
-      return "analyze";
-    if (op.includes("debug") || op.includes("fix") || op.includes("resolve"))
-      return "debug";
+    if (op.includes("refactor")) return "refactor";
+    if (op.includes("debug")) return "debug";
     if (op.includes("test")) return "test";
-    return "modify"; // default
+    if (op.includes("analyze")) return "analyze";
+    if (op.includes("create")) return "create";
+    return "modify";
   }
 
-  private calculateDependencies(context: any): number {
-    if (context.dependencies && Array.isArray(context.dependencies)) {
-      return context.dependencies.length;
+  private calculateDependencies(context: unknown): number {
+    const ctx = context as { dependencies?: string[]; dependencyCount?: number };
+    // Support both formats: context.dependencies array or context.dependencyCount
+    if (ctx?.dependencyCount !== undefined) {
+      return ctx.dependencyCount;
     }
-    if (context.dependencyCount) {
-      return context.dependencyCount;
-    }
-
-    const description = context.description || "";
-    const desc = description.toLowerCase();
-    if (desc.includes("independent")) return 0;
-    if (desc.includes("depends on")) return 3;
-    if (desc.includes("multiple dependencies")) return 5;
-    if (desc.includes("complex dependencies")) return 8;
-    return 1;
+    return ctx?.dependencies?.length || 0;
   }
 
-  /**
-   * Assess risk level based on operation type and description
-   * ENHANCED: Added missing high-risk keywords for better accuracy
-   */
-  private assessRiskLevel(context: any): ComplexityMetrics["riskLevel"] {
-    if (context.riskLevel) {
-      return context.riskLevel;
-    }
-
-    const operation = context.operation || "";
-    const description = context.description || "";
-    const opLower = operation.toLowerCase();
-    const descLower = description.toLowerCase();
-
-    // CRITICAL: Database, migrations, and infrastructure changes
-    if (
-      opLower.includes("database") ||
-      opLower.includes("migration") ||
-      opLower.includes("deploy") ||
-      opLower.includes("release") ||
-      opLower.includes("production") ||
-      descLower.includes("breaking change") ||
-      descLower.includes("critical")
-    ) {
-      return "critical";
-    }
-
-    // HIGH: Security, payment, authentication, and API changes
-    if (
-      opLower.includes("api") ||
-      opLower.includes("security") ||
-      opLower.includes("auth") ||
-      opLower.includes("payment") ||
-      opLower.includes("billing") ||
-      opLower.includes("user") ||
-      opLower.includes("login") ||
-      opLower.includes("password") ||
-      opLower.includes("token") ||
-      opLower.includes("session") ||
-      opLower.includes("permission") ||
-      descLower.includes("complex") ||
-      descLower.includes("multiple files")
-    ) {
-      return "high";
-    }
-
-    // LOW: Documentation and trivial changes
-    if (
-      opLower.includes("documentation") ||
-      opLower.includes("comment") ||
-      opLower.includes("readme") ||
-      opLower.includes("typo") ||
-      descLower.includes("simple") ||
-      descLower.includes("single file") ||
-      descLower.includes("fix typo")
-    ) {
-      return "low";
-    }
-
-    return "medium";
+  private assessRiskLevel(context: unknown): ComplexityMetrics["riskLevel"] {
+    const ctx = context as { riskLevel?: string; critical?: boolean; highRisk?: boolean };
+    if (ctx?.critical || ctx?.riskLevel === "critical") return "critical";
+    if (ctx?.highRisk || ctx?.riskLevel === "high") return "high";
+    if (ctx?.riskLevel === "medium") return "medium";
+    return "low";
   }
 
-  private estimateDuration(context: any): number {
-    if (context.estimatedDuration) {
-      return context.estimatedDuration;
-    }
-
-    const fileCount = this.calculateFileCount(context);
-    const changeVolume = this.calculateChangeVolume(context);
-    const dependencies = this.calculateDependencies(context);
-
-    return Math.round(fileCount * 15 + changeVolume * 0.1 + dependencies * 5);
-  }
-
-  private generateReasoning(
-    metrics: ComplexityMetrics,
-    score: number,
-    level: string,
-  ): string[] {
-    const reasoning: string[] = [];
-
-    if (metrics.fileCount > 5) {
-      reasoning.push(
-        `High file count (${metrics.fileCount}) indicates distributed changes`,
-      );
-    }
-
-    if (metrics.changeVolume > 100) {
-      reasoning.push(
-        `Large change volume (${metrics.changeVolume} lines) suggests significant impact`,
-      );
-    }
-
-    if (
-      metrics.operationType === "refactor" ||
-      metrics.operationType === "debug"
-    ) {
-      reasoning.push(
-        `Operation type '${metrics.operationType}' typically requires specialized handling`,
-      );
-    }
-
-    if (metrics.dependencies > 3) {
-      reasoning.push(
-        `Multiple dependencies (${metrics.dependencies}) necessitate coordinated execution`,
-      );
-    }
-
-    if (metrics.riskLevel === "high" || metrics.riskLevel === "critical") {
-      reasoning.push(
-        `Risk level '${metrics.riskLevel}' requires careful orchestration`,
-      );
-    }
-
-    if (metrics.estimatedDuration > 60) {
-      reasoning.push(
-        `Estimated duration (${metrics.estimatedDuration}min) suggests complex operation`,
-      );
-    }
-
-    reasoning.push(
-      `Overall complexity score: ${Math.round(score)} (${level} level)`,
-    );
-
-    return reasoning;
+  private estimateDuration(context: unknown): number {
+    const ctx = context as { estimatedDuration?: number; estimatedTime?: number };
+    return ctx?.estimatedDuration || ctx?.estimatedTime || 30;
   }
 }
 
-// Export singleton instance
-export const complexityAnalyzer = new ComplexityAnalyzer();
+// Singleton instance for convenience
+let analyzerInstance: ComplexityAnalyzer | null = null;
+
+export function getComplexityAnalyzer(): ComplexityAnalyzer {
+  if (!analyzerInstance) {
+    analyzerInstance = new ComplexityAnalyzer();
+  }
+  return analyzerInstance;
+}
+
+// Backward compatibility: export singleton instance
+export const complexityAnalyzer = getComplexityAnalyzer();

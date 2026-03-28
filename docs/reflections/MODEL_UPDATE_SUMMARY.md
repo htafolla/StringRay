@@ -3,7 +3,7 @@
 ✅ **Successfully updated all model references** from `openrouter/xai-grok-2-1212-fast-1` to `grok` or `openrouter/xai-grok-2-1212-fast-1` as appropriate:
 
 **Main Configuration Files Updated:**
-- `./opencode.json` - All 27 agents now use grok
+- `./opencode.json` - All 25 agents now use grok
 - `./.opencode/OpenCode.json` - All agents configured  
 - `./.opencode/enforcer-config.json` - Override models updated
 - `./staging-env/opencode.json` - All agents updated

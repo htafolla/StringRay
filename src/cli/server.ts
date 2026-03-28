@@ -14,6 +14,28 @@ const { version } = JSON.parse(fs.readFileSync(packageJsonPath, "utf-8"));
 const app = express();
 const PORT = 3000;
 
+// API key authentication
+const API_KEY = process.env.STRRAY_API_KEY;
+
+function requireAuth(req: Request, res: Response, next: NextFunction) {
+  if (!API_KEY) {
+    // If no API key configured, allow access (development mode)
+    return next();
+  }
+
+  const providedKey = req.headers["x-api-key"];
+
+  if (!providedKey) {
+    return res.status(401).json({ error: "API key required. Set STRRAY_API_KEY environment variable." });
+  }
+
+  if (providedKey !== API_KEY) {
+    return res.status(403).json({ error: "Invalid API key" });
+  }
+
+  next();
+}
+
 // Lazy load security headers middleware
 let securityMiddleware: any = null;
 const getSecurityMiddleware = async () => {
@@ -51,7 +73,7 @@ app.use(async (req: Request, res: Response, next: NextFunction) => {
 app.use(express.static(join(__dirname, "public")));
 
 // API endpoints
-app.get("/api/status", (req: Request, res: Response) => {
+app.get("/api/status", requireAuth, (req: Request, res: Response) => {
   // Return framework status
     res.json({
     framework: "StringRay",
@@ -62,7 +84,7 @@ app.get("/api/status", (req: Request, res: Response) => {
   });
 });
 
-app.get("/api/agents", (req: any, res: any) => {
+app.get("/api/agents", requireAuth, (req: any, res: any) => {
   // Return agent configurations
   res.json({
     agents: [

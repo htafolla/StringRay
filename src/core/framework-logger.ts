@@ -244,7 +244,10 @@ export class FrameworkUsageLogger {
       }
 
       const jobIdPart = entry.jobId ? `[${entry.jobId}] ` : "";
-      const logEntry = `${new Date(entry.timestamp).toISOString()} ${jobIdPart}[${entry.component}] ${entry.action} - ${entry.status.toUpperCase()}\n`;
+      const detailsPart = entry.details 
+        ? ` | ${JSON.stringify(entry.details)}` 
+        : "";
+      const logEntry = `${new Date(entry.timestamp).toISOString()} ${jobIdPart}[${entry.component}] ${entry.action} - ${entry.status.toUpperCase()}${detailsPart}\n`;
       fs.appendFileSync(logFile, logEntry);
     } catch (error) {
       // Silent fail - cannot log to console as this IS the logger

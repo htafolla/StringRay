@@ -85,12 +85,11 @@ export async function activateStringRayFramework(
       { jobId },
     );
   } catch (error) {
-    console.error("❌ StringRay Framework activation failed:", error);
-    frameworkLogger.log(
+    await frameworkLogger.log(
       "stringray-activation",
-      "StringRay framework activation failed",
+      "framework-activation-failed",
       "error",
-      { jobId, error },
+      { jobId, error: String(error) },
     );
     throw error;
   }
@@ -104,25 +103,57 @@ async function activateCodexInjection(jobId: string): Promise<void> {
     { jobId },
   );
 
-  const { createStringRayCodexInjectorHook } = await import("./codex-injector");
+  const { createStringRayCodexInjectorHook } = await import("./codex-injector.js");
   const hook = createStringRayCodexInjectorHook();
 
+  // Store hook globally for OpenCode to pick up
   (globalThis as any).strRayHooks = (globalThis as any).strRayHooks || [];
+  (globalThis as any).strRayHooks.push(hook);
 
   frameworkLogger.log(
     "stringray-activation",
     "codex injection activated",
     "success",
-    { jobId },
+    { jobId, hookName: hook.name },
   );
 }
 
 async function activateHooks(jobId: string): Promise<void> {
-  // Temporarily disabled hooks activation to prevent import errors
-  // frameworkLogger.log("stringray-activation", "activating StringRay hooks", "info", { jobId });
-  // const { loadHooks } = await import("./index");
-  // await loadHooks();
-  // frameworkLogger.log("stringray-activation", "StringRay hooks activated", "success", { jobId });
+  try {
+    frameworkLogger.log(
+      "stringray-activation",
+      "activating StringRay hooks",
+      "info",
+      { jobId },
+    );
+
+    // Create and register the Codex injector hook
+    const { createStringRayCodexInjectorHook } = await import("./codex-injector");
+    const hook = createStringRayCodexInjectorHook();
+    
+    // Store hook globally for OpenCode to pick up
+    (globalThis as any).strRayHooks = (globalThis as any).strRayHooks || [];
+    (globalThis as any).strRayHooks.push(hook);
+
+    // Log hook registration
+    await frameworkLogger.log(
+      "stringray-activation",
+      "StringRay hooks activated",
+      "success",
+      { 
+        jobId, 
+        hookName: hook.name,
+        hooksRegistered: (globalThis as any).strRayHooks.length 
+      },
+    );
+  } catch (error) {
+    await frameworkLogger.log(
+      "stringray-activation",
+      "hooks activation failed",
+      "error",
+      { jobId, error: String(error) },
+    );
+  }
 }
 
 async function activateBootOrchestrator(jobId: string): Promise<void> {

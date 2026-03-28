@@ -8,7 +8,7 @@ tags: [performance, performance, analysis]
 mcp:
   performance-analysis:
     command: node
-    args: [node_modules/strray-ai/dist/plugin/mcps/dist/plugin/mcps/performance-analysis.server.js]
+    args: [node_modules/strray-ai/dist/mcps/performance-analysis.server.js]
 ---
 
 # Performance Analysis Skill

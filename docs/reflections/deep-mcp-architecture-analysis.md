@@ -99,8 +99,8 @@ The MCP servers CAN work standalone - they're just not USED that way internally.
 ## What Was Actually Broken (If Anything)
 
 ### 1. Agent Configuration Issues (REAL)
-- 27 agents missing from opencode.json ✅ FIXED
-- 27 agents had model: default causing ProviderModelNotFoundError ✅ FIXED
+- 25 agents missing from opencode.json ✅ FIXED
+- 25 agents had model: default causing ProviderModelNotFoundError ✅ FIXED
 - Agent name renames not propagated everywhere ✅ FIXED
 
 ### 2. TaskSkillRouter Integration (REAL)

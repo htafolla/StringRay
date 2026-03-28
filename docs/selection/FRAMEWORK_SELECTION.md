@@ -79,7 +79,7 @@ Complete implementation of all Universal Development Codex principles for maximu
 | **Maintenance**      | Minimal        | Moderate                  |
 | **Team Size**        | 1-20           | 5-50+                     |
 | **Configuration**    | Simple JSON    | Advanced YAML + JSON      |
-| **Agent Count**      | 6 core agents  | 8 specialized agents      |
+| **Agent Count**      | 6 core agents  | 25 specialized agents      |
 | **Monitoring**       | Basic metrics  | Advanced analytics        |
 | **Integration**      | Plug-and-play  | Deep workflow integration |
 

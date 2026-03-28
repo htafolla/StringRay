@@ -77,8 +77,8 @@ Critical Issues:
 
 ### 4. **Maintenance Burden**
 
-- **Full Framework**: 27 agents, complex workflows, extensive configuration
-- **Lite Framework**: 27 agents, streamlined workflows, minimal configuration
+- **Full Framework**: 25 agents, complex workflows, extensive configuration
+- **Lite Framework**: 25 agents, streamlined workflows, minimal configuration
 - **Gap**: 70% less maintenance overhead for lite framework
 
 ## Accuracy Assessment

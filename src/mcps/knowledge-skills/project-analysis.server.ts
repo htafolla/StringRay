@@ -42,7 +42,7 @@ class StrRayProjectAnalysisServer {
   constructor() {
     this.server = new Server(
       {
-        name: "project-analysis", version: "1.7.5",
+        name: "project-analysis", version: "1.15.6",
       },
       {
         capabilities: {
@@ -202,7 +202,7 @@ class StrRayProjectAnalysisServer {
             throw new Error(`Unknown tool: ${name}`);
         }
       } catch (error) {
-        console.error(`Error in project analysis tool ${name}:`, error);
+        frameworkLogger.log("mcps/project-analysis", "tool", "error", { tool: name, error: String(error) });
         throw error;
       }
     });
@@ -278,7 +278,7 @@ class StrRayProjectAnalysisServer {
       confidenceThreshold = 0.7,
     } = args;
 
-    console.log(`🔍 Identifying project patterns: ${projectRoot}`);
+    frameworkLogger.log("mcps/project-analysis", "identify-patterns", "info", { projectRoot });
 
     const patterns = await this.detectPatterns(
       projectRoot,
@@ -309,7 +309,7 @@ class StrRayProjectAnalysisServer {
   private async analyzeProjectHealth(args: any): Promise<any> {
     const { projectRoot, includeTrends = false, focusMetrics } = args;
 
-    console.log(`🏥 Analyzing project health: ${projectRoot}`);
+    frameworkLogger.log("mcps/project-analysis", "analyze-health", "info", { projectRoot });
 
     const healthAssessment = await this.assessProjectHealth(
       projectRoot,
@@ -891,11 +891,11 @@ class StrRayProjectAnalysisServer {
     );
 
     const cleanup = async (signal: string) => {
-      console.log(`Received ${signal}, shutting down gracefully...`);
+      frameworkLogger.log("mcps/project-analysis", "shutdown", "info", { signal });
 
       // Set a timeout to force exit if graceful shutdown fails
       const timeout = setTimeout(() => {
-        console.error("Graceful shutdown timeout, forcing exit...");
+        frameworkLogger.log("mcps/project-analysis", "shutdown", "error", { message: "Graceful shutdown timeout, forcing exit..." });
         process.exit(1);
       }, 5000); // 5 second timeout
 
@@ -904,11 +904,11 @@ class StrRayProjectAnalysisServer {
           await this.server.close();
         }
         clearTimeout(timeout);
-        console.log("StrRay Project Analysis MCP Server shut down gracefully");
+        frameworkLogger.log("mcps/project-analysis", "shutdown", "success");
         process.exit(0);
       } catch (error) {
         clearTimeout(timeout);
-        console.error("Error during server shutdown:", error);
+        frameworkLogger.log("mcps/project-analysis", "shutdown", "error", { message: `Error during server shutdown: ${String(error)}` });
         process.exit(1);
       }
     };
@@ -925,9 +925,7 @@ class StrRayProjectAnalysisServer {
         setTimeout(checkParent, 1000); // Check again in 1 second
       } catch (error) {
         // Parent process died, shut down gracefully
-        console.log(
-          "Parent process (opencode) died, shutting down MCP server...",
-        );
+        frameworkLogger.log("mcps/project-analysis", "parent-death", "info");
         cleanup("parent-process-death");
       }
     };
@@ -937,12 +935,12 @@ class StrRayProjectAnalysisServer {
 
     // Handle uncaught exceptions and unhandled rejections
     process.on("uncaughtException", (error) => {
-      console.error("Uncaught Exception:", error);
+      frameworkLogger.log("mcps/project-analysis", "uncaughtException", "error", { error: String(error) });
       cleanup("uncaughtException");
     });
 
     process.on("unhandledRejection", (reason, promise) => {
-      console.error("Unhandled Rejection at:", promise, "reason:", reason);
+      frameworkLogger.log("mcps/project-analysis", "unhandledRejection", "error", { error: String(reason) });
       cleanup("unhandledRejection");
     });
   }
@@ -951,7 +949,7 @@ class StrRayProjectAnalysisServer {
 // Start the server if run directly
 if (import.meta.url === `file://${process.argv[1]}`) {
   const server = new StrRayProjectAnalysisServer();
-  server.run().catch(console.error);
+  server.run().catch((error) => frameworkLogger.log("mcps/project-analysis", "run", "error", { error: String(error) }));
 }
 
 export default StrRayProjectAnalysisServer;

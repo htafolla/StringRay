@@ -7,9 +7,13 @@
  * Version: 1.1.1
  */
 
-const { spawn } = require('child_process');
-const fs = require('fs');
-const path = require('path');
+import { spawn } from 'child_process';
+import * as fs from 'fs';
+import * as path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 class MonitoringSystem {
   constructor() {
@@ -63,7 +67,7 @@ class MonitoringSystem {
     this.log(`Memory Usage: ${metrics.memory.heapUsed}MB / ${metrics.memory.heapTotal}MB`, 'performance');
     this.log(`Active Processes: ${metrics.processes}`, 'monitor');
     this.log(`Build Size: ${metrics.buildSize}KB`, 'performance');
-    this.log(`Error Count: ${metrics.errors}`, this.errors.errors > 0 ? 'error' : 'info');
+    this.log(`Error Count: ${metrics.errors.errors}`, metrics.errors.errors > 0 ? 'error' : 'info');
     
     // Check for alerts
     this.checkAlerts(metrics);
@@ -74,7 +78,6 @@ class MonitoringSystem {
 
   async getMemoryUsage() {
     return new Promise((resolve) => {
-      const { spawn } = require('child_process');
       const child = spawn('node', ['-e', `
         const used = process.memoryUsage();
         resolve({
@@ -102,7 +105,6 @@ class MonitoringSystem {
 
   async getProcessCount() {
     return new Promise((resolve) => {
-      const { spawn } = require('child_process');
       const child = spawn('ps', ['-axo', 'pid=,comm=', '--no-headers'], { stdio: 'pipe' });
       
       let output = '';
@@ -111,7 +113,7 @@ class MonitoringSystem {
       });
       
       child.on('close', () => {
-        const lines = output.trim().split('\\n');
+        const lines = output.trim().split('\n');
         const processCount = lines.filter(line => line.trim() !== '').length;
         resolve(processCount);
       });
@@ -120,7 +122,6 @@ class MonitoringSystem {
 
   async getBuildSize() {
     return new Promise((resolve) => {
-      const { spawn } = require('child_process');
       const child = spawn('du', ['-sk', 'dist'], { stdio: 'pipe' });
       
       let output = '';
@@ -138,12 +139,11 @@ class MonitoringSystem {
 
   async getErrorCount() {
     return new Promise((resolve) => {
-      const fs = require('fs');
       const logPath = path.join(this.projectDir, 'activity.log');
       
       if (fs.existsSync(logPath)) {
         const logContent = fs.readFileSync(logPath, 'utf8');
-        const errorLines = logContent.split('\\n').filter(line => 
+        const errorLines = logContent.split('\n').filter(line => 
           line.toLowerCase().includes('error') || line.toLowerCase().includes('failed')
         );
         resolve({ errors: errorLines.length });

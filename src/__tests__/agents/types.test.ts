@@ -81,6 +81,9 @@ describe("Agent Types", () => {
       description: "A test agent",
       mode: "primary",
       system: "You are a helpful assistant",
+      capabilities: ["read", "write"],
+      maxComplexity: 10,
+      enabled: true,
     };
 
     it("should accept minimal required configuration", () => {
@@ -112,6 +115,9 @@ describe("Agent Types", () => {
         prompt_append: "Additional instructions",
         disable: false,
         color: "#ff0000",
+        capabilities: ["read", "write"],
+        maxComplexity: 10,
+        enabled: true,
       };
 
       expect(fullConfig.temperature).toBe(0.7);
@@ -154,6 +160,9 @@ describe("Agent Types", () => {
         temperature: 0.5,
         tools: { include: ["test"] },
         permission: { edit: "allow" },
+        capabilities: ["read", "write"],
+        maxComplexity: 10,
+        enabled: true,
       };
 
       const serialized = JSON.stringify(config);
@@ -194,6 +203,9 @@ describe("Agent Types", () => {
         prompt_append: "Additional context",
         disable: false,
         color: "#00ff00",
+        capabilities: ["read", "write", "execute"],
+        maxComplexity: 20,
+        enabled: true,
       };
 
       // TypeScript should enforce all these types at compile time

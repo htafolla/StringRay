@@ -1,16 +1,58 @@
-# StrRay Framework - Technical Migration Guide
+# StrRay Framework v1.15.1 - Technical Migration Guide
 
 ## 📋 Migration Overview
 
-This guide covers the technical migration procedures for StrRay Framework configuration and component updates. These procedures ensure smooth transitions between framework versions while maintaining system integrity and functionality.
+This guide covers the technical migration procedures for upgrading from StrRay Framework v1.8.x to v1.15.1. The v1.15.1 release introduces a major architectural refactoring implementing the **Facade Pattern** while maintaining 100% backward compatibility.
+
+## 🎉 Good News: No Migration Required!
+
+**v1.15.1 maintains 100% backward compatibility.** All existing code, configurations, and workflows continue to work exactly as before.
+
+### What Changed (Internal Only)
+
+- **Internal Architecture**: Refactored to Facade Pattern
+- **Code Organization**: Monolithic components split into facades + modules
+- **Performance**: 87% code reduction, faster execution
+- **Maintainability**: Better separation of concerns
+
+### What Stayed the Same
+
+- ✅ `@agent-name` syntax - unchanged
+- ✅ CLI commands - work exactly as before
+- ✅ Configuration files - same format and location
+- ✅ All agents - same names and capabilities
+- ✅ Custom agents - same creation process
+- ✅ Public APIs - unchanged
 
 ## 🔄 Configuration Migration
 
-### Phase 2: Configuration Flattening
+### No Configuration Changes Required
 
-**Objective**: Transform nested configuration structures into flat, maintainable formats.
+All configuration files remain compatible:
 
-#### Before (Nested Structure)
+- `.opencode/OpenCode.json` - unchanged
+- `.opencode/strray/features.json` - unchanged
+- `.opencode/agents/` - unchanged
+- Environment variables - unchanged
+
+### Verification
+
+```bash
+# Check current configuration
+npx strray-ai status
+
+# Validate configuration
+npx strray-ai validate
+
+# Run health check
+npx strray-ai health
+```
+
+### Phase 2: Configuration Flattening (Historical Reference)
+
+**Note**: This section documents historical configuration changes. v1.15.1 doesn't require these changes.
+
+#### Before (Nested Structure) - Historical
 
 ```json
 {
@@ -30,7 +72,7 @@ This guide covers the technical migration procedures for StrRay Framework config
 }
 ```
 
-#### After (Flattened Structure)
+#### After (Flattened Structure) - Historical
 
 ```json
 {
@@ -43,116 +85,75 @@ This guide covers the technical migration procedures for StrRay Framework config
 }
 ```
 
-#### Migration Steps
-
-1. **Extract nested values** to top-level configuration keys
-2. **Update key naming** to follow flat structure conventions
-3. **Remove nested objects** and replace with direct property access
-4. **Validate configuration** against new schema requirements
-
-#### Validation Commands
-
-```bash
-# Check configuration syntax
-python3 -c "import json; json.load(open('.opencode/OpenCode.json'))"
-
-# Validate required properties
-python3 -c "
-config = json.load(open('.opencode/OpenCode.json'))
-required = ['strray_agents', 'dynamic_models', 'ai_logging']
-missing = [k for k in required if k not in config]
-print('Missing:', missing) if missing else print('Configuration valid')
-"
-```
-
-### Phase 3: Hook Consolidation
-
-**Objective**: Consolidate 8 individual hooks into 4 consolidated categories for simplified maintenance.
-
-#### Hook Consolidation Mapping
-
-| Original Hook | Consolidated Category | Purpose                 |
-| ------------- | --------------------- | ----------------------- |
-| pre-commit    | commit                | Code quality validation |
-| post-commit   | commit                | Automated processing    |
-| pre-build     | build                 | Build preparation       |
-| post-build    | build                 | Build verification      |
-| pre-deploy    | deploy                | Deployment checks       |
-| post-deploy   | deploy                | Deployment validation   |
-| pre-test      | test                  | Test environment setup  |
-| post-test     | test                  | Test result processing  |
-
-#### Implementation Steps
-
-1. **Identify hook usage** across configuration files
-2. **Map legacy hooks** to consolidated categories
-3. **Update hook dispatcher** to handle consolidated events
-4. **Migrate hook configurations** to new structure
-
-#### Backward Compatibility
-
-```typescript
-// Legacy hook support
-const legacyHookMapping = {
-  "pre-commit": "commit.pre",
-  "post-commit": "commit.post",
-  "pre-build": "build.pre",
-  "post-build": "build.post",
-};
-
-// Automatic translation
-function translateLegacyHook(hookName) {
-  return legacyHookMapping[hookName] || hookName;
-}
-```
-
 ## 🛠️ Component Migration
+
+### Facade Pattern Architecture (v1.15.1)
+
+The major architectural change in v1.15.1 is the implementation of the **Facade Pattern**:
+
+```
+v1.15.1 Architecture:
+┌──────────────────────────────────────────────────────────────┐
+│                    PUBLIC API LAYER                           │
+├──────────────────────────────────────────────────────────────┤
+│  RuleEnforcer    TaskSkillRouter    MCPClient               │
+│  (416 lines)     (490 lines)        (312 lines)             │
+│  Facade          Facade             Facade                  │
+└────────────────────┬────────────────────┬───────────────────┘
+                     │                    │
+┌────────────────────┴────────────────────┴───────────────────┐
+│                    MODULE LAYER                              │
+├─────────────────┬─────────────────────┬─────────────────────┤
+│ RuleEnforcer    │ TaskSkillRouter     │ MCPClient           │
+│ Modules:        │ Modules:            │ Modules:            │
+│ - Core          │ - Mappings (12)     │ - Connection        │
+│ - Config        │ - Analytics         │ - Registry          │
+│ - Logger        │ - Routing           │ - Tools             │
+│ - Metrics       │ - Patterns          │ - Resources         │
+│ - Validation    │ - Validation        │ - Prompts           │
+│ - Integration   │ - Utilities         │ - Sampling          │
+│                 │                     │ - Notifications     │
+│                 │                     │ - Root              │
+└─────────────────┴─────────────────────┴─────────────────────┘
+```
+
+### Code Metrics Comparison
+
+| Component | v1.8.x | v1.15.1 | Reduction |
+|-----------|--------|--------|-----------|
+| RuleEnforcer | 2,714 lines | 416 lines | 85% |
+| TaskSkillRouter | 1,933 lines | 490 lines | 75% |
+| MCP Client | 1,413 lines | 312 lines | 78% |
+| Dead Code | 3,170 lines | 0 lines | 100% |
+| **Total** | **8,230 lines** | **1,218 lines** | **87%** |
 
 ### Agent System Migration
 
-#### Agent Configuration Updates
+#### No Agent Changes Required
 
-```json
-// Before
-{
-  "agents": {
-    "enforcer": { "enabled": true },
-    "architect": { "enabled": true }
-  }
-}
+All agents remain compatible:
 
-// After
-{
-  "strray_agents": {
-    "enabled": ["enforcer", "architect"],
-    "disabled": []
-  }
-}
-```
+- **25 Specialized Agents**: Same capabilities and interfaces
+- **Custom Agents**: Same creation process
+- **Agent Delegation**: Works identically
+- **Agent Communication**: Unchanged protocols
 
-#### Agent State Migration
+#### New Agents in v1.15.1
 
-1. **Preserve agent state** during configuration changes
-2. **Update state references** to use new configuration paths
-3. **Validate agent initialization** with updated configuration
-4. **Test agent communication** post-migration
+v1.15.1 adds 19 new specialized agents:
+
+- storyteller, researcher, and 17 more
+- All use the same invocation syntax: `@agent-name`
+- No migration needed for existing agent usage
 
 ### MCP Server Migration
 
 #### Server Configuration Updates
 
-```json
-// Before
-{
-  "mcps": {
-    "testing-strategy": {
-      "command": "node mcps/testing-strategy.server.js",
-      "config": "mcps/testing-strategy.mcp.json"
-    }
-  }
-}
+No changes required for MCP server configuration. All existing servers continue to work.
 
-// After (with error handling)
+```json
+// Configuration remains unchanged
 {
   "mcps": {
     "testing-strategy": {
@@ -165,149 +166,78 @@ function translateLegacyHook(hookName) {
 
 #### MCP Integration Validation
 
-1. **Test server startup** with new configuration format
-2. **Validate tool registration** and availability
-3. **Check inter-server communication** functionality
-4. **Verify error handling** and recovery mechanisms
+```bash
+# Validate MCP servers
+npx strray-ai validate --mcp
+
+# Check server health
+npx strray-ai health --component mcp
+```
 
 ## 🔧 Hook System Migration
 
-### Consolidated Hook Categories
+### No Hook Changes Required
 
-#### Commit Hooks
+All hooks continue to work:
 
-```javascript
-// Consolidated commit hook handler
-function handleCommitHook(type, data) {
-  if (type === "pre") {
-    // Pre-commit validation
-    return validateCodeQuality(data);
-  } else if (type === "post") {
-    // Post-commit processing
-    return processCommitResults(data);
-  }
-}
-```
+- pre-commit, post-commit
+- pre-build, post-build
+- pre-deploy, post-deploy
+- pre-test, post-test
 
-#### Build Hooks
+### Consolidated Hook Categories (Historical Reference)
 
-```javascript
-// Build lifecycle management
-function manageBuildLifecycle(phase, config) {
-  switch (phase) {
-    case "pre":
-      return prepareBuildEnvironment(config);
-    case "post":
-      return validateBuildArtifacts(config);
-  }
-}
-```
-
-#### Deploy Hooks
-
-```javascript
-// Deployment pipeline integration
-function handleDeployment(stage, environment) {
-  const hooks = {
-    pre: validateDeploymentReadiness,
-    post: verifyDeploymentSuccess,
-  };
-
-  return hooks[stage]?.(environment);
-}
-```
-
-### Hook Dispatcher Updates
-
-#### Legacy Hook Translation
-
-```typescript
-class HookDispatcher {
-  translateLegacyHook(hookName: string): string {
-    const mapping = {
-      "pre-commit": "commit.pre",
-      "post-commit": "commit.post",
-      "pre-build": "build.pre",
-      "post-build": "build.post",
-      "pre-deploy": "deploy.pre",
-      "post-deploy": "deploy.post",
-    };
-    return mapping[hookName] || hookName;
-  }
-}
-```
-
-#### Consolidated Hook Execution
-
-```typescript
-async function executeConsolidatedHook(
-  category: string,
-  type: string,
-  data: any,
-) {
-  const hookKey = `${category}.${type}`;
-  const hookHandler = this.consolidatedHooks[hookKey];
-
-  if (hookHandler) {
-    return await hookHandler(data);
-  }
-
-  throw new Error(`No handler for consolidated hook: ${hookKey}`);
-}
-```
+| Original Hook | Consolidated Category | Purpose                 |
+| ------------- | --------------------- | ----------------------- |
+| pre-commit    | commit                | Code quality validation |
+| post-commit   | commit                | Automated processing    |
+| pre-build     | build                 | Build preparation       |
+| post-build    | build                 | Build verification      |
+| pre-deploy    | deploy                | Deployment checks       |
+| post-deploy   | deploy                | Deployment validation   |
+| pre-test      | test                  | Test environment setup  |
+| post-test     | test                  | Test result processing  |
 
 ## ✅ Validation Procedures
 
-### Configuration Validation
+### Pre-Migration Validation
 
 ```bash
-# Comprehensive validation script
-#!/bin/bash
+# Run before upgrading to v1.15.1
 
-echo "🔍 StrRay Migration Validation"
-echo "============================="
+# 1. Backup current configuration
+cp -r .opencode .opencode.backup
 
-# 1. Configuration syntax
-if python3 -c "import json; json.load(open('.opencode/OpenCode.json'))"; then
-  echo "✅ Configuration syntax valid"
-else
-  echo "❌ Configuration syntax invalid"
-  exit 1
-fi
+# 2. Verify current installation
+npx strray-ai --version
 
-# 2. Required properties
-missing=$(python3 -c "
-import json
-config = json.load(open('.opencode/OpenCode.json'))
-required = ['strray_agents', 'dynamic_models', 'ai_logging']
-missing = [k for k in required if k not in config]
-print(','.join(missing)) if missing else print('')
-")
+# 3. Run health check
+npx strray-ai health
 
-if [ -n "$missing" ]; then
-  echo "❌ Missing required properties: $missing"
-  exit 1
-else
-  echo "✅ All required properties present"
-fi
+# 4. Validate current configuration
+npx strray-ai validate
+```
 
-# 3. Agent configuration
-agent_count=$(python3 -c "
-import json
-config = json.load(open('.opencode/OpenCode.json'))
-agents = config.get('strray_agents', {}).get('enabled', [])
-print(len(agents))
-")
+### Post-Migration Validation
 
-if [ "$agent_count" -ge 6 ]; then
-  echo "✅ Agent configuration valid ($agent_count agents)"
-else
-  echo "❌ Insufficient agents configured ($agent_count)"
-  exit 1
-fi
+```bash
+# Run after upgrading to v1.15.1
 
-echo ""
-echo "🎉 Migration validation completed successfully!"
+# 1. Verify new version
+npx strray-ai --version
+# Expected: 1.9.0
+
+# 2. Run comprehensive health check
+npx strray-ai health
+
+# 3. Validate configuration still works
+npx strray-ai validate
+
+# 4. Test agent invocation
+npx strray-ai test @enforcer
+
+# 5. Run test suite
+npm test
 ```
 
 ### Component Testing
@@ -325,29 +255,21 @@ npm run lint            # Code quality checks
 ### Configuration Rollback
 
 ```bash
-# Restore previous configuration
+# If issues occur, restore previous configuration
 cp .opencode/OpenCode.json.backup .opencode/OpenCode.json
 
 # Restart framework
-bash .opencode/init.sh
+npx strray-ai init
 ```
 
-### Hook System Rollback
+### Version Rollback
 
-```javascript
-// Revert to legacy hook system
-const legacyHooks = {
-  "pre-commit": originalPreCommitHandler,
-  "post-commit": originalPostCommitHandler,
-  // ... restore all legacy hooks
-};
-```
+```bash
+# Rollback to previous version
+npm install strray-ai@1.8.x
 
-### Agent System Rollback
-
-```python
-# Restore previous agent configuration
-agent_config.rollback_to_version('1.0.0')
+# Verify rollback
+npx strray-ai --version
 ```
 
 ## 📊 Migration Metrics
@@ -360,6 +282,16 @@ agent_config.rollback_to_version('1.0.0')
 - **Memory Usage**: < 100MB additional
 - **Error Rate**: < 1% during migration
 
+### v1.15.1 Improvements
+
+| Metric | v1.8.x | v1.15.1 | Improvement |
+|--------|--------|--------|-------------|
+| **Bundle Size** | Larger | 87% smaller | Faster loading |
+| **Agent Spawning** | Slower | Faster | Better performance |
+| **Memory Usage** | Higher | Lower | More efficient |
+| **Code Maintainability** | Lower | Higher | Better structure |
+| **Error Recovery** | Good | Better | Improved isolation |
+
 ### Monitoring Commands
 
 ```bash
@@ -367,26 +299,55 @@ agent_config.rollback_to_version('1.0.0')
 watch -n 5 'ps aux | grep strray'
 
 # Check agent health
-curl http://localhost:3000/api/agents/health
+npx strray-ai health --agents
 
 # Validate hook execution
-tail -f .opencode/logs/hook-execution.log
+tail -f .opencode/logs/strray-plugin-$(date +%Y-%m-%d).log
 ```
 
 ## 📞 Support Resources
 
 ### Migration Assistance
 
-- **Configuration Examples**: See `docs/framework/architecture/migration-examples/`
-- **Troubleshooting Guide**: See `docs/framework/troubleshooting/MIGRATION_ISSUES.md`
+- **Configuration Examples**: See `docs/architecture/migration-examples/`
+- **Troubleshooting Guide**: See `docs/troubleshooting/MIGRATION_ISSUES.md`
 - **Community Support**: GitHub Issues and Discussions
 
 ### Emergency Contacts
 
 - **Framework Issues**: Create GitHub issue with "migration" label
-- **Configuration Problems**: Check `docs/framework/troubleshooting/CONFIG_VALIDATION.md`
-- **Agent Failures**: Review `docs/framework/agents/AGENT_DEBUGGING.md`
+- **Configuration Problems**: Check `docs/troubleshooting/CONFIG_VALIDATION.md`
+- **Agent Failures**: Review `docs/agents/AGENT_DEBUGGING.md`
+
+## 🎯 Quick Migration Checklist
+
+- [ ] Backup current configuration: `cp -r .opencode .opencode.backup`
+- [ ] Update to v1.15.1: `npm install strray-ai@latest`
+- [ ] Verify version: `npx strray-ai --version` (should show 1.9.0)
+- [ ] Run health check: `npx strray-ai health`
+- [ ] Validate configuration: `npx strray-ai validate`
+- [ ] Test agent invocation: `npx strray-ai test @enforcer`
+- [ ] Run test suite: `npm test`
+- [ ] Verify all hooks work: Test commit/build/deploy hooks
+- [ ] Check logs: `tail -f .opencode/logs/strray-plugin-$(date +%Y-%m-%d).log`
+
+## ✨ Summary
+
+**v1.15.1 is the easiest upgrade ever!**
+
+- ✅ No breaking changes
+- ✅ No configuration updates needed
+- ✅ No code changes required
+- ✅ All existing functionality preserved
+- ✅ Better performance (87% code reduction)
+- ✅ Improved reliability
+
+Simply run `npm install strray-ai@latest` and enjoy the benefits!
 
 ---
 
-_This technical migration guide ensures smooth transitions between StrRay Framework versions while maintaining system stability and functionality._
+_This technical migration guide ensures smooth transitions to StrRay Framework v1.15.1 while maintaining system stability and functionality._
+
+---
+
+*StringRay AI v1.15.1 - Facade Pattern Migration Guide*

@@ -1,0 +1,230 @@
+#!/usr/bin/env node
+/**
+ * Changelog Generator
+ * 
+ * Generates CHANGELOG.md from git commit messages using conventional commits.
+ * Run: node scripts/node/generate-changelog.js [from-tag] [to-tag]
+ * 
+ * Conventional Commits format:
+ *   feat: new feature
+ *   fix: bug fix
+ *   docs: documentation changes
+ *   style: formatting
+ *   refactor: code refactoring
+ *   test: adding tests
+ *   chore: maintenance
+ * 
+ * Breaking changes: feat! or fix! or feat(scope)!
+ */
+
+import * as fs from "fs";
+import * as path from "path";
+import { execSync } from "child_process";
+
+const PROJECT_ROOT = process.cwd();
+const CHANGELOG_PATH = path.join(PROJECT_ROOT, "CHANGELOG.md");
+
+// Commit types with descriptions
+const TYPES = {
+  feat: { section: "Features", emoji: "✨" },
+  fix: { section: "Bug Fixes", emoji: "🐛" },
+  docs: { section: "Documentation", emoji: "📚" },
+  style: { section: "Styling", emoji: "💄" },
+  refactor: { section: "Code Refactoring", emoji: "♻️" },
+  test: { section: "Tests", emoji: "🧪" },
+  chore: { section: "Chores", emoji: "🔧" },
+  perf: { section: "Performance", emoji: "⚡" },
+  ci: { section: "CI/CD", emoji: "👷" },
+  revert: { section: "Reverts", emoji: "⏪" },
+};
+
+const BREAKING_TYPES = {
+  breaking: { section: "BREAKING CHANGES", emoji: "💥" },
+};
+
+/**
+ * Parse conventional commit message
+ */
+function parseCommit(message) {
+  const lines = message.split("\n");
+  const header = lines[0];
+
+  // Match conventional commit format
+  const match = header.match(/^(\w+)(\(([^)]+)\))?(!)?:\s+(.+)$/);
+
+  if (!match) {
+    return null;
+  }
+
+  const [, type, , scope, breaking, description] = match;
+
+  return {
+    type: type.toLowerCase(),
+    scope: scope || null,
+    breaking: breaking === "!" || header.includes("BREAKING CHANGE"),
+    description: description.trim(),
+    scopeFormatted: scope ? `**${scope}**` : "",
+  };
+}
+
+/**
+ * Get git log between tags or commits
+ */
+function getCommits(fromTag, toTag = "HEAD") {
+  const range = fromTag ? `${fromTag}..${toTag}` : toTag;
+
+  try {
+    const log = execSync(
+      `git log ${range} --no-merges --pretty=format:"%H|%s|%B" 2>/dev/null`,
+      { encoding: "utf-8", cwd: PROJECT_ROOT }
+    );
+
+    if (!log.trim()) return [];
+
+    const commits = [];
+    const entries = log.split("\n\n").filter(Boolean);
+
+    for (const entry of entries) {
+      const [hash, ...parts] = entry.split("|");
+      const message = parts.join("|").trim();
+      const parsed = parseCommit(message);
+
+      if (parsed) {
+        commits.push({
+          hash: hash.substring(0, 7),
+          ...parsed,
+        });
+      }
+    }
+
+    return commits;
+  } catch (error) {
+    console.error("❌ Error getting git log:", error.message);
+    return [];
+  }
+}
+
+/**
+ * Group commits by type
+ */
+function groupCommits(commits) {
+  const groups = {};
+
+  for (const commit of commits) {
+    const key = commit.breaking ? "breaking" : commit.type;
+    if (!groups[key]) {
+      groups[key] = [];
+    }
+    groups[key].push(commit);
+  }
+
+  return groups;
+}
+
+/**
+ * Generate changelog markdown
+ */
+function generateChangelog(groups, fromTag, toTag) {
+  const now = new Date().toISOString().split("T")[0];
+  const version = toTag === "HEAD" ? "unreleased" : toTag.replace("v", "");
+
+  let changelog = `# Changelog\n\n`;
+  changelog += `All notable changes to this project will be documented in this file.\n\n`;
+  changelog += `The format is based on [Conventional Commits](https://www.conventionalcommits.org/).\n\n`;
+
+  // Version header
+  if (fromTag) {
+    changelog += `## [${version}] - ${now}`;
+    if (fromTag) {
+      changelog += ` (from ${fromTag})`;
+    }
+    changelog += `\n\n`;
+  } else {
+    changelog += `## [Unreleased] - ${now}\n\n`;
+  }
+
+  // Breaking changes first
+  if (groups.breaking) {
+    changelog += `### 💥 BREAKING CHANGES\n\n`;
+    for (const commit of groups.breaking) {
+      changelog += `- ${commit.description}`;
+      if (commit.scopeFormatted) {
+        changelog += ` (${commit.scopeFormatted})`;
+      }
+      changelog += ` (\`${commit.hash}\`)\n`;
+    }
+    changelog += "\n";
+  }
+
+  // Regular types
+  for (const [type, info] of Object.entries(TYPES)) {
+    const commits = groups[type];
+    if (!commits || commits.length === 0) continue;
+
+    changelog += `### ${info.emoji} ${info.section}\n\n`;
+
+    // Group by scope
+    const byScope = {};
+    for (const commit of commits) {
+      const scope = commit.scope || "other";
+      if (!byScope[scope]) {
+        byScope[scope] = [];
+      }
+      byScope[scope].push(commit);
+    }
+
+    for (const [scope, scopeCommits] of Object.entries(byScope)) {
+      if (scope !== "other") {
+        changelog += `**${scope}:**\n`;
+      }
+
+      for (const commit of scopeCommits) {
+        changelog += `- ${commit.description}`;
+        changelog += ` (\`${commit.hash}\`)\n`;
+      }
+
+      if (scope !== "other") {
+        changelog += "\n";
+      }
+    }
+  }
+
+  changelog += "---\n\n";
+  changelog += "*Generated by \`scripts/node/generate-changelog.js\`*\n";
+
+  return changelog;
+}
+
+/**
+ * Main
+ */
+function main() {
+  const [, , fromTag, toTag = "HEAD"] = process.argv;
+
+  console.log("🔄 Generating changelog...\n");
+
+  const commits = getCommits(fromTag, toTag);
+  console.log(`Found ${commits.length} conventional commits\n`);
+
+  if (commits.length === 0) {
+    console.log("ℹ️  No conventional commits found");
+    console.log("   Use format: feat: description, fix: description, etc.");
+    return;
+  }
+
+  const groups = groupCommits(commits);
+
+  // Show summary
+  for (const [type, commits] of Object.entries(groups)) {
+    const info = TYPES[type] || BREAKING_TYPES[type];
+    console.log(`   ${info?.emoji || "📌"} ${info?.section || type}: ${commits.length}`);
+  }
+
+  const changelog = generateChangelog(groups, fromTag, toTag);
+  fs.writeFileSync(CHANGELOG_PATH, changelog);
+
+  console.log(`\n✅ Changelog generated: ${CHANGELOG_PATH}`);
+}
+
+// Run
+main();

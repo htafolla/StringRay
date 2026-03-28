@@ -8,7 +8,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import { execSync } from "child_process";
-import { frameworkLogger } from "../core/framework-logger.js";
+import { frameworkLogger } from "../../core/framework-logger.js";
 
 interface ValidationResult {
   passed: boolean;

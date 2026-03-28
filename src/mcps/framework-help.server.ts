@@ -6,6 +6,7 @@ import {
   ListToolsRequestSchema,
   McpError,
 } from "@modelcontextprotocol/sdk/types.js";
+import { frameworkLogger } from "../core/framework-logger.js";
 
 class FrameworkHelpServer {
   private server: Server;
@@ -13,7 +14,7 @@ class FrameworkHelpServer {
   constructor() {
     this.server = new Server(
       {
-        name: "strray/framework-help", version: "1.7.5",
+        name: "strray/framework-help", version: "1.15.6",
       },
       {
         capabilities: {
@@ -97,15 +98,26 @@ class FrameworkHelpServer {
     this.server.setRequestHandler(CallToolRequestSchema, async (request) => {
       const { name, arguments: args } = request.params;
 
-      switch (name) {
-        case "strray_get_capabilities":
-          return this.handleGetCapabilities(args);
-        case "strray_get_commands":
-          return this.handleGetCommands(args);
-        case "strray_explain_capability":
-          return this.handleExplainCapability(args);
-        default:
-          throw new McpError(ErrorCode.MethodNotFound, `Unknown tool: ${name}`);
+      try {
+        switch (name) {
+          case "strray_get_capabilities":
+            return this.handleGetCapabilities(args);
+          case "strray_get_commands":
+            return this.handleGetCommands(args);
+          case "strray_explain_capability":
+            return this.handleExplainCapability(args);
+          default:
+            throw new McpError(ErrorCode.MethodNotFound, `Unknown tool: ${name}`);
+        }
+      } catch (error) {
+        if (error instanceof McpError) {
+          throw error;
+        }
+        frameworkLogger.log("mcps/framework-help", "tool-call", "error", { tool: name, error: String(error) });
+        throw new McpError(
+          ErrorCode.InternalError,
+          `Tool "${name}" execution failed: ${error instanceof Error ? error.message : String(error)}`,
+        );
       }
     });
   }
@@ -248,6 +260,10 @@ Test Coverage - Automated testing analysis
 - Monitor error rates through automated tracking
         `.trim();
         break;
+
+      default:
+        commands = `Error: Unknown command type "${type}". Valid types: agent-commands, system-commands, reporting-commands`;
+        break;
     }
 
     return {
@@ -264,20 +280,16 @@ Test Coverage - Automated testing analysis
     const capability = args?.capability;
 
     if (!capability) {
-      return {
-        content: [
-          {
-            type: "text",
-            text: "Error: capability parameter is required",
-          },
-        ],
-      };
+      throw new McpError(
+        ErrorCode.InvalidParams,
+        "capability parameter is required",
+      );
     }
 
     const explanations: { [key: string]: string } = {
       enforcer: `
 **Enforcer Agent**
-Automatically validates code against the Universal Development Codex (46 mandatory terms).
+Automatically validates code against the Universal Development Codex (60 mandatory terms).
 Prevents common errors, enforces coding standards, and ensures production-ready code.
 
 **Capabilities:**
@@ -386,7 +398,7 @@ ${Object.entries(capabilities.reporting)
       return `
 **StringRay Framework - Complete Capabilities Overview**
 
-**27 Specialized Agents:**
+**25 Specialized Agents:**
 ${Object.entries(capabilities.agents)
   .map(([name, desc]) => `- **${name}**: ${desc}`)
   .join("\n")}
@@ -423,7 +435,7 @@ ${Object.entries(capabilities.reporting)
       return `
 **StringRay Framework Capabilities:**
 
-**8 Agents:** enforcer, architect, orchestrator, bug-triage-specialist, code-reviewer, security-auditor, refactorer, testing-lead
+**25 Agents:** enforcer, architect, orchestrator, bug-triage-specialist, code-reviewer, security-auditor, refactorer, testing-lead, researcher, strategist, seo-consultant, content-creator, growth-strategist, multimodal-looker, frontend-ui-ux-engineer, frontend-engineer, tech-writer, log-monitor, analyzer, backend-engineer, performance-engineer, database-engineer, devops-engineer, mobile-developer, librarian-agents-updater
 
 **23 Skills:** project-analysis, testing-strategy, code-review, security-audit, performance-optimization, refactoring-strategies, ui-ux-design, documentation-generation, and more
 
@@ -459,14 +471,14 @@ ${items.map(([name, desc]) => `- **${name}**: ${desc}`).join("\n")}
   async start() {
     const transport = new StdioServerTransport();
     await this.server.connect(transport);
-    console.error("StringRay Framework Help Server started");
+    frameworkLogger.log("mcps/framework-help", "start", "info", { message: "StringRay Framework Help Server started" });
   }
 }
 
 // Auto-start if this file is run directly - conditional server initialization for development/testing
 if (import.meta.url === `file://${process.argv[1]}`) {
   const server = new FrameworkHelpServer();
-  server.start().catch(console.error);
+  server.start().catch((error) => frameworkLogger.log("mcps/framework-help", "run", "error", { error: String(error) }));
 }
 
 export { FrameworkHelpServer };

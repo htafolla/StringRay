@@ -17,12 +17,12 @@ The Universal Version Manager (`scripts/universal-version-manager.js`) maintains
 ```javascript
 const OFFICIAL_VERSIONS = {
   framework: {
-    version: "1.7.5",
-    displayName: "StringRay AI v1.3.4",
+    version: "1.15.1",
+    displayName: "StringRay AI vX.X.X",
     lastUpdated: "2026-01-15",
   },
   codex: {
-    version: "v1.3.0",
+    version: "vX.X.X",
     termsCount: 50,
     lastUpdated: "2026-01-15",
   },
@@ -57,19 +57,19 @@ git add . && git commit -m "chore: bump version to 1.0.5"
 
 ### Framework References
 
-- `StringRay AI v1.3.4` → `StringRay AI v1.3.4`
-- `StringRay AI v1.3.4` → `StringRay AI v1.3.4`
+- `StringRay AI vX.X.X` → `StringRay AI vX.X.X`
+- `StringRay AI vX.X.X` → `StringRay AI vX.X.X`
 - Version badges and headers
 
 ### Codex References
 
-- `Universal Development Codex v1.1.1` → `Universal Development Codex v1.1.1`
+- `Universal Development Codex vX.X.X` → `Universal Development Codex vX.X.X`
 - `55-term` → `55-term`
 - `55 Universal Development Codex` → `55 Universal Development Codex`
 
 ### Dependency References
 
-- `OpenCode v1.1.1` → `OpenCode v1.1.1`
+- `OpenCode vX.X.X` → `OpenCode vX.X.X`
 
 ## Files Excluded
 

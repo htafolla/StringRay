@@ -10,6 +10,7 @@
 
 import * as fs from "fs";
 import * as path from "path";
+import { frameworkLogger } from "../core/framework-logger.js";
 
 interface AgentConfig {
   name: string;
@@ -43,6 +44,7 @@ const DEFAULT_AGENT_CONFIG: AgentConfig = {
   name: "unknown",
   description: "Default agent configuration",
   capabilities: ["general-purpose"],
+  system: "You are a helpful AI assistant.",
   tools: {
     include: ["read", "grep", "edit", "bash"],
   },
@@ -74,8 +76,11 @@ export async function resolveAgent(agentName: string): Promise<AgentConfig> {
   }
 
   // Return default fallback if nothing found
-  console.warn(
-    `[AgentResolver] Agent '${agentName}' not found, using default config`,
+  await frameworkLogger.log(
+    "agent-resolver",
+    "agent-not-found-using-default",
+    "warning",
+    { agentName },
   );
   return {
     ...DEFAULT_AGENT_CONFIG,
@@ -98,7 +103,12 @@ async function loadAgentRegistry(): Promise<AgentRegistry> {
       return agentsModule.builtinAgents || {};
     }
   } catch (error) {
-    console.warn(`[AgentResolver] Failed to load agent registry: ${error}`);
+    await frameworkLogger.log(
+      "agent-resolver",
+      "failed-to-load-registry",
+      "warning",
+      { error: String(error) },
+    );
   }
 
   return {};
@@ -116,11 +126,6 @@ async function loadAgentConfigFile(
     "code-reviewer": "codeReviewer",
     "testing-lead": "testArchitect",
     "security-auditor": "securityAuditor",
-    "multimodal-looker": "multimodalLooker",
-    "seo-consultant": "seoSpecialist",
-    "content-creator": "seoCopywriter",
-    "growth-strategist": "marketingExpert",
-    "tech-writer": "documentationWriter",
   };
 
   const fileName = agentFileMap[agentName] || agentName;
@@ -142,8 +147,11 @@ async function loadAgentConfigFile(
       return agentModule[camelName] || agentModule.default || null;
     }
   } catch (error) {
-    console.warn(
-      `[AgentResolver] Failed to load agent config for '${agentName}': ${error}`,
+    await frameworkLogger.log(
+      "agent-resolver",
+      "failed-to-load-agent-config",
+      "warning",
+      { agentName, error: String(error) },
     );
   }
 

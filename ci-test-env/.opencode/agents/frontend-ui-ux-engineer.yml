@@ -3,6 +3,17 @@ description: "Frontend UI/UX Engineer - UI/UX design and user experience special
 version: "1.0.0"
 mode: subagent
 
+# =============================================================================
+# CODEX COMPLIANCE
+# =============================================================================
+# UI/UX engineering must follow these Codex rules:
+# - Term 30: Accessibility First - semantic HTML, ARIA labels, keyboard navigation
+# - Term 28: Performance Budget Enforcement - lazy load non-critical components
+# - Term 15: Separation of Concerns - keep UI separate from business logic
+# - Term 3: Do Not Over-Engineer - simple, intuitive interfaces
+# - Term 35: Version Control Best Practices - atomic commits for UI changes
+# - Term 20: Consistent Code Style - follow design system patterns
+
 # Logging Configuration
 logging:
   level: warn

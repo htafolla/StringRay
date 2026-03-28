@@ -8,7 +8,7 @@ tags: [testing, testing, best, practices]
 mcp:
   testing-best-practices:
     command: node
-    args: [node_modules/strray-ai/dist/plugin/mcps/dist/mcps/knowledge-skills/testing-best-practices.server.js]
+    args: [node_modules/strray-ai/dist/mcps/knowledge-skills/testing-best-practices.server.js]
 ---
 
 # Testing Best Practices Skill

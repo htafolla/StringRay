@@ -10,6 +10,7 @@ import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
+import { frameworkLogger } from "../core/framework-logger.js";
 
 class StrRayProcessorPipelineServer {
   private server: Server;
@@ -28,7 +29,7 @@ class StrRayProcessorPipelineServer {
   constructor() {
     this.server = new Server(
       {
-        name: "processor-pipeline", version: "1.7.5",
+        name: "processor-pipeline", version: "1.15.6",
       },
       {
         capabilities: {
@@ -626,7 +627,7 @@ ${complianceResults.actions.map((a: string) => `• 🔧 ${a}`).join("\n") || "N
 // Start the server if run directly
 if (import.meta.url === `file://${process.argv[1]}`) {
   const server = new StrRayProcessorPipelineServer();
-  server.run().catch(console.error);
+  server.run().catch((error) => frameworkLogger.log("mcps/processor-pipeline", "run", "error", { error: String(error) }));
 }
 
 export { StrRayProcessorPipelineServer };

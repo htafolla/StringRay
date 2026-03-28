@@ -121,7 +121,7 @@ export class CircuitBreaker extends EventEmitter {
       };
     } catch (error) {
       // Failure
-      const circuitResult = this.onFailure(error as Error);
+      const circuitResult = await this.onFailure(error as Error);
       circuitResult.executionTime = Date.now() - startTime;
 
       // Try fallback if provided
@@ -157,12 +157,10 @@ export class CircuitBreaker extends EventEmitter {
       operation()
         .then((result) => {
           clearTimeout(timeoutId);
-          this.successes++;
           resolve(result);
         })
         .catch((error) => {
           clearTimeout(timeoutId);
-          this.failures++;
           reject(error);
         });
     });
@@ -171,7 +169,7 @@ export class CircuitBreaker extends EventEmitter {
   /**
    * Handle successful operation
    */
-  private onSuccess(): void {
+  private async onSuccess(): Promise<void> {
     this.successes++;
     this.lastSuccessTime = Date.now();
     this.consecutiveSuccesses++;
@@ -189,10 +187,10 @@ export class CircuitBreaker extends EventEmitter {
         this.emit("stateChanged", CircuitState.CLOSED);
         await frameworkLogger.log(
           "circuit-breaker",
-          "-circuit-breaker-this-config-name-closed-recovered",
+          "circuit-closed-recovered",
           "info",
           {
-            message: `🔄 Circuit Breaker ${this.config.name}: CLOSED (recovered)`,
+            message: `Circuit Breaker ${this.config.name}: CLOSED (recovered)`,
           },
         );
       }
@@ -207,7 +205,7 @@ export class CircuitBreaker extends EventEmitter {
   /**
    * Handle failed operation
    */
-  private onFailure(error: Error): CircuitBreakerResult<any> {
+  private async onFailure(error: Error): Promise<CircuitBreakerResult<any>> {
     this.failures++;
     this.lastFailureTime = Date.now();
     this.consecutiveFailures++;
@@ -234,10 +232,10 @@ export class CircuitBreaker extends EventEmitter {
         this.emit("stateChanged", CircuitState.OPEN);
         await frameworkLogger.log(
           "circuit-breaker",
-          "-circuit-breaker-this-config-name-open-failure-thr",
+          "circuit-open-failure-threshold",
           "info",
           {
-            message: `🔴 Circuit Breaker ${this.config.name}: OPEN (failure threshold exceeded)`,
+            message: `Circuit Breaker ${this.config.name}: OPEN (failure threshold exceeded)`,
           },
         );
       }
@@ -248,10 +246,10 @@ export class CircuitBreaker extends EventEmitter {
       this.emit("stateChanged", CircuitState.OPEN);
       await frameworkLogger.log(
         "circuit-breaker",
-        "-circuit-breaker-this-config-name-open-half-open-f",
+        "circuit-open-half-open-failure",
         "info",
         {
-          message: `🔴 Circuit Breaker ${this.config.name}: OPEN (half-open failure)`,
+          message: `Circuit Breaker ${this.config.name}: OPEN (half-open failure)`,
         },
       );
     }
@@ -271,17 +269,17 @@ export class CircuitBreaker extends EventEmitter {
   /**
    * Manually trip the circuit breaker
    */
-  trip(): void {
+  async trip(): Promise<void> {
     if (this.state !== CircuitState.OPEN) {
       this.state = CircuitState.OPEN;
       this.nextAttemptTime = Date.now() + this.config.recoveryTimeout;
       this.emit("stateChanged", CircuitState.OPEN);
       await frameworkLogger.log(
         "circuit-breaker",
-        "-circuit-breaker-this-config-name-open-manually-tr",
+        "circuit-open-manually-tripped",
         "info",
         {
-          message: `🔴 Circuit Breaker ${this.config.name}: OPEN (manually tripped)`,
+          message: `Circuit Breaker ${this.config.name}: OPEN (manually tripped)`,
         },
       );
     }
@@ -290,7 +288,7 @@ export class CircuitBreaker extends EventEmitter {
   /**
    * Manually reset the circuit breaker
    */
-  reset(): void {
+  async reset(): Promise<void> {
     if (this.state !== CircuitState.CLOSED) {
       this.state = CircuitState.CLOSED;
       this.failures = 0;
@@ -300,10 +298,10 @@ export class CircuitBreaker extends EventEmitter {
       this.emit("stateChanged", CircuitState.CLOSED);
       await frameworkLogger.log(
         "circuit-breaker",
-        "-circuit-breaker-this-config-name-closed-manually-",
+        "circuit-closed-manually-reset",
         "info",
         {
-          message: `🟢 Circuit Breaker ${this.config.name}: CLOSED (manually reset)`,
+          message: `Circuit Breaker ${this.config.name}: CLOSED (manually reset)`,
         },
       );
     }

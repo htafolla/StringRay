@@ -13,6 +13,7 @@ import {
 } from "@modelcontextprotocol/sdk/types.js";
 import { execSync } from "child_process";
 import fs from "fs";
+import { frameworkLogger } from "../core/framework-logger.js";
 
 class StrRayModelHealthCheckServer {
   private server: Server;
@@ -20,7 +21,7 @@ class StrRayModelHealthCheckServer {
   constructor() {
     this.server = new Server(
       {
-        name: "model-health-check", version: "1.7.5",
+        name: "model-health-check", version: "1.15.6",
       },
       {
         capabilities: {
@@ -30,7 +31,7 @@ class StrRayModelHealthCheckServer {
     );
 
     this.setupToolHandlers();
-    console.log("StrRay Model Health Check MCP Server initialized");
+    frameworkLogger.log("mcps/model-health-check", "initialize", "info");
   }
 
   private setupToolHandlers() {
@@ -257,14 +258,14 @@ class StrRayModelHealthCheckServer {
   public async start() {
     const transport = new StdioServerTransport();
     await this.server.connect(transport);
-    console.log("StrRay Model Health Check MCP Server started");
+    frameworkLogger.log("mcps/model-health-check", "start", "info");
   }
 }
 
 // Start the server if this file is run directly
 if (import.meta.url === `file://${process.argv[1]}`) {
   const server = new StrRayModelHealthCheckServer();
-  server.start().catch(console.error);
+  server.start().catch((error) => frameworkLogger.log("mcps/model-health-check", "run", "error", { error: String(error) }));
 }
 
 export default StrRayModelHealthCheckServer;

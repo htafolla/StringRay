@@ -164,7 +164,7 @@ const workflow = {
   ]
 };
 
-// This spawns 27 agents without governance
+// This spawns 25 agents without governance
 await coordinator.executeOrchestrationWorkflow(workflow);
 ```
 

@@ -18,6 +18,6 @@ export {
 export * from "./security-headers.js";
 export * from "./security-hardening-system.js";
 export * from "./security-hardener.js";
-export * from "./secure-authentication-system.js";
+// Removed: secure-authentication-system.js (unused - 1305 lines of dead code)
 export * from "./security-auditor.js";
 export * from "./examples.js";

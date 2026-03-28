@@ -8,7 +8,7 @@ tags: [design, architect, tools]
 mcp:
   architect-tools:
     command: node
-    args: [node_modules/strray-ai/dist/plugin/mcps/dist/plugin/mcps/architect-tools.server.js]
+    args: [node_modules/strray-ai/dist/mcps/architect-tools.server.js]
 ---
 
 # Architect Tools Skill

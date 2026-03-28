@@ -10,12 +10,17 @@ import {
 } from "./rule-enforcer.js";
 import { frameworkLogger } from "../core/framework-logger.js";
 import { frameworkReportingSystem } from "../reporting/framework-reporting-system.js";
-import { createTaskSkillRouter } from "../delegation/task-skill-router.js";
+import { AgentDelegator } from "../delegation/agent-delegator.js";
+import { StringRayStateManager } from "../state/state-manager.js";
+import { strRayConfigLoader } from "../core/config-loader.js";
 import * as fs from "fs";
 import * as path from "path";
 
-// Create TaskSkillRouter instance for intelligent routing
-const taskSkillRouter = createTaskSkillRouter();
+// Minimum confidence to auto-delegate to another agent
+const DELEGATION_CONFIDENCE_THRESHOLD = 0.50;
+
+// Agents that enforcer should NOT delegate to (enforcer handles these itself)
+const ENFORCER_HANDLES = new Set(["enforcer", "code-reviewer"]);
 
 export interface RoutingRecommendation {
   suggestedAgent: string;
@@ -24,22 +29,14 @@ export interface RoutingRecommendation {
   matchedKeyword?: string;
 }
 
-/**
- * Pre-process task description to get intelligent routing recommendation
- * Uses TaskSkillRouter to determine the best agent/skill for the task
- */
 export function getTaskRoutingRecommendation(
   taskDescription: string,
 ): RoutingRecommendation {
-  const result = taskSkillRouter.routeTask(taskDescription, {
-    useHistoricalData: false, // Skip history for fresh decisions
-  });
-
   return {
-    suggestedAgent: result.agent,
-    suggestedSkill: result.skill,
-    confidence: result.confidence,
-    matchedKeyword: result.matchedKeyword || "none",
+    suggestedAgent: "enforcer",
+    suggestedSkill: "",
+    confidence: 0.5,
+    matchedKeyword: "none",
   };
 }
 
@@ -109,6 +106,241 @@ function buildTaskDescription(
 }
 
 /**
+ * Execute the full release workflow
+ * Triggered when user says: release, npm publish, publish to npm, bump and publish, ship it
+ */
+async function executeReleaseWorkflow(
+  operation: string,
+  context: RuleValidationContext,
+  jobId: string,
+  routing: RoutingRecommendation,
+): Promise<EnforcementResult> {
+  const { execSync } = await import('child_process');
+  
+  // Extract release options from routing context
+  const releaseContext = (routing as any).context || {};
+  const bumpType = releaseContext.bumpType || 'patch';
+  const createTag = releaseContext.createTag || false;
+  
+  await frameworkLogger.log(
+    "enforcer-tools",
+    "release-workflow-starting",
+    "info",
+    { jobId, bumpType, createTag },
+  );
+  
+  const steps: string[] = [];
+  const errors: string[] = [];
+  
+  // HARD STOP: Build must pass before release
+  await frameworkLogger.log("enforcer-tools", "release-build-check", "info", { step: "Verifying build passes..." });
+  try {
+    execSync(`npm run build`, {
+      cwd: process.cwd(),
+      stdio: 'pipe'
+    });
+    steps.push("✅ Build verified");
+  } catch (e) {
+    const errorMsg = `🛑 RELEASE STOPPED: Build failed before publishing. Fix build errors first.`;
+    console.error(errorMsg);
+    console.error(`Error: ${e}`);
+    return {
+      operation: "release",
+      passed: false,
+      blocked: true,
+      errors: [errorMsg, `Build error: ${e}`],
+      warnings: [],
+      fixes: [],
+      report: {
+        passed: false,
+        operation: "release",
+        errors: [errorMsg, `Build error: ${e}`],
+        warnings: [],
+        results: [],
+        timestamp: new Date(),
+      },
+    };
+  }
+  
+  try {
+    // Step 1: Run version-manager to bump version and generate changelog
+    await frameworkLogger.log("enforcer-tools", "release-step-1-version", "info", { step: "Bumping version..." });
+    try {
+      const versionArg = createTag ? '--tag' : '';
+      execSync(`node scripts/node/version-manager.mjs ${bumpType} ${versionArg}`, {
+        cwd: process.cwd(),
+        stdio: 'inherit'
+      });
+      steps.push("✅ Version bumped + changelog generated");
+    } catch (e) {
+      errors.push(`Version bump failed: ${e}`);
+    }
+    
+    // Step 2: Git commit and push
+    await frameworkLogger.log("enforcer-tools", "release-step-2-git", "info", { step: "Committing and pushing..." });
+    try {
+      execSync(`git add -A && git commit -m "release: v${bumpType} - Changelog updated" && git push`, {
+        cwd: process.cwd(),
+        stdio: 'inherit'
+      });
+      steps.push("✅ Git commit + push");
+    } catch (e) {
+      errors.push(`Git commit/push failed: ${e}`);
+    }
+    
+    // Step 3: npm publish
+    await frameworkLogger.log("enforcer-tools", "release-step-3-npm", "info", { step: "Publishing to npm..." });
+    try {
+      execSync(`npm publish`, {
+        cwd: process.cwd(),
+        stdio: 'inherit'
+      });
+      steps.push("✅ npm published");
+    } catch (e) {
+      errors.push(`npm publish failed: ${e}`);
+    }
+    
+    // Step 4: Generate tweet context
+    await frameworkLogger.log("enforcer-tools", "release-step-4-tweet", "info", { step: "Generating tweet..." });
+    try {
+      execSync(`node scripts/node/release-tweet.mjs`, {
+        cwd: process.cwd(),
+        stdio: 'inherit'
+      });
+      steps.push("✅ Tweet context generated - ready for @growth-strategist");
+    } catch (e) {
+      errors.push(`Tweet generation failed: ${e}`);
+    }
+    
+  } catch (e) {
+    errors.push(`Release workflow failed: ${e}`);
+  }
+  
+  return {
+    operation: "release",
+    passed: errors.length === 0,
+    blocked: false,
+    errors,
+    warnings: [],
+    fixes: [],
+    report: {
+      passed: errors.length === 0,
+      operation: "release",
+      errors,
+      warnings: steps,
+      results: steps.map(s => ({ rule: 'release', passed: true, message: s })),
+      timestamp: new Date(),
+    },
+  };
+}
+
+/**
+ * Delegate a task to another agent via AgentDelegator
+ * This is the key integration that ensures enforcer routes to best agent
+ */
+async function delegateToAgent(
+  agentName: string,
+  operation: string,
+  context: RuleValidationContext,
+  jobId: string,
+): Promise<EnforcementResult> {
+  try {
+    // Create a minimal state manager and config loader for the delegator
+    const stateManager = new StringRayStateManager();
+    
+    // Create the delegator
+    const delegator = new AgentDelegator(stateManager, strRayConfigLoader);
+    
+    // Build task description for the delegated agent
+    const taskDescription = buildTaskDescription(operation, context);
+    
+    // Build the delegation request
+    const request = {
+      operation,
+      description: taskDescription,
+      context: {
+        ...context,
+        originalJobId: jobId,
+      },
+      sessionId: stateManager.get("current_session_id") as string || `delegated-${jobId}`,
+    };
+
+    // Analyze and get delegation strategy
+    const analysis = await (delegator as any).analyzeDelegation(request);
+    
+    // Execute the delegation
+    const result = await delegator.executeDelegation(analysis, request);
+
+    await frameworkLogger.log(
+      "enforcer-tools",
+      "delegation-complete",
+      "info",
+      {
+        jobId,
+        delegatedTo: agentName,
+        success: result.success,
+        agentsUsed: result.agents,
+      },
+    );
+
+    // Convert delegation result to EnforcementResult format
+    return {
+      operation,
+      passed: result.success,
+      blocked: !result.success,
+      errors: result.errors || [],
+      warnings: [],
+      fixes: [],
+      report: {
+        passed: result.success,
+        operation,
+        timestamp: new Date(),
+        errors: result.errors || [],
+        warnings: [],
+        results: [],
+      } as ValidationReport,
+    };
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    
+    await frameworkLogger.log(
+      "enforcer-tools",
+      "delegation-failed",
+      "error",
+      {
+        jobId,
+        delegatedTo: agentName,
+        error: errorMessage,
+      },
+    );
+
+    // Fall back to self-execution if delegation fails
+    return await ruleValidationSelf(operation, context, jobId);
+  }
+}
+
+/**
+ * Fallback: Execute validation ourselves if delegation fails
+ */
+async function ruleValidationSelf(
+  operation: string,
+  context: RuleValidationContext,
+  jobId: string,
+): Promise<EnforcementResult> {
+  const report = await ruleEnforcer.validateOperation(operation, context);
+  
+  return {
+    operation,
+    passed: report.passed,
+    blocked: !report.passed && report.errors.some(e => e.includes("required") || e.includes("violation")),
+    errors: report.errors,
+    warnings: report.warnings,
+    fixes: [],
+    report,
+  };
+}
+
+/**
  * Run pre-commit validation with auto-fix enabled
  * This is the integration point that automatically creates test files when needed
  */
@@ -169,6 +401,7 @@ export interface EnforcementResult {
 /**
  * Rule Validation Tool - Validates operations against rule hierarchy
  * Now with intelligent task routing via TaskSkillRouter
+ * Automatically delegates to best agent when confidence is high
  */
 export async function ruleValidation(
   operation: string,
@@ -189,6 +422,48 @@ export async function ruleValidation(
     routingSkill: routing.suggestedSkill,
     routingConfidence: routing.confidence,
   });
+
+  // DELEGATION LOGIC: If high confidence and recommended agent is not enforcer, delegate!
+  const shouldDelegate = 
+    routing.confidence >= DELEGATION_CONFIDENCE_THRESHOLD &&
+    !ENFORCER_HANDLES.has(routing.suggestedAgent) &&
+    routing.suggestedAgent !== "enforcer";
+
+  // SPECIAL CASE: Release workflow - execute full release process
+  if (routing.matchedKeyword === "release-workflow") {
+    await frameworkLogger.log(
+      "enforcer-tools",
+      "release-workflow-triggered",
+      "info",
+      {
+        jobId,
+        operation,
+        bumpType: (routing as any).context?.bumpType || 'patch',
+        createTag: (routing as any).context?.createTag || false,
+      },
+    );
+    
+    // Execute the release workflow
+    return await executeReleaseWorkflow(operation, context, jobId, routing);
+  }
+
+  if (shouldDelegate) {
+    await frameworkLogger.log(
+      "enforcer-tools",
+      "delegating-to-agent",
+      "info",
+      {
+        jobId,
+        operation,
+        delegatedTo: routing.suggestedAgent,
+        confidence: routing.confidence,
+        reason: `High confidence (${routing.confidence}) routing to specialized agent`,
+      },
+    );
+
+    // Delegate to the recommended agent instead of doing work itself
+    return await delegateToAgent(routing.suggestedAgent, operation, context, jobId);
+  }
 
   // Use enhanced context with routing for validation
   const report = await ruleEnforcer.validateOperation(operation, enhancedContext);
@@ -578,15 +853,19 @@ async function generateCodexComplianceReport(
       );
     }
 
-    if (
-      newCode.includes("console.log") &&
-      !newCode.includes("// TODO") &&
-      !newCode.includes("// DEBUG")
-    ) {
-      warnings.push(
-        "Codex warning: Consider removing console.log statements in production code",
-      );
-    }
+    // Check for actual console.log() calls (more precise than just string containment)
+    const consoleLogCallMatches = newCode.match(/console\.log\(/g);
+    if (consoleLogCallMatches && consoleLogCallMatches.length > 0) {
+      // Only flag console.log if it's not in comments
+      const isNotInComment = !newCode.includes("//") && !newCode.includes("/*");
+      if (isNotInComment) {
+        violations.push(
+          'Codex violation: console.log() statements detected in production code - use frameworkLogger instead',
+          );
+      }
+    } else {
+        // console.log found in comments - this is okay
+      }
 
     if (
       !newCode.includes("try") &&

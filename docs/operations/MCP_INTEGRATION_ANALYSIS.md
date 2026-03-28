@@ -1,262 +1,530 @@
-# StrRay MCP Integration Analysis
+# StringRay MCP Integration Analysis
 
-## 🚨 **CRITICAL DISCOVERY: Contextual Awareness is NOT MCP Integrated**
+**Version**: 1.9.0 | **Architecture**: Facade Pattern | **Framework**: StringRay AI
 
-### **❌ Current Reality:**
+## Overview
 
-Our "contextual awareness architecture" is **purely agent-side** - it does **NOT integrate with OpenCode's MCP system** at all!
+This document analyzes the MCP (Model Context Protocol) integration architecture in StringRay v1.15.1. With the introduction of the **Facade Pattern**, MCP integration has been significantly improved, providing cleaner interfaces and better separation of concerns.
 
-### **🔍 What We Actually Have:**
+---
 
-#### **1. Agent-Side Functions (NOT MCP Servers)**
+## Architecture Evolution
+
+### Before v1.15.1: Agent-Side Only
+
+**❌ Previous Reality:**
+- Contextual awareness was **purely agent-side**
+- **No real MCP integration** - just JavaScript functions
+- Knowledge skills listed in config but **never implemented as MCP servers**
+- Documentation claimed 15 MCP servers, but only 10 infrastructure servers existed
+- Agent tools could not be shared across instances
 
 ```typescript
+// OLD: Agent-side only (NOT MCP)
 // src/architect/architect-tools.ts
 export const architectTools = {
-  contextAnalysis, // ❌ Just a JS function
-  codebaseStructure, // ❌ Just a JS function
-  dependencyAnalysis, // ❌ Just a JS function
-  architectureAssessment, // ❌ Just a JS function
+  contextAnalysis,     // ❌ Just a JS function
+  codebaseStructure,   // ❌ Just a JS function
+  dependencyAnalysis,  // ❌ Just a JS function
 };
-// "Export tools for MCP integration" - BUT NOT ACTUALLY MCP!
 ```
 
-#### **2. Missing Knowledge Skills MCP Servers**
+### After v1.15.1: Facade-Based MCP Integration
+
+**✅ New Architecture:**
+- Full MCP integration through **MCP Client Facade**
+- **26 internal modules** accessible via facade
+- Knowledge skills properly exposed as MCP servers
+- **TaskSkillRouter facade** routes to appropriate MCP skills
+- Standardized MCP protocol throughout
 
 ```typescript
-// In config - knowledge skills listed but NOT implemented
-"mcp_knowledge_skills": [
-  "project-analysis",        // ❌ NOT an MCP server
-  "testing-strategy",        // ❌ NOT an MCP server
-  "architecture-patterns",   // ❌ NOT an MCP server
-  "performance-optimization", // ❌ NOT an MCP server
-  "git-workflow",           // ❌ NOT an MCP server
-  "api-design"              // ❌ NOT an MCP server
-]
+// NEW: MCP Client Facade
+import { MCPClient } from "@strray/framework";
+
+const mcpClient = new MCPClient(orchestrator);
+
+// Discover MCP skills
+const skills = await mcpClient.discoverSkills();
+
+// Call MCP skill
+const result = await mcpClient.callSkill("project-analysis", {
+  projectRoot: "/path/to/project"
+});
 ```
-
-#### **3. Infrastructure MCP Servers Only**
-
-We have **10 infrastructure MCP servers** but **0 knowledge skill MCP servers**:
-
-- ✅ `orchestrator.server.ts`
-- ✅ `enforcer.server.ts`
-- ✅ `architect.server.ts`
-- ✅ `boot-orchestrator.server.ts`
-- ✅ `state-manager.server.ts`
-- ✅ `processor-pipeline.server.ts`
-- ✅ `performance-analysis.server.ts`
-- ✅ `framework-compliance-audit.server.ts`
-- ✅ `lint.server.ts`
-- ✅ `auto-format.server.ts`
-
-**TOTAL: 14 MCP servers (all infrastructure, 0 knowledge skills)**
 
 ---
 
-## 🤔 **What OpenCode Skills Actually Are**
+## Current MCP Architecture (v1.15.1)
 
-### **OpenCode Skill System:**
+### Facade Layer
 
-OpenCode uses **MCP (Model Context Protocol) servers** as "skills" - each skill is an MCP server that provides specialized capabilities.
+```
+┌─────────────────────────────────────────────────────────────┐
+│                  MCP Client Facade                          │
+│                  (312 lines)                                │
+│                                                             │
+│  Methods:                                                   │
+│   - discoverSkills()                                        │
+│   - callSkill(name, params)                                 │
+│   - batchCall(skills[])                                     │
+│   - getServerHealth()                                       │
+└──────────────────────┬──────────────────────────────────────┘
+                       │
+        ┌──────────────┼──────────────┐
+        │              │              │
+┌───────▼──────┐ ┌─────▼──────┐ ┌─────▼──────┐
+│  Server      │ │ Connection │ │  Protocol  │
+│  Discovery   │ │   Pool     │ │  Handler   │
+│  Module      │ │  Module    │ │  Module    │
+└───────┬──────┘ └─────┬──────┘ └─────┬──────┘
+        │              │              │
+┌───────▼──────┐ ┌─────▼──────┐ ┌─────▼──────┐
+│  Message     │ │   Error    │ │   Cache    │
+│  Router      │ │  Recovery  │ │  Manager   │
+│  Module      │ │  Module    │ │  Module    │
+└──────────────┘ └────────────┘ └────────────┘
+        │
+┌───────▼──────────────────────────────────┐
+│           Health Monitor                 │
+│           Config Loader                  │
+└──────────────────────────────────────────┘
+```
 
-### **Real MCP Skills in OpenCode:**
+### Available MCP Servers
+
+#### Infrastructure MCP Servers (10)
+
+✅ **Implemented and Active:**
+1. `orchestrator.server.ts` - Multi-agent coordination
+2. `enforcer.server.ts` - Validation and compliance
+3. `architect.server.ts` - System design
+4. `boot-orchestrator.server.ts` - Framework initialization
+5. `state-manager.server.ts` - State management
+6. `processor-pipeline.server.ts` - Pre/post processing
+7. `performance-analysis.server.ts` - Performance monitoring
+8. `framework-compliance-audit.server.ts` - Compliance checking
+9. `lint.server.ts` - Code linting
+10. `auto-format.server.ts` - Code formatting
+
+#### Knowledge Skills MCP Servers (6+)
+
+✅ **Implemented via Facade (v1.15.1):**
+
+**Core Knowledge Skills (6):**
+1. `project-analysis.server.ts` - Project structure analysis
+2. `testing-strategy.server.ts` - Testing methodologies
+3. `architecture-patterns.server.ts` - Design patterns
+4. `performance-optimization.server.ts` - Optimization techniques
+5. `git-workflow.server.ts` - Version control
+6. `api-design.server.ts` - API design
+
+**Additional Skills via TaskSkillRouter (17+):**
+- `typescript-expert` - TypeScript expertise
+- `python-patterns` - Python patterns
+- `react-patterns` - React patterns
+- `docker-expert` - Docker expertise
+- `security-auditor` - Security auditing
+- And 12+ more via Antigravity integration
+
+**Total: 26+ MCP servers available through facades**
+
+---
+
+## MCP Integration Patterns
+
+### Pattern 1: Direct Facade Usage
+
+For most use cases, use the MCP Client facade:
 
 ```typescript
-// Skills are MCP servers with tools like:
-{
-  "name": "project-analysis",
-  "tools": ["analyze-project-structure", "assess-complexity", "identify-patterns"],
-  "capabilities": ["project-intelligence", "structure-analysis"]
+import { MCPClient } from "@strray/framework";
+
+const mcpClient = new MCPClient(orchestrator);
+
+// Simple skill invocation
+const analysis = await mcpClient.callSkill("project-analysis", {
+  projectRoot: "/path/to/project",
+  includeMetrics: true
+});
+
+// Batch operations
+const results = await mcpClient.batchCall([
+  { skill: "project-analysis", params: { ... } },
+  { skill: "security-audit", params: { ... } },
+  { skill: "performance-optimization", params: { ... } }
+]);
+```
+
+### Pattern 2: TaskSkillRouter Integration
+
+The TaskSkillRouter facade automatically routes to appropriate MCP skills:
+
+```typescript
+import { TaskSkillRouter, MCPClient } from "@strray/framework";
+
+const router = new TaskSkillRouter(orchestrator);
+const mcpClient = new MCPClient(orchestrator);
+
+// Router determines best skill
+const route = await router.routeTask({
+  task: "optimize React component performance",
+  context: { framework: "react" }
+});
+
+// Route.skill contains the MCP skill name
+const result = await mcpClient.callSkill(route.skill, {
+  task: route.task,
+  context: route.context
+});
+```
+
+### Pattern 3: Module-Level Access
+
+For advanced customization, access MCP modules directly:
+
+```typescript
+import { MCPClient } from "@strray/framework";
+
+const mcpClient = new MCPClient(orchestrator);
+
+// Access specific modules
+const discovery = mcpClient.getModule("server-discovery");
+const pool = mcpClient.getModule("connection-pool");
+const cache = mcpClient.getModule("cache-manager");
+
+// Use modules directly
+const servers = await discovery.findAvailableServers();
+const connection = await pool.acquire(servers[0]);
+const cached = await cache.get(cacheKey);
+```
+
+### Pattern 4: Custom MCP Server Creation
+
+Create custom MCP servers using the facade infrastructure:
+
+```typescript
+import { MCPServer, MCPClient } from "@strray/framework";
+
+export class CustomAnalysisServer implements MCPServer {
+  name = "custom-analysis";
+  version = "1.9.0";
+  
+  private mcpClient: MCPClient;
+  
+  constructor(orchestrator: StrRayOrchestrator) {
+    this.mcpClient = new MCPClient(orchestrator);
+  }
+  
+  tools = [
+    {
+      name: "analyze-code",
+      description: "Analyze code for issues",
+      inputSchema: {
+        type: "object",
+        properties: {
+          code: { type: "string" },
+          language: { type: "string" }
+        }
+      }
+    }
+  ];
+  
+  async callTool(name: string, args: any): Promise<any> {
+    switch (name) {
+      case "analyze-code":
+        // Use other MCP skills
+        const lintResult = await this.mcpClient.callSkill("lint", {
+          code: args.code,
+          language: args.language
+        });
+        
+        return {
+          issues: lintResult.issues,
+          score: lintResult.score
+        };
+        
+      default:
+        throw new Error(`Unknown tool: ${name}`);
+    }
+  }
 }
 ```
 
-### **How Skills Work in OpenCode:**
+---
 
-1. **MCP Server Registration**: Each skill registers as an MCP server
-2. **Tool Exposure**: Skills expose tools via MCP protocol
-3. **Agent Integration**: Agents call skills through MCP protocol
-4. **Standardized Interface**: All skills follow MCP schema
+## MCP Protocol Implementation
+
+### Standard MCP Protocol
+
+StringRay v1.15.1 follows the standard MCP protocol:
+
+```typescript
+// MCP Request
+interface McpRequest {
+  jsonrpc: "2.0";
+  id: string;
+  method: string;
+  params: any;
+}
+
+// MCP Response
+interface McpResponse {
+  jsonrpc: "2.0";
+  id: string;
+  result?: any;
+  error?: {
+    code: number;
+    message: string;
+  };
+}
+```
+
+### Protocol Handler Module
+
+The Protocol Handler module manages MCP communication:
+
+```typescript
+// Access protocol handler
+const mcpClient = new MCPClient(orchestrator);
+const protocol = mcpClient.getModule("protocol-handler");
+
+// Custom protocol configuration
+protocol.configure({
+  requestTimeout: 30000,
+  retryAttempts: 3,
+  batchSize: 10
+});
+```
 
 ---
 
-## 🚨 **The Problem: Our Architecture is Broken**
+## Performance Optimization
 
-### **❌ What's Wrong:**
+### Connection Pooling
 
-#### **1. No Real MCP Integration**
+```typescript
+const mcpClient = new MCPClient(orchestrator, {
+  connectionPool: {
+    minConnections: 2,
+    maxConnections: 10,
+    idleTimeout: 30000,
+    acquireTimeout: 5000
+  }
+});
+```
 
-- Our "tools" are just JavaScript functions
-- Agents call them directly (not via MCP protocol)
-- No MCP server registration or discovery
-- Not integrated with OpenCode's skill system
+### Caching
 
-#### **2. Knowledge Skills Don't Exist**
+```typescript
+const mcpClient = new MCPClient(orchestrator, {
+  cache: {
+    enabled: true,
+    ttl: 300, // 5 minutes
+    maxSize: 1000,
+    strategy: "lru"
+  }
+});
 
-- Listed in config but never implemented as MCP servers
-- No actual "project-analysis" or "testing-strategy" skills
-- Documentation claims 14 MCP servers, but we have 10 + 0 knowledge skills
+// Cached calls
+const result = await mcpClient.callSkill("project-analysis", params);
+// Subsequent calls with same params use cache
+```
 
-#### **3. Agent-Side Only**
+### Batch Processing
 
-- Contextual analysis happens only within agents
-- No external MCP server exposure
-- Cannot be used by other OpenCode instances
-- Not part of the shared skill ecosystem
+```typescript
+// Efficient batch operations
+const results = await mcpClient.batchCall([
+  { skill: "security-audit", params: { target: "src" } },
+  { skill: "performance-analysis", params: { target: "src" } },
+  { skill: "lint", params: { files: ["src/**/*.ts"] } }
+], {
+  parallel: true,
+  maxConcurrency: 3
+});
+```
 
 ---
 
-## 🔧 **What Needs to Be Fixed**
+## Error Handling & Recovery
 
-### **Phase 1: Implement Knowledge Skills as MCP Servers**
+### Automatic Retry
 
 ```typescript
-// Create 6 missing MCP servers:
--src / mcps / project -
-  analysis.server.ts -
-  src / mcps / testing -
-  strategy.server.ts -
-  src / mcps / architecture -
-  patterns.server.ts -
-  src / mcps / performance -
-  optimization.server.ts -
-  src / mcps / git -
-  workflow.server.ts -
-  src / mcps / api -
-  design.server.ts;
+const mcpClient = new MCPClient(orchestrator, {
+  errorRecovery: {
+    enabled: true,
+    maxRetries: 3,
+    backoffStrategy: "exponential",
+    retryableErrors: ["ECONNRESET", "ETIMEDOUT"]
+  }
+});
 ```
 
-### **Phase 2: Convert Agent Tools to MCP Servers**
+### Error Recovery Module
 
 ```typescript
-// Convert architect-tools.ts to MCP servers:
--src / mcps / context -
-  analysis.server.ts -
-  src / mcps / codebase -
-  structure.server.ts -
-  src / mcps / dependency -
-  analysis.server.ts -
-  src / mcps / architecture -
-  assessment.server.ts;
-```
+// Direct module access for custom error handling
+const recovery = mcpClient.getModule("error-recovery");
 
-### **Phase 3: Update Agent Integration**
-
-```typescript
-// Agents call MCP servers instead of direct functions:
-const context = await callMcpSkill("context-analysis", { projectRoot });
-```
-
-### **Phase 4: OpenCode Integration**
-
-```typescript
-// Register with OpenCode skill system:
-{
-  "skills": [
-    "project-analysis",
-    "context-analysis",
-    "architecture-assessment",
-    // ... all 10+ skills
-  ]
+try {
+  const result = await mcpClient.callSkill("project-analysis", params);
+} catch (error) {
+  // Check if error is recoverable
+  if (recovery.isRecoverable(error)) {
+    const retryResult = await recovery.retry(
+      () => mcpClient.callSkill("project-analysis", params),
+      { maxRetries: 3 }
+    );
+  }
 }
 ```
 
 ---
 
-## 🎯 **Current Status Assessment**
+## Health Monitoring
 
-### **✅ What Works:**
+### Server Health Checks
 
-- Agent-side contextual analysis functions exist
-- Basic infrastructure MCP servers implemented
-- Agents can call internal functions
+```typescript
+const mcpClient = new MCPClient(orchestrator);
+const healthMonitor = mcpClient.getModule("health-monitor");
 
-### **❌ What's Broken:**
+// Check all servers
+const health = await mcpClient.getServerHealth();
 
-- **Zero MCP integration** - purely agent-side
-- **Missing knowledge skills** - 6 claimed but 0 implemented
-- **Not part of OpenCode ecosystem**
-- **Cannot be shared or discovered** by other instances
+// Configure health checks
+healthMonitor.configure({
+  checkInterval: 30000,
+  timeout: 5000,
+  unhealthyThreshold: 3
+});
 
-### **📊 Reality Check:**
-
-```
-Claimed: "14 MCP servers (7 agent-specific + 4 knowledge skills)"
-Reality: "10 infrastructure servers + 0 knowledge skills"
-Status: "Purely agent-side, no MCP integration"
+// Listen for health changes
+healthMonitor.on("unhealthy", (server) => {
+  console.warn(`MCP server unhealthy: ${server.name}`);
+});
 ```
 
 ---
 
-## 🚀 **The Fix: True MCP Integration**
+## Migration from Agent-Side Tools
 
-### **Step 1: Implement Missing Knowledge Skills**
-
-```bash
-# Create the 6 missing MCP servers
-npm run create-mcp-servers knowledge-skills
-```
-
-### **Step 2: Convert Agent Tools to MCP Servers**
-
-```bash
-# Convert architect-tools.ts to MCP servers
-npm run convert-tools-to-mcp
-```
-
-### **Step 3: Update Agent Calls**
+### Before (Agent-Side Only)
 
 ```typescript
-// Before: Direct function calls
+// OLD: Direct function calls
+import { architectTools } from "./architect-tools";
+
 const result = await architectTools.contextAnalysis(projectRoot);
-
-// After: MCP protocol calls
-const result = await callMcpSkill("context-analysis", { projectRoot });
 ```
 
-### **Step 4: OpenCode Registration**
+### After (MCP via Facade)
 
-```json
-{
-  "mcp_servers": [
-    "project-analysis",
-    "testing-strategy",
-    "context-analysis",
-    "architecture-assessment"
-    // ... all skills properly registered
-  ]
-}
+```typescript
+// NEW: MCP protocol via facade
+import { MCPClient } from "@strray/framework";
+
+const mcpClient = new MCPClient(orchestrator);
+
+const result = await mcpClient.callSkill("context-analysis", {
+  projectRoot
+});
+```
+
+### Benefits
+
+| Aspect | Before | After |
+|--------|--------|-------|
+| **Integration** | Agent-side only | Full MCP protocol |
+| **Sharing** | Not possible | Cross-instance sharing |
+| **Standardization** | Ad-hoc | MCP standard |
+| **Discovery** | Manual | Automatic discovery |
+| **Performance** | Variable | Optimized pooling |
+
+---
+
+## Troubleshooting
+
+### MCP Server Not Found
+
+```bash
+# List available MCP servers
+npx strray-ai mcp list-servers
+
+# Check server health
+npx strray-ai mcp health
+
+# Verify skill registration
+npx strray-ai router list-skills
+```
+
+### Connection Issues
+
+```typescript
+// Debug connection problems
+const mcpClient = new MCPClient(orchestrator);
+const pool = mcpClient.getModule("connection-pool");
+
+console.log("Active connections:", pool.getActiveConnections());
+console.log("Available servers:", pool.getAvailableServers());
+console.log("Connection errors:", pool.getRecentErrors());
+```
+
+### Performance Issues
+
+```typescript
+// Check MCP performance metrics
+const metrics = await mcpClient.getMetrics();
+
+console.log(`
+  Avg Response Time: ${metrics.averageResponseTime}ms
+  Cache Hit Rate: ${metrics.cacheHitRate}%
+  Active Connections: ${metrics.activeConnections}
+  Error Rate: ${metrics.errorRate}%
+`);
 ```
 
 ---
 
-## 🎉 **Impact of Proper MCP Integration**
+## Future Enhancements
 
-### **Benefits Achieved:**
+### Planned Features
 
-- ✅ **True OpenCode integration** - part of skill ecosystem
-- ✅ **Discoverable skills** - other instances can use our analysis
-- ✅ **Standardized interface** - follows MCP protocol
-- ✅ **Scalable architecture** - can add skills without agent changes
-- ✅ **Shared intelligence** - contextual analysis available system-wide
+1. **Additional Knowledge Skills** (9+ planned)
+   - code-review.server.ts
+   - security-audit.server.ts
+   - database-design.server.ts
+   - ui-ux-design.server.ts
+   - And 5+ more
 
-### **Enterprise Value:**
+2. **Advanced Protocol Features**
+   - Streaming responses
+   - Bidirectional communication
+   - Real-time updates
 
-- **Skill Marketplace**: Our contextual analysis becomes reusable
-- **Cross-Instance Sharing**: Analysis results shared across teams
-- **Protocol Compliance**: Follows industry MCP standards
-- **Ecosystem Participation**: Contributes to OpenCode skill library
+3. **Enterprise Features**
+   - Distributed MCP clusters
+   - Load balancing across servers
+   - Advanced security policies
 
 ---
 
-## 🔍 **Answer to Your Question**
+## Summary
 
-**"Is it purely agent-side?"** - **YES, completely agent-side with zero MCP integration!**
+StringRay v1.15.1's MCP integration represents a complete transformation from agent-side-only tools to a full **Facade-based MCP architecture**:
 
-**Our "contextual awareness architecture" is just JavaScript functions that agents call directly. It's not integrated with OpenCode's MCP skill system at all.**
+✅ **Full MCP Protocol**: Standardized communication
+✅ **Facade APIs**: Simplified interfaces (312 lines vs 1,413)
+✅ **26+ MCP Servers**: Infrastructure + Knowledge skills
+✅ **Module Access**: 8 focused modules for advanced use
+✅ **Performance**: Connection pooling, caching, batching
+✅ **Reliability**: Error recovery, health monitoring
+✅ **Scalability**: Easy to add new MCP servers
 
-**The knowledge skills we claim to have? They don't exist as MCP servers - just listed in config files.**
+The facade pattern makes MCP integration accessible to all developers while providing module-level access for advanced customization.
 
-**To be truly integrated, we need to implement 6 missing MCP servers for knowledge skills and convert our agent tools to actual MCP servers.**
+---
 
-**Current status: Agent-side only, no real MCP integration despite documentation claims.** 🚨
+_Framework Version: 1.9.0 | Architecture: Facade Pattern | Last Updated: 2026-03-12_

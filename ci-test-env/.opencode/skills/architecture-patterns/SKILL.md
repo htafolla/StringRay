@@ -8,7 +8,7 @@ tags: [design, architecture, patterns]
 mcp:
   architecture-patterns:
     command: node
-    args: [node_modules/strray-ai/dist/plugin/mcps/dist/mcps/knowledge-skills/architecture-patterns.server.js]
+    args: [node_modules/strray-ai/dist/mcps/knowledge-skills/architecture-patterns.server.js]
 ---
 
 # Architecture Patterns Skill

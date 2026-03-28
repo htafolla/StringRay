@@ -326,12 +326,6 @@ export class KernelAnalyzer {
     }
 
     // Determine inference level
-    if (!result.fatalAssumptions!.length) {
-      result.fatalAssumptions = [];
-    } else if (!result.cascadePatterns!.length) {
-      result.cascadePatterns = [];
-    }
-    
     if (result.fatalAssumptions!.length > 0) {
       result.level = 'L3'; // Assumption surfacing
     } else if (result.cascadePatterns!.length > 0) {

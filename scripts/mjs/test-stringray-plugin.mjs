@@ -186,7 +186,7 @@ async function runComprehensiveTests() {
     },
     {
       name: "Codex Integration Test",
-      command: `node ${__dirname}/../node/validate-codex.js`,
+      command: `node ${__dirname}/../node/validate-codex.mjs`,
       description: "Validates codex parsing and injection functionality",
     },
     {

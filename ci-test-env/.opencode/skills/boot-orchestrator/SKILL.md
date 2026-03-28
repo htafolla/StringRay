@@ -8,7 +8,7 @@ tags: [infrastructure, boot, orchestrator]
 mcp:
   boot-orchestrator:
     command: node
-    args: [node_modules/strray-ai/dist/plugin/mcps/dist/plugin/mcps/boot-orchestrator.server.js]
+    args: [node_modules/strray-ai/dist/mcps/boot-orchestrator.server.js]
 ---
 
 # Boot Orchestrator Skill

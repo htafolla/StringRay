@@ -9,16 +9,29 @@ import {
   ComplexityAnalyzer,
   ComplexityMetrics,
 } from "../delegation/complexity-analyzer.js";
-import { createAgentDelegator } from "../delegation/agent-delegator.js";
+import {
+  createAgentDelegator,
+  AgentDelegator,
+} from "../delegation/agent-delegator.js";
 import { strRayConfigLoader } from "../core/config-loader.js";
 
 export interface AgentSpawnRequest {
   agentType: string;
   task: string;
-  context?: Record<string, any>;
+  context?: Record<string, unknown>;
   priority?: "low" | "medium" | "high" | "critical";
   timeout?: number;
   dependencies?: string[];
+}
+
+export interface AgentExecutionResult {
+  success: boolean;
+  agentType: string;
+  task: string;
+  executionTime?: number;
+  complexity?: number;
+  result?: unknown;
+  delegationResult?: unknown;
 }
 
 export interface SpawnedAgent {
@@ -28,7 +41,7 @@ export interface SpawnedAgent {
   status: "spawning" | "active" | "completed" | "failed" | "cancelled";
   startTime: number;
   endTime?: number;
-  result?: any;
+  result?: AgentExecutionResult;
   error?: string;
   progress: number;
   clickable: boolean;
@@ -44,16 +57,40 @@ export interface AgentOrchestrationState {
   agentDependencies: Map<string, string[]>;
   monitoringEnabled: boolean;
   cleanupInterval: number;
-  isMainOrchestrator: boolean; // Flag to indicate if this is the main orchestrator
+  isMainOrchestrator: boolean;
+}
+
+export interface ExecutionContext {
+  isExecutingAsSubagent: boolean;
+  currentAgentId: string | null;
+  spawnStack: string[];
+}
+
+export interface OrchestrationDelegationRequest {
+  operation: string;
+  description: string;
+  context?: Record<string, unknown>;
+}
+
+export interface OrchestrationDelegationResult {
+  success: boolean;
+  results?: Array<{
+    agent: string;
+    output: unknown;
+    executionTime: number;
+  }>;
+  totalTime: number;
+  errors?: string[];
+  agents?: string[];
 }
 
 export class EnhancedMultiAgentOrchestrator {
   private state: AgentOrchestrationState;
   private stateManager: StringRayStateManager;
   private complexityAnalyzer: ComplexityAnalyzer;
-  private agentDelegator: any;
-  private executionContext: any;
-  private cleanupTimer: any;
+  private agentDelegator: AgentDelegator;
+  private executionContext: ExecutionContext;
+  private cleanupTimer: ReturnType<typeof setInterval> | null = null;
 
   constructor(
     stateManager?: StringRayStateManager,
@@ -73,11 +110,10 @@ export class EnhancedMultiAgentOrchestrator {
       failedAgents: new Map(),
       agentDependencies: new Map(),
       monitoringEnabled: true,
-      cleanupInterval: stateManager ? 300000 : 30000, // 5 minutes for main, 30 seconds for sub
+      cleanupInterval: stateManager ? 300000 : 30000,
       isMainOrchestrator,
     };
 
-    // Initialize execution context for security tracking
     this.executionContext = {
       isExecutingAsSubagent: false,
       currentAgentId: null,
@@ -110,7 +146,12 @@ export class EnhancedMultiAgentOrchestrator {
           `Only the main orchestrator may spawn agents. ` +
           `Subagent spawning is strictly prohibited to prevent infinite loops and resource exhaustion.`,
       );
-      console.error(`🚨 ${error.message}`);
+      await frameworkLogger.log(
+        "enhanced-multi-agent-orchestrator",
+        "subagent-spawn-violation",
+        "error",
+        { message: error.message },
+      );
       throw error;
     }
 
@@ -269,12 +310,12 @@ export class EnhancedMultiAgentOrchestrator {
     agent: SpawnedAgent,
     request: AgentSpawnRequest,
     jobId: string,
-  ): Promise<any> {
+  ): Promise<AgentExecutionResult> {
     try {
       // Use the agent delegator system - first analyze, then execute
       const delegationRequest = {
         operation: "execute",
-        files: [`task-${agent.id}.txt`],
+        description: request.task,
         context: {
           agentName: request.agentType,
           taskDescription: request.task,
@@ -294,15 +335,14 @@ export class EnhancedMultiAgentOrchestrator {
         delegationRequest,
       );
 
+      const firstResult = result.results?.[0];
       return {
-        success: true,
+        success: result.success,
         agentType: request.agentType,
         task: request.task,
-        executionTime: result.executionTime || 0,
-        complexity: delegation.complexity || 0,
-        result:
-          result.result ||
-          `Completed ${request.agentType} task: ${request.task}`,
+        executionTime: result.totalTime,
+        complexity: delegation.complexity.score,
+        result: firstResult?.output || `Completed ${request.agentType} task: ${request.task}`,
         delegationResult: result,
       };
     } catch (error) {
@@ -323,7 +363,7 @@ export class EnhancedMultiAgentOrchestrator {
   private async simulateAgentExecution(
     agent: SpawnedAgent,
     request: AgentSpawnRequest,
-  ): Promise<any> {
+  ): Promise<AgentExecutionResult> {
     // Simulate different execution times based on agent type and complexity
     const baseTime = this.getAgentExecutionTime(request.agentType);
     const complexityMetrics = await this.complexityAnalyzer.analyzeComplexity(

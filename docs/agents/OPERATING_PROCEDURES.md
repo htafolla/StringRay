@@ -1,8 +1,16 @@
-# StrRay Framework - Agent Operating Procedures
+# StrRay Framework - Agent Operating Procedures (v1.15.1)
 
 ## Overview
 
-This document provides comprehensive operating procedures for all StrRay Framework agents, including workflow execution, inter-agent communication, error handling, and integration patterns. These procedures ensure effective utilization of the multi-agent system for development workflow enhancement.
+This document provides comprehensive operating procedures for all 27 StrRay Framework agents, including workflow execution, inter-agent communication, error handling, and integration patterns. These procedures ensure effective utilization of the multi-agent system for development workflow enhancement with proper documentation and cross-reference validation.
+
+### Agent Count: 25 Specialized Agents
+
+| Category | Count | Agents |
+|----------|-------|--------|
+| Primary | 1 | Orchestrator |
+| Planning | 14 | Architect, Enforcer, Test Architect, Security Auditor, Code Reviewer, Researcher, Testing Lead, Performance Engineer, Storyteller, Backend Engineer, Frontend Engineer, Database Engineer, and 2 additional specialized agents |
+| Implementation | 12 | Bug Triage Specialist, Refactorer, Tech Writer, Code Analyzer, Multimodal Looker, UI/UX Design, DevOps Engineer, Mobile Developer, Growth Strategist, Content Creator, SEO Consultant, and 1 additional specialized agent | These procedures ensure effective utilization of the multi-agent system for development workflow enhancement.
 
 ## Agent Workflow Execution
 
@@ -64,9 +72,11 @@ This document provides comprehensive operating procedures for all StrRay Framewo
 **Expected Outputs**:
 
 - Detailed workflow execution plan
-- Agent assignments with responsibilities
+- Agent assignments with responsibilities for up to 25 specialized agents
 - Progress tracking dashboard
 - Consolidated results with conflict resolutions
+- **Documentation Requirements**: All agent coordination must be documented
+- **Cross-Reference Validation**: Each agent's work must reference relevant Codex terms
 
 ### Implementation Agent Workflows
 
@@ -129,7 +139,9 @@ This document provides comprehensive operating procedures for all StrRay Framewo
 
 ## Inter-Agent Communication
 
-### Communication Patterns
+### Agent Coordination Architecture (v1.15.1)
+
+The 25 specialized agents communicate through the orchestrator using the following patterns:
 
 #### Direct Agent-to-Agent Messaging
 

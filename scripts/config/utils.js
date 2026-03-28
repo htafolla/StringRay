@@ -3,12 +3,38 @@
 /**
  * StringRay Framework Configuration Manager
  * Centralized configuration and setup utilities
+ * 
+ * Purpose: Manages StringRay framework configuration and development environment setup
+ * 
+ * Features:
+ * - Create default configuration files
+ * - Validate existing configuration
+ * - Setup development environment
+ * - Run setup commands with timeout handling
+ * 
+ * Usage:
+ *   node scripts/config/utils.js <command>
+ * 
+ * Commands:
+ *   init       - Create default configuration
+ *   setup-dev  - Setup development environment
+ *   validate   - Validate configuration
+ * 
+ * Examples:
+ *   node scripts/config/utils.js init
+ *   node scripts/config/utils.js validate
+ * 
  * Author: StringRay Enforcer Agent
- * Version: 1.1.1
+ * Version: 1.9.0
  */
 
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { spawn } from 'child_process';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 class ConfigManager {
   constructor() {
@@ -34,7 +60,7 @@ class ConfigManager {
     const defaultConfig = {
       framework: {
         name: 'StringRay Framework',
-        version: '1.1.1',
+        version: '1.9.0',
         buildMode: 'production',
         logLevel: 'info'
       },
@@ -87,7 +113,7 @@ class ConfigManager {
     }
   }
 
-  setupDevelopment() {
+  async setupDevelopment() {
     this.log('Setting up StringRay development environment...', 'config');
     
     const setupSteps = [
@@ -100,7 +126,7 @@ class ConfigManager {
     for (const step of setupSteps) {
       try {
         this.log(`Running: ${step.name}`);
-        this.runCommand(step.command);
+        await this.runCommand(step.command);
         this.log(`✅ ${step.name}: Completed`);
       } catch (error) {
         this.log(`❌ ${step.name}: Failed - ${error.message}`, 'error');
@@ -113,8 +139,6 @@ class ConfigManager {
   }
 
   runCommand(command, timeout = 60000) {
-    const { spawn } = require('child_process');
-    
     return new Promise((resolve, reject) => {
       const child = spawn(command, { 
         shell: true, 
@@ -187,6 +211,6 @@ switch (command) {
     console.log('  setup-dev  - Setup development environment');
     console.log('  validate   - Validate configuration');
     console.log('');
-    console.log('Usage: node config/utils.js <command>');
+    console.log('Usage: node scripts/config/utils.js <command>');
     process.exit(1);
 }

@@ -48,6 +48,12 @@ Thumbs.db
 # Backup files
 *.bak
 *.backup
+
+# Misnamed directories from accidental full path operations
+Users/
+home/
+blaze/
+
 *.orig
 *.rej
 *.tmp
@@ -286,6 +292,7 @@ dynamodb/
 !.opencode/mcps/.gitkeep
 .opencode/state
 !.opencode/state
+.opencode/skills/
 
 # Include postinstall script for npm package
 !scripts/node/postinstall.cjs
@@ -374,6 +381,15 @@ dist/
 build/
 out/
 # Runtime data and test artifacts
-performance-baselines.json
-Users/blaze/dev/stringray/test-consent.json
 
+
+# Test logs
+test-activity-*.log
+test-calibration-*.log
+logs/test-activity/
+logs/test-calibration/
+logs/reports/
+var/
+
+# Auto-generated performance baselines
+performance-baselines.json

@@ -1,0 +1,30 @@
+{
+  "framework": {
+    "name": "StringRay Framework",
+    "version": "1.15.6",
+    "buildMode": "production",
+    "logLevel": "info"
+  },
+  "agents": {
+    "orchestrator": {
+      "enabled": true,
+      "maxComplexity": 100,
+      "timeout": 30000
+    },
+    "enforcer": {
+      "enabled": true,
+      "strictMode": true,
+      "todoSystem": "file-based"
+    },
+    "testing": {
+      "parallelExecution": true,
+      "timeout": 120000,
+      "coverageThreshold": 85
+    }
+  },
+  "monitoring": {
+    "enabled": true,
+    "logRetention": "7d",
+    "healthChecks": true
+  }
+}

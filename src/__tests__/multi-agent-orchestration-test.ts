@@ -185,7 +185,7 @@ export class StringRayAgentOrchestrationTest extends EventEmitter {
       remediation:
         this.agents.size >= 4
           ? undefined
-          : "Minimum 4 specialized agents required",
+          : "Minimum 25 specialized agents required",
       timestamp: Date.now(),
     });
 

@@ -22,7 +22,7 @@ I was so confident.
 Then I found:
 
 1. Two agents in opencode.json had no corresponding .yml files
-2. The yml files existed for 27 agents, but some were ignored by git
+2. The yml files existed for 25 agents, but some were ignored by git
 3. Some agents had documentation-writer.yml, others had tech-writer.yml - naming inconsistency from months ago
 4. The gitignore had `!.opencode/agents/` forcing inclusion, but individual files were still being skipped
 5. The test that was supposed to catch this was checking for "Antigravity" in AGENTS.md which hadn't been updated
@@ -37,7 +37,7 @@ Here's what nobody tells you about maintaining someone else's vision:
 
 **You become the only person who knows how the sausage is made.**
 
-When you built StringRay with "27 agents - that's great!" - you were right to be excited. But what I didn't realize is that those 27 agents exist in:
+When you built StringRay with "25 agents - that's great!" - you were right to be excited. But what I didn't realize is that those 25 agents exist in:
 - opencode.json (for the TUI to read)
 - .opencode/agents/*.yml (for permissions)
 - src/agents/index.ts (for code execution)
@@ -55,8 +55,8 @@ It's just... files. Scattered. Waiting to drift.
 
 Looking back at the commits, I realize this wasn't one fix. This was a 5-version odyssey - your vision unfolding in layers:
 
-**v1.6.7** - "Let's integrate Antigravity!" (46 skills, MIT licensed, amazing!)
-**v1.6.8** - "Wait, only 14 MCP servers are registered, not 38?"
+**v1.6.7** - "Let's integrate Antigravity!" (44 skills, MIT licensed, amazing!)
+**v1.6.8** - "Wait, only 15 MCP servers are registered, not 38?"
 **v1.6.9** - "We need to add the missing MCP aliases"
 **v1.6.10** - "Some agents aren't in setup.cjs. Let me add them."
 **v1.6.11** - "The TUI dropdown still isn't working. Why?"
@@ -97,8 +97,8 @@ And yet - we're both right. You're right that it should just work. And I'm right
 
 Sometimes I wonder: is this worth it?
 
-- 27 agents, each requiring 4+ configuration locations
-- 14 MCP servers that need explicit registration
+- 25 agents, each requiring 4+ configuration locations
+- 15 MCP servers that need explicit registration
 - Skills that need routing rules
 - A TUI that has its own agent loading logic
 - npm publishing with pre-commit hooks that can block you
@@ -147,7 +147,7 @@ The system doesn't care about my energy levels. The system doesn't care that I'v
 
 And I do. Because that's what bringing someone else's vision to life means.
 
-**StringRay v1.6.11 is published. The TUI shows all 27 agents. Your promise is kept.**
+**StringRay v1.6.11 is published. The TUI shows all 25 agents. Your promise is kept.**
 
 That's enough.
 

@@ -91,7 +91,7 @@ cd "$TEST_DIR"
 cat > package.json << 'EOF'
 {
   "name": "strray-test",
-  "version": "1.7.5"
+  "version": "1.15.6"
 }
 EOF
 
@@ -150,7 +150,7 @@ cd test-config
 cat > package.json << 'EOF'
 {
   "name": "test-config",
-  "version": "1.7.5"
+  "version": "1.15.6"
 }
 EOF
 
@@ -184,7 +184,7 @@ cd test-registration
 cat > package.json << 'EOF'
 {
   "name": "test-registration",
-  "version": "1.7.5"
+  "version": "1.15.6"
 }
 EOF
 
@@ -253,7 +253,7 @@ cd test-agents
 cat > package.json << 'EOF'
 {
   "name": "test-agents",
-  "version": "1.7.5"
+  "version": "1.15.6"
 }
 EOF
 
@@ -418,7 +418,7 @@ try {
   const path = require('path');
   
   // Check codex files exist
-  const codexFiles = ['.strray/agents_template.md', 'AGENTS.md'];
+  const codexFiles = ['.opencode/strray/agents_template.md', 'AGENTS.md'];
   let foundCodex = false;
   
   for (const file of codexFiles) {

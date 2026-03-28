@@ -8,7 +8,7 @@ tags: [compliance, framework, compliance, audit]
 mcp:
   framework-compliance-audit:
     command: node
-    args: [node_modules/strray-ai/dist/plugin/mcps/dist/plugin/mcps/framework-compliance-audit.server.js]
+    args: [node_modules/strray-ai/dist/mcps/framework-compliance-audit.server.js]
 ---
 
 # Framework Compliance Audit Skill

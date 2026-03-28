@@ -1,0 +1,752 @@
+[
+  {
+    "keywords": [
+      "design",
+      "architect",
+      "plan",
+      "system",
+      "model",
+      "pattern",
+      "scalability",
+      "dependency",
+      "structure",
+      "architecture",
+      "system-integration",
+      "delegation",
+      "complexity-analysis",
+      "solid",
+      "clean-architecture"
+    ],
+    "skill": "architecture-patterns",
+    "agent": "architect",
+    "confidence": 0.95
+  },
+  {
+    "keywords": [
+      "ux",
+      "ui",
+      "interface",
+      "mockup",
+      "prototype",
+      "figma",
+      "wireframe",
+      "css",
+      "html",
+      "component"
+    ],
+    "skill": "ui-ux-design",
+    "agent": "frontend-ui-ux-engineer",
+    "confidence": 0.95
+  },
+  {
+    "keywords": [
+      "frontend",
+      "react",
+      "vue",
+      "angular"
+    ],
+    "skill": "frontend-development",
+    "agent": "frontend-engineer",
+    "confidence": 0.95
+  },
+  {
+    "keywords": [
+      "backend",
+      "api",
+      "server",
+      "microservice",
+      "endpoint"
+    ],
+    "skill": "backend-development",
+    "agent": "backend-engineer",
+    "confidence": 0.95
+  },
+  {
+    "keywords": [
+      "fix",
+      "debug",
+      "triage",
+      "broken",
+      "error",
+      "crash",
+      "bug",
+      "issue",
+      "resolve",
+      "root cause",
+      "debugging",
+      "error-analysis",
+      "fix-validation",
+      "surgical-fix",
+      "stack-trace",
+      "error-investigation",
+      "triage",
+      "surgical-fix",
+      "root-cause",
+      "debugging",
+      "crash",
+      "exception",
+      "fix-validation"
+    ],
+    "skill": "bug-triage",
+    "agent": "bug-triage-specialist",
+    "confidence": 0.92
+  },
+  {
+    "keywords": [
+      "security",
+      "vulnerability",
+      "threat",
+      "scan",
+      "risk",
+      "exploit",
+      "secure",
+      "pentest",
+      "encrypt",
+      "vulnerability-detection",
+      "compliance-monitoring",
+      "threat-analysis",
+      "security-validation",
+      "audit-trail",
+      "owasp",
+      "vulnerability",
+      "threat",
+      "secrets",
+      "hardcoded",
+      "outdated",
+      "permissions",
+      "env-exposure",
+      "ssl",
+      "tls",
+      "https",
+      "dependency-audit",
+      "owasp"
+    ],
+    "skill": "security-audit",
+    "agent": "security-auditor",
+    "confidence": 0.95
+  },
+  {
+    "keywords": [
+      "review",
+      "audit",
+      "assess",
+      "evaluate",
+      "check",
+      "inspect",
+      "quality",
+      "validate",
+      "code-review",
+      "quality-assurance",
+      "monitoring",
+      "analytics",
+      "compliance-validation",
+      "pull-request",
+      "pr-review",
+      "linting",
+      "quality-metrics",
+      "improvement"
+    ],
+    "skill": "code-review",
+    "agent": "code-reviewer",
+    "confidence": 0.9
+  },
+  {
+    "keywords": [
+      "test",
+      "testing",
+      "jest",
+      "coverage",
+      "unit",
+      "e2e",
+      "cypress",
+      "qa",
+      "spec",
+      "verify",
+      "validate",
+      "test-auto-creation",
+      "test-strategy-design",
+      "coverage-optimization",
+      "behavioral-testing",
+      "performance-validation",
+      "qa",
+      "quality-assurance",
+      "test-automation",
+      "unit-test",
+      "integration-test",
+      "e2e-test",
+      "test-coverage",
+      "coverage-analysis"
+    ],
+    "skill": "testing-best-practices",
+    "agent": "testing-lead",
+    "confidence": 0.95
+  },
+  {
+    "keywords": [
+      "refactor",
+      "cleanup",
+      "improve",
+      "restructure",
+      "modernize",
+      "debt",
+      "dry",
+      "consolidate",
+      "technical-debt-elimination",
+      "code-consolidation",
+      "surgical-refactoring",
+      "maintainability-enhancement",
+      "code-quality",
+      "maintainability",
+      "restructure",
+      "consolidation",
+      "debt",
+      "authentication",
+      "auth system",
+      "oauth",
+      "jwt",
+      "session management"
+    ],
+    "skill": "refactoring-strategies",
+    "agent": "refactorer",
+    "confidence": 0.92
+  },
+  {
+    "keywords": [
+      "performance",
+      "optimize",
+      "bottleneck",
+      "benchmark",
+      "profile",
+      "speed",
+      "latency",
+      "performance-profiling",
+      "resource-optimization",
+      "load-testing",
+      "bottleneck-analysis",
+      "caching-optimization",
+      "memory-optimization",
+      "core-web-vitals",
+      "lcp",
+      "inp",
+      "cls",
+      "metrics",
+      "build-time",
+      "memory-usage",
+      "load-time",
+      "bundle-size",
+      "optimization",
+      "bottleneck",
+      "profiling",
+      "monitoring",
+      "perf"
+    ],
+    "skill": "performance-optimization",
+    "agent": "performance-engineer",
+    "confidence": 0.93
+  },
+  {
+    "keywords": [
+      "deploy",
+      "ci/cd",
+      "pipeline",
+      "docker",
+      "kubernetes",
+      "infrastructure",
+      "aws",
+      "cloud"
+    ],
+    "skill": "devops-deployment",
+    "agent": "devops-engineer",
+    "confidence": 0.94
+  },
+  {
+    "keywords": [
+      "database",
+      "db",
+      "sql",
+      "schema",
+      "migration",
+      "query",
+      "postgres",
+      "mysql",
+      "mongodb"
+    ],
+    "skill": "database-design",
+    "agent": "database-engineer",
+    "confidence": 0.95
+  },
+  {
+    "keywords": [
+      "docs",
+      "documentation",
+      "readme",
+      "wiki",
+      "guide",
+      "manual",
+      "document",
+      "write"
+    ],
+    "skill": "documentation-generation",
+    "agent": "tech-writer",
+    "confidence": 0.9
+  },
+  {
+    "keywords": [
+      "codebase",
+      "codebase-exploration",
+      "context-building",
+      "discover",
+      "documentation-retrieval",
+      "explore",
+      "implementation",
+      "lookup",
+      "pattern-recognition",
+      "research",
+      "search"
+    ],
+    "skill": "git-workflow",
+    "agent": "researcher",
+    "confidence": 0.88
+  },
+  {
+    "keywords": [
+      "story",
+      "narrative",
+      "journey",
+      "saga",
+      "reflection",
+      "write a",
+      "deep-reflection",
+      "technical-story"
+    ],
+    "skill": "storytelling",
+    "agent": "storyteller",
+    "confidence": 0.95
+  },
+  {
+    "keywords": [
+      "seo",
+      "search",
+      "ranking",
+      "google",
+      "meta",
+      "sitemap",
+      "optimize"
+    ],
+    "skill": "seo-consultant",
+    "agent": "seo-consultant",
+    "confidence": 0.96
+  },
+  {
+    "keywords": [
+      "marketing",
+      "growth",
+      "content",
+      "blog",
+      "campaign",
+      "metric",
+      "acquisition"
+    ],
+    "skill": "growth-strategist",
+    "agent": "growth-strategist",
+    "confidence": 0.92
+  },
+  {
+    "keywords": [
+      "mobile",
+      "ios",
+      "android",
+      "react-native",
+      "flutter",
+      "swift",
+      "kotlin"
+    ],
+    "skill": "mobile-development",
+    "agent": "mobile-developer",
+    "confidence": 0.95
+  },
+  {
+    "keywords": [
+      "log",
+      "monitor",
+      "anomaly",
+      "alert",
+      "observability",
+      "watch",
+      "trace"
+    ],
+    "skill": "log-monitor",
+    "agent": "log-monitor",
+    "confidence": 0.93
+  },
+  {
+    "keywords": [
+      "image",
+      "diagram",
+      "visual",
+      "screenshot",
+      "photo",
+      "look at"
+    ],
+    "skill": "multimodal-looker",
+    "agent": "multimodal-looker",
+    "confidence": 0.94
+  },
+  {
+    "keywords": [
+      "complexity",
+      "metrics",
+      "static analysis",
+      "measure",
+      "assess",
+      "code-analysis",
+      "system-analysis",
+      "dependency-analysis",
+      "performance-analysis",
+      "security-analysis",
+      "architecture-analysis",
+      "technical-debt-assessment",
+      "integration-analysis",
+      "comprehensive-reporting",
+      "examine",
+      "static-analysis",
+      "complexity",
+      "metrics",
+      "code-quality",
+      "anti-pattern",
+      "lint",
+      "eslint",
+      "prettier",
+      "format",
+      "performance"
+    ],
+    "skill": "code-analyzer",
+    "agent": "code-analyzer",
+    "confidence": 0.9
+  },
+  {
+    "keywords": [
+      "branch",
+      "codebase",
+      "commit",
+      "conflict",
+      "discover",
+      "explore",
+      "git",
+      "merge",
+      "repository",
+      "version"
+    ],
+    "skill": "git-workflow",
+    "agent": "researcher",
+    "confidence": 0.88
+  },
+  {
+    "keywords": [
+      "enforce",
+      "compliance",
+      "rule",
+      "standard",
+      "codex",
+      "block",
+      "prevent",
+      "error-prevention",
+      "systematic-validation",
+      "codex-enforcement",
+      "security-policy",
+      "compliance",
+      "threshold",
+      "audit",
+      "lint",
+      "pre-commit",
+      "introspection",
+      "bundle-size",
+      "test-coverage",
+      "duplication",
+      "jscpd",
+      "syntax-error",
+      "error-handling",
+      "convention",
+      "framework-compliance"
+    ],
+    "skill": "enforcer",
+    "agent": "enforcer",
+    "confidence": 0.95
+  },
+  {
+    "keywords": [
+      "orchestrate",
+      "coordinate",
+      "delegate",
+      "workflow",
+      "manage",
+      "multi-step",
+      "multi-agent-orchestration",
+      "workflow-management",
+      "task-delegation",
+      "conflict-resolution",
+      "session-management"
+    ],
+    "skill": "orchestrator",
+    "agent": "orchestrator",
+    "confidence": 0.94
+  },
+  {
+    "keywords": [
+      "plan",
+      "strategy",
+      "roadmap",
+      "vision",
+      "goal",
+      "objective",
+      "prioritize",
+      "decide"
+    ],
+    "skill": "strategist",
+    "agent": "strategist",
+    "confidence": 0.9
+  },
+  {
+    "keywords": [
+      "format",
+      "formatting",
+      "prettier",
+      "lint:fix",
+      "auto-format",
+      "code-style"
+    ],
+    "skill": "auto-format",
+    "agent": "enforcer",
+    "confidence": 0.9
+  },
+  {
+    "keywords": [
+      "session",
+      "state",
+      "persistence",
+      "recovery",
+      "backup"
+    ],
+    "skill": "session-management",
+    "agent": "orchestrator",
+    "confidence": 0.85
+  },
+  {
+    "keywords": [
+      "api",
+      "endpoint",
+      "rest",
+      "graphql",
+      "request",
+      "response",
+      "openapi"
+    ],
+    "skill": "api-design",
+    "agent": "backend-engineer",
+    "confidence": 0.92
+  },
+  {
+    "keywords": [
+      "stress-test-0"
+    ],
+    "agent": "bug-triage-specialist",
+    "skill": "bug-triage",
+    "confidence": 0.9,
+    "autoGenerated": true,
+    "autoGeneratedAt": "2026-03-20T21:42:16.150Z"
+  },
+  {
+    "keywords": [
+      "stress-test-1"
+    ],
+    "agent": "code-reviewer",
+    "skill": "code-review",
+    "confidence": 0.9,
+    "autoGenerated": true,
+    "autoGeneratedAt": "2026-03-20T21:42:16.150Z"
+  },
+  {
+    "keywords": [
+      "stress-test-2",
+      "perf"
+    ],
+    "agent": "performance-engineer",
+    "skill": "performance-optimization",
+    "confidence": 0.9,
+    "autoGenerated": true,
+    "autoGeneratedAt": "2026-03-20T21:42:16.150Z"
+  },
+  {
+    "keywords": [
+      "stress-test-3"
+    ],
+    "agent": "testing-lead",
+    "skill": "testing-best-practices",
+    "confidence": 0.9,
+    "autoGenerated": true,
+    "autoGeneratedAt": "2026-03-20T21:42:16.150Z"
+  },
+  {
+    "keywords": [
+      "stress-test-4"
+    ],
+    "agent": "security-auditor",
+    "skill": "security-audit",
+    "confidence": 0.9,
+    "autoGenerated": true,
+    "autoGeneratedAt": "2026-03-20T21:42:16.150Z"
+  },
+  {
+    "keywords": [
+      "e2e-1"
+    ],
+    "agent": "code-reviewer",
+    "skill": "code-review",
+    "confidence": 0.9,
+    "autoGenerated": true,
+    "autoGeneratedAt": "2026-03-20T22:33:49.731Z"
+  },
+  {
+    "keywords": [
+      "e2e-2",
+      "perf"
+    ],
+    "agent": "performance-engineer",
+    "skill": "performance-optimization",
+    "confidence": 0.9,
+    "autoGenerated": true,
+    "autoGeneratedAt": "2026-03-20T22:33:49.732Z"
+  },
+  {
+    "keywords": [
+      "e2e-3"
+    ],
+    "agent": "testing-lead",
+    "skill": "testing-best-practices",
+    "confidence": 0.9,
+    "autoGenerated": true,
+    "autoGeneratedAt": "2026-03-20T22:33:49.732Z"
+  },
+  {
+    "keywords": [
+      "e2e-4"
+    ],
+    "agent": "security-auditor",
+    "skill": "security-audit",
+    "confidence": 0.9,
+    "autoGenerated": true,
+    "autoGeneratedAt": "2026-03-20T22:33:49.732Z"
+  },
+  {
+    "keywords": [
+      "e2e-5"
+    ],
+    "agent": "refactorer",
+    "skill": "refactoring-strategies",
+    "confidence": 0.9,
+    "autoGenerated": true,
+    "autoGeneratedAt": "2026-03-20T22:33:49.733Z"
+  },
+  {
+    "keywords": [
+      "test-0.5529761171611898"
+    ],
+    "agent": "bug-triage-specialist",
+    "skill": "bug-triage",
+    "confidence": 0.9,
+    "autoGenerated": true,
+    "autoGeneratedAt": "2026-03-20T22:39:21.456Z"
+  },
+  {
+    "keywords": [
+      "test-0.16742614828927516"
+    ],
+    "agent": "code-reviewer",
+    "skill": "code-review",
+    "confidence": 0.9,
+    "autoGenerated": true,
+    "autoGeneratedAt": "2026-03-20T22:39:21.456Z"
+  },
+  {
+    "keywords": [
+      "test-0.48963983958092205",
+      "perf"
+    ],
+    "agent": "performance-engineer",
+    "skill": "performance-optimization",
+    "confidence": 0.9,
+    "autoGenerated": true,
+    "autoGeneratedAt": "2026-03-20T22:39:21.456Z"
+  },
+  {
+    "keywords": [
+      "test-0.8717365494490283"
+    ],
+    "agent": "security-auditor",
+    "skill": "security-audit",
+    "confidence": 0.9,
+    "autoGenerated": true,
+    "autoGeneratedAt": "2026-03-20T22:39:21.456Z"
+  },
+  {
+    "keywords": [
+      "test-0.3362740549961909"
+    ],
+    "agent": "refactorer",
+    "skill": "refactoring-strategies",
+    "confidence": 0.9,
+    "autoGenerated": true,
+    "autoGeneratedAt": "2026-03-20T22:39:21.457Z"
+  },
+  {
+    "keywords": [
+      "pipeline-0"
+    ],
+    "agent": "bug-triage-specialist",
+    "skill": "bug-triage",
+    "confidence": 0.9,
+    "autoGenerated": true,
+    "autoGeneratedAt": "2026-03-20T23:46:49.805Z"
+  },
+  {
+    "keywords": [
+      "pipeline-1"
+    ],
+    "agent": "code-reviewer",
+    "skill": "code-review",
+    "confidence": 0.9,
+    "autoGenerated": true,
+    "autoGeneratedAt": "2026-03-20T23:46:49.806Z"
+  },
+  {
+    "keywords": [
+      "pipeline-2",
+      "perf"
+    ],
+    "agent": "performance-engineer",
+    "skill": "performance-optimization",
+    "confidence": 0.9,
+    "autoGenerated": true,
+    "autoGeneratedAt": "2026-03-20T23:46:49.807Z"
+  },
+  {
+    "keywords": [
+      "pipeline-3"
+    ],
+    "agent": "testing-lead",
+    "skill": "testing-best-practices",
+    "confidence": 0.9,
+    "autoGenerated": true,
+    "autoGeneratedAt": "2026-03-20T23:46:49.807Z"
+  },
+  {
+    "keywords": [
+      "pipeline-4"
+    ],
+    "agent": "security-auditor",
+    "skill": "security-audit",
+    "confidence": 0.9,
+    "autoGenerated": true,
+    "autoGeneratedAt": "2026-03-20T23:46:49.807Z"
+  }
+]

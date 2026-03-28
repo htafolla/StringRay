@@ -23,7 +23,7 @@ class StrRayPerformanceAnalysisServer {
   constructor() {
     this.server = new Server(
       {
-        name: "performance-analysis", version: "1.7.5",
+        name: "performance-analysis", version: "1.15.6",
       },
       {
         capabilities: {
@@ -191,7 +191,7 @@ class StrRayPerformanceAnalysisServer {
       analysisResults.summary =
         this.generatePerformanceSummary(analysisResults);
     } catch (error) {
-      console.error("Performance analysis error:", error);
+      frameworkLogger.log("mcps/performance-analysis", "analysis", "error", { error: String(error) });
       analysisResults.passed = false;
       analysisResults.bottlenecks.push(
         `Analysis error: ${error instanceof Error ? error.message : String(error)}`,
@@ -669,7 +669,7 @@ ${results.recommendations.map((r) => `• 💡 ${r}`).join("\n") || "No recommen
 // Start the server if run directly
 if (import.meta.url === `file://${process.argv[1]}`) {
   const server = new StrRayPerformanceAnalysisServer();
-  server.run().catch(console.error);
+  server.run().catch((error) => frameworkLogger.log("mcps/performance-analysis", "run", "error", { error: String(error) }));
 }
 
 export { StrRayPerformanceAnalysisServer };

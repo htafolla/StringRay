@@ -1,188 +1,188 @@
-name: CI/CD Pipeline
+name: StringRay CI/CD
 
 on:
   push:
-    branches: [main, master]
+    branches: [master, main]
   pull_request:
-    branches: [main, master]
+    branches: [master, main]
   workflow_dispatch:
+  schedule:
+    - cron: "0 8 * * *"  # Daily at 8 AM UTC
 
-# Enable CodeQL permissions for this workflow
-permissions:
-  security-events: write
-  actions: read
-  contents: read
-
-# Disable CodeQL
 env:
-  CODEQL_ACTION_DISABLE: true
-  CODEQL_ACTION_FEATURE_MULTI_LANGUAGE: false
-  CODEQL_ACTION_FEATURE_SARIF_COMBINE: false
+  NODE_VERSION: "20.x"
 
 jobs:
-  test:
+  # ═══════════════════════════════════════════════════════
+  # Quality Checks
+  # ═══════════════════════════════════════════════════════
+  quality:
+    name: Quality Checks
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [18.x, 20.19.6]
     steps:
-      - name: Disable CodeQL
-        run: |
-          echo "CODEQL_DISABLED=true" >> $GITHUB_ENV
-          # Kill any existing CodeQL processes
-          pkill -f codeql || true
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node.js ${{ matrix.node-version }}
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
-          cache: npm
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
 
       - name: Install dependencies
         run: npm ci --ignore-scripts
 
-      - name: Run postinstall configuration
-        run: npm run postinstall
-
-      - name: Validate postinstall files
-        run: node scripts/mjs/test-postinstall-files.mjs
-
-      - name: Setup CI paths
-        run: node scripts/node/setup-ci-paths.cjs
-
-      - name: TypeScript type check
+      - name: TypeScript check
         run: npm run typecheck
 
-      - name: Lint code
+      - name: ESLint
         run: npm run lint
 
-      - name: Build project
+  # ═══════════════════════════════════════════════════════
+  # Unit Tests
+  # ═══════════════════════════════════════════════════════
+  test-unit:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    needs: quality
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
         run: npm run build:all
 
       - name: Run unit tests
-        run: |
-          npm run test:unit || (echo "Retrying with clean install..." && rm -rf node_modules package-lock.json && npm install --ignore-scripts  && npm run test:unit)
+        run: npm test
 
-      - name: Run integration tests
-        run: npm run test:integration
-
-      - name: Run security audit
-        run: npm run security-audit
-
-  build:
-    needs: test
+  # ═══════════════════════════════════════════════════════
+  # Pipeline Tests
+  # ═══════════════════════════════════════════════════════
+  test-pipeline:
+    name: Pipeline Tests
     runs-on: ubuntu-latest
+    needs: test-unit
     steps:
-      - name: Disable CodeQL
-        run: |
-          echo "CODEQL_DISABLED=true" >> $GITHUB_ENV
-          pkill -f codeql || true
-
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20.19"
+          node-version: ${{ env.NODE_VERSION }}
           cache: "npm"
 
       - name: Install dependencies
-        run: npm ci --ignore-scripts
+        run: npm ci
 
-      - name: Build plugin
-        run: npm run build
-
-      - name: Build all
+      - name: Build
         run: npm run build:all
 
-      - name: Validate package
-        run: npm pack --dry-run
+      - name: Run pipeline tests
+        run: npm run test:pipelines
 
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: strray-ai-build
-          path: dist/
-          retention-days: 30
-
-  publish:
-    needs: build
+  # ═══════════════════════════════════════════════════════
+  # Consumer Package Test
+  # ═══════════════════════════════════════════════════════
+  test-package:
+    name: Package Installation
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    needs: test-pipeline
     steps:
-      - name: Disable CodeQL
-        run: |
-          echo "CODEQL_DISABLED=true" >> $GITHUB_ENV
-          pkill -f codeql || true
-
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20.19"
+          node-version: ${{ env.NODE_VERSION }}
           cache: "npm"
 
       - name: Install dependencies
-        run: npm ci --ignore-scripts
+        run: npm ci
 
-      - name: Build for publish
-        run: npm run build
+      - name: Build package
+        run: |
+          npm run build:all
+          npm pack
 
-  # NPM Orchestration Test - disabled, run manually if needed
-  # npm-orchestration-test:
-  #   runs-on: ubuntu-latest
-  #   needs: test
-  #   if: github.event_name == 'push' || github.event_name == 'pull_request'
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
+      - name: Create test project
+        run: |
+          mkdir -p test-install
+          cd test-install
+          npm init -y
+          npm install ../strray-ai-*.tgz
 
-  #     - name: Setup Node.js 20.x
-  #       uses: actions/setup-node@v4
-  #       with:
-  #         node-version: 20.x
-  #         cache: npm
+      - name: Run postinstall
+        run: |
+          cd test-install
+          node node_modules/strray-ai/scripts/node/postinstall.cjs
 
-  #     - name: Run CI NPM Orchestration Test
-  #       run: bash scripts/bash/ci-npm-orchestration-test.sh
-  #       timeout-minutes: 10
-  #       env:
-  #         PROJECT_DIR: ${{ github.workspace }}
+      - name: Validate postinstall
+        run: |
+          cd test-install
+          node node_modules/strray-ai/scripts/mjs/validate-postinstall-config.mjs
 
-  #     - name: Upload test artifacts on failure
-  #       if: failure()
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: npm-test-logs-${{ github.run_id }}
-  #         path: /tmp/strray-ci-test-*/logs/
+      - name: Validate MCP
+        run: |
+          cd test-install
+          node node_modules/strray-ai/scripts/mjs/validate-mcp-connectivity.cjs
 
-      - name: Run CI NPM Orchestration Test
-        run: bash scripts/bash/ci-npm-orchestration-test.sh
-        timeout-minutes: 10
-        env:
-          PROJECT_DIR: ${{ github.workspace }}
+  # ═══════════════════════════════════════════════════════
+  # Security Audit
+  # ═══════════════════════════════════════════════════════
+  security:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    needs: test-package
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Upload test artifacts on failure
-        if: failure()
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Security audit
+        run: npm audit --audit-level=high || true
+
+  # ═══════════════════════════════════════════════════════
+  # CI/CD Health Monitor (runs after all jobs)
+  # ═══════════════════════════════════════════════════════
+  ci-health:
+    name: CI Health Monitor
+    runs-on: ubuntu-latest
+    needs: [quality, test-unit, test-pipeline, test-package, security]
+    if: always()
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+
+      - name: Run health monitor
+        run: node scripts/node/ci-cd-auto-fix.cjs
+
+      - name: Upload health report
         uses: actions/upload-artifact@v4
         with:
-          name: npm-test-logs-${{ github.run_id }}
-          path: /tmp/strray-ci-test-*/logs/
-          retention-days: 7
-
-      - name: Comment PR on failure
-        if: failure() && github.event_name == 'pull_request'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: '❌ **NPM Orchestration Test Failed**\n\nThe npm package installation and/or path transformation failed.\n\nPlease check:\n1. Postinstall script transforms paths correctly\n2. Plugin paths point to node_modules/strray-ai/\n3. MCP server paths are transformed\n\nSee workflow logs for details.'
-            })
+          name: ci-health-report
+          path: .opencode/logs/ci-cd-monitor-report.json

@@ -8,7 +8,7 @@ tags: [security, security, scan]
 mcp:
   security-scan:
     command: node
-    args: [node_modules/strray-ai/dist/plugin/mcps/dist/plugin/mcps/security-scan.server.js]
+    args: [node_modules/strray-ai/dist/mcps/security-scan.server.js]
 ---
 
 # Security Scan Skill

@@ -75,7 +75,7 @@ export default async function strrayCodexPlugin(input: {
 - **When**: Plugin initialization
 - **Purpose**: Register MCP servers and run framework bootstrap
 - **Mechanism**:
-  1. Registers 14 MCP servers (7 agent-specific + 4 knowledge skills)
+  1. Registers 15 MCP servers (7 agent-specific + 4 knowledge skills)
   2. Executes `.opencode/init.sh` for framework initialization
   3. Returns MCP server configuration to OpenCode
 

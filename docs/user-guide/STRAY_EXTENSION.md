@@ -52,7 +52,7 @@ StrRay is a comprehensive extension framework for that adds specialized AI agent
 2. **Mode Selection**:
 
    ```bash
-   # Full mode (all 27 agents)
+   # Full mode (all N agents)
    bash .opencode/commands/mode-switch.md full
 
    # Lite mode (4 core agents)
@@ -154,7 +154,7 @@ git commit -m "feat: add user authentication"
 
 | Feature             | Standard OpenCode | StrRay Extension                       |
 | ------------------- | ----------------------- | -------------------------------------- |
-| AI Agents           | Basic set               | 8 specialized agents                   |
+| AI Agents           | Basic set               | 25 specialized agents                   |
 | Code Quality        | Standard checks         | Universal Development Codex compliance |
 | Automation          | Basic hooks             | Comprehensive development workflow     |
 | Error Prevention    | ~70%                    | ~90%                                   |
@@ -236,14 +236,14 @@ No. StrRay requires OpenCode's plugin system and orchestration capabilities to f
 Both use the same OpenCode foundation but with different agent configurations:
 
 - **Lite**: 4 core agents for essential development support
-- **Full**: 8 specialized agents for comprehensive development capabilities
+- **Full**: 25 specialized agents for comprehensive development capabilities
 
 ### How do I switch between lite and full modes?
 
 Use the mode switching command:
 
 ```bash
-bash .opencode/commands/mode-switch.md full  # All 27 agents
+bash .opencode/commands/mode-switch.md full  # All N agents
 bash .opencode/commands/mode-switch.md lite  # 4 core agents
 ```
 
@@ -273,4 +273,4 @@ Modify the agents configuration in `.opencode/OpenCode.json`:
 
 ---
 
-_StrRay AI v1.1.1 - Enhancing OpenCode with systematic AI-assisted development capabilities._
+_StrRay AI  - Enhancing OpenCode with systematic AI-assisted development capabilities._

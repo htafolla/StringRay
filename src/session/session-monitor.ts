@@ -37,6 +37,14 @@ export interface SessionMetrics {
   agentCount: number;
 }
 
+export interface InteractionRecord {
+  timestamp: number;
+  duration: number;
+  success: boolean;
+  agentId?: string;
+  operation?: string;
+}
+
 export interface MonitorConfig {
   healthCheckIntervalMs: number;
   metricsCollectionIntervalMs: number;
@@ -72,6 +80,9 @@ export class SessionMonitor {
   private activeAlerts = new Map<string, Alert>();
   private healthCheckInterval?: NodeJS.Timeout | undefined;
   private metricsInterval?: NodeJS.Timeout | undefined;
+  private interactionHistory = new Map<string, InteractionRecord[]>();
+  private sessionResponseTimes = new Map<string, number[]>();
+  private sessionErrors = new Map<string, number>();
 
   constructor(
     stateManager: StringRayStateManager,
@@ -187,8 +198,24 @@ export class SessionMonitor {
       } else {
         health.activeAgents = sessionStatus.agentCount;
 
-        // Simplified health checks for now
-        // TODO: Implement comprehensive session health monitoring
+        this.performComprehensiveHealthChecks(sessionId, health, issues, sessionStatus);
+
+        if (health.errorCount > 10) {
+          issues.push(`High error count: ${health.errorCount} errors detected`);
+          status = "degraded";
+        }
+
+        if (health.responseTime > this.config.alertThresholds.maxResponseTime * 2) {
+          issues.push(`Critical response time: ${health.responseTime}ms (exceeded 2x threshold)`);
+          status = "critical";
+        }
+
+        const recentInteractions = this.interactionHistory.get(sessionId) || [];
+        const failedRatio = this.calculateFailureRatio(recentInteractions);
+        if (failedRatio > this.config.alertThresholds.maxErrorRate) {
+          issues.push(`High failure rate: ${(failedRatio * 100).toFixed(1)}% failed interactions`);
+          status = status === "healthy" ? "degraded" : status;
+        }
       }
 
       const metadata = this.cleanupManager?.getSessionMetadata(sessionId);
@@ -255,17 +282,31 @@ export class SessionMonitor {
     if (!sessionStatus) return null;
 
     const metadata = this.cleanupManager?.getSessionMetadata(sessionId);
+    const interactions = this.interactionHistory.get(sessionId) || [];
+    const responseTimes = this.sessionResponseTimes.get(sessionId) || [];
+    const errorCount = this.sessionErrors.get(sessionId) || 0;
+
+    const successfulInteractions = interactions.filter(i => i.success).length;
+    const failedInteractions = interactions.filter(i => !i.success).length;
+    const totalInteractions = interactions.length;
+
+    const avgResponseTime = responseTimes.length > 0
+      ? responseTimes.reduce((a, b) => a + b, 0) / responseTimes.length
+      : 0;
+
+    const conflictResolutionRate = this.calculateConflictResolutionRate(sessionId, interactions);
+    const coordinationEfficiency = this.calculateCoordinationEfficiency(sessionId, interactions);
 
     const metrics: SessionMetrics = {
       timestamp: Date.now(),
       sessionId,
-      totalInteractions: 0, // TODO: Implement interaction tracking
-      successfulInteractions: 0,
-      failedInteractions: 0,
-      averageResponseTime: 0,
-      conflictResolutionRate: 1.0, // Simplified
-      coordinationEfficiency: 1.0,
-      memoryUsage: metadata?.memoryUsage || 0,
+      totalInteractions,
+      successfulInteractions,
+      failedInteractions,
+      averageResponseTime: avgResponseTime,
+      conflictResolutionRate,
+      coordinationEfficiency,
+      memoryUsage: metadata?.memoryUsage || this.calculateSessionMemoryUsage(sessionId),
       agentCount: sessionStatus.agentCount,
     };
 
@@ -482,26 +523,158 @@ export class SessionMonitor {
     frameworkLogger.log("session-monitor", "shutdown-complete", "info");
   }
 
+  /**
+   * Record an interaction for tracking
+   */
+  recordInteraction(
+    sessionId: string,
+    interaction: InteractionRecord,
+  ): void {
+    if (!this.interactionHistory.has(sessionId)) {
+      this.interactionHistory.set(sessionId, []);
+    }
+
+    const interactions = this.interactionHistory.get(sessionId)!;
+    interactions.push(interaction);
+
+    if (interactions.length > 100) {
+      interactions.shift();
+    }
+
+    if (!this.sessionResponseTimes.has(sessionId)) {
+      this.sessionResponseTimes.set(sessionId, []);
+    }
+    this.sessionResponseTimes.get(sessionId)!.push(interaction.duration);
+
+    if (!interaction.success) {
+      const currentErrors = this.sessionErrors.get(sessionId) || 0;
+      this.sessionErrors.set(sessionId, currentErrors + 1);
+    }
+
+    this.persistInteractionData();
+  }
+
+  /**
+   * Get interaction history for a session
+   */
+  getInteractionHistory(sessionId: string, limit = 50): InteractionRecord[] {
+    const history = this.interactionHistory.get(sessionId) || [];
+    return history.slice(-limit);
+  }
+
+  /**
+   * Perform comprehensive health checks on a session
+   */
+  private performComprehensiveHealthChecks(
+    sessionId: string,
+    health: SessionHealth,
+    issues: string[],
+    sessionStatus: { active: boolean; agentCount: number },
+  ): void {
+    if (!sessionStatus.active) {
+      issues.push("Session is not active");
+      health.status = "degraded";
+    }
+
+    const interactions = this.interactionHistory.get(sessionId) || [];
+    const recentWindow = interactions.slice(-20);
+    const staleThreshold = 5 * 60 * 1000;
+
+    if (recentWindow.length > 0) {
+      const lastInteraction = recentWindow[recentWindow.length - 1];
+      if (lastInteraction) {
+        const timeSinceLastInteraction = Date.now() - lastInteraction.timestamp;
+
+        if (timeSinceLastInteraction > staleThreshold) {
+          issues.push(`Stale session: no activity for ${Math.round(timeSinceLastInteraction / 1000)}s`);
+          health.status = "degraded";
+        }
+      }
+    }
+
+    const responseTimes = this.sessionResponseTimes.get(sessionId) || [];
+    if (responseTimes.length > 0) {
+      const avgResponseTime = responseTimes.reduce((a, b) => a + b, 0) / responseTimes.length;
+      if (avgResponseTime > this.config.alertThresholds.maxResponseTime * 1.5) {
+        issues.push(`Elevated response time: ${avgResponseTime.toFixed(0)}ms average`);
+      }
+    }
+
+    const coordinationEfficiency = this.calculateCoordinationEfficiency(sessionId, interactions);
+    if (coordinationEfficiency < this.config.alertThresholds.minCoordinationEfficiency) {
+      issues.push(`Low coordination efficiency: ${(coordinationEfficiency * 100).toFixed(0)}%`);
+      health.status = "degraded";
+    }
+  }
+
+  /**
+   * Calculate failure ratio from interactions
+   */
+  private calculateFailureRatio(interactions: InteractionRecord[]): number {
+    if (interactions.length === 0) return 0;
+    const failures = interactions.filter(i => !i.success).length;
+    return failures / interactions.length;
+  }
+
+  /**
+   * Calculate conflict resolution rate from interactions
+   */
+  private calculateConflictResolutionRate(
+    sessionId: string,
+    interactions: InteractionRecord[],
+  ): number {
+    if (interactions.length === 0) return 1.0;
+
+    const successfulInteractions = interactions.filter(i => i.success).length;
+    return successfulInteractions / interactions.length;
+  }
+
+  /**
+   * Calculate coordination efficiency from interactions
+   */
+  private calculateCoordinationEfficiency(
+    sessionId: string,
+    interactions: InteractionRecord[],
+  ): number {
+    if (interactions.length === 0) return 1.0;
+
+    const successfulInteractions = interactions.filter(i => i.success).length;
+    const baseEfficiency = successfulInteractions / interactions.length;
+
+    const recentInteractions = interactions.slice(-10);
+    const hasMultipleAgents = new Set(recentInteractions.map(i => i.agentId).filter(Boolean)).size > 1;
+    const agentDiversityBonus = hasMultipleAgents ? 0.1 : 0;
+
+    return Math.min(1.0, baseEfficiency + agentDiversityBonus);
+  }
+
+  private persistInteractionData(): void {
+    const interactionData: Record<string, InteractionRecord[]> = {};
+    for (const [sessionId, history] of this.interactionHistory) {
+      interactionData[sessionId] = history;
+    }
+    this.stateManager.set("monitor:interactions", interactionData);
+  }
+
   private calculateSessionMemoryUsage(sessionId: string): number {
     // Estimate memory usage based on session activity
-    const metrics = this.collectMetrics(sessionId);
-    if (!metrics) return 0;
+    const interactions = this.interactionHistory.get(sessionId) || [];
 
     // Base memory + per-interaction overhead
     const baseMemory = 1024 * 1024; // 1MB base
     const perInteractionMemory = 8 * 1024; // 8KB per interaction
-    const totalInteractions = metrics.totalInteractions;
+    const totalInteractions = interactions.length;
 
     return baseMemory + totalInteractions * perInteractionMemory;
   }
 
   private countSessionConflicts(sessionId: string): number {
     // Estimate conflicts based on failed interactions
-    const metrics = this.collectMetrics(sessionId);
-    if (!metrics) return 0;
+    const interactions = this.interactionHistory.get(sessionId) || [];
+    const failedInteractions = interactions.filter(i => !i.success).length;
 
     // Conflicts are estimated as failed interactions that might indicate coordination issues
-    return Math.floor(metrics.failedInteractions * 0.1); // Assume 10% of failures are conflicts
+    return Math.floor(failedInteractions * 0.1); // Assume 10% of failures are conflicts
   }
 
   private calculateAverageResponseTime(sessionId: string): number {

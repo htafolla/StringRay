@@ -1,0 +1,38 @@
+#!/bin/bash
+# StringRay Pre-Push Hook
+# Runs full validation suite before push
+# This hook BLOCKS the push if validation fails
+
+set -e
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+
+BRANCH=$(git rev-parse --abbrev-ref HEAD)
+
+# Read pushed refs from stdin
+while read local_ref local_sha remote_ref remote_sha; do
+  if [ "$local_sha" != "0000000000000000000000000000000000000000" ]; then
+    if [ "$remote_sha" != "0000000000000000000000000000000000000000" ]; then
+      COMMIT_RANGE="${remote_sha}..${local_sha}"
+    else
+      COMMIT_RANGE="${local_sha}"
+    fi
+
+    CHANGED_FILES=$(git diff --name-only $COMMIT_RANGE --diff-filter=ACM | grep -E '\.(ts|tsx|js|jsx|mjs)$' || true)
+
+    if [ -n "$CHANGED_FILES" ]; then
+      if command -v node >/dev/null 2>&1; then
+        export HOOK_TYPE="pre-push"
+        export COMMIT_RANGE="$COMMIT_RANGE"
+        export CHANGED_FILES="$CHANGED_FILES"
+        export BRANCH="$BRANCH"
+        export PROJECT_ROOT="$PROJECT_ROOT"
+        node "$PROJECT_ROOT/scripts/hooks/run-hook.js" pre-push
+        exit $?
+      fi
+    fi
+  fi
+done
+
+exit 0

@@ -44,7 +44,7 @@ class StrRayBootOrchestratorServer {
   constructor() {
     this.server = new Server(
       {
-        name: "boot-orchestrator", version: "1.7.5",
+        name: "boot-orchestrator", version: "1.15.6",
       },
       {
         capabilities: {
@@ -1019,7 +1019,7 @@ ${results.warnings.length > 0 ? `**Warnings:**\n${results.warnings.map((w: strin
 // Start the server if run directly
 if (import.meta.url === `file://${process.argv[1]}`) {
   const server = new StrRayBootOrchestratorServer();
-  server.run().catch(console.error);
+  server.run().catch((error) => frameworkLogger.log("mcps/boot-orchestrator", "run", "error", { error: String(error) }));
 }
 
 export { StrRayBootOrchestratorServer };

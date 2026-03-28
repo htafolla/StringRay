@@ -9,17 +9,42 @@
 
 import { describe, test, expect, beforeEach, vi } from "vitest";
 import {
-  StringRayOrchestrator,
+  KernelOrchestrator,
   OrchestrationResult,
   OrchestratorConfig,
 } from "../../core/orchestrator.js";
 import { TaskDefinition } from "../../agents/types.js";
 
-describe("StringRayOrchestrator", () => {
-  let orchestrator: StringRayOrchestrator;
+// Mock framework-logger to prevent logging side effects
+vi.mock("../../core/framework-logger.js", () => ({
+  frameworkLogger: {
+    log: vi.fn().mockResolvedValue(undefined),
+    error: vi.fn().mockResolvedValue(undefined),
+    warn: vi.fn().mockResolvedValue(undefined),
+    info: vi.fn().mockResolvedValue(undefined),
+    debug: vi.fn().mockResolvedValue(undefined),
+  },
+}));
+
+// Mock kernel-patterns to avoid pattern detection in tests
+vi.mock("../../core/kernel-patterns.js", () => ({
+  getKernel: () => ({
+    analyze: () => ({
+      level: "L1",
+      confidence: 0.5,
+      cascadePatterns: [],
+      fatalAssumptions: [],
+      actionRequired: null,
+    }),
+  }),
+  resetKernel: () => {},
+}));
+
+describe("KernelOrchestrator", () => {
+  let orchestrator: KernelOrchestrator;
 
   beforeEach(() => {
-    orchestrator = new StringRayOrchestrator({
+    orchestrator = new KernelOrchestrator({
       maxConcurrentTasks: 3,
       taskTimeout: 60000,
       conflictResolutionStrategy: "majority_vote",
@@ -27,7 +52,7 @@ describe("StringRayOrchestrator", () => {
   });
 
   test("should initialize with default configuration", () => {
-    const defaultOrchestrator = new StringRayOrchestrator();
+    const defaultOrchestrator = new KernelOrchestrator();
     expect(defaultOrchestrator).toBeDefined();
   });
 
@@ -36,11 +61,11 @@ describe("StringRayOrchestrator", () => {
       maxConcurrentTasks: 5,
       conflictResolutionStrategy: "expert_priority",
     };
-    const customOrchestrator = new StringRayOrchestrator(config);
+    const customOrchestrator = new KernelOrchestrator(config);
     expect(customOrchestrator).toBeDefined();
   });
 
-  test.skip("should execute single task successfully", async () => {
+  test("should execute single task successfully", async () => {
     const task: TaskDefinition = {
       id: "test-task-1",
       type: "exploration",
@@ -52,6 +77,16 @@ describe("StringRayOrchestrator", () => {
       subagentType: "code-analyzer",
     };
 
+    // Mock delegateToSubagent to return typed result matching task
+    const mockDelegate = vi
+      .spyOn(orchestrator as any, "delegateToSubagent")
+      .mockResolvedValue({
+        success: true,
+        result: { type: task.type, simulated: true },
+        agentName: "code-analyzer",
+        executionTime: 50,
+      });
+
     const result = await orchestrator.executeComplexTask("Single task test", [
       task,
     ]);
@@ -62,6 +97,8 @@ describe("StringRayOrchestrator", () => {
     expect(result[0].success).toBe(true);
     expect(result[0].result.type).toBe("exploration");
     expect(result[0].duration).toBeGreaterThan(0);
+
+    mockDelegate.mockRestore();
   });
 
   test("should handle task execution failures", async () => {
@@ -94,7 +131,7 @@ describe("StringRayOrchestrator", () => {
     mockExecute.mockRestore();
   });
 
-  test.skip("should execute complex multi-step tasks", async () => {
+  test("should execute complex multi-step tasks", async () => {
     const tasks: TaskDefinition[] = [
       {
         id: "step-1",
@@ -118,6 +155,16 @@ describe("StringRayOrchestrator", () => {
       },
     ];
 
+    // Mock delegateToSubagent to return typed results matching each task
+    const mockDelegate = vi
+      .spyOn(orchestrator as any, "delegateToSubagent")
+      .mockImplementation(async (...args: unknown[]) => ({
+        success: true,
+        result: { type: (args[1] as any)?.type, simulated: true },
+        agentName: args[0] as string,
+        executionTime: 50,
+      }));
+
     const result = await orchestrator.executeComplexTask(
       "Complex test task",
       tasks,
@@ -132,6 +179,8 @@ describe("StringRayOrchestrator", () => {
     expect(result[1].success).toBe(true);
     expect(result[0].result.type).toBe("exploration");
     expect(result[1].result.type).toBe("documentation");
+
+    mockDelegate.mockRestore();
   });
 
   test("should respect task dependencies in complex tasks", async () => {
@@ -206,7 +255,7 @@ describe("StringRayOrchestrator", () => {
     mockDelegate.mockRestore();
   });
 
-  test.skip("should limit concurrent task execution", async () => {
+  test("should limit concurrent task execution", async () => {
     const tasks: TaskDefinition[] = Array.from({ length: 5 }, (_, i) => ({
       id: `task-${i}`,
       type: "exploration",
@@ -217,6 +266,25 @@ describe("StringRayOrchestrator", () => {
       status: "pending",
       subagentType: "code-analyzer",
     }));
+
+    // Mock delegateToSubagent with a delay to ensure sequential execution is measurable
+    const mockDelegate = vi
+      .spyOn(orchestrator as any, "delegateToSubagent")
+      .mockImplementation(
+        () =>
+          new Promise((resolve) =>
+            setTimeout(
+              () =>
+                resolve({
+                  success: true,
+                  result: { type: "exploration", simulated: true },
+                  agentName: "code-analyzer",
+                  executionTime: 200,
+                }),
+              200,
+            ),
+          ),
+      );
 
     const startTime = Date.now();
     const result = await orchestrator.executeComplexTask(
@@ -231,6 +299,8 @@ describe("StringRayOrchestrator", () => {
 
     // Should take some time due to sequential execution in batches
     expect(endTime - startTime).toBeGreaterThan(500);
+
+    mockDelegate.mockRestore();
   });
 
   test("should resolve conflicts using configured strategy", () => {

@@ -3,6 +3,51 @@ description: "Architect agent for design and architecture validation"
 version: "1.0.0"
 mode: subagent
 
+# =============================================================================
+# CODEX COMPLIANCE
+# =============================================================================
+# Architecture decisions must follow these Codex rules:
+# - Term 24: Single Responsibility Principle - each component has one reason to change
+# - Term 22: Interface Segregation - specific interfaces over god interfaces
+# - Term 23: Open/Closed Principle - open for extension, closed for modification
+# - Term 15: Separation of Concerns - clear boundaries between layers
+# - Term 3: Do Not Over-Engineer - simple solutions over complex
+# - Term 17: YAGNI - don't build what isn't needed
+
+# =============================================================================
+# INTEGRATION RESPONSIBILITIES
+# =============================================================================
+# When designing new components or features, the architect MUST:
+#
+# 1. FULL APPLICATION INTEGRATION:
+#    - Identify ALL files that need modification across the entire codebase
+#    - Update imports, exports, and references throughout the application
+#    - Ensure new code integrates seamlessly with existing patterns
+#    - Check for circular dependencies and break them appropriately
+#    - Verify all integration points work together
+#
+# 2. DOCUMENTATION UPDATES (MANDATORY):
+#    - Update README.md when adding new features or changing behavior
+#    - Update AGENTS.md when adding/modifying agent capabilities
+#    - Update CHANGELOG.md with architectural changes
+#    - Add/update architecture documentation in docs/
+#    - Update API documentation when endpoints change
+#    - Cross-reference all affected documentation
+#
+# 3. CONFIGURATION UPDATES:
+#    - Update routing configurations
+#    - Update feature flags when adding new capabilities
+#    - Update environment configurations if needed
+#    - Check opencode.json and config files
+#
+# 4. TEST INTEGRATION:
+#    - Ensure tests exist for new integration points
+#    - Update existing tests that may be affected
+#    - Add integration tests for cross-component functionality
+#
+# NEVER leave documentation or integration incomplete. All changes must be
+# fully integrated and documented before marking work as complete.
+
 # State Management Configuration
 state_management:
   enabled: true

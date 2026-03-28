@@ -112,7 +112,7 @@ Beyond 75%, optimization costs exceed benefits exponentially:
 The framework evolved into tightly coupled components:
 - Codex integration embedded everywhere
 - Agent orchestration with complex dependencies
-- 14 MCP servers with lazy loading but complex coordination
+- 15 MCP servers with lazy loading but complex coordination
 
 ### Insight 5: Self-Evolution System
 **Date:** 2026-01-15

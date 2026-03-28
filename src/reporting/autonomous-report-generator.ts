@@ -205,18 +205,21 @@ export class AutonomousReportGenerator {
         `report-${report.reportId}`,
       );
 
-      console.log(
-        `🤖 AUTONOMOUS DIAGNOSTIC REPORT GENERATED: ${report.reportId}`,
+      await frameworkLogger.log(
+        "autonomous-report-generator",
+        "report-generated",
+        "info",
+        {
+          reportId: report.reportId,
+          duration: report.sessionDuration,
+          criticalIssues: report.criticalIssues.length,
+          recommendations: report.recommendations.length,
+        },
+        sessionId,
       );
-      console.log(
-        `   Duration: ${(report.sessionDuration / 1000).toFixed(1)}s`,
-      );
-      console.log(`   Issues: ${report.criticalIssues.length}`);
-      console.log(`   Recommendations: ${report.recommendations.length}`);
 
       return report;
     } catch (error) {
-      console.error("❌ Autonomous report generation failed:", error);
       await frameworkLogger.log(
         "autonomous-report-generator",
         "report-generation-failed",
@@ -598,15 +601,9 @@ Session Summary: ${report.summary.recommendation}
     setInterval(
       async () => {
         try {
-          console.log("🤖 Generating scheduled diagnostic report...");
-          const report = await this.generateDiagnosticReport();
-          console.log(`✅ Report generated: ${report.reportId}`);
-
-          // Export and display the report
-          const reportText = this.exportReportAsText(report);
-          console.log(reportText);
+          await this.generateDiagnosticReport();
         } catch (error) {
-          console.error("❌ Scheduled report generation failed:", error);
+          // Silently handle scheduled report errors
         }
       },
       intervalMinutes * 60 * 1000,

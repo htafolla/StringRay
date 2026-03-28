@@ -4,7 +4,7 @@ import { setupServer } from "msw/node";
 // Mock API responses for testing
 export const handlers = [
   // Session API mocks
-  rest.post("/api/sessions", (req, res, ctx) => {
+  rest.post("/api/sessions", (req: any, res: any, ctx: any) => {
     return res(
       ctx.json({
         id: "session_123",
@@ -14,7 +14,7 @@ export const handlers = [
     );
   }),
 
-  rest.get("/api/sessions/:id", (req, res, ctx) => {
+  rest.get("/api/sessions/:id", (req: any, res: any, ctx: any) => {
     const { id } = req.params;
     return res(
       ctx.json({
@@ -27,7 +27,7 @@ export const handlers = [
   }),
 
   // Orchestrator API mocks
-  rest.post("/api/orchestrate", (req, res, ctx) => {
+  rest.post("/api/orchestrate", (req: any, res: any, ctx: any) => {
     return res(
       ctx.json({
         sessionId: "session_123",
@@ -38,7 +38,7 @@ export const handlers = [
   }),
 
   // Performance API mocks
-  rest.get("/api/performance/metrics", (req, res, ctx) => {
+  rest.get("/api/performance/metrics", (req: any, res: any, ctx: any) => {
     return res(
       ctx.json({
         responseTime: 245,
@@ -51,7 +51,7 @@ export const handlers = [
   }),
 
   // Codex validation API mocks
-  rest.post("/api/codex/validate", (req, res, ctx) => {
+  rest.post("/api/codex/validate", (req: any, res: any, ctx: any) => {
     return res(
       ctx.json({
         compliant: true,

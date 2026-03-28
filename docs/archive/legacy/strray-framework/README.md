@@ -28,7 +28,7 @@ tail -n +6 strray/commands/security-scan.md | bash
 StrRay uses a direct integration with the @opencode-ai/plugin SDK, providing:
 
 - **Model Cache**: Centralized model configuration in `strray/scripts/.model_cache.json`
-- **Agent System**: 8 specialized agents with optimized model routing
+- **Agent System**: 25 specialized agents with optimized model routing
 - **MCP Skills**: 6 knowledge skills for domain expertise
 - **Automation Hooks**: Pre-commit and continuous validation
 

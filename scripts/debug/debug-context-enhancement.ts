@@ -1,116 +1,94 @@
 /**
  * Context Enhancement Debug Script
- * Debug the context enhancement process to see why it's failing
+ * Debug the complexity analysis process (UPDATED for consolidated API)
+ *
+ * NOTE: This script was updated after consolidating complexity analyzers.
+ * The setContextProviders() method was removed as part of the consolidation.
+ * Context providers are now handled internally by the complexity analyzer.
  */
 
-import { frameworkLogger } from "./src/framework-logger";
-import { ComplexityAnalyzer } from "./src/delegation/complexity-analyzer";
-import { CodebaseContextAnalyzer } from "./src/delegation/codebase-context-analyzer";
-import { ASTCodeParser } from "./src/delegation/ast-code-parser";
-import { DependencyGraphBuilder } from "./src/delegation/dependency-graph-builder";
+import { frameworkLogger } from "../../src/core/framework-logger.js";
+import { ComplexityAnalyzer } from "../../src/delegation/complexity-analyzer.js";
 
-async function debugContextEnhancement() {
-  console.log("🔧 DEBUGGING CONTEXT ENHANCEMENT PROCESS");
-  console.log("======================================");
+async function debugComplexityAnalysis() {
+  console.log("🔧 DEBUGGING COMPLEXITY ANALYSIS");
+  console.log("=================================");
 
-  // Create context providers
-  console.log("\n🏗️ Creating context providers...");
-  const contextAnalyzer = new CodebaseContextAnalyzer();
-  const astParser = new ASTCodeParser();
-  const dependencyBuilder = new DependencyGraphBuilder(
-    contextAnalyzer,
-    astParser,
-  );
-
-  console.log("✅ Context providers created");
-
-  // Create complexity analyzer and set providers
-  console.log("\n🔗 Setting up complexity analyzer with context providers...");
+  // Create complexity analyzer
+  console.log("\n🏗️ Creating complexity analyzer...");
   const complexityAnalyzer = new ComplexityAnalyzer();
-  complexityAnalyzer.setContextProviders(
-    contextAnalyzer,
-    astParser,
-    dependencyBuilder,
-  );
-  console.log("✅ Context providers connected to complexity analyzer");
+  console.log("✅ Complexity analyzer created");
 
-  // Test context enhancement with a file path
-  console.log("\n🎯 Testing context enhancement with file path...");
-  const testContext = {
-    fileCount: 5,
-    changeVolume: 100,
-    dependencies: 3,
-    riskLevel: "medium" as const,
-    filePath: "src/delegation/agent-delegator.ts",
-  };
+  // Test complexity analysis with various contexts
+  console.log("\n🎯 Testing complexity analysis...");
 
-  console.log("Test context:", testContext);
+  const testCases = [
+    {
+      name: "Simple edit",
+      operation: "edit",
+      context: {
+        files: ["simple.ts"],
+        changes: { added: 10, deleted: 5, modified: 0 },
+        dependencies: [],
+        riskLevel: "low",
+      },
+    },
+    {
+      name: "Complex refactor",
+      operation: "refactor",
+      context: {
+        files: ["complex.ts", "utils.ts", "types.ts"],
+        changes: { added: 200, deleted: 150, modified: 50 },
+        dependencies: ["dep1", "dep2", "dep3", "dep4", "dep5"],
+        riskLevel: "high",
+        estimatedDuration: 120,
+      },
+    },
+    {
+      name: "Debug task",
+      operation: "debug",
+      context: {
+        files: ["buggy.ts"],
+        changes: { added: 20, deleted: 10, modified: 5 },
+        dependencies: [],
+        riskLevel: "critical",
+      },
+    },
+  ];
 
-  try {
-    console.log("\n📊 Running complexity analysis with context enhancement...");
-    const metrics = await complexityAnalyzer.analyzeComplexity(
-      "refactor",
-      testContext,
-    );
-    console.log("✅ Context enhancement succeeded!");
-    console.log("Enhanced metrics:", {
-      fileCount: metrics.fileCount,
-      changeVolume: metrics.changeVolume,
-      dependencies: metrics.dependencies,
-      riskLevel: metrics.riskLevel,
-      estimatedDuration: metrics.estimatedDuration,
-    });
-  } catch (error) {
-    console.log("❌ Context enhancement failed:", error);
-
-    // Check individual components
-    console.log("\n🔍 Checking individual context providers...");
-
-    try {
-      console.log("Testing CodebaseContextAnalyzer...");
-      const analysis = await contextAnalyzer.analyzeCodebase();
-      console.log(
-        "✅ CodebaseContextAnalyzer works - files:",
-        analysis.structure.totalFiles,
-      );
-    } catch (e) {
-      console.log("❌ CodebaseContextAnalyzer failed:", e);
-    }
+  for (const testCase of testCases) {
+    console.log(`\n📊 Testing: ${testCase.name}`);
+    console.log(`   Operation: ${testCase.operation}`);
 
     try {
-      console.log("Testing ASTCodeParser...");
-      const astAnalysis = await astParser.analyzeFile(
-        "src/delegation/agent-delegator.ts",
+      const metrics = complexityAnalyzer.analyzeComplexity(
+        testCase.operation,
+        testCase.context,
       );
-      console.log(
-        "✅ ASTCodeParser works - functions:",
-        astAnalysis.structure.functions.length,
-      );
-    } catch (e) {
-      console.log("❌ ASTCodeParser failed:", e);
+
+      const score = complexityAnalyzer.calculateComplexityScore(metrics);
+
+      console.log(`   ✅ Analysis complete`);
+      console.log(`   📈 Score: ${score.score}/100 (${score.level})`);
+      console.log(`   🎯 Strategy: ${score.recommendedStrategy}`);
+      console.log(`   👥 Agents: ${score.estimatedAgents}`);
+      console.log(`   📝 Reasoning: ${score.reasoning.slice(0, 2).join("; ")}...`);
+    } catch (error) {
+      console.log(`   ❌ Analysis failed:`, error);
     }
   }
 
-  // Check logs for any errors
-  console.log("\n📋 Checking recent logs for errors...");
-  const recentLogs = frameworkLogger.getRecentLogs(20);
-  const errorLogs = recentLogs.filter(
-    (log) => log.status === "error" || log.action.includes("failed"),
-  );
+  // Test threshold configuration
+  console.log("\n⚙️ Testing threshold configuration...");
+  const currentThresholds = complexityAnalyzer.getThresholds();
+  console.log("Current thresholds:", currentThresholds);
 
-  if (errorLogs.length > 0) {
-    console.log("Recent errors:");
-    errorLogs.forEach((log) => {
-      console.log(
-        `  ${log.timestamp} [${log.component}] ${log.action}: ${JSON.stringify(log.details)}`,
-      );
-    });
-  } else {
-    console.log("No recent errors found");
-  }
-
-  console.log("\n✅ Context enhancement debugging complete!");
+  console.log("\n✅ Complexity analysis debugging complete!");
+  console.log("\n📋 Summary:");
+  console.log("   - Complexity analyzer uses consolidated complexity-core.ts");
+  console.log("   - Thresholds are unified across delegation and routing");
+  console.log("   - Context analysis is handled internally");
 }
 
 // Run the debug
-debugContextEnhancement().catch(console.error);
+debugComplexityAnalysis().catch(console.error);

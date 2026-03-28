@@ -22,7 +22,7 @@ interface CodexInjectorHook {
       input: { tool: string; args?: Record<string, unknown> },
       output: { output?: string; [key: string]: unknown },
       sessionId: string,
-    ) => { output?: string; [key: string]: unknown };
+    ) => Promise<{ output?: string; [key: string]: unknown }>;
   };
 }
 
@@ -99,7 +99,7 @@ describe("Codex Enforcement Integration", () => {
       loadCodexContext: vi.fn().mockResolvedValue({
         success: true,
         context: {
-          version: "1.7.5",
+          version: "1.15.6",
           terms: new Map(),
           interweaves: [],
           lenses: [],
@@ -144,7 +144,7 @@ describe("Codex Enforcement Integration", () => {
       loadCodexContext: vi.fn().mockResolvedValue({
         success: true,
         context: {
-          version: "1.7.5",
+          version: "1.15.6",
           terms: new Map(),
           interweaves: [],
           lenses: [],
@@ -198,7 +198,7 @@ describe("Codex Enforcement Integration", () => {
       loadCodexContext: vi.fn().mockResolvedValue({
         success: true,
         context: {
-          version: "1.7.5",
+          version: "1.15.6",
           terms: new Map(),
           interweaves: [],
           lenses: [],

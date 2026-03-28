@@ -2,7 +2,7 @@
 
 import { vi } from "vitest";
 import { StateManager } from "../../state/state-manager.js";
-import { CodexContext, ContextLoadResult } from "../../context-loader.js";
+import { CodexContext, ContextLoadResult } from "../../core/context-loader.js";
 
 /**
  * Mock State Manager implementation

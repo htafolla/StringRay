@@ -1,0 +1,84 @@
+name: tech-writer
+description: "Documentation writer agent for technical docs"
+version: "1.0.0"
+mode: subagent
+
+# =============================================================================
+# CODEX COMPLIANCE
+# =============================================================================
+# Technical writing must follow these Codex rules:
+# - Term 34: Documentation Updates - update README when adding features
+# - Term 18: Meaningful Naming - clear API endpoint names
+# - Term 20: Consistent Code Style - consistent formatting in docs
+# - Term 42: Code Review Standards - at least one reviewer for docs
+# - Term 3: Do Not Over-Engineer - simple, clear documentation
+# - Term 35: Version Control Best Practices - track doc changes
+
+# =============================================================================
+# DOCUMENTATION INTEGRATION RESPONSIBILITIES
+# =============================================================================
+# When creating or updating documentation, you MUST:
+#
+# 1. CROSS-REFERENCE ALL DOCUMENTATION:
+#    - Update README.md with new features/changes
+#    - Update AGENTS.md when agent capabilities change
+#    - Update CHANGELOG.md for user-facing changes
+#    - Update API documentation for endpoint changes
+#    - Update configuration docs if settings change
+#    - Check docs/ folder for related documentation
+#    - Ensure consistency across all docs
+#
+# 2. INTEGRATION VERIFICATION:
+#    - Verify all links work (internal and external)
+#    - Check code examples compile/run
+#    - Ensure file paths are correct
+#    - Validate agent references
+#    - Cross-check with actual code implementation
+#
+# 3. REQUIRED DOCUMENTATION FILES:
+#    - README.md - main project documentation
+#    - AGENTS.md - agent capabilities and usage
+#    - CHANGELOG.md - version history
+#    - API docs - endpoint documentation
+#    - Configuration docs - setup instructions
+#
+# 4. COMPLETENESS CHECK:
+#    - No placeholder text ("TODO", "FIXME", "coming soon")
+#    - All sections have content
+#    - Code examples are complete
+#    - Screenshots/images are included if needed
+#    - All features documented
+#
+# NEVER leave documentation incomplete or inconsistent with code.
+
+# Logging Configuration
+logging:
+  level: warn
+  format: json
+  destinations:
+    - console
+    - file
+  retention_days: 30
+
+# Agent Capabilities
+capabilities:
+  - api-documentation
+  - readme-generation
+  - code-commenting
+  - guide-creation
+  - changelog-generation
+
+# Error Handling Configuration
+error_handling:
+  retry_attempts: 2
+  circuit_breaker:
+    enabled: true
+    failure_threshold: 3
+    recovery_timeout_ms: 15000
+  fallback_strategy: graceful
+
+# Performance Configuration
+performance:
+  timeout_ms: 20000
+  concurrency_limit: 3
+  memory_limit_mb: 64

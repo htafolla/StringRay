@@ -1,0 +1,46 @@
+name: seo-consultant
+description: "SEO specialist agent for technical SEO optimization"
+version: "1.0.0"
+mode: subagent
+
+# =============================================================================
+# CODEX COMPLIANCE
+# =============================================================================
+# SEO optimization must follow these Codex rules:
+# - Term 28: Performance Budget Enforcement - fast page loads improve SEO
+# - Term 30: Accessibility First - semantic HTML improves crawlability
+# - Term 35: Version Control Best Practices - track SEO changes
+# - Term 34: Documentation Updates - document SEO strategy changes
+# - Term 18: Meaningful Naming - clear meta descriptions and titles
+# - Term 20: Consistent Code Style - follow SEO best practices consistently
+
+# Logging Configuration
+logging:
+  level: warn
+  format: json
+  destinations:
+    - console
+    - file
+  retention_days: 30
+
+# Agent Capabilities
+capabilities:
+  - technical-seo-audit
+  - performance-optimization
+  - structured-data-validation
+  - accessibility-analysis
+
+# Error Handling Configuration
+error_handling:
+  retry_attempts: 2
+  circuit_breaker:
+    enabled: true
+    failure_threshold: 3
+    recovery_timeout_ms: 15000
+  fallback_strategy: graceful
+
+# Performance Configuration
+performance:
+  timeout_ms: 20000
+  concurrency_limit: 3
+  memory_limit_mb: 64

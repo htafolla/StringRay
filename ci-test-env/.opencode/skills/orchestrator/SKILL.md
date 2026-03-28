@@ -8,7 +8,7 @@ tags: [orchestration, orchestrator]
 mcp:
   orchestrator:
     command: node
-    args: [node_modules/strray-ai/dist/plugin/mcps/dist/plugin/mcps/orchestrator.server.js]
+    args: [node_modules/strray-ai/dist/mcps/orchestrator.server.js]
 ---
 
 # Orchestrator Skill

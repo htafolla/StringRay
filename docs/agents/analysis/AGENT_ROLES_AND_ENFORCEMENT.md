@@ -2,7 +2,40 @@
 
 ## 🎯 Executive Summary
 
-The StrRay Framework employs **5 specialized AI agents** with **clear separation of responsibilities** and a **hierarchical rule enforcement system**. The **Enforcer agent** holds supreme authority over code quality, codex compliance, and contextual analysis validation.
+The StrRay Framework employs **25 specialized AI agents** with **clear separation of responsibilities** and a **hierarchical rule enforcement system**.
+
+## Agent Architecture (v1.15.1)
+
+```
+Agent Hierarchy (27 Total)
+├── Primary Agent
+│   └── Orchestrator (coordinates all other agents)
+├── Planning Agents (14)
+│   ├── Architect - Codebase intelligence authority
+│   ├── Enforcer - Rule enforcement authority
+│   ├── Test Architect - Testing strategy specialist
+│   ├── Security Auditor - Security validation
+│   ├── Code Reviewer - Quality assessment
+│   ├── Researcher - Codebase exploration
+│   ├── Testing Lead - Test coordination
+│   ├── Performance Engineer - Performance optimization
+│   ├── Storyteller - Technical documentation
+│   ├── Backend Engineer - Backend design
+│   ├── Frontend Engineer - Frontend design
+│   └── Database Engineer - Database design
+├── Implementation Agents (12)
+│   ├── Bug Triage Specialist - Surgical fixes
+│   ├── Refactorer - Code optimization
+│   ├── Tech Writer - Documentation
+│   ├── Code Analyzer - Deep analysis
+│   ├── Multimodal Looker - Visual analysis
+│   ├── UI/UX Design - Interface design
+│   ├── DevOps Engineer - CI/CD automation
+│   ├── Mobile Developer - Mobile apps
+│   ├── Growth Strategist - Growth planning
+│   ├── Content Creator - Content production
+│   └── SEO Consultant - SEO optimization
+``` The **Enforcer agent** holds supreme authority over code quality, codex compliance, and contextual analysis validation.
 
 ---
 
@@ -44,11 +77,14 @@ The StrRay Framework employs **5 specialized AI agents** with **clear separation
 **Responsibilities**:
 
 - **FINAL AUTHORITY** on all development rules
-- Enforce Universal Development Codex v1.1.1 (all 55-terms)
+- Enforce Universal Development Codex v1.7.5 (all 60-terms)
 - Validate contextual analysis integration
 - Block operations violating rules
 - Implement automated fixes and remediation
 - Quality gate control before commits
+- **Documentation Requirements**: Validates all 25 agents document their work
+- **Cross-Reference Validation**: Ensures agents reference correct Codex terms
+- **Integration Enforcement**: Enforces proper integration between all agents
 
 **Authority Level**: **SUPREME** (binding decisions, cannot be overridden)
 **Code Writing**: Limited (fixes violations, generates test stubs)
@@ -137,16 +173,29 @@ ruleHierarchy.set("input-validation", ["tests-required"]);
 
 ## 🔄 Agent Interaction Workflow
 
-### **Code Creation Workflow**
+### **Code Creation Workflow (v1.15.1 - All 27 Agents)**
 
 ```
 1. Developer Request → Orchestrator (task analysis & routing)
 2. Orchestrator → Architect (design validation)
-3. Architect → Enforcer (rule compliance check)
-4. Enforcer → Test-Architect (test requirements)
-5. Test-Architect → Refactorer (implementation if needed)
-6. Implementation → Enforcer (final quality gate)
-7. Enforcer → Commit (if all validations pass)
+3. Orchestrator → Researcher (codebase exploration if needed)
+4. Architect → Enforcer (rule compliance check)
+5. Enforcer → Test-Architect (test requirements)
+6. Enforcer → Security-Auditor (security validation)
+7. Enforcer → Performance-Engineer (performance requirements)
+8. Test-Architect → Testing-Lead (test coordination)
+9. Orchestrator → Bug-Triage (if issues found)
+10. Orchestrator → Refactorer (implementation if needed)
+11. Orchestrator → Backend-Engineer / Frontend-Engineer / Database-Engineer (specialized implementation)
+12. Implementation → Code-Reviewer (quality validation)
+13. Implementation → Enforcer (final quality gate - all 60 Codex terms)
+14. Enforcer → Commit (if all validations pass)
+15. Storyteller documents the journey (optional)
+
+Note: All 25 agents coordinate through the Orchestrator. Each agent must:
+- Document their work and decisions
+- Cross-reference relevant Codex terms
+- Validate integration with other agents
 ```
 
 ### **Quality Gate Process**
@@ -168,7 +217,7 @@ Result: PASS → Commit Allowed
 
 ### **Supreme Authority Areas**
 
-1. **Codex Enforcement**: All 55 Universal Development Codex terms
+1. **Codex Enforcement**: All 60 Universal Development Codex terms (v1.7.5)
 2. **Quality Gates**: Final approval for all code changes
 3. **Rule Validation**: Hierarchical rule system enforcement
 4. **Context Analysis**: Validates proper integration patterns

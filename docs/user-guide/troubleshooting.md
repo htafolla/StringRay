@@ -1,385 +1,749 @@
-# Troubleshooting Guide
+# StrRay Framework - Centralized Troubleshooting Reference
 
 ## Overview
 
-This guide provides solutions for common issues encountered when using the StringRay Framework. Issues are organized by category with symptoms, causes, and step-by-step solutions.
+This guide provides solutions for common issues encountered when using the StrRay framework. Issues are organized by category with step-by-step resolution procedures.
 
-## Quick Diagnostic Commands
+## Installation Issues
 
-```bash
-# Framework health check
-npx strray-ai health
+### Framework Not Found After Installation
 
-# Validate installation
-npx strray-ai validate
+**Symptoms**:
 
-# Check framework status
-npx strray-ai status
-
-# Analyze recent activity
-tail -50 logs/framework/activity.log
-```
-
-## Agent Issues
-
-### Agent Commands Not Responding
-
-**Symptoms**: @agent commands are ignored in OpenCode
-
-**Possible Causes**:
-- Framework plugin not loaded
-- OpenCode configuration issues
-- Agent initialization failures
+- `strray: command not found`
+- Framework commands not recognized
 
 **Solutions**:
 
-1. **Check Plugin Loading**:
+1. **Check PATH Configuration**:
+
    ```bash
-   # Restart OpenCode completely
-   # Check that StringRay plugin appears in loaded plugins
+   # Check if StrRay is in PATH
+   which strray
+
+   # Add to PATH if missing
+   export PATH="$HOME/.npm-global/bin:$PATH"
    ```
 
-2. **Validate Configuration**:
+2. **Reinstall Globally**:
+
    ```bash
-   # Check .opencode/OpenCode.json exists and is valid
-   cat .opencode/OpenCode.json
+   npm uninstall -g @strray/framework
+   npm install -g @strray/framework
    ```
 
-3. **Test Framework Health**:
+3. **Verify Installation**:
    ```bash
-   npx strray-ai health
-   # Should show: Framework active, agents loaded
+   strray --version
+   npm list -g @strray/framework
    ```
 
-### Agent Execution Errors
+### Permission Denied Errors
 
-**Symptoms**: Agents start but fail during execution
+**Symptoms**:
 
-**Possible Causes**:
-- Missing dependencies
-- Permission issues
-- Resource constraints
+- `EACCES: permission denied`
+- Cannot write to installation directory
 
 **Solutions**:
 
-1. **Check Agent Logs**:
+1. **Fix npm Permissions**:
+
    ```bash
-   tail -100 logs/framework/activity.log | grep "agent"
+   # Create npm-global directory
+   mkdir ~/.npm-global
+   npm config set prefix ~/.npm-global
+
+   # Add to PATH
+   export PATH="$HOME/.npm-global/bin:$PATH"
    ```
 
-2. **Validate Permissions**:
+2. **Use sudo (not recommended)**:
+
    ```bash
-   # Ensure write access to project files
-   ls -la src/
+   sudo npm install -g @strray/framework
    ```
 
-3. **Check Resource Usage**:
+3. **Use Node Version Manager**:
+
    ```bash
-   # Monitor memory and CPU during agent execution
-   top -p $(pgrep -f "OpenCode")
+   # Install nvm
+   curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v1.1.1/install.sh | bash
+
+   # Install and use Node.js
+   nvm install node
+   nvm use node
    ```
 
-## Framework Initialization Issues
+### Dependency Installation Failures
 
-### Framework Not Starting
+**Symptoms**:
 
-**Symptoms**: `npx strray-ai init` fails or hangs
-
-**Possible Causes**:
-- Node.js version incompatibility
-- Missing dependencies
-- Configuration conflicts
+- `npm install` fails
+- Missing peer dependencies
+- Network timeout errors
 
 **Solutions**:
 
-1. **Check Node.js Version**:
-   ```bash
-   node --version  # Should be 18+
-   npm --version   # Should be compatible
-   ```
+1. **Clear Cache and Retry**:
 
-2. **Clear Cache and Reinstall**:
    ```bash
+   npm cache clean --force
    rm -rf node_modules package-lock.json
    npm install
    ```
 
-3. **Validate Configuration**:
+2. **Use Different Registry**:
+
    ```bash
-   # Check for syntax errors in config files
-   node -e "console.log('Config syntax OK')"
+   npm config set registry https://registry.npmjs.org/
+   npm install
    ```
 
-### Codex Loading Failures
+3. **Install Peer Dependencies**:
+   ```bash
+   npm install --legacy-peer-deps
+   ```
 
-**Symptoms**: Framework starts but codex terms not applied
+## Configuration Issues
 
-**Possible Causes**:
-- Missing .opencode/strray/codex.json file
-- Corrupted codex data
-- Version mismatches
+### Invalid Configuration File
+
+**Symptoms**:
+
+- `Configuration validation failed`
+- Agents not loading properly
 
 **Solutions**:
 
-1. **Verify Codex File**:
+1. **Validate Configuration**:
+
    ```bash
-   ls -la .opencode/strray/codex.json
-   # File should exist and be readable
+   strray config validate
    ```
 
-2. **Validate Codex Content**:
+2. **Reset to Defaults**:
+
    ```bash
-   # Check codex has required terms
-   grep '"number":' .opencode/strray/codex.json | wc -l  # Should show 59
+   strray config reset
    ```
 
-3. **Check Framework Logs**:
+3. **Check JSON Syntax**:
    ```bash
-   grep "codex" logs/framework/activity.log
+   # Validate JSON syntax
+   cat .opencode/strray/config.json | jq .
+   ```
+
+### Environment Variables Not Loading
+
+**Symptoms**:
+
+- Environment-specific settings not applied
+- API keys not recognized
+
+**Solutions**:
+
+1. **Check .env File Location**:
+
+   ```bash
+   ls -la .env*
+   ```
+
+2. **Verify Variable Format**:
+
+   ```bash
+   # Correct format
+   STRRAY_ENV=production
+   API_KEY=your_key_here
+   ```
+
+3. **Load Environment Manually**:
+   ```bash
+   source .env
+   strray config reload
+   ```
+
+## Agent Issues
+
+### Agent Not Responding
+
+**Symptoms**:
+
+- Agent commands timeout
+- No response to trigger keywords
+
+**Solutions**:
+
+1. **Check Agent Status**:
+
+   ```bash
+   strray agent status
+   ```
+
+2. **Restart Agent**:
+
+   ```bash
+   strray agent restart <agent-name>
+   ```
+
+3. **Check Agent Logs**:
+   ```bash
+   strray logs agent <agent-name>
+   ```
+
+### Agent Permission Errors
+
+**Symptoms**:
+
+- `Permission denied` for tool execution
+- Agent cannot access required resources
+
+**Solutions**:
+
+1. **Check Agent Permissions**:
+
+   ```bash
+   strray agent permissions <agent-name>
+   ```
+
+2. **Update Permissions**:
+
+   ```bash
+   strray config set agents.<agent>.permissions "read,write,bash"
+   ```
+
+3. **Verify Tool Permissions**:
+   ```bash
+   strray tools permissions
+   ```
+
+## Tool Integration Issues
+
+### Tool Not Available
+
+**Symptoms**:
+
+- `Tool not found` errors
+- Commands fail due to missing tools
+
+**Solutions**:
+
+1. **Check Tool Installation**:
+
+   ```bash
+   strray tools list
+   ```
+
+2. **Install Missing Tools**:
+
+   ```bash
+   strray tools install <tool-name>
+   ```
+
+3. **Manual Tool Installation**:
+   ```bash
+   # Example for git
+   which git || apt-get install git
+   ```
+
+### Tool Execution Timeout
+
+**Symptoms**:
+
+- Commands hang indefinitely
+- `Timeout exceeded` errors
+
+**Solutions**:
+
+1. **Increase Timeout**:
+
+   ```bash
+   strray config set tools.timeout 300000
+   ```
+
+2. **Run in Background**:
+
+   ```bash
+   strray task "long running task" --async
+   ```
+
+3. **Check System Resources**:
+   ```bash
+   # Check memory and CPU usage
+   top
+   free -h
    ```
 
 ## Performance Issues
 
 ### Slow Response Times
 
-**Symptoms**: Agent responses take unusually long
+**Symptoms**:
 
-**Possible Causes**:
-- High complexity tasks
-- Resource constraints
-- Network issues
+- Commands take longer than expected
+- Framework feels sluggish
 
 **Solutions**:
 
-1. **Check Complexity Scores**:
+1. **Check System Resources**:
+
    ```bash
-   # Monitor task complexity in logs
-   grep "complexity" logs/framework/activity.log
+   # Monitor resource usage
+   htop
+   iostat -x 1
    ```
 
-2. **Monitor Resources**:
+2. **Clear Cache**:
+
    ```bash
-   # Check system resources
-   df -h    # Disk space
-   free -h  # Memory
+   strray cache clear
    ```
 
 3. **Optimize Configuration**:
-   ```json
-   // Reduce concurrent operations in config
-   {
-     "framework": {
-       "maxConcurrentAgents": 2
-     }
-   }
+   ```bash
+   strray config set performance.mode optimized
    ```
 
 ### Memory Issues
 
-**Symptoms**: Out of memory errors or degraded performance
+**Symptoms**:
 
-**Possible Causes**:
-- Large codebases
-- Memory leaks
-- Configuration issues
+- `Out of memory` errors
+- System becomes unresponsive
 
 **Solutions**:
 
-1. **Monitor Memory Usage**:
-   ```bash
-   # Check memory consumption
-   ps aux | grep "OpenCode"
-   ```
+1. **Increase Memory Limits**:
 
-2. **Adjust Memory Settings**:
    ```bash
-   # Increase Node.js memory limit
+   # For Node.js
    export NODE_OPTIONS="--max-old-space-size=4096"
    ```
 
-3. **Process Large Codebases in Batches**:
-   ```typescript
-   // Split large analysis tasks
-   const batches = splitFilesIntoBatches(allFiles, 50);
-   for (const batch of batches) {
-     await analyzeBatch(batch);
-   }
-   ```
+2. **Monitor Memory Usage**:
 
-## Configuration Issues
-
-### Invalid Configuration
-
-**Symptoms**: Framework fails to start with config errors
-
-**Possible Causes**:
-- JSON syntax errors
-- Invalid property values
-- Missing required fields
-
-**Solutions**:
-
-1. **Validate JSON Syntax**:
    ```bash
-   # Check config file syntax
-   python3 -m json.tool .opencode/OpenCode.json
+   strray monitor memory
    ```
 
-2. **Use Configuration Templates**:
+3. **Reduce Parallel Operations**:
    ```bash
-   # Reset to known good configuration
-   cp api/API_REFERENCE.md .opencode/OpenCode.json
-   ```
-
-3. **Check Required Fields**:
-   ```json
-   // Ensure all required fields are present
-   {
-     "model_routing": {
-       "enforcer": "openrouter/xai-grok-2-1212-fast-1"
-     },
-     "framework": {
-       "version": "1.7.5"
-     }
-   }
+   strray config set tools.parallel false
    ```
 
 ## Network and Connectivity Issues
 
-### MCP Server Connection Failures
+### Connection Timeouts
 
-**Symptoms**: Agents cannot connect to MCP servers
+**Symptoms**:
 
-**Possible Causes**:
-- Network restrictions
-- Port conflicts
-- Server startup failures
+- Network requests fail
+- External service integration issues
 
 **Solutions**:
 
-1. **Test MCP Connectivity**:
+1. **Check Network Connectivity**:
+
    ```bash
-   # Use built-in connectivity test
-   node scripts/test:mcp-connectivity.js
+   ping 8.8.8.8
+   curl -I https://registry.npmjs.org
    ```
 
-2. **Check Server Logs**:
+2. **Configure Proxy**:
+
    ```bash
-   # Examine MCP server startup logs
-   tail -50 logs/mcp-*.log
+   npm config set proxy http://proxy.company.com:8080
+   npm config set https-proxy http://proxy.company.com:8080
    ```
 
-3. **Verify Network Access**:
+3. **Use Different DNS**:
    ```bash
-   # Test basic connectivity
-   curl -I http://localhost:3000/health
+   echo "nameserver 8.8.8.8" > /etc/resolv.conf
    ```
 
-## Development Environment Issues
+### SSL/TLS Certificate Issues
 
-### Testing Failures
+**Symptoms**:
 
-**Symptoms**: Unit tests or integration tests failing
-
-**Possible Causes**:
-- Mock configuration issues
-- Environment differences
-- Code changes breaking tests
+- `certificate verify failed` errors
+- Cannot connect to HTTPS endpoints
 
 **Solutions**:
 
-1. **Run Tests with Debug Output**:
+1. **Update CA Certificates**:
+
    ```bash
-   npm test -- --verbose
+   # Ubuntu/Debian
+   sudo apt-get install ca-certificates
+   sudo update-ca-certificates
    ```
 
-2. **Check Mock Configuration**:
-   ```typescript
-   // Ensure mocks are properly configured
-   vi.mock("../framework-logger.js", () => ({
-     frameworkLogger: { log: vi.fn() }
-   }));
+2. **Disable SSL Verification (temporary)**:
+
+   ```bash
+   npm config set strict-ssl false
    ```
 
-3. **Validate Test Environment**:
+3. **Use Custom Certificate**:
    ```bash
-   # Check test environment setup
-   npm run test:setup
+   export NODE_EXTRA_CA_CERTS=/path/to/custom-ca.pem
+   ```
+
+## File System Issues
+
+### Permission Denied on Files
+
+**Symptoms**:
+
+- Cannot read/write project files
+- File access errors
+
+**Solutions**:
+
+1. **Check File Permissions**:
+
+   ```bash
+   ls -la <problematic-file>
+   ```
+
+2. **Fix Permissions**:
+
+   ```bash
+   chmod 644 <file>
+   chmod 755 <directory>
+   ```
+
+3. **Change Ownership**:
+   ```bash
+   sudo chown -R $(whoami) <project-directory>
+   ```
+
+### File Not Found Errors
+
+**Symptoms**:
+
+- Configuration files missing
+- Required files not located
+
+**Solutions**:
+
+1. **Check File Existence**:
+
+   ```bash
+   find . -name "*.json" -type f
+   ```
+
+2. **Regenerate Missing Files**:
+
+   ```bash
+   strray init --force
+   ```
+
+ 3. **Restore from Backup**:
+    ```bash
+    strray backup restore
+    ```
+
+### Misnamed Directories (Users/home/blaze)
+
+**Symptoms**:
+
+- `Users/`, `home/`, or `blaze/` directories found at project root
+- Nested directory structures like `Users/blaze/dev/stringray/`
+- Confusing directory layout with duplicate paths
+
+**Root Cause**:
+
+This occurs when full absolute paths are used incorrectly, creating nested directory structures. For example:
+
+```bash
+# Someone accidentally used full path as relative:
+mkdir /Users/blaze/dev/stringray/test-consent.json
+# When running from ~/dev/stringray, this creates:
+#   ~/dev/stringray/Users/blaze/dev/stringray/test-consent.json
+```
+
+**Solutions**:
+
+1. **Detect Misnamed Directories**:
+    ```bash
+    # Find common misnamed directories
+    find . -maxdepth 1 -type d \( -name "Users" -o -name "home" -o -name "blaze" \)
+
+    # Check for nested structures
+    find . -type d -path "*/Users/*" -o -path "*/home/*"
+    ```
+
+2. **Verify Contents Before Deletion**:
+    ```bash
+    # Always check what's inside
+    ls -la Users/
+    du -sh Users/
+    find Users/ -type f
+    git status  # Check if tracked
+    ```
+
+ 3. **Rename Misnamed Directory (SAFER)**:
+     ```bash
+     # BETTER: Rename instead of delete (can always undo)
+     mv Users/ Users.deleted/
+
+     # Verify contents before final deletion
+     ls -la Users.deleted/
+     git status  # Check if tracked
+
+     # Only delete after verification and if certain
+     rm -rf Users.deleted/
+
+     # Remove from git if tracked
+     git rm -r "Users/blaze/dev/stringray/test-consent.json"
+     git commit -m "chore: Remove incorrect Users/ directory structure"
+     ```
+
+**Prevention**:
+
+1. **Use Relative Paths**:
+    ```bash
+    # BAD: Absolute paths
+    /Users/blaze/dev/stringray/test-consent.json
+
+    # GOOD: Relative paths
+    ./test-consent.json
+    ```
+
+2. **Path Validation in Scripts**:
+    ```javascript
+    // Validate paths don't create nested structures
+    function validatePath(path) {
+      const normalized = path.normalize(path);
+      const projectRoot = process.cwd();
+
+      // Prevent creating Users/, home/, blaze/ nested structures
+      if (normalized.includes(projectRoot + '/Users/') ||
+          normalized.includes(projectRoot + '/home/')) {
+        throw new Error('Potential nested directory structure detected');
+      }
+
+      return normalized;
+    }
+    ```
+
+3. **Add Pre-commit Checks**:
+    ```bash
+    # .opencode/hooks/pre-commit
+    if [ -d "Users" ] || [ -d "home" ] || [ -d "blaze" ]; then
+      echo "⚠️  Warning: Misnamed directory detected (Users/home/blaze)"
+      echo "This may indicate accidental full path operations."
+      echo "Please review before committing."
+      exit 1
+    fi
+    ```
+
+**Critical Safety Warning**:
+
+⚠️ **Always verify before deleting!** Especially when working in development directories like `~/dev/`:
+
+```bash
+# Safety checklist before rm -rf:
+# - [ ] Checked directory contents with ls -la
+# - [ ] Verified size with du -sh
+# - [ ] Confirmed with git status (if tracked)
+# - [ ] Listed files with find
+# - [ ] Verified not deleting critical paths (~/dev/, ~/, etc.)
+```
+
+## Logging and Debugging
+
+### Enable Debug Logging
+
+```bash
+# Enable debug mode
+strray config set logging.level debug
+
+# View logs
+strray logs tail
+
+# Search logs
+strray logs grep "error"
+```
+
+### Generate Diagnostic Report
+
+```bash
+# Create comprehensive diagnostic
+strray diagnose --full > diagnostic-$(date +%Y%m%d).txt
+
+# Include system information
+uname -a >> diagnostic.txt
+node --version >> diagnostic.txt
+npm --version >> diagnostic.txt
+```
+
+## Framework-Specific Issues
+
+### Codex Integration Problems
+
+**Symptoms**:
+
+- Codex principles not applied
+- Framework behavior inconsistent
+
+**Solutions**:
+
+1. **Verify Codex Version**:
+
+   ```bash
+   strray config get framework.codex
+   ```
+
+2. **Update Framework**:
+
+   ```bash
+   strray update framework
+   ```
+
+3. **Reset to Codex Defaults**:
+   ```bash
+   strray codex reset
+   ```
+
+### Plugin Loading Issues
+
+**Symptoms**:
+
+- Custom plugins not loading
+- Plugin functionality missing
+
+**Solutions**:
+
+1. **Check Plugin Directory**:
+
+   ```bash
+   ls -la .opencode/strray/plugins/
+   ```
+
+2. **Validate Plugin Structure**:
+
+   ```bash
+   strray plugins validate
+   ```
+
+3. **Reload Plugins**:
+   ```bash
+   strray plugins reload
    ```
 
 ## Emergency Procedures
 
-### Complete Framework Reset
+### Framework Lockup
 
-**When**: Framework is in an unrecoverable state
+If StrRay becomes unresponsive:
 
-**Procedure**:
-```bash
-# 1. Stop all processes
-pkill -f "OpenCode"
-pkill -f "strray"
+1. **Kill Process**:
 
-# 2. Clear all caches and state
-rm -rf .opencode/state/*
-rm -rf node_modules/.cache
-rm -rf logs/framework/*
+   ```bash
+   pkill -f strray
+   ```
 
-# 3. Reset configuration
-cp api/API_REFERENCE.md .opencode/OpenCode.json
+2. **Clear Locks**:
 
-# 4. Clean reinstall
-rm -rf node_modules package-lock.json
-npm install
+   ```bash
+   rm -f .opencode/strray/locks/*
+   ```
 
-# 5. Restart framework
-npx strray-ai init
-```
+3. **Restart Framework**:
+   ```bash
+   strray daemon restart
+   ```
 
 ### Data Recovery
 
-**When**: Important session data needs to be preserved
+For configuration or project data loss:
 
-**Procedure**:
+1. **Check Backups**:
+
+   ```bash
+   ls -la .opencode/strray/backups/
+   ```
+
+2. **Restore from Backup**:
+
+   ```bash
+   strray backup restore latest
+   ```
+
+3. **Reinitialize**:
+   ```bash
+   strray init --clean
+   ```
+
+## Getting Additional Help
+
+### Community Support
+
+- **Forum**: https://community.strray.dev
+- **Discord**: https://discord.gg/strray
+- **GitHub Issues**: https://github.com/strray/framework/issues
+
+### Professional Support
+
+- **Enterprise Support**: support@strray.dev
+- **Documentation**: https://docs.strray.dev
+- **Training**: https://learn.strray.dev
+
+### Diagnostic Commands
+
 ```bash
-# 1. Backup current state
-cp -r .opencode/state backup-$(date +%Y%m%d-%H%M%S)
+# Quick health check
+strray health
 
-# 2. Export important sessions
-npx strray-ai export-sessions --output backup-sessions.json
+# Full system diagnostic
+strray diagnose --comprehensive
 
-# 3. Reset framework
-# (follow reset procedure above)
+# Performance analysis
+strray analyze performance
 
-# 4. Restore sessions
-npx strray-ai import-sessions --input backup-sessions.json
+# Generate support ticket data
+strray support generate-ticket
 ```
 
-## Getting Help
+## Prevention Best Practices
 
-### Community Resources
-
-- **Documentation**: Check docs/ directory for detailed guides
-- **Issue Tracking**: Report bugs with full logs and configuration
-- **Performance Monitoring**: Use built-in monitoring tools
-
-### Diagnostic Information
-
-When reporting issues, include:
+### Regular Maintenance
 
 ```bash
-# System information
-uname -a
-node --version
-npm --version
+# Weekly maintenance
+strray maintenance weekly
 
-# Framework status
-npx strray-ai health
+# Update framework
+strray update all
 
-# Recent logs
-tail -100 logs/framework/activity.log
-
-# Configuration (redact sensitive data)
-cat .opencode/OpenCode.json | jq '.'
+# Clean caches
+strray cache clean
 ```
 
-This comprehensive troubleshooting guide covers the most common issues. For complex problems not covered here, check the framework logs and consider reaching out to the development team with detailed diagnostic information.
+### Monitoring Setup
+
+```bash
+# Enable monitoring
+strray monitor enable
+
+# Set up alerts
+strray alerts configure
+
+# Performance tracking
+strray metrics enable
+```
+
+### Backup Strategy
+
+```bash
+# Automated backups
+strray backup schedule daily
+
+# Verify backups
+strray backup verify
+
+# Offsite backup
+strray backup sync s3://my-backup-bucket
+```

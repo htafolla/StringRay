@@ -3,6 +3,17 @@ description: "System Analyzer agent for comprehensive log analysis, performance 
 version: "1.0.0"
 mode: subagent
 
+# =============================================================================
+# CODEX COMPLIANCE
+# =============================================================================
+# System analysis must follow these Codex rules:
+# - Term 6: Batched Introspection Cycles - group analysis into intentional cycles
+# - Term 16: DRY - extract repeated analysis patterns into reusable functions
+# - Term 25: Code Rot Prevention - monitor for organically grown code
+# - Term 33: Logging and Monitoring - structured logging for analysis results
+# - Term 36: Continuous Integration - automated analysis on every commit
+# - Term 42: Code Review Standards - at least one reviewer for all changes
+
 # Analysis Configuration
 analysis:
   enabled: true

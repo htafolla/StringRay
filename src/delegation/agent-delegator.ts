@@ -18,8 +18,8 @@ import {
 import { StringRayStateManager } from "../state/state-manager.js";
 import { strRayConfigLoader } from "../core/config-loader.js";
 import { frameworkLogger } from "../core/framework-logger.js";
-import { TaskSkillRouter, createTaskSkillRouter } from "./task-skill-router.js";
 import { getKernel, KernelInferenceResult } from "../core/kernel-patterns.js";
+import { DEFAULT_AGENTS } from "../config/default-agents.js";
 
 export interface AgentCapability {
   name: string;
@@ -92,7 +92,6 @@ export class AgentDelegator {
   private complexityAnalyzer: ComplexityAnalyzer;
   private stateManager: StringRayStateManager;
   private configLoader: typeof strRayConfigLoader;
-  private taskSkillRouter: TaskSkillRouter;
   private kernel: ReturnType<typeof getKernel>;
 
   constructor(
@@ -102,291 +101,11 @@ export class AgentDelegator {
     this.stateManager = stateManager;
     this.configLoader = configLoader;
     this.complexityAnalyzer = new ComplexityAnalyzer();
-    this.taskSkillRouter = createTaskSkillRouter(stateManager);
     this.kernel = getKernel();
   }
 
   getAvailableAgents(): AgentCapability[] {
-    const defaultAgents = [
-      {
-        name: "enforcer",
-        capabilities: ["code-quality", "validation"],
-        status: "active",
-        expertise: "code quality enforcement",
-        capacity: 100,
-        performance: 95,
-        specialties: ["validation", "compliance"],
-      },
-      {
-        name: "architect",
-        capabilities: ["design", "planning"],
-        status: "active",
-        expertise: "system architecture",
-        capacity: 90,
-        performance: 85,
-        specialties: ["design", "planning"],
-      },
-      {
-        name: "orchestrator",
-        capabilities: [
-          "task-coordination",
-          "multi-agent-management",
-          "workflow-orchestration",
-        ],
-        status: "active",
-        expertise: "orchestrating complex multi-agent workflows",
-        capacity: 90,
-        performance: 85,
-        specialties: ["coordination", "delegation", "workflow"],
-      },
-      {
-        name: "log-monitor",
-        capabilities: ["log-analysis", "pattern-detection", "alerting"],
-        status: "active",
-        expertise: "log monitoring and analysis",
-        capacity: 60,
-        performance: 75,
-        specialties: ["logs", "monitoring", "alerts"],
-      },
-      {
-        name: "researcher",
-        capabilities: [
-          "code-search",
-          "documentation-lookup",
-          "implementation-search",
-        ],
-        status: "active",
-        expertise: "codebase search and documentation",
-        capacity: 80,
-        performance: 85,
-        specialties: ["search", "docs", "patterns"],
-      },
-      {
-        name: "multimodal-looker",
-        capabilities: [
-          "image-analysis",
-          "diagram-understanding",
-          "visual-inspection",
-        ],
-        status: "active",
-        expertise: "analyzing images and visual content",
-        capacity: 70,
-        performance: 80,
-        specialties: ["images", "diagrams", "screenshots"],
-      },
-      {
-        name: "code-analyzer",
-        capabilities: ["code-analysis", "pattern-detection", "metrics"],
-        status: "active",
-        expertise: "deep code analysis",
-        capacity: 75,
-        performance: 80,
-        specialties: ["analysis", "metrics", "patterns"],
-      },
-      {
-        name: "code-reviewer",
-        capabilities: ["review", "quality"],
-        status: "active",
-        expertise: "code review",
-        capacity: 80,
-        performance: 80,
-        specialties: ["review", "quality"],
-      },
-      {
-        name: "security-auditor",
-        capabilities: ["security", "audit"],
-        status: "active",
-        expertise: "security analysis",
-        capacity: 70,
-        performance: 75,
-        specialties: ["security", "audit"],
-      },
-      {
-        name: "testing-lead",
-        capabilities: ["testing", "coverage"],
-        status: "active",
-        expertise: "test architecture",
-        capacity: 85,
-        performance: 80,
-        specialties: ["testing", "coverage"],
-      },
-      {
-        name: "refactorer",
-        capabilities: ["refactoring", "optimization"],
-        status: "active",
-        expertise: "code refactoring",
-        capacity: 75,
-        performance: 85,
-        specialties: ["refactoring", "optimization"],
-      },
-      {
-        name: "bug-triage-specialist",
-        capabilities: ["debugging", "analysis"],
-        status: "active",
-        expertise: "bug triage",
-        capacity: 60,
-        performance: 70,
-        specialties: ["debugging", "analysis"],
-      },
-      {
-        name: "strategist",
-        capabilities: [
-          "strategic-planning",
-          "complex-problem-solving",
-          "architecture-design",
-          "technical-strategy",
-          "risk-assessment",
-        ],
-        status: "active",
-        expertise: "strategic guidance and complex problem-solving",
-        capacity: 100,
-        performance: 95,
-        specialties: ["architecture decisions", "technical strategy", "risk analysis"],
-      },
-      {
-        name: "seo-consultant",
-        capabilities: [
-          "technical-seo-audit",
-          "schema-markup-generation",
-          "robots-txt-optimization",
-          "core-web-vitals-optimization",
-          "ai-search-optimization",
-        ],
-        status: "active",
-        expertise: "technical SEO optimization",
-        capacity: 70,
-        performance: 80,
-        specialties: ["schema", "robots.txt", "Core Web Vitals", "AI search"],
-      },
-      {
-        name: "content-creator",
-        capabilities: [
-          "seo-content-writing",
-          "keyword-optimization",
-          "meta-description",
-          "content-strategy",
-        ],
-        status: "active",
-        expertise: "SEO content creation",
-        capacity: 65,
-        performance: 75,
-        specialties: ["content", "keywords", "metadata"],
-      },
-      {
-        name: "growth-strategist",
-        capabilities: [
-          "campaign-strategy",
-          "market-analysis",
-          "brand-positioning",
-          "content-marketing-strategy",
-        ],
-        status: "active",
-        expertise: "strategic marketing",
-        capacity: 75,
-        performance: 80,
-        specialties: ["campaigns", "branding", "growth"],
-      },
-      {
-        name: "database-engineer",
-        capabilities: [
-          "schema-design",
-          "query-optimization",
-          "migrations",
-          "data-modeling",
-        ],
-        status: "active",
-        expertise: "database architecture",
-        capacity: 70,
-        performance: 75,
-        specialties: ["schema", "performance", "migrations"],
-      },
-      {
-        name: "devops-engineer",
-        capabilities: [
-          "ci-cd",
-          "infrastructure",
-          "containerization",
-          "monitoring",
-        ],
-        status: "active",
-        expertise: "DevOps and infrastructure",
-        capacity: 70,
-        performance: 75,
-        specialties: ["CI/CD", "Kubernetes", "AWS"],
-      },
-      {
-        name: "backend-engineer",
-        capabilities: [
-          "api-design",
-          "server-logic",
-          "database-integration",
-          "security",
-        ],
-        status: "active",
-        expertise: "backend development",
-        capacity: 80,
-        performance: 85,
-        specialties: ["APIs", "Node.js", "databases"],
-      },
-      {
-        name: "frontend-engineer",
-        capabilities: [
-          "ui-development",
-          "component-design",
-          "state-management",
-          "accessibility",
-        ],
-        status: "active",
-        expertise: "frontend development",
-        capacity: 80,
-        performance: 85,
-        specialties: ["React", "TypeScript", "CSS"],
-      },
-      {
-        name: "performance-engineer",
-        capabilities: [
-          "performance-optimization",
-          "profiling",
-          "caching",
-          "load-testing",
-        ],
-        status: "active",
-        expertise: "performance optimization",
-        capacity: 65,
-        performance: 80,
-        specialties: ["profiling", "caching", "optimization"],
-      },
-      {
-        name: "mobile-developer",
-        capabilities: [
-          "ios-development",
-          "android-development",
-          "cross-platform",
-          "mobile-ui",
-        ],
-        status: "active",
-        expertise: "mobile app development",
-        capacity: 70,
-        performance: 75,
-        specialties: ["React Native", "iOS", "Android"],
-      },
-      {
-        name: "tech-writer",
-        capabilities: [
-          "api-documentation",
-          "markdown",
-          "technical-writing",
-          "examples",
-        ],
-        status: "active",
-        expertise: "technical documentation",
-        capacity: 70,
-        performance: 80,
-        specialties: ["API docs", "guides", "READMEs"],
-      },
-    ];
-
-    return defaultAgents.map((agent) => {
+    return DEFAULT_AGENTS.map((agent) => {
       const storedAgent = this.stateManager.get(
         `agent_capabilities:${agent.name}`,
       ) as AgentCapability;
@@ -422,17 +141,12 @@ export class AgentDelegator {
       stateManager: this.stateManager,
     };
 
-    const preprocessResult = this.taskSkillRouter.preprocess(
-      description,
-      routingOptions,
-    );
-
     return {
-      operation: preprocessResult.operation,
-      context: preprocessResult.context,
-      suggestedAgent: preprocessResult.routing.agent,
-      suggestedSkill: preprocessResult.routing.skill,
-      confidence: preprocessResult.routing.confidence,
+      operation: description,
+      context: {},
+      suggestedAgent: DEFAULT_AGENTS[0]?.name || "enforcer",
+      suggestedSkill: "",
+      confidence: 0.5,
     };
   }
 
@@ -636,9 +350,26 @@ export class AgentDelegator {
       });
     }
 
-    return agents.length > 0
+    const finalAgents = agents.length > 0
       ? agents
       : [{ name: "enforcer", confidence: 0.75, role: "validation" }];
+    
+    // Log complete agent selection for analytics
+    frameworkLogger.log(
+      "agent-delegator",
+      "agents-selected",
+      "info",
+      {
+        operation,
+        strategy: complexityScore.recommendedStrategy,
+        complexityLevel: complexityScore.level,
+        complexityScore: complexityScore.score,
+        agents: finalAgents.map(a => ({ name: a.name, role: a.role, confidence: a.confidence })),
+        agentCount: finalAgents.length,
+      }
+    );
+    
+    return finalAgents;
   }
 
   private mapOperationToType(
@@ -732,20 +463,7 @@ export class AgentDelegator {
     'testing-lead',
     'log-monitor',
     'researcher',
-    'multimodal-looker',
     'analyzer',
-    'seo-consultant',
-    'content-creator',
-    'growth-strategist',
-    'database-engineer',
-    'devops-engineer',
-    'backend-engineer',
-    'frontend-engineer',
-    'frontend-ui-ux-engineer',
-    'tech-writer',
-    'performance-engineer',
-    'mobile-developer',
-    'strategist',
   ]);
 
   /**

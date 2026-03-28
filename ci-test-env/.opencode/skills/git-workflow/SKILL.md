@@ -8,7 +8,7 @@ tags: [collaboration, git, workflow]
 mcp:
   git-workflow:
     command: node
-    args: [node_modules/strray-ai/dist/plugin/mcps/dist/mcps/knowledge-skills/git-workflow.server.js]
+    args: [node_modules/strray-ai/dist/mcps/knowledge-skills/git-workflow.server.js]
 ---
 
 # Git Workflow Skill

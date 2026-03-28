@@ -17,13 +17,13 @@
 import { spawn } from "child_process";
 import { resolveAgent } from "../mcps/agent-resolver.js";
 
-interface TaskContext {
+export interface TaskContext {
   taskDescription: string;
   context?: Record<string, unknown>;
   [key: string]: unknown;
 }
 
-interface AgentConfig {
+export interface AgentConfig {
   name: string;
   system?: string;
   tools?: {
@@ -33,7 +33,7 @@ interface AgentConfig {
   [key: string]: unknown;
 }
 
-interface IntegrationResult {
+export interface IntegrationResult {
   success: boolean;
   agent: string;
   task?: string;

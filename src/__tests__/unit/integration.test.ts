@@ -35,7 +35,7 @@ describe("StringRay Integration Script", () => {
 
   describe("TaskContext Interface", () => {
     it("should accept valid task context", () => {
-      const task: import("../scripts/integration").TaskContext = {
+      const task: import("../../scripts/integration.js").TaskContext = {
         taskDescription: "Check code quality",
         context: { file: "src/**/*.ts" },
       };
@@ -45,7 +45,7 @@ describe("StringRay Integration Script", () => {
     });
 
     it("should allow additional properties", () => {
-      const task: import("../scripts/integration").TaskContext = {
+      const task: import("../../scripts/integration.js").TaskContext = {
         taskDescription: "Test task",
         priority: "high",
         timeout: 30000,
@@ -58,7 +58,7 @@ describe("StringRay Integration Script", () => {
 
   describe("AgentConfig Interface", () => {
     it("should define valid agent config", () => {
-      const config: import("../scripts/integration").AgentConfig = {
+      const config: import("../../scripts/integration.js").AgentConfig = {
         name: "enforcer",
         system: "You are a code quality enforcer...",
         tools: { include: ["read", "grep", "edit"] },
@@ -69,7 +69,7 @@ describe("StringRay Integration Script", () => {
     });
 
     it("should allow exclude tools", () => {
-      const config: import("../scripts/integration").AgentConfig = {
+      const config: import("../../scripts/integration.js").AgentConfig = {
         name: "architect",
         tools: { exclude: ["bash"] },
       };
@@ -80,7 +80,7 @@ describe("StringRay Integration Script", () => {
 
   describe("IntegrationResult Interface", () => {
     it("should define successful result", () => {
-      const result: import("../scripts/integration").IntegrationResult = {
+      const result: import("../../scripts/integration.js").IntegrationResult = {
         success: true,
         agent: "enforcer",
         task: "Check code quality",
@@ -93,7 +93,7 @@ describe("StringRay Integration Script", () => {
     });
 
     it("should define error result", () => {
-      const result: import("../scripts/integration").IntegrationResult = {
+      const result: import("../../scripts/integration.js").IntegrationResult = {
         success: false,
         agent: "enforcer",
         error: "Agent not found",

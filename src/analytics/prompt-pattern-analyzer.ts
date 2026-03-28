@@ -12,8 +12,8 @@ import type {
   PromptDataPoint,
   RoutingOutcome,
   RoutingDecision,
-} from "../delegation/task-skill-router.js";
-import { routingOutcomeTracker } from "../delegation/task-skill-router.js";
+} from "../delegation/config/types.js";
+import { routingOutcomeTracker } from "../delegation/analytics/outcome-tracker.js";
 
 export interface TemplateGap {
   gapType: "missing_template" | "pattern_mismatch" | "emerging_pattern";

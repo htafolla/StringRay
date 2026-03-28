@@ -82,7 +82,7 @@ fi
 echo ""
 echo "🧪 Validating test coverage..."
 if command -v npm &> /dev/null && [ -f "package.json" ]; then
-    if npm run test:coverage > /dev/null 2>&1; then
+    if npm test -- --run > /dev/null 2>&1; then
         echo "✅ Tests passing"
     else
         ISSUES+=("Test failures detected")

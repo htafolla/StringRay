@@ -1,6 +1,7 @@
 // Simplified Orchestration Flow Reporter
 // Works with job correlation integration
 import * as fs from "fs";
+import { frameworkLogger } from "../core/framework-logger.js";
 
 export interface OrchestrationFlowReport {
   jobId: string;
@@ -48,9 +49,13 @@ export class OrchestrationFlowReporter {
       performance,
     };
 
-    console.log(
-      `🎯 [${jobId}] [orchestration-reporter] Generated comprehensive orchestration flow report`,
+    await frameworkLogger.log(
+      "orchestration-flow-reporter",
+      "report-generated",
+      "info",
+      { jobId, agentCount: agents.length },
     );
+
     return report;
   }
 

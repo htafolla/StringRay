@@ -8,4 +8,12 @@
  */
 
 export * from "./processor-manager.js";
-export * from "./processor-types.js";
+export type {
+  ProcessorContext,
+  PreValidateContext,
+  PostValidateContext,
+  ProcessorExecutionResult,
+  ProcessorHealthCheck,
+  TestResults,
+  RegressionResults,
+} from "./processor-types.js";

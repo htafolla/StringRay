@@ -10,7 +10,7 @@
 
 import { StringRayStateManager } from "../state/state-manager.js";
 import { frameworkLogger } from "../core/framework-logger.js";
-import { ProcessorRegistration, ProcessorHook } from "./processor-types.js";
+import { ProcessorRegistration, ProcessorHook, PreValidateContext, PostValidateContext, ProcessorExecutionResult } from "./processor-types.js";
 import {
   detectProjectLanguage,
   getTestFilePath,
@@ -542,16 +542,16 @@ export class ProcessorManager {
           result = await this.executeSpawnGovernance(safeContext);
           break;
         case "performanceBudget":
-          result = await this.executePerformanceBudget(safeContext);
+          result = await this.executePerformanceBudget(safeContext as PreValidateContext);
           break;
         case "asyncPattern":
-          result = await this.executeAsyncPattern(safeContext);
+          result = await this.executeAsyncPattern(safeContext as PreValidateContext);
           break;
         case "consoleLogGuard":
-          result = await this.executeConsoleLogGuard(safeContext);
+          result = await this.executeConsoleLogGuard(safeContext as PreValidateContext);
           break;
         case "postProcessorChain":
-          result = await this.executePostProcessorChain(safeContext);
+          result = await this.executePostProcessorChain(safeContext as PostValidateContext);
           break;
         default:
           throw new Error(`Unknown processor: ${name}`);
@@ -975,8 +975,12 @@ export class ProcessorManager {
 
       // If violations found, delegate to enforcer for centralized remediation
       if (!result.passed && result.errors.length > 0) {
+        const violations = result.errors.map((msg: string) => ({
+          rule: "unknown",
+          message: msg,
+        }));
         await ruleEnforcer.attemptRuleViolationFixes(
-          result.errors,
+          violations,
           validationContext,
         );
       }
@@ -1582,7 +1586,7 @@ export class ProcessorManager {
   /**
    * Execute performance budget processor
    */
-  private async executePerformanceBudget(context: Record<string, unknown>): Promise<Record<string, unknown>> {
+  private async executePerformanceBudget(context: PreValidateContext): Promise<ProcessorExecutionResult> {
     const { runPerformanceBudgetCheck } =
       await import("./performance-budget-processor.js");
     return runPerformanceBudgetCheck(context);
@@ -1602,7 +1606,7 @@ export class ProcessorManager {
   /**
    * Execute async pattern processor
    */
-  private async executeAsyncPattern(context: Record<string, unknown>): Promise<Record<string, unknown>> {
+  private async executeAsyncPattern(context: PreValidateContext): Promise<ProcessorExecutionResult> {
     const { runAsyncPatternCheck } =
       await import("./async-pattern-processor.js");
     return runAsyncPatternCheck(context);
@@ -1622,7 +1626,7 @@ export class ProcessorManager {
   /**
    * Execute console log guard processor
    */
-  private async executeConsoleLogGuard(context: Record<string, unknown>): Promise<Record<string, unknown>> {
+  private async executeConsoleLogGuard(context: PreValidateContext): Promise<ProcessorExecutionResult> {
     const { runConsoleLogGuard } =
       await import("./console-log-guard-processor.js");
     return runConsoleLogGuard(context);
@@ -1642,7 +1646,7 @@ export class ProcessorManager {
   /**
    * Execute postprocessor chain validator
    */
-  private async executePostProcessorChain(context: Record<string, unknown>): Promise<Record<string, unknown>> {
+  private async executePostProcessorChain(context: PostValidateContext): Promise<ProcessorExecutionResult> {
     const { runPostProcessorChainValidation } =
       await import("./postprocessor-chain-validator.js");
     return runPostProcessorChainValidation(context);

@@ -1,4 +1,4 @@
-export { StringRayOrchestrator } from "./orchestrator.js";
+export { KernelOrchestrator } from "./orchestrator.js";
 export { defaultStringRayConfig } from "./strray-activation.js";
 
 // Decoupled config path resolution (Layer 1)

@@ -272,6 +272,9 @@ export class ProcessorManager {
       case "testAutoCreation":
         await this.initializeTestAutoCreationProcessor();
         break;
+      case "typescriptCompilation":
+        await this.initializeTypeScriptCompilationProcessor();
+        break;
       default:
         // Generic initialization
         break;
@@ -516,6 +519,9 @@ export class ProcessorManager {
           break;
         case "agentsMdValidation":
           result = await this.executeAgentsMdValidation(safeContext);
+          break;
+        case "typescriptCompilation":
+          result = await this.executeTypeScriptCompilation(safeContext);
           break;
         default:
           throw new Error(`Unknown processor: ${name}`);
@@ -1486,5 +1492,27 @@ export class ProcessorManager {
       message: "Coverage analysis skipped - no coverage data available",
       coverage: null,
     };
+  }
+
+  /**
+   * Initialize TypeScript compilation processor
+   */
+  private async initializeTypeScriptCompilationProcessor(): Promise<void> {
+    frameworkLogger.log(
+      "processor-manager",
+      "initializing typescript compilation processor",
+      "info",
+    );
+  }
+
+  /**
+   * Execute TypeScript compilation processor
+   */
+  private async executeTypeScriptCompilation(context: Record<string, unknown>): Promise<Record<string, unknown>> {
+    const { runTypeScriptCompilation } =
+      await import("./typescript-compilation-processor.js");
+
+    const cwd = (context.directory as string) || process.cwd();
+    return runTypeScriptCompilation(cwd) as unknown as Record<string, unknown>;
   }
 }

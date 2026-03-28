@@ -309,6 +309,19 @@ export class BootOrchestrator {
       );
 
       this.processorManager.registerProcessor({
+        name: "typescriptCompilation",
+        type: "pre",
+        priority: 15,
+        enabled: true,
+      });
+      frameworkLogger.log(
+        "boot-orchestrator",
+        "registered typescriptCompilation processor",
+        "success",
+        { jobId },
+      );
+
+      this.processorManager.registerProcessor({
         name: "codexCompliance",
         type: "pre",
         priority: 20,

@@ -142,22 +142,23 @@
     "licenses/skills/"
   ],
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.0.4",
     "@types/jsonwebtoken": "^9.0.10",
     "commander": "^11.1.0",
-    "jsonwebtoken": "^9.0.3",
-    "ws": "^8.20.0"
+    "jsonwebtoken": "^9.0.3"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",
     "@faker-js/faker": "^10.3.0",
+    "@modelcontextprotocol/sdk": "^1.28.0",
     "@types/express": "^5.0.6",
     "@types/node": "^25.2.3",
     "@typescript-eslint/eslint-plugin": "^6.15.0",
     "@typescript-eslint/parser": "^6.15.0",
     "@vitest/coverage-v8": "^4.0.18",
     "eslint": "^8.57.1",
-    "vitest": "^4.0.18"
+    "express": "^5.2.1",
+    "vitest": "^4.0.18",
+    "ws": "^8.20.0"
   },
   "optionalDependencies": {
     "@rollup/rollup-linux-x64-gnu": "^4.30.1"

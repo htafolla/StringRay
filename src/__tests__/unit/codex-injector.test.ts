@@ -62,7 +62,7 @@ const getMockCodexStats = (sessionId: string) => {
     loaded: true,
     fileCount: 1,
     totalTerms: 3,
-    version: "1.15.6",
+    version: "1.15.11",
   };
 };
 
@@ -256,7 +256,7 @@ describe("StringRay Codex Injector (Mock-Based)", () => {
         loaded: true,
         fileCount: 1,
         totalTerms: 3,
-        version: "1.15.6",
+        version: "1.15.11",
       });
     });
 

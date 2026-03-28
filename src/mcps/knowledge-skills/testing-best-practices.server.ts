@@ -59,7 +59,7 @@ class StrRayTestingBestPracticesServer {
   constructor() {
     this.server = new Server(
       {
-        name: "testing-best-practices", version: "1.15.6",
+        name: "testing-best-practices", version: "1.15.11",
       },
       {
         capabilities: {

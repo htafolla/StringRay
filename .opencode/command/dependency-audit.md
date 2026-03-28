@@ -69,7 +69,7 @@ Comprehensive dependency analysis and security audit for all project dependencie
   "vulnerabilities": [
     {
       "package": "lodash",
-      "version": "1.15.1",
+      "version": "1.15.11",
       "severity": "high",
       "cve": "CVE-2021-23337",
       "description": "Command injection vulnerability"
@@ -85,14 +85,14 @@ Security-focused format for CI/CD integration:
 
 ```json
 {
-  "version": "1.15.1",
+  "version": "1.15.11",
   "$schema": "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json",
   "runs": [
     {
       "tool": {
         "driver": {
           "name": "Dependency Audit",
-          "version": "1.15.1"
+          "version": "1.15.11"
         }
       },
       "results": [...]

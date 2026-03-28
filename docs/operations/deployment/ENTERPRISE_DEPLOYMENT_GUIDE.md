@@ -174,7 +174,7 @@ npm install
   },
         "framework": {
         "name": "strray",
-        "version": "1.15.1",
+        "version": "1.15.11",
         "performance_mode": "optimized",
         "monitoring_enabled": true,
         "facade_pattern": true
@@ -418,7 +418,7 @@ data:
     {
       "framework": {
         "name": "strray",
-        "version": "1.15.1",
+        "version": "1.15.11",
         "performance_mode": "optimized",
         "monitoring_enabled": true,
         "facade_pattern": true

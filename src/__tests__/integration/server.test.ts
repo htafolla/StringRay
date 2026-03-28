@@ -59,7 +59,7 @@ const createTestServer = () => {
   app.get("/api/status", (req, res) => {
     res.json({
       framework: "StringRay",
-      version: "1.15.6",
+      version: "1.15.11",
       status: "active",
       agents: 8,
       timestamp: new Date().toISOString(),

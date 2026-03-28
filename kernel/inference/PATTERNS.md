@@ -279,7 +279,7 @@ Direct testing worked because it included initialize
   params: {
     protocolVersion: "2024-11-05",
     capabilities: {},
-    clientInfo: { name: "strray-mcp-client", version: "1.15.1" }
+    clientInfo: { name: "strray-mcp-client", version: "1.15.11" }
   }
 }
 

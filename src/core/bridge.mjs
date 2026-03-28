@@ -208,6 +208,40 @@ async function handleHealth(input) {
   };
 }
 
+// ============================================================================
+// Filesystem Codex Loader (bridge-native, no dist/ dependency)
+// ============================================================================
+
+/**
+ * Load codex.json from the standard priority chain.
+ * Same logic as codex-formatter.ts but inlined so bridge works standalone.
+ */
+function loadCodexFromFs(projectRoot) {
+  const envDir = process.env.STRRAY_CONFIG_DIR;
+  const candidates = [];
+
+  if (envDir) candidates.push(join(projectRoot, envDir, "codex.json"));
+  candidates.push(join(projectRoot, ".strray", "codex.json"));
+  candidates.push(join(projectRoot, ".opencode", "strray", "codex.json"));
+  candidates.push(join(projectRoot, "codex.json"));
+
+  for (const candidate of candidates) {
+    try {
+      if (existsSync(candidate)) {
+        const raw = readFileSync(candidate, "utf-8");
+        const parsed = JSON.parse(raw);
+        if (parsed && parsed.version && Array.isArray(parsed.terms)) {
+          return { codex: parsed, source: candidate };
+        }
+      }
+    } catch {
+      continue;
+    }
+  }
+
+  return { codex: null, source: null };
+}
+
 async function handleGetCodexPrompt(input, projectRoot, logDir) {
   const { severityFilter, includeExamples, maxTerms, compressed } = input;
   logToActivity(logDir, `get-codex-prompt: severity=${severityFilter || "all"} compressed=${!!compressed}`);
@@ -229,16 +263,19 @@ async function handleGetCodexPrompt(input, projectRoot, logDir) {
     source = result.configPath;
     charCount = result.charCount;
   } else {
-    // Built-in fallback
-    let terms = BUILTIN_CODEX.terms;
+    // Try filesystem first, fall back to built-in
+    const { codex, source: fsSource } = loadCodexFromFs(projectRoot);
+    const termsSource = codex || BUILTIN_CODEX;
+
+    let terms = termsSource.terms;
     if (severityFilter) {
       terms = terms.filter((t) => severityFilter.includes(t.severity));
     }
     const severityOrder = { blocking: 0, high: 1, medium: 2 };
-    terms.sort((a, b) => severityOrder[a.severity] - severityOrder[b.severity]);
+    terms.sort((a, b) => (severityOrder[a.severity] || 3) - (severityOrder[b.severity] || 3));
     if (maxTerms) terms = terms.slice(0, maxTerms);
 
-    const lines = [`## StringRay Universal Development Codex v${BUILTIN_CODEX.version}`];
+    const lines = [`## StringRay Universal Development Codex v${termsSource.version}`];
     const emojis = { blocking: "🔴", high: "🟡", medium: "🟢" };
     const labels = { blocking: "BLOCKING", high: "HIGH PRIORITY", medium: "MEDIUM" };
 
@@ -251,9 +288,9 @@ async function handleGetCodexPrompt(input, projectRoot, logDir) {
 
     prompt = lines.join("\n");
     termCount = terms.length;
-    totalTerms = BUILTIN_CODEX.terms.length;
-    version = BUILTIN_CODEX.version;
-    source = null;
+    totalTerms = termsSource.terms.length;
+    version = termsSource.version;
+    source = fsSource;
     charCount = prompt.length;
   }
 
@@ -265,7 +302,7 @@ async function handleGetCodexPrompt(input, projectRoot, logDir) {
     version,
     source,
     charCount,
-    via: CodexFormatterModule ? "framework" : "builtin",
+    via: CodexFormatterModule ? "framework" : (source ? "filesystem" : "builtin"),
   };
 }
 

@@ -8,7 +8,7 @@
  * @since 2026-01-09
  */
 
-import WebSocket from "ws";
+import { WebSocket } from 'ws';
 import {
   BaseIntegration,
   type IntegrationConfig,
@@ -179,7 +179,7 @@ export class CrossLanguageBridge extends BaseIntegration {
           this.handleMessage(data);
         });
 
-        this.ws!.on("error", (error) => {
+        this.ws!.on("error", (error: Error) => {
           clearTimeout(timeout);
           this.log("error", `Connection error: ${error.message}`);
           reject(error);

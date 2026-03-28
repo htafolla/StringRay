@@ -236,7 +236,7 @@ async function testPostProcessors(pm: ProcessorManager): Promise<void> {
     
     const result = await pm.executePostProcessors(
       "write",
-      { filePath: "/test/file.ts" },
+      { filePath: "/test/file.ts", operation: "write" },
       preResults
     );
     

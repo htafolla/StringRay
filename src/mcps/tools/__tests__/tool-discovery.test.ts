@@ -10,7 +10,7 @@ import { MCPTool, IMcpConnection, JsonRpcResponse } from '../../types/index.js';
 
 describe('ToolDiscovery', () => {
   let discovery: ToolDiscovery;
-  let mockConnection: ReturnType<typeof vi.fn> & IMcpConnection;
+  let mockConnection: any;
 
   beforeEach(() => {
     discovery = new ToolDiscovery();
@@ -19,8 +19,8 @@ describe('ToolDiscovery', () => {
       isConnected: true,
       connect: vi.fn().mockResolvedValue(undefined),
       disconnect: vi.fn().mockResolvedValue(undefined),
-      sendRequest: vi.fn(),
-    };
+      sendRequest: vi.fn() as any,
+    } as any;
   });
 
   describe('discoverTools', () => {

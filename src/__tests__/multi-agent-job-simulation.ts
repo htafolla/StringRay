@@ -1,7 +1,7 @@
 // Multi-Agent Job Simulation - Complex Test Class Implementation
 // This simulates a real-world multi-agent operation with job correlation
 
-import { jobCorrelationManager } from "../job-correlation-manager.js";
+import { jobCorrelationManager } from "../jobs/job-correlation-manager.js";
 
 // Simulate complex enterprise test class
 // Remove the import to fix compilation issues

@@ -416,10 +416,8 @@ describe("Scaling Engine Prediction Accuracy Benchmarks", () => {
       const start = performance.now();
 
       // Mock scaling prediction using predictive analytics
-      const prediction = await predictiveAnalytics.predictOptimalAgent(
-        `scaling-${scenario.timestamp}`,
-        "scaling-decision",
-        scenario.currentLoad / 100, // Normalize complexity
+      const prediction = await predictiveAnalytics.predictOptimalAgent?.(
+        { id: `scaling-${scenario.timestamp}`, type: "scaling-decision", complexity: scenario.currentLoad / 100 },
       );
 
       const latency = performance.now() - start;
@@ -543,7 +541,7 @@ describe("Dashboard Update Performance Benchmarks", () => {
       const data = mockDashboardData[i % mockDashboardData.length];
 
       // Use event emission to add custom metrics
-      liveMetricsCollector.emit("collect-custom-metrics", {
+      liveMetricsCollector.emit?.("collect-custom-metrics", {
         sourceId: "dashboard-test",
         timestamp: Date.now(),
         addMetric: (metric: any) => {
@@ -628,7 +626,7 @@ describe("Dashboard Update Performance Benchmarks", () => {
       }));
 
       for (const update of updates) {
-        liveMetricsCollector.emit("collect-custom-metrics", {
+        liveMetricsCollector.emit?.("collect-custom-metrics", {
           sourceId: update.sourceId,
           timestamp: update.timestamp,
           addMetric: (metric: any) => {
@@ -694,7 +692,7 @@ describe("Plugin Marketplace Search Performance Benchmarks", () => {
 
     // Register mock plugins
     for (const plugin of mockPlugins) {
-      marketplaceService.registerPlugin(plugin);
+      marketplaceService.registerPlugin?.(plugin);
     }
   });
 
@@ -737,7 +735,7 @@ describe("Plugin Marketplace Search Performance Benchmarks", () => {
 
       // Calculate relevance score (simplified)
       const relevanceScore =
-        results.plugins.reduce((score, plugin, index) => {
+        results.plugins.reduce((score: number, plugin: any, index: number) => {
           const queryWords = query.toLowerCase().split(/\s+/);
           const pluginText =
             `${plugin.name} ${plugin.description} ${plugin.tags.join(" ")}`.toLowerCase();
@@ -942,10 +940,8 @@ describe("Automated Benchmarking Suite Integration", () => {
           category: "custom",
           function: async () => {
             // Scaling prediction benchmark
-            const prediction = await predictiveAnalytics.predictOptimalAgent(
-              "test-scaling-task",
-              "scaling",
-              0.5,
+            const prediction = await predictiveAnalytics.predictOptimalAgent?.(
+              { id: "test-scaling-task", type: "scaling", complexity: 0.5 },
             );
             if (prediction.riskLevel === "high") {
               throw new Error("Scaling prediction accuracy too low");
@@ -962,7 +958,7 @@ describe("Automated Benchmarking Suite Integration", () => {
           category: "custom",
           function: async () => {
             const start = performance.now();
-            liveMetricsCollector.emit("collect-custom-metrics", {
+            liveMetricsCollector.emit?.("collect-custom-metrics", {
               sourceId: "benchmark-test",
               timestamp: Date.now(),
               addMetric: (metric: any) => {

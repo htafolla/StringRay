@@ -14,8 +14,8 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
 import {
   ProcessorManager,
-  ProcessorResult,
 } from "../../processors/processor-manager.js";
+import type { ProcessorResult } from "../../processors/processor-types.js";
 import { StringRayStateManager } from "../../state/state-manager.js";
 import { setupStandardMocks } from "../utils/test-utils.js";
 
@@ -147,7 +147,7 @@ describe("Processor Activation", () => {
       ];
       const results = await processorManager.executePostProcessors(
         "testOperation",
-        { data: "test" },
+        { data: "test", operation: "testOperation" },
         preResults,
       );
       expect(results).toHaveLength(1);
@@ -876,7 +876,7 @@ describe("Processor Activation", () => {
       await processorManager.initializeProcessors();
 
       // Create agent task context
-      const agentContext = {
+      const agentContext: Record<string, unknown> = {
         agentName: "architect",
         task: "Design new API architecture",
         startTime: Date.now() - 1000,
@@ -884,12 +884,13 @@ describe("Processor Activation", () => {
         success: true,
         result: { apiDesign: "RESTful API with GraphQL" },
         capabilities: ["design", "architecture"],
+        operation: "agent-architect",
       };
 
       // Execute post-processors
       const results = await processorManager.executePostProcessors(
         "agent-architect",
-        agentContext,
+        agentContext as any,
         [],
       );
 
@@ -917,7 +918,7 @@ describe("Processor Activation", () => {
       // Execute with invalid context (not an agent task)
       const results = await processorManager.executePostProcessors(
         "invalid-operation",
-        { someOtherData: "test" },
+        { someOtherData: "test" } as any,
         [],
       );
 

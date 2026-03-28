@@ -2,6 +2,8 @@
  * Retry Handler for Redeploy Operations
  */
 
+import { frameworkLogger } from "../../core/framework-logger.js";
+
 export class RetryHandler {
   constructor(
     private config: {

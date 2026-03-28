@@ -370,15 +370,17 @@ export abstract class BaseIntegration
       return;
     }
 
-    const logLevelMap: Record<LogLevel, number> = {
+    const statusToLevel: Record<string, number> = {
       error: 0,
+      warning: 1,
       warn: 1,
       info: 2,
       debug: 3,
+      success: 2, // map success to info level
     };
 
-    const currentLevel = logLevelMap[this.config.logLevel];
-    const statusLevel = logLevelMap[status];
+    const currentLevel = statusToLevel[this.config.logLevel] ?? 2;
+    const statusLevel = statusToLevel[status] ?? 2;
 
     // Skip if below log level
     if (statusLevel > currentLevel && status !== "success") {

@@ -97,7 +97,7 @@ describe("E2E Orchestration Flow", () => {
     expect(stateManager.get("processor:active")).toBe(true);
 
     // Get processor manager from state
-    const pm = stateManager.get("processor:manager");
+    const pm = stateManager.get("processor:manager") as any;
     expect(pm).toBeDefined();
     expect(pm).toBe(processorManager);
 

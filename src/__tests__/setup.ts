@@ -74,7 +74,7 @@ afterAll(() => {
       const tempDir = os.tmpdir();
       const files = fs.readdirSync(process.cwd());
       
-      files.forEach((file) => {
+      files.forEach((file: string) => {
         if (file.startsWith("test-activity-") || file.startsWith("test-calibration-")) {
           const filePath = path.join(process.cwd(), file);
           if (fs.existsSync(filePath)) {

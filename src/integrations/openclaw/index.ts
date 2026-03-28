@@ -93,7 +93,7 @@ export class OpenClawIntegration extends BaseIntegration {
     });
 
     // Set up event listeners using inherited emit
-    this.client.onStateChange(async (state, previousState) => {
+    this.client.onStateChange(async (state: string, previousState: string) => {
       this.log('info', `Client state: ${previousState} → ${state}`);
       this.emit('stateChange', { previousState, newState: state });
       

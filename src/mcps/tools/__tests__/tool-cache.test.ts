@@ -87,9 +87,9 @@ describe('ToolCache', () => {
     it('should evict oldest entry when at capacity', () => {
       cache = new ToolCache({ maxEntries: 2 });
 
-      cache.set('server1', [{ name: 'tool1', description: 'Test', inputSchema: {} }]);
-      cache.set('server2', [{ name: 'tool2', description: 'Test', inputSchema: {} }]);
-      cache.set('server3', [{ name: 'tool3', description: 'Test', inputSchema: {} }]);
+      cache.set('server1', [{ name: 'tool1', description: 'Test', inputSchema: { type: "object" } }]);
+      cache.set('server2', [{ name: 'tool2', description: 'Test', inputSchema: { type: "object" } }]);
+      cache.set('server3', [{ name: 'tool3', description: 'Test', inputSchema: { type: "object" } }]);
 
       expect(cache.has('server1')).toBe(false);
       expect(cache.has('server2')).toBe(true);
@@ -99,8 +99,8 @@ describe('ToolCache', () => {
 
   describe('clear', () => {
     it('should clear all entries', () => {
-      cache.set('server1', [{ name: 'tool1', description: 'Test', inputSchema: {} }]);
-      cache.set('server2', [{ name: 'tool2', description: 'Test', inputSchema: {} }]);
+      cache.set('server1', [{ name: 'tool1', description: 'Test', inputSchema: { type: "object" } }]);
+      cache.set('server2', [{ name: 'tool2', description: 'Test', inputSchema: { type: "object" } }]);
 
       cache.clear();
 
@@ -112,7 +112,7 @@ describe('ToolCache', () => {
 
   describe('invalidate', () => {
     it('should remove specific server entry', () => {
-      cache.set('server1', [{ name: 'tool1', description: 'Test', inputSchema: {} }]);
+      cache.set('server1', [{ name: 'tool1', description: 'Test', inputSchema: { type: "object" } }]);
 
       const result = cache.invalidate('server1');
 
@@ -129,7 +129,7 @@ describe('ToolCache', () => {
 
   describe('has', () => {
     it('should return true for valid cached entry', () => {
-      cache.set('server1', [{ name: 'tool1', description: 'Test', inputSchema: {} }]);
+      cache.set('server1', [{ name: 'tool1', description: 'Test', inputSchema: { type: "object" } }]);
 
       expect(cache.has('server1')).toBe(true);
     });
@@ -140,7 +140,7 @@ describe('ToolCache', () => {
 
     it('should return false for expired entry', () => {
       cache = new ToolCache({ ttlMs: -1 });
-      cache.set('server1', [{ name: 'tool1', description: 'Test', inputSchema: {} }]);
+      cache.set('server1', [{ name: 'tool1', description: 'Test', inputSchema: { type: "object" } }]);
 
       expect(cache.has('server1')).toBe(false);
     });
@@ -148,8 +148,8 @@ describe('ToolCache', () => {
 
   describe('getCachedServers', () => {
     it('should return all cached server names', () => {
-      cache.set('server1', [{ name: 'tool1', description: 'Test', inputSchema: {} }]);
-      cache.set('server2', [{ name: 'tool2', description: 'Test', inputSchema: {} }]);
+      cache.set('server1', [{ name: 'tool1', description: 'Test', inputSchema: { type: "object" } }]);
+      cache.set('server2', [{ name: 'tool2', description: 'Test', inputSchema: { type: "object" } }]);
 
       const servers = cache.getCachedServers();
 
@@ -160,7 +160,7 @@ describe('ToolCache', () => {
 
     it('should not include expired servers', () => {
       cache = new ToolCache({ ttlMs: -1 });
-      cache.set('server1', [{ name: 'tool1', description: 'Test', inputSchema: {} }]);
+      cache.set('server1', [{ name: 'tool1', description: 'Test', inputSchema: { type: "object" } }]);
 
       expect(cache.getCachedServers()).toEqual([]);
     });
@@ -168,8 +168,8 @@ describe('ToolCache', () => {
 
   describe('getStats', () => {
     it('should return cache statistics', () => {
-      cache.set('server1', [{ name: 'tool1', description: 'Test', inputSchema: {} }]);
-      cache.set('server2', [{ name: 'tool2', description: 'Test', inputSchema: {} }]);
+      cache.set('server1', [{ name: 'tool1', description: 'Test', inputSchema: { type: "object" } }]);
+      cache.set('server2', [{ name: 'tool2', description: 'Test', inputSchema: { type: "object" } }]);
 
       const stats = cache.getStats();
 
@@ -192,10 +192,10 @@ describe('ToolCache', () => {
     it('should evict least recently used entry', () => {
       cache = new ToolCache({ maxEntries: 2 });
 
-      cache.set('server1', [{ name: 'tool1', description: 'Test', inputSchema: {} }]);
-      cache.set('server2', [{ name: 'tool2', description: 'Test', inputSchema: {} }]);
+      cache.set('server1', [{ name: 'tool1', description: 'Test', inputSchema: { type: "object" } }]);
+      cache.set('server2', [{ name: 'tool2', description: 'Test', inputSchema: { type: "object" } }]);
       cache.get('server1'); // Access server1 to make it recently used
-      cache.set('server3', [{ name: 'tool3', description: 'Test', inputSchema: {} }]);
+      cache.set('server3', [{ name: 'tool3', description: 'Test', inputSchema: { type: "object" } }]);
 
       expect(cache.has('server1')).toBe(true); // Recently accessed, kept
       expect(cache.has('server2')).toBe(false); // Least recently used, evicted

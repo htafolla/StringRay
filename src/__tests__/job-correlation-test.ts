@@ -1,8 +1,8 @@
 // Integration test for job correlation fix
 // Tests that jobIds are properly included in activity logs
 
-import { jobCorrelationManager } from "../job-correlation-manager.js";
-import { generateJobId } from "../framework-logger.js";
+import { jobCorrelationManager } from "../jobs/job-correlation-manager.js";
+import { generateJobId } from "../core/framework-logger.js";
 
 async function testJobCorrelation() {
   console.log("🧪 Testing Job Correlation Fix...");

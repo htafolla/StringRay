@@ -111,7 +111,7 @@ describe("ProcessorManager Reuse (Critical Regression)", () => {
     // 2. Second tool execution - retrieves from state
 
     // First execution - creates and registers
-    let pm = stateManager.get("processor:manager");
+    let pm: any = stateManager.get("processor:manager");
     if (!pm) {
       pm = new ProcessorManager(stateManager);
       pm.registerProcessor({

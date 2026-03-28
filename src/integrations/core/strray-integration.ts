@@ -9,11 +9,11 @@
  */
 
 import { EventEmitter } from "events";
-import { StringRayOrchestrator, TaskDefinition } from "../../orchestrator.js";
+import { StringRayOrchestrator, TaskDefinition } from "../../orchestrator/orchestrator.js";
 import { securityHardeningSystem } from "../../security/security-hardening-system.js";
 import { enterpriseMonitoringSystem } from "../../monitoring/enterprise-monitoring-system.js";
 import { performanceSystem } from "../../performance/performance-system-orchestrator.js";
-import { frameworkLogger } from "../core/framework-logger.js";
+import { frameworkLogger } from "../../core/framework-logger.js";
 
 // Framework detection and capabilities
 export enum SupportedFramework {

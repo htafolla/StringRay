@@ -10,14 +10,14 @@ import { MCPClient, MCPClientManager, mcpClientManager } from "./mcp-client";
 describe("mcp-client", () => {
   describe("MCPClient", () => {
     it("should instantiate", () => {
-      const instance = new MCPClient();
+      const instance = new MCPClient({ serverName: "test", command: "test", args: [] });
       expect(instance).toBeInstanceOf(MCPClient);
     });
   });
 
   describe("MCPClientManager", () => {
     it("should instantiate", () => {
-      const instance = new MCPClientManager();
+      const instance = MCPClientManager.getInstance();
       expect(instance).toBeInstanceOf(MCPClientManager);
     });
   });

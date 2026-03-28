@@ -10,7 +10,7 @@ import { IMcpConnection, MCPToolResult, JsonRpcResponse } from '../../types/inde
 
 describe('ToolExecutor', () => {
   let executor: ToolExecutor;
-  let mockConnection: ReturnType<typeof vi.fn> & IMcpConnection;
+  let mockConnection: any;
 
   beforeEach(() => {
     executor = new ToolExecutor();

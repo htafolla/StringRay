@@ -158,10 +158,10 @@ describe("KernelOrchestrator", () => {
     // Mock delegateToSubagent to return typed results matching each task
     const mockDelegate = vi
       .spyOn(orchestrator as any, "delegateToSubagent")
-      .mockImplementation(async (_agentName: string, task: any) => ({
+      .mockImplementation(async (...args: unknown[]) => ({
         success: true,
-        result: { type: task.type, simulated: true },
-        agentName: _agentName,
+        result: { type: (args[1] as any)?.type, simulated: true },
+        agentName: args[0] as string,
         executionTime: 50,
       }));
 

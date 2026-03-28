@@ -295,7 +295,7 @@ export class IntegrationRegistry extends EventEmitter {
       frameworkLogger.log(
         "integration-registry",
         `Integration '${name}' already loaded`,
-        "warn",
+        "warning",
         { name },
         this.jobId,
       ).catch(console.error);
@@ -434,7 +434,7 @@ export class IntegrationRegistry extends EventEmitter {
           frameworkLogger.log(
             "integration-registry",
             `Skipping '${name}': not registered`,
-            "warn",
+            "warning",
             { name },
             this.jobId,
           ).catch(console.error);
@@ -476,7 +476,7 @@ export class IntegrationRegistry extends EventEmitter {
     frameworkLogger.log(
       "integration-registry",
       `Load complete: ${succeeded} succeeded, ${failed} failed`,
-      failed > 0 ? "warn" : "success",
+      failed > 0 ? "warning" : "success",
       { succeeded, failed },
       this.jobId,
     ).catch(console.error);
@@ -522,7 +522,7 @@ export class IntegrationRegistry extends EventEmitter {
     frameworkLogger.log(
       "integration-registry",
       `Unload complete: ${succeeded} succeeded, ${failed} failed`,
-      failed > 0 ? "warn" : "success",
+      failed > 0 ? "warning" : "success",
       { succeeded, failed },
       this.jobId,
     ).catch(console.error);
@@ -760,7 +760,7 @@ export async function discoverIntegrations(
       frameworkLogger.log(
         "integration-registry",
         `Integrations directory not found: ${integrationsPath}`,
-        "warn",
+        "warning",
         { path: integrationsPath },
       ).catch(console.error);
       return discovered;
@@ -821,7 +821,7 @@ export async function discoverIntegrations(
           frameworkLogger.log(
             "integration-registry",
             `Failed to load integration from ${indexPath}: ${errorMessage}`,
-            "warn",
+            "warning",
             { path: indexPath, error: errorMessage },
           ).catch(console.error);
         }
@@ -876,7 +876,7 @@ export async function autoRegisterIntegrations(
 
       // Check named exports
       if (!integration) {
-        const keys = Object.keys(d.module);
+        const keys = Object.keys(d.module as Record<string, unknown>);
         for (const key of keys) {
           const maybe = (d.module as Record<string, unknown>)[key];
           if (isIntegration(maybe)) {
@@ -896,7 +896,7 @@ export async function autoRegisterIntegrations(
       frameworkLogger.log(
         "integration-registry",
         `Failed to register integration '${d.name}': ${errorMessage}`,
-        "warn",
+        "warning",
         { name: d.name, error: errorMessage },
       ).catch(console.error);
     }

@@ -8,7 +8,7 @@
  * @since 2026-03-14
  */
 
-import WebSocket from 'ws';
+import { WebSocket } from 'ws';
 import * as crypto from 'crypto';
 import {
   OpenClawClientConfig,
@@ -84,23 +84,23 @@ export class OpenClawClient {
       try {
         this.ws = new WebSocket(this.config.gatewayUrl);
 
-        this.ws.on('open', () => {
+        this.ws!.on('open', () => {
           this.logger.info('[OpenClawClient] WebSocket connected, sending handshake...');
           this.sendHandshake();
           resolve();
         });
 
-        this.ws.on('message', (data: Buffer | string) => {
+        this.ws!.on('message', (data: Buffer | string) => {
           const message = typeof data === 'string' ? data : data.toString();
           this.handleMessage(message);
         });
 
-        this.ws.on('close', (code: number, reason: Buffer) => {
+        this.ws!.on('close', (code: number, reason: Buffer) => {
           this.logger.info(`[OpenClawClient] Connection closed: ${code} ${reason.toString()}`);
           this.handleDisconnect(code, reason.toString());
         });
 
-        this.ws.on('error', (error: Error) => {
+        this.ws!.on('error', (error: Error) => {
           this.logger.error('[OpenClawClient] WebSocket error:', error.message);
           this.stats.errors++;
           
@@ -112,11 +112,11 @@ export class OpenClawClient {
           }
         });
 
-        this.ws.on('ping', () => {
+        this.ws!.on('ping', () => {
           this.logger.debug('[OpenClawClient] Received ping');
         });
 
-        this.ws.on('pong', () => {
+        this.ws!.on('pong', () => {
           this.logger.debug('[OpenClawClient] Received pong');
         });
       } catch (error) {

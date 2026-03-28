@@ -22,7 +22,7 @@ interface CodexInjectorHook {
       input: { tool: string; args?: Record<string, unknown> },
       output: { output?: string; [key: string]: unknown },
       sessionId: string,
-    ) => { output?: string; [key: string]: unknown };
+    ) => Promise<{ output?: string; [key: string]: unknown }>;
   };
 }
 

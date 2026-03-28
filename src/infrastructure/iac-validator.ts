@@ -557,7 +557,7 @@ export async function validateCommand(args: string[]): Promise<void> {
   }
 }
 
-function printResults(results: ValidationResult[]): void {
+async function printResults(results: ValidationResult[]): Promise<void> {
   for (const result of results) {
     await frameworkLogger.log("iac-validator", "-n-result-file-", "info", {
       message: `\n📄 ${result.file}:`,
@@ -568,7 +568,7 @@ function printResults(results: ValidationResult[]): void {
         message: "  ❌ Errors:",
       });
       result.errors.forEach((error) => {
-        await frameworkLogger.log(
+        void frameworkLogger.log(
           "iac-validator",
           "-error-path-error-message-",
           "error",
@@ -582,14 +582,14 @@ function printResults(results: ValidationResult[]): void {
         message: "  ⚠️  Warnings:",
       });
       result.warnings.forEach((warning) => {
-        await frameworkLogger.log(
+        void frameworkLogger.log(
           "iac-validator",
           "-warning-path-warning-message-",
           "info",
           { message: `    • ${warning.path}: ${warning.message}` },
         );
         if (warning.suggestion) {
-          await frameworkLogger.log(
+          void frameworkLogger.log(
             "iac-validator",
             "-warning-suggestion-",
             "info",

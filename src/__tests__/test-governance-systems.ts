@@ -15,13 +15,13 @@ import {
   agentSpawnGovernor,
   type SpawnContext,
   type SpawnAuthorization,
-} from "./src/orchestrator/agent-spawn-governor.js";
+} from "../orchestrator/agent-spawn-governor.js";
 import {
   MultiAgentOrchestrationCoordinator,
   multiAgentOrchestrationCoordinator,
   type OrchestrationWorkflow,
-} from "./src/orchestrator/multi-agent-orchestration-coordinator.js";
-import { StringRayStateManager } from "./src/state/state-manager.js";
+} from "../orchestrator/multi-agent-orchestration-coordinator.js";
+import { StringRayStateManager } from "../state/state-manager.js";
 
 interface TestResult {
   testName: string;
@@ -194,7 +194,7 @@ class GovernanceSystemsTest {
       const results = await Promise.all(attempts);
 
       // Should detect pattern and block some spawns
-      const blocked = results.filter((r) => !r.authorized).length;
+      const blocked = results.filter((r: SpawnAuthorization) => !r.authorized).length;
 
       return blocked > 0;
     }, "Detects and prevents infinite spawn patterns");

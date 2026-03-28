@@ -4,7 +4,7 @@
  * Enforces codex term #31: Async Pattern Detection.
  */
 
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeEach } from "vitest";
 import {
   AsyncPatternProcessor,
   runAsyncPatternCheck,

@@ -256,7 +256,7 @@ describe("Processor Implementations Integration Tests", () => {
       });
 
       const priorities = result.results.map((r) => {
-        const processor = processorManager["registry"].get(r.processorName);
+        const processor = processorManager.getProcessors().get(r.processorName);
         return processor?.priority ?? 0;
       });
 
@@ -279,15 +279,15 @@ describe("Processor Implementations Integration Tests", () => {
 
   describe("Registry Integration", () => {
     it("should have processors registered in the registry", () => {
-      const registry = processorManager["registry"];
+      const registry = processorManager.getProcessors();
       expect(registry.get("preValidate")).toBeDefined();
       expect(registry.get("logProtection")).toBeDefined();
       expect(registry.get("codexCompliance")).toBeDefined();
-      expect(registry.get("testExecution")).toBeDefined();
+      expect(registry.get("versionCompliance")).toBeDefined();
     });
 
     it("should retrieve processor from registry by name", () => {
-      const registry = processorManager["registry"];
+      const registry = processorManager.getProcessors();
       const processor = registry.get("preValidate");
       expect(processor).toBeDefined();
       expect(processor?.name).toBe("preValidate");

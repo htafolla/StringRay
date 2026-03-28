@@ -159,6 +159,13 @@ export class ProcessorManager {
   }
 
   /**
+   * Get all registered processors
+   */
+  getProcessors(): Map<string, ProcessorConfig> {
+    return this.processors;
+  }
+
+  /**
    * Initialize all registered processors
    */
   async initializeProcessors(): Promise<boolean> {
@@ -507,6 +514,9 @@ export class ProcessorManager {
           break;
         case "codexCompliance":
           result = await this.executeCodexCompliance(safeContext);
+          break;
+        case "logProtection":
+          result = await this.executeLogProtection(safeContext);
           break;
         case "versionCompliance":
           result = await this.executeVersionCompliance(safeContext);
@@ -1012,6 +1022,28 @@ export class ProcessorManager {
   private async executeErrorBoundary(context: any): Promise<any> {
     // Setup error boundaries
     return { boundaries: "established" };
+  }
+
+  private async executeLogProtection(context: any): Promise<any> {
+    try {
+      const { LogProtectionProcessor } = await import("./implementations/log-protection-processor.js");
+      const processor = new LogProtectionProcessor();
+
+      const filePath = context.filePath || context.toolInput?.args?.filePath;
+      const operation = context.operation || context.toolInput?.args?.operation;
+
+      const result = await processor.execute({
+        filePath,
+        operation,
+      });
+
+      return result.data;
+    } catch (error) {
+      return {
+        allowed: false,
+        reason: `Log protection error: ${error instanceof Error ? error.message : String(error)}`,
+      };
+    }
   }
 
   private async executeAgentsMdValidation(context: any): Promise<any> {

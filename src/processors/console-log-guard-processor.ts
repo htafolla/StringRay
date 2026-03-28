@@ -76,7 +76,7 @@ export class ConsoleLogGuardProcessor {
   }
 
   /**
-   * Remove single-line (//) and multi-line (/* *​/) comments from source code.
+   * Remove single-line (//) and multi-line comments from source code.
    * Preserves line structure so line numbers remain valid.
    */
   stripComments(content: string): string {

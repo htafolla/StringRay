@@ -4,7 +4,7 @@
  * Enforces codex term #28: Performance Budgets.
  */
 
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeEach } from "vitest";
 import {
   PerformanceBudgetProcessor,
   runPerformanceBudgetCheck,

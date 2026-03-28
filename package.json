@@ -73,7 +73,7 @@
     "setup-dev": "node scripts/node/setup-dev.cjs",
     "prepare-consumer": "node scripts/node/prepare-consumer.cjs",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint src",
+    "lint": "eslint -c tests/config/eslint.config.js src",
     "lint:fix": "eslint src --fix",
     "security-audit": "npm audit || true",
     "test:security-audit": "npm run test:security",

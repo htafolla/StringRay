@@ -13,18 +13,16 @@ module.exports = {
   env: {
     node: true,
     es2022: true,
-    "vitest/globals": true,
   },
   parser: "@typescript-eslint/parser",
   parserOptions: {
     ecmaVersion: "latest",
     sourceType: "module",
   },
-  plugins: ["@typescript-eslint", "vitest"],
+  plugins: ["@typescript-eslint"],
   extends: [
     "eslint:recommended",
     "plugin:@typescript-eslint/recommended",
-    "plugin:vitest/recommended",
   ],
   rules: {
     // === PROCESSOR-SPECIFIC RULES ===
@@ -115,12 +113,6 @@ module.exports = {
     "prefer-const": "warn",
     "no-var": "error",
 
-    // === VITEST PLUGIN RULES ===
-
-    "vitest/consistent-test-it": ["error", { fn: "test" }],
-    "vitest/no-test-prefixes": "error",
-    "vitest/valid-expect": "error",
-    "vitest/expect-expect": ["error", { assertFunctionNames: ["expect", "expect.*"] }],
   },
   overrides: [
     {

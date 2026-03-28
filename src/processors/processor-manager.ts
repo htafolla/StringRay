@@ -275,6 +275,21 @@ export class ProcessorManager {
       case "typescriptCompilation":
         await this.initializeTypeScriptCompilationProcessor();
         break;
+      case "spawnGovernance":
+        await this.initializeSpawnGovernanceProcessor();
+        break;
+      case "performanceBudget":
+        await this.initializePerformanceBudgetProcessor();
+        break;
+      case "asyncPattern":
+        await this.initializeAsyncPatternProcessor();
+        break;
+      case "consoleLogGuard":
+        await this.initializeConsoleLogGuardProcessor();
+        break;
+      case "postProcessorChain":
+        await this.initializePostProcessorChainProcessor();
+        break;
       default:
         // Generic initialization
         break;
@@ -522,6 +537,21 @@ export class ProcessorManager {
           break;
         case "typescriptCompilation":
           result = await this.executeTypeScriptCompilation(safeContext);
+          break;
+        case "spawnGovernance":
+          result = await this.executeSpawnGovernance(safeContext);
+          break;
+        case "performanceBudget":
+          result = await this.executePerformanceBudget(safeContext);
+          break;
+        case "asyncPattern":
+          result = await this.executeAsyncPattern(safeContext);
+          break;
+        case "consoleLogGuard":
+          result = await this.executeConsoleLogGuard(safeContext);
+          break;
+        case "postProcessorChain":
+          result = await this.executePostProcessorChain(safeContext);
           break;
         default:
           throw new Error(`Unknown processor: ${name}`);
@@ -1514,5 +1544,107 @@ export class ProcessorManager {
 
     const cwd = (context.directory as string) || process.cwd();
     return runTypeScriptCompilation(cwd) as unknown as Record<string, unknown>;
+  }
+
+  // --- Codex Gap Processors (Tier 1) ---
+
+  /**
+   * Initialize spawn governance processor (Codex #52-57)
+   */
+  private async initializeSpawnGovernanceProcessor(): Promise<void> {
+    frameworkLogger.log(
+      "processor-manager",
+      "initializing spawn governance processor",
+      "info",
+    );
+  }
+
+  /**
+   * Execute spawn governance processor
+   */
+  private async executeSpawnGovernance(context: Record<string, unknown>): Promise<Record<string, unknown>> {
+    const { runSpawnGovernance } =
+      await import("./spawn-governance-processor.js");
+    return runSpawnGovernance(context);
+  }
+
+  /**
+   * Initialize performance budget processor (Codex #28)
+   */
+  private async initializePerformanceBudgetProcessor(): Promise<void> {
+    frameworkLogger.log(
+      "processor-manager",
+      "initializing performance budget processor",
+      "info",
+    );
+  }
+
+  /**
+   * Execute performance budget processor
+   */
+  private async executePerformanceBudget(context: Record<string, unknown>): Promise<Record<string, unknown>> {
+    const { runPerformanceBudgetCheck } =
+      await import("./performance-budget-processor.js");
+    return runPerformanceBudgetCheck(context);
+  }
+
+  /**
+   * Initialize async pattern processor (Codex #31)
+   */
+  private async initializeAsyncPatternProcessor(): Promise<void> {
+    frameworkLogger.log(
+      "processor-manager",
+      "initializing async pattern processor",
+      "info",
+    );
+  }
+
+  /**
+   * Execute async pattern processor
+   */
+  private async executeAsyncPattern(context: Record<string, unknown>): Promise<Record<string, unknown>> {
+    const { runAsyncPatternCheck } =
+      await import("./async-pattern-processor.js");
+    return runAsyncPatternCheck(context);
+  }
+
+  /**
+   * Initialize console log guard processor (Codex #33)
+   */
+  private async initializeConsoleLogGuardProcessor(): Promise<void> {
+    frameworkLogger.log(
+      "processor-manager",
+      "initializing console log guard processor",
+      "info",
+    );
+  }
+
+  /**
+   * Execute console log guard processor
+   */
+  private async executeConsoleLogGuard(context: Record<string, unknown>): Promise<Record<string, unknown>> {
+    const { runConsoleLogGuard } =
+      await import("./console-log-guard-processor.js");
+    return runConsoleLogGuard(context);
+  }
+
+  /**
+   * Initialize postprocessor chain validator (Codex #58)
+   */
+  private async initializePostProcessorChainProcessor(): Promise<void> {
+    frameworkLogger.log(
+      "processor-manager",
+      "initializing postprocessor chain validator",
+      "info",
+    );
+  }
+
+  /**
+   * Execute postprocessor chain validator
+   */
+  private async executePostProcessorChain(context: Record<string, unknown>): Promise<Record<string, unknown>> {
+    const { runPostProcessorChainValidation } =
+      await import("./postprocessor-chain-validator.js");
+    return runPostProcessorChainValidation(context);
   }
 }

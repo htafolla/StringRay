@@ -399,6 +399,72 @@ export class BootOrchestrator {
         { jobId },
       );
 
+      // Codex gap processors (Tier 1)
+      this.processorManager.registerProcessor({
+        name: "spawnGovernance",
+        type: "pre",
+        priority: 40,
+        enabled: true,
+      });
+      frameworkLogger.log(
+        "boot-orchestrator",
+        "registered spawnGovernance processor",
+        "success",
+        { jobId },
+      );
+
+      this.processorManager.registerProcessor({
+        name: "performanceBudget",
+        type: "pre",
+        priority: 45,
+        enabled: true,
+      });
+      frameworkLogger.log(
+        "boot-orchestrator",
+        "registered performanceBudget processor",
+        "success",
+        { jobId },
+      );
+
+      this.processorManager.registerProcessor({
+        name: "asyncPattern",
+        type: "pre",
+        priority: 50,
+        enabled: true,
+      });
+      frameworkLogger.log(
+        "boot-orchestrator",
+        "registered asyncPattern processor",
+        "success",
+        { jobId },
+      );
+
+      this.processorManager.registerProcessor({
+        name: "consoleLogGuard",
+        type: "pre",
+        priority: 55,
+        enabled: true,
+      });
+      frameworkLogger.log(
+        "boot-orchestrator",
+        "registered consoleLogGuard processor",
+        "success",
+        { jobId },
+      );
+
+      this.processorManager.registerProcessor({
+        name: "postProcessorChain",
+        type: "post",
+        priority: 140,
+        enabled: true,
+      });
+      frameworkLogger.log(
+        "boot-orchestrator",
+        "registered postProcessorChain processor",
+        "success",
+        { jobId },
+      );
+
       // Skip refactoring logging processor - not available in this build
       frameworkLogger.log(
         "boot-orchestrator",

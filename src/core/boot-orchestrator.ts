@@ -42,15 +42,9 @@ function setupGracefulShutdown(): void {
 
   process.on("SIGINT", async () => {
     if (isShuttingDown) {
-      // Graceful shutdown messages kept as console.log for user visibility
-      await frameworkLogger.log(
-        "boot-orchestrator",
-        "-received-sigint-shutting-down-gracefully-",
-        "info",
-        { message: "Received SIGINT, shutting down gracefully..." },
-      );
       process.exit(0);
     }
+    isShuttingDown = true;
     try {
       await frameworkLogger.log(
         "boot-orchestrator",
@@ -134,7 +128,6 @@ export class BootOrchestrator {
   private stateManager: StringRayStateManager;
   private processorManager: ProcessorManager;
   private config: BootSequenceConfig;
-  private memoryMonitorListener?: (alert: any) => void;
 
   constructor(
     config: Partial<BootSequenceConfig> = {},
@@ -197,17 +190,12 @@ export class BootOrchestrator {
       let orchestratorModule;
       try {
         orchestratorModule = await import("../core/orchestrator");
-      } catch (jsError) {
-        // Fallback to TypeScript import for testing/development
-        try {
-          orchestratorModule = await import("../core/orchestrator");
-        } catch (tsError) {
-          console.error(
-            "❌ Failed to load orchestrator from both .js and .ts:",
-            { jsError, tsError },
-          );
-          return false;
-        }
+      } catch (importError) {
+        console.error(
+          "❌ Failed to load orchestrator:",
+          importError,
+        );
+        return false;
       }
 
       const orchestratorInstance = orchestratorModule.strRayOrchestrator;
@@ -295,175 +283,37 @@ export class BootOrchestrator {
         { jobId },
       );
 
-      this.processorManager.registerProcessor({
-        name: "preValidate",
-        type: "pre",
-        priority: 10,
-        enabled: true,
-      });
-      frameworkLogger.log(
-        "boot-orchestrator",
-        "registered preValidate processor",
-        "success",
-        { jobId },
-      );
+      // Processor definitions — single source of truth for all registrations
+      const PROCESSOR_DEFS: Array<{ name: string; type: "pre" | "post"; priority: number; enabled: boolean }> = [
+        { name: "preValidate", type: "pre", priority: 10, enabled: true },
+        { name: "typescriptCompilation", type: "pre", priority: 15, enabled: true },
+        { name: "codexCompliance", type: "pre", priority: 20, enabled: true },
+        { name: "testAutoCreation", type: "pre", priority: 22, enabled: true },
+        { name: "versionCompliance", type: "pre", priority: 25, enabled: true },
+        { name: "errorBoundary", type: "pre", priority: 30, enabled: true },
+        { name: "agentsMdValidation", type: "pre", priority: 35, enabled: true },
+        { name: "stateValidation", type: "post", priority: 130, enabled: true },
+        { name: "spawnGovernance", type: "pre", priority: 40, enabled: true },
+        { name: "performanceBudget", type: "pre", priority: 45, enabled: true },
+        { name: "asyncPattern", type: "pre", priority: 50, enabled: true },
+        { name: "consoleLogGuard", type: "pre", priority: 55, enabled: true },
+        { name: "postProcessorChain", type: "post", priority: 140, enabled: true },
+      ];
 
-      this.processorManager.registerProcessor({
-        name: "typescriptCompilation",
-        type: "pre",
-        priority: 15,
-        enabled: true,
-      });
-      frameworkLogger.log(
-        "boot-orchestrator",
-        "registered typescriptCompilation processor",
-        "success",
-        { jobId },
-      );
-
-      this.processorManager.registerProcessor({
-        name: "codexCompliance",
-        type: "pre",
-        priority: 20,
-        enabled: true,
-      });
-      frameworkLogger.log(
-        "boot-orchestrator",
-        "registered codexCompliance processor",
-        "success",
-        { jobId },
-      );
-
-      this.processorManager.registerProcessor({
-        name: "testAutoCreation",
-        type: "pre",
-        priority: 22,
-        enabled: true,
-      });
-      frameworkLogger.log(
-        "boot-orchestrator",
-        "registered testAutoCreation processor",
-        "success",
-        { jobId },
-      );
-
-      this.processorManager.registerProcessor({
-        name: "versionCompliance",
-        type: "pre",
-        priority: 25,
-        enabled: true,
-      });
-      frameworkLogger.log(
-        "boot-orchestrator",
-        "registered versionCompliance processor",
-        "success",
-        { jobId },
-      );
-
-      this.processorManager.registerProcessor({
-        name: "errorBoundary",
-        type: "pre",
-        priority: 30,
-        enabled: true,
-      });
-      frameworkLogger.log(
-        "boot-orchestrator",
-        "registered errorBoundary processor",
-        "success",
-        { jobId },
-      );
-
-      this.processorManager.registerProcessor({
-        name: "agentsMdValidation",
-        type: "pre",
-        priority: 35,
-        enabled: true,
-      });
-      frameworkLogger.log(
-        "boot-orchestrator",
-        "registered agentsMdValidation processor",
-        "success",
-        { jobId },
-      );
-
-      this.processorManager.registerProcessor({
-        name: "stateValidation",
-        type: "post",
-        priority: 130,
-        enabled: true,
-      });
-      frameworkLogger.log(
-        "boot-orchestrator",
-        "registered stateValidation processor",
-        "success",
-        { jobId },
-      );
-
-      // Codex gap processors (Tier 1)
-      this.processorManager.registerProcessor({
-        name: "spawnGovernance",
-        type: "pre",
-        priority: 40,
-        enabled: true,
-      });
-      frameworkLogger.log(
-        "boot-orchestrator",
-        "registered spawnGovernance processor",
-        "success",
-        { jobId },
-      );
-
-      this.processorManager.registerProcessor({
-        name: "performanceBudget",
-        type: "pre",
-        priority: 45,
-        enabled: true,
-      });
-      frameworkLogger.log(
-        "boot-orchestrator",
-        "registered performanceBudget processor",
-        "success",
-        { jobId },
-      );
-
-      this.processorManager.registerProcessor({
-        name: "asyncPattern",
-        type: "pre",
-        priority: 50,
-        enabled: true,
-      });
-      frameworkLogger.log(
-        "boot-orchestrator",
-        "registered asyncPattern processor",
-        "success",
-        { jobId },
-      );
-
-      this.processorManager.registerProcessor({
-        name: "consoleLogGuard",
-        type: "pre",
-        priority: 55,
-        enabled: true,
-      });
-      frameworkLogger.log(
-        "boot-orchestrator",
-        "registered consoleLogGuard processor",
-        "success",
-        { jobId },
-      );
-
-      this.processorManager.registerProcessor({
-        name: "postProcessorChain",
-        type: "post",
-        priority: 140,
-        enabled: true,
-      });
-      frameworkLogger.log(
-        "boot-orchestrator",
-        "registered postProcessorChain processor",
-        "success",
-        { jobId },
-      );
+      for (const def of PROCESSOR_DEFS) {
+        this.processorManager.registerProcessor({
+          name: def.name,
+          type: def.type,
+          priority: def.priority,
+          enabled: def.enabled,
+        });
+        frameworkLogger.log(
+          "boot-orchestrator",
+          `registered ${def.name} processor`,
+          "success",
+          { jobId },
+        );
+      }
 
       // Skip refactoring logging processor - not available in this build
       frameworkLogger.log(
@@ -607,9 +457,9 @@ export class BootOrchestrator {
         let CodexInjector;
         try {
           ({ CodexInjector } = await import("./codex-injector"));
-        } catch (error) {
-          // Fallback to import without .js extension (for OpenCode plugin environment)
-          ({ CodexInjector } = await import("./codex-injector"));
+        } catch (importError) {
+          console.error("❌ Failed to load codex injector:", importError);
+          return false;
         }
         codexInjector = new CodexInjector();
         this.stateManager.set("processor:codex_injector", codexInjector);
@@ -800,14 +650,6 @@ export class BootOrchestrator {
       });
     }
 
-    // Attach the listener to the memory monitor only if none exist
-    if (
-      this.memoryMonitorListener &&
-      memoryMonitor.listenerCount("alert") === 0
-    ) {
-      memoryMonitor.on("alert", this.memoryMonitorListener);
-    }
-
     // Log initial memory status
     const initialStats = memoryMonitor.getCurrentStats();
     frameworkLogger.log(
@@ -866,7 +708,7 @@ export class BootOrchestrator {
    * Execute the boot sequence (internal framework initialization)
    */
   async executeBootSequence(): Promise<BootResult> {
-    const jobId = `boot-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const jobId = `boot-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
 
     frameworkLogger.log(
       "boot-orchestrator",

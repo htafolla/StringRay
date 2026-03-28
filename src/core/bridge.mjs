@@ -40,11 +40,10 @@
 import {
   existsSync,
   readFileSync,
-  writeFileSync,
   appendFileSync,
   mkdirSync,
 } from "fs";
-import { join, dirname, relative, resolve } from "path";
+import { join, dirname, resolve } from "path";
 import { fileURLToPath } from "url";
 import { homedir } from "os";
 import { createServer } from "http";
@@ -133,12 +132,7 @@ async function loadFramework(projectRoot) {
       if (!CodexFormatterModule) {
         const cfPath = join(distDir, "core", "codex-formatter.js");
         if (!existsSync(cfPath)) {
-          // Try loading from source (dev mode)
-          const cfSrcPath = join(projectRoot, "src", "core", "codex-formatter.ts");
-          if (existsSync(cfSrcPath)) {
-            // Load as TS via dynamic import won't work without ts-node,
-            // so we'll use the built-in fallback logic
-          }
+          // dist/ not available for codex formatter — will use built-in fallback
         }
         if (existsSync(cfPath)) {
           const mod = await import(cfPath);
@@ -166,9 +160,11 @@ async function loadFramework(projectRoot) {
 
 // ============================================================================
 // Built-in Codex Fallback (when dist/ is not available)
+// NOTE: The canonical source is codex-formatter.ts BUILTIN_CODEX.
+// This is a minimal inline copy for bridge standalone mode only.
 // ============================================================================
 
-const BUILTIN_CODEX = {
+const BRIDGE_CODEX_FALLBACK = {
   version: "fallback-1.0.0",
   terms: [
     { id: "resolve-all-errors", title: "Resolve All Errors", description: "Never leave unhandled errors, rejected promises, or uncaught exceptions in production code.", severity: "blocking" },
@@ -220,7 +216,7 @@ function loadCodexFromFs(projectRoot) {
   const envDir = process.env.STRRAY_CONFIG_DIR;
   const candidates = [];
 
-  if (envDir) candidates.push(resolve(envDir, "codex.json"));
+  if (envDir) candidates.push(resolve(projectRoot, envDir, "codex.json"));
   candidates.push(join(projectRoot, ".strray", "codex.json"));
   candidates.push(join(projectRoot, ".opencode", "strray", "codex.json"));
   candidates.push(join(projectRoot, "codex.json"));
@@ -265,7 +261,7 @@ async function handleGetCodexPrompt(input, projectRoot, logDir) {
   } else {
     // Try filesystem first, fall back to built-in
     const { codex, source: fsSource } = loadCodexFromFs(projectRoot);
-    const termsSource = codex || BUILTIN_CODEX;
+    const termsSource = codex || BRIDGE_CODEX_FALLBACK;
 
     let terms = termsSource.terms;
     if (severityFilter) {
@@ -395,9 +391,10 @@ function startHttpServer(port, projectRoot) {
 
   return new Promise((resolve, reject) => {
     const server = createServer(async (req, res) => {
-      // CORS headers
+      // CORS headers (wildcard — restrict via STRRAY_HTTP_CORS_ORIGIN env var in production)
+      const corsOrigin = process.env.STRRAY_HTTP_CORS_ORIGIN || "*";
       res.setHeader("Content-Type", "application/json");
-      res.setHeader("Access-Control-Allow-Origin", "*");
+      res.setHeader("Access-Control-Allow-Origin", corsOrigin);
       res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
       res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
@@ -433,9 +430,20 @@ function startHttpServer(port, projectRoot) {
         return;
       }
 
-      // POST handler
+      // POST handler (1MB body size limit)
+      const MAX_BODY_SIZE = 1024 * 1024;
       let body = "";
-      req.on("data", (chunk) => { body += chunk; });
+      let bodySize = 0;
+      req.on("data", (chunk) => {
+        bodySize += chunk.length;
+        if (bodySize > MAX_BODY_SIZE) {
+          res.writeHead(413);
+          res.end(JSON.stringify({ error: "Request body too large (max 1MB)" }));
+          req.destroy();
+          return;
+        }
+        body += chunk;
+      });
       req.on("end", async () => {
         try {
           const command = JSON.parse(body);

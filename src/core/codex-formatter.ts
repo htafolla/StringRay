@@ -74,7 +74,7 @@ export interface FormatResult {
 // Built-in Fallback Codex (when no codex.json is found)
 // ============================================================================
 
-const BUILTIN_CODEX: CodexConfig = {
+export const BUILTIN_CODEX: CodexConfig = {
   version: "fallback-1.0.0",
   terms: [
     {
@@ -135,7 +135,7 @@ const BUILTIN_CODEX: CodexConfig = {
 
 /**
  * Find codex.json using the standard priority chain.
- * Mirrors config-paths.ts resolveCodexPath() but self-contained.
+ * Mirrors config-paths.ts resolveCodexPath() but returns first match.
  */
 export function findCodexPath(projectRoot?: string): string | null {
   const root = projectRoot || process.cwd();
@@ -148,7 +148,10 @@ export function findCodexPath(projectRoot?: string): string | null {
   }
   candidates.push(join(root, ".strray", "codex.json"));
   candidates.push(join(root, ".opencode", "strray", "codex.json"));
+  // Additional fallback locations (for standalone usage)
   candidates.push(join(root, "codex.json"));
+  candidates.push(join(root, "src", "codex.json"));
+  candidates.push(join(root, "docs", "agents", "codex.json"));
 
   for (const candidate of candidates) {
     if (existsSync(candidate)) {

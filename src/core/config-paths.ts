@@ -24,17 +24,17 @@ import { join, resolve } from "path";
 /** Environment variable name for custom config root */
 export const STRRAY_CONFIG_DIR_ENV = "STRRAY_CONFIG_DIR";
 
-/** Resolved config directory (cached per process) */
-let _resolvedConfigDir: string | null = null;
+/** Resolved config directories, cached per projectRoot */
+const _resolvedConfigDirs = new Map<string, string>();
 
 /**
  * Detect the best available config directory.
  * Scans in priority order and caches the first one that exists (or the first default).
  */
 export function getConfigDir(projectRoot?: string): string {
-  if (_resolvedConfigDir) return _resolvedConfigDir;
-
   const root = projectRoot || process.cwd();
+  const cached = _resolvedConfigDirs.get(root);
+  if (cached) return cached;
   const envDir = process.env[STRRAY_CONFIG_DIR_ENV];
 
   // Priority candidates
@@ -52,14 +52,14 @@ export function getConfigDir(projectRoot?: string): string {
   // Return the first that exists, or the highest-priority default
   for (const c of candidates) {
     if (existsSync(c.dir)) {
-      _resolvedConfigDir = c.dir;
+      _resolvedConfigDirs.set(root, c.dir);
       return c.dir;
     }
   }
 
   // Nothing exists — use highest priority default (env > .strray > .opencode)
   const defaultDir = candidates[0]!;
-  _resolvedConfigDir = defaultDir.dir;
+  _resolvedConfigDirs.set(root, defaultDir.dir);
   return defaultDir.dir;
 }
 
@@ -177,5 +177,5 @@ export function resolveLogDir(projectRoot?: string): string {
  * Reset the cached config dir (useful for testing).
  */
 export function resetConfigDirCache(): void {
-  _resolvedConfigDir = null;
+  _resolvedConfigDirs.clear();
 }

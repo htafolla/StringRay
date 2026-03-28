@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Conventional Commits](https://www.conventionalcommits.org/).
 
-## [--silent] - 2026-03-28
+## [1.15.12] - 2026-03-28
 
 ### 🔄 Changes
 

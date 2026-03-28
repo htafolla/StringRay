@@ -20,6 +20,7 @@ export {
   getCodexConfig,
   findCodexPath,
   loadCodex,
+  BUILTIN_CODEX,
 } from "./codex-formatter.js";
 export type {
   CodexTerm,

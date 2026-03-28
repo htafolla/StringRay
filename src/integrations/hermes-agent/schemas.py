@@ -69,3 +69,32 @@ STRRAY_HEALTH = {
         "properties": {},
     },
 }
+
+STRRAY_HOOKS = {
+    "name": "strray_hooks",
+    "description": (
+        "Manage StringRay git hooks (install, uninstall, list, status). "
+        "Installs pre-commit, post-commit, pre-push, and post-push hooks "
+        "that run TypeScript validation, Codex checks, and monitoring. "
+        "Use 'install' to set up all hooks, 'list' to see current status."
+    ),
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "action": {
+                "type": "string",
+                "enum": ["install", "uninstall", "list", "status"],
+                "description": "Action to perform on git hooks",
+            },
+            "hooks": {
+                "type": "array",
+                "items": {
+                    "type": "string",
+                    "enum": ["pre-commit", "post-commit", "pre-push", "post-push"],
+                },
+                "description": "Specific hooks to manage (default: all)",
+            },
+        },
+        "required": ["action"],
+    },
+}

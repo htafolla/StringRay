@@ -492,7 +492,7 @@ class TestRegisterIntegration(unittest.TestCase):
         ctx = MagicMock()
         pi.register(ctx)
         names = [c[1]["name"] for c in ctx.register_tool.call_args_list]
-        self.assertEqual(set(names), {"strray_validate", "strray_codex_check", "strray_health"})
+        self.assertEqual(set(names), {"strray_validate", "strray_codex_check", "strray_health", "strray_hooks"})
 
     def test_toolset_name(self):
         ctx = MagicMock()
@@ -537,7 +537,8 @@ class TestRegisterIntegration(unittest.TestCase):
 
     def test_survives_missing_session_hook(self):
         ctx = MagicMock()
-        ctx.register_hook.side_effect = [None, None, (AttributeError, None)]
+        # pre_tool_call, post_tool_call succeed; on_session_start fails; 3 lifecycle hooks fail
+        ctx.register_hook.side_effect = [None, None, AttributeError("nope"), AttributeError("nope"), AttributeError("nope"), AttributeError("nope")]
         pi.register(ctx)  # should not raise
 
     def test_survives_missing_command_reg(self):
@@ -935,9 +936,255 @@ class TestBridgeHelperTimeoutDefault(unittest.TestCase):
     def test_custom_timeout(self):
         """_call_bridge respects custom timeout."""
         with patch("subprocess.run") as m:
-            m.return_value = MagicMock(returncode=0, stdout='{"ok":true}', stderr="")
+            m.return_value = MagicMock(returncode=0, stdout='{\"ok\":true}', stderr="")
             tools_mod._call_bridge({"command": "health"}, timeout=5)
             self.assertEqual(m.call_args[1]["timeout"], 5)
+
+
+class TestStrrayHooksTool(unittest.TestCase):
+    """Tests for the strray_hooks tool."""
+
+    def test_list_via_bridge(self):
+        """list action uses bridge when available."""
+        with patch.object(tools_mod, "_call_bridge", return_value={
+            "status": "ok", "action": "list",
+            "hooks": {"managed": ["pre-commit"], "missing": [], "external": [], "stale": []},
+        }) as m:
+            r = json.loads(tools_mod.strray_hooks({"action": "list"}))
+            self.assertEqual(r["status"], "ok")
+            self.assertEqual(r["via"], "bridge")
+            m.assert_called_once()
+            call_cmd = m.call_args[0][0]
+            self.assertEqual(call_cmd["command"], "hooks")
+            self.assertEqual(call_cmd["action"], "list")
+
+    def test_install_via_bridge(self):
+        """install action uses bridge."""
+        with patch.object(tools_mod, "_call_bridge", return_value={
+            "status": "ok", "action": "install", "installed": ["pre-commit", "post-commit"],
+            "skipped": [], "errors": [],
+        }) as m:
+            r = json.loads(tools_mod.strray_hooks({"action": "install"}))
+            self.assertEqual(r["via"], "bridge")
+            self.assertEqual(len(r["result"]["installed"]), 2)
+
+    def test_uninstall_via_bridge(self):
+        """uninstall action uses bridge."""
+        with patch.object(tools_mod, "_call_bridge", return_value={
+            "status": "ok", "action": "uninstall", "removed": ["pre-commit"], "restored": [],
+        }) as m:
+            r = json.loads(tools_mod.strray_hooks({"action": "uninstall"}))
+            self.assertEqual(r["via"], "bridge")
+
+    def test_bridge_error_fallback(self):
+        """Falls back to file-based when bridge errors."""
+        with patch.object(tools_mod, "_call_bridge", return_value={"error": "node not found"}):
+            # Without a real git repo, should return error
+            r = json.loads(tools_mod.strray_hooks({"action": "list"}))
+            self.assertIn("via", r)
+
+    def test_specific_hooks(self):
+        """Can request specific hooks."""
+        with patch.object(tools_mod, "_call_bridge", return_value={
+            "status": "ok", "action": "list",
+            "hooks": {"managed": [], "missing": ["pre-commit"], "external": [], "stale": []},
+        }) as m:
+            tools_mod.strray_hooks({"action": "list", "hooks": ["pre-commit"]})
+            call_cmd = m.call_args[0][0]
+            self.assertEqual(call_cmd["hooks"], ["pre-commit"])
+
+    def test_status_defaults_to_list(self):
+        """status action works like list."""
+        with patch.object(tools_mod, "_call_bridge", return_value={
+            "status": "ok", "action": "status",
+            "hooks": {"managed": [], "missing": [], "external": [], "stale": []},
+        }) as m:
+            r = json.loads(tools_mod.strray_hooks({"action": "status"}))
+            self.assertEqual(r["status"], "ok")
+            m.assert_called_once()
+
+    def test_default_action_is_list(self):
+        """Missing action defaults to list."""
+        with patch.object(tools_mod, "_call_bridge", return_value={
+            "status": "ok", "action": "list",
+            "hooks": {"managed": [], "missing": [], "external": [], "stale": []},
+        }) as m:
+            tools_mod.strray_hooks({})
+            call_cmd = m.call_args[0][0]
+            self.assertEqual(call_cmd["action"], "list")
+
+
+class TestStrrayHooksSchema(unittest.TestCase):
+    """Tests for the STRRAY_HOOKS schema."""
+
+    def test_schema_has_required_fields(self):
+        s = schemas.STRRAY_HOOKS
+        self.assertEqual(s["name"], "strray_hooks")
+        self.assertIn("action", s["parameters"]["properties"])
+        self.assertIn("hooks", s["parameters"]["properties"])
+        self.assertIn("action", s["parameters"]["required"])
+
+    def test_action_enum(self):
+        s = schemas.STRRAY_HOOKS
+        action = s["parameters"]["properties"]["action"]
+        self.assertIn("install", action["enum"])
+        self.assertIn("uninstall", action["enum"])
+        self.assertIn("list", action["enum"])
+        self.assertIn("status", action["enum"])
+
+    def test_hooks_enum(self):
+        s = schemas.STRRAY_HOOKS
+        hooks = s["parameters"]["properties"]["hooks"]
+        self.assertIn("pre-commit", hooks["items"]["enum"])
+        self.assertIn("post-commit", hooks["items"]["enum"])
+        self.assertIn("pre-push", hooks["items"]["enum"])
+        self.assertIn("post-push", hooks["items"]["enum"])
+
+    def test_description_mentions_hooks(self):
+        s = schemas.STRRAY_HOOKS
+        self.assertIn("git hooks", s["description"])
+
+
+class TestLifecycleHooks(unittest.TestCase):
+    """Tests for the new lifecycle hooks: on_file_write, on_validation_result, on_error."""
+
+    def setUp(self):
+        # Reset tracking lists
+        pi._modified_files = []
+        pi._validation_results = []
+        pi._errors = []
+
+    def test_on_file_write_logs(self):
+        with tempfile.TemporaryDirectory() as td:
+            log_dir = Path(td)
+            original = pi.LOG_DIR
+            pi.LOG_DIR = log_dir
+
+            pi._on_file_write("src/index.ts", "hello world", "write_file")
+
+            self.assertEqual(len(pi._modified_files), 1)
+            self.assertEqual(pi._modified_files[0]["path"], "src/index.ts")
+            self.assertEqual(pi._modified_files[0]["tool"], "write_file")
+
+            content = (log_dir / "activity.log").read_text()
+            self.assertIn("[file-write]", content)
+
+            pi.LOG_DIR = original
+
+    def test_on_file_write_empty_content(self):
+        pi._on_file_write("a.ts", "", "write_file")
+        self.assertEqual(len(pi._modified_files), 1)
+
+    def test_on_validation_result_passed(self):
+        with tempfile.TemporaryDirectory() as td:
+            log_dir = Path(td)
+            original = pi.LOG_DIR
+            pi.LOG_DIR = log_dir
+
+            pi._on_validation_result("strray_validate", True, [])
+
+            self.assertEqual(len(pi._validation_results), 1)
+            self.assertTrue(pi._validation_results[0]["passed"])
+
+            content = (log_dir / "activity.log").read_text()
+            self.assertIn("[validation]", content)
+
+            pi.LOG_DIR = original
+
+    def test_on_validation_result_failed(self):
+        pi._on_validation_result("strray_codex_check", False, ["console.log found"])
+        self.assertFalse(pi._validation_results[0]["passed"])
+        self.assertEqual(pi._validation_results[0]["violation_count"], 1)
+        self.assertEqual(len(pi._validation_results[0]["violations"]), 1)
+
+    def test_on_validation_result_truncates_violations(self):
+        many = [f"violation-{i}" for i in range(20)]
+        pi._on_validation_result("test", False, many)
+        # Should keep only first 5
+        self.assertEqual(len(pi._validation_results[0]["violations"]), 5)
+
+    def test_on_error_logs(self):
+        with tempfile.TemporaryDirectory() as td:
+            log_dir = Path(td)
+            original = pi.LOG_DIR
+            pi.LOG_DIR = log_dir
+
+            pi._on_error("write_file", "disk full", {"path": "a.ts"})
+
+            self.assertEqual(len(pi._errors), 1)
+            self.assertEqual(pi._errors[0]["tool"], "write_file")
+
+            content = (log_dir / "activity.log").read_text()
+            self.assertIn("[error]", content)
+
+            pi.LOG_DIR = original
+
+    def test_on_error_increments_stats(self):
+        initial = pi._session_stats["bridge_errors"]
+        pi._on_error("terminal", "timeout", None)
+        self.assertEqual(pi._session_stats["bridge_errors"], initial + 1)
+
+    def test_on_error_truncates_long_error(self):
+        long_error = "x" * 500
+        pi._on_error("tool", long_error, {})
+        self.assertLessEqual(len(pi._errors[0]["error"]), 200)
+
+    def test_on_error_no_args(self):
+        pi._on_error("tool", "crash", None)
+        self.assertEqual(pi._errors[0]["args_keys"], [])
+
+
+class TestRegisterIntegrationV2_1(unittest.TestCase):
+    """Test that register() wires all 4 tools and 5 hooks in v2.1."""
+
+    def test_wires_four_tools(self):
+        ctx = MagicMock()
+        pi.register(ctx)
+        names = [c[1]["name"] for c in ctx.register_tool.call_args_list]
+        self.assertEqual(set(names), {
+            "strray_validate", "strray_codex_check",
+            "strray_health", "strray_hooks",
+        })
+
+    def test_strray_hooks_schema_wired(self):
+        ctx = MagicMock()
+        pi.register(ctx)
+        sm = {c[1]["name"]: c[1]["schema"] for c in ctx.register_tool.call_args_list}
+        self.assertIs(sm["strray_hooks"], schemas.STRRAY_HOOKS)
+
+    def test_strray_hooks_handler_wired(self):
+        ctx = MagicMock()
+        pi.register(ctx)
+        hm = {c[1]["name"]: c[1]["handler"] for c in ctx.register_tool.call_args_list}
+        self.assertIs(hm["strray_hooks"], tools_mod.strray_hooks)
+
+    def test_registers_five_hooks(self):
+        ctx = MagicMock()
+        pi.register(ctx)
+        hook_names = [c[0][0] for c in ctx.register_hook.call_args_list]
+        self.assertIn("pre_tool_call", hook_names)
+        self.assertIn("post_tool_call", hook_names)
+        self.assertIn("on_file_write", hook_names)
+        self.assertIn("on_validation_result", hook_names)
+        self.assertIn("on_error", hook_names)
+
+    def test_survives_missing_lifecycle_hooks(self):
+        """New hooks should fail gracefully if not supported."""
+        ctx = MagicMock()
+        # All 5 hook registrations: pre_tool_call, post_tool_call, on_session_start, on_file_write, on_validation_result, on_error
+        # Let the 3 new ones raise
+        def side_effect(*args):
+            raise AttributeError("not available")
+        ctx.register_hook.side_effect = [None, None, None, side_effect, side_effect, side_effect]
+        pi.register(ctx)  # should not raise
+
+    def test_v2_1_log_message(self):
+        ctx = MagicMock()
+        with self.assertLogs("strray-hermes", level="INFO") as cm:
+            pi.register(ctx)
+        self.assertTrue(any("v2.1" in m for m in cm.output))
+        self.assertTrue(any("4 tools" in m for m in cm.output))
+        self.assertTrue(any("5 hooks" in m for m in cm.output))
 
 
 if __name__ == "__main__":

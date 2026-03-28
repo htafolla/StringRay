@@ -14,6 +14,7 @@
  *   health        - Quick framework health check
  *   codex-check   - Check code against codex rules
  *   stats         - Return bridge/framework statistics
+ *   hooks         - Manage git hooks (install, uninstall, list, status)
  *
  * Usage:
  *   echo '{"command":"health"}' | node bridge.mjs [--cwd /path]   # stdin mode
@@ -28,8 +29,12 @@ import {
   appendFileSync,
   mkdirSync,
   readdirSync,
+  lstatSync,
+  symlinkSync,
+  unlinkSync,
+  renameSync,
 } from "fs";
-import { join, dirname } from "path";
+import { join, dirname, relative } from "path";
 import { fileURLToPath } from "url";
 import { homedir } from "os";
 
@@ -446,6 +451,136 @@ async function handleCodexCheck(input, projectRoot, logDir) {
   };
 }
 
+function handleHooks(input, projectRoot) {
+  const { action, hooks } = input;
+  const hookTypes = hooks || ["pre-commit", "post-commit", "pre-push", "post-push"];
+  const gitHooksDir = join(projectRoot, ".git", "hooks");
+  const strrayHooksDir = join(projectRoot, "hooks");
+
+  if (!existsSync(gitHooksDir)) {
+    return { error: "Not a git repository — no .git/hooks directory" };
+  }
+
+  const result = { managed: [], missing: [], external: [], stale: [] };
+
+  // ── list / status ───────────────────────────────────────
+  if (action === "list" || action === "status") {
+    for (const hookName of hookTypes) {
+      const gitHook = join(gitHooksDir, hookName);
+      const strrayHook = join(strrayHooksDir, hookName);
+
+      if (!existsSync(gitHook)) {
+        result.missing.push(hookName);
+      } else {
+        try {
+          const content = readFileSync(gitHook, "utf-8");
+          if (content.includes("StringRay") || content.includes("strray") || content.includes("run-hook.js")) {
+            result.managed.push(hookName);
+          } else {
+            result.external.push(hookName);
+          }
+        } catch {
+          result.external.push(hookName);
+        }
+      }
+
+      // Check if strray source hook exists
+      if (!existsSync(strrayHook)) {
+        result.stale.push(hookName);
+      }
+    }
+
+    return {
+      status: "ok",
+      action,
+      hooks: result,
+      gitHooksDir,
+      strrayHooksDir,
+    };
+  }
+
+  // ── install ─────────────────────────────────────────────
+  if (action === "install") {
+    const installed = [];
+    const skipped = [];
+    const errors = [];
+
+    for (const hookName of hookTypes) {
+      const src = join(strrayHooksDir, hookName);
+      const dst = join(gitHooksDir, hookName);
+
+      if (!existsSync(src)) {
+        skipped.push(hookName);
+        continue;
+      }
+
+      try {
+        // Backup existing non-strray hooks
+        if (existsSync(dst)) {
+          const content = readFileSync(dst, "utf-8");
+          if (!content.includes("StringRay") && !content.includes("strray") && !content.includes("run-hook.js")) {
+            renameSync(dst, `${dst}.strray-backup`);
+          } else {
+            unlinkSync(dst);
+          }
+        }
+
+        // Create symlink
+        const rel = relative(join(gitHooksDir), src);
+        try {
+          // symlinkSync with 'junction' on Windows
+          symlinkSync(rel, dst);
+        } catch {
+          // Symlink may fail (permissions, cross-device) — copy instead
+          const srcContent = readFileSync(src, "utf-8");
+          writeFileSync(dst, srcContent, { mode: 0o755 });
+        }
+        installed.push(hookName);
+      } catch (err) {
+        errors.push({ hook: hookName, error: err.message });
+      }
+    }
+
+    return { status: "ok", action: "install", installed, skipped, errors };
+  }
+
+  // ── uninstall ───────────────────────────────────────────
+  if (action === "uninstall") {
+    const removed = [];
+    const restored = [];
+
+    for (const hookName of hookTypes) {
+      const dst = join(gitHooksDir, hookName);
+      const backup = `${dst}.strray-backup`;
+
+      if (!existsSync(dst)) continue;
+
+      try {
+        const content = readFileSync(dst, "utf-8");
+        const isStrray = content.includes("StringRay") || content.includes("strray") || content.includes("run-hook.js");
+
+        if (isStrray || lstatSync(dst).isSymbolicLink()) {
+          unlinkSync(dst);
+
+          // Restore backup if exists
+          if (existsSync(backup)) {
+            renameSync(backup, dst);
+            restored.push(hookName);
+          } else {
+            removed.push(hookName);
+          }
+        }
+      } catch {
+        // Skip unremovable hooks
+      }
+    }
+
+    return { status: "ok", action: "uninstall", removed, restored };
+  }
+
+  return { error: `Unknown hooks action: ${action}. Use: install, uninstall, list, status` };
+}
+
 function handleStats() {
   return {
     frameworkReady,
@@ -458,7 +593,7 @@ function handleStats() {
 
 // ── Known commands for positional-arg mode ──────────────────
 const KNOWN_COMMANDS = new Set([
-  "health", "stats", "pre-process", "post-process", "validate", "codex-check",
+  "health", "stats", "pre-process", "post-process", "validate", "codex-check", "hooks",
 ]);
 
 // ── Main ─────────────────────────────────────────────────────
@@ -539,6 +674,9 @@ async function main() {
       break;
     case "stats":
       response = handleStats();
+      break;
+    case "hooks":
+      response = handleHooks(command, projectRoot);
       break;
     default:
       response = { error: `Unknown command: ${cmd}` };

@@ -5,6 +5,8 @@ Falls back to CLI (npx strray-ai) when bridge is unavailable.
 """
 
 import json
+import os
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -206,3 +208,112 @@ def strray_health(args: dict, **kwargs) -> str:
 
     # Fallback to CLI
     return _run_strray(["health"], timeout=15)
+
+
+# ── Tool: strray_hooks ───────────────────────────────────────
+
+def strray_hooks(args: dict, **kwargs) -> str:
+    """Manage StringRay git hooks.
+
+    Actions: install, uninstall, list, status
+    Uses bridge for hook management when available.
+    Falls back to direct file-based management when bridge unavailable.
+    """
+    action = args.get("action", "list")
+    hooks = args.get("hooks", ["pre-commit", "post-commit", "pre-push", "post-push"])
+
+    # Try bridge first
+    bridge_result = _call_bridge({
+        "command": "hooks",
+        "action": action,
+        "hooks": hooks,
+    }, timeout=15)
+
+    if "error" not in bridge_result:
+        return json.dumps({
+            "status": "ok",
+            "action": action,
+            "hooks": hooks,
+            "result": bridge_result,
+            "via": "bridge",
+        })
+
+    # Fallback: direct file-based hook management
+    git_hooks_dir = Path(PROJECT_ROOT) / ".git" / "hooks"
+    strray_hooks_dir = Path(PROJECT_ROOT) / "hooks"
+
+    if not git_hooks_dir.exists():
+        return json.dumps({"error": "Not a git repository", "via": "fallback"})
+
+    if action in ("list", "status"):
+        result = {"managed": [], "missing": [], "external": [], "stale": []}
+        for hook_name in hooks:
+            git_hook = git_hooks_dir / hook_name
+            strray_hook = strray_hooks_dir / hook_name
+            if not git_hook.exists():
+                result["missing"].append(hook_name)
+            else:
+                try:
+                    content = git_hook.read_text()[:500]
+                    if "StringRay" in content or "strray" in content or "run-hook.js" in content:
+                        result["managed"].append(hook_name)
+                    else:
+                        result["external"].append(hook_name)
+                except OSError:
+                    result["external"].append(hook_name)
+            if not strray_hook.exists():
+                result["stale"].append(hook_name)
+        return json.dumps({"status": "ok", "action": action, **result, "via": "fallback"})
+
+    if action == "install":
+        installed = []
+        skipped = []
+        for hook_name in hooks:
+            src = strray_hooks_dir / hook_name
+            dst = git_hooks_dir / hook_name
+            if not src.exists():
+                skipped.append(hook_name)
+                continue
+            try:
+                if dst.exists():
+                    try:
+                        content = dst.read_text()[:500]
+                        if "StringRay" not in content and "strray" not in content:
+                            dst.rename(dst.with_suffix(".strray-backup"))
+                        else:
+                            dst.unlink()
+                    except OSError:
+                        pass
+                try:
+                    rel = os.path.relpath(str(src), str(git_hooks_dir))
+                    os.symlink(rel, dst)
+                except OSError:
+                    shutil.copy2(src, dst)
+                installed.append(hook_name)
+            except OSError:
+                pass
+        return json.dumps({"status": "ok", "action": "install", "installed": installed, "skipped": skipped, "via": "fallback"})
+
+    if action == "uninstall":
+        removed = []
+        restored = []
+        for hook_name in hooks:
+            dst = git_hooks_dir / hook_name
+            backup = dst.with_suffix(".strray-backup")
+            if not dst.exists():
+                continue
+            try:
+                content = dst.read_text()[:500]
+                is_strray = "StringRay" in content or "strray" in content or "run-hook.js" in content
+                if is_strray or dst.is_symlink():
+                    dst.unlink()
+                    if backup.exists():
+                        shutil.move(str(backup), str(dst))
+                        restored.append(hook_name)
+                    else:
+                        removed.append(hook_name)
+            except OSError:
+                pass
+        return json.dumps({"status": "ok", "action": "uninstall", "removed": removed, "restored": restored, "via": "fallback"})
+
+    return json.dumps({"error": f"Unknown action: {action}", "via": "fallback"})

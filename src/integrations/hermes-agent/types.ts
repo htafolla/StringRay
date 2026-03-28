@@ -73,7 +73,8 @@ export type BridgeCommand =
   | "post-process"
   | "validate"
   | "codex-check"
-  | "stats";
+  | "stats"
+  | "hooks";
 
 /**
  * Request sent to bridge.mjs via stdin
@@ -88,6 +89,8 @@ export interface BridgeRequest {
   operation?: string;
   code?: string;
   focusAreas?: string[];
+  action?: string;
+  hooks?: string[];
 }
 
 /**
@@ -174,6 +177,27 @@ export interface BridgeStatsResponse {
 }
 
 /**
+ * Hooks response from bridge
+ */
+export interface BridgeHooksResponse {
+  status: "ok";
+  action: "install" | "uninstall" | "list" | "status";
+  hooks?: {
+    managed: string[];
+    missing: string[];
+    external: string[];
+    stale: string[];
+  };
+  installed?: string[];
+  skipped?: string[];
+  removed?: string[];
+  restored?: string[];
+  errors?: Array<{ hook: string; error: string }>;
+  gitHooksDir?: string;
+  strrayHooksDir?: string;
+}
+
+/**
  * Union type for all bridge responses
  */
 export type BridgeResponse =
@@ -183,6 +207,7 @@ export type BridgeResponse =
   | BridgeValidateResponse
   | BridgeCodexCheckResponse
   | BridgeStatsResponse
+  | BridgeHooksResponse
   | { error: string };
 
 // ============================================================================

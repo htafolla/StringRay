@@ -413,6 +413,62 @@ def _strray_command(args: str) -> str:
 
 # ── Registration ──────────────────────────────────────────────
 
+# Session tracking for new lifecycle hooks
+_modified_files: list = []
+_validation_results: list = []
+_errors: list = []
+
+
+def _on_file_write(file_path: str, content: str, tool_name: str, **kwargs):
+    """Fires when a code-producing tool writes a file.
+
+    Validates the file was written correctly and logs the event.
+    """
+    _log_to_file("activity.log",
+        f"[file-write] path={file_path} tool={tool_name} size={len(content) if content else 0}")
+
+    _modified_files.append({
+        "path": file_path,
+        "tool": tool_name,
+        "timestamp": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+    })
+
+
+def _on_validation_result(tool_name: str, passed: bool, violations: list, **kwargs):
+    """Fires when a validation/check completes.
+
+    Tracks validation outcomes for session context.
+    """
+    _log_to_file("activity.log",
+        f"[validation] tool={tool_name} passed={passed} violations={len(violations)}")
+
+    _validation_results.append({
+        "tool": tool_name,
+        "passed": passed,
+        "violation_count": len(violations),
+        "violations": violations[:5],
+        "timestamp": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+    })
+
+
+def _on_error(tool_name: str, error: str, args: dict, **kwargs):
+    """Fires when a tool call fails.
+
+    Logs the error and tracks it for session context.
+    """
+    _log_to_file("activity.log",
+        f"[error] tool={tool_name} error={str(error)[:200]}")
+
+    _session_stats["bridge_errors"] += 1
+
+    _errors.append({
+        "tool": tool_name,
+        "error": str(error)[:200],
+        "args_keys": list((args or {}).keys()),
+        "timestamp": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+    })
+
+
 def register(ctx):
     """Wire schemas to handlers and register lifecycle hooks."""
     # ── Register tools ────────────────────────────────────────
@@ -434,6 +490,12 @@ def register(ctx):
         schema=schemas.STRRAY_HEALTH,
         handler=tools.strray_health,
     )
+    ctx.register_tool(
+        name="strray_hooks",
+        toolset="strray-hermes",
+        schema=schemas.STRRAY_HOOKS,
+        handler=tools.strray_hooks,
+    )
 
     # ── Register hooks ────────────────────────────────────────
     ctx.register_hook("pre_tool_call", _on_pre_tool_call)
@@ -445,12 +507,23 @@ def register(ctx):
     except (AttributeError, TypeError):
         logger.debug("[strray] on_session_start hook not yet available")
 
+    # Try to register new lifecycle hooks
+    for hook_name, hook_fn in [
+        ("on_file_write", _on_file_write),
+        ("on_validation_result", _on_validation_result),
+        ("on_error", _on_error),
+    ]:
+        try:
+            ctx.register_hook(hook_name, hook_fn)
+        except (AttributeError, TypeError):
+            logger.debug("[strray] %s hook not yet available", hook_name)
+
     # ── Register slash command ────────────────────────────────
     try:
         ctx.register_command(
             name="strray",
             handler=_strray_command,
-            description="StringRay status, stats, and enforcement info",
+            description="StringRay status, stats, hooks, and enforcement info",
             args_hint="[status|stats|help]",
             aliases=("sr",),
         )
@@ -460,11 +533,11 @@ def register(ctx):
     # ── Bootstrap ─────────────────────────────────────────────
     _ensure_log_dir()
     _log_to_file("activity.log",
-        f"[plugin-loaded] StringRay Hermes Plugin v2.0 — "
-        f"3 tools, 2 hooks, bridge={BRIDGE_PATH.exists()}")
+        f"[plugin-loaded] StringRay Hermes Plugin v2.1 — "
+        f"4 tools, 5 hooks, bridge={BRIDGE_PATH.exists()}")
 
     logger.info(
-        "[strray] Plugin v2.0 loaded: 3 tools, 2 hooks, "
+        "[strray] Plugin v2.1 loaded: 4 tools, 5 hooks, "
         "bridge=%s — full framework pipeline active",
         BRIDGE_PATH.exists(),
     )

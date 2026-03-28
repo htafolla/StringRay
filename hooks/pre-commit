@@ -1,0 +1,28 @@
+#!/bin/bash
+# StringRay Pre-Commit Hook
+# Runs TypeScript check, linting, and Codex validation before commit
+# This hook BLOCKS the commit if validation fails
+
+set -e
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+
+# Get staged files (only source files)
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(ts|tsx|js|jsx|mjs)$' || true)
+
+if [ -z "$STAGED_FILES" ]; then
+  exit 0
+fi
+
+# Run the Node.js hook runner
+if command -v node >/dev/null 2>&1; then
+  export HOOK_TYPE="pre-commit"
+  export STAGED_FILES="$STAGED_FILES"
+  export PROJECT_ROOT="$PROJECT_ROOT"
+  node "$PROJECT_ROOT/scripts/hooks/run-hook.js" pre-commit
+  exit $?
+else
+  echo "Warning: Node.js not found, skipping StringRay pre-commit validation"
+  exit 0
+fi

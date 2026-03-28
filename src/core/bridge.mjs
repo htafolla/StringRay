@@ -44,7 +44,7 @@ import {
   appendFileSync,
   mkdirSync,
 } from "fs";
-import { join, dirname, relative } from "path";
+import { join, dirname, relative, resolve } from "path";
 import { fileURLToPath } from "url";
 import { homedir } from "os";
 import { createServer } from "http";
@@ -220,7 +220,7 @@ function loadCodexFromFs(projectRoot) {
   const envDir = process.env.STRRAY_CONFIG_DIR;
   const candidates = [];
 
-  if (envDir) candidates.push(join(projectRoot, envDir, "codex.json"));
+  if (envDir) candidates.push(resolve(envDir, "codex.json"));
   candidates.push(join(projectRoot, ".strray", "codex.json"));
   candidates.push(join(projectRoot, ".opencode", "strray", "codex.json"));
   candidates.push(join(projectRoot, "codex.json"));
@@ -423,7 +423,7 @@ function startHttpServer(port, projectRoot) {
           return;
         }
         if (url.pathname === "/stats") {
-          const result = handleStats();
+          const result = await handleStats();
           res.writeHead(200);
           res.end(JSON.stringify(result));
           return;

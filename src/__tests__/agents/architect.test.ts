@@ -81,7 +81,7 @@ describe("Architect Agent Configuration", () => {
     });
   });
 
-  describe.skip("Integration Points", () => {
+  describe("Integration Points", () => {
     it("should have concise integration guidance", () => {
       const system = architect.system;
       // Simplified prompt

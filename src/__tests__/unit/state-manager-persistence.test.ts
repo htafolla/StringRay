@@ -79,10 +79,10 @@ describe("StringRayStateManager - Persistence Features", () => {
       });
     });
 
-    // Skip this test due to dynamic import mocking issues with Vitest
-    it.skip("should load existing state from disk", async () => {
+    it("should load existing state from disk", async () => {
       const existingState = { "test-key": "test-value", "number-key": 42 };
       vi.mocked(mockFs.existsSync).mockReturnValue(true);
+      vi.mocked(mockFs.statSync).mockReturnValue({ isFile: () => false } as any);
       vi.mocked(mockFs.readFileSync).mockReturnValue(
         JSON.stringify(existingState),
       );
@@ -246,10 +246,7 @@ describe("StringRayStateManager - Persistence Features", () => {
       expect(finalStats.pendingWrites).toBe(0);
     });
 
-    it.skip("should report correct stats when persistence disabled", async () => {
-      // Skipped due to Vitest dynamic import mocking limitations
-      // The state manager correctly handles disabled persistence in production,
-      // but the test environment cannot properly mock dynamic fs imports.
+    it("should report correct stats when persistence disabled", async () => {
       const noPersistManager = new StringRayStateManager(
         "/test/state.json",
         false,

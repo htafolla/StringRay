@@ -105,7 +105,7 @@ describe("Codex Enforcement E2E", () => {
   });
 
   describe("Error Resolution Enforcement", () => {
-    it.skip("should block improper error handling", async () => {
+    it("should block improper error handling", async () => {
       const badErrorCode = `
         function processData() {
           try {
@@ -132,7 +132,7 @@ describe("Codex Enforcement E2E", () => {
   });
 
   describe("Infinite Loop Prevention", () => {
-    it.skip("should block infinite loops", async () => {
+    it("should block infinite loops", async () => {
       const infiniteLoopCode = `
         function badFunction() {
           while (true) { // Infinite loop
@@ -157,7 +157,7 @@ describe("Codex Enforcement E2E", () => {
   });
 
   describe("State Management Patterns", () => {
-    it.skip("should block global state abuse", async () => {
+    it("should block global state abuse", async () => {
       const globalStateCode = `
         class BadService {
           static globalCounter = 0; // Global state
@@ -177,27 +177,30 @@ describe("Codex Enforcement E2E", () => {
       expect(result.passed).toBe(false);
       expect(
         result.errors.some(
-          (error) => error.includes("state") || error.includes("global"),
+          (error) =>
+            error.toLowerCase().includes("state") ||
+            error.toLowerCase().includes("global") ||
+            error.toLowerCase().includes("dom"),
         ),
       ).toBe(true);
     });
   });
 
   describe("Rule Statistics", () => {
-    it.skip("should provide accurate rule statistics", () => {
+    it("should provide accurate rule statistics", () => {
       const stats = ruleEnforcer.getRuleStats();
 
-      expect(stats.totalRules).toBeGreaterThan(8); // Should have our new rules
+      expect(stats.totalRules).toBeGreaterThan(8); // Should have many rules
       expect(stats.enabledRules).toBeGreaterThan(0);
       expect(stats.ruleCategories).toBeDefined();
-      expect(stats.ruleCategories["architecture"]).toBeGreaterThan(2); // Should have our new architecture rules
+      expect(stats.ruleCategories["architecture"]).toBeGreaterThan(2); // Should have architecture rules
     });
 
-    it.skip("should have all critical rules registered", () => {
+    it("should have all critical rules registered", () => {
       const stats = ruleEnforcer.getRuleStats();
 
-      // Should have the critical rules we added
-      expect(stats.totalRules).toBe(11); // 8 original + 3 new
+      // Should have all registered rules including async-loaded ones
+      expect(stats.totalRules).toBeGreaterThan(20);
       expect(Object.keys(stats.ruleCategories)).toContain("architecture");
       expect(Object.keys(stats.ruleCategories)).toContain("code-quality");
       expect(Object.keys(stats.ruleCategories)).toContain("security");

@@ -154,10 +154,10 @@ export class RuleEnforcer {
       ["no-over-engineering", "No Over-Engineering (Codex Term #3)", "Prevents over-engineering by enforcing simple, direct solutions without unnecessary abstractions", "architecture", "error"],
       
       // Codex Term #7: Resolve All Errors
-      ["resolve-all-errors", "Resolve All Errors (Codex Term #7)", "Ensures all runtime errors are properly handled and prevented", "architecture", "blocking"],
+      ["error-resolution", "Resolve All Errors (Codex Term #7)", "Ensures all runtime errors are properly handled and prevented", "architecture", "blocking"],
       
       // Codex Term #8: Prevent Infinite Loops
-      ["prevent-infinite-loops", "Prevent Infinite Loops (Codex Term #8)", "Ensures all loops have clear termination conditions", "architecture", "blocking"],
+      ["loop-safety", "Prevent Infinite Loops (Codex Term #8)", "Ensures all loops have clear termination conditions", "architecture", "blocking"],
       
       // Codex Term #41: State Management Patterns
       ["state-management-patterns", "State Management Patterns (Codex Term #41)", "Ensures proper state management patterns are used throughout the application", "architecture", "high"],

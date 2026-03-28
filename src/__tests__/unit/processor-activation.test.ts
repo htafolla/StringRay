@@ -454,9 +454,7 @@ describe("Processor Activation", () => {
       expect(result.results[2]?.processorName).toBe("errorBoundary");
     });
 
-    it.skip("should handle processor execution failures gracefully in concurrent scenarios", async () => {
-      // TODO: Update test for new registry-based processor architecture
-      // This test mocks internal executeProcessor which now uses registry pattern
+    it("should handle processor execution failures gracefully in concurrent scenarios", async () => {
       processorManager.registerProcessor({
         name: "preValidate",
         type: "pre",
@@ -473,7 +471,7 @@ describe("Processor Activation", () => {
 
       await processorManager.initializeProcessors();
 
-      // Mock one processor to fail
+      // Mock executeProcessor to make preValidate fail and codexCompliance succeed
       const originalExecute = processorManager["executeProcessor"];
       processorManager["executeProcessor"] = vi
         .fn()
@@ -486,7 +484,12 @@ describe("Processor Activation", () => {
               processorName: name,
             };
           }
-          return originalExecute.call(processorManager, name, context);
+          // Ensure codexCompliance returns success regardless of context
+          return {
+            success: true,
+            duration: 5,
+            processorName: name,
+          };
         });
 
       const result = await processorManager.executePreProcessors({

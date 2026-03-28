@@ -37,7 +37,7 @@ export class ConsentManager {
   private submissionQueue: any[] = [];
   
   constructor(configPath = ".opencode/consent.json") {
-    this.configPath = path.join(process.cwd(), configPath);
+    this.configPath = path.isAbsolute(configPath) ? configPath : path.join(process.cwd(), configPath);
   }
 
   /**

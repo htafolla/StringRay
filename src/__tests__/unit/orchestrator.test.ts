@@ -15,6 +15,31 @@ import {
 } from "../../core/orchestrator.js";
 import { TaskDefinition } from "../../agents/types.js";
 
+// Mock framework-logger to prevent logging side effects
+vi.mock("../../core/framework-logger.js", () => ({
+  frameworkLogger: {
+    log: vi.fn().mockResolvedValue(undefined),
+    error: vi.fn().mockResolvedValue(undefined),
+    warn: vi.fn().mockResolvedValue(undefined),
+    info: vi.fn().mockResolvedValue(undefined),
+    debug: vi.fn().mockResolvedValue(undefined),
+  },
+}));
+
+// Mock kernel-patterns to avoid pattern detection in tests
+vi.mock("../../core/kernel-patterns.js", () => ({
+  getKernel: () => ({
+    analyze: () => ({
+      level: "L1",
+      confidence: 0.5,
+      cascadePatterns: [],
+      fatalAssumptions: [],
+      actionRequired: null,
+    }),
+  }),
+  resetKernel: () => {},
+}));
+
 describe("KernelOrchestrator", () => {
   let orchestrator: KernelOrchestrator;
 
@@ -40,7 +65,7 @@ describe("KernelOrchestrator", () => {
     expect(customOrchestrator).toBeDefined();
   });
 
-  test.skip("should execute single task successfully", async () => {
+  test("should execute single task successfully", async () => {
     const task: TaskDefinition = {
       id: "test-task-1",
       type: "exploration",
@@ -52,6 +77,16 @@ describe("KernelOrchestrator", () => {
       subagentType: "code-analyzer",
     };
 
+    // Mock delegateToSubagent to return typed result matching task
+    const mockDelegate = vi
+      .spyOn(orchestrator as any, "delegateToSubagent")
+      .mockResolvedValue({
+        success: true,
+        result: { type: task.type, simulated: true },
+        agentName: "code-analyzer",
+        executionTime: 50,
+      });
+
     const result = await orchestrator.executeComplexTask("Single task test", [
       task,
     ]);
@@ -62,6 +97,8 @@ describe("KernelOrchestrator", () => {
     expect(result[0].success).toBe(true);
     expect(result[0].result.type).toBe("exploration");
     expect(result[0].duration).toBeGreaterThan(0);
+
+    mockDelegate.mockRestore();
   });
 
   test("should handle task execution failures", async () => {
@@ -94,7 +131,7 @@ describe("KernelOrchestrator", () => {
     mockExecute.mockRestore();
   });
 
-  test.skip("should execute complex multi-step tasks", async () => {
+  test("should execute complex multi-step tasks", async () => {
     const tasks: TaskDefinition[] = [
       {
         id: "step-1",
@@ -118,6 +155,16 @@ describe("KernelOrchestrator", () => {
       },
     ];
 
+    // Mock delegateToSubagent to return typed results matching each task
+    const mockDelegate = vi
+      .spyOn(orchestrator as any, "delegateToSubagent")
+      .mockImplementation(async (_agentName: string, task: any) => ({
+        success: true,
+        result: { type: task.type, simulated: true },
+        agentName: _agentName,
+        executionTime: 50,
+      }));
+
     const result = await orchestrator.executeComplexTask(
       "Complex test task",
       tasks,
@@ -132,6 +179,8 @@ describe("KernelOrchestrator", () => {
     expect(result[1].success).toBe(true);
     expect(result[0].result.type).toBe("exploration");
     expect(result[1].result.type).toBe("documentation");
+
+    mockDelegate.mockRestore();
   });
 
   test("should respect task dependencies in complex tasks", async () => {
@@ -206,7 +255,7 @@ describe("KernelOrchestrator", () => {
     mockDelegate.mockRestore();
   });
 
-  test.skip("should limit concurrent task execution", async () => {
+  test("should limit concurrent task execution", async () => {
     const tasks: TaskDefinition[] = Array.from({ length: 5 }, (_, i) => ({
       id: `task-${i}`,
       type: "exploration",
@@ -217,6 +266,25 @@ describe("KernelOrchestrator", () => {
       status: "pending",
       subagentType: "code-analyzer",
     }));
+
+    // Mock delegateToSubagent with a delay to ensure sequential execution is measurable
+    const mockDelegate = vi
+      .spyOn(orchestrator as any, "delegateToSubagent")
+      .mockImplementation(
+        () =>
+          new Promise((resolve) =>
+            setTimeout(
+              () =>
+                resolve({
+                  success: true,
+                  result: { type: "exploration", simulated: true },
+                  agentName: "code-analyzer",
+                  executionTime: 200,
+                }),
+              200,
+            ),
+          ),
+      );
 
     const startTime = Date.now();
     const result = await orchestrator.executeComplexTask(
@@ -231,6 +299,8 @@ describe("KernelOrchestrator", () => {
 
     // Should take some time due to sequential execution in batches
     expect(endTime - startTime).toBeGreaterThan(500);
+
+    mockDelegate.mockRestore();
   });
 
   test("should resolve conflicts using configured strategy", () => {

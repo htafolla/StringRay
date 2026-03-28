@@ -12,6 +12,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import { spawn } from "child_process";
+import { resolveCodexPath, resolveStateDir } from "../core/config-paths.js";
 
 // Import lean system prompt generator
 let SystemPromptGenerator: any;
@@ -305,14 +306,20 @@ interface CodexContextEntry {
 let cachedCodexContexts: CodexContextEntry[] | null = null;
 
 /**
- * Codex file locations to search
+ * Codex file locations resolved through the standard priority chain.
+ * Falls back to additional OpenCode-specific files not covered by the resolver.
  */
-const CODEX_FILE_LOCATIONS = [
-  ".opencode/strray/codex.json",
-  ".opencode/codex.codex",
-  ".strray/agents_template.md",
-  "AGENTS.md",
-];
+function getCodexFileLocations(directory?: string): string[] {
+  const root = directory || process.cwd();
+  const resolved = resolveCodexPath(root);
+  // Add OpenCode-specific fallbacks not in the standard chain
+  resolved.push(
+    path.join(root, ".opencode", "codex.codex"),
+    path.join(root, ".strray", "agents_template.md"),
+    path.join(root, "AGENTS.md"),
+  );
+  return resolved;
+}
 
 /**
  * Read file content safely
@@ -389,8 +396,9 @@ function loadCodexContext(directory: string): CodexContextEntry[] {
 
   const codexContexts: CodexContextEntry[] = [];
 
-  for (const relativePath of CODEX_FILE_LOCATIONS) {
-    const fullPath = path.join(directory, relativePath);
+  const locations = getCodexFileLocations(directory);
+  for (const fileLocation of locations) {
+    const fullPath = path.isAbsolute(fileLocation) ? fileLocation : path.join(directory, fileLocation);
     const content = readFileContent(fullPath);
 
     if (content && content.trim().length > 0) {
@@ -406,7 +414,7 @@ function loadCodexContext(directory: string): CodexContextEntry[] {
   if (codexContexts.length === 0) {
     void getOrCreateLogger(directory).then((l) =>
       l.error(
-        `No valid codex files found. Checked: ${CODEX_FILE_LOCATIONS.join(", ")}`,
+        `No valid codex files found. Checked: ${locations.join(", ")}`,
       ),
     );
   }
@@ -557,7 +565,7 @@ export default async function strrayCodexPlugin(input: {
           logger.log("🚀 StrRay framework not booted, initializing...");
           // Create new state manager (framework not booted yet)
           stateManager = new StrRayStateManager(
-            path.join(directory, ".opencode", "state"),
+            resolveStateDir(directory),
           );
           // Store globally for future use
           (globalThis as any).strRayStateManager = stateManager;
@@ -712,7 +720,7 @@ export default async function strrayCodexPlugin(input: {
         if (!ProcessorManager || !StrRayStateManager) return;
 
         const stateManager = new StrRayStateManager(
-          path.join(directory, ".opencode", "state"),
+          resolveStateDir(directory),
         );
         const processorManager = new ProcessorManager(stateManager);
 

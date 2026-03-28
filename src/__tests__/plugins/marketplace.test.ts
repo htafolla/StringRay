@@ -90,6 +90,18 @@ const faker = {
       return result;
     }),
   },
+  number: {
+    int: vi.fn((options?: { min?: number; max?: number }) => {
+      const min = options?.min ?? 0;
+      const max = options?.max ?? 100;
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }),
+    float: vi.fn((options?: { min?: number; max?: number }) => {
+      const min = options?.min ?? 0;
+      const max = options?.max ?? 5;
+      return Math.random() * (max - min) + min;
+    }),
+  },
   lorem: {
     paragraph: vi.fn(() => "Test plugin description"),
     paragraphs: vi.fn((count: number) => Array(count).fill("Test plugin description")),
@@ -178,7 +190,7 @@ function generateMockMetadata(
     ),
     supportedFrameworks: ["strray"],
     supportedPlatforms: [
-      faker.helpers.arrayElement(["linux", "macos", "windows"]),
+      faker.helpers.arrayElement(["node", "browser", "deno"]),
     ],
     supportedArchitectures: [faker.helpers.arrayElement(["x64", "arm64"])],
     languages: [
@@ -237,33 +249,29 @@ function generateMockVersion(
 function generateMockPlugin(
   overrides: Partial<MarketplacePlugin> = {},
 ): MarketplacePlugin {
-  const id = overrides.id || "test-plugin-123";
+  const id = overrides.id || faker.string.uuid();
   const name = overrides.name || "Test Plugin";
   const version = overrides.latestVersion || "1.0.0";
 
   return {
     id,
     name,
-    description: overrides.description || "A test plugin description",
+    description:
+      typeof overrides.description === "string"
+        ? overrides.description
+        : Array.isArray(overrides.description)
+          ? overrides.description.join(" ")
+          : "A test plugin description",
     latestVersion: version,
-    author: overrides.author || {
-      id: "test-author",
-      name: "Test Author",
-      email: "test@example.com",
-    },
+    author: overrides.author || generateMockAuthor({ verified: true }),
     category: overrides.category || "agent",
     tags: overrides.tags || ["test", "plugin"],
     license: overrides.license || "MIT",
-    stats: overrides.stats || { downloads: 100, rating: 4.5, reviews: 10 },
-    security: overrides.security || { verified: true, lastAudit: Date.now() },
-    metadata: overrides.metadata || { size: 50000, languages: ["typescript"] },
-    compatibility: overrides.compatibility || {
-      frameworkVersion: "1.0.0",
-      nodeVersion: "18.0.0",
-    },
-    versions: overrides.versions || [
-      { version, publishedAt: Date.now(), changelog: "Initial release" },
-    ],
+    stats: overrides.stats || generateMockStats(),
+    security: overrides.security || generateMockSecurity(),
+    metadata: overrides.metadata || generateMockMetadata(),
+    compatibility: overrides.compatibility || generateMockCompatibility(),
+    versions: overrides.versions || [generateMockVersion({ version })],
     dependencies: overrides.dependencies || [],
     createdAt: overrides.createdAt || Date.now() - 86400000,
     updatedAt: overrides.updatedAt || Date.now(),
@@ -271,7 +279,7 @@ function generateMockPlugin(
   };
 }
 
-describe.skip("Plugin Marketplace Service - Core Functionality", () => {
+describe("Plugin Marketplace Service - Core Functionality", () => {
   let service: PluginMarketplaceService;
 
   beforeEach(() => {
@@ -411,15 +419,15 @@ describe.skip("Plugin Marketplace Service - Core Functionality", () => {
       const categoryPlugins = [
         generateMockPlugin({
           category,
-          stats: generateMockStats({ rating: 3.5 }),
+          stats: generateMockStats({ rating: 3.5, downloads: 100 }),
         }),
         generateMockPlugin({
           category,
-          stats: generateMockStats({ rating: 4.8 }),
+          stats: generateMockStats({ rating: 4.8, downloads: 500 }),
         }),
         generateMockPlugin({
           category,
-          stats: generateMockStats({ rating: 2.1 }),
+          stats: generateMockStats({ rating: 2.1, downloads: 50 }),
         }),
       ];
       const otherPlugins = Array.from({ length: 2 }, () =>
@@ -593,7 +601,7 @@ describe.skip("Plugin Marketplace Service - Core Functionality", () => {
   });
 });
 
-describe.skip("Plugin Marketplace Service - Search Functionality", () => {
+describe("Plugin Marketplace Service - Search Functionality", () => {
   let service: PluginMarketplaceService;
 
   beforeEach(() => {
@@ -920,16 +928,14 @@ describe.skip("Plugin Marketplace Service - Search Functionality", () => {
       service.registerPlugin(plugin1);
       service.registerPlugin(plugin2);
 
-      const query: MarketplaceSearchQuery = {
-        query: "security",
-      };
+      const query: MarketplaceSearchQuery = {};
 
       const result = await service.search(query);
 
       expect(result.facets).toHaveProperty("categories");
       expect(result.facets).toHaveProperty("authors");
 
-      // Should have counts for each facet
+      // Should have counts for each facet from registered plugins
       expect(result.facets.categories.security).toBeGreaterThan(0);
       expect(result.facets.categories.performance).toBeGreaterThan(0);
     });
@@ -969,7 +975,7 @@ describe.skip("Plugin Marketplace Service - Search Functionality", () => {
   });
 });
 
-describe.skip("Plugin Marketplace Service - Download & Security", () => {
+describe("Plugin Marketplace Service - Download & Security", () => {
   let service: PluginMarketplaceService;
 
   beforeEach(() => {
@@ -984,7 +990,7 @@ describe.skip("Plugin Marketplace Service - Download & Security", () => {
       });
       service.registerPlugin(plugin);
 
-      const result = await service.downloadPlugin(plugin.id, "1.0.0");
+      const result = await service.downloadPlugin(plugin.id, "1.7.5");
 
       expect(result.success).toBe(true);
       expect(result.downloadUrl).toBe(plugin.versions[0].downloadUrl);
@@ -1011,7 +1017,7 @@ describe.skip("Plugin Marketplace Service - Download & Security", () => {
 
     it("should update download statistics", async () => {
       const plugin = generateMockPlugin({
-        stats: generateMockStats({ downloads: 10 }),
+        stats: generateMockStats({ downloads: 10, lastDownload: Date.now() - 100000 }),
       });
       service.registerPlugin(plugin);
 
@@ -1133,7 +1139,7 @@ describe.skip("Plugin Marketplace Service - Download & Security", () => {
   });
 });
 
-describe.skip("Plugin Marketplace Service - Error Handling & Edge Cases", () => {
+describe("Plugin Marketplace Service - Error Handling & Edge Cases", () => {
   let service: PluginMarketplaceService;
 
   beforeEach(() => {
@@ -1259,7 +1265,7 @@ describe.skip("Plugin Marketplace Service - Error Handling & Edge Cases", () => 
     it("should handle memory pressure from large search results", async () => {
       const plugins = Array.from({ length: 500 }, () =>
         generateMockPlugin({
-          description: faker.lorem.paragraphs(5), // Large descriptions
+          description: faker.lorem.paragraphs(5).join("\n"), // Large descriptions
         }),
       );
 
@@ -1353,7 +1359,7 @@ describe.skip("Plugin Marketplace Service - Error Handling & Edge Cases", () => 
   });
 });
 
-describe.skip("Plugin Marketplace Service - Integration Scenarios", () => {
+describe("Plugin Marketplace Service - Integration Scenarios", () => {
   let service: PluginMarketplaceService;
 
   beforeEach(() => {
@@ -1391,10 +1397,10 @@ describe.skip("Plugin Marketplace Service - Integration Scenarios", () => {
 
     it("should handle plugin updates and versioning", async () => {
       const plugin = generateMockPlugin({
-        latestVersion: "1.0.0",
+        latestVersion: "1.1.0",
         versions: [
-          generateMockVersion({ version: "1.7.5" }),
-          generateMockVersion({ version: "1.7.5" }),
+          generateMockVersion({ version: "1.0.0", downloadUrl: "https://example.com/v1.0.0" }),
+          generateMockVersion({ version: "1.1.0", downloadUrl: "https://example.com/v1.1.0" }),
         ],
       });
       service.registerPlugin(plugin);
@@ -1544,7 +1550,7 @@ describe.skip("Plugin Marketplace Service - Integration Scenarios", () => {
 });
 
 // Test coverage verification
-describe.skip("Plugin Marketplace Service - Coverage Validation", () => {
+describe("Plugin Marketplace Service - Coverage Validation", () => {
   it("should achieve >85% code coverage across all methods", () => {
     // This test ensures we've exercised all major code paths
     // In a real CI environment, this would be verified by coverage tools

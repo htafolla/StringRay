@@ -156,6 +156,7 @@
     "@typescript-eslint/parser": "^6.15.0",
     "@vitest/coverage-v8": "^4.0.18",
     "eslint": "^8.57.1",
+    "eslint-plugin-vitest": "^0.5.4",
     "express": "^5.2.1",
     "vitest": "^4.0.18",
     "ws": "^8.20.0"

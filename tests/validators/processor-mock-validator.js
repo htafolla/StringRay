@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 /**
  * Processor Mock Coverage Validator
  * 
@@ -5,34 +7,19 @@
  * Run this before the test suite to catch missing mocks early.
  * 
  * Usage:
- *   npx ts-node tests/validators/processor-mock-validator.ts
+ *   node tests/validators/processor-mock-validator.js
  * 
  * Exit codes:
  *   0 - All processors have proper mocks
  *   1 - Missing mocks detected
  */
 
-import * as fs from "fs";
-import * as path from "path";
-import { execSync } from "child_process";
-
-interface MockRequirement {
-  processor: string;
-  file: string;
-  dependencies: string[];
-  hasChildProcess: boolean;
-  hasFS: boolean;
-  hasOtherMocks: boolean;
-}
-
-interface ValidationResult {
-  valid: boolean;
-  errors: string[];
-  warnings: string[];
-}
+const fs = require("fs");
+const path = require("path");
+const { execSync } = require("child_process");
 
 // Processors that require mocks
-const PROCESSORS_REQUIRING_MOCKS: Record<string, string[]> = {
+const PROCESSORS_REQUIRING_MOCKS = {
   "TestExecutionProcessor": ["child_process", "fs", "language-detector"],
   "CodexComplianceProcessor": ["rule-enforcer"],
   "VersionComplianceProcessor": ["version-compliance-processor"],
@@ -41,7 +28,7 @@ const PROCESSORS_REQUIRING_MOCKS: Record<string, string[]> = {
   "AgentsMdValidationProcessor": ["agents-md-validation-processor"],
 };
 
-function analyzeTestFile(filePath: string): MockRequirement | null {
+function analyzeTestFile(filePath) {
   const content = fs.readFileSync(filePath, "utf-8");
   const processorName = Object.keys(PROCESSORS_REQUIRING_MOCKS).find(
     (name) => content.includes(`new ${name}()`),
@@ -63,9 +50,9 @@ function analyzeTestFile(filePath: string): MockRequirement | null {
   };
 }
 
-function validateMockRequirements(testDir: string): ValidationResult {
-  const errors: string[] = [];
-  const warnings: string[] = [];
+function validateMockRequirements(testDir) {
+  const errors = [];
+  const warnings = [];
 
   // Find all processor test files
   const testFiles = execSync(
@@ -81,7 +68,7 @@ function validateMockRequirements(testDir: string): ValidationResult {
     if (!analysis) continue;
 
     // Check for missing mocks
-    const missingMocks: string[] = [];
+    const missingMocks = [];
 
     if (analysis.dependencies.includes("child_process") && !analysis.hasChildProcess) {
       missingMocks.push("child_process");

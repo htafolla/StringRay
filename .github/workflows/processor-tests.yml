@@ -27,7 +27,7 @@ jobs:
         run: npm ci
 
       - name: Run mock coverage validator
-        run: npx ts-node tests/validators/processor-mock-validator.ts
+        run: node tests/validators/processor-mock-validator.js
 
   processor-tests:
     name: Processor Tests

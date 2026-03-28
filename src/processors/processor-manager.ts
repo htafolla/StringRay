@@ -598,16 +598,6 @@ export class ProcessorManager {
         `All processors must be registered via ProcessorRegistry. ` +
         `Legacy switch-based execution has been removed.`
       );
-
-      const duration = Date.now() - startTime;
-      this.updateMetrics(name, true, duration);
-
-      return {
-        success: true,
-        data: result,
-        duration,
-        processorName: name,
-      };
     } catch (error) {
       const duration = Date.now() - startTime;
       this.updateMetrics(name, false, duration);

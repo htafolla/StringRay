@@ -103,16 +103,18 @@ async function activateCodexInjection(jobId: string): Promise<void> {
     { jobId },
   );
 
-  const { createStringRayCodexInjectorHook } = await import("./codex-injector");
+  const { createStringRayCodexInjectorHook } = await import("./codex-injector.js");
   const hook = createStringRayCodexInjectorHook();
 
+  // Store hook globally for OpenCode to pick up
   (globalThis as any).strRayHooks = (globalThis as any).strRayHooks || [];
+  (globalThis as any).strRayHooks.push(hook);
 
   frameworkLogger.log(
     "stringray-activation",
     "codex injection activated",
     "success",
-    { jobId },
+    { jobId, hookName: hook.name },
   );
 }
 

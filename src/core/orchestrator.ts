@@ -26,6 +26,7 @@ export interface OrchestratorConfig {
 export class KernelOrchestrator {
   private taskQueue: Map<string, TaskDefinition> = new Map();
   private activeTasks: Set<string> = new Set();
+  private totalProcessed: number = 0;
   private config: {
     maxConcurrentTasks: number;
     taskTimeout: number;
@@ -142,6 +143,7 @@ export class KernelOrchestrator {
     } finally {
       this.activeTasks.delete(taskId);
       this.taskQueue.delete(taskId);
+      this.totalProcessed++;
     }
   }
 
@@ -543,7 +545,7 @@ export class KernelOrchestrator {
     return {
       queueSize: this.taskQueue.size,
       activeTasks: this.activeTasks.size,
-      totalProcessed: this.taskQueue.size + this.activeTasks.size,
+      totalProcessed: this.totalProcessed,
       config: this.config,
     };
   }

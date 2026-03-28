@@ -150,38 +150,8 @@ def _log_tool_event(event_type, tool, args=None, duration=0, error=None):
 
 # ── Bridge calls ──────────────────────────────────────────────
 
-def _call_bridge(command: dict, timeout: int = 15) -> dict:
+def _call_bridge(command: dict, timeout: int = 10) -> dict:
     """Call bridge.mjs with a JSON command, return parsed response."""
-    _session_stats["bridge_calls"] += 1
-    try:
-        result = subprocess.run(
-            [sys.executable.replace("python", "node") if "python" in sys.executable else "node",
-             str(BRIDGE_PATH), "--cwd", str(PROJECT_ROOT)],
-            input=json.dumps(command),
-            capture_output=True,
-            text=True,
-            timeout=timeout,
-        )
-        if result.returncode != 0:
-            _session_stats["bridge_errors"] += 1
-            logger.debug("Bridge error: %s", result.stderr[:200] if result.stderr else "unknown")
-            return {"error": result.stderr[:200] if result.stderr else "bridge failed"}
-
-        return json.loads(result.stdout)
-    except FileNotFoundError:
-        _session_stats["bridge_errors"] += 1
-        logger.warning("Node.js not found — bridge unavailable")
-        return {"error": "node not found"}
-    except subprocess.TimeoutExpired:
-        _session_stats["bridge_errors"] += 1
-        return {"error": f"bridge timed out after {timeout}s"}
-    except (json.JSONDecodeError, OSError) as e:
-        _session_stats["bridge_errors"] += 1
-        return {"error": str(e)}
-
-
-def _call_bridge_fast(command: dict, timeout: int = 10) -> dict:
-    """Same as _call_bridge but tries 'node' directly."""
     _session_stats["bridge_calls"] += 1
     try:
         result = subprocess.run(
@@ -248,7 +218,7 @@ def _on_pre_tool_call(tool_name: str, args: dict, task_id: str, **kwargs):
 
         # Run quality gate via bridge
         _session_stats["quality_gate_runs"] += 1
-        bridge_result = _call_bridge_fast({
+        bridge_result = _call_bridge({
             "command": "pre-process",
             "tool": tool_name,
             "args": args or {},
@@ -349,7 +319,7 @@ def _on_post_tool_call(tool_name: str, args: dict, result, task_id: str, **kwarg
     # Code-producing tools get post-processors
     if tool_name in _CODE_TOOLS:
         # Run post-processors via bridge
-        bridge_result = _call_bridge_fast({
+        bridge_result = _call_bridge({
             "command": "post-process",
             "tool": tool_name,
             "args": args or {},
@@ -426,7 +396,7 @@ def _strray_command(args: str) -> str:
         )
 
     # Default: status (calls bridge health)
-    bridge_result = _call_bridge_fast({"command": "health"}, timeout=10)
+    bridge_result = _call_bridge({"command": "health"}, timeout=10)
     if "error" in bridge_result:
         return f"StringRay plugin loaded. Bridge: {bridge_result['error']}"
 

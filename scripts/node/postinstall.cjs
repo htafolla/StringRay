@@ -297,9 +297,13 @@ if (fs.existsSync(scriptsSource)) {
 }
 
 // Detect if we're in a consumer environment (installed via npm)
-// Check both the target directory and current working directory
+// Check for strray-ai package manifest instead of string-matching directory paths
 const cwd = process.cwd();
-const isConsumerEnvironment = !targetDir.includes("dev/stringray") && !targetDir.includes("stringray");
+const isConsumerEnvironment = fs.existsSync(
+  path.join(targetDir, 'node_modules', 'strray-ai', 'package.json')
+) || fs.existsSync(
+  path.join(cwd, 'node_modules', 'strray-ai', 'package.json')
+);
 
 // Convert paths for consumer environment
 if (isConsumerEnvironment) {
@@ -312,16 +316,47 @@ if (isConsumerEnvironment) {
 
 // Convert MCP server paths only (not plugin paths - those are for npm packages)
 // Note: MCP servers are in dist/mcps/ NOT dist/plugin/mcps/
-const mainOpencodePath = path.join(targetDir, "opencode.json");
+  const mainOpencodePath = path.join(targetDir, "opencode.json");
   if (fs.existsSync(mainOpencodePath)) {
-    let opencodeContent = fs.readFileSync(mainOpencodePath, "utf8");
-    // Convert MCP server paths (mcpServers use command array)
-    opencodeContent = opencodeContent.replace(
-      /"\.\.?\/dist\/mcps\//g,
-      '"node_modules/strray-ai/dist/mcps/'
-    );
-    fs.writeFileSync(mainOpencodePath, opencodeContent, "utf8");
-    console.log("✅ Updated MCP paths in opencode.json");
+    try {
+      const opencode = JSON.parse(fs.readFileSync(mainOpencodePath, "utf8"));
+      let modified = false;
+      // Convert MCP server paths in command arrays
+      if (opencode.mcpServers) {
+        for (const server of Object.values(opencode.mcpServers)) {
+          if (server.command && typeof server.command === 'string') {
+            const updated = server.command.replace(
+              /node_modules\/strray-ai\/dist\/mcps\//,
+              'node_modules/strray-ai/dist/mcps/'
+            );
+            // Normalize any relative dist paths to use node_modules
+            const normalized = updated.replace(
+              /^[.]{0,2}\/dist\/mcps\//,
+              'node_modules/strray-ai/dist/mcps/'
+            );
+            if (normalized !== server.command) {
+              server.command = normalized;
+              modified = true;
+            }
+          }
+          // Handle command arrays (some MCP configs use arrays)
+          if (Array.isArray(server.command)) {
+            server.command = server.command.map(arg =>
+              arg.replace(/^[.]{0,2}\/dist\/mcps\//, 'node_modules/strray-ai/dist/mcps/')
+            );
+            modified = true;
+          }
+        }
+      }
+      if (modified) {
+        fs.writeFileSync(mainOpencodePath, JSON.stringify(opencode, null, 2) + "\n", "utf8");
+        console.log("✅ Updated MCP paths in opencode.json");
+      } else {
+        console.log("ℹ️  No MCP path updates needed in opencode.json");
+      }
+    } catch (error) {
+      console.warn(`⚠️ Could not update opencode.json: ${error.message}`);
+    }
   }
 }
 

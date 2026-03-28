@@ -269,7 +269,7 @@ class TestPreToolCallHook(unittest.TestCase):
         pi._session_stats["started_at"] = None
         pi._session_stats["session_id"] = None
 
-    @patch.object(pi, "_call_bridge_fast")
+    @patch.object(pi, "_call_bridge")
     def test_strray_mcp_no_bridge(self, mock_bridge):
         """StringRay MCP tools skip bridge entirely."""
         pi._on_pre_tool_call("mcp_strray_lint_lint", {}, "t1")
@@ -277,13 +277,13 @@ class TestPreToolCallHook(unittest.TestCase):
         self.assertEqual(pi._session_stats["native_tool_calls"], 0)
         mock_bridge.assert_not_called()
 
-    @patch.object(pi, "_call_bridge_fast")
+    @patch.object(pi, "_call_bridge")
     def test_native_tool_no_bridge(self, mock_bridge):
         """Non-code native tools don't call bridge."""
         pi._on_pre_tool_call("read_file", {"path": "a.md"}, "t1")
         mock_bridge.assert_not_called()
 
-    @patch.object(pi, "_call_bridge_fast", return_value={"passed": True, "qualityGate": {"passed": True, "violations": []}, "processors": {"ran": False}})
+    @patch.object(pi, "_call_bridge", return_value={"passed": True, "qualityGate": {"passed": True, "violations": []}, "processors": {"ran": False}})
     def test_code_tool_calls_bridge(self, mock_bridge):
         """Code-producing tools trigger bridge pre-process."""
         pi._on_pre_tool_call("write_file", {"path": "a.ts"}, "t1")
@@ -292,7 +292,7 @@ class TestPreToolCallHook(unittest.TestCase):
         self.assertEqual(call_cmd["command"], "pre-process")
         self.assertEqual(call_cmd["tool"], "write_file")
 
-    @patch.object(pi, "_call_bridge_fast", return_value={"passed": True, "qualityGate": {"passed": True, "violations": []}, "processors": {"ran": False}})
+    @patch.object(pi, "_call_bridge", return_value={"passed": True, "qualityGate": {"passed": True, "violations": []}, "processors": {"ran": False}})
     def test_code_tool_increments_stats(self, mock_bridge):
         for t in ["write_file", "patch", "execute_code"]:
             pi._session_stats["code_operations"] = 0
@@ -301,13 +301,13 @@ class TestPreToolCallHook(unittest.TestCase):
             self.assertEqual(pi._session_stats["code_operations"], 1, f"{t}")
             self.assertEqual(pi._session_stats["quality_gate_runs"], 1, f"{t}")
 
-    @patch.object(pi, "_call_bridge_fast", return_value={"passed": False, "qualityGate": {"passed": False, "violations": ["tests-required: no test"]}, "processors": {"ran": False}})
+    @patch.object(pi, "_call_bridge", return_value={"passed": False, "qualityGate": {"passed": False, "violations": ["tests-required: no test"]}, "processors": {"ran": False}})
     def test_quality_gate_block(self, mock_bridge):
         """Quality gate failures increment block counter."""
         pi._on_pre_tool_call("write_file", {"path": "a.ts"}, "t1")
         self.assertEqual(pi._session_stats["quality_gate_blocks"], 1)
 
-    @patch.object(pi, "_call_bridge_fast", return_value={"passed": True, "qualityGate": {"passed": True}, "processors": {"ran": True, "success": True, "processorCount": 2, "details": [{"name": "preValidate", "success": True}]}})
+    @patch.object(pi, "_call_bridge", return_value={"passed": True, "qualityGate": {"passed": True}, "processors": {"ran": True, "success": True, "processorCount": 2, "details": [{"name": "preValidate", "success": True}]}})
     def test_pre_processor_stats(self, mock_bridge):
         pi._on_pre_tool_call("write_file", {"path": "a.ts"}, "t1")
         self.assertEqual(pi._session_stats["pre_processor_runs"], 1)
@@ -341,13 +341,13 @@ class TestPreToolCallHook(unittest.TestCase):
 
     def test_no_nudge_write_file(self):
         """write_file is a code tool — no nudge, gets bridge instead."""
-        with patch.object(pi, "_call_bridge_fast", return_value={"passed": True, "qualityGate": {"passed": True}, "processors": {"ran": False}}):
+        with patch.object(pi, "_call_bridge", return_value={"passed": True, "qualityGate": {"passed": True}, "processors": {"ran": False}}):
             with self.assertRaises(AssertionError):
                 with self.assertLogs("strray-hermes", level="INFO"):
                     pi._on_pre_tool_call("write_file", {}, "t1")
 
     def test_accumulates(self):
-        with patch.object(pi, "_call_bridge_fast", return_value={"passed": True, "qualityGate": {"passed": True}, "processors": {"ran": False}}):
+        with patch.object(pi, "_call_bridge", return_value={"passed": True, "qualityGate": {"passed": True}, "processors": {"ran": False}}):
             for _ in range(5):
                 pi._on_pre_tool_call("terminal", {}, "t1")
         self.assertEqual(pi._session_stats["total_tool_calls"], 5)
@@ -367,13 +367,13 @@ class TestPostToolCallHook(unittest.TestCase):
         # Reset post_processor_runs since it accumulates across tests
         pi._session_stats["post_processor_runs"] = 0
 
-    @patch.object(pi, "_call_bridge_fast")
+    @patch.object(pi, "_call_bridge")
     def test_non_code_no_bridge(self, mock_bridge):
         """Non-code tools don't trigger bridge post-process."""
         pi._on_post_tool_call("terminal", {"command": "ls"}, None, "t1")
         mock_bridge.assert_not_called()
 
-    @patch.object(pi, "_call_bridge_fast", return_value={"processors": {"ran": True, "success": True, "processorCount": 2, "details": []}})
+    @patch.object(pi, "_call_bridge", return_value={"processors": {"ran": True, "success": True, "processorCount": 2, "details": []}})
     def test_code_tool_calls_bridge(self, mock_bridge):
         """Code-producing tools trigger bridge post-process."""
         pi._on_post_tool_call("write_file", {"path": "a.ts"}, None, "t1")
@@ -382,12 +382,12 @@ class TestPostToolCallHook(unittest.TestCase):
         self.assertEqual(call_cmd["command"], "post-process")
         self.assertEqual(call_cmd["tool"], "write_file")
 
-    @patch.object(pi, "_call_bridge_fast", return_value={"processors": {"ran": True, "success": True, "processorCount": 1, "details": []}})
+    @patch.object(pi, "_call_bridge", return_value={"processors": {"ran": True, "success": True, "processorCount": 1, "details": []}})
     def test_post_processor_stats(self, mock_bridge):
         pi._on_post_tool_call("patch", {"path": "a.ts"}, None, "t1")
         self.assertEqual(pi._session_stats["post_processor_runs"], 1)
 
-    @patch.object(pi, "_call_bridge_fast", return_value={"processors": {"ran": True, "success": True, "processorCount": 2, "details": []}})
+    @patch.object(pi, "_call_bridge", return_value={"processors": {"ran": True, "success": True, "processorCount": 2, "details": []}})
     def test_post_captures_result(self, mock_bridge):
         pi._on_post_tool_call("write_file", {"path": "a.ts"}, {"error": "disk full"}, "t1")
         call_cmd = mock_bridge.call_args[0][0]
@@ -443,19 +443,19 @@ class TestSlashCommand(unittest.TestCase):
 
     def test_status_via_bridge(self):
         """v2: status uses bridge, not tools.strray_health."""
-        with patch.object(pi, "_call_bridge_fast", return_value={"framework": "loaded", "version": "1.15.0", "components": {"qualityGate": True, "processorManager": True}}) as m:
+        with patch.object(pi, "_call_bridge", return_value={"framework": "loaded", "version": "1.15.0", "components": {"qualityGate": True, "processorManager": True}}) as m:
             o = pi._strray_command("status")
             self.assertIn("loaded", o)
             self.assertIn("1.15.0", o)
             m.assert_called_once_with({"command": "health"}, timeout=10)
 
     def test_status_bridge_error(self):
-        with patch.object(pi, "_call_bridge_fast", return_value={"error": "node not found"}):
+        with patch.object(pi, "_call_bridge", return_value={"error": "node not found"}):
             o = pi._strray_command("status")
             self.assertIn("node not found", o)
 
     def test_default_status(self):
-        with patch.object(pi, "_call_bridge_fast", return_value={"framework": "loaded", "version": "1.0", "components": {}}):
+        with patch.object(pi, "_call_bridge", return_value={"framework": "loaded", "version": "1.0", "components": {}}):
             o = pi._strray_command("")
             self.assertIn("loaded", o)
 
@@ -784,16 +784,16 @@ class TestPreToolCallBridgeErrors(unittest.TestCase):
         pi._session_stats["started_at"] = None
         pi._session_stats["session_id"] = None
 
-    @patch.object(pi, "_call_bridge_fast", return_value={"error": "bridge crashed"})
+    @patch.object(pi, "_call_bridge", return_value={"error": "bridge crashed"})
     def test_code_tool_bridge_error_does_not_crash(self, mock_bridge):
         """Bridge error during pre-process should not crash the hook."""
         pi._on_pre_tool_call("write_file", {"path": "a.ts"}, "t1")
         self.assertEqual(pi._session_stats["code_operations"], 1)
-        # Note: bridge_calls stat is inside the real _call_bridge_fast,
+        # Note: bridge_calls stat is inside the real _call_bridge,
         # so mocking it doesn't increment the counter. Verify hook doesn't crash.
         mock_bridge.assert_called_once()
 
-    @patch.object(pi, "_call_bridge_fast", return_value={"error": "timeout"})
+    @patch.object(pi, "_call_bridge", return_value={"error": "timeout"})
     def test_multiple_code_tools_with_bridge_errors(self, mock_bridge):
         """Multiple bridge errors accumulate properly."""
         for i in range(3):
@@ -808,19 +808,19 @@ class TestPostToolCallBridgeErrors(unittest.TestCase):
     def setUp(self):
         pi._session_stats["post_processor_runs"] = 0
 
-    @patch.object(pi, "_call_bridge_fast", return_value={"error": "bridge down"})
+    @patch.object(pi, "_call_bridge", return_value={"error": "bridge down"})
     def test_code_tool_post_bridge_error(self, mock_bridge):
         """Bridge error during post-process should not crash."""
         pi._on_post_tool_call("write_file", {"path": "a.ts"}, None, "t1")
         mock_bridge.assert_called_once()
 
-    @patch.object(pi, "_call_bridge_fast", return_value={"processors": {"ran": False}})
+    @patch.object(pi, "_call_bridge", return_value={"processors": {"ran": False}})
     def test_code_tool_processors_not_ran(self, mock_bridge):
         """Processors not running is handled gracefully."""
         pi._on_post_tool_call("execute_code", {"command": "echo hi"}, {"duration": 42}, "t1")
         self.assertEqual(pi._session_stats["post_processor_runs"], 0)
 
-    @patch.object(pi, "_call_bridge_fast", return_value={"processors": {"ran": True, "success": False, "processorCount": 1, "details": [{"name": "testAutoCreation", "success": False, "error": "no test file"}]}})
+    @patch.object(pi, "_call_bridge", return_value={"processors": {"ran": True, "success": False, "processorCount": 1, "details": [{"name": "testAutoCreation", "success": False, "error": "no test file"}]}})
     def test_post_processor_failure_logging(self, mock_bridge):
         """Failed post-processors are tracked but don't crash."""
         pi._on_post_tool_call("write_file", {"path": "a.ts"}, None, "t1")
@@ -835,7 +835,7 @@ class TestPreToolCallEdgeCases(unittest.TestCase):
         pi._session_stats["started_at"] = None
         pi._session_stats["session_id"] = None
 
-    @patch.object(pi, "_call_bridge_fast", return_value={"passed": True, "qualityGate": {"passed": True}, "processors": {"ran": False}})
+    @patch.object(pi, "_call_bridge", return_value={"passed": True, "qualityGate": {"passed": True}, "processors": {"ran": False}})
     def test_all_code_tools_trigger_bridge(self, mock_bridge):
         """Every tool in _CODE_TOOLS calls the bridge."""
         code_tools = ["write_file", "patch", "execute_code", "write", "edit"]
@@ -844,7 +844,7 @@ class TestPreToolCallEdgeCases(unittest.TestCase):
             pi._on_pre_tool_call(tool, {}, "t1")
             self.assertEqual(pi._session_stats["code_operations"], 1, f"{tool} should be a code tool")
 
-    @patch.object(pi, "_call_bridge_fast")
+    @patch.object(pi, "_call_bridge")
     def test_unknown_tool_not_strray_mcp(self, mock_bridge):
         """Unknown tools should be treated as native tools."""
         pi._on_pre_tool_call("some_random_tool", {}, "t1")
@@ -857,7 +857,7 @@ class TestPreToolCallEdgeCases(unittest.TestCase):
         self.assertEqual(pi._session_stats["native_tool_calls"], 1)
         self.assertEqual(pi._session_stats["strray_mcp_calls"], 0)
 
-    @patch.object(pi, "_call_bridge_fast", return_value={"passed": True, "qualityGate": {"passed": True, "violations": []}, "processors": {"ran": True, "success": True, "processorCount": 3, "details": [{"name": "p1", "success": True}, {"name": "p2", "success": True}, {"name": "p3", "success": False, "error": "failed"}]}})
+    @patch.object(pi, "_call_bridge", return_value={"passed": True, "qualityGate": {"passed": True, "violations": []}, "processors": {"ran": True, "success": True, "processorCount": 3, "details": [{"name": "p1", "success": True}, {"name": "p2", "success": True}, {"name": "p3", "success": False, "error": "failed"}]}})
     def test_pre_processor_partial_failure(self, mock_bridge):
         """Pre-processors with partial failure still count as ran."""
         pi._on_pre_tool_call("write_file", {"path": "a.ts"}, "t1")
@@ -869,7 +869,7 @@ class TestSlashCommandEdgeCases(unittest.TestCase):
 
     def test_unknown_command_defaults_to_status(self):
         """Unknown args default to status."""
-        with patch.object(pi, "_call_bridge_fast", return_value={"framework": "loaded", "version": "1.0", "components": {}}) as m:
+        with patch.object(pi, "_call_bridge", return_value={"framework": "loaded", "version": "1.0", "components": {}}) as m:
             pi._strray_command("something-random")
             m.assert_called_once_with({"command": "health"}, timeout=10)
 
@@ -904,19 +904,19 @@ class TestPostToolCallDuration(unittest.TestCase):
     def setUp(self):
         pi._session_stats["post_processor_runs"] = 0
 
-    @patch.object(pi, "_call_bridge_fast", return_value={"processors": {"ran": False}})
+    @patch.object(pi, "_call_bridge", return_value={"processors": {"ran": False}})
     def test_duration_extracted_from_result_dict(self, mock_bridge):
         """Duration from result dict is logged correctly."""
         # We verify the post hook doesn't crash with duration in result
         pi._on_post_tool_call("write_file", {"path": "a.ts"}, {"duration": 1234, "success": True}, "t1")
         # No crash = pass
 
-    @patch.object(pi, "_call_bridge_fast", return_value={"processors": {"ran": False}})
+    @patch.object(pi, "_call_bridge", return_value={"processors": {"ran": False}})
     def test_non_dict_result_no_crash(self, mock_bridge):
         """Non-dict result doesn't crash the hook."""
         pi._on_post_tool_call("write_file", {"path": "a.ts"}, "string result", "t1")
 
-    @patch.object(pi, "_call_bridge_fast", return_value={"processors": {"ran": False}})
+    @patch.object(pi, "_call_bridge", return_value={"processors": {"ran": False}})
     def test_none_result_no_crash(self, mock_bridge):
         """None result doesn't crash the hook."""
         pi._on_post_tool_call("write_file", {"path": "a.ts"}, None, "t1")

@@ -20,6 +20,7 @@ def _find_project_root():
     for _ in range(6):
         if (d / "package.json").exists():
             return d
+        d = d.parent
     return Path.cwd()
 
 PROJECT_ROOT = _find_project_root()

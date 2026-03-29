@@ -92,7 +92,7 @@ class StrategistServer {
   constructor() {
     this.server = new Server(
       {
-        name: "strray/strategist", version: "1.15.18",
+        name: "strray/strategist", version: "1.15.19",
       },
       {
         capabilities: {

@@ -12,7 +12,26 @@
 import * as fs from "fs";
 import * as path from "path";
 import { spawn } from "child_process";
-import { frameworkLogger } from "../core/framework-logger.js";
+// frameworkLogger — dynamically loaded (works from both dist/plugin/ and .opencode/plugins/)
+let frameworkLogger: any;
+
+async function loadFrameworkLogger() {
+  if (frameworkLogger) return;
+  const candidates = [
+    "../../dist/core/framework-logger.js",
+    "../core/framework-logger.js",
+  ];
+  for (const p of candidates) {
+    try {
+      frameworkLogger = (await import(p)).frameworkLogger;
+      return;
+    } catch (_) {
+      // try next candidate
+    }
+  }
+  // Fallback noop logger — plugin works without structured logging
+  frameworkLogger = { log: () => {} };
+}
 
 // Dynamic imports for config-paths (works from both dist/plugin/ and .opencode/plugins/)
 let _resolveCodexPath: any;
@@ -35,6 +54,7 @@ async function loadConfigPaths() {
       // try next candidate
     }
   }
+  await loadFrameworkLogger();
   frameworkLogger.log("strray-codex-plugin", "config-paths-load-failed", "warning", { warning: "Failed to load config-paths module from any location" });
 }
 
@@ -67,6 +87,7 @@ async function importSystemPromptGenerator() {
         // try next candidate
       }
     }
+    await loadFrameworkLogger();
     frameworkLogger.log("strray-codex-plugin", "system-prompt-generator-load-failed", "warning", { warning: "Failed to load lean system prompt generator, using fallback" });
   }
 }

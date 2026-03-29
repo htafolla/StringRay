@@ -191,7 +191,7 @@ npm view strray-ai@latest version  # → 1.3.2
 
 # Edit version manager
 code scripts/node/universal-version-manager.js
-# → Set version: "1.15.17"
+# → Set version: "1.15.18"
 
 # Run sync
 npm run version:sync

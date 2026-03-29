@@ -120,7 +120,7 @@ class StrRayDocumentationGenerationServer {
   constructor() {
     this.server = new Server(
       {
-        name: "documentation-generation", version: "1.15.17",
+        name: "documentation-generation", version: "1.15.18",
       },
       {
         capabilities: {
@@ -1007,7 +1007,7 @@ class StrRayDocumentationGenerationServer {
       openapi: "3.0.0",
       info: {
         title: "API Documentation",
-        version: "1.15.17",
+        version: "1.15.18",
         description: "Generated API documentation",
       },
       servers: [

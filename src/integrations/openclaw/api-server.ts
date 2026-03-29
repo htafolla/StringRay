@@ -8,6 +8,7 @@
  * @since 2026-03-14
  */
 
+import * as crypto from 'crypto';
 import * as http from 'http';
 import {
   StringRayAPIServerConfig,
@@ -148,7 +149,25 @@ export class StringRayAPIServer {
 
     // Set CORS headers if enabled
     if (this.config.cors) {
-      res.setHeader('Access-Control-Allow-Origin', '*');
+      // Security: When an API key is configured, restrict CORS to localhost only
+      // to prevent cross-origin attacks where a malicious site could make
+      // authenticated requests using the API key from a victim's browser.
+      if (this.config.apiKey) {
+        this.logger.warn(
+          '[StringRayAPIServer] Security: API key is set with CORS enabled. ' +
+          'Restricting Access-Control-Allow-Origin to localhost only. ' +
+          'Configure explicit allowed origins if cross-origin access is needed.'
+        );
+        const origin = req.headers.origin;
+        if (origin && ['http://localhost', 'http://127.0.0.1', 'http://localhost:3000',
+            'http://127.0.0.1:3000', 'http://localhost:5173', 'http://127.0.0.1:5173'].includes(origin)) {
+          res.setHeader('Access-Control-Allow-Origin', origin);
+        } else {
+          res.setHeader('Access-Control-Allow-Origin', 'http://127.0.0.1');
+        }
+      } else {
+        res.setHeader('Access-Control-Allow-Origin', '*');
+      }
       res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
       res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     }
@@ -309,21 +328,28 @@ export class StringRayAPIServer {
   }
 
   /**
-   * Validate API key
+   * Validate API key using constant-time comparison to prevent timing attacks
    */
   private validateApiKey(authHeader: string | undefined): boolean {
     if (!authHeader) {
       return false;
     }
 
-    // Support Bearer token
-    if (authHeader.startsWith('Bearer ')) {
-      const token = authHeader.slice(7);
-      return token === this.config.apiKey;
+    const expectedKey = this.config.apiKey;
+    const providedKey = authHeader.startsWith('Bearer ')
+      ? authHeader.slice(7)
+      : authHeader;
+
+    // Length mismatch check: return false immediately (length is not secret),
+    // but this does not leak information about the key content.
+    if (providedKey.length !== expectedKey.length) {
+      return false;
     }
 
-    // Support direct API key
-    return authHeader === this.config.apiKey;
+    // Use timing-safe comparison for the actual key content
+    const expectedBuf = Buffer.from(expectedKey, 'utf-8');
+    const providedBuf = Buffer.from(providedKey, 'utf-8');
+    return crypto.timingSafeEqual(expectedBuf, providedBuf);
   }
 
   /**

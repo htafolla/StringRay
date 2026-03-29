@@ -279,7 +279,7 @@ The missing piece that enables autonomous CI/CD recovery:
 **No breaking changes.** This is a validation and bugfix release.
 
 **Recommended steps**:
-1. Update version in package.json: `"version": "1.15.17"`
+1. Update version in package.json: `"version": "1.15.18"`
 2. Run `npm install` to refresh dependencies
 3. Run `npm run test:core-framework` to verify
 4. Deploy with confidence

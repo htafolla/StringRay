@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Conventional Commits](https://www.conventionalcommits.org/).
 
+## [1.15.18] - 2026-03-29
+
+### 🔄 Changes
+
+### 🐛 Bug Fixes
+- fix: state persistence path, enforcer blocked logic, console bleed, test fixes, subagent enforcement (#12) (044a0e3)
+
+### 🔧 Maintenance
+- chore: rebuild dist after console.* cleanup (07e4a68)
+
+---
+
 ## [1.15.17] - 2026-03-29
 
 ### 🔄 Changes

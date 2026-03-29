@@ -1,6 +1,6 @@
 {
   "$schema": "./features.schema.json",
-  "version": "1.15.17",
+  "version": "1.15.18",
   "description": "StringRay Framework - Unified Feature Configuration",
   "token_optimization": {
     "enabled": true,

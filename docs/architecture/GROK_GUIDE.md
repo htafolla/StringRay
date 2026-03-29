@@ -98,7 +98,7 @@ Update your `.opencode/OpenCode.json`:
   },
   "framework": {
     "name": "strray",
-    "version": "1.15.17"
+    "version": "1.15.18"
   }
 }
 ```

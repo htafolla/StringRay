@@ -4,7 +4,7 @@
  */
 
 import { frameworkLogger } from "../core/framework-logger.js";
-import { runCommand } from "../utils/command-runner.js";
+import { runCommandSafe } from "../utils/command-runner.js";
 
 export interface PendingChange {
   filePath: string;
@@ -339,7 +339,7 @@ export class IntelligentCommitBatcher {
    */
   private async stageFiles(files: string[]): Promise<void> {
     for (const file of files) {
-      await runCommand(`git add "${file}"`, { silent: true });
+      await runCommandSafe("git", ["add", "--", file], { silent: true });
     }
   }
 
@@ -348,9 +348,11 @@ export class IntelligentCommitBatcher {
    */
   private async performGitCommit(message: string): Promise<boolean> {
     try {
-      const result = await runCommand(`git commit -m "${message}"`, {
-        silent: true,
-      });
+      const result = await runCommandSafe(
+        "git",
+        ["commit", "-m", message],
+        { silent: true },
+      );
       return result.success;
     } catch (error) {
       return false;

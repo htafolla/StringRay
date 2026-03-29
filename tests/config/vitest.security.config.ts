@@ -17,7 +17,7 @@ export default defineConfig({
     name: "StrRay Security Tests",
     environment: "node",
     globals: true,
-    setupFiles: ["./src/__tests__/setup/security-setup.ts"],
+    setupFiles: ["./src/__tests__/setup.ts"],
 
     // Sequential execution for security tests (to avoid interference)
     pool: "threads",

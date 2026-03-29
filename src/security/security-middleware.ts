@@ -86,11 +86,44 @@ export class SecurityMiddleware {
     };
   }
 
+  private cleanupInterval: ReturnType<typeof setInterval> | null = null;
+
   /**
    * Rate limiting middleware
+   * Includes periodic cleanup of expired entries to prevent memory leaks.
    */
   rateLimit(): (req: Request, res: Response, next: NextFunction) => void {
     const requests = new Map<string, { count: number; resetTime: number }>();
+    const windowMs = this.config.rateLimiting?.windowMs ?? 60 * 1000;
+
+    // Periodically evict expired entries to prevent unbounded memory growth
+    const cleanupInterval = setInterval(() => {
+      const now = Date.now();
+      requests.forEach((entry, key) => {
+        if (now > entry.resetTime) {
+          requests.delete(key);
+        }
+      });
+      // If the map is empty and rate limiting is disabled, stop cleanup
+      if (requests.size === 0) {
+        clearInterval(cleanupInterval);
+        if (this.cleanupInterval === cleanupInterval) {
+          this.cleanupInterval = null;
+        }
+      }
+    }, windowMs);
+
+    // Store reference so it can be cleared on shutdown
+    this.cleanupInterval = cleanupInterval;
+
+    // Ensure the interval is cleaned up on process exit
+    const stopCleanup = () => {
+      clearInterval(cleanupInterval);
+      if (this.cleanupInterval === cleanupInterval) {
+        this.cleanupInterval = null;
+      }
+    };
+    process.on('exit', stopCleanup);
 
     return (req: Request, res: Response, next: NextFunction) => {
       if (!this.config.rateLimiting?.enabled) {
@@ -99,7 +132,6 @@ export class SecurityMiddleware {
 
       const clientIP = req.ip || req.connection.remoteAddress || "unknown";
       const now = Date.now();
-      const windowMs = this.config.rateLimiting.windowMs;
       const maxRequests = this.config.rateLimiting.maxRequests;
 
       const clientData = requests.get(clientIP);

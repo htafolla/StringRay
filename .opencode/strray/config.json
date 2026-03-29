@@ -1,6 +1,6 @@
 {
   "$schema": "./config.schema.json",
-  "version": "1.15.17",
+  "version": "1.15.18",
   "description": "StringRay Framework - Token Management & Performance Configuration",
   
   "token_management": {

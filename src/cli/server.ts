@@ -118,7 +118,7 @@ app.get("/", (req: any, res: any) => {
 });
 
 // Add route for refactoring logs
-app.get("/logs", async (req: any, res: any) => {
+app.get("/logs", requireAuth, async (req: Request, res: Response) => {
   const logPath = join(__dirname, "..", ".opencode", "REFACTORING_LOG.md");
   // Server debug logging - remove for production
 

@@ -352,7 +352,9 @@ export class OpenClawConfigLoader {
 
     const sampleConfig: OpenClawIntegrationConfig = {
       gatewayUrl: 'ws://127.0.0.1:18789',
-      authToken: process.env.OPENCLAW_AUTH_TOKEN || 'your-auth-token-here',
+      // SECURITY WARNING: authToken MUST be configured before use.
+      // Leaving this empty will prevent authenticated connections.
+      authToken: process.env.OPENCLAW_AUTH_TOKEN || '',
       deviceId: process.env.OPENCLAW_DEVICE_ID || 'your-device-id',
       autoReconnect: true,
       maxReconnectAttempts: 5,
@@ -361,7 +363,9 @@ export class OpenClawConfigLoader {
         enabled: true,
         port: 18431,
         host: '127.0.0.1',
-        apiKey: process.env.OPENCLAW_API_KEY || 'your-api-key-here',
+        // SECURITY WARNING: apiKey MUST be configured before exposing the API server.
+        // Without an API key, the server is open to unauthenticated access.
+        apiKey: process.env.OPENCLAW_API_KEY || '',
       },
       hooks: {
         enabled: true,

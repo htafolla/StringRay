@@ -1,8 +1,8 @@
+dist/
 # Dependencies and build outputs
 node_modules/
 
 # Build outputs
-dist/
 build/
 out/
 .next/
@@ -75,7 +75,6 @@ __pycache__/
 .Python
 build/
 develop-eggs/
-dist/
 downloads/
 eggs/
 .eggs/
@@ -328,7 +327,6 @@ coverage/
 .parcel-cache/
 .next/
 .nuxt/
-dist/
 build/
 out/
 .DS_Store
@@ -377,7 +375,6 @@ build/Release/
 .parcel-cache/
 .next/
 .nuxt/
-dist/
 build/
 out/
 # Runtime data and test artifacts
@@ -394,5 +391,9 @@ var/
 # Auto-generated performance baselines
 performance-baselines.json
 
+# Temp session files
+context-ses*.json
+
 # Version manager backups
 backups/
+ci-test-env/

@@ -276,7 +276,27 @@ export const testAutoCreationProcessor = {
       }
 
       // Read source file to analyze exports
-      const fullSourcePath = path.join(directory, filePath);
+      const fullSourcePath = path.resolve(directory, filePath);
+      // Validate the resolved path stays within the expected directory to prevent path traversal
+      const resolvedDirectory = path.resolve(directory);
+      if (!fullSourcePath.startsWith(resolvedDirectory + path.sep) && fullSourcePath !== resolvedDirectory) {
+        await frameworkLogger.log(
+          "test-auto-creation",
+          "skipped-path-traversal",
+          "warning",
+          {
+            message: `Skipped: resolved path "${fullSourcePath}" escapes expected directory "${resolvedDirectory}"`,
+            directory,
+            filePath,
+          },
+        );
+        return {
+          success: false,
+          processorName: "testAutoCreation",
+          duration: Date.now() - startTime,
+          error: `Path traversal detected: resolved path escapes expected directory`,
+        };
+      }
       if (!fs.existsSync(fullSourcePath)) {
         await frameworkLogger.log(
           "test-auto-creation",

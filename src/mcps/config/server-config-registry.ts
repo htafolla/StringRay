@@ -230,6 +230,13 @@ export class ServerConfigRegistry {
    * Uses the knowledge-skills directory as default location
    */
   createDynamicConfig(serverName: string): IServerConfig {
+    // Validate serverName against path traversal attacks
+    if (!serverName || serverName.includes('..') || serverName.includes('/') || serverName.includes('\\') || serverName.includes('\0')) {
+      const errorMsg = `Invalid server name "${serverName}": must not contain "..", "/", "\\", or null bytes`;
+      console.warn(`[ServerConfigRegistry] Security warning: ${errorMsg}`);
+      throw new Error(errorMsg);
+    }
+
     const basePath = process.env.STRRAY_DEV_PATH
       ? process.env.STRRAY_DEV_PATH
       : 'node_modules/strray-ai/dist';

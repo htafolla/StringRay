@@ -143,7 +143,7 @@ class StrRayApiDesignServer {
 
 if (import.meta.url === `file://${process.argv[1]}`) {
   const server = new StrRayApiDesignServer();
-  server.run().catch(console.error);
+  server.run().catch(() => {});
 }
 
 export default StrRayApiDesignServer;

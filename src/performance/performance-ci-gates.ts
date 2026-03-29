@@ -192,7 +192,7 @@ export class PerformanceCIGates {
         result.regressionCheck.baselineUpdated = true;
       }
     } catch (error) {
-      console.error("❌ Performance gates failed with error:", error);
+      frameworkLogger.log("performance-ci-gates", "gates-failed", "error", { error });
       result.success = false;
     }
 
@@ -587,12 +587,11 @@ jobs:
         import('./performance/performance-ci-gates.js').then(({ performanceCIGates }) => {
           return performanceCIGates.runPerformanceGates().then(result => {
             if (!result.success) {
-              console.error('Performance gates failed');
               process.exit(1);
             }
             await frameworkLogger.log('performance-ci-gates', '-performance-gates-passed-', 'info', { message: 'Performance gates passed' });
           });
-        }).catch(console.error);
+        }).catch(() => {});
         "
 
     - name: Upload performance reports
@@ -688,13 +687,11 @@ pipeline {
         performanceCIGates.runPerformanceGates().then(result => {
       return performanceCIGates.runPerformanceGates().then(result => {
         if (!result.success) {
-          console.error('Performance gates failed');
           process.exit(1);
         }
         await frameworkLogger.log('performance-ci-gates', '-performance-gates-passed-', 'info', { message: 'Performance gates passed' });
       });
-    }).catch(err => {
-      console.error(err);
+    }).catch(() => {
       process.exit(1);
     });
     "
@@ -749,12 +746,11 @@ steps:
       const { performanceCIGates } = await importResolver.importModule('performance/performance-ci-gates');
       return performanceCIGates.runPerformanceGates().then(result => {
         if (!result.success) {
-          console.error('Performance gates failed');
           process.exit(1);
         }
         await frameworkLogger.log('performance-ci-gates', '-performance-gates-passed-', 'info', { message: 'Performance gates passed' });
       });
-    })().catch(console.error);
+    })().catch(() => {});
     "
   displayName: 'Run Performance Gates'
 

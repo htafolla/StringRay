@@ -5,6 +5,7 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { EscalationEngine } from "../../../postprocessor/escalation/EscalationEngine.js";
 import { PostProcessorContext } from "../../../postprocessor/types.js";
+import { frameworkLogger } from "../../../core/framework-logger.js";
 
 describe("EscalationEngine", () => {
   let engine: EscalationEngine;
@@ -144,12 +145,19 @@ describe("EscalationEngine", () => {
 
   describe("Alerting", () => {
     it("should send alerts through configured channels", async () => {
-      const consoleSpy = vi.spyOn(console, "log");
+      const loggerSpy = vi.spyOn(frameworkLogger, "log").mockResolvedValue(undefined);
 
       await engine.evaluateEscalation(mockContext, 5, "Critical error", []);
 
-      // Check that alert was sent (should contain the escalation message)
-      expect(consoleSpy).toHaveBeenCalled();
+      // Check that alert was logged via frameworkLogger
+      expect(loggerSpy).toHaveBeenCalledWith(
+        "EscalationEngine",
+        "display-alert",
+        expect.any(String),
+        expect.any(Object),
+      );
+
+      loggerSpy.mockRestore();
     });
   });
 

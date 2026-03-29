@@ -799,5 +799,5 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     .then((results) => {
       // Validation completion - kept as console.log for user feedback
     })
-    .catch(console.error);
+    .catch(() => {});
 }

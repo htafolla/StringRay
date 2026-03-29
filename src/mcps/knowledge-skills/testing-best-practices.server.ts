@@ -1078,7 +1078,7 @@ class StrRayTestingBestPracticesServer {
 // Run the server if this file is executed directly
 if (import.meta.url === `file://${process.argv[1]}`) {
   const server = new StrRayTestingBestPracticesServer();
-  server.run().catch(console.error);
+  server.run().catch(() => {});
 }
 
 export { StrRayTestingBestPracticesServer };

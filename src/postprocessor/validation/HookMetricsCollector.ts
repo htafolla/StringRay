@@ -232,12 +232,12 @@ function parseArgs(): {
   const exitCode = parseInt(exitCodeArg, 10);
 
   if (hookType !== "post-commit" && hookType !== "post-push") {
-    console.error('Invalid hook type. Must be "post-commit" or "post-push"');
+    frameworkLogger.log("hook-metrics-collector", "invalid-hook-type", "error", { message: 'Invalid hook type. Must be "post-commit" or "post-push"' });
     return null;
   }
 
   if (isNaN(duration) || isNaN(exitCode)) {
-    console.error("Invalid duration or exit code");
+    frameworkLogger.log("hook-metrics-collector", "invalid-args", "error", { message: "Invalid duration or exit code" });
     return null;
   }
 
@@ -268,10 +268,7 @@ async function main(): Promise<void> {
 // Run if called directly
 if (require.main === module) {
   main().catch((error) => {
-    console.error(
-      "Hook metrics error:",
-      error instanceof Error ? error.message : String(error),
-    );
+    frameworkLogger.log("hook-metrics-collector", "metrics-error", "error", { error: error instanceof Error ? error.message : String(error) });
     process.exit(1);
   });
 }

@@ -240,7 +240,7 @@ export class SecurityHardeningSystem extends EventEmitter {
 
         return true;
       } catch (error) {
-        console.error("Security middleware error:", error);
+        frameworkLogger.log("security-hardening", "middleware-error", "error", { error: error instanceof Error ? error.message : String(error) });
         this.emitSecurityEvent({
           type: "suspicious_activity",
           severity: "high",
@@ -819,9 +819,13 @@ export class SecurityHardeningSystem extends EventEmitter {
 
     // Log high-severity events
     if (event.severity === "high" || event.severity === "critical") {
-      console.error(
-        `[SECURITY ${event.severity.toUpperCase()}] ${event.message}`,
-      );
+      frameworkLogger.log("security-hardening", "high-severity-event", "error", {
+        severity: event.severity,
+        message: event.message,
+        type: event.type,
+        source: event.source,
+        ipAddress: event.ipAddress,
+      });
     }
   }
 
@@ -834,7 +838,12 @@ export class SecurityHardeningSystem extends EventEmitter {
 
     if (event.severity === "critical") {
       // Immediate action required for critical events
-      console.error(`🚨 CRITICAL SECURITY EVENT: ${event.message}`);
+      frameworkLogger.log("security-hardening", "critical-event", "error", {
+        message: event.message,
+        type: event.type,
+        source: event.source,
+        ipAddress: event.ipAddress,
+      });
       // Could trigger alerts, notifications, etc.
     }
   }
@@ -843,14 +852,21 @@ export class SecurityHardeningSystem extends EventEmitter {
    * Handle rate limit exceeded
    */
   private handleRateLimitExceeded(event: SecurityEvent): void {
-    console.warn(`⚠️ Rate limit exceeded for IP: ${event.ipAddress}`);
+    frameworkLogger.log("security-hardening", "rate-limit-exceeded", "warning", {
+      ipAddress: event.ipAddress,
+      message: event.message,
+    });
   }
 
   /**
    * Handle validation failure
    */
   private handleValidationFailure(event: SecurityEvent): void {
-    console.warn(`⚠️ Input validation failed: ${event.message}`);
+    frameworkLogger.log("security-hardening", "input-validation-failed", "warning", {
+      message: event.message,
+      type: event.type,
+      source: event.source,
+    });
   }
 
   /**

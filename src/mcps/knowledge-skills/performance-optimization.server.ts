@@ -129,7 +129,7 @@ class StrRayPerformanceOptimizationServer {
 
 if (import.meta.url === `file://${process.argv[1]}`) {
   const server = new StrRayPerformanceOptimizationServer();
-  server.run().catch(console.error);
+  server.run().catch(() => {});
 }
 
 export default StrRayPerformanceOptimizationServer;

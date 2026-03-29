@@ -21,7 +21,7 @@ export function withJobContext<T>(operation: () => T, jobId?: string): T {
     return operation();
   } finally {
     // Auto-complete job on operation finish
-    jobContext.complete(true).catch(console.error);
+    jobContext.complete(true).catch(() => {});
   }
 }
 

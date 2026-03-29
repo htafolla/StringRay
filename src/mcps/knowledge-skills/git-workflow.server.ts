@@ -134,7 +134,7 @@ class StrRayGitWorkflowServer {
 
 if (import.meta.url === `file://${process.argv[1]}`) {
   const server = new StrRayGitWorkflowServer();
-  server.run().catch(console.error);
+  server.run().catch(() => {});
 }
 
 export default StrRayGitWorkflowServer;

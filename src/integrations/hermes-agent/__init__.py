@@ -113,6 +113,9 @@ _session_stats = {
     "post_processor_runs": 0,
     "bridge_calls": 0,
     "bridge_errors": 0,
+    "subagent_dispatches": 0,
+    "subagent_validations": 0,
+    "subagent_blocks": 0,
 }
 
 # ── File logging ──────────────────────────────────────────────
@@ -200,6 +203,16 @@ def _on_pre_tool_call(tool_name: str, args: dict, task_id: str, **kwargs):
     if _is_strray_mcp(tool_name):
         _session_stats["strray_mcp_calls"] += 1
         _log_to_file("activity.log", f"[quality-gate] SKIP (strray-mcp): {tool_name}")
+        return
+
+    # delegate_task: snapshot working tree so post_hook can validate changes
+    if tool_name == "delegate_task":
+        tid = kwargs.get("task_id", "") or args.get("task_id", "") or task_id
+        if tid:
+            _delegate_snapshots[tid] = _snapshot_working_tree()
+        _session_stats["subagent_dispatches"] += 1
+        _log_to_file("activity.log",
+            f"[pre-tool] SUBAGENT DISPATCH: task_id={tid}")
         return
 
     _session_stats["native_tool_calls"] += 1
@@ -311,6 +324,13 @@ def _on_post_tool_call(tool_name: str, args: dict, result, task_id: str, **kwarg
         error = result["error"]
     _log_tool_event("complete", tool_name, args, duration, error)
 
+    # delegate_task: validate all files the subagent changed
+    if tool_name == "delegate_task":
+        tid = kwargs.get("task_id", "") or args.get("task_id", "") or task_id
+        if tid:
+            _validate_subagent_changes(tid)
+        return
+
     # Track file modifications
     if file_path:
         _log_to_file("activity.log",
@@ -355,7 +375,8 @@ def _on_session_start(session_id: str, platform: str, **kwargs):
     for key in ("code_operations", "total_tool_calls", "strray_mcp_calls",
                 "native_tool_calls", "quality_gate_runs", "quality_gate_blocks",
                 "pre_processor_runs", "post_processor_runs",
-                "bridge_calls", "bridge_errors"):
+                "bridge_calls", "bridge_errors",
+                "subagent_dispatches", "subagent_validations", "subagent_blocks"):
         _session_stats[key] = 0
 
     _ensure_log_dir()
@@ -384,7 +405,10 @@ def _strray_command(args: str) -> str:
             f"  Pre-processor runs: {_session_stats['pre_processor_runs']}\n"
             f"  Post-processor runs: {_session_stats['post_processor_runs']}\n"
             f"  Bridge calls: {_session_stats['bridge_calls']}\n"
-            f"  Bridge errors: {_session_stats['bridge_errors']}"
+            f"  Bridge errors: {_session_stats['bridge_errors']}\n"
+            f"  Subagent dispatches: {_session_stats['subagent_dispatches']}\n"
+            f"  Subagent validations: {_session_stats['subagent_validations']}\n"
+            f"  Subagent blocks: {_session_stats['subagent_blocks']}"
         )
 
     if cmd == "help":
@@ -413,10 +437,105 @@ def _strray_command(args: str) -> str:
 
 # ── Registration ──────────────────────────────────────────────
 
-# Session tracking for new lifecycle hooks
+# ── Session tracking for new lifecycle hooks
 _modified_files: list = []
 _validation_results: list = []
 _errors: list = []
+
+# ── Subagent (delegate_task) enforcement ────────────────────
+# Subagents bypass all StringRay hooks because they run in isolated
+# contexts. We enforce by snapshotting the working tree before dispatch
+# and validating all changed files after return.
+
+_delegate_snapshots: dict = {}  # task_id → set of (path, mtime)
+
+
+def _snapshot_working_tree() -> dict:
+    """Snapshot file mtimes under project root for subagent change detection."""
+    try:
+        result = subprocess.run(
+            ["git", "-C", str(PROJECT_ROOT), "diff", "--name-only", "HEAD"],
+            capture_output=True, text=True, timeout=5,
+        )
+        if result.returncode == 0:
+            changed = set(result.stdout.strip().split("\n")) if result.stdout.strip() else set()
+        else:
+            changed = set()
+    except (FileNotFoundError, subprocess.TimeoutExpired):
+        changed = set()
+    return {"changed_before": changed}
+
+
+def _validate_subagent_changes(task_id: str, **kwargs):
+    """After delegate_task returns, find what the subagent changed and validate."""
+    snapshot = _delegate_snapshots.pop(task_id, None)
+    if not snapshot:
+        return
+
+    before = snapshot.get("changed_before", set())
+
+    try:
+        result = subprocess.run(
+            ["git", "-C", str(PROJECT_ROOT), "diff", "--name-only", "HEAD"],
+            capture_output=True, text=True, timeout=5,
+        )
+        if result.returncode != 0:
+            return
+        after = set(result.stdout.strip().split("\n")) if result.stdout.strip() else set()
+    except (FileNotFoundError, subprocess.TimeoutExpired):
+        return
+
+    new_changes = after - before
+    if not new_changes:
+        return
+
+    # Filter to source files only (skip dist, node_modules, logs, etc.)
+    source_files = sorted(f for f in new_changes if any(
+        f.startswith(prefix) for prefix in ("src/", "dist/", "scripts/", ".opencode/plugins/")
+    ) and not any(
+        skip in f for skip in ("node_modules/", ".log", "__pycache__", ".map")
+    ))
+
+    if not source_files:
+        return
+
+    _session_stats["code_operations"] += len(source_files)
+    _session_stats["subagent_validations"] += 1
+
+    # Resolve to absolute paths for validation
+    abs_files = [str(PROJECT_ROOT / f) for f in source_files]
+
+    # Run validation on all changed files via bridge
+    bridge_result = _call_bridge({
+        "command": "validate",
+        "files": abs_files,
+        "operation": "modify",
+    }, timeout=30)
+
+    if "error" in bridge_result:
+        _log_to_file("activity.log",
+            f"[subagent-validate] BRIDGE ERROR: {bridge_result['error']}")
+        return
+
+    results = bridge_result.get("fileResults", bridge_result.get("results", {}))
+    for rel_path in source_files:
+        file_result = results.get(rel_path, results.get(str(PROJECT_ROOT / rel_path), {}))
+        passed = file_result.get("passed", True)
+        violations = file_result.get("violations", [])
+
+        if not passed:
+            _session_stats["quality_gate_blocks"] += 1
+            _session_stats["subagent_blocks"] += 1
+            _log_to_file("activity.log",
+                f"[subagent-validate] BLOCKED: {rel_path} "
+                f"violations={'; '.join(str(v) for v in violations[:3])}")
+            logger.warning(
+                "[strray] Subagent BLOCKED %s: %s",
+                rel_path, violations[:3],
+            )
+        else:
+            _log_to_file("activity.log",
+                f"[subagent-validate] PASSED: {rel_path}")
 
 
 def _on_file_write(file_path: str, content: str, tool_name: str, **kwargs):
@@ -533,11 +652,11 @@ def register(ctx):
     # ── Bootstrap ─────────────────────────────────────────────
     _ensure_log_dir()
     _log_to_file("activity.log",
-        f"[plugin-loaded] StringRay Hermes Plugin v2.1 — "
-        f"4 tools, 5 hooks, bridge={BRIDGE_PATH.exists()}")
+        f"[plugin-loaded] StringRay Hermes Plugin v2.2 — "
+        f"4 tools, 5 hooks, subagent enforcement, bridge={BRIDGE_PATH.exists()}")
 
     logger.info(
-        "[strray] Plugin v2.1 loaded: 4 tools, 5 hooks, "
-        "bridge=%s — full framework pipeline active",
+        "[strray] Plugin v2.2 loaded: 4 tools, 5 hooks, "
+        "subagent enforcement active, bridge=%s",
         BRIDGE_PATH.exists(),
     )

@@ -8,6 +8,7 @@ import {
   PostProcessorContext,
   PostProcessorResult,
 } from "../../../postprocessor/types.js";
+import { frameworkLogger } from "../../../core/framework-logger.js";
 
 describe("SuccessHandler", () => {
   let handler: SuccessHandler;
@@ -105,16 +106,24 @@ describe("SuccessHandler", () => {
   describe("Success Confirmation", () => {
     it("should perform success confirmation when enabled", async () => {
       const customHandler = new SuccessHandler({ successConfirmation: true });
-      const consoleSpy = vi.spyOn(console, "log");
+      const loggerSpy = vi.spyOn(frameworkLogger, "log").mockResolvedValue(undefined);
 
       await customHandler.handleSuccess(mockContext, mockResult, []);
 
-      expect(consoleSpy).toHaveBeenCalledWith(
-        "🔍 Confirming deployment success...",
+      expect(loggerSpy).toHaveBeenCalledWith(
+        "SuccessHandler",
+        "confirm-success",
+        "info",
+        expect.objectContaining({ message: "🔍 Confirming deployment success..." }),
       );
-      expect(consoleSpy).toHaveBeenCalledWith(
-        "✅ Deployment success confirmed",
+      expect(loggerSpy).toHaveBeenCalledWith(
+        "SuccessHandler",
+        "confirm-success",
+        "info",
+        expect.objectContaining({ message: "✅ Deployment success confirmed" }),
       );
+
+      loggerSpy.mockRestore();
     });
 
     it("should skip success confirmation when disabled", async () => {
@@ -145,14 +154,18 @@ describe("SuccessHandler", () => {
   describe("Success Notifications", () => {
     it("should send notifications when enabled", async () => {
       const customHandler = new SuccessHandler({ notificationEnabled: true });
-      const consoleSpy = vi.spyOn(console, "log");
+      const loggerSpy = vi.spyOn(frameworkLogger, "log").mockResolvedValue(undefined);
 
       await customHandler.handleSuccess(mockContext, mockResult, []);
 
-      expect(consoleSpy).toHaveBeenCalledWith(
-        "📢 Success Notification:",
-        expect.any(String),
+      expect(loggerSpy).toHaveBeenCalledWith(
+        "SuccessHandler",
+        "send-notifications",
+        "info",
+        expect.objectContaining({ message: "📢 Success Notification:" }),
       );
+
+      loggerSpy.mockRestore();
     });
 
     it("should skip notifications when disabled", async () => {
@@ -171,14 +184,24 @@ describe("SuccessHandler", () => {
   describe("Cleanup Operations", () => {
     it("should perform cleanup when enabled", async () => {
       const customHandler = new SuccessHandler({ cleanupEnabled: true });
-      const consoleSpy = vi.spyOn(console, "log");
+      const loggerSpy = vi.spyOn(frameworkLogger, "log").mockResolvedValue(undefined);
 
       await customHandler.handleSuccess(mockContext, mockResult, []);
 
-      expect(consoleSpy).toHaveBeenCalledWith(
-        "🧹 Performing post-success cleanup...",
+      expect(loggerSpy).toHaveBeenCalledWith(
+        "SuccessHandler",
+        "perform-cleanup",
+        "info",
+        expect.objectContaining({ message: "🧹 Performing post-success cleanup..." }),
       );
-      expect(consoleSpy).toHaveBeenCalledWith("✅ Cleanup completed");
+      expect(loggerSpy).toHaveBeenCalledWith(
+        "SuccessHandler",
+        "perform-cleanup",
+        "info",
+        expect.objectContaining({ message: "✅ Cleanup completed" }),
+      );
+
+      loggerSpy.mockRestore();
     });
 
     it("should skip cleanup when disabled", async () => {
@@ -196,14 +219,24 @@ describe("SuccessHandler", () => {
   describe("Metrics Collection", () => {
     it("should collect and log metrics when enabled", async () => {
       const customHandler = new SuccessHandler({ metricsCollection: true });
-      const consoleSpy = vi.spyOn(console, "log");
+      const loggerSpy = vi.spyOn(frameworkLogger, "log").mockResolvedValue(undefined);
 
       await customHandler.handleSuccess(mockContext, mockResult, []);
 
-      expect(consoleSpy).toHaveBeenCalledWith("📊 Success Metrics:");
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining("Total Duration:"),
+      expect(loggerSpy).toHaveBeenCalledWith(
+        "SuccessHandler",
+        "log-metrics",
+        "info",
+        expect.objectContaining({ message: "📊 Success Metrics:" }),
       );
+      expect(loggerSpy).toHaveBeenCalledWith(
+        "SuccessHandler",
+        "log-metrics",
+        "info",
+        expect.objectContaining({ message: expect.stringContaining("Total Duration:") }),
+      );
+
+      loggerSpy.mockRestore();
     });
 
     it("should skip metrics collection when disabled", async () => {

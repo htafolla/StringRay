@@ -214,10 +214,10 @@ export class ProcessorManager {
               error: error instanceof Error ? error.message : String(error),
             },
           );
-          console.error(
-            `❌ Failed to initialize processor ${config.name}:`,
-            error,
-          );
+          frameworkLogger.log("processor-manager", "processor-initialization-failed", "error", {
+            processor: config.name,
+            error: error instanceof Error ? error.message : String(error),
+          });
           return {
             name: config.name,
             success: false,
@@ -230,10 +230,10 @@ export class ProcessorManager {
     const failures = results.filter((r) => !r.success);
 
     if (failures.length > 0) {
-      console.error(
-        `❌ Failed to initialize ${failures.length} processors:`,
-        failures,
-      );
+      frameworkLogger.log("processor-manager", "batch-initialization-failed", "error", {
+        count: failures.length,
+        failures: failures.map(f => f.error).join(", "),
+      });
       return false;
     }
 
@@ -735,7 +735,10 @@ export class ProcessorManager {
       try {
         await this.cleanupProcessor(name);
       } catch (error) {
-        console.error(`❌ Failed to cleanup processor ${name}:`, error);
+        frameworkLogger.log("processor-manager", "processor-cleanup-failed", "error", {
+          processor: name,
+          error: error instanceof Error ? error.message : String(error),
+        });
       }
     }
 
@@ -1004,7 +1007,9 @@ export class ProcessorManager {
         timestamp: new Date().toISOString(),
       };
     } catch (error) {
-      console.warn("Codex compliance check failed:", error);
+      frameworkLogger.log("processor-manager", "codex-compliance-check-failed", "warning", {
+        error: error instanceof Error ? error.message : String(error),
+      });
       return {
         compliant: true, // Allow processing to continue
         violations: [
@@ -1359,7 +1364,9 @@ export class ProcessorManager {
         message: "Not an agent task completion context",
       };
     } catch (error) {
-      console.error("Refactoring logging failed:", error);
+      frameworkLogger.log("processor-manager", "refactoring-logging-failed", "error", {
+        error: error instanceof Error ? error.message : String(error),
+      });
       return {
         logged: false,
         success: false,

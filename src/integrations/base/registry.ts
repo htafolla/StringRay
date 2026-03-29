@@ -174,7 +174,7 @@ export class IntegrationRegistry extends EventEmitter {
       "info",
       { name, version: integration.version },
       this.jobId,
-    ).catch(console.error);
+    ).catch(() => {});
   }
 
   /**
@@ -199,7 +199,7 @@ export class IntegrationRegistry extends EventEmitter {
           "error",
           { name, error: String(error) },
           this.jobId,
-        ).catch(console.error);
+        ).catch(() => {});
       });
     }
 
@@ -213,7 +213,7 @@ export class IntegrationRegistry extends EventEmitter {
       "info",
       { name },
       this.jobId,
-    ).catch(console.error);
+    ).catch(() => {});
   }
 
   // ==========================================================================
@@ -298,7 +298,7 @@ export class IntegrationRegistry extends EventEmitter {
         "warning",
         { name },
         this.jobId,
-      ).catch(console.error);
+      ).catch(() => {});
       return;
     }
 
@@ -338,7 +338,7 @@ export class IntegrationRegistry extends EventEmitter {
         "success",
         { name, version: integration.version },
         this.jobId,
-      ).catch(console.error);
+      ).catch(() => {});
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
 
@@ -384,7 +384,7 @@ export class IntegrationRegistry extends EventEmitter {
         "success",
         { name },
         this.jobId,
-      ).catch(console.error);
+      ).catch(() => {});
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
 
@@ -403,7 +403,7 @@ export class IntegrationRegistry extends EventEmitter {
         "error",
         { name, error: errorMessage },
         this.jobId,
-      ).catch(console.error);
+      ).catch(() => {});
     }
   }
 
@@ -422,7 +422,7 @@ export class IntegrationRegistry extends EventEmitter {
       "info",
       { total: entries.length, enabled: enabledEntries.length },
       this.jobId,
-    ).catch(console.error);
+    ).catch(() => {});
 
     const results: Array<{ name: string; success: boolean; error?: string }> = [];
 
@@ -437,7 +437,7 @@ export class IntegrationRegistry extends EventEmitter {
             "warning",
             { name },
             this.jobId,
-          ).catch(console.error);
+          ).catch(() => {});
           results.push({ name, success: false, error: "Not registered" });
           continue;
         }
@@ -459,7 +459,7 @@ export class IntegrationRegistry extends EventEmitter {
           "error",
           { name, error: errorMessage },
           this.jobId,
-        ).catch(console.error);
+        ).catch(() => {});
       }
     }
 
@@ -479,7 +479,7 @@ export class IntegrationRegistry extends EventEmitter {
       failed > 0 ? "warning" : "success",
       { succeeded, failed },
       this.jobId,
-    ).catch(console.error);
+    ).catch(() => {});
   }
 
   /**
@@ -494,7 +494,7 @@ export class IntegrationRegistry extends EventEmitter {
       "info",
       { count: loadedNames.length },
       this.jobId,
-    ).catch(console.error);
+    ).catch(() => {});
 
     const results: Array<{ name: string; success: boolean; error?: string }> = [];
 
@@ -525,7 +525,7 @@ export class IntegrationRegistry extends EventEmitter {
       failed > 0 ? "warning" : "success",
       { succeeded, failed },
       this.jobId,
-    ).catch(console.error);
+    ).catch(() => {});
   }
 
   // ==========================================================================
@@ -658,7 +658,7 @@ export class IntegrationRegistry extends EventEmitter {
       "info",
       { cleared: names.length - this.loadedIntegrations.size },
       this.jobId,
-    ).catch(console.error);
+    ).catch(() => {});
   }
 
   /**
@@ -762,7 +762,7 @@ export async function discoverIntegrations(
         `Integrations directory not found: ${integrationsPath}`,
         "warning",
         { path: integrationsPath },
-      ).catch(console.error);
+      ).catch(() => {});
       return discovered;
     }
 
@@ -815,7 +815,7 @@ export async function discoverIntegrations(
             `Discovered integration: ${name}`,
             "info",
             { name, path: indexPath },
-          ).catch(console.error);
+          ).catch(() => {});
         } catch (error) {
           const errorMessage = error instanceof Error ? error.message : String(error);
           frameworkLogger.log(
@@ -823,7 +823,7 @@ export async function discoverIntegrations(
             `Failed to load integration from ${indexPath}: ${errorMessage}`,
             "warning",
             { path: indexPath, error: errorMessage },
-          ).catch(console.error);
+          ).catch(() => {});
         }
       }
     }
@@ -834,7 +834,7 @@ export async function discoverIntegrations(
       `Error during integration discovery: ${errorMessage}`,
       "error",
       { error: errorMessage },
-    ).catch(console.error);
+    ).catch(() => {});
   }
 
   return discovered;
@@ -898,7 +898,7 @@ export async function autoRegisterIntegrations(
         `Failed to register integration '${d.name}': ${errorMessage}`,
         "warning",
         { name: d.name, error: errorMessage },
-      ).catch(console.error);
+      ).catch(() => {});
     }
   }
 

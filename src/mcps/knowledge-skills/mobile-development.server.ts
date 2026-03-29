@@ -635,4 +635,4 @@ class HomePage extends StatelessWidget {
 
 // Start server if run directly
 const server = new StrRayMobileDevelopmentServer();
-server.start().catch(console.error);
+server.start().catch(() => {});

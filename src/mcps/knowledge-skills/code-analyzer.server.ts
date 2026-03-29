@@ -550,5 +550,5 @@ class CodeAnalyzerServer {
   }
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) { new CodeAnalyzerServer().run().catch(console.error); }
+if (import.meta.url === `file://${process.argv[1]}`) { new CodeAnalyzerServer().run().catch(() => {}); }
 export default CodeAnalyzerServer;

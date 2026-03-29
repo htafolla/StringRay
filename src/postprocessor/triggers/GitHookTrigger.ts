@@ -591,12 +591,6 @@ fi
         } catch (error) {
           await frameworkLogger.log('git-hook-trigger', 'log-cleanup-failed', 'error', { error: error instanceof Error ? error.message : String(error) });
         }
-          if (result.errors.length > 0) {
-            console.error('Log cleanup errors:', result.errors);
-          }
-        } catch (error) {
-          console.error('Log cleanup failed:', error.message);
-        }
       })();
       "
 

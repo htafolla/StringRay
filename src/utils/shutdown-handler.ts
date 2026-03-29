@@ -44,7 +44,7 @@ export function createGracefulShutdown(options: ShutdownOptions): ShutdownHandle
 
     // Force exit after timeout
     const timeout = setTimeout(() => {
-      console.error("Graceful shutdown timeout, forcing exit...");
+      process.stderr.write("Graceful shutdown timeout, forcing exit...\n");
       process.exit(1);
     }, shutdownTimeout);
 
@@ -62,7 +62,7 @@ export function createGracefulShutdown(options: ShutdownOptions): ShutdownHandle
       process.exit(0);
     } catch (error) {
       clearTimeout(timeout);
-      console.error(`Error during ${serverName} shutdown:`, error);
+      process.stderr.write(`Error during ${serverName} shutdown: ${error instanceof Error ? error.message : String(error)}\n`);
       process.exit(1);
     }
   };
@@ -78,13 +78,13 @@ export function createGracefulShutdown(options: ShutdownOptions): ShutdownHandle
 
   // Handle uncaught exceptions
   process.on("uncaughtException", (error) => {
-    console.error("Uncaught Exception:", error);
+    process.stderr.write(`Uncaught Exception: ${error instanceof Error ? error.message : String(error)}\n`);
     cleanup("uncaughtException");
   });
 
   // Handle unhandled rejections
   process.on("unhandledRejection", (reason, promise) => {
-    console.error("Unhandled Rejection at:", promise, "reason:", reason);
+    process.stderr.write(`Unhandled Rejection at: ${String(promise)} reason: ${String(reason)}\n`);
     cleanup("unhandledRejection");
   });
 

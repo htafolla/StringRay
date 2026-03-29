@@ -236,7 +236,7 @@ export class PerformanceMonitoringDashboard extends EventEmitter {
       this.metrics.timestamp = timestamp;
       this.emit("metrics-updated", this.metrics);
     } catch (error) {
-      console.error("Failed to update dashboard metrics:", error);
+      frameworkLogger.log("performance-dashboard", "metrics-update-failed", "error", { error });
       this.emit("error", error);
     }
   }
@@ -265,7 +265,7 @@ export class PerformanceMonitoringDashboard extends EventEmitter {
         (h) => timestamp - h.timestamp < retentionMs,
       );
     } catch (error) {
-      console.warn("Failed to update bundle size metrics:", error);
+      frameworkLogger.log("performance-dashboard", "bundle-size-update-failed", "warning", { error });
     }
   }
 
@@ -322,7 +322,7 @@ export class PerformanceMonitoringDashboard extends EventEmitter {
         (h) => timestamp - h.timestamp < retentionMs,
       );
     } catch (error) {
-      console.warn("Failed to update web vitals metrics:", error);
+      frameworkLogger.log("performance-dashboard", "web-vitals-update-failed", "warning", { error });
     }
   }
 
@@ -667,7 +667,7 @@ export class PerformanceMonitoringDashboard extends EventEmitter {
         { jobId, message: alert.message },
       );
     } catch (error) {
-      console.error("Failed to send webhook notification:", error);
+      frameworkLogger.log("performance-dashboard", "webhook-failed", "error", { error });
     }
   }
 

@@ -1156,7 +1156,7 @@ class StrRayDatabaseDesignServer {
 // Run the server if this file is executed directly
 if (import.meta.url === `file://${process.argv[1]}`) {
   const server = new StrRayDatabaseDesignServer();
-  server.run().catch(console.error);
+  server.run().catch(() => {});
 }
 
 export { StrRayDatabaseDesignServer };

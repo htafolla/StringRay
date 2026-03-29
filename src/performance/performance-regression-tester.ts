@@ -12,6 +12,7 @@ import { performance } from "perf_hooks";
 import * as fs from "fs";
 import * as path from "path";
 import { execSync } from "child_process";
+import { frameworkLogger } from "../core/framework-logger.js";
 import {
   PerformanceBudgetEnforcer,
   PerformanceReport,
@@ -81,7 +82,7 @@ export class PerformanceRegressionTester {
         // No existing baselines found, will use defaults
       }
     } catch (error) {
-      console.error(`Failed to load baselines from ${baselineFile}:`, error);
+      frameworkLogger.log("performance-regression-tester", "baseline-load-failed", "error", { file: baselineFile, error });
     }
   }
 
@@ -93,7 +94,7 @@ export class PerformanceRegressionTester {
       const baselines = Object.fromEntries(this.baselines);
       fs.writeFileSync(baselineFile, JSON.stringify(baselines, null, 2));
     } catch (error) {
-      console.error(`Failed to save baselines to ${baselineFile}:`, error);
+      frameworkLogger.log("performance-regression-tester", "baseline-save-failed", "error", { file: baselineFile, error });
     }
   }
 
@@ -213,7 +214,7 @@ export class PerformanceRegressionTester {
         : "N/A";
 
       if (result.error) {
-        console.error(`Test ${result.testName} failed:`, result.error);
+        frameworkLogger.log("performance-regression-tester", "test-failed", "error", { testName: result.testName, error: result.error });
       }
     }
 
@@ -225,7 +226,7 @@ export class PerformanceRegressionTester {
     try {
       budgetReport = await this.budgetEnforcer.generatePerformanceReport();
     } catch (error) {
-      console.error("Failed to generate performance budget report:", error);
+      frameworkLogger.log("performance-regression-tester", "budget-report-failed", "error", { error });
     }
 
     const suiteDuration = performance.now() - suiteStartTime;
@@ -251,7 +252,7 @@ export class PerformanceRegressionTester {
     if (shouldFail) {
       throw new Error("Performance regression test suite failed");
     } else {
-      console.log("Performance regression test suite passed");
+      frameworkLogger.log("performance-regression-tester", "suite-passed", "info", { message: "Performance regression test suite passed" });
     }
 
     const result: any = {

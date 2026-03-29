@@ -1077,7 +1077,7 @@ describe("${pathModule.basename(sourceFile, ".ts")}", () => {${testCases}
 // Start the server if run directly
 if (import.meta.url === `file://${process.argv[1]}`) {
   const server = new StrRayTestingStrategyServer();
-  server.run().catch(console.error);
+  server.run().catch(() => {});
 }
 
 export default StrRayTestingStrategyServer;

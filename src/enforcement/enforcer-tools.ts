@@ -337,7 +337,7 @@ async function ruleValidationSelf(
   return {
     operation,
     passed: report.passed,
-    blocked: !report.passed && report.errors.some(e => e.includes("required") || e.includes("violation")),
+    blocked: report.errors.length > 0,
     errors: report.errors,
     warnings: report.warnings,
     fixes: [],
@@ -476,11 +476,7 @@ export async function ruleValidation(
   const result: EnforcementResult = {
     operation,
     passed: report.passed,
-    blocked:
-      !report.passed &&
-      report.errors.some(
-        (e) => e.includes("required") || e.includes("violation"),
-      ),
+    blocked: report.errors.length > 0,
     errors: report.errors,
     warnings: report.warnings,
     fixes: [],
@@ -597,7 +593,7 @@ export async function contextAnalysisValidation(
     ...validationResult,
     errors: [...validationResult.errors, ...contextIssues.errors],
     warnings: [...validationResult.warnings, ...contextIssues.warnings],
-    blocked: validationResult.blocked || contextIssues.errors.length > 0,
+    blocked: validationResult.blocked,
   };
 
   await frameworkLogger.log(
@@ -662,10 +658,14 @@ export async function codexEnforcement(
   // Generate codex compliance report
   const codexReport = await generateCodexComplianceReport(files, newCode);
 
+  const combinedErrors = [...validationResult.errors, ...codexReport.violations];
+  const combinedWarnings = [...validationResult.warnings, ...codexReport.warnings];
+
   const result: EnforcementResult = {
     ...validationResult,
-    errors: [...validationResult.errors, ...codexReport.violations],
-    warnings: [...validationResult.warnings, ...codexReport.warnings],
+    errors: combinedErrors,
+    warnings: combinedWarnings,
+    blocked: combinedErrors.length > 0,
   };
 
   await frameworkLogger.log(

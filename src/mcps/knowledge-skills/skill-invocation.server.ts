@@ -570,7 +570,7 @@ class SkillInvocationServer {
 // Start the server if this file is run directly
 if (import.meta.url === `file://${process.argv[1]}`) {
   const server = new SkillInvocationServer();
-  server.run().catch(console.error);
+  server.run().catch(() => {});
 }
 
 export { SkillInvocationServer };

@@ -404,8 +404,7 @@ export abstract class BaseIntegration
         this.jobId,
       );
     } catch {
-      // Fallback to console if logger fails
-      console.log(`[${this.name}] ${message}`, details || "");
+      // Silent fail - logging should never break application
     }
   }
 

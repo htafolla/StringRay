@@ -135,7 +135,7 @@ class StrRayArchitecturePatternsServer {
 
 if (import.meta.url === `file://${process.argv[1]}`) {
   const server = new StrRayArchitecturePatternsServer();
-  server.run().catch(console.error);
+  server.run().catch(() => {});
 }
 
 export default StrRayArchitecturePatternsServer;

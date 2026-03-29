@@ -1,5 +1,6 @@
 import { IMcpConnection, IServerConfig } from '../types/index.js';
 import { McpConnection } from './mcp-connection.js';
+import { frameworkLogger } from '../../core/framework-logger.js';
 
 /**
  * Connection Manager
@@ -52,7 +53,7 @@ export class ConnectionManager {
     for (const [serverName, connection] of this.connections) {
       disconnectPromises.push(
         connection.disconnect().catch((error) => {
-          console.error(`Error disconnecting ${serverName}:`, error);
+          frameworkLogger.log("connection-manager", "disconnect-error", "error", { serverName, error });
         })
       );
     }

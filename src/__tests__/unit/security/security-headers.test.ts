@@ -13,6 +13,7 @@
 
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { SecurityHeadersMiddleware } from "../../../security/security-headers.js";
+import { frameworkLogger } from "../../../core/framework-logger.js";
 
 describe("SecurityHeadersMiddleware", () => {
   let middleware: SecurityHeadersMiddleware;
@@ -62,15 +63,18 @@ describe("SecurityHeadersMiddleware", () => {
     });
 
     it("should handle invalid response object gracefully", () => {
-      const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+      const loggerSpy = vi.spyOn(frameworkLogger, "log").mockResolvedValue(undefined);
 
       middleware.applySecurityHeaders(null as any);
       middleware.applySecurityHeaders({} as any);
 
-      expect(consoleSpy).toHaveBeenCalledWith(
-        "SecurityHeadersMiddleware: Invalid response object",
+      expect(loggerSpy).toHaveBeenCalledWith(
+        "security-headers",
+        "invalid-response-object",
+        "warning",
+        expect.objectContaining({ warning: "SecurityHeadersMiddleware: Invalid response object" }),
       );
-      consoleSpy.mockRestore();
+      loggerSpy.mockRestore();
     });
 
     it("should apply custom CSP when configured", () => {

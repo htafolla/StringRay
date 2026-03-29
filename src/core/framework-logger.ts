@@ -36,19 +36,19 @@ export function withJobContext<T>(
     if (result instanceof Promise) {
       return result.finally(async () => {
         // Auto-complete job on operation finish
-        await jobContext.complete(true).catch(console.error);
+        await jobContext.complete(true).catch(() => {});
         // Restore original context
         currentJobContext = originalContext;
       });
     } else {
       // Sync operation - complete immediately
-      jobContext.complete(true).catch(console.error);
+      jobContext.complete(true).catch(() => {});
       currentJobContext = originalContext;
       return Promise.resolve(result);
     }
   } catch (error) {
     // Error occurred - complete job with failure
-    jobContext.complete(false, { error: String(error) }).catch(console.error);
+    jobContext.complete(false, { error: String(error) }).catch(() => {});
     currentJobContext = originalContext;
     throw error;
   }

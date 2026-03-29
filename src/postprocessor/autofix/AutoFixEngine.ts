@@ -374,7 +374,7 @@ export class AutoFixEngine {
         { message: "✅ Fixes rolled back" },
       );
     } catch (error) {
-      console.error("❌ Rollback failed:", error);
+      await frameworkLogger.log("autofix-engine", "rollback-failed", "error", { error: error instanceof Error ? error.message : String(error) });
       throw error;
     }
   }

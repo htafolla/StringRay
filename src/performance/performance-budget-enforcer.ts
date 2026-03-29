@@ -18,6 +18,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { execSync } from "child_process";
 import { performance } from "perf_hooks";
+import { frameworkLogger } from "../core/framework-logger.js";
 
 // Performance budget constants from Universal Development Codex
 export const PERFORMANCE_BUDGET = {
@@ -157,7 +158,7 @@ export class PerformanceBudgetEnforcer extends EventEmitter {
         });
         gzippedSize = parseInt(gzipped.trim());
       } catch (error) {
-        console.warn(`Failed to gzip ${file}:`, error);
+        frameworkLogger.log("performance-budget-enforcer", "gzip-failed", "warning", { file, error });
         gzippedSize = size; // Fallback to uncompressed size
       }
 
@@ -466,27 +467,29 @@ export class PerformanceBudgetEnforcer extends EventEmitter {
    */
   private handleViolation(violation: PerformanceBudgetViolation): void {
     const severity = violation.severity.toUpperCase();
-    console.warn(
-      `[${severity}] Performance budget violation: ${violation.metric}`,
-    );
-    console.warn(
-      `  Actual: ${violation.actual.toLocaleString()}, Budget: ${violation.budget.toLocaleString()} (${violation.percentage.toFixed(1)}%)`,
-    );
-    console.warn(`  Recommendation: ${violation.recommendation}`);
+    frameworkLogger.log("performance-budget-enforcer", "budget-violation", "warning", {
+      severity,
+      metric: violation.metric,
+      actual: violation.actual.toLocaleString(),
+      budget: violation.budget.toLocaleString(),
+      percentage: violation.percentage.toFixed(1) + "%",
+      recommendation: violation.recommendation,
+    });
   }
 
   /**
    * Handle budget exceeded events
    */
   private handleBudgetExceeded(violation: PerformanceBudgetViolation): void {
-    console.error(
-      `🚨 PERFORMANCE BUDGET EXCEEDED: ${violation.metric} (${violation.percentage.toFixed(1)}% of budget)`,
-    );
+    frameworkLogger.log("performance-budget-enforcer", "budget-exceeded", "error", {
+      metric: violation.metric,
+      percentage: violation.percentage.toFixed(1) + "% of budget",
+    });
 
     if (violation.severity === "critical") {
-      console.error(
-        "🚨 CRITICAL: This violation requires immediate attention before deployment",
-      );
+      frameworkLogger.log("performance-budget-enforcer", "critical-violation", "error", {
+        message: "CRITICAL: This violation requires immediate attention before deployment",
+      });
     }
   }
 
@@ -507,7 +510,7 @@ export class PerformanceBudgetEnforcer extends EventEmitter {
       try {
         await this.generatePerformanceReport();
       } catch (error) {
-        console.error("Performance monitoring error:", error);
+        frameworkLogger.log("performance-budget-enforcer", "monitoring-error", "error", { error });
       }
 
       setTimeout(monitor, intervalMs);

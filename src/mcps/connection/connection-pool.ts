@@ -1,5 +1,6 @@
 import { IMcpConnection, IServerConfig } from '../types/index.js';
 import { McpConnection } from './mcp-connection.js';
+import { frameworkLogger } from '../../core/framework-logger.js';
 
 /**
  * Pooled Connection
@@ -106,7 +107,7 @@ export class ConnectionPool implements IConnectionPoolExtended {
       for (const pooled of pool) {
         disconnectPromises.push(
           pooled.connection.disconnect().catch((error) => {
-            console.error('Error disconnecting pooled connection:', error);
+            frameworkLogger.log("connection-pool", "disconnect-error", "error", { error });
           })
         );
       }
@@ -193,7 +194,7 @@ export class ConnectionPool implements IConnectionPoolExtended {
       ) {
         // Disconnect and remove stale connection
         pooled.connection.disconnect().catch((error) => {
-          console.error('Error disconnecting stale connection:', error);
+          frameworkLogger.log("connection-pool", "stale-disconnect-error", "error", { error });
         });
         pool.splice(i, 1);
       }

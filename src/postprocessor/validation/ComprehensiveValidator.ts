@@ -50,7 +50,7 @@ class ComprehensiveValidator {
         .split("\n")
         .filter((f) => f.trim());
     } catch (error) {
-      console.warn("⚠️ Could not determine changed files");
+      frameworkLogger.log("comprehensive-validator", "config-warning", "warning", { message: "Could not determine changed files" });
       return [];
     }
   }
@@ -486,9 +486,6 @@ async function main(): Promise<void> {
 
 // Run validation
 main().catch((error) => {
-  console.error(
-    "❌ Comprehensive validation failed:",
-    error instanceof Error ? error.message : String(error),
-  );
+  frameworkLogger.log("comprehensive-validator", "validation-error", "error", { error: error instanceof Error ? error.message : String(error) });
   process.exit(1);
 });

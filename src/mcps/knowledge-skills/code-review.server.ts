@@ -1026,7 +1026,7 @@ class StrRayCodeReviewServer {
 // Run the server if this file is executed directly
 if (import.meta.url === `file://${process.argv[1]}`) {
   const server = new StrRayCodeReviewServer();
-  server.run().catch(console.error);
+  server.run().catch(() => {});
 }
 
 export { StrRayCodeReviewServer };

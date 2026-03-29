@@ -42,10 +42,7 @@ class LightweightValidator {
         .split("\n")
         .filter((f) => f.trim());
     } catch (error) {
-      console.warn(
-        "⚠️ Could not determine changed files:",
-        error instanceof Error ? error.message : String(error),
-      );
+      frameworkLogger.log("lightweight-validator", "config-warning", "warning", { message: "Could not determine changed files", error: error instanceof Error ? error.message : String(error) });
       return [];
     }
   }
@@ -348,9 +345,6 @@ async function main(): Promise<void> {
 
 // Run validation
 main().catch((error) => {
-  console.error(
-    "❌ Validation failed:",
-    error instanceof Error ? error.message : String(error),
-  );
+  frameworkLogger.log("lightweight-validator", "validation-error", "error", { error: error instanceof Error ? error.message : String(error) });
   process.exit(1);
 });

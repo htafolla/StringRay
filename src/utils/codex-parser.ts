@@ -9,6 +9,7 @@
  */
 
 import { CodexContext, CodexTerm } from "../core/context-loader.js";
+import { frameworkLogger } from "../core/framework-logger.js";
 import * as fs from "fs";
 import * as path from "path";
 
@@ -28,20 +29,19 @@ function sanitizeTermDescription(description: string): string {
   
   // Check for potential runaway expansion patterns
   if (description.length > MAX_TERM_DESCRIPTION_LENGTH) {
-    console.warn(
-      `⚠️ Codex term description exceeded ${MAX_TERM_DESCRIPTION_LENGTH} chars, truncating. ` +
-      `This may indicate corrupted codex data.`
-    );
+    frameworkLogger.log("codex-parser", "parse-warning", "warning", {
+      message: `Codex term description exceeded ${MAX_TERM_DESCRIPTION_LENGTH} chars, truncating. This may indicate corrupted codex data.`,
+      length: description.length,
+    });
     return description.substring(0, MAX_TERM_DESCRIPTION_LENGTH) + "... [TRUNCATED]";
   }
   
   // Check for repeated patterns that indicate corruption
   const repeatedPattern = /(.+?)\1{5,}/;
   if (repeatedPattern.test(description)) {
-    console.warn(
-      "⚠️ Codex term description contains repeated patterns, indicating potential corruption. " +
-      "Returning sanitized version."
-    );
+    frameworkLogger.log("codex-parser", "parse-warning", "warning", {
+      message: "Codex term description contains repeated patterns, indicating potential corruption. Returning sanitized version.",
+    });
     // Return a minimal safe description
     return "Term description contains potential corruption.";
   }

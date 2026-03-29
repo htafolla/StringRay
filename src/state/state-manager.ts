@@ -16,7 +16,7 @@ export class StringRayStateManager implements StateManager {
 
   static readonly VERSION = "1.5.2";
 
-  constructor(persistencePath = ".opencode/state", persistenceEnabled = true) {
+  constructor(persistencePath = ".opencode/state/state.json", persistenceEnabled = true) {
     this.persistencePath = persistencePath;
     this.persistenceEnabled = persistenceEnabled;
     this.initializePersistence();

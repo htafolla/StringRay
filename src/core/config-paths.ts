@@ -94,7 +94,7 @@ export function resolveConfigPath(relativePath: string, projectRoot?: string): s
 }
 
 /**
- * Get the state persistence directory.
+ * Get the state persistence directory (the parent directory for state.json).
  * Similar logic to resolveConfigPath but for the state/ subdirectory.
  */
 export function resolveStateDir(projectRoot?: string): string {
@@ -116,6 +116,14 @@ export function resolveStateDir(projectRoot?: string): string {
 
   // Default: use highest-priority path (will be auto-created by StateManager)
   return candidates[0]!;
+}
+
+/**
+ * Get the state persistence FILE path (e.g. .opencode/state/state.json).
+ * Prefer this over resolveStateDir when you need a file path for fs.writeFileSync.
+ */
+export function resolveStateFilePath(projectRoot?: string): string {
+  return join(resolveStateDir(projectRoot), "state.json");
 }
 
 /**

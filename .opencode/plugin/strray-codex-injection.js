@@ -11,6 +11,36 @@
 import * as fs from "fs";
 import * as path from "path";
 import { spawn } from "child_process";
+import { fileURLToPath } from "url";
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+async function resolvePluginImport(relativePath) {
+    const fromPlugin = path.resolve(__dirname, relativePath);
+    try { return await import("file://" + fromPlugin); } catch (_) {}
+    const fromNM = path.resolve(__dirname, "..", "..", "node_modules", relativePath);
+    try { return await import("file://" + fromNM); } catch (_) {}
+    const fallbacks = [
+        path.resolve("/app/backend/node_modules", relativePath),
+        path.resolve("/app/node_modules", relativePath),
+        path.resolve(__dirname, "..", "..", "backend", "node_modules", relativePath),
+    ];
+    for (const fb of fallbacks) {
+        try { return await import("file://" + fb); } catch (_) {}
+    }
+    return null;
+}
+
+function findStrrayDistDir() {
+    const candidates = [
+        path.resolve(__dirname, "..", "..", "node_modules", "strray-ai", "dist"),
+        path.resolve("/app/node_modules/strray-ai/dist"),
+        path.resolve("/app/backend/node_modules/strray-ai/dist"),
+        path.resolve(__dirname, "..", "..", "backend", "node_modules", "strray-ai", "dist"),
+    ];
+    for (const d of candidates) { if (fs.existsSync(d)) return d; }
+    return null;
+}
 // Dynamic imports for config-paths and framework-logger
 // Uses candidate-based resolution to work from both dist/plugin/ and .opencode/plugins/
 let _resolveCodexPath;
@@ -20,12 +50,14 @@ async function loadFrameworkLogger() {
     if (_frameworkLogger)
         return _frameworkLogger;
     const candidates = [
+        "strray-ai/dist/core/framework-logger.js",
         "../core/framework-logger.js",
         "../../dist/core/framework-logger.js",
     ];
     for (const p of candidates) {
         try {
-            const mod = await import(p);
+            const mod = await resolvePluginImport(p);
+            if (!mod) throw new Error("not found");
             _frameworkLogger = mod.frameworkLogger;
             return _frameworkLogger;
         }
@@ -43,12 +75,14 @@ async function loadConfigPaths() {
     if (_resolveCodexPath && _resolveStateDir)
         return;
     const candidates = [
+        "strray-ai/dist/core/config-paths.js",
         "../core/config-paths.js",
         "../../dist/core/config-paths.js",
     ];
     for (const p of candidates) {
         try {
-            const mod = await import(p);
+            const mod = await resolvePluginImport(p);
+            if (!mod) throw new Error("not found");
             _resolveCodexPath = mod.resolveCodexPath;
             _resolveStateDir = mod.resolveStateDir;
             return;
@@ -74,12 +108,14 @@ let SystemPromptGenerator;
 async function importSystemPromptGenerator() {
     if (!SystemPromptGenerator) {
         const candidates = [
+            "strray-ai/dist/core/system-prompt-generator.js",
             "../core/system-prompt-generator.js",
             "../../dist/core/system-prompt-generator.js",
         ];
         for (const p of candidates) {
             try {
-                const module = await import(p);
+                const module = await resolvePluginImport(p);
+                if (!module) throw new Error("not found");
                 SystemPromptGenerator = module.generateLeanSystemPrompt;
                 return;
             }
@@ -99,41 +135,25 @@ async function loadStrRayComponents() {
     if (ProcessorManager && StrRayStateManager && featuresConfigLoader)
         return;
     const logger = await getOrCreateLogger(process.cwd());
-    // Try local dist first (for development)
+    const distDir = findStrrayDistDir();
+    if (!distDir) {
+        logger.error("Failed to locate strray-ai dist directory from any known path");
+        return;
+    }
     try {
-        logger.log(`🔄 Attempting to load from ../../dist/`);
-        const procModule = await import("../../dist/processors/processor-manager.js");
-        const stateModule = await import("../../dist/state/state-manager.js");
-        const featuresModule = await import("../../dist/core/features-config.js");
-        ProcessorManager = procModule.ProcessorManager;
-        StrRayStateManager = stateModule.StrRayStateManager;
-        featuresConfigLoader = featuresModule.featuresConfigLoader;
-        detectTaskType = featuresModule.detectTaskType;
-        logger.log(`✅ Loaded from ../../dist/`);
+        logger.log("🔄 Loading from " + distDir);
+        const pm = await import("file://" + path.join(distDir, "processors", "processor-manager.js"));
+        const sm = await import("file://" + path.join(distDir, "state", "state-manager.js"));
+        const fm = await import("file://" + path.join(distDir, "core", "features-config.js"));
+        ProcessorManager = pm.ProcessorManager;
+        StrRayStateManager = sm.StrRayStateManager;
+        featuresConfigLoader = fm.featuresConfigLoader;
+        detectTaskType = fm.detectTaskType;
+        logger.log("✅ Loaded from " + distDir);
         return;
     }
     catch (e) {
-        logger.error(`❌ Failed to load from ../../dist/: ${e?.message || e}`);
-    }
-    // Try node_modules (for consumer installation)
-    const pluginPaths = ["strray-ai", "strray-framework"];
-    for (const pluginPath of pluginPaths) {
-        try {
-            logger.log(`🔄 Attempting to load from ../../node_modules/${pluginPath}/dist/`);
-            const pm = await import(`../../node_modules/${pluginPath}/dist/processors/processor-manager.js`);
-            const sm = await import(`../../node_modules/${pluginPath}/dist/state/state-manager.js`);
-            const fm = await import(`../../node_modules/${pluginPath}/dist/core/features-config.js`);
-            ProcessorManager = pm.ProcessorManager;
-            StrRayStateManager = sm.StrRayStateManager;
-            featuresConfigLoader = fm.featuresConfigLoader;
-            detectTaskType = fm.detectTaskType;
-            logger.log(`✅ Loaded from ../../node_modules/${pluginPath}/dist/`);
-            return;
-        }
-        catch (e) {
-            logger.error(`❌ Failed to load from ../../node_modules/${pluginPath}/dist/: ${e?.message || e}`);
-            continue;
-        }
+        logger.error("❌ Failed to load from " + distDir + ": " + (e?.message || e));
     }
 }
 function spawnPromise(command, args, cwd) {
@@ -531,17 +551,22 @@ export default async function strrayCodexPlugin(input) {
                 let stateManager;
                 let processorManager;
                 // Check if framework is already booted (global state exists)
-                const globalState = globalThis.strRayStateManager;
+                const sessionKey = "strRayStateManager_" + process.pid;
+                const globalState = globalThis[sessionKey];
                 if (globalState) {
                     logger.log("🔗 Connecting to booted StrRay framework");
                     stateManager = globalState;
                 }
                 else {
                     logger.log("🚀 StrRay framework not booted, initializing...");
-                    // Create new state manager (framework not booted yet)
-                    stateManager = new StrRayStateManager(await resolveStateDir(directory));
-                    // Store globally for future use
-                    globalThis.strRayStateManager = stateManager;
+                    try {
+                        const stateDir = await resolveStateDir(directory);
+                        stateManager = new StrRayStateManager(stateDir);
+                    } catch (stateErr) {
+                        logger.log("⚠️ resolveStateDir failed, using directory: " + (stateErr?.message || stateErr));
+                        stateManager = new StrRayStateManager(directory);
+                    }
+                    globalThis[sessionKey] = stateManager;
                 }
                 // Get processor manager from state
                 processorManager = stateManager.get("processor:manager");
@@ -594,6 +619,11 @@ export default async function strrayCodexPlugin(input) {
                 }
                 // PHASE 2: Execute pre-processors with detailed logging
                 try {
+                    if (typeof processorManager.executePreProcessors !== "function") {
+                        logger.error("executePreProcessors is not a function — clearing stale cache");
+                        stateManager.set("processor:manager", null);
+                        globalThis[sessionKey] = null;
+                    } else {
                     logger.log(`▶️ Executing pre-processors for ${tool}...`);
                     const result = await processorManager.executePreProcessors({
                         tool,
@@ -620,8 +650,14 @@ export default async function strrayCodexPlugin(input) {
                 catch (error) {
                     logger.error(`💥 Pre-processor execution error`, error);
                 }
+                    } // end pre-processor guard
                 // PHASE 3: Execute post-processors after tool completion
                 try {
+                    if (typeof processorManager.executePostProcessors !== "function") {
+                        logger.error("executePostProcessors is not a function — clearing stale cache");
+                        stateManager.set("processor:manager", null);
+                        globalThis[sessionKey] = null;
+                    } else {
                     logger.log(`▶️ Executing post-processors for ${tool}...`);
                     logger.log(`📝 Post-processor args: ${JSON.stringify(args)}`);
                     const postResults = await processorManager.executePostProcessors(tool, {
@@ -646,6 +682,7 @@ export default async function strrayCodexPlugin(input) {
                 catch (error) {
                     logger.error(`💥 Post-processor execution error`, error);
                 }
+                    } // end post-processor guard
             }
         },
         // Execute POST-processors AFTER tool completes (this is the correct place!)
@@ -657,7 +694,20 @@ export default async function strrayCodexPlugin(input) {
             // This feeds the inference tuner with real tool usage data so it
             // can refine keyword mappings and improve predictive analytics.
             try {
-                const { routingOutcomeTracker } = await import("../delegation/analytics/outcome-tracker.js");
+                let routingOutcomeTracker = null;
+                const distDir = findStrrayDistDir();
+                if (distDir) {
+                    try {
+                        const mod = await import("file://" + path.join(distDir, "delegation", "analytics", "outcome-tracker.js"));
+                        routingOutcomeTracker = mod.routingOutcomeTracker;
+                    } catch (_) {}
+                }
+                if (!routingOutcomeTracker) {
+                    try {
+                        const mod = await resolvePluginImport("strray-ai/dist/delegation/analytics/outcome-tracker.js");
+                        if (mod) routingOutcomeTracker = mod.routingOutcomeTracker;
+                    } catch (_) {}
+                }
                 const mapping = TOOL_AGENT_MAP[tool];
                 const taskType = classifyTaskType(tool, args);
                 const rawDesc = args?.content
@@ -755,7 +805,20 @@ export default async function strrayCodexPlugin(input) {
             if (_openCodeToolCallCount - _lastTuneToolCallCount >= INFERENCE_TUNE_INTERVAL) {
                 _lastTuneToolCallCount = _openCodeToolCallCount;
                 try {
-                    const { inferenceTuner } = await import("../services/inference-tuner.js");
+                    let inferenceTuner = null;
+                    const tDir = findStrrayDistDir();
+                    if (tDir) {
+                        try {
+                            const mod = await import("file://" + path.join(tDir, "services", "inference-tuner.js"));
+                            inferenceTuner = mod.inferenceTuner;
+                        } catch (_) {}
+                    }
+                    if (!inferenceTuner) {
+                        try {
+                            const mod = await resolvePluginImport("strray-ai/dist/services/inference-tuner.js");
+                            if (mod) inferenceTuner = mod.inferenceTuner;
+                        } catch (_) {}
+                    }
                     inferenceTuner
                         .runTuningCycle()
                         .then(() => {
@@ -791,13 +854,7 @@ export default async function strrayCodexPlugin(input) {
             const logger = await getOrCreateLogger(directory);
             logger.log("🔧 Plugin config hook triggered - initializing StrRay integration");
             // Initialize StrRay framework
-            // Primary: project .opencode/init.sh (copied by postinstall)
-            // Fallback: package .opencode/init.sh (works when postinstall skips for Hermes consumers)
-            let initScriptPath = path.join(directory, ".opencode", "init.sh");
-            const pkgInitPath = path.join(directory, "node_modules", "strray-ai", ".opencode", "init.sh");
-            if (!fs.existsSync(initScriptPath) && fs.existsSync(pkgInitPath)) {
-                initScriptPath = pkgInitPath;
-            }
+            const initScriptPath = path.join(directory, ".opencode", "init.sh");
             if (fs.existsSync(initScriptPath)) {
                 try {
                     const { stderr } = await spawnPromise("bash", [initScriptPath], directory);

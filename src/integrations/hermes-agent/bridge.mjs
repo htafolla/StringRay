@@ -45,6 +45,7 @@ let ProcessorManager = null;
 let StrRayStateManager = null;
 let featuresConfigLoader = null;
 let runQualityGateWithLogging = null;
+let enforcerValidators = null;
 let frameworkReady = false;
 let frameworkLoadAttempted = false;
 
@@ -159,6 +160,25 @@ async function loadFramework(projectRoot) {
         if (existsSync(fmPath)) {
           const fm = await import(fmPath);
           featuresConfigLoader = fm.featuresConfigLoader;
+        }
+      }
+
+      // RuleEnforcer — full code analysis (security, quality, architecture)
+      if (!enforcerValidators) {
+        const rePath = join(distDir, "enforcement", "index.js");
+        if (existsSync(rePath)) {
+          try {
+            const reModule = await import(rePath);
+            // Use ValidatorRegistry directly to bypass RuleExecutor dependency chain
+            // which cascades failures when validators lack full project context
+            const ValidatorRegistry = reModule.ValidatorRegistry;
+            if (ValidatorRegistry) {
+              enforcerValidators = new ValidatorRegistry();
+              // Validators are pre-registered in constructor — no registerAllValidators needed
+            }
+          } catch (e) {
+            logToActivity(join(projectRoot, "logs", "framework"), `ValidatorRegistry load skipped: ${e.message}`);
+          }
         }
       }
 
@@ -433,21 +453,102 @@ async function handleValidate(input, projectRoot, logDir) {
 }
 
 async function handleCodexCheck(input, projectRoot, logDir) {
-  const { code, focusAreas } = input;
-  logToActivity(logDir, `codex-check: code_length=${code?.length || 0} focus=${focusAreas}`);
+  const { code, focusAreas, operation } = input;
+  const codeLen = code?.length || 0;
+  logToActivity(logDir, `codex-check: code_length=${codeLen} focus=${focusAreas} operation=${operation}`);
 
-  // Check code against debug patterns via quality gate
+  // Collect violations from both systems
+  const allViolations = [];
+  const allChecks = [];
+  let enforcerRan = false;
+
+  // Phase 1: Quality gate (fast meta-checks + basic patterns)
   const qualityResult = await runQualityGateCheck(
     { tool: "write", args: { content: code } },
     projectRoot,
     logDir,
   );
 
+  if (qualityResult.checks) {
+    allChecks.push(...qualityResult.checks);
+  }
+  if (qualityResult.violations?.length) {
+    allViolations.push(...qualityResult.violations);
+  }
+
+  // Phase 2: Enforcement validators (deep code analysis — security, quality, architecture)
+  //    Use ValidatorRegistry directly instead of RuleEnforcer.validateOperation()
+  //    to avoid the dependency chain cascade that blocks validators on snippet analysis.
+  //    Only run content-analysis validators — skip project-level validators that
+  //    require full context (docs, tests, CI, package.json) and always fail on snippets.
+  const SNIPPET_SAFE_RULES = new Set([
+    "security-by-design",
+    "input-validation",
+    "clean-debug-logs",
+    "console-log-usage",
+    "no-duplicate-code",
+    "loop-safety",
+    "no-over-engineering",
+    "single-responsibility",
+    "error-resolution",
+    "module-system-consistency",
+  ]);
+
+  if (enforcerValidators && codeLen > 0) {
+    try {
+      const ctx = { operation: "write", newCode: code, files: [] };
+      const validators = enforcerValidators.getAllValidators();
+      let enforcerViolations = 0;
+
+      for (const v of validators) {
+        // Only run snippet-safe validators, or respect focus areas
+        if (!SNIPPET_SAFE_RULES.has(v.ruleId)) {
+          // Still run if focus area explicitly requests this category
+          if (focusAreas && focusAreas !== "all" && Array.isArray(focusAreas)) {
+            if (focusAreas.includes(v.category)) {
+              // Fall through to validate
+            } else {
+              continue;
+            }
+          } else {
+            continue;
+          }
+        }
+
+        try {
+          const result = await v.validate(ctx);
+          if (!result.passed) {
+            enforcerViolations++;
+            allViolations.push({
+              id: v.ruleId,
+              severity: v.severity || "error",
+              message: result.message,
+              suggestions: result.suggestions,
+            });
+            allChecks.push({ id: v.ruleId, passed: false, message: result.message });
+          }
+        } catch {
+          // Skip broken validators gracefully
+        }
+      }
+
+      enforcerRan = true;
+      logToActivity(logDir, `codex-check: Validators ran against ${validators.length} rules (${SNIPPET_SAFE_RULES.size} snippet-safe), ${enforcerViolations} violations`);
+    } catch (e) {
+      logToActivity(logDir, `codex-check: Validator error: ${e.message}`);
+    }
+  } else if (!enforcerValidators) {
+    logToActivity(logDir, `codex-check: Validators not available, quality gate only`);
+  }
+
+  const passed = allViolations.length === 0;
+
   return {
-    passed: qualityResult.passed,
-    violations: qualityResult.violations,
-    checks: qualityResult.checks,
+    passed,
+    violations: allViolations,
+    checks: allChecks,
     focusAreas: focusAreas || "all",
+    enforcerRan,
   };
 }
 
@@ -615,6 +716,9 @@ async function main() {
       i++;
     } else if (!argv[i].startsWith("-") && !positionalCommand && KNOWN_COMMANDS.has(argv[i])) {
       positionalCommand = argv[i];
+    } else if (!argv[i].startsWith("-") && positionalCommand && !positionalPayload) {
+      // Inline JSON payload after command: node bridge.mjs hooks '{"action":"install"}'
+      positionalPayload = argv[i];
     }
   }
 

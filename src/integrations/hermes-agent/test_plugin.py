@@ -423,6 +423,9 @@ class TestSlashCommand(unittest.TestCase):
             "post_processor_runs": 6,
             "bridge_calls": 15,
             "bridge_errors": 0,
+            "subagent_dispatches": 3,
+            "subagent_validations": 1,
+            "subagent_blocks": 0,
         }
 
     def test_stats(self):
@@ -1182,7 +1185,7 @@ class TestRegisterIntegrationV2_1(unittest.TestCase):
         ctx = MagicMock()
         with self.assertLogs("strray-hermes", level="INFO") as cm:
             pi.register(ctx)
-        self.assertTrue(any("v2.1" in m for m in cm.output))
+        self.assertTrue(any("v2.2" in m for m in cm.output))
         self.assertTrue(any("4 tools" in m for m in cm.output))
         self.assertTrue(any("5 hooks" in m for m in cm.output))
 

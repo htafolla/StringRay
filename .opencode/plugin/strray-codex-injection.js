@@ -791,7 +791,13 @@ export default async function strrayCodexPlugin(input) {
             const logger = await getOrCreateLogger(directory);
             logger.log("🔧 Plugin config hook triggered - initializing StrRay integration");
             // Initialize StrRay framework
-            const initScriptPath = path.join(directory, ".opencode", "init.sh");
+            // Primary: project .opencode/init.sh (copied by postinstall)
+            // Fallback: package .opencode/init.sh (works when postinstall skips for Hermes consumers)
+            let initScriptPath = path.join(directory, ".opencode", "init.sh");
+            const pkgInitPath = path.join(directory, "node_modules", "strray-ai", ".opencode", "init.sh");
+            if (!fs.existsSync(initScriptPath) && fs.existsSync(pkgInitPath)) {
+                initScriptPath = pkgInitPath;
+            }
             if (fs.existsSync(initScriptPath)) {
                 try {
                     const { stderr } = await spawnPromise("bash", [initScriptPath], directory);

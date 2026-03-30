@@ -96,6 +96,25 @@ function cloneRepo(url: string, targetDir: string): string {
 
   const errors: string[] = [];
 
+  // Prefer gh repo clone when authenticated (faster, handles auth seamlessly)
+  let hasGh = false;
+  try {
+    execSync("gh auth status --hostname github.com", { stdio: "pipe", timeout: 5000 });
+    hasGh = true;
+  } catch { /* gh not installed or not authenticated */ }
+
+  if (hasGh) {
+    try {
+      console.log(`  Cloning via gh...`);
+      execSync(`gh repo clone ${slug.owner}/${slug.repo} "${extracted}" -- --depth 1`, { stdio: "pipe", timeout: 60000 });
+      return extracted;
+    } catch (ghErr: unknown) {
+      const stderr = (ghErr as { stderr?: Buffer })?.stderr?.toString("utf-8") || "";
+      errors.push(`  gh repo clone: ${stderr.split("\n").filter((l: string) => l.includes("Error:"))[0]?.trim() || (ghErr as Error).message.split("\n")[0]}`);
+    }
+  }
+
+  // Fallback: tarball download (public repos)
   for (const branch of ["main", "master"]) {
     const archiveUrl = `https://codeload.github.com/${slug.owner}/${slug.repo}/tar.gz/${branch}`;
     try {
@@ -123,25 +142,9 @@ function cloneRepo(url: string, targetDir: string): string {
     }
   }
 
+  // Last resort: git clone (HTTPS then SSH)
   const httpsUrl = url;
   const sshUrl = url.replace(/^https:\/\/github\.com\//, "git@github.com:");
-
-  let hasGh = false;
-  try {
-    execSync("gh auth status --hostname github.com", { stdio: "pipe", timeout: 5000 });
-    hasGh = true;
-  } catch { /* gh not installed or not authenticated */ }
-
-  if (hasGh && slug) {
-    try {
-      console.log(`  Trying gh repo clone...`);
-      execSync(`gh repo clone ${slug.owner}/${slug.repo} "${extracted}" -- --depth 1`, { stdio: "pipe", timeout: 60000 });
-      return extracted;
-    } catch (ghErr: unknown) {
-      const stderr = (ghErr as { stderr?: Buffer })?.stderr?.toString("utf-8") || "";
-      errors.push(`  gh repo clone: ${stderr.split("\n").filter((l: string) => l.includes("Error:"))[0]?.trim() || (ghErr as Error).message.split("\n")[0]}`);
-    }
-  }
 
   for (const [proto, gitUrl] of [["HTTPS", httpsUrl], ["SSH", sshUrl]] as const) {
     try {

@@ -151,6 +151,7 @@ export class StringRayStateManager implements StateManager {
     frameworkLogger.log("state-manager", "get operation", "info", {
       key,
       hasValue: value !== undefined,
+      valueType: value ? (value as unknown as { constructor?: { name?: string } }).constructor?.name : undefined,
     });
     return value;
   }
@@ -260,6 +261,34 @@ export class StringRayStateManager implements StateManager {
   // Enterprise features for advanced state management
   getStateVersion(): string {
     return StringRayStateManager.VERSION || "1.1.1";
+  }
+
+  // Check if stored value is a valid class instance (has prototype methods)
+  // This helps detect values that were serialized to JSON and lost their prototype chain
+  isValidClassInstance(
+    value: unknown,
+    methodName: string,
+  ): boolean {
+    if (!value || typeof value !== "object") return false;
+    if (typeof (value as Record<string, unknown>)[methodName] === "function")
+      return true;
+    // Check if it's a plain object that lost its prototype
+    if (
+      (value as Record<string, unknown>).constructor?.name === "Object" ||
+      !(value as Record<string, unknown>).constructor
+    ) {
+      frameworkLogger.log(
+        "state-manager",
+        "invalid-class-instance-detected",
+        "warning",
+        {
+          key: "detection",
+          hasMethod: methodName in (value as Record<string, unknown>),
+        },
+      );
+      return false;
+    }
+    return false;
   }
 
   getAuditLog(): Array<{ timestamp: Date; operation: string; key: string }> {

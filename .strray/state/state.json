@@ -1,0 +1,80 @@
+{
+  "votingHistory": [
+    {
+      "id": "vote_1777658332423_b1e77462",
+      "sessionId": "inference-governance-1777658332423",
+      "topic": "Codify Extract Method pattern",
+      "voteCount": 3,
+      "strategy": "consensus",
+      "decision": "approve",
+      "confidence": 0.03255563636363649,
+      "participantCount": 3,
+      "timestamp": 1777658332423,
+      "resolvedAt": 1777658377446
+    },
+    {
+      "id": "vote_1777658377447_0e68871e",
+      "sessionId": "inference-governance-1777658332423",
+      "topic": "Codify Test Coverage Expansion pattern",
+      "voteCount": 3,
+      "strategy": "expert_priority",
+      "decision": "approve",
+      "confidence": 0.95,
+      "participantCount": 3,
+      "timestamp": 1777658377447,
+      "resolvedAt": 1777658421393
+    },
+    {
+      "id": "vote_1777658421393_6084719a",
+      "sessionId": "inference-governance-1777658332423",
+      "topic": "Address: Bug: fix: increase timeout for processor auto-discovery tests to prevent flak... (106x)",
+      "voteCount": 3,
+      "strategy": "expert_priority",
+      "decision": "approve",
+      "confidence": 0.608,
+      "participantCount": 3,
+      "timestamp": 1777658421393,
+      "resolvedAt": 1777658466404
+    }
+  ],
+  "metrics": {
+    "totalVotes": 9,
+    "successfulVotes": 3,
+    "failedVotes": 0,
+    "averageConfidence": 0.5301852121212122,
+    "strategyUsage": {
+      "majority_vote": 0,
+      "consensus": 1,
+      "expert_priority": 2
+    },
+    "agentParticipation": {},
+    "averageVoterTurnout": 0
+  },
+  "exportedAt": "2026-05-01T18:01:16.850Z",
+  "voting:history": [
+    {
+      "id": "vote_1777658504796_18f93f28",
+      "sessionId": "inference-governance-1777658504796",
+      "topic": "Codify Extract Method pattern",
+      "voteCount": 3,
+      "strategy": "consensus",
+      "decision": "approve",
+      "confidence": 0.03255563636363637,
+      "participantCount": 3,
+      "timestamp": 1777658504797,
+      "resolvedAt": 1777658549816
+    },
+    {
+      "id": "vote_1777658549816_4eb1fad5",
+      "sessionId": "inference-governance-1777658504796",
+      "topic": "Codify Test Coverage Expansion pattern",
+      "voteCount": 3,
+      "strategy": "expert_priority",
+      "decision": "approve",
+      "confidence": 0.76,
+      "participantCount": 3,
+      "timestamp": 1777658549816,
+      "resolvedAt": 1777658594831
+    }
+  ]
+}

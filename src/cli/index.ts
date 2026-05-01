@@ -858,6 +858,7 @@ program
   .description('Run a self-improvement inference cycle: collect → propose → govern → verify')
   .option('-f, --force', 'Force cycle even if threshold not met')
   .option('--no-verify', 'Skip deploy verification step')
+  .option('--no-apply', 'Skip applying approved proposals (create PRs)')
   .option('--json', 'Output raw JSON result')
   .action(async (options) => {
     const { InferenceCycle } = await import('../inference/inference-cycle.js');
@@ -912,7 +913,7 @@ program
       console.log(`  Recurring patterns: ${corpus.recurringPatterns.length}`);
     }
 
-    const cycle = new InferenceCycle(projectRoot, undefined, { skipDeployVerify: options.noVerify ?? true, force: options.force ?? false });
+    const cycle = new InferenceCycle(projectRoot, undefined, { skipDeployVerify: options.noVerify ?? true, skipApply: options.noApply ?? false, force: options.force ?? false });
     const result = await cycle.maybeRunCycle();
 
     if (options.json) {

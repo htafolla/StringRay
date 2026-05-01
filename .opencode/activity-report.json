@@ -1,0 +1,86 @@
+{
+  "sessions": [],
+  "activities": [
+    {
+      "timestamp": "2026-05-01T14:11:18.820Z",
+      "id": "act-1777644678820-2fhnut",
+      "category": "session",
+      "level": "info",
+      "action": "session-ended",
+      "message": "Activity logging session ended",
+      "sessionId": "session-1777644676953-jcvsoy",
+      "details": {
+        "duration": 1867
+      }
+    },
+    {
+      "timestamp": "2026-05-01T14:15:48.940Z",
+      "id": "act-1777644948940-bk9lu4",
+      "category": "session",
+      "level": "info",
+      "action": "session-ended",
+      "message": "Activity logging session ended",
+      "sessionId": "session-1777644948304-94e3jb",
+      "details": {
+        "duration": 636
+      }
+    },
+    {
+      "timestamp": "2026-05-01T14:19:04.258Z",
+      "id": "act-1777645144258-62mkul",
+      "category": "session",
+      "level": "info",
+      "action": "session-ended",
+      "message": "Activity logging session ended",
+      "sessionId": "session-1777645142121-o2r4xe",
+      "details": {
+        "duration": 2137
+      }
+    },
+    {
+      "timestamp": "2026-05-01T14:22:04.914Z",
+      "id": "act-1777645324914-smm8z9",
+      "category": "session",
+      "level": "info",
+      "action": "session-ended",
+      "message": "Activity logging session ended",
+      "sessionId": "session-1777645322539-vq3rpc",
+      "details": {
+        "duration": 2375
+      }
+    },
+    {
+      "timestamp": "2026-05-01T14:24:04.958Z",
+      "id": "act-1777645444958-lqybiz",
+      "category": "session",
+      "level": "info",
+      "action": "session-ended",
+      "message": "Activity logging session ended",
+      "sessionId": "session-1777645442726-3r1yc7",
+      "details": {
+        "duration": 2232
+      }
+    },
+    {
+      "timestamp": "2026-05-01T14:26:28.200Z",
+      "id": "act-1777645588200-mftako",
+      "category": "session",
+      "level": "info",
+      "action": "session-ended",
+      "message": "Activity logging session ended",
+      "sessionId": "session-1777645587485-idcri5",
+      "details": {
+        "duration": 715
+      }
+    }
+  ],
+  "stats": {
+    "total": 6,
+    "byCategory": {
+      "session": 6
+    },
+    "byLevel": {
+      "info": 6
+    }
+  }
+}

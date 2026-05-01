@@ -562,8 +562,8 @@ Respond with EXACTLY one of:
     ].join("\n");
 
     try {
-      const response = await this.invokeAgent(agentName, prompt);
-      return this.parseAgentResponse(response, proposal);
+      const { response, toolCalls } = await this.invokeAgent(agentName, prompt);
+      return this.parseAgentResponse(response, proposal, toolCalls);
     } catch (error) {
       frameworkLogger.log("inference-cycle", "agent-invocation-fallback", "info", {
         agent: agentName,
@@ -577,9 +577,10 @@ Respond with EXACTLY one of:
     }
   }
 
-  private async invokeAgent(agentName: string, prompt: string): Promise<string> {
+  private async invokeAgent(agentName: string, prompt: string): Promise<{ response: string; toolCalls: string[] }> {
     if (this.agentInvoker) {
-      return this.agentInvoker(agentName, prompt);
+      const resp = await this.agentInvoker(agentName, prompt);
+      return { response: resp, toolCalls: [] }; // AgentInvoker doesn't provide tool calls
     }
 
     if (this.opencodeAvailable === null) {
@@ -626,8 +627,24 @@ Respond with EXACTLY one of:
 
       let stdout = "";
       let stderr = "";
+      let toolCalls: string[] = [];
 
-      child.stdout?.on("data", (data: Buffer) => { stdout += data.toString(); });
+      child.stdout?.on("data", (data: Buffer) => {
+        const chunk = data.toString();
+        stdout += chunk;
+        // Parse JSON stream for tool usage
+        try {
+          const lines = chunk.split("\n").filter((l) => l.trim());
+          for (const line of lines) {
+            const evt = JSON.parse(line);
+            if (evt.type === "tool_use") {
+              toolCalls.push(evt.part?.tool || "unknown");
+            }
+          }
+        } catch {
+          // Ignore parse errors for incomplete JSON
+        }
+      });
       child.stderr?.on("data", (data: Buffer) => { stderr += data.toString(); });
 
       child.on("close", (code) => {
@@ -635,7 +652,7 @@ Respond with EXACTLY one of:
         if (settled) return;
         settled = true;
         if (code === 0 && stdout.trim()) {
-          resolve(stdout.trim());
+          resolve({ response: stdout.trim(), toolCalls });
         } else {
           reject(new Error(`opencode --agent ${agentName} exited ${code}: ${stderr.substring(0, 200)}`));
         }
@@ -654,6 +671,7 @@ Respond with EXACTLY one of:
   private parseAgentResponse(
     response: string,
     proposal: InferenceProposal,
+    toolCalls: string[] = [],
   ): { decision: string; confidence: number; reasoning: string } {
     const lower = response.toLowerCase();
 
@@ -664,10 +682,34 @@ Respond with EXACTLY one of:
         : proposal.confidence >= 0.7 ? "approve" : "reject";
 
     const confMatch = response.match(/confidence[:\s]*(0?\.\d+|1\.0|1|0)/i);
-    const confidence = confMatch ? Math.min(1, Math.max(0, parseFloat(confMatch[1]!))) : proposal.confidence;
+    let confidence = confMatch ? Math.min(1, Math.max(0, parseFloat(confMatch[1]!))) : proposal.confidence;
 
     const reasonMatch = response.match(/reasoning[:\s]*(.+)/i);
     const reasoning = reasonMatch ? reasonMatch[1]!.trim() : response.substring(0, 200);
+
+    // Boost confidence if agent actually used MCP tools
+    if (toolCalls.length > 0) {
+      const toolBoost = Math.min(0.2, toolCalls.length * 0.05);
+      confidence = Math.min(1, confidence + toolBoost);
+      frameworkLogger.log("inference-cycle", "tool-boost", "info", {
+        agent: proposal.id,
+        toolCount: toolCalls.length,
+        tools: toolCalls,
+        boost: toolBoost,
+      });
+    }
+
+    // Boost confidence if agent actually used MCP tools
+    if (toolCalls.length > 0) {
+      const toolBoost = Math.min(0.2, toolCalls.length * 0.05);
+      confidence = Math.min(1, confidence + toolBoost);
+      frameworkLogger.log("inference-cycle", "tool-boost", "info", {
+        agent: proposal.id,
+        toolCount: toolCalls.length,
+        tools: toolCalls,
+        boost: toolBoost,
+      });
+    }
 
     return { decision, confidence, reasoning };
   }

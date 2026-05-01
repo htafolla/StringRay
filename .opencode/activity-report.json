@@ -1,0 +1,50 @@
+{
+  "sessions": [],
+  "activities": [
+    {
+      "timestamp": "2026-05-01T17:44:30.895Z",
+      "id": "act-1777657470895-vlz6qz",
+      "category": "session",
+      "level": "info",
+      "action": "session-ended",
+      "message": "Activity logging session ended",
+      "sessionId": "session-1777657470341-pk91rz",
+      "details": {
+        "duration": 554
+      }
+    },
+    {
+      "timestamp": "2026-05-01T17:48:54.812Z",
+      "id": "act-1777657734812-vazpmf",
+      "category": "session",
+      "level": "info",
+      "action": "session-ended",
+      "message": "Activity logging session ended",
+      "sessionId": "session-1777657734225-cdx3ku",
+      "details": {
+        "duration": 587
+      }
+    },
+    {
+      "timestamp": "2026-05-01T17:48:55.095Z",
+      "id": "act-1777657735095-vmqo9n",
+      "category": "session",
+      "level": "info",
+      "action": "session-ended",
+      "message": "Activity logging session ended",
+      "sessionId": "session-1777657733121-bmwr13",
+      "details": {
+        "duration": 1973
+      }
+    }
+  ],
+  "stats": {
+    "total": 3,
+    "byCategory": {
+      "session": 3
+    },
+    "byLevel": {
+      "info": 3
+    }
+  }
+}

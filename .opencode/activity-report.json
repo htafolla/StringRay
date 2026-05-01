@@ -1,0 +1,26 @@
+{
+  "sessions": [],
+  "activities": [
+    {
+      "timestamp": "2026-05-01T17:09:08.240Z",
+      "id": "act-1777655348240-r4znut",
+      "category": "session",
+      "level": "info",
+      "action": "session-ended",
+      "message": "Activity logging session ended",
+      "sessionId": "session-1777655347666-wy158x",
+      "details": {
+        "duration": 574
+      }
+    }
+  ],
+  "stats": {
+    "total": 1,
+    "byCategory": {
+      "session": 1
+    },
+    "byLevel": {
+      "info": 1
+    }
+  }
+}

@@ -406,10 +406,11 @@ Proposal Type: ${p.type}
 Description: ${p.description}
 Evidence: ${p.evidence.slice(0, 5).join("; ")}
 
-Your job: Review the actual codebase to verify this proposal makes sense. Search the code to confirm:
-1. Does the problem described actually exist in the codebase?
-2. Is the proposed solution appropriate?
-3. Are there any missed edge cases?
+CRITICAL:
+1. You MUST use your MCP tools (read, grep, glob) to examine the ACTUAL codebase
+2. Read the relevant files mentioned in the evidence
+3. Verify the problem exists in the current code
+4. Check if the proposed solution makes sense
 
 Respond with EXACTLY one of:
 - GO (proposal is valid, approve)
@@ -546,7 +547,7 @@ Respond with EXACTLY one of:
     proposal: InferenceProposal,
   ): Promise<{ decision: string; confidence: number; reasoning: string }> {
     const prompt = [
-      `Review this inference proposal from 0xRay's self-improvement cycle.`,
+      `You are the ${agentName} agent. Review this inference proposal from 0xRay's self-improvement cycle.`,
       ``,
       `Title: ${proposal.title}`,
       `Type: ${proposal.type}`,
@@ -555,10 +556,16 @@ Respond with EXACTLY one of:
       `Evidence: ${proposal.evidence.join("; ")}`,
       `Description: ${proposal.description}`,
       ``,
+      `CRITICAL INSTRUCTIONS:`,
+      `1. You MUST use your MCP tools (read, grep, glob) to examine the ACTUAL codebase first`,
+      `2. Read the relevant source files mentioned in the evidence`,
+      `3. Verify the problem actually exists in the current code`,
+      `4. Only THEN cast your vote based on what you found`,
+      ``,
       `Cast your vote. Respond with exactly this format:`,
       `DECISION: approve|reject`,
       `CONFIDENCE: 0.XX`,
-      `REASONING: <one sentence>`,
+      `REASONING: <specific reasoning based on the code you read>`,
     ].join("\n");
 
     try {

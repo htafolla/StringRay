@@ -1,0 +1,55 @@
+{
+  "votingHistory": [],
+  "metrics": {
+    "totalVotes": 0,
+    "successfulVotes": 0,
+    "failedVotes": 0,
+    "averageConfidence": 0,
+    "strategyUsage": {
+      "majority_vote": 0,
+      "consensus": 0,
+      "expert_priority": 0
+    },
+    "agentParticipation": {},
+    "averageVoterTurnout": 0
+  },
+  "exportedAt": "2026-05-13T00:17:30.895Z",
+  "voting:history": [
+    {
+      "id": "vote_1778631527515_95b3b449",
+      "sessionId": "inference-governance-1778631470088",
+      "topic": "Codify Extract Method pattern",
+      "voteCount": 3,
+      "strategy": "consensus",
+      "decision": "approve",
+      "confidence": 0.04887403636363637,
+      "participantCount": 3,
+      "timestamp": 1778631527516,
+      "resolvedAt": 1778631527516
+    },
+    {
+      "id": "vote_1778631527516_d1c991e6",
+      "sessionId": "inference-governance-1778631470088",
+      "topic": "Codify Test Coverage Expansion pattern",
+      "voteCount": 3,
+      "strategy": "expert_priority",
+      "decision": "approve",
+      "confidence": 0.78,
+      "participantCount": 3,
+      "timestamp": 1778631527516,
+      "resolvedAt": 1778631527516
+    },
+    {
+      "id": "vote_1778631527516_ba734592",
+      "sessionId": "inference-governance-1778631470088",
+      "topic": "Address: Bug: fix: increase timeout for processor auto-discovery tests to prevent flak... (112x)",
+      "voteCount": 2,
+      "strategy": "expert_priority",
+      "decision": "reject",
+      "confidence": 0.6799999999999999,
+      "participantCount": 3,
+      "timestamp": 1778631527516,
+      "resolvedAt": 1778631527516
+    }
+  ]
+}

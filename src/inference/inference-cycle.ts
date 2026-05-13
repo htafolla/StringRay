@@ -870,8 +870,6 @@ Respond with EXACTLY one of:
       } else {
         responseText = JSON.stringify(result);
       }
-      // Only return if the response contains actual vote data (PROPOSAL blocks).
-      // Generic orchestration ACKs like "Tool orchestrate-task executed..." have no votes.
       if (/PROPOSAL:\s*\d+/i.test(responseText)) {
         return responseText;
       }

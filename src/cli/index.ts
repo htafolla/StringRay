@@ -843,9 +843,10 @@ program
      const { InferenceCycle } = await import('../inference/inference-cycle.js');
      const { shouldTriggerCycle } = await import('../inference/inference-accumulator.js');
      const { accumulateCorpus } = await import('../inference/inference-accumulator.js');
-     const { featuresConfigLoader } = await import('../core/features-config.js');
+      const { featuresConfigLoader } = await import('../core/features-config.js');
+      const { initializeGovernanceIntegration, shutdownGovernanceIntegration } = await import('../integrations/governance/index.js');
 
-     // Guard: inference:run is internal to StringRay development only
+      // Guard: inference:run is internal to StringRay development only
      const isStringRayRepo = (() => {
        try {
          const pkg = JSON.parse(readFileSync(join(process.cwd(), 'package.json'), 'utf-8'));
@@ -910,6 +911,13 @@ program
       console.log(`\nCorpus: ${corpus.sessions.length} sessions, ${corpus.totalCommits} commits`);
       console.log(`  Recurring problems: ${corpus.recurringProblems.length}`);
       console.log(`  Recurring patterns: ${corpus.recurringPatterns.length}`);
+    }
+
+    // Initialize external governance integration for two-oscillator governance
+    const govConfig = (features as any)?.inference_governance;
+    if (govConfig?.enabled) {
+      await shutdownGovernanceIntegration();
+      await initializeGovernanceIntegration();
     }
 
     const cycle = InferenceCycle.getInstance(projectRoot, { skipDeployVerify: options.noVerify ?? true, skipApply: options.noApply ?? false, skipResearcherReview: options.noResearcherReview ?? false, force: options.force ?? false });

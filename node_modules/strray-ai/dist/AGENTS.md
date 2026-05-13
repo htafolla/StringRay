@@ -120,10 +120,14 @@ The storyteller is now a **skill** (not an agent) so it runs with full session c
 
 ## Available Agents
 
+**42 OpenCode agents** defined by YAML configs in `src/opencode/agents/` (copied to `.opencode/agents/` during build). These are the agents OpenCode reads and routes to.
+
+**22 internal routing modules** in `src/agents/*.ts` — TypeScript implementations that handle delegation, spawning, and orchestration logic. These are framework internals, not OpenCode agents.
+
+### Primary Agents (7)
+
 | Agent | Purpose | Invoke |
 |-------|---------|--------|
-| `@enforcer` | Codex compliance & error prevention | `@enforcer analyze this code` |
-| `@orchestrator` | Complex multi-step task coordination | `@orchestrator implement feature` |
 | `@architect` | System design & technical decisions | `@architect design API` |
 | `@security-auditor` | Vulnerability detection | `@security-auditor scan` |
 | `@code-reviewer` | Quality assessment | `@code-reviewer review PR` |
@@ -131,6 +135,12 @@ The storyteller is now a **skill** (not an agent) so it runs with full session c
 | `@testing-lead` | Testing strategy | `@testing-lead plan tests` |
 | `@bug-triage-specialist` | Error investigation | `@bug-triage-specialist debug error` |
 | `@researcher` | Codebase exploration | `@researcher find implementation` |
+
+### Subagent / Skill-Based Agents (35)
+
+The remaining 35 agents are specialized subagents mapped to specific skills. They are invoked automatically by the routing system based on keywords and complexity analysis. See `src/opencode/strray/routing-mappings.json` for the full keyword-to-agent mapping.
+
+> **Architecture Note**: Agents are defined by YAML configs (`src/opencode/agents/*.yml`), not by TypeScript files. The TypeScript files in `src/agents/` are internal routing implementations used by the delegation system. When you invoke `@architect`, OpenCode reads `.opencode/agents/architect.yml` — not `src/agents/architect.ts`.
 
 
 ## Available Skills
@@ -518,34 +528,35 @@ npx strray-ai report --ci --output json
 # In code comment or prompt
 @architect design a REST API for user management
 
-@enforcer analyze this code for security issues
+@code-reviewer review this pull request
 
 @testing-lead create tests for authentication module
 ```
 
 **Chaining Agents**:
 ```
-@orchestrator implement feature:user-authentication
-  → Spawns @architect → @testing-lead → @code-reviewer
+@architect design feature:user-authentication
+  → Spawns @testing-lead → @code-reviewer
 ```
 
 ### Agent Selection Guide
 
 | Task Type | Primary Agent | Supporting Agents |
 |-----------|---------------|-------------------|
-| New feature | @orchestrator | @architect, @testing-lead |
-| Bug fix | @bug-triage-specialist | @enforcer, @code-reviewer |
+| New feature | @architect | @testing-lead, @code-reviewer |
+| Bug fix | @bug-triage-specialist | @code-reviewer |
 | Refactor | @refactorer | @architect, @testing-lead |
-| Security audit | @security-auditor | @enforcer |
-| Code review | @code-reviewer | @enforcer |
+| Security audit | @security-auditor | @code-reviewer |
+| Code review | @code-reviewer | @architect |
 | Research | @researcher | @architect |
+```
 
 ### Session Management
 
 **Start a Session**:
 ```bash
 # Sessions are automatic - invoke agent to start
-@orchestrator implement login feature
+@architect design login feature
 ```
 
 **View Active Sessions**:

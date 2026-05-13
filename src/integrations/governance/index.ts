@@ -15,8 +15,6 @@ import type {
   GovernanceCheckResponse,
   GovernanceVoteResult,
   BatchGovernanceCheck,
-  SolarGovernanceVoteResult,
-  SolarContext,
 } from './types.js';
 import { DEFAULT_GOVERNANCE_CONFIG } from './types.js';
 import { GovernanceClient } from './governance-client.js';
@@ -129,11 +127,6 @@ export class InferenceGovernanceIntegration extends BaseIntegration {
       throw new Error('Governance integration not available');
     }
 
-    // Use solar-enhanced governance if enabled
-    if (this.configData.useSolarEnhancement) {
-      return this.checkProposalWithSolar(proposal);
-    }
-
     const request: GovernanceCheckRequest = {
       proposalId: proposal.id,
       proposalText: `${proposal.title}\n\n${proposal.description}`,
@@ -143,77 +136,6 @@ export class InferenceGovernanceIntegration extends BaseIntegration {
 
     const response = await this.client!.checkProposal(request);
     return this.applyDecisionLogic(response);
-  }
-
-  /**
-   * Check a proposal with solar-enhanced governance (govern_with_solar tool)
-   *
-   * Brings real-time solar context from NOAA GOES into the decision,
-   * automatically adjusting vote weight and adding warnings based on
-   * current solar activity.
-   */
-  async checkProposalWithSolar(
-    proposal: InferenceProposal,
-  ): Promise<SolarGovernanceVoteResult> {
-    if (!this.isAvailable()) {
-      throw new Error('Governance integration not available');
-    }
-
-    frameworkLogger.log(
-      'inference-governance',
-      'solar-check-start',
-      'info',
-      {
-        proposalId: proposal.id,
-        proposalTitle: proposal.title,
-      },
-    );
-
-    const solarResponse = await this.client!.governWithSolar({
-      proposal: `${proposal.title}\n\n${proposal.description}`,
-      baseVoteWeight: this.configData.decisionLogic.voteWeightMultiplier,
-    });
-
-    // Map solar response to standard governance response structure
-    const mappedResponse: GovernanceCheckResponse = {
-      success: true,
-      proposalId: proposal.id,
-      governanceIsotopeId: `solar-${solarResponse.solarContext.solarActivityLevel}`,
-      resonanceScore: solarResponse.solarContext.solarResonance,
-      isotopicRatio: 0,
-      vortexVolume: 0,
-      historicalCoherence: 0,
-      recommendation: solarResponse.confidenceAdjustment < -0.1 ? 'NEEDS_REVISION' : 'PASS',
-      confidence: Math.max(0, Math.min(1, proposal.confidence + solarResponse.confidenceAdjustment)),
-      voteWeight: solarResponse.adjustedVoteWeight,
-      reasons: [
-        solarResponse.solarContext.recommendation,
-        `Solar activity: ${solarResponse.solarContext.solarActivityLevel} (resonance: ${solarResponse.solarContext.solarResonance.toFixed(4)})`,
-      ],
-    };
-
-    const baseResult = this.applyDecisionLogic(mappedResponse);
-
-    const result: SolarGovernanceVoteResult = {
-      ...baseResult,
-      solarContext: solarResponse.solarContext,
-      solarConfidenceAdjustment: solarResponse.confidenceAdjustment,
-    };
-
-    frameworkLogger.log(
-      'inference-governance',
-      'solar-check-complete',
-      'info',
-      {
-        proposalId: proposal.id,
-        solarActivityLevel: solarResponse.solarContext.solarActivityLevel,
-        adjustedVoteWeight: solarResponse.adjustedVoteWeight,
-        confidenceAdjustment: solarResponse.confidenceAdjustment,
-        passed: result.passed,
-      },
-    );
-
-    return result;
   }
 
   /**
@@ -376,7 +298,6 @@ export class InferenceGovernanceIntegration extends BaseIntegration {
             revisionConfidenceMax: features.inference_governance.decision_logic?.revision_confidence_max ?? DEFAULT_GOVERNANCE_CONFIG.decisionLogic.revisionConfidenceMax,
             voteWeightMultiplier: features.inference_governance.decision_logic?.vote_weight_multiplier ?? DEFAULT_GOVERNANCE_CONFIG.decisionLogic.voteWeightMultiplier,
           },
-          useSolarEnhancement: features.inference_governance.use_solar_enhancement ?? false,
         };
       }
 

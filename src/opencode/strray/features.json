@@ -414,7 +414,6 @@
     "endpoint_url": "https://mcp-production-80e2.up.railway.app/governance",
     "request_timeout_ms": 10000,
     "min_confidence_threshold": 0.5,
-    "use_solar_enhancement": false,
     "decision_logic": {
       "pass_confidence_min": 0.9,
       "revision_confidence_max": 0.89,

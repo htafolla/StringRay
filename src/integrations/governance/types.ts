@@ -68,8 +68,7 @@ export interface GovernanceIntegrationConfig {
     /** Multiplier for vote weight from governance */
     voteWeightMultiplier: number;
   };
-  /** Whether to use solar-enhanced governance when available */
-  useSolarEnhancement: boolean;
+
 }
 
 /**
@@ -85,67 +84,7 @@ export const DEFAULT_GOVERNANCE_CONFIG: GovernanceIntegrationConfig = {
     revisionConfidenceMax: 0.89,
     voteWeightMultiplier: 1.0,
   },
-  useSolarEnhancement: false,
 };
-
-// ============================================================================
-// Solar Governance Types (govern_with_solar tool)
-// ============================================================================
-
-/**
- * Solar activity levels from NOAA GOES data
- */
-export type SolarActivityLevel = 'quiet' | 'moderate' | 'active' | 'storm';
-
-/**
- * Solar context returned by govern_with_solar
- */
-export interface SolarContext {
-  /** Current solar activity level */
-  solarActivityLevel: SolarActivityLevel;
-  /** Solar resonance score (0-1) */
-  solarResonance: number;
-  /** Modifier applied to vote weight based on solar activity */
-  solarActivityModifier: number;
-  /** Human-readable recommendation based on solar conditions */
-  recommendation: string;
-}
-
-/**
- * Solar-enhanced governance check request
- */
-export interface SolarGovernanceCheckRequest {
-  /** The proposal text to evaluate */
-  proposal: string;
-  /** Starting vote weight (0.5 - 1.5) */
-  baseVoteWeight?: number;
-}
-
-/**
- * Solar-enhanced governance check response
- */
-export interface SolarGovernanceCheckResponse {
-  /** Original recommendation before solar adjustments */
-  originalRecommendation: string;
-  /** Real-time solar context from NOAA GOES */
-  solarContext: SolarContext;
-  /** Vote weight after solar adjustment */
-  adjustedVoteWeight: number;
-  /** Final recommendation with solar warning appended if applicable */
-  finalRecommendation: string;
-  /** Confidence adjustment applied due to solar activity */
-  confidenceAdjustment: number;
-}
-
-/**
- * Solar-enhanced vote result — extends standard vote with solar context
- */
-export interface SolarGovernanceVoteResult extends GovernanceVoteResult {
-  /** Solar context that influenced the decision */
-  solarContext: SolarContext;
-  /** Confidence adjustment from solar activity */
-  solarConfidenceAdjustment: number;
-}
 
 // ============================================================================
 // Governance Vote Types

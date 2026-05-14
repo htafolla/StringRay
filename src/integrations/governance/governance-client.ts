@@ -199,7 +199,9 @@ export class GovernanceClient {
         voteWeight: result.voteWeight as number,
         reasons: Array.isArray(result.reasoning)
           ? (result.reasoning as string[])
-          : [result.reasoning as string],
+          : Array.isArray(result.reasons)
+            ? (result.reasons as string[])
+            : [String(result.reasons ?? result.reasoning ?? '')],
       };
 
       if (!this.isValidResponse(response)) {

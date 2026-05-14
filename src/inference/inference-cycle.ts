@@ -709,11 +709,20 @@ Respond with EXACTLY one of:
 
         const resolved = coordinator.resolveVoting(voteId);
         if (resolved) {
+          const resolvedDetails: string[] = resolved.details?.map((d) => `${d.agentName}: vote=${d.vote}, weight=${d.weight.toFixed(2)}`) || [];
+          for (const pv of proposalVotes) {
+            if (pv.reasoning) {
+              const existing = resolvedDetails.findIndex((d) => d.startsWith(`${pv.agentName}:`));
+              if (existing >= 0) {
+                resolvedDetails[existing] += `, reason: ${pv.reasoning}`;
+              }
+            }
+          }
           results.push({
             proposalId: proposal.id,
             decision: resolved.decision === "approve" ? "approve" : "reject",
             confidence: resolved.confidence,
-            details: resolved.details?.map((d) => `${d.agentName}: vote=${d.vote}, weight=${d.weight.toFixed(2)}`) || [],
+            details: resolvedDetails,
           });
 
           if (resolved.details) {

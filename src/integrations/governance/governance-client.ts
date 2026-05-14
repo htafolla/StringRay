@@ -33,7 +33,7 @@ export class GovernanceClient {
   constructor(config: Partial<GovernanceClientConfig> = {}) {
     this.config = {
       baseUrl: 'https://mcp-production-80e2.up.railway.app',
-      timeoutMs: 10000,
+      timeoutMs: 30000,
       retryAttempts: 3,
       retryDelayMs: 1000,
       ...config,
@@ -197,9 +197,11 @@ export class GovernanceClient {
         recommendation: result.recommendation as 'PASS' | 'NEEDS_REVISION' | 'REJECT',
         confidence: result.confidence as number,
         voteWeight: result.voteWeight as number,
-        reasons: Array.isArray(result.reasoning)
-          ? (result.reasoning as string[])
-          : [result.reasoning as string],
+        reasons: Array.isArray(result.reasons)
+          ? (result.reasons as string[])
+          : Array.isArray(result.reasoning)
+            ? (result.reasoning as string[])
+            : [String(result.reasons ?? result.reasoning ?? '')],
       };
 
       if (!this.isValidResponse(response)) {

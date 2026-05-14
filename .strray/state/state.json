@@ -1,92 +1,17 @@
 {
-  "votingHistory": [
-    {
-      "id": "vote_1778759152884_029eaefd",
-      "sessionId": "inference-governance-1778759136783",
-      "topic": "Codify Extract Method pattern",
-      "voteCount": 1,
-      "strategy": "consensus",
-      "decision": "approve",
-      "confidence": 0.325,
-      "participantCount": 4,
-      "timestamp": 1778759152884,
-      "resolvedAt": 1778759152885
-    },
-    {
-      "id": "vote_1778759152885_b33516d4",
-      "sessionId": "inference-governance-1778759136783",
-      "topic": "Codify Test Coverage Expansion pattern",
-      "voteCount": 1,
-      "strategy": "expert_priority",
-      "decision": "reject",
-      "confidence": 0.7,
-      "participantCount": 4,
-      "timestamp": 1778759152885,
-      "resolvedAt": 1778759152885
-    },
-    {
-      "id": "vote_1778759152885_e9c24042",
-      "sessionId": "inference-governance-1778759136783",
-      "topic": "Address: Bug: fix: increase timeout for processor auto-discovery tests to prevent flak... (112x)",
-      "voteCount": 1,
-      "strategy": "expert_priority",
-      "decision": "reject",
-      "confidence": 0.85,
-      "participantCount": 4,
-      "timestamp": 1778759152885,
-      "resolvedAt": 1778759152885
-    }
-  ],
+  "votingHistory": [],
   "metrics": {
-    "totalVotes": 3,
-    "successfulVotes": 3,
+    "totalVotes": 0,
+    "successfulVotes": 0,
     "failedVotes": 0,
-    "averageConfidence": 0.625,
+    "averageConfidence": 0,
     "strategyUsage": {
       "majority_vote": 0,
-      "consensus": 1,
-      "expert_priority": 2
+      "consensus": 0,
+      "expert_priority": 0
     },
     "agentParticipation": {},
     "averageVoterTurnout": 0
   },
-  "exportedAt": "2026-05-14T11:47:53.997Z",
-  "voting:history": [
-    {
-      "id": "vote_1778759565848_b948a705",
-      "sessionId": "inference-governance-1778759552576",
-      "topic": "Codify Extract Method pattern",
-      "voteCount": 1,
-      "strategy": "consensus",
-      "decision": "approve",
-      "confidence": 0.41,
-      "participantCount": 4,
-      "timestamp": 1778759565848,
-      "resolvedAt": 1778759565848
-    },
-    {
-      "id": "vote_1778759565848_f95e8df2",
-      "sessionId": "inference-governance-1778759552576",
-      "topic": "Codify Test Coverage Expansion pattern",
-      "voteCount": 1,
-      "strategy": "expert_priority",
-      "decision": "approve",
-      "confidence": 0.78,
-      "participantCount": 4,
-      "timestamp": 1778759565848,
-      "resolvedAt": 1778759565849
-    },
-    {
-      "id": "vote_1778759565849_ab246866",
-      "sessionId": "inference-governance-1778759552576",
-      "topic": "Address: Bug: fix: increase timeout for processor auto-discovery tests to prevent flak... (112x)",
-      "voteCount": 1,
-      "strategy": "expert_priority",
-      "decision": "approve",
-      "confidence": 0.9099999999999999,
-      "participantCount": 4,
-      "timestamp": 1778759565849,
-      "resolvedAt": 1778759565849
-    }
-  ]
+  "exportedAt": "2026-05-14T13:24:41.011Z"
 }

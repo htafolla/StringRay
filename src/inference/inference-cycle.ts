@@ -709,11 +709,20 @@ Respond with EXACTLY one of:
 
         const resolved = coordinator.resolveVoting(voteId);
         if (resolved) {
+          const resolvedDetails: string[] = resolved.details?.map((d) => `${d.agentName}: vote=${d.vote}, weight=${d.weight.toFixed(2)}`) || [];
+          for (const pv of proposalVotes) {
+            if (pv.reasoning) {
+              const existing = resolvedDetails.findIndex((d) => d.startsWith(`${pv.agentName}:`));
+              if (existing >= 0) {
+                resolvedDetails[existing] += `, reason: ${pv.reasoning}`;
+              }
+            }
+          }
           results.push({
             proposalId: proposal.id,
             decision: resolved.decision === "approve" ? "approve" : "reject",
             confidence: resolved.confidence,
-            details: resolved.details?.map((d) => `${d.agentName}: vote=${d.vote}, weight=${d.weight.toFixed(2)}`) || [],
+            details: resolvedDetails,
           });
 
           if (resolved.details) {
@@ -870,8 +879,7 @@ Respond with EXACTLY one of:
       } else {
         responseText = JSON.stringify(result);
       }
-      // Only return if the response contains actual vote data (PROPOSAL blocks).
-      // Generic orchestration ACKs like "Tool orchestrate-task executed..." have no votes.
+      process.stderr.write("[DEBUG] orchestrator raw response:\n" + responseText.substring(0, 4000) + "\n=====\n");
       if (/PROPOSAL:\s*\d+/i.test(responseText)) {
         return responseText;
       }

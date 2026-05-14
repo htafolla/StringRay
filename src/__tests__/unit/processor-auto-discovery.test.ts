@@ -29,7 +29,7 @@ describe("Processor Auto-Discovery", () => {
     const discovered = await manager.discoverProcessors(tmpDir);
 
     expect(discovered).toEqual([]);
-  });
+  }, 30000);
 
   it("should not overwrite hardcoded factories", async () => {
     const stateManager = new StringRayStateManager();
@@ -40,7 +40,7 @@ describe("Processor Auto-Discovery", () => {
     await manager.discoverProcessors(tmpDir);
 
     expect((manager as any).factories.size).toBe(factoriesBefore);
-  });
+  }, 30000);
 
   it("should handle missing implementations directory gracefully", async () => {
     const stateManager = new StringRayStateManager();

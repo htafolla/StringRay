@@ -635,12 +635,6 @@ Respond with EXACTLY one of:
 
     // OSCILLATOR 2: External governance check — runs in addition if available
     const governanceIntegration = getGovernanceIntegration();
-    frameworkLogger.log("inference-cycle", "governance-integration-check", "info", {
-      available: governanceIntegration?.isAvailable(),
-      configEnabled: governanceIntegration ? (governanceIntegration as any).configData?.enabled : null,
-      status: governanceIntegration ? (governanceIntegration as any).status : null,
-      hasClient: governanceIntegration ? (governanceIntegration as any).client !== null : null,
-    });
     if (governanceIntegration?.isAvailable()) {
       frameworkLogger.log("inference-cycle", "using-external-governance", "info", {
         proposalCount: proposals.length,

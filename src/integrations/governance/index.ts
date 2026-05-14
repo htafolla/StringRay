@@ -259,15 +259,14 @@ export class InferenceGovernanceIntegration extends BaseIntegration {
         frameworkLogger.log(
           'inference-governance',
           'check-proposal-error',
-          'warning',
+          'error',
           {
             proposalId: proposal.id,
             error: error instanceof Error ? error.message : String(error),
           },
         );
         
-        // Fallback to local decision
-        results.push(this.createFallbackVote(proposal));
+        throw error;
       }
     }
 
@@ -332,31 +331,6 @@ export class InferenceGovernanceIntegration extends BaseIntegration {
       reason,
       governanceResponse: response,
       passed,
-    };
-  }
-
-  /**
-   * Create fallback vote when governance is unavailable
-   */
-  private createFallbackVote(proposal: InferenceProposal): GovernanceVoteResult {
-    return {
-      vote: proposal.confidence >= 0.7 ? 'YES' : 'ABSTAIN',
-      weight: 1.0,
-      reason: 'Fallback: governance endpoint unavailable',
-      governanceResponse: {
-        success: false,
-        proposalId: proposal.id,
-        governanceIsotopeId: 'fallback',
-        resonanceScore: 0,
-        isotopicRatio: 0,
-        vortexVolume: 0,
-        historicalCoherence: 0,
-        recommendation: 'NEEDS_REVISION',
-        confidence: proposal.confidence,
-        voteWeight: 1.0,
-        reasons: ['Governance endpoint unavailable, using local confidence'],
-      },
-      passed: proposal.confidence >= 0.7,
     };
   }
 

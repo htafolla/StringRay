@@ -28,7 +28,7 @@ describe("Processor Auto-Discovery", () => {
 
     const discovered = await manager.discoverProcessors(tmpDir);
 
-    expect(discovered).toEqual([]);
+expect(discovered).toEqual([]);
   }, 30000);
 
   it("should not overwrite hardcoded factories", async () => {

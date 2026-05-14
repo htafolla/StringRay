@@ -33,7 +33,7 @@ export class GovernanceClient {
   constructor(config: Partial<GovernanceClientConfig> = {}) {
     this.config = {
       baseUrl: 'https://mcp-production-80e2.up.railway.app',
-      timeoutMs: 10000,
+      timeoutMs: 30000,
       retryAttempts: 3,
       retryDelayMs: 1000,
       ...config,

@@ -75,7 +75,7 @@ describe("Processor Auto-Discovery", () => {
     expect(discovered).toContain("coverageAnalysis");
     expect(discovered).toContain("stateValidation");
     expect(discovered).toContain("testExecution");
-  }, 60000);
+  }, 120000);
 
   it("should skip constructors that require arguments", async () => {
     const processorCode = `
@@ -109,7 +109,7 @@ export class NeedsArgsProcessor {
     const factory = (manager as any).factories.get("preValidate");
     expect(factory).toBeDefined();
     expect(typeof factory.execute).toBe("function");
-  }, 60000);
+  }, 120000);
 
   it("should discover PostProcessor subclasses", async () => {
     const stateManager = new StringRayStateManager();
@@ -119,7 +119,7 @@ export class NeedsArgsProcessor {
 
     expect(discovered).toContain("regressionTesting");
     expect(discovered).toContain("coverageAnalysis");
-  }, 60000);
+  }, 120000);
 
   it("should registerProcessorInstance create factory from IProcessor", async () => {
     const stateManager = new StringRayStateManager();

@@ -104,6 +104,7 @@ export class InferenceCycle {
   private opencodeAvailable: boolean | null = null;
   private agentInvoker: AgentInvoker | null;
   private options: InferenceCycleOptions;
+  private lastRawOpencodeOutput: string = "";
 
   constructor(projectRoot?: string, agentInvoker?: AgentInvoker, options?: InferenceCycleOptions) {
     this.projectRoot = projectRoot || process.cwd();
@@ -655,35 +656,72 @@ Respond with EXACTLY one of:
     const sessionId = `inference-governance-${Date.now()}`;
     const results: InferenceCycleResult["votes"] = [];
 
+    const allGovernanceAgents = new Set<string>();
+    for (const agents of Object.values(GOVERNANCE_AGENTS)) {
+      for (const a of agents) allGovernanceAgents.add(a);
+    }
+
+    const proposalAgentMap = proposals.map((p, i) => {
+      const agents = GOVERNANCE_AGENTS[p.type] ?? ["code-reviewer"];
+      return { index: i, type: p.type, agents: [...new Set(["architect", ...agents])] };
+    });
+
     const todoPrompt = [
-      `Vote on ${proposals.length} inference proposals. Output EXACTLY one PROPOSAL block per proposal.`,
+      `You are the architect agent governing ${proposals.length} inference proposals.`,
+      `You must vote on each proposal AND create tasks for the relevant governance sub-agents to vote as well.`,
       ``,
-      `FORMAT (exact, no extra text, no markdown):`,
+      `GOVERNANCE AGENTS BY PROPOSAL TYPE:`,
+      ...Object.entries(GOVERNANCE_AGENTS).map(([type, agents]) => `  ${type}: ${agents.join(", ")}`),
+      ``,
+      `For each proposal, create a task for each relevant sub-agent (based on its type) asking them to vote.`,
+      `Then cast your own architect vote.`,
+      ``,
+      `OUTPUT FORMAT (exact, no extra text, no markdown):`,
+      `One PROPOSAL block per agent per proposal. Each block starts with PROPOSAL: <number>.`,
+      ``,
       `PROPOSAL: <number>`,
-      `  AGENT: architect`,
+      `  AGENT: <agent-name>`,
       `  DECISION: approve|reject|abstain`,
       `  CONFIDENCE: 0.XX`,
       `  REASONING: <brief reason>`,
       ``,
-      `Example:`,
+      `Example for a [fix] type proposal with agents [architect, code-reviewer, refactorer, researcher]:`,
       `PROPOSAL: 1`,
       `  AGENT: architect`,
       `  DECISION: approve`,
       `  CONFIDENCE: 0.85`,
-      `  REASONING: Cleanup reduces maintenance burden`,
+      `  REASONING: Low-risk bug fix improves stability`,
+      `PROPOSAL: 1`,
+      `  AGENT: code-reviewer`,
+      `  DECISION: approve`,
+      `  CONFIDENCE: 0.80`,
+      `  REASONING: Code change is clean and well-scoped`,
+      `PROPOSAL: 1`,
+      `  AGENT: refactorer`,
+      `  DECISION: approve`,
+      `  CONFIDENCE: 0.75`,
+      `  REASONING: Minor refactoring reduces tech debt`,
+      `PROPOSAL: 1`,
+      `  AGENT: researcher`,
+      `  DECISION: approve`,
+      `  CONFIDENCE: 0.70`,
+      `  REASONING: Pattern confirmed across codebase`,
       ``,
       `PROPOSALS:`,
     ];
 
     for (let i = 0; i < proposals.length; i++) {
       const p = proposals[i]!;
-      todoPrompt.push(`${i + 1}. [${p.type}] "${p.title}"`);
+      const agents = GOVERNANCE_AGENTS[p.type] ?? ["code-reviewer"];
+      todoPrompt.push(`${i + 1}. [${p.type}] "${p.title}" — agents: architect, ${agents.join(", ")}`);
     }
 
     try {
+      this.lastRawOpencodeOutput = "";
       const jsonOutput = await this.invokeAgentInternal("architect", todoPrompt.join("\n"));
 
-      const allVotes = this.parseSubagentVotes(jsonOutput, proposals);
+      const rawForParsing = this.lastRawOpencodeOutput || jsonOutput;
+      const allVotes = this.parseSubagentVotes(rawForParsing, proposals);
 
       for (const proposal of proposals) {
         const agents = GOVERNANCE_AGENTS[proposal.type] ?? ["code-reviewer"];
@@ -709,11 +747,20 @@ Respond with EXACTLY one of:
 
         const resolved = coordinator.resolveVoting(voteId);
         if (resolved) {
+          const resolvedDetails: string[] = resolved.details?.map((d) => `${d.agentName}: vote=${d.vote}, weight=${d.weight.toFixed(2)}`) || [];
+          for (const pv of proposalVotes) {
+            if (pv.reasoning) {
+              const existing = resolvedDetails.findIndex((d) => d.startsWith(`${pv.agentName}:`));
+              if (existing >= 0) {
+                resolvedDetails[existing] += `, reason: ${pv.reasoning}`;
+              }
+            }
+          }
           results.push({
             proposalId: proposal.id,
             decision: resolved.decision === "approve" ? "approve" : "reject",
             confidence: resolved.confidence,
-            details: resolved.details?.map((d) => `${d.agentName}: vote=${d.vote}, weight=${d.weight.toFixed(2)}`) || [],
+            details: resolvedDetails,
           });
 
           if (resolved.details) {
@@ -870,8 +917,10 @@ Respond with EXACTLY one of:
       } else {
         responseText = JSON.stringify(result);
       }
-      // Only return if the response contains actual vote data (PROPOSAL blocks).
-      // Generic orchestration ACKs like "Tool orchestrate-task executed..." have no votes.
+      frameworkLogger.log("inference-cycle", "orchestrator-raw", "info", {
+        agentName,
+        responsePreview: responseText.substring(0, 4000),
+      });
       if (/PROPOSAL:\s*\d+/i.test(responseText)) {
         return responseText;
       }
@@ -990,6 +1039,7 @@ Respond with EXACTLY one of:
             await agentSpawnGovernor.completeSpawn(trackingId, true).catch(() => {});
           }
           frameworkLogger.log("inference-cycle", "opencode-spawn-success", "info", { agentName, trackingId });
+          this.lastRawOpencodeOutput = stdout.trim();
           const textResponse = this.extractTextFromNdjson(stdout.trim());
           if (textResponse) {
             resolve(textResponse);

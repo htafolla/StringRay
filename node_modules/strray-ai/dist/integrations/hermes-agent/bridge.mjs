@@ -705,7 +705,7 @@ async function handleGovern(input, projectRoot, logDir) {
 
   try {
     const { InferenceCycle } = await import("../../inference/inference-cycle.js");
-    const cycle = new InferenceCycle(projectRoot, undefined, { skipApply: true });
+    const cycle = InferenceCycle.getInstance(projectRoot, { skipApply: true });
     const result = await cycle.governExternalProposals(proposals);
     return {
       cycleId: result.cycleId,
@@ -726,7 +726,7 @@ async function handleApply(input, projectRoot, logDir) {
 
   try {
     const { InferenceCycle } = await import("../../inference/inference-cycle.js");
-    const cycle = new InferenceCycle(projectRoot);
+    const cycle = InferenceCycle.getInstance(projectRoot);
     const result = await cycle.governExternalProposals(proposals);
     return {
       cycleId: result.cycleId,

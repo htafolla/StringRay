@@ -831,6 +831,16 @@ Respond with EXACTLY one of:
             if (m) structured = m[0].trim();
           }
 
+          // In pure MCP mode, log the raw server response when we couldn't extract structured vote.
+          // This turns silent "no structured vote" into a visible diagnostic.
+          if (!structured && process.env.STRRAY_FORCE_MCP_GOVERNANCE === 'true') {
+            frameworkLogger.log("inference-cycle", "pure-mcp-skill-raw-result", "warning", {
+              agent,
+              tool: "analyze_proposal",
+              rawResultPreview: JSON.stringify(skillResult).substring(0, 600),
+            });
+          }
+
           skillVotes.push({
             agent,
             toolUsed: "analyze_proposal",
@@ -1089,12 +1099,12 @@ Respond with EXACTLY one of:
     }
 
     // Resolve the actual opencode project root (where .opencode/ config lives)
-    const opencodeRoot = this.resolveOpencodeRoot();
+    const configRoot = this.resolveConfigRoot();
 
     frameworkLogger.log("inference-cycle", "opencode-spawn-start", "info", {
       agentName,
       trackingId,
-      opencodeRoot,
+      configRoot,
     });
 
     return new Promise((resolve, reject) => {
@@ -1115,7 +1125,7 @@ Respond with EXACTLY one of:
         "opencode",
         ["run", "--agent", agentName, "--message", prompt, "--format", "json"],
         {
-          cwd: opencodeRoot,
+          cwd: configRoot,
           env: { ...process.env, NODE_ENV: "production", OPENCODE_MCP_CONFIG: "./node_modules/strray-ai/opencode.json" },
           stdio: ["ignore", "pipe", "pipe"],
         },
@@ -1305,7 +1315,7 @@ Respond with EXACTLY one of:
     return texts.join("\n").trim();
   }
 
-  private resolveOpencodeRoot(): string {
+  private resolveConfigRoot(): string {
     // Use the provider-agnostic config path resolver (prefers .strray/, falls back to .opencode/strray/)
     const configDir = getConfigDir(this.projectRoot);
     // If we resolved to a .strray or custom dir, use its parent as the "root"

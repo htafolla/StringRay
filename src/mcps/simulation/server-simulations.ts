@@ -24,23 +24,6 @@ export const codeReviewSimulations: Record<string, SimulatorFunction> = {
       },
     ],
   }),
-  analyze_proposal: (args: any = {}): MCPToolResult => {
-    const { proposalTitle = "", proposalDescription = "", evidence = [], proposalType = "" } = args;
-    const text = `${proposalTitle} ${proposalDescription} ${(evidence || []).join(" ")}`.toLowerCase();
-    let decision: "approve" | "reject" | "abstain" = "approve";
-    let confidence = 0.82;
-    let reasoning = "The proposal appears reasonable from a code quality and maintainability perspective.";
-    if (text.includes("extract method")) {
-      decision = "approve"; confidence = 0.93; reasoning = "Extract Method is a well-established refactoring pattern that improves readability and reduces cognitive load when applied consistently.";
-    } else if (text.includes("test coverage")) {
-      decision = "approve"; confidence = 0.90; reasoning = "Expanding automated test coverage generally improves long-term code health and reduces regression risk.";
-    } else if (text.includes("technical debt")) {
-      decision = "approve"; confidence = 0.78; reasoning = "Addressing accumulated technical debt systematically improves long-term maintainability and reduces future bug rates.";
-    }
-    return {
-      content: [{ type: "text", text: `DECISION: ${decision}\nCONFIDENCE: ${confidence.toFixed(2)}\nREASONING: ${reasoning}` }],
-    };
-  },
 };
 
 /**
@@ -55,26 +38,6 @@ export const securityAuditSimulations: Record<string, SimulatorFunction> = {
       },
     ],
   }),
-  analyze_proposal: (args: any = {}): MCPToolResult => {
-    const { proposalTitle = "", proposalDescription = "", evidence = [], proposalType = "" } = args;
-    const text = `${proposalTitle} ${proposalDescription} ${(evidence || []).join(" ")}`.toLowerCase();
-    let decision: "approve" | "reject" | "abstain" = "approve";
-    let confidence = 0.82;
-    let reasoning = "The proposal does not appear to introduce significant new security surface area.";
-    if (text.includes("extract method")) {
-      decision = "approve"; confidence = 0.88; reasoning = "Extract Method refactoring improves security posture by reducing attack surface in large monolithic files and enabling better isolation of sensitive logic.";
-    } else if (text.includes("test coverage")) {
-      decision = "approve"; confidence = 0.91; reasoning = "Expanding test coverage is one of the highest-ROI security controls available — more tests surface regressions and boundary condition vulnerabilities earlier.";
-    } else if (text.includes("technical debt")) {
-      decision = "approve"; confidence = 0.79; reasoning = "Paying down technical debt reduces the likelihood of security vulnerabilities that accumulate in unmaintained code paths.";
-    }
-    if (proposalType === "fix" && text.includes("timeout")) {
-      confidence = Math.max(0.65, confidence - 0.10);
-    }
-    return {
-      content: [{ type: "text", text: `DECISION: ${decision}\nCONFIDENCE: ${confidence.toFixed(2)}\nREASONING: ${reasoning}` }],
-    };
-  },
 };
 
 /**
@@ -117,26 +80,6 @@ export const researcherSimulations: Record<string, SimulatorFunction> = {
       },
     ],
   }),
-  analyze_proposal: (args: any = {}): MCPToolResult => {
-    const { proposalTitle = "", proposalDescription = "", evidence = [], proposalType = "" } = args;
-    const text = `${proposalTitle} ${proposalDescription} ${(evidence || []).join(" ")}`.toLowerCase();
-    let decision: "approve" | "reject" | "abstain" = "approve";
-    let confidence = 0.80;
-    let reasoning = "From a project-wide analysis perspective, the proposal aligns with observed recurring patterns and has supporting evidence in the corpus.";
-    if (text.includes("extract method")) {
-      decision = "approve"; confidence = 0.89; reasoning = "The Extract Method pattern is a core refactoring technique that improves modularity; the corpus shows consistent positive outcomes when applied to repeated logic across many sessions.";
-    } else if (text.includes("test coverage")) {
-      decision = "approve"; confidence = 0.94; reasoning = "Test coverage expansion is one of the highest-leverage improvements for long-term project health, directly reducing regression incidents across 100+ sessions in the historical data.";
-    } else if (text.includes("technical debt")) {
-      decision = "approve"; confidence = 0.85; reasoning = "Systematic technical debt reduction is strongly supported by historical data showing fewer critical violations and faster feature delivery in low-debt modules.";
-    }
-    if (proposalType === "fix" && !text.includes("pattern") && !text.includes("recurring")) {
-      confidence = Math.max(0.68, confidence - 0.10);
-    }
-    return {
-      content: [{ type: "text", text: `DECISION: ${decision}\nCONFIDENCE: ${confidence.toFixed(2)}\nREASONING: ${reasoning}` }],
-    };
-  },
 };
 
 /**

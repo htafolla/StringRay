@@ -59,11 +59,12 @@ export type CyclePhase =
 const CYCLE_STATE_FILE = "inference-cycle-state.json";
 const CYCLE_HISTORY_FILE = "inference-cycle-history.json";
 const GOVERNANCE_AGENTS: Record<string, string[]> = {
-  fix: ["code-reviewer", "refactorer", "researcher"],
-  refactor: ["code-reviewer", "refactorer", "researcher"],
-  guard: ["code-reviewer", "security-auditor", "researcher"],
-  automate: ["architect", "strategist", "researcher"],
-  codify: ["architect", "researcher"],
+  // Real individual knowledge-skill MCP servers (have analyze_proposal handlers)
+  fix: ["code-review", "security-audit", "researcher"],
+  refactor: ["code-review", "security-audit", "researcher"],
+  guard: ["code-review", "security-audit", "researcher"],
+  automate: ["code-review", "security-audit", "researcher"],
+  codify: ["code-review", "security-audit", "researcher"],
 };
 
 export type AgentInvoker = (agentName: string, prompt: string) => Promise<string>;

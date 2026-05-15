@@ -201,3 +201,13 @@ export class ConnectionPool implements IConnectionPoolExtended {
     }
   }
 }
+
+// Shared singleton for MCPClient real transport
+let sharedConnectionPool: ConnectionPool | null = null;
+
+export function getConnectionPool(): ConnectionPool {
+  if (!sharedConnectionPool) {
+    sharedConnectionPool = new ConnectionPool({ maxPoolSize: 10, maxIdleTimeMs: 300000 });
+  }
+  return sharedConnectionPool;
+}

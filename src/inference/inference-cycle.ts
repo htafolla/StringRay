@@ -805,10 +805,13 @@ Respond with EXACTLY one of:
     };
 
     for (const proposal of proposals) {
+      console.error(`[LIVE] Starting real governance for proposal: ${proposal.title}`);
       const agents = GOVERNANCE_AGENTS[proposal.type] ?? ["code-review", "security-audit"];
       const skillVotes: any[] = [];
 
       for (const agent of agents) {
+        const callStart = Date.now();
+        console.error(`[LIVE]   → Calling real MCP server "${agent}" with analyze_proposal...`);
         try {
           const skillResult = await mcpClientManager.callServerTool(agent, "analyze_proposal", {
             proposalTitle: proposal.title,
@@ -817,6 +820,7 @@ Respond with EXACTLY one of:
             proposalType: proposal.type,
           });
 
+          const callDur = Date.now() - callStart;
           let structured = "";
           const contents = (skillResult as any)?.content || [];
           for (const c of contents) {
@@ -831,6 +835,11 @@ Respond with EXACTLY one of:
             if (m) structured = m[0].trim();
           }
 
+          console.error(`[LIVE]     ← ${agent} responded in ${callDur}ms — structured DECISION found: ${!!structured}`);
+          if (structured) {
+            console.error(`[LIVE]        ${structured.split('\n')[0]}`);
+          }
+
           skillVotes.push({
             agent,
             toolUsed: "analyze_proposal",
@@ -838,6 +847,8 @@ Respond with EXACTLY one of:
             structuredVote: structured || null,
           });
         } catch (err) {
+          const callDur = Date.now() - callStart;
+          console.error(`[LIVE]     ← ERROR from ${agent} after ${callDur}ms: ${err}`);
           skillVotes.push({
             agent,
             toolUsed: "analyze_proposal",

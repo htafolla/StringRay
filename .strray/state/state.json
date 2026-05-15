@@ -1,17 +1,465 @@
 {
-  "votingHistory": [],
-  "metrics": {
-    "totalVotes": 0,
-    "successfulVotes": 0,
-    "failedVotes": 0,
-    "averageConfidence": 0,
-    "strategyUsage": {
-      "majority_vote": 0,
-      "consensus": 0,
-      "expert_priority": 0
+  "coordination:main_coordinator": {
+    "strRayOrchestrator": {
+      "taskQueue": {},
+      "activeTasks": {},
+      "totalProcessed": 0,
+      "config": {
+        "maxConcurrentTasks": 3,
+        "taskTimeout": 10000,
+        "conflictResolutionStrategy": "majority_vote"
+      },
+      "kernel": {
+        "config": {
+          "enabled": true,
+          "confidenceThreshold": 0.75,
+          "maxPatternsPerAnalysis": 10,
+          "enableLearning": true,
+          "autoPrevention": true
+        },
+        "patterns": {},
+        "assumptions": {},
+        "cascades": {}
+      }
     },
-    "agentParticipation": {},
-    "averageVoterTurnout": 0
+    "enhancedOrchestrator": {
+      "state": {
+        "activeAgents": {},
+        "pendingSpawns": [],
+        "completedAgents": {},
+        "failedAgents": {},
+        "agentDependencies": {},
+        "monitoringEnabled": true,
+        "cleanupInterval": 30000,
+        "isMainOrchestrator": true
+      },
+      "stateManager": {
+        "store": {},
+        "persistencePath": "/Users/blaze/dev/stringray/.strray/state/state.json",
+        "persistenceEnabled": true,
+        "writeQueue": {},
+        "initialized": true,
+        "earlyOperationsQueue": []
+      },
+      "complexityAnalyzer": {
+        "thresholds": {
+          "simple": 15,
+          "moderate": 25,
+          "complex": 50,
+          "enterprise": 75
+        },
+        "operationWeights": {
+          "create": 1,
+          "modify": 1.2,
+          "refactor": 1.8,
+          "analyze": 1.5,
+          "debug": 2,
+          "test": 1.3
+        },
+        "riskMultipliers": {
+          "low": 0.8,
+          "medium": 1,
+          "high": 1.3,
+          "critical": 1.6
+        },
+        "calibrationHistory": []
+      },
+      "agentDelegator": {
+        "complexityAnalyzer": {
+          "thresholds": {
+            "simple": 15,
+            "moderate": 25,
+            "complex": 50,
+            "enterprise": 75
+          },
+          "operationWeights": {
+            "create": 1,
+            "modify": 1.2,
+            "refactor": 1.8,
+            "analyze": 1.5,
+            "debug": 2,
+            "test": 1.3
+          },
+          "riskMultipliers": {
+            "low": 0.8,
+            "medium": 1,
+            "high": 1.3,
+            "critical": 1.6
+          },
+          "calibrationHistory": []
+        },
+        "stateManager": {
+          "store": {},
+          "persistencePath": "/Users/blaze/dev/stringray/.strray/state/state.json",
+          "persistenceEnabled": true,
+          "writeQueue": {},
+          "initialized": true,
+          "earlyOperationsQueue": []
+        },
+        "configLoader": {
+          "configPath": "/Users/blaze/dev/stringray/.strray/config.json",
+          "cachedConfig": null,
+          "cacheExpiry": 30000,
+          "lastLoadTime": 0
+        },
+        "kernel": {
+          "config": {
+            "enabled": true,
+            "confidenceThreshold": 0.75,
+            "maxPatternsPerAnalysis": 10,
+            "enableLearning": true,
+            "autoPrevention": true
+          },
+          "patterns": {},
+          "assumptions": {},
+          "cascades": {}
+        },
+        "agentMetrics": {
+          "stateManager": {
+            "store": {},
+            "persistencePath": "/Users/blaze/dev/stringray/.strray/state/state.json",
+            "persistenceEnabled": true,
+            "writeQueue": {},
+            "initialized": true,
+            "earlyOperationsQueue": []
+          },
+          "retentionConfig": {
+            "maxEntries": 10000,
+            "maxAgeMs": 2592000000,
+            "enableAutoCleanup": true,
+            "cleanupIntervalMs": 3600000
+          },
+          "initialized": false
+        }
+      },
+      "executionContext": {
+        "isExecutingAsSubagent": false,
+        "currentAgentId": null,
+        "spawnStack": []
+      },
+      "cleanupTimer": null
+    },
+    "agentDelegator": {
+      "complexityAnalyzer": {
+        "thresholds": {
+          "simple": 15,
+          "moderate": 25,
+          "complex": 50,
+          "enterprise": 75
+        },
+        "operationWeights": {
+          "create": 1,
+          "modify": 1.2,
+          "refactor": 1.8,
+          "analyze": 1.5,
+          "debug": 2,
+          "test": 1.3
+        },
+        "riskMultipliers": {
+          "low": 0.8,
+          "medium": 1,
+          "high": 1.3,
+          "critical": 1.6
+        },
+        "calibrationHistory": []
+      },
+      "stateManager": {
+        "store": {},
+        "persistencePath": "/Users/blaze/dev/stringray/.strray/state/state.json",
+        "persistenceEnabled": true,
+        "writeQueue": {},
+        "initialized": true,
+        "earlyOperationsQueue": []
+      },
+      "configLoader": {
+        "configPath": "/Users/blaze/dev/stringray/.strray/config.json",
+        "cachedConfig": null,
+        "cacheExpiry": 30000,
+        "lastLoadTime": 0
+      },
+      "kernel": {
+        "config": {
+          "enabled": true,
+          "confidenceThreshold": 0.75,
+          "maxPatternsPerAnalysis": 10,
+          "enableLearning": true,
+          "autoPrevention": true
+        },
+        "patterns": {},
+        "assumptions": {},
+        "cascades": {}
+      },
+      "agentMetrics": {
+        "stateManager": {
+          "store": {},
+          "persistencePath": "/Users/blaze/dev/stringray/.strray/state/state.json",
+          "persistenceEnabled": true,
+          "writeQueue": {},
+          "initialized": true,
+          "earlyOperationsQueue": []
+        },
+        "retentionConfig": {
+          "maxEntries": 10000,
+          "maxAgeMs": 2592000000,
+          "enableAutoCleanup": true,
+          "cleanupIntervalMs": 3600000
+        },
+        "initialized": false
+      }
+    },
+    "stateManager": {
+      "store": {},
+      "persistencePath": "/Users/blaze/dev/stringray/.strray/state/state.json",
+      "persistenceEnabled": true,
+      "writeQueue": {},
+      "initialized": true,
+      "earlyOperationsQueue": []
+    },
+    "complexityAnalyzer": {
+      "thresholds": {
+        "simple": 15,
+        "moderate": 25,
+        "complex": 50,
+        "enterprise": 75
+      },
+      "operationWeights": {
+        "create": 1,
+        "modify": 1.2,
+        "refactor": 1.8,
+        "analyze": 1.5,
+        "debug": 2,
+        "test": 1.3
+      },
+      "riskMultipliers": {
+        "low": 0.8,
+        "medium": 1,
+        "high": 1.3,
+        "critical": 1.6
+      },
+      "calibrationHistory": []
+    },
+    "coordinationMetrics": {
+      "totalWorkflows": 0,
+      "successfulWorkflows": 0,
+      "failedWorkflows": 0,
+      "averageDuration": 0,
+      "agentUtilization": {},
+      "coordinationEfficiency": 0
+    }
   },
-  "exportedAt": "2026-05-15T14:18:59.026Z"
+  "coordination:strray_orchestrator": {
+    "taskQueue": {},
+    "activeTasks": {},
+    "totalProcessed": 0,
+    "config": {
+      "maxConcurrentTasks": 3,
+      "taskTimeout": 10000,
+      "conflictResolutionStrategy": "majority_vote"
+    },
+    "kernel": {
+      "config": {
+        "enabled": true,
+        "confidenceThreshold": 0.75,
+        "maxPatternsPerAnalysis": 10,
+        "enableLearning": true,
+        "autoPrevention": true
+      },
+      "patterns": {},
+      "assumptions": {},
+      "cascades": {}
+    }
+  },
+  "coordination:enhanced_orchestrator": {
+    "state": {
+      "activeAgents": {},
+      "pendingSpawns": [],
+      "completedAgents": {},
+      "failedAgents": {},
+      "agentDependencies": {},
+      "monitoringEnabled": true,
+      "cleanupInterval": 30000,
+      "isMainOrchestrator": true
+    },
+    "stateManager": {
+      "store": {},
+      "persistencePath": "/Users/blaze/dev/stringray/.strray/state/state.json",
+      "persistenceEnabled": true,
+      "writeQueue": {},
+      "initialized": true,
+      "earlyOperationsQueue": []
+    },
+    "complexityAnalyzer": {
+      "thresholds": {
+        "simple": 15,
+        "moderate": 25,
+        "complex": 50,
+        "enterprise": 75
+      },
+      "operationWeights": {
+        "create": 1,
+        "modify": 1.2,
+        "refactor": 1.8,
+        "analyze": 1.5,
+        "debug": 2,
+        "test": 1.3
+      },
+      "riskMultipliers": {
+        "low": 0.8,
+        "medium": 1,
+        "high": 1.3,
+        "critical": 1.6
+      },
+      "calibrationHistory": []
+    },
+    "agentDelegator": {
+      "complexityAnalyzer": {
+        "thresholds": {
+          "simple": 15,
+          "moderate": 25,
+          "complex": 50,
+          "enterprise": 75
+        },
+        "operationWeights": {
+          "create": 1,
+          "modify": 1.2,
+          "refactor": 1.8,
+          "analyze": 1.5,
+          "debug": 2,
+          "test": 1.3
+        },
+        "riskMultipliers": {
+          "low": 0.8,
+          "medium": 1,
+          "high": 1.3,
+          "critical": 1.6
+        },
+        "calibrationHistory": []
+      },
+      "stateManager": {
+        "store": {},
+        "persistencePath": "/Users/blaze/dev/stringray/.strray/state/state.json",
+        "persistenceEnabled": true,
+        "writeQueue": {},
+        "initialized": true,
+        "earlyOperationsQueue": []
+      },
+      "configLoader": {
+        "configPath": "/Users/blaze/dev/stringray/.strray/config.json",
+        "cachedConfig": null,
+        "cacheExpiry": 30000,
+        "lastLoadTime": 0
+      },
+      "kernel": {
+        "config": {
+          "enabled": true,
+          "confidenceThreshold": 0.75,
+          "maxPatternsPerAnalysis": 10,
+          "enableLearning": true,
+          "autoPrevention": true
+        },
+        "patterns": {},
+        "assumptions": {},
+        "cascades": {}
+      },
+      "agentMetrics": {
+        "stateManager": {
+          "store": {},
+          "persistencePath": "/Users/blaze/dev/stringray/.strray/state/state.json",
+          "persistenceEnabled": true,
+          "writeQueue": {},
+          "initialized": true,
+          "earlyOperationsQueue": []
+        },
+        "retentionConfig": {
+          "maxEntries": 10000,
+          "maxAgeMs": 2592000000,
+          "enableAutoCleanup": true,
+          "cleanupIntervalMs": 3600000
+        },
+        "initialized": false
+      }
+    },
+    "executionContext": {
+      "isExecutingAsSubagent": false,
+      "currentAgentId": null,
+      "spawnStack": []
+    },
+    "cleanupTimer": null
+  },
+  "coordination:agent_delegator": {
+    "complexityAnalyzer": {
+      "thresholds": {
+        "simple": 15,
+        "moderate": 25,
+        "complex": 50,
+        "enterprise": 75
+      },
+      "operationWeights": {
+        "create": 1,
+        "modify": 1.2,
+        "refactor": 1.8,
+        "analyze": 1.5,
+        "debug": 2,
+        "test": 1.3
+      },
+      "riskMultipliers": {
+        "low": 0.8,
+        "medium": 1,
+        "high": 1.3,
+        "critical": 1.6
+      },
+      "calibrationHistory": []
+    },
+    "stateManager": {
+      "store": {},
+      "persistencePath": "/Users/blaze/dev/stringray/.strray/state/state.json",
+      "persistenceEnabled": true,
+      "writeQueue": {},
+      "initialized": true,
+      "earlyOperationsQueue": []
+    },
+    "configLoader": {
+      "configPath": "/Users/blaze/dev/stringray/.strray/config.json",
+      "cachedConfig": null,
+      "cacheExpiry": 30000,
+      "lastLoadTime": 0
+    },
+    "kernel": {
+      "config": {
+        "enabled": true,
+        "confidenceThreshold": 0.75,
+        "maxPatternsPerAnalysis": 10,
+        "enableLearning": true,
+        "autoPrevention": true
+      },
+      "patterns": {},
+      "assumptions": {},
+      "cascades": {}
+    },
+    "agentMetrics": {
+      "stateManager": {
+        "store": {},
+        "persistencePath": "/Users/blaze/dev/stringray/.strray/state/state.json",
+        "persistenceEnabled": true,
+        "writeQueue": {},
+        "initialized": true,
+        "earlyOperationsQueue": []
+      },
+      "retentionConfig": {
+        "maxEntries": 10000,
+        "maxAgeMs": 2592000000,
+        "enableAutoCleanup": true,
+        "cleanupIntervalMs": 3600000
+      },
+      "initialized": false
+    }
+  },
+  "coordination:metrics": {
+    "totalWorkflows": 0,
+    "successfulWorkflows": 0,
+    "failedWorkflows": 0,
+    "averageDuration": 0,
+    "agentUtilization": {},
+    "coordinationEfficiency": 0
+  }
 }

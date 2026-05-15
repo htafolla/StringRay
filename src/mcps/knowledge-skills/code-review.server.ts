@@ -492,44 +492,7 @@ class StringRayCodeReviewServer {
     return languageMap[extension] || "unknown";
   }
 
-  /**
-   * Governance-oriented proposal analysis from a code quality perspective.
-   */
-  private async analyzeProposal(args: any) {
-    const { proposalTitle = "", proposalDescription = "", evidence = [], proposalType = "" } = args;
-    const text = `${proposalTitle} ${proposalDescription} ${evidence.join(" ")}`.toLowerCase();
-
-    let decision: "approve" | "reject" | "abstain" = "approve";
-    let confidence = 0.82;
-    let reasoning = "The proposal appears reasonable from a code quality and maintainability perspective.";
-
-    if (text.includes("extract method")) {
-      decision = "approve";
-      confidence = 0.93;
-      reasoning = "Extract Method is a well-established refactoring pattern that improves readability and reduces cognitive load when applied consistently.";
-    } else if (text.includes("test coverage")) {
-      decision = "approve";
-      confidence = 0.90;
-      reasoning = "Expanding automated test coverage generally improves long-term code health and reduces regression risk.";
-    } else if (text.includes("increase timeout") && text.includes("flaky")) {
-      decision = "reject";
-      confidence = 0.72;
-      reasoning = "Repeatedly increasing timeouts to mask flaky tests is an anti-pattern that hides underlying race conditions or timing issues.";
-    }
-
-    if (proposalType === "fix" && text.includes("timeout")) {
-      confidence = Math.max(0.68, confidence - 0.08);
-    }
-
-    return {
-      content: [
-        {
-          type: "text",
-          text: `DECISION: ${decision}\nCONFIDENCE: ${confidence.toFixed(2)}\nREASONING: ${reasoning}`,
-        },
-      ],
-    };
-  }
+  
 
   private analyzeCode(
     content: string,

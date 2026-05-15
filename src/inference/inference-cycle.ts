@@ -804,11 +804,32 @@ Respond with EXACTLY one of:
       codify: ["code-review", "security-audit", "researcher"],
     };
 
-    for (const proposal of proposals) {
-      const agents = GOVERNANCE_AGENTS[proposal.type] ?? ["code-review", "security-audit"];
-      const skillVotes: any[] = [];
+    // Pre-warm the three real MCP servers so the first real calls are fast
+    const govServers = ["code-review", "security-audit", "researcher"];
+    console.error(`[LIVE] Pre-warming real MCP servers: ${govServers.join(", ")}`);
+    await Promise.all(
+      govServers.map(async (srv) => {
+        try {
+          await mcpClientManager.callServerTool(srv, "analyze_proposal", {
+            proposalTitle: "warmup",
+            proposalDescription: "warmup",
+            evidence: [],
+            proposalType: "fix",
+          });
+          console.error(`[LIVE]   ✓ ${srv} ready`);
+        } catch {
+          console.error(`[LIVE]   (warmup for ${srv} will happen on first real call)`);
+        }
+      })
+    );
 
-      for (const agent of agents) {
+    for (const proposal of proposals) {
+      console.error(`[LIVE] Governing proposal: ${proposal.title}`);
+      const agents = GOVERNANCE_AGENTS[proposal.type] ?? ["code-review", "security-audit"];
+
+      const callPromises = agents.map(async (agent) => {
+        const t0 = Date.now();
+        console.error(`[LIVE]   → real call to ${agent} ...`);
         try {
           const skillResult = await mcpClientManager.callServerTool(agent, "analyze_proposal", {
             proposalTitle: proposal.title,
@@ -816,6 +837,7 @@ Respond with EXACTLY one of:
             evidence: proposal.evidence,
             proposalType: proposal.type,
           });
+          const dur = Date.now() - t0;
 
           let structured = "";
           const contents = (skillResult as any)?.content || [];
@@ -831,21 +853,27 @@ Respond with EXACTLY one of:
             if (m) structured = m[0].trim();
           }
 
-          skillVotes.push({
+          console.error(`[LIVE]     ← ${agent} done in ${dur}ms → ${structured ? structured.split('\n')[0] : 'no structured vote'}`);
+
+          return {
             agent,
             toolUsed: "analyze_proposal",
             rawResponse: structured || JSON.stringify(skillResult),
             structuredVote: structured || null,
-          });
+          };
         } catch (err) {
-          skillVotes.push({
+          const dur = Date.now() - t0;
+          console.error(`[LIVE]     ← ERROR from ${agent} after ${dur}ms: ${err}`);
+          return {
             agent,
             toolUsed: "analyze_proposal",
             rawResponse: `error: ${err}`,
             structuredVote: null,
-          });
+          };
         }
-      }
+      });
+
+      const skillVotes = await Promise.all(callPromises);
 
       const approves = skillVotes.filter((v: any) => v.structuredVote && v.structuredVote.includes("DECISION: approve")).length;
       const rejects = skillVotes.filter((v: any) => v.structuredVote && v.structuredVote.includes("DECISION: reject")).length;

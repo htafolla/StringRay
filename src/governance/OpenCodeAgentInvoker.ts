@@ -1,6 +1,8 @@
 import type { InferenceProposal } from '../inference/inference-cycle.js';
 import type { ProposalDeliberationInvoker, AgentReview } from './AgentInvoker.js';
 import { GOVERNANCE_AGENTS } from '../inference/inference-cycle.js';
+import * as fs from 'fs';
+import * as path from 'path';
 
 type InvokeArchitect = (prompt: string) => Promise<string>;
 type ParseVotes = (
@@ -28,14 +30,17 @@ export class OpenCodeAgentInvoker implements ProposalDeliberationInvoker {
     const subAgents = GOVERNANCE_AGENTS[proposal.type] ?? ['code-reviewer'];
     const allAgents = ['architect', ...subAgents];
 
+    // Enrich evidence with actual file content when possible (major speed/quality win)
+    const enrichedEvidence = this.enrichEvidenceWithFileContent(proposal.evidence);
+
     const promptLines = [
       `You are the architect agent. Evaluate the following proposal and create tasks for the relevant sub-agents to vote, then cast your own vote.`,
       ``,
       `Proposal Type: [${proposal.type}]`,
       `Title: ${proposal.title}`,
       `Description: ${proposal.description}`,
-      `Evidence:`,
-      ...proposal.evidence.map((e) => `  - ${e}`),
+      `Evidence (with file contents where available):`,
+      ...enrichedEvidence,
       ``,
       `Agents that must vote on this proposal: ${allAgents.join(', ')}`,
       ``,
@@ -63,5 +68,35 @@ export class OpenCodeAgentInvoker implements ProposalDeliberationInvoker {
       confidence: v.confidence,
       reasoning: v.reasoning,
     }));
+  }
+
+  /**
+   * Attempts to read actual file contents for paths mentioned in the evidence.
+   * This dramatically reduces the amount of exploration agents have to do.
+   */
+  private enrichEvidenceWithFileContent(evidence: string[]): string[] {
+    const enriched: string[] = [];
+    const filePathRegex = /(?:src|dist|scripts|tests?)[^\s'"]+\.(ts|js|tsx|jsx|mjs|cjs|json|md)/g;
+
+    for (const line of evidence) {
+      enriched.push(`  - ${line}`);
+
+      const matches = line.match(filePathRegex) || [];
+      for (const filePath of matches) {
+        try {
+          const fullPath = path.isAbsolute(filePath) ? filePath : path.join(process.cwd(), filePath);
+          if (fs.existsSync(fullPath)) {
+            const content = fs.readFileSync(fullPath, 'utf-8');
+            // Limit size to avoid huge prompts
+            const limited = content.length > 8000 ? content.slice(0, 8000) + '\n... (truncated)' : content;
+            enriched.push(`    [FILE CONTENT: ${filePath}]\n${limited}`);
+          }
+        } catch (err) {
+          // Ignore unreadable files
+        }
+      }
+    }
+
+    return enriched;
   }
 }

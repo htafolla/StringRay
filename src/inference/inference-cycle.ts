@@ -129,6 +129,13 @@ export class InferenceCycle {
         (output: string, proposals: InferenceProposal[]) =>
           this.parseSubagentVotes(output, proposals)
       );
+
+    console.error(">>> USING INVOKER:", this.proposalAgentInvoker.constructor.name);
+
+    frameworkLogger.log("inference-cycle", "invoker-selected", "info", {
+      invoker: this.proposalAgentInvoker.constructor.name,
+      isDefault: !proposalAgentInvoker,
+    });
   }
 
   async governExternalProposals(proposals: InferenceProposal[]): Promise<InferenceCycleResult> {
@@ -848,11 +855,16 @@ Respond with EXACTLY one of:
       throw new Error("Governance integration not available");
     }
 
-    // Build rich agent reviews via the pluggable invoker (OpenCode for now, MCP later)
+    // Build rich agent reviews via the pluggable invoker
     const agentReviews: string[] = [];
 
     for (const proposal of proposals) {
+      const delibStart = Date.now();
       const reviews = await this.proposalAgentInvoker.deliberate(proposal);
+      const delibDuration = Date.now() - delibStart;
+
+      console.error(`>>> DELIBERATION TIME for ${proposal.id}: ${delibDuration}ms (invoker: ${this.proposalAgentInvoker.constructor.name})`);
+
       for (const r of reviews) {
         agentReviews.push(`${r.agent}: ${r.reasoning} (confidence: ${r.confidence})`);
       }

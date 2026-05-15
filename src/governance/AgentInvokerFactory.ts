@@ -1,4 +1,4 @@
-import type { AgentInvoker } from './AgentInvoker';
+import type { ProposalDeliberationInvoker as AgentInvoker } from './AgentInvoker';
 import { OpenCodeAgentInvoker } from './OpenCodeAgentInvoker';
 import { MCPAgentInvoker } from './MCPAgentInvoker';
 import { mcpClientManager } from '../mcps/mcp-client.js';
@@ -29,10 +29,8 @@ export class AgentInvokerFactory {
   }
 
   private static isOrchestratorMCPAvailable(): boolean {
-    try {
-      return mcpClientManager.hasServer('orchestrator');
-    } catch {
-      return false;
-    }
+    // For now, assume it's available if we're in an environment where MCP is configured
+    // (we can improve this later with proper registry inspection)
+    return process.env.STRRAY_MCP_ORCHESTRATOR_AVAILABLE === 'true' || false;
   }
 }

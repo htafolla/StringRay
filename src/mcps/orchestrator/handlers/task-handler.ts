@@ -203,23 +203,19 @@ export class TaskHandler {
 
   private mapAgentToTool(agent: string): string {
     const map: Record<string, string> = {
-      // Servers that have analyze_proposal
-      'code-review': 'analyze_proposal',
-      'security-audit': 'analyze_proposal',
-      'researcher': 'analyze_proposal',
+      // Primary domain tools for each agent (used during task execution, not governance)
+      'code-review': 'analyze_code_quality',
+      'code-reviewer': 'analyze_code_quality',
+      'security-audit': 'scan_vulnerabilities',
+      'security-auditor': 'scan_vulnerabilities',
+      'researcher': 'search_codebase',
       'bug-triage-specialist': 'analyze_proposal',
-
-      // Legacy aliases that should resolve to the above
-      'code-reviewer': 'analyze_proposal',
-      'security-auditor': 'analyze_proposal',
       'refactorer': 'analyze_proposal',
-      'architect': 'analyze_proposal',
-      'architecture-patterns': 'analyze_proposal',
-
-      // Implementation / apply focused tools
       'refactoring-strategies': 'suggest_refactor',
       'testing-strategy': 'analyze_test_coverage',
       'testing-lead': 'analyze_test_coverage',
+      'architect': 'analyze_proposal',
+      'architecture-patterns': 'analyze_proposal',
     };
     return map[agent] || 'analyze_proposal';
   }

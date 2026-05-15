@@ -795,6 +795,26 @@ Respond with EXACTLY one of:
     proposals: InferenceProposal[],
   ): Promise<InferenceCycleResult["votes"]> {
     const results: InferenceCycleResult["votes"] = [];
+    const govStart = Date.now();
+
+    // Pre-warm the three governance servers early so we pay spawn + MCP handshake cost upfront
+    // instead of during the first proposal.
+    const governanceServers = ["code-review", "security-audit", "researcher"];
+    frameworkLogger.log("inference-cycle", "pre-warm-governance-servers", "info", {
+      servers: governanceServers,
+    });
+
+    // Fire and forget warm-up (they will be ready by the time we need them)
+    Promise.all(
+      governanceServers.map((srv) =>
+        mcpClientManager.callServerTool(srv, "analyze_proposal", {
+          proposalTitle: "warmup",
+          proposalDescription: "warmup",
+          evidence: [],
+          proposalType: "fix",
+        }).catch(() => {}) // ignore warmup errors
+      )
+    );
 
     const GOVERNANCE_AGENTS: Record<string, string[]> = {
       fix: ["code-review", "security-audit", "researcher"],
@@ -806,15 +826,24 @@ Respond with EXACTLY one of:
 
     for (const proposal of proposals) {
       const agents = GOVERNANCE_AGENTS[proposal.type] ?? ["code-review", "security-audit"];
-      const skillVotes: any[] = [];
 
-      for (const agent of agents) {
+      // Parallel real calls + heavy tracing so we can see exactly where time is spent
+      const callStart = Date.now();
+      const callPromises = agents.map(async (agent) => {
+        const t0 = Date.now();
         try {
           const skillResult = await mcpClientManager.callServerTool(agent, "analyze_proposal", {
             proposalTitle: proposal.title,
             proposalDescription: proposal.description,
             evidence: proposal.evidence,
             proposalType: proposal.type,
+          });
+          const dur = Date.now() - t0;
+
+          frameworkLogger.log("inference-cycle", "mcp-gov-call", "info", {
+            agent,
+            proposal: proposal.title.substring(0, 50),
+            durationMs: dur,
           });
 
           let structured = "";
@@ -831,21 +860,36 @@ Respond with EXACTLY one of:
             if (m) structured = m[0].trim();
           }
 
-          skillVotes.push({
+          return {
             agent,
             toolUsed: "analyze_proposal",
             rawResponse: structured || JSON.stringify(skillResult),
             structuredVote: structured || null,
-          });
+            durationMs: dur,
+          };
         } catch (err) {
-          skillVotes.push({
+          const dur = Date.now() - t0;
+          frameworkLogger.log("inference-cycle", "mcp-gov-call-error", "error", {
+            agent,
+            durationMs: dur,
+            error: String(err),
+          });
+          return {
             agent,
             toolUsed: "analyze_proposal",
             rawResponse: `error: ${err}`,
             structuredVote: null,
-          });
+            durationMs: dur,
+          };
         }
-      }
+      });
+
+      const skillVotes = await Promise.all(callPromises);
+      frameworkLogger.log("inference-cycle", "proposal-gov-batch", "info", {
+        proposal: proposal.title.substring(0, 50),
+        batchDurationMs: Date.now() - callStart,
+        agents,
+      });
 
       const approves = skillVotes.filter((v: any) => v.structuredVote && v.structuredVote.includes("DECISION: approve")).length;
       const rejects = skillVotes.filter((v: any) => v.structuredVote && v.structuredVote.includes("DECISION: reject")).length;
@@ -866,6 +910,11 @@ Respond with EXACTLY one of:
         details: skillVotes.map((v: any) => `${v.agent}: ${v.structuredVote?.split('\n')[0] || 'no structured vote'}`),
       });
     }
+
+    frameworkLogger.log("inference-cycle", "governance-phase-complete", "info", {
+      totalGovernanceMs: Date.now() - govStart,
+      proposalCount: proposals.length,
+    });
 
     return results;
   }

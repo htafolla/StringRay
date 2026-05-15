@@ -47,7 +47,7 @@ npm install strray-ai
 
 **What happens during install?**
 - Copies OpenCode configuration files to your project
-- Configures 26 agents with proper capabilities
+- Configures 42 agents with proper capabilities
 - Sets up Codex enforcement rules
 - Enables webhook triggers for CI/CD integration
 - Ready to use with Hermes immediately
@@ -64,7 +64,7 @@ This installs only the MCP servers - no OpenCode dependency.
 
 ## ✨ Features
 
-- **🤖 24 Specialized Agents** - Autonomous agents that read/write code, run commands, and enforce compliance
+- **🤖 42 Specialized Agents** - Autonomous agents that read/write code, run commands, and enforce compliance
 - **📏 99.6% Error Prevention** - Universal Development Codex (60 terms)
 - **⚡ 44 Framework Skills** + 10 curated community sources (170+ additional skills available)
 - **🛡️ Enterprise Security** - Comprehensive validation and scanning
@@ -86,16 +86,10 @@ This installs only the MCP servers - no OpenCode dependency.
 | `@testing-lead` | Testing strategy & coverage | Active |
 | `@bug-triage-specialist` | Error investigation | Active |
 | `@researcher` | Codebase exploration | Active |
-| ~~`@enforcer`~~ | ~~Codex compliance & error prevention~~ | **DEPRECATED** |
-| ~~`@orchestrator`~~ | ~~Complex multi-step task coordination~~ | **DEPRECATED** |
-
-> **Architecture Note (2026-04-17)**: `@enforcer` and `@orchestrator` are deprecated.
-> - **Enforcement** is now handled by the **plugin-level preValidate processor** and **MCP servers**
-> - **Orchestration** is now handled by **agent-delegator** based on **complexity analysis**
 
 > **Note:** 0xRay auto-configures all agents during installation. To customize agent settings, see the [Agent Configuration Guide](https://github.com/htafolla/stringray/blob/master/docs/AGENT_CONFIG.md).
 
-[View all 26 agents →](https://github.com/htafolla/stringray/blob/master/AGENTS.md)
+[View all 42 agents →](https://github.com/htafolla/stringray/blob/master/AGENTS.md)
 
 ## 📦 OpenClaw Integration
 
@@ -285,7 +279,7 @@ npx strray-ai antigravity status       # Show installed skills with licenses
 
 ```
 .opencode/
-├── agents/         # 24 agent configurations
+├── agents/         # 42 agent configurations (YAML configs)
 ├── skills/         # Framework skills
 ├── strray/
 │   ├── codex.json      # Codex rules
@@ -385,7 +379,7 @@ stringray/
 │   ├── validation/            # Agent config & estimation validators
 │   └── jobs/                  # Background job management
 ├── .opencode/                 # OpenCode configuration
-│   ├── agents/               # Agent configs (26 agents)
+│   ├── agents/               # Agent configs (42 agents)
 │   ├── strray/               # 0xRay config
 │   │   ├── codex.json        # 60-term development codex
 │   │   ├── features.json     # Feature flags
@@ -401,17 +395,17 @@ stringray/
 ## 💬 Usage
 
 ```bash
-# Code quality enforcement
-@enforcer analyze this code for issues
-
-# Complex task orchestration  
-@orchestrator implement user authentication system
-
 # System design
 @architect design database schema for e-commerce
 
 # Security audit
 @security-auditor scan for vulnerabilities
+
+# Code review
+@code-reviewer review authentication module
+
+# Testing
+@testing-lead create tests for payment system
 ```
 
 ## 🔌 Framework Integration

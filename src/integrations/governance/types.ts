@@ -75,8 +75,8 @@ export interface GovernanceIntegrationConfig {
  */
 export const DEFAULT_GOVERNANCE_CONFIG: GovernanceIntegrationConfig = {
   enabled: false,
-  endpointUrl: 'https://mcp-production-80e2.up.railway.app/governance',
-  requestTimeoutMs: 10000,
+  endpointUrl: 'https://mcp-production-80e2.up.railway.app',
+  requestTimeoutMs: 30000,
   minConfidenceThreshold: 0.5,
   decisionLogic: {
     passConfidenceMin: 0.9,
@@ -93,6 +93,29 @@ export const DEFAULT_GOVERNANCE_CONFIG: GovernanceIntegrationConfig = {
  * Solar activity levels from NOAA GOES data
  */
 export type SolarActivityLevel = 'quiet' | 'moderate' | 'active' | 'storm';
+
+/**
+ * Minimal solar feature vector used by neural fusion modulation
+ * Derived from NOAA SWPC data (X-ray flux, Kp-index, etc.)
+ */
+export interface SolarFeaturesLike {
+  xrayUVLift: number;
+  magPerturbation: number;
+  activityLevel?: SolarActivityLevel;
+}
+
+/**
+ * Solar modulation record — tracks what modulation was applied and why
+ */
+export interface SolarModulation {
+  solar_applied: boolean;
+  activity_level: string;
+  gainMultiplier: number;
+  metaShift: number;
+  confShift: number;
+  metaDelta: number;
+  confDelta: number;
+}
 
 /**
  * Solar context returned by govern_with_solar
@@ -132,6 +155,15 @@ export interface SolarGovernanceCheckResponse {
   finalRecommendation: string;
   /** Confidence adjustment applied due to solar activity */
   confidenceAdjustment: number;
+  /** Live solar feature vector from NOAA (if available) */
+  solarFeatures?: SolarFeaturesLike;
+  /** Solar modulation details from neural fusion coupling (if available) */
+  solarModulation?: {
+    activity_level: string;
+    gainMultiplier: number;
+    metaDelta: number;
+    confDelta: number;
+  };
 }
 
 /**
@@ -142,6 +174,11 @@ export interface SolarGovernanceVoteResult extends GovernanceVoteResult {
   solarContext: SolarContext;
   /** Confidence adjustment from solar activity */
   solarConfidenceAdjustment: number;
+  /** Solar modulation: coupling gain and level, propagated from neural fusion */
+  solarModulation?: {
+    gainMultiplier: number;
+    activityLevel: string;
+  };
 }
 
 // ============================================================================

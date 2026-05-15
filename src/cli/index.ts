@@ -1069,6 +1069,35 @@ program
     removeMCPCommand(name);
   });
 
+program
+  .command('mcp-enable-grok')
+  .alias('mcp:enable-grok')
+  .description('Enable 0xRay MCP servers for Grok CLI (orchestrator + core skills)')
+  .option('--skills <skills>', 'Comma-separated list of skills (default: core set)')
+  .action(async (options) => {
+    const { enableGrokMCPCommand } = await import('./commands/mcp-enable-grok.js');
+    const skills = options.skills ? options.skills.split(',') : undefined;
+    enableGrokMCPCommand({ skills });
+  });
+
+program
+  .command('mcp-disable-grok')
+  .alias('mcp:disable-grok')
+  .description('Disable 0xRay MCP servers from Grok CLI')
+  .action(async () => {
+    const { disableGrokMCPCommand } = await import('./commands/mcp-disable-grok.js');
+    disableGrokMCPCommand();
+  });
+
+program
+  .command('mcp-grok-status')
+  .alias('mcp:grok-status')
+  .description('Show 0xRay MCP server status for Grok CLI')
+  .action(async () => {
+    const { showGrokMCPStatusCommand } = await import('./commands/mcp-grok-status.js');
+    showGrokMCPStatusCommand();
+  });
+
 // Analytics enable command
 // TODO: Re-enable after fixing dashboard module
 // program

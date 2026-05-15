@@ -18,6 +18,7 @@ strray-ai-*.tgz
 # StringRay runtime artifacts
 .strray/profiles/
 .strray/inference/
+.strray/state/
 .opencode/**/*.d.ts
 .opencode/**/*.d.ts.map
 .strray/**/*.d.ts

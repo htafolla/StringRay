@@ -806,9 +806,9 @@ Respond with EXACTLY one of:
 
     for (const proposal of proposals) {
       const agents = GOVERNANCE_AGENTS[proposal.type] ?? ["code-review", "security-audit"];
-      const skillVotes: any[] = [];
 
-      for (const agent of agents) {
+      // Fire the three real MCP calls in parallel for speed (real transport has spawn/handshake cost)
+      const callPromises = agents.map(async (agent) => {
         try {
           const skillResult = await mcpClientManager.callServerTool(agent, "analyze_proposal", {
             proposalTitle: proposal.title,
@@ -831,21 +831,23 @@ Respond with EXACTLY one of:
             if (m) structured = m[0].trim();
           }
 
-          skillVotes.push({
+          return {
             agent,
             toolUsed: "analyze_proposal",
             rawResponse: structured || JSON.stringify(skillResult),
             structuredVote: structured || null,
-          });
+          };
         } catch (err) {
-          skillVotes.push({
+          return {
             agent,
             toolUsed: "analyze_proposal",
             rawResponse: `error: ${err}`,
             structuredVote: null,
-          });
+          };
         }
-      }
+      });
+
+      const skillVotes = await Promise.all(callPromises);
 
       const approves = skillVotes.filter((v: any) => v.structuredVote && v.structuredVote.includes("DECISION: approve")).length;
       const rejects = skillVotes.filter((v: any) => v.structuredVote && v.structuredVote.includes("DECISION: reject")).length;

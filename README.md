@@ -236,6 +236,46 @@ Once connected, Hermes can use the tools directly in conversation:
 - The state-manager persists to `.strray/state/mcp-state.json` — survives Hermes restarts
 - Auto-format and lint need Prettier/ESLint installed in your project to do real work (otherwise they report what's missing)
 
+## 🧠 Grok CLI Integration
+
+0xRay can expose its orchestrator and core agents as MCP servers directly to the Grok CLI.
+
+### Quick Setup
+
+```bash
+# Enable 0xRay MCP servers for Grok CLI (global)
+npx strray-ai mcp:enable-grok
+```
+
+This registers the following MCP servers in `~/.grok/config.toml`:
+- `0xray-orchestrator` (multi-agent task planning)
+- `0xray-code-review`
+- `0xray-security-audit`
+- `0xray-bug-triage-specialist`
+- `0xray-researcher`
+
+### Commands
+
+| Command                        | Description                              |
+|--------------------------------|------------------------------------------|
+| `strray-ai mcp:enable-grok`    | Enable 0xRay MCP servers for Grok CLI    |
+| `strray-ai mcp:grok-status`    | Show currently enabled 0xRay servers     |
+| `strray-ai mcp:disable-grok`   | Remove 0xRay MCP servers from Grok CLI   |
+
+You can also enable a custom set of skills:
+```bash
+npx strray-ai mcp:enable-grok --skills orchestrator,code-review,researcher
+```
+
+### After Enabling
+
+1. Restart your Grok CLI session.
+2. Grok can now call 0xRay agents directly (e.g. "Use the orchestrator to plan a refactor of the auth module").
+
+### Project-Level Config
+
+To enable only for a specific project, create `.grok/config.toml` in your project root and run the command with the `--project` flag (support coming in next update).
+
 ## 📖 Documentation
 
 | Guide | Description |

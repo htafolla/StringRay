@@ -7,6 +7,8 @@ import { VotingCoordinator } from "../delegation/voting-coordinator.js";
 import { StringRayStateManager } from "../state/state-manager.js";
 import { frameworkLogger } from "../core/framework-logger.js";
 import { getGovernanceIntegration, type GovernanceVoteResult, type SolarGovernanceVoteResult } from "../integrations/governance/index.js";
+import { OpenCodeAgentInvoker } from "../governance/OpenCodeAgentInvoker.js";
+import type { ProposalDeliberationInvoker } from "../governance/AgentInvoker.js";
 import { getAgentSpawn } from "../core/features-config.js";
 import { agentSpawnGovernor } from "../orchestrator/agent-spawn-governor.js";
 import { spawnGate } from "../core/opencode-spawn-gate.js";
@@ -58,7 +60,7 @@ export type CyclePhase =
 
 const CYCLE_STATE_FILE = "inference-cycle-state.json";
 const CYCLE_HISTORY_FILE = "inference-cycle-history.json";
-const GOVERNANCE_AGENTS: Record<string, string[]> = {
+export const GOVERNANCE_AGENTS: Record<string, string[]> = {
   fix: ["code-reviewer", "refactorer", "researcher"],
   refactor: ["code-reviewer", "refactorer", "researcher"],
   guard: ["code-reviewer", "security-auditor", "researcher"],
@@ -85,7 +87,7 @@ export class InferenceCycle {
   static getInstance(projectRoot?: string, options?: InferenceCycleOptions): InferenceCycle {
     const root = path.resolve(projectRoot || process.cwd());
     if (!InferenceCycle.instances.has(root)) {
-      InferenceCycle.instances.set(root, new InferenceCycle(root, undefined, options));
+      InferenceCycle.instances.set(root, new InferenceCycle(root, undefined, undefined, options));
     }
     return InferenceCycle.instances.get(root)!;
   }
@@ -102,16 +104,31 @@ export class InferenceCycle {
   private projectRoot: string;
   private phase: CyclePhase = "idle";
   private opencodeAvailable: boolean | null = null;
-  private agentInvoker: AgentInvoker | null;
+  private readonly proposalAgentInvoker: ProposalDeliberationInvoker;
+  // Legacy low-level callback (function type) for the old invokeAgentInternal path
+  private readonly lowLevelAgentInvoker: ((agentName: string, prompt: string) => Promise<string>) | undefined;
   private options: InferenceCycleOptions;
   private lastRawOpencodeOutput: string = "";
 
-  constructor(projectRoot?: string, agentInvoker?: AgentInvoker, options?: InferenceCycleOptions) {
+  constructor(
+    projectRoot?: string,
+    proposalAgentInvoker?: ProposalDeliberationInvoker,
+    lowLevelAgentInvoker?: (agentName: string, prompt: string) => Promise<string>,
+    options?: InferenceCycleOptions
+  ) {
     this.projectRoot = projectRoot || process.cwd();
     this.inferenceDir = path.join(this.projectRoot, "docs", "inference");
     this.stateDir = path.join(this.projectRoot, ".strray", "inference");
-    this.agentInvoker = agentInvoker ?? null;
     this.options = options ?? {};
+    this.lowLevelAgentInvoker = lowLevelAgentInvoker;
+
+    this.proposalAgentInvoker =
+      proposalAgentInvoker ??
+      new OpenCodeAgentInvoker(
+        (prompt: string) => this.invokeAgentInternal("architect", prompt),
+        (output: string, proposals: InferenceProposal[]) =>
+          this.parseSubagentVotes(output, proposals)
+      );
   }
 
   async governExternalProposals(proposals: InferenceProposal[]): Promise<InferenceCycleResult> {
@@ -820,8 +837,6 @@ Respond with EXACTLY one of:
     return merged;
   }
 
-  // Removed: buildOrchestratorGovernancePrompt (replaced by inline TODO prompt in governProposals)
-
   /**
    * Govern proposals using external chrono-warp-drive Dynamo endpoint
    */
@@ -833,10 +848,15 @@ Respond with EXACTLY one of:
       throw new Error("Governance integration not available");
     }
 
-    // Build agent reviews from proposal evidence
-    const agentReviews = proposals.flatMap((p) =>
-      p.evidence.slice(0, 2).map((e) => `[${p.type}] ${e}`),
-    );
+    // Build rich agent reviews via the pluggable invoker (OpenCode for now, MCP later)
+    const agentReviews: string[] = [];
+
+    for (const proposal of proposals) {
+      const reviews = await this.proposalAgentInvoker.deliberate(proposal);
+      for (const r of reviews) {
+        agentReviews.push(`${r.agent}: ${r.reasoning} (confidence: ${r.confidence})`);
+      }
+    }
 
     try {
       const batchResult = await governanceIntegration.checkProposals(
@@ -930,9 +950,9 @@ Respond with EXACTLY one of:
       });
     }
 
-    if (this.agentInvoker) {
+    if (this.lowLevelAgentInvoker) {
       frameworkLogger.log("inference-cycle", "invoke-via-callback", "info", { agentName });
-      return this.agentInvoker(agentName, prompt);
+      return this.lowLevelAgentInvoker(agentName, prompt);
     }
 
     return this.invokeViaOpencode(agentName, prompt);

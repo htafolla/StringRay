@@ -55,7 +55,7 @@ export class InferenceGovernanceIntegration extends BaseIntegration {
     await this.log('info', 'Initializing governance client...');
 
     this.client = new GovernanceClient({
-      baseUrl: this.configData.endpointUrl.replace(/\/governance$/, ''),
+      baseUrl: this.configData.endpointUrl,
       timeoutMs: this.configData.requestTimeoutMs,
     });
 
@@ -209,6 +209,14 @@ export class InferenceGovernanceIntegration extends BaseIntegration {
       ...baseResult,
       solarContext: solarResponse.solarContext,
       solarConfidenceAdjustment: solarResponse.confidenceAdjustment,
+      ...(solarResponse.solarModulation
+        ? {
+            solarModulation: {
+              gainMultiplier: solarResponse.solarModulation.gainMultiplier,
+              activityLevel: solarResponse.solarModulation.activity_level,
+            },
+          }
+        : {}),
     };
 
     frameworkLogger.log(
@@ -220,6 +228,7 @@ export class InferenceGovernanceIntegration extends BaseIntegration {
         solarActivityLevel: solarResponse.solarContext.solarActivityLevel,
         adjustedVoteWeight: solarResponse.adjustedVoteWeight,
         confidenceAdjustment: solarResponse.confidenceAdjustment,
+        gainMultiplier: solarResponse.solarModulation?.gainMultiplier,
         passed: solarResult.passed,
       },
     );

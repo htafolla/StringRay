@@ -14,6 +14,7 @@ import type {
   SolarGovernanceCheckResponse,
   GovernanceClientConfig,
   GovernanceClientStats,
+  SolarFeaturesLike,
 } from './types.js';
 import {
   GovernanceError,
@@ -101,6 +102,19 @@ export class GovernanceClient {
         adjustedVoteWeight: result.adjustedVoteWeight as number,
         finalRecommendation: result.finalRecommendation as string,
         confidenceAdjustment: result.confidenceAdjustment as number,
+        ...(result.solarFeatures
+          ? { solarFeatures: result.solarFeatures as SolarFeaturesLike }
+          : {}),
+        ...(result.solarModulation
+          ? {
+              solarModulation: {
+                activity_level: (result.solarModulation as Record<string, unknown>).activity_level as string,
+                gainMultiplier: (result.solarModulation as Record<string, unknown>).gainMultiplier as number,
+                metaDelta: (result.solarModulation as Record<string, unknown>).metaDelta as number,
+                confDelta: (result.solarModulation as Record<string, unknown>).confDelta as number,
+              },
+            }
+          : {}),
       };
 
       if (!this.isValidSolarResponse(response)) {
@@ -307,8 +321,7 @@ export class GovernanceClient {
       sc.solarActivityModifier <= 1 &&
       typeof sc.recommendation === 'string' &&
       typeof r.adjustedVoteWeight === 'number' &&
-      r.adjustedVoteWeight >= 0.5 &&
-      r.adjustedVoteWeight <= 1.5 &&
+      r.adjustedVoteWeight >= 0 &&
       typeof r.finalRecommendation === 'string' &&
       typeof r.confidenceAdjustment === 'number'
     );

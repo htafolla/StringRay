@@ -30,6 +30,8 @@ import {
   SimulationEngine,
   getAllServerSimulations,
 } from './simulation/index.js';
+import { getConnectionPool } from './connection/connection-pool.js';
+import type { IServerConfig } from './types/index.js';
 
 /**
  * Retry configuration for MCP tool execution
@@ -121,6 +123,31 @@ export class MCPClient extends EventEmitter {
     }
 
     throw lastError || new Error(`Operation ${operationName} failed after ${this.retryConfig.maxRetries} retries`);
+  }
+
+  /**
+   * Execute a tool using the real MCP transport (ConnectionPool + McpConnection + ToolExecutor).
+   * This is the production path.
+   */
+  private async executeRealTool(toolName: string, args: unknown): Promise<MCPToolResult> {
+    const pool = getConnectionPool();
+    const serverConfig = this.config as unknown as IServerConfig;
+
+    const connection = await pool.acquire(this.config.serverName, serverConfig);
+
+    try {
+      const result = await this.toolExecutor.executeTool(connection, toolName, args);
+      return result;
+    } finally {
+      pool.release(connection);
+    }
+  }
+
+  /**
+   * Whether we are running in pure-MCP governance mode (no simulation allowed for governance tools).
+   */
+  private get isPureMcpMode(): boolean {
+    return process.env.STRRAY_FORCE_MCP_GOVERNANCE === 'true';
   }
 
   /**
@@ -308,12 +335,17 @@ export class MCPClient extends EventEmitter {
   }
 
   /**
-   * Call a specific MCP server tool
+   * Call a specific MCP server tool.
+   *
+   * Production-ready order of preference:
+   * 1. Real transport (ConnectionPool + JSON-RPC) is always attempted first for
+   *    governance servers or when STRRAY_FORCE_MCP_GOVERNANCE=true.
+   * 2. Simulation only as fallback (for non-governance tools or when real fails outside pure mode).
+   * 3. Hard error in pure-MCP mode — no silent generic fallbacks.
    */
   async callTool(toolName: string, args: unknown = {}): Promise<MCPToolResult> {
     const startTime = Date.now();
 
-    // Emit tool.before event
     const beforeEvent: ToolBeforeEvent = {
       toolName,
       serverName: this.config.serverName,
@@ -322,16 +354,69 @@ export class MCPClient extends EventEmitter {
     };
     this.emit('tool.before', beforeEvent);
 
+    const serverName = this.config.serverName;
+    const isGovernanceServer = ['code-review', 'security-audit', 'researcher'].includes(serverName);
+    const isGovernanceTool = toolName === 'analyze_proposal';
+    const preferReal = this.isPureMcpMode || isGovernanceServer || isGovernanceTool;
+
     try {
-      // Wrap with retry for simulation (and future real connections)
-      if (this.simulationEngine.canSimulate(this.config.serverName, toolName)) {
+      // === PRIMARY PATH: Real MCP transport (JSON-RPC via pooled process) ===
+      if (preferReal) {
         try {
           const result = await this.executeWithRetry(
-            () => this.simulationEngine.simulate(this.config.serverName, toolName, args),
+            () => this.executeRealTool(toolName, args),
+            `real:${toolName}`
+          );
+
+          frameworkLogger.log(
+            'mcp-client',
+            'real-transport-success',
+            'info',
+            {
+              server: serverName,
+              tool: toolName,
+              pureMode: this.isPureMcpMode,
+            }
+          );
+
+          const afterEvent: ToolAfterEvent = {
+            ...beforeEvent,
+            result,
+            duration: Date.now() - startTime,
+            success: true,
+          };
+          this.emit('tool.after', afterEvent);
+
+          return result;
+        } catch (realError) {
+          const errMsg = realError instanceof Error ? realError.message : String(realError);
+
+          frameworkLogger.log(
+            'mcp-client',
+            'real-transport-failed',
+            this.isPureMcpMode ? 'error' : 'warning',
+            { server: serverName, tool: toolName, error: errMsg }
+          );
+
+          if (this.isPureMcpMode) {
+            const pureError = new Error(
+              `[PURE MCP] Real transport failed for ${serverName}/${toolName}: ${errMsg}. ` +
+              `No simulation fallback allowed in pure governance mode.`
+            );
+            throw pureError;
+          }
+          // Outside pure mode we fall through to simulation if available
+        }
+      }
+
+      // === FALLBACK PATH: Simulation (only for non-critical tools or non-pure mode) ===
+      if (this.simulationEngine.canSimulate(serverName, toolName)) {
+        try {
+          const result = await this.executeWithRetry(
+            () => this.simulationEngine.simulate(serverName, toolName, args),
             `simulate:${toolName}`
           );
 
-          // Emit tool.after event (success)
           const afterEvent: ToolAfterEvent = {
             ...beforeEvent,
             result,
@@ -344,24 +429,30 @@ export class MCPClient extends EventEmitter {
         } catch (error) {
           frameworkLogger.log(
             'mcp-client',
-            `Simulation failed for ${toolName}: ${error instanceof Error ? error.message : String(error)}`,
-            'info',
-            { toolName }
+            `Simulation failed for ${toolName}`,
+            'warning',
+            { server: serverName, tool: toolName }
           );
         }
       }
 
-      // Return generic fallback result
+      // === LAST RESORT: Generic fallback (never in pure mode) ===
+      if (this.isPureMcpMode) {
+        throw new Error(
+          `[PURE MCP] No real MCP response and no simulation registered for ${serverName}/${toolName}. ` +
+          `Pure governance mode requires real transport.`
+        );
+      }
+
       const fallbackResult = {
         content: [
           {
-            type: 'text',
-            text: `Tool ${toolName} executed on ${this.config.serverName} server`,
+            type: 'text' as const,
+            text: `Tool ${toolName} executed on ${serverName} server`,
           },
         ],
       };
 
-      // Emit tool.after event (fallback success)
       const afterEvent: ToolAfterEvent = {
         ...beforeEvent,
         result: fallbackResult,
@@ -372,8 +463,8 @@ export class MCPClient extends EventEmitter {
 
       return fallbackResult;
     } catch (error) {
-      // Emit tool.after event (error)
       const errorMessage = error instanceof Error ? error.message : String(error);
+
       const afterEvent: ToolAfterEvent = {
         ...beforeEvent,
         error: errorMessage,

@@ -201,3 +201,20 @@ export class ConnectionPool implements IConnectionPoolExtended {
     }
   }
 }
+
+// === Singleton for shared use across MCPClient instances ===
+let sharedConnectionPool: ConnectionPool | null = null;
+
+/**
+ * Get (or create) the default shared ConnectionPool.
+ * Used by MCPClient for real transport execution.
+ */
+export function getConnectionPool(): ConnectionPool {
+  if (!sharedConnectionPool) {
+    sharedConnectionPool = new ConnectionPool({
+      maxPoolSize: 10,
+      maxIdleTimeMs: 5 * 60 * 1000, // 5 minutes
+    });
+  }
+  return sharedConnectionPool;
+}

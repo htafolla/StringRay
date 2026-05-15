@@ -30,6 +30,8 @@ import {
   SimulationEngine,
   getAllServerSimulations,
 } from './simulation/index.js';
+import { McpConnection } from './connection/mcp-connection.js';
+import type { IServerConfig } from './types/index.js';
 
 /**
  * Retry configuration for MCP tool execution
@@ -323,15 +325,18 @@ export class MCPClient extends EventEmitter {
     this.emit('tool.before', beforeEvent);
 
     try {
-      // Wrap with retry for simulation (and future real connections)
-      if (this.simulationEngine.canSimulate(this.config.serverName, toolName)) {
+      const isGovernanceTool = toolName === 'analyze_proposal' ||
+        ['code-review', 'security-audit', 'researcher', 'bug-triage-specialist'].includes(this.config.serverName);
+
+      // REMOVE SIMULATION CRUTCH for governance / analyze_proposal (user request: make servers real)
+      // Only use simulation for non-governance tools if explicitly registered
+      if (!isGovernanceTool && this.simulationEngine.canSimulate(this.config.serverName, toolName)) {
         try {
           const result = await this.executeWithRetry(
             () => this.simulationEngine.simulate(this.config.serverName, toolName, args),
             `simulate:${toolName}`
           );
 
-          // Emit tool.after event (success)
           const afterEvent: ToolAfterEvent = {
             ...beforeEvent,
             result,
@@ -339,7 +344,6 @@ export class MCPClient extends EventEmitter {
             success: true,
           };
           this.emit('tool.after', afterEvent);
-
           return result;
         } catch (error) {
           frameworkLogger.log(
@@ -351,7 +355,30 @@ export class MCPClient extends EventEmitter {
         }
       }
 
-      // Return generic fallback result
+      // === REAL MCP SERVER PATH (for analyze_proposal and governance skills) ===
+      if (isGovernanceTool) {
+        try {
+          const realResult = await this.executeRealToolCall(toolName, args);
+          const afterEvent: ToolAfterEvent = {
+            ...beforeEvent,
+            result: realResult,
+            duration: Date.now() - startTime,
+            success: true,
+          };
+          this.emit('tool.after', afterEvent);
+          return realResult;
+        } catch (realError) {
+          frameworkLogger.log(
+            'mcp-client',
+            `Real MCP call failed for ${this.config.serverName}:${toolName}, falling back to generic: ${realError instanceof Error ? realError.message : String(realError)}`,
+            'warning',
+            { toolName, server: this.config.serverName }
+          );
+          // fall through to generic below
+        }
+      }
+
+      // Generic fallback (last resort)
       const fallbackResult = {
         content: [
           {
@@ -433,6 +460,47 @@ export class MCPClient extends EventEmitter {
    */
   offToolAfter(callback: (event: ToolAfterEvent) => void): void {
     this.off('tool.after', callback);
+  }
+
+  /**
+   * Execute a tool call against the REAL MCP server process (no simulation).
+   * Spawns the server via McpConnection (stdio), sends tools/call, returns result.
+   * This is the path that makes the knowledge-skill servers (code-review, etc.) real.
+   */
+  private async executeRealToolCall(toolName: string, args: unknown): Promise<MCPToolResult> {
+    const serverName = this.config.serverName;
+    const serverConfig: IServerConfig | undefined = defaultServerRegistry.get(serverName);
+
+    if (!serverConfig) {
+      throw new Error(`No server config registered for ${serverName}`);
+    }
+
+    // Use a fresh connection for this call (simple & reliable for governance)
+    const connection = new McpConnection(serverConfig);
+
+    try {
+      await connection.connect();
+
+      const executor = new ToolExecutor();
+      const result = await executor.executeTool(connection, toolName, args);
+
+      return result;
+    } finally {
+      // Best effort shutdown
+      try {
+        if (typeof (connection as any).disconnect === 'function') {
+          await (connection as any).disconnect();
+        } else {
+          // Force kill the child process if exposed
+          const proc = (connection as any).process;
+          if (proc && !proc.killed) {
+            proc.kill('SIGTERM');
+          }
+        }
+      } catch {
+        // ignore cleanup errors
+      }
+    }
   }
 }
 
@@ -542,8 +610,47 @@ export class MCPClientManager {
     toolName: string,
     args: unknown = {}
   ): Promise<MCPToolResult> {
+    const isDebug = process.env.STRRAY_FORCE_MCP_GOVERNANCE === 'true' || process.env.STRRAY_MCP_DEBUG === 'true';
+
+    if (isDebug) {
+      const timestamp = new Date().toISOString();
+      console.error(`\n${'='.repeat(90)}`);
+      console.error(`>>> MCP CALL [${timestamp}]`);
+      console.error(`    Server : ${serverName}`);
+      console.error(`    Tool   : ${toolName}`);
+      console.error(`    Args size: ${JSON.stringify(args).length} bytes`);
+      try {
+        const argsPreview = JSON.stringify(args, null, 2);
+        console.error(`    Full Args:\n${argsPreview.substring(0, 8000)}`);
+        if (argsPreview.length > 8000) console.error('    ... [args truncated]');
+      } catch {
+        console.error(`    Args: [could not stringify]`);
+      }
+      console.error(`${'='.repeat(90)}`);
+    }
+
+    const start = Date.now();
     const client = await this.getClient(serverName);
-    return client.callTool(toolName, args);
+    const result = await client.callTool(toolName, args);
+    const duration = Date.now() - start;
+
+    if (isDebug) {
+      const timestamp = new Date().toISOString();
+      console.error(`\n${'='.repeat(90)}`);
+      console.error(`>>> MCP RESPONSE [${timestamp}]  (took ${duration}ms)`);
+      console.error(`    Server : ${serverName}`);
+      console.error(`    Tool   : ${toolName}`);
+      try {
+        const resultStr = JSON.stringify(result, null, 2);
+        console.error(`    Full Result:\n${resultStr.substring(0, 12000)}`);
+        if (resultStr.length > 12000) console.error(`    ... [result truncated, total ${resultStr.length} chars]`);
+      } catch {
+        console.error(`    Result: ${String(result).substring(0, 2000)}`);
+      }
+      console.error(`${'='.repeat(90)}\n`);
+    }
+
+    return result;
   }
 
   /**
@@ -580,10 +687,31 @@ export class MCPClientManager {
   }
 
   /**
-   * Clear all cached clients
+   * Clear all cached clients (best effort — does not fully kill connections yet)
    */
   clearClients(): void {
     this.clients.clear();
+  }
+
+  /**
+   * Shutdown all MCP clients and their underlying connections.
+   * This is critical so that the Node process can exit cleanly.
+   */
+  async shutdown(): Promise<void> {
+    const clients = Array.from(this.clients.values());
+    this.clients.clear();
+
+    for (const client of clients) {
+      try {
+        // Best effort: if the client has a disconnect method on its internal connection, call it.
+        // For now we rely on process kill in McpConnection.
+        if (typeof (client as any).disconnect === 'function') {
+          await (client as any).disconnect();
+        }
+      } catch (err) {
+        // ignore
+      }
+    }
   }
 }
 

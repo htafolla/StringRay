@@ -24,11 +24,22 @@ export class ServerConfigRegistry {
    * Register all default server configurations
    */
   private registerDefaultConfigs(): void {
-    // For consumer projects: default to node_modules/strray-ai/dist/
-    // For local dev: use STRRAY_DEV_PATH env var (e.g., "dist")
-    const basePath = process.env.STRRAY_DEV_PATH
-      ? process.env.STRRAY_DEV_PATH
-      : 'node_modules/strray-ai/dist';
+    // Smart basePath detection for real server spawning
+    // Priority: STRRAY_DEV_PATH env > local dist (if running in source tree) > node_modules
+    let basePath = process.env.STRRAY_DEV_PATH || '';
+
+    if (!basePath) {
+      // Check if we are inside the stringray source (dist exists next to us)
+      const localDist = 'dist';
+      const fs = require('fs');
+      const path = require('path');
+      const candidate = path.join(process.cwd(), localDist, 'mcps', 'knowledge-skills', 'code-review.server.js');
+      if (fs.existsSync(candidate)) {
+        basePath = localDist;
+      } else {
+        basePath = 'node_modules/strray-ai/dist';
+      }
+    }
 
     // Code Review Server
     this.register({
@@ -62,11 +73,11 @@ export class ServerConfigRegistry {
       timeout: 25000,
     });
 
-    // Researcher Server
+    // Researcher Server (maps to project-analysis in current layout)
     this.register({
       serverName: 'researcher',
       command: 'node',
-      args: [`${basePath}/mcps/researcher.server.js`],
+      args: [`${basePath}/mcps/project-analysis.server.js`],
       timeout: 60000,
     });
 

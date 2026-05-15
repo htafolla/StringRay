@@ -10,6 +10,7 @@ import { getGovernanceIntegration, type GovernanceVoteResult } from "../integrat
 import { getAgentSpawn } from "../core/features-config.js";
 import { agentSpawnGovernor } from "../orchestrator/agent-spawn-governor.js";
 import { spawnGate } from "../core/opencode-spawn-gate.js";
+import { mcpClientManager } from "../mcps/mcp-client.js";
 
 export interface InferenceProposal {
   id: string;
@@ -651,6 +652,11 @@ Respond with EXACTLY one of:
   private async governProposalsInternal(
     proposals: InferenceProposal[],
   ): Promise<InferenceCycleResult["votes"]> {
+    // PURE INDIVIDUAL MCP SKILLS PATH (user requirement)
+    if (process.env.STRRAY_FORCE_MCP_GOVERNANCE === 'true') {
+      return this.governProposalsWithIndividualSkills(proposals);
+    }
+
     const coordinator = this.getCoordinator();
     const sessionId = `inference-governance-${Date.now()}`;
     const results: InferenceCycleResult["votes"] = [];
@@ -744,6 +750,94 @@ Respond with EXACTLY one of:
       avgConfidence: metrics.averageConfidence.toFixed(2),
       strategyUsage: metrics.strategyUsage,
     });
+
+    return results;
+  }
+
+  /**
+   * Pure individual knowledge-skill MCP path (when STRRAY_FORCE_MCP_GOVERNANCE=true).
+   * Each proposal is sent directly to the relevant skill servers via analyze_proposal.
+   * No orchestrator/architect prompt for the actual voting.
+   */
+  private async governProposalsWithIndividualSkills(
+    proposals: InferenceProposal[],
+  ): Promise<InferenceCycleResult["votes"]> {
+    process.stderr.write(`>>> [PURE MCP] Using individual knowledge-skill servers for governance (no architect prompt)\n`);
+
+    const results: InferenceCycleResult["votes"] = [];
+
+    const GOVERNANCE_AGENTS: Record<string, string[]> = {
+      fix: ["code-review", "security-audit"],
+      refactor: ["code-review", "security-audit"],
+      guard: ["code-review", "security-audit"],
+      automate: ["code-review", "security-audit"],
+      codify: ["code-review", "security-audit"],
+    };
+
+    for (const proposal of proposals) {
+      const agents = GOVERNANCE_AGENTS[proposal.type] ?? ["code-review", "security-audit"];
+      const skillVotes: any[] = [];
+
+      for (const agent of agents) {
+        try {
+          const skillResult = await mcpClientManager.callServerTool(agent, "analyze_proposal", {
+            proposalTitle: proposal.title,
+            proposalDescription: proposal.description,
+            evidence: proposal.evidence,
+            proposalType: proposal.type,
+          });
+
+          // Aggressive extraction of DECISION/CONFIDENCE/REASONING
+          let structured = "";
+          const contents = (skillResult as any)?.content || [];
+          for (const c of contents) {
+            if (c?.text && c.text.includes("DECISION:")) {
+              structured = c.text.trim();
+              break;
+            }
+          }
+          if (!structured) {
+            const full = JSON.stringify(skillResult);
+            const m = full.match(/DECISION:\s*(approve|reject|abstain)[\s\S]{0,300}?REASONING:[^\n"]*/i);
+            if (m) structured = m[0].trim();
+          }
+
+          skillVotes.push({
+            agent,
+            toolUsed: "analyze_proposal",
+            rawResponse: structured || JSON.stringify(skillResult),
+            structuredVote: structured || null,
+          });
+        } catch (err) {
+          skillVotes.push({
+            agent,
+            toolUsed: "analyze_proposal",
+            rawResponse: `error: ${err}`,
+            structuredVote: null,
+          });
+        }
+      }
+
+      // Aggregate
+      const approves = skillVotes.filter(v => v.structuredVote && v.structuredVote.includes("DECISION: approve")).length;
+      const rejects = skillVotes.filter(v => v.structuredVote && v.structuredVote.includes("DECISION: reject")).length;
+      const decision = approves > rejects ? "approve" : (rejects > approves ? "reject" : "abstain");
+
+      let avgConf = 0.75;
+      const confMatches = skillVotes.map(v => {
+        if (!v.structuredVote) return 0.75;
+        const m = v.structuredVote.match(/CONFIDENCE:\s*([0-9.]+)/);
+        return m ? parseFloat(m[1]) : 0.75;
+      });
+      if (confMatches.length > 0) avgConf = confMatches.reduce((a, b) => a + b, 0) / confMatches.length;
+
+      results.push({
+        proposalId: proposal.id,
+        decision: decision as any,
+        confidence: Math.round(avgConf * 100) / 100,
+        details: skillVotes.map(v => `${v.agent}: ${v.structuredVote?.split('\n')[0] || 'no structured vote'}`),
+      });
+    }
 
     return results;
   }
@@ -846,15 +940,43 @@ Respond with EXACTLY one of:
   }
 
   private async invokeAgentInternal(agentName: string, prompt: string): Promise<string> {
+    const isPureMcpMode = process.env.STRRAY_FORCE_MCP_GOVERNANCE === "true";
+
     frameworkLogger.log("inference-cycle", "invoke-agent-internal", "info", {
       agentName,
       promptLength: prompt.length,
+      pureMcpMode: isPureMcpMode,
     });
 
+    // === COMPLETE MCP DEBUG TRACING (when STRRAY_FORCE_MCP_GOVERNANCE=true) ===
+    if (isPureMcpMode) {
+      console.error(`\n${"=".repeat(80)}`);
+      console.error(`>>> MCP GOVERNANCE TRACE — AGENT: ${agentName.toUpperCase()}`);
+      console.error(`>>> TIMESTAMP: ${new Date().toISOString()}`);
+      console.error(`${"=".repeat(80)}`);
+      console.error(`>>> FULL PROMPT SENT TO ORCHESTRATOR:`);
+      console.error(prompt);
+      console.error(`\n>>> ARGS SENT TO orchestrate-task:`);
+      console.error(JSON.stringify({
+        description: prompt,
+        tasks: [{
+          id: `task-${Date.now()}`,
+          description: prompt,
+          type: agentName,
+          priority: "high",
+        }],
+        executionMode: "sequential",
+      }, null, 2));
+      console.error(`${"=".repeat(80)}\n`);
+    }
+
     let mcpResponseText: string | undefined;
+    let mcpCallDuration = 0;
 
     try {
       const { mcpClientManager } = await import("../mcps/mcp-client.js");
+
+      const mcpStart = Date.now();
       const result = await mcpClientManager.callServerTool("orchestrator", "orchestrate-task", {
         description: prompt,
         tasks: [{
@@ -865,6 +987,8 @@ Respond with EXACTLY one of:
         }],
         executionMode: "sequential",
       });
+      mcpCallDuration = Date.now() - mcpStart;
+
       const content = (result as { content?: Array<{ text?: string }> }).content;
       mcpResponseText = "";
       if (content && Array.isArray(content)) {
@@ -872,22 +996,49 @@ Respond with EXACTLY one of:
       } else {
         mcpResponseText = JSON.stringify(result);
       }
+
+      // === COMPLETE MCP DEBUG TRACING — RESPONSE ===
+      if (isPureMcpMode) {
+        console.error(`\n${"=".repeat(80)}`);
+        console.error(`>>> MCP RESPONSE FROM ORCHESTRATOR (took ${mcpCallDuration}ms)`);
+        console.error(`>>> RAW RESULT OBJECT:`);
+        console.error(JSON.stringify(result, null, 2));
+        console.error(`\n>>> EXTRACTED TEXT (first 5000 chars):`);
+        console.error(mcpResponseText.substring(0, 5000));
+        if (mcpResponseText.length > 5000) {
+          console.error(`... [truncated, total length: ${mcpResponseText.length} chars]`);
+        }
+        console.error(`${"=".repeat(80)}\n`);
+      }
+
       // Only return if the response contains actual vote data (PROPOSAL blocks).
       // Generic orchestration ACKs like "Tool orchestrate-task executed..." have no votes.
       if (/PROPOSAL:\s*\d+/i.test(mcpResponseText)) {
         frameworkLogger.log("inference-cycle", "using-mcp-orchestrator-path", "info", { agentName });
-        console.error(`>>> USING MCP PATH (orchestrator/orchestrate-task) for ${agentName}`);
+        console.error(`>>> USING MCP PATH (orchestrator/orchestrate-task) for ${agentName} — VALID PROPOSAL BLOCKS FOUND`);
         return mcpResponseText;
       }
+
       frameworkLogger.log("inference-cycle", "mcp-no-votes", "info", {
         agentName,
         responsePreview: mcpResponseText.substring(0, 200),
       });
+
+      if (isPureMcpMode) {
+        console.error(`>>> MCP RESULT: No PROPOSAL: blocks detected in orchestrator response`);
+      }
     } catch (mcpError) {
       frameworkLogger.log("inference-cycle", "mcp-invocation-failed", "info", {
         agentName,
         error: String(mcpError),
       });
+
+      if (isPureMcpMode) {
+        console.error(`\n${"=".repeat(80)}`);
+        console.error(`>>> MCP CALL FAILED for ${agentName}`);
+        console.error(`>>> ERROR: ${mcpError}`);
+        console.error(`${"=".repeat(80)}\n`);
+      }
     }
 
     if (this.agentInvoker) {
@@ -898,13 +1049,13 @@ Respond with EXACTLY one of:
     // === PURE MCP TEST MODE ===
     // Set STRRAY_FORCE_MCP_GOVERNANCE=true to run and test ONLY the MCP path.
     // This completely disables the opencode run fallback for governance deliberation.
-    // Use this to validate that the MCP (orchestrator + knowledge skills) route works in isolation.
-    if (process.env.STRRAY_FORCE_MCP_GOVERNANCE === "true") {
+    if (isPureMcpMode) {
       frameworkLogger.log("inference-cycle", "pure-mcp-mode-no-opencode-fallback", "warning", {
         agentName,
         message: "OPENCODE FALLBACK BLOCKED — pure MCP governance test mode active",
       });
       console.error(`>>> PURE MCP MODE: opencode fallback disabled for ${agentName}`);
+      console.error(`>>> RETURNING mcpResponseText (may be empty or generic ACK)`);
       return mcpResponseText || `MCP-ONLY: No usable PROPOSAL output from orchestrator for ${agentName}`;
     }
 

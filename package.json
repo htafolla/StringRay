@@ -71,6 +71,8 @@
     "test:full-suite": "npm run typecheck && npm run test:integration-all && npm run test:performance-all && npm run test:agents-all && npm run test:infrastructure && npm run test:root",
     "postinstall": "node scripts/node/postinstall.cjs",
     "setup-dev": "node scripts/node/setup-dev.cjs",
+    "debug:inference": "node dist/cli/index.js inference:debug",
+    "debug:inference:force": "STRRAY_FORCE_MCP_GOVERNANCE=true STRRAY_DEV_PATH=dist node dist/cli/index.js inference:run --force",
     "prepare-consumer": "node scripts/node/prepare-consumer.cjs",
     "typecheck": "tsc --noEmit",
     "lint": "eslint -c tests/config/eslint.config.js src",

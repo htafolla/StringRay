@@ -6,7 +6,7 @@ import { DeployVerifier, DeployVerificationResult } from "./deploy-verifier.js";
 import { VotingCoordinator } from "../delegation/voting-coordinator.js";
 import { StringRayStateManager } from "../state/state-manager.js";
 import { frameworkLogger } from "../core/framework-logger.js";
-import { getGovernanceIntegration, type GovernanceVoteResult } from "../integrations/governance/index.js";
+import { getGovernanceIntegration, type GovernanceVoteResult, type SolarGovernanceVoteResult } from "../integrations/governance/index.js";
 import { getAgentSpawn } from "../core/features-config.js";
 import { agentSpawnGovernor } from "../orchestrator/agent-spawn-governor.js";
 import { spawnGate } from "../core/opencode-spawn-gate.js";
@@ -104,6 +104,7 @@ export class InferenceCycle {
   private opencodeAvailable: boolean | null = null;
   private agentInvoker: AgentInvoker | null;
   private options: InferenceCycleOptions;
+  private lastRawOpencodeOutput: string = "";
 
   constructor(projectRoot?: string, agentInvoker?: AgentInvoker, options?: InferenceCycleOptions) {
     this.projectRoot = projectRoot || process.cwd();
@@ -655,35 +656,67 @@ Respond with EXACTLY one of:
     const sessionId = `inference-governance-${Date.now()}`;
     const results: InferenceCycleResult["votes"] = [];
 
+    const allGovernanceAgents = new Set<string>();
+    for (const agents of Object.values(GOVERNANCE_AGENTS)) {
+      for (const a of agents) allGovernanceAgents.add(a);
+    }
+
     const todoPrompt = [
-      `Vote on ${proposals.length} inference proposals. Output EXACTLY one PROPOSAL block per proposal.`,
+      `You are the architect agent governing ${proposals.length} inference proposals.`,
+      `You must vote on each proposal AND create tasks for the relevant governance sub-agents to vote as well.`,
       ``,
-      `FORMAT (exact, no extra text, no markdown):`,
+      `GOVERNANCE AGENTS BY PROPOSAL TYPE:`,
+      ...Object.entries(GOVERNANCE_AGENTS).map(([type, agents]) => `  ${type}: ${agents.join(", ")}`),
+      ``,
+      `For each proposal, create a task for each relevant sub-agent (based on its type) asking them to vote.`,
+      `Then cast your own architect vote.`,
+      ``,
+      `OUTPUT FORMAT (exact, no extra text, no markdown):`,
+      `One PROPOSAL block per agent per proposal. Each block starts with PROPOSAL: <number>.`,
+      ``,
       `PROPOSAL: <number>`,
-      `  AGENT: architect`,
+      `  AGENT: <agent-name>`,
       `  DECISION: approve|reject|abstain`,
       `  CONFIDENCE: 0.XX`,
       `  REASONING: <brief reason>`,
       ``,
-      `Example:`,
+      `Example for a [fix] type proposal with agents [architect, code-reviewer, refactorer, researcher]:`,
       `PROPOSAL: 1`,
       `  AGENT: architect`,
       `  DECISION: approve`,
       `  CONFIDENCE: 0.85`,
-      `  REASONING: Cleanup reduces maintenance burden`,
+      `  REASONING: Low-risk bug fix improves stability`,
+      `PROPOSAL: 1`,
+      `  AGENT: code-reviewer`,
+      `  DECISION: approve`,
+      `  CONFIDENCE: 0.80`,
+      `  REASONING: Code change is clean and well-scoped`,
+      `PROPOSAL: 1`,
+      `  AGENT: refactorer`,
+      `  DECISION: approve`,
+      `  CONFIDENCE: 0.75`,
+      `  REASONING: Minor refactoring reduces tech debt`,
+      `PROPOSAL: 1`,
+      `  AGENT: researcher`,
+      `  DECISION: approve`,
+      `  CONFIDENCE: 0.70`,
+      `  REASONING: Pattern confirmed across codebase`,
       ``,
       `PROPOSALS:`,
     ];
 
     for (let i = 0; i < proposals.length; i++) {
       const p = proposals[i]!;
-      todoPrompt.push(`${i + 1}. [${p.type}] "${p.title}"`);
+      const agents = GOVERNANCE_AGENTS[p.type] ?? ["code-reviewer"];
+      todoPrompt.push(`${i + 1}. [${p.type}] "${p.title}" — agents: architect, ${agents.join(", ")}`);
     }
 
     try {
+      this.lastRawOpencodeOutput = "";
       const jsonOutput = await this.invokeAgentInternal("architect", todoPrompt.join("\n"));
 
-      const allVotes = this.parseSubagentVotes(jsonOutput, proposals);
+      const rawForParsing = this.lastRawOpencodeOutput || jsonOutput;
+      const allVotes = this.parseSubagentVotes(rawForParsing, proposals);
 
       for (const proposal of proposals) {
         const agents = GOVERNANCE_AGENTS[proposal.type] ?? ["code-reviewer"];
@@ -813,16 +846,27 @@ Respond with EXACTLY one of:
       );
 
       const votes: InferenceCycleResult["votes"] = batchResult.results.map(
-        (result: GovernanceVoteResult) => ({
-          proposalId: result.governanceResponse.proposalId,
-          decision: result.vote.toLowerCase() === "yes" ? "approve" : "reject",
-          confidence: result.governanceResponse.confidence,
-          details: [
+        (result: GovernanceVoteResult) => {
+          const details = [
             `Governance: ${result.governanceResponse.recommendation}`,
             `Isotope: ${result.governanceResponse.governanceIsotopeId}`,
             ...result.governanceResponse.reasons.slice(0, 2),
-          ],
-        }),
+          ];
+
+          const solarResult = result as SolarGovernanceVoteResult;
+          if (solarResult.solarModulation) {
+            details.push(
+              `Solar modulation: ${solarResult.solarModulation.activityLevel} (gain: ${solarResult.solarModulation.gainMultiplier}x)`,
+            );
+          }
+
+          return {
+            proposalId: result.governanceResponse.proposalId,
+            decision: result.vote.toLowerCase() === "yes" ? "approve" : "reject",
+            confidence: result.governanceResponse.confidence,
+            details,
+          };
+        },
       );
 
       frameworkLogger.log("inference-cycle", "external-governance-complete", "info", {
@@ -990,6 +1034,7 @@ Respond with EXACTLY one of:
             await agentSpawnGovernor.completeSpawn(trackingId, true).catch(() => {});
           }
           frameworkLogger.log("inference-cycle", "opencode-spawn-success", "info", { agentName, trackingId });
+          this.lastRawOpencodeOutput = stdout.trim();
           const textResponse = this.extractTextFromNdjson(stdout.trim());
           if (textResponse) {
             resolve(textResponse);

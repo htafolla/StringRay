@@ -6,7 +6,7 @@ import { DeployVerifier, DeployVerificationResult } from "./deploy-verifier.js";
 import { VotingCoordinator } from "../delegation/voting-coordinator.js";
 import { StringRayStateManager } from "../state/state-manager.js";
 import { frameworkLogger } from "../core/framework-logger.js";
-import { getGovernanceIntegration, type GovernanceVoteResult } from "../integrations/governance/index.js";
+import { getGovernanceIntegration, type GovernanceVoteResult, type SolarGovernanceVoteResult } from "../integrations/governance/index.js";
 import { getAgentSpawn } from "../core/features-config.js";
 import { agentSpawnGovernor } from "../orchestrator/agent-spawn-governor.js";
 import { spawnGate } from "../core/opencode-spawn-gate.js";
@@ -846,16 +846,27 @@ Respond with EXACTLY one of:
       );
 
       const votes: InferenceCycleResult["votes"] = batchResult.results.map(
-        (result: GovernanceVoteResult) => ({
-          proposalId: result.governanceResponse.proposalId,
-          decision: result.vote.toLowerCase() === "yes" ? "approve" : "reject",
-          confidence: result.governanceResponse.confidence,
-          details: [
+        (result: GovernanceVoteResult) => {
+          const details = [
             `Governance: ${result.governanceResponse.recommendation}`,
             `Isotope: ${result.governanceResponse.governanceIsotopeId}`,
             ...result.governanceResponse.reasons.slice(0, 2),
-          ],
-        }),
+          ];
+
+          const solarResult = result as SolarGovernanceVoteResult;
+          if (solarResult.solarModulation) {
+            details.push(
+              `Solar modulation: ${solarResult.solarModulation.activityLevel} (gain: ${solarResult.solarModulation.gainMultiplier}x)`,
+            );
+          }
+
+          return {
+            proposalId: result.governanceResponse.proposalId,
+            decision: result.vote.toLowerCase() === "yes" ? "approve" : "reject",
+            confidence: result.governanceResponse.confidence,
+            details,
+          };
+        },
       );
 
       frameworkLogger.log("inference-cycle", "external-governance-complete", "info", {

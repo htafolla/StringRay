@@ -851,6 +851,8 @@ Respond with EXACTLY one of:
       promptLength: prompt.length,
     });
 
+    let mcpResponseText: string | undefined;
+
     try {
       const { mcpClientManager } = await import("../mcps/mcp-client.js");
       const result = await mcpClientManager.callServerTool("orchestrator", "orchestrate-task", {
@@ -864,20 +866,22 @@ Respond with EXACTLY one of:
         executionMode: "sequential",
       });
       const content = (result as { content?: Array<{ text?: string }> }).content;
-      let responseText = "";
+      mcpResponseText = "";
       if (content && Array.isArray(content)) {
-        responseText = content.map((c: { text?: string }) => c.text ?? "").join("");
+        mcpResponseText = content.map((c: { text?: string }) => c.text ?? "").join("");
       } else {
-        responseText = JSON.stringify(result);
+        mcpResponseText = JSON.stringify(result);
       }
       // Only return if the response contains actual vote data (PROPOSAL blocks).
       // Generic orchestration ACKs like "Tool orchestrate-task executed..." have no votes.
-      if (/PROPOSAL:\s*\d+/i.test(responseText)) {
-        return responseText;
+      if (/PROPOSAL:\s*\d+/i.test(mcpResponseText)) {
+        frameworkLogger.log("inference-cycle", "using-mcp-orchestrator-path", "info", { agentName });
+        console.error(`>>> USING MCP PATH (orchestrator/orchestrate-task) for ${agentName}`);
+        return mcpResponseText;
       }
       frameworkLogger.log("inference-cycle", "mcp-no-votes", "info", {
         agentName,
-        responsePreview: responseText.substring(0, 200),
+        responsePreview: mcpResponseText.substring(0, 200),
       });
     } catch (mcpError) {
       frameworkLogger.log("inference-cycle", "mcp-invocation-failed", "info", {
@@ -891,10 +895,24 @@ Respond with EXACTLY one of:
       return this.agentInvoker(agentName, prompt);
     }
 
+    // === PURE MCP TEST MODE ===
+    // Set STRRAY_FORCE_MCP_GOVERNANCE=true to run and test ONLY the MCP path.
+    // This completely disables the opencode run fallback for governance deliberation.
+    // Use this to validate that the MCP (orchestrator + knowledge skills) route works in isolation.
+    if (process.env.STRRAY_FORCE_MCP_GOVERNANCE === "true") {
+      frameworkLogger.log("inference-cycle", "pure-mcp-mode-no-opencode-fallback", "warning", {
+        agentName,
+        message: "OPENCODE FALLBACK BLOCKED — pure MCP governance test mode active",
+      });
+      console.error(`>>> PURE MCP MODE: opencode fallback disabled for ${agentName}`);
+      return mcpResponseText || `MCP-ONLY: No usable PROPOSAL output from orchestrator for ${agentName}`;
+    }
+
     return this.invokeViaOpencode(agentName, prompt);
   }
 
   private async invokeViaOpencode(agentName: string, prompt: string): Promise<string> {
+    console.error(`>>> USING LEGACY OPENCODE FALLBACK (opencode run --agent ${agentName})`);
     // GATE: Centralized spawn gate — blocks all opencode spawning by default
     spawnGate.assertAllowed("inference-cycle");
 

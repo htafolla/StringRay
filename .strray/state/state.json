@@ -1,0 +1,17 @@
+{
+  "votingHistory": [],
+  "metrics": {
+    "totalVotes": 0,
+    "successfulVotes": 0,
+    "failedVotes": 0,
+    "averageConfidence": 0,
+    "strategyUsage": {
+      "majority_vote": 0,
+      "consensus": 0,
+      "expert_priority": 0
+    },
+    "agentParticipation": {},
+    "averageVoterTurnout": 0
+  },
+  "exportedAt": "2026-05-15T11:20:11.148Z"
+}

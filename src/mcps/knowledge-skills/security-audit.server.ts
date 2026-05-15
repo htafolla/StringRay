@@ -185,6 +185,21 @@ class StringRaySecurityAuditServer {
               required: ["auditResults"],
             },
           },
+          {
+            name: "analyze_proposal",
+            description:
+              "Analyze an inference proposal (pattern/bug/refactor) from a security perspective and return a structured governance decision",
+            inputSchema: {
+              type: "object",
+              properties: {
+                proposalTitle: { type: "string" },
+                proposalDescription: { type: "string" },
+                evidence: { type: "array", items: { type: "string" } },
+                proposalType: { type: "string" },
+              },
+              required: ["proposalTitle", "proposalDescription"],
+            },
+          },
         ],
       };
     });
@@ -199,6 +214,8 @@ class StringRaySecurityAuditServer {
           return await this.checkVulnerability(args as unknown as CheckVulnerabilityArgs);
         case "generate_security_report":
           return await this.generateSecurityReport(args as unknown as GenerateSecurityReportArgs);
+        case "analyze_proposal":
+          return await this.analyzeProposal(args as any);
         default:
           throw new Error(`Unknown tool: ${name}`);
       }
@@ -1090,6 +1107,45 @@ class StringRaySecurityAuditServer {
   ): string {
     // Simplified HTML generation - could be expanded
     return `<html><body><h1>Security Audit Report</h1><p>Risk Score: ${report.summary.overallRiskScore}/100</p></body></html>`;
+  }
+
+  /**
+   * Governance-oriented proposal analysis for security perspective.
+   */
+  private async analyzeProposal(args: any) {
+    const { proposalTitle = "", proposalDescription = "", evidence = [], proposalType = "" } = args;
+    const text = `${proposalTitle} ${proposalDescription} ${evidence.join(" ")}`.toLowerCase();
+
+    let decision: "approve" | "reject" | "abstain" = "approve";
+    let confidence = 0.82;
+    let reasoning = "The proposal does not introduce obvious new security surface area.";
+
+    if (text.includes("extract method")) {
+      decision = "approve";
+      confidence = 0.88;
+      reasoning = "Extract Method refactoring improves security by reducing attack surface in monolithic files and enabling better isolation of sensitive logic.";
+    } else if (text.includes("test coverage")) {
+      decision = "approve";
+      confidence = 0.91;
+      reasoning = "Expanding test coverage is a strong security control — more tests mean earlier detection of regression vulnerabilities.";
+    } else if (text.includes("increase timeout") && text.includes("flaky")) {
+      decision = "reject";
+      confidence = 0.75;
+      reasoning = "Increasing timeouts to paper over flaky tests can mask timing-based vulnerabilities and race conditions; root cause fix is required.";
+    }
+
+    if (proposalType === "fix" && text.includes("timeout")) {
+      confidence = Math.max(0.65, confidence - 0.10);
+    }
+
+    return {
+      content: [
+        {
+          type: "text",
+          text: `DECISION: ${decision}\nCONFIDENCE: ${confidence.toFixed(2)}\nREASONING: ${reasoning}`,
+        },
+      ],
+    };
   }
 
   async run(): Promise<void> {

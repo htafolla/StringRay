@@ -26,7 +26,7 @@ import {
   GovernanceRequest,
   GovernanceResponse,
 } from './governance-types';
-import { applyDecisionMatrix, mergeVotes } from './governance-core';
+import { applyDecisionMatrix, mergeVotes } from './governance-core.js';
 import { frameworkLogger } from '../core/framework-logger.js';
 
 export class GovernanceService {

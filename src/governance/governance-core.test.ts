@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { applyDecisionMatrix, mergeVotes } from './governance-core';
-import type { GovernanceVote } from './governance-types';
+import { applyDecisionMatrix, mergeVotes } from './governance-core.js';
+import type { GovernanceVote } from './governance-types.js';
 
 describe('governance-core', () => {
   describe('applyDecisionMatrix', () => {

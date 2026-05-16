@@ -153,6 +153,11 @@ describe('POST / — JSON-RPC tools/list', () => {
 
 describe('POST / — JSON-RPC tools/call govern_proposals', () => {
   it('governs proposals with PHI/TAU matrix', async () => {
+    // Use in-process skill execution so the test doesn't require real MCP child processes
+    const originalVercel = process.env.VERCEL;
+    process.env.VERCEL = '1';
+
+    try {
     const res = await post('/', {
       jsonrpc: '2.0',
       id: 4,
@@ -164,6 +169,9 @@ describe('POST / — JSON-RPC tools/call govern_proposals', () => {
             { type: 'fix', title: 'Fix auth bug', description: 'Token validation is broken' },
             { type: 'refactor', title: 'Clean up utils', description: 'Reduce duplication in utility functions' },
           ],
+          options: {
+            require_external: false, // Test does not require live Dynamo integration
+          },
         },
       },
     })
@@ -179,6 +187,9 @@ describe('POST / — JSON-RPC tools/call govern_proposals', () => {
     expect(text.results[0].finalDecision).toMatch(/approve|reject|needs_revision/)
     expect(typeof text.results[0].averageConfidence).toBe('number')
     expect(text.overallDecision).toBeDefined()
+    } finally {
+      process.env.VERCEL = originalVercel;
+    }
   })
 })
 

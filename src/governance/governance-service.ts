@@ -162,63 +162,60 @@ export class GovernanceService {
     const results: GovernanceVote[][] = [];
     const integration = this.integration;
 
-    const useIntegration = integration?.isAvailable?.() === true;
+    const integrationAvailable = integration?.isAvailable?.() === true;
 
+    if (!integrationAvailable) {
+      const message =
+        'External Dynamo/Solar governance is required but InferenceGovernanceIntegration is not available or not initialized. ' +
+        'Call initializeGovernanceIntegration() before using GovernanceService with external governance.';
+
+      frameworkLogger.log('governance-service', 'external-dynamo-unavailable', 'error', {
+        requireExternal,
+        message,
+      });
+
+      if (requireExternal) {
+        throw new Error(message);
+      }
+
+      // If external is not strictly required, return abstain votes
+      for (const proposal of proposals) {
+        results.push([{
+          server: 'external-dynamo',
+          decision: 'abstain',
+          confidence: 0.2,
+          reasoning: 'InferenceGovernanceIntegration not available',
+        }]);
+      }
+      return results;
+    }
+
+    // Integration is available — use it exclusively (no fallback)
     for (const proposal of proposals) {
       try {
-        let vote: GovernanceVote;
+        const inferenceProposal: InferenceProposal = {
+          id: proposal.id,
+          type: proposal.type as any,
+          title: proposal.title,
+          description: proposal.description,
+          evidence: proposal.evidence || [],
+          confidence: proposal.confidence || 0.8,
+          source: 'recurring_pattern',
+          status: 'pending',
+        };
 
-        if (useIntegration) {
-          // Preferred path: Use the managed InferenceGovernanceIntegration
-          // (respects features.json, has lifecycle, retries, proper config)
-          const inferenceProposal: InferenceProposal = {
-            id: proposal.id,
-            type: proposal.type as any,
-            title: proposal.title,
-            description: proposal.description,
-            evidence: proposal.evidence || [],
-            confidence: proposal.confidence || 0.8,
-            source: 'recurring_pattern', // closest match in InferenceProposal source type
-            status: 'pending',
-          };
+        const result = await integration!.checkProposal(inferenceProposal);
 
-          const result = await integration!.checkProposal(inferenceProposal);
-
-          vote = {
-            server: 'external-dynamo',
-            decision: result.vote === 'YES' ? 'approve' : result.vote === 'NO' ? 'reject' : 'needs_revision',
-            confidence: result.governanceResponse?.confidence ?? 0.85,
-            reasoning: result.reason || 'External solar-modulated governance decision',
-            weight: 1.1,
-          };
-        } else {
-          // Fallback: direct client (less ideal, but keeps "Dynamo required" behavior working)
-          // Note: This path has fewer guarantees (no feature flag enforcement from integration)
-          const { GovernanceClient } = await import('../integrations/governance/governance-client.js');
-          const client = new GovernanceClient(); // still uses default config for now
-
-          const proposalText = `${proposal.title}\n\n${proposal.description}\n\nEvidence: ${(proposal.evidence || []).join('; ')}`;
-          const external = await client.governWithSolar({
-            proposal: proposalText,
-            baseVoteWeight: proposal.confidence || 0.8,
-          });
-
-          const decision = (external.finalRecommendation || external.originalRecommendation || 'NEEDS_REVISION').toLowerCase();
-          const conf = 0.85 + (external.confidenceAdjustment || 0);
-
-          vote = {
-            server: 'external-dynamo',
-            decision: decision.includes('pass') || decision === 'approve' ? 'approve' : 'needs_revision',
-            confidence: Math.min(0.99, Math.max(0.6, conf)),
-            reasoning: `Solar-adjusted governance (${(external.solarContext as any)?.activityLevel || 'unknown'} solar)`,
-            weight: external.adjustedVoteWeight || 1.0,
-          };
-        }
-
-        results.push([vote]);
+        results.push([{
+          server: 'external-dynamo',
+          decision: result.vote === 'YES' ? 'approve' : result.vote === 'NO' ? 'reject' : 'needs_revision',
+          confidence: result.governanceResponse?.confidence ?? 0.85,
+          reasoning: result.reason || 'External solar-modulated governance decision via InferenceGovernanceIntegration',
+          weight: 1.1,
+        }]);
       } catch (error) {
         const msg = error instanceof Error ? error.message : String(error);
-        frameworkLogger.log('governance-service', 'external-dynamo-error', 'error', { error: msg, usedIntegration: useIntegration });
+        frameworkLogger.log('governance-service', 'external-dynamo-error', 'error', { error: msg });
 
         if (requireExternal) {
           throw new Error(`External Dynamo governance is required but failed: ${msg}`);
@@ -228,7 +225,7 @@ export class GovernanceService {
           server: 'external-dynamo',
           decision: 'abstain',
           confidence: 0.3,
-          reasoning: `External governance unavailable: ${msg}`,
+          reasoning: `External governance call failed: ${msg}`,
         }]);
       }
     }

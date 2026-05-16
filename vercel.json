@@ -3,9 +3,17 @@
     {
       "src": "api/mcp.ts",
       "use": "@vercel/node"
+    },
+    {
+      "src": "api/health.ts",
+      "use": "@vercel/node"
     }
   ],
   "routes": [
+    {
+      "src": "/health",
+      "dest": "api/health.ts"
+    },
     {
       "src": "/(.*)",
       "dest": "api/mcp.ts"

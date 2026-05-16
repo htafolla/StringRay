@@ -1,5 +1,6 @@
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
+import crypto from 'node:crypto'
 
 // ---- Constants & Types ----
 const PHI = 1.666
@@ -28,6 +29,22 @@ interface Proposal {
   confidence?: number
 }
 
+interface Session {
+  id: string
+  createdAt: number
+  clientInfo?: Record<string, unknown>
+}
+
+// ---- Session Registry ----
+const sessions = new Map<string, Session>()
+
+function createSession(clientInfo?: Record<string, unknown>): Session {
+  const id = crypto.randomUUID()
+  const session: Session = { id, createdAt: Date.now(), clientInfo }
+  sessions.set(id, session)
+  return session
+}
+
 // ---- Tool Definitions ----
 const TOOLS: ToolDefinition[] = [
   {
@@ -54,6 +71,20 @@ const TOOLS: ToolDefinition[] = [
             required: ['type', 'title', 'description'],
           },
         },
+        context: {
+          type: 'object',
+          description: 'Optional context (project, phase, etc.)',
+        },
+        options: {
+          type: 'object',
+          properties: {
+            require_external: {
+              type: 'boolean',
+              default: true,
+              description: 'Whether external Dynamo/Solar governance is required (default: true)',
+            },
+          },
+        },
       },
       required: ['proposals'],
     },
@@ -72,6 +103,11 @@ const TOOLS: ToolDefinition[] = [
   {
     name: 'govern_health',
     description: 'Health check for the governance MCP server.',
+    inputSchema: { type: 'object', properties: {} },
+  },
+  {
+    name: 'govern_sessions',
+    description: 'List active governance sessions.',
     inputSchema: { type: 'object', properties: {} },
   },
 ]
@@ -154,6 +190,7 @@ app.get('/', (c) => {
     description: '0xRay Governance MCP Server — Streamable HTTP (MCP 2024-11-05)',
     endpoints: {
       'GET /': 'Server info',
+      'GET /docs': 'Server info (alias)',
       'GET /health': 'Health check',
       'GET /tools': 'List available MCP tools',
       'POST /': 'JSON-RPC endpoint for MCP Streamable HTTP transport',
@@ -161,12 +198,38 @@ app.get('/', (c) => {
   })
 })
 
+app.get('/docs', (c) => {
+  return c.json({
+    name: 'governance',
+    version: '1.0.0',
+    protocol: 'Streamable HTTP (MCP 2024-11-05)',
+    description: '0xRay Governance MCP Server — orchestrates code-review, security-audit, ' +
+      'and researcher skill servers plus external Dynamo/Solar governance for ' +
+      'comprehensive proposal governance.',
+    endpoints: {
+      'GET /': 'Server info and documentation',
+      'GET /docs': 'This documentation',
+      'GET /health': 'Health check',
+      'GET /tools': 'List available MCP tools',
+      'POST /': 'JSON-RPC endpoint for MCP Streamable HTTP transport',
+    },
+    tools: TOOLS.map(t => ({
+      name: t.name,
+      description: t.description,
+      input: t.inputSchema.properties ? Object.fromEntries(
+        Object.entries(t.inputSchema.properties).map(([k, v]) => [k, (v as { type?: string; description?: string }).type || 'object']),
+      ) : {},
+    })),
+    sessionCount: sessions.size,
+  })
+})
+
 app.get('/health', (c) => {
-  return c.json({ status: 'ok', time: Date.now() })
+  return c.json({ status: 'ok', time: Date.now(), sessions: sessions.size })
 })
 
 app.get('/tools', (c) => {
-  return c.json({ tools: TOOLS })
+  return c.json({ tools: TOOLS, count: TOOLS.length })
 })
 
 // ---- POST / — JSON-RPC Handler ----
@@ -182,7 +245,9 @@ app.post('/', async (c) => {
     }
 
     switch (message.method) {
-      case 'initialize':
+      case 'initialize': {
+        const clientInfo = message.params?.clientInfo
+        const session = createSession(clientInfo)
         return c.json({
           jsonrpc: '2.0',
           id: reqId,
@@ -190,8 +255,10 @@ app.post('/', async (c) => {
             protocolVersion: '2024-11-05',
             capabilities: { tools: {} },
             serverInfo: { name: 'governance', version: '1.0.0' },
+            _session: { id: session.id },
           },
         })
+      }
 
       case 'ping':
         return c.json({ jsonrpc: '2.0', id: reqId, result: {} })
@@ -245,7 +312,26 @@ app.post('/', async (c) => {
             result: {
               content: [{
                 type: 'text',
-                text: JSON.stringify({ status: 'ok', time: Date.now() }),
+                text: JSON.stringify({ status: 'ok', time: Date.now(), sessions: sessions.size }),
+              }],
+            },
+          })
+        }
+
+        if (toolName === 'govern_sessions') {
+          return c.json({
+            jsonrpc: '2.0',
+            id: reqId,
+            result: {
+              content: [{
+                type: 'text',
+                text: JSON.stringify({
+                  count: sessions.size,
+                  sessions: Array.from(sessions.values()).map(s => ({
+                    id: s.id,
+                    createdAt: s.createdAt,
+                  })),
+                }, null, 2),
               }],
             },
           })

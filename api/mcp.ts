@@ -168,6 +168,14 @@ async function handleMCPMessage(_sessionId: string, msg: any): Promise<any> {
             options: { requireExternalDynamo: true },
           }
 
+          // Ensure Dynamo Solar SSOT integration is initialized (important for serverless cold starts)
+          const { initializeGovernanceIntegration } = await import('./src/integrations/governance/index.js')
+          try {
+            await initializeGovernanceIntegration()
+          } catch {
+            // If Dynamo is unreachable, GovernanceService will handle it based on requireExternalDynamo
+          }
+
           // Use the shared GovernanceService (supports in-process on Vercel)
           const service = getGovernanceService()
           const response = await service.govern(request)

@@ -1,17 +1,19 @@
 /**
  * GovernanceService
  *
- * The central orchestrator for 0xRay governance.
- * It coordinates:
- *   - The three real skill MCP servers (via MCPClientManager)
- *   - The required external Dynamo/Solar governance
- *   - Merging logic from governance-core
+ * Central orchestrator for governance.
  *
- * This service is used by:
- *   - governance.server.ts (MCP exposure)
- *   - OpenClaw API server
- *   - Future integrations (Hermes, etc.)
- *   - Reflection governance flows
+ * Architecture:
+ *   - Internal Layer: 3 real skill MCPs (code-review, security-audit, researcher)
+ *     → Internal deliberation based on knowledge and code patterns.
+ *
+ *   - External Filter: Dynamo Solar SSOT
+ *     → Single Source of Truth governance signal based on sunlight physics,
+ *       a neural net, and temporal first principles. This is a required check.
+ *
+ *   - Merge Layer: governance-core.ts (weighted voting + PHI/TAU matrix)
+ *
+ * Dynamo Solar SSOT is treated as a mandatory external filter (not optional, not a fallback).
  */
 
 import { mcpClientManager } from '../mcps/mcp-client.js';
@@ -42,7 +44,14 @@ export class GovernanceService {
   }
 
   /**
-   * Main entry point: Govern a set of proposals using real skill servers + required external.
+   * Main entry point: Govern a set of proposals.
+   *
+   * Flow:
+   *   1. Internal deliberation → 3 real skill MCPs (code-review, security-audit, researcher)
+   *   2. External filter       → Dynamo Solar SSOT (via InferenceGovernanceIntegration)
+   *   3. Merge                 → governance-core.ts (weighted + PHI/TAU logic)
+   *
+   * Dynamo Solar SSOT is treated as a hard requirement by default.
    */
   async govern(request: GovernanceRequest): Promise<GovernanceResponse> {
     const { proposals, context, options } = request;
@@ -51,7 +60,21 @@ export class GovernanceService {
     frameworkLogger.log('governance-service', 'govern-start', 'info', {
       proposalCount: proposals.length,
       context,
+      requireExternalDynamo: requireExternal,
     });
+
+    // Early validation: Dynamo Solar SSOT is a hard requirement
+    if (requireExternal) {
+      const integration = this.integration;
+      if (!integration?.isAvailable?.()) {
+        const message =
+          'Dynamo Solar SSOT is required but InferenceGovernanceIntegration is not available. ' +
+          'Call initializeGovernanceIntegration() early in application startup.';
+
+        frameworkLogger.log('governance-service', 'dynamo-solar-ssot-unavailable', 'error', { message });
+        throw new Error(message);
+      }
+    }
 
     // 1. Call the three real skill MCPs (one call per server, returns array of votes, one per proposal)
     const [codeReviewVotes, securityVotes, researcherVotes] = await Promise.all([
@@ -166,10 +189,10 @@ export class GovernanceService {
 
     if (!integrationAvailable) {
       const message =
-        'External Dynamo/Solar governance is required but InferenceGovernanceIntegration is not available or not initialized. ' +
-        'Call initializeGovernanceIntegration() before using GovernanceService with external governance.';
+        'Dynamo Solar SSOT is required but InferenceGovernanceIntegration is not available or not initialized. ' +
+        'Call initializeGovernanceIntegration() early during application bootstrap.';
 
-      frameworkLogger.log('governance-service', 'external-dynamo-unavailable', 'error', {
+      frameworkLogger.log('governance-service', 'dynamo-solar-ssot-unavailable', 'error', {
         requireExternal,
         message,
       });
@@ -210,7 +233,7 @@ export class GovernanceService {
           server: 'external-dynamo',
           decision: result.vote === 'YES' ? 'approve' : result.vote === 'NO' ? 'reject' : 'needs_revision',
           confidence: result.governanceResponse?.confidence ?? 0.85,
-          reasoning: result.reason || 'External solar-modulated governance decision via InferenceGovernanceIntegration',
+          reasoning: result.reason || 'Dynamo Solar SSOT filter decision',
           weight: 1.1,
         }]);
       } catch (error) {

@@ -3,13 +3,13 @@
  *
  * First-class Governance Service that orchestrates the real individual
  * skill MCP servers (code-review, security-audit, researcher) plus the
- * required external Dynamo/Solar governance.
+ * required Dynamo Solar SSOT filter.
  *
  * This is the primary governance entry point for all integrations
  * (Hermes, OpenCode, OpenClaw, Grok CLI, Jelly, CI/CD).
  *
  * It always runs proposals through the three real skill servers
- * and the external Dynamo governance (Dynamo is required).
+ * and the Dynamo Solar SSOT filter (required by default).
  */
 
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
@@ -116,8 +116,8 @@ class GovernanceServer {
             name: "govern_proposals",
             description:
               "Run one or more proposals through the full 0xRay governance system. " +
-              "Always consults the three real skill MCP servers (code-review, security-audit, researcher) " +
-              "and the required external Dynamo/Solar governance. Returns merged structured decisions. " +
+              "Internal deliberation via 3 skill MCPs + required Dynamo Solar SSOT filter. " +
+              "Returns merged structured decisions. " +
               "Supports regulatory compliance proposals: AML/KYC, PSD2, GDPR content moderation, " +
               "and other compliance-related governance scenarios.",
             inputSchema: {

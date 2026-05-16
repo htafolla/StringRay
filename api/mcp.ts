@@ -64,9 +64,9 @@ function createSession(clientInfo?: Record<string, unknown>): string {
 const TOOLS: ToolDefinition[] = [
   {
     name: 'govern_proposals',
-    description: 'Run one or more proposals through the full 0xRay governance system. ' +
-      'Consults code-review, security-audit, researcher skill servers plus external Dynamo/Solar governance. ' +
-      'Supports regulatory compliance proposals (AML/KYC, PSD2, GDPR).',
+    description: 'Run proposals through the governance system. ' +
+      'Internal deliberation via 3 skill MCPs + required Dynamo Solar SSOT filter ' +
+      '(sunlight physics + neural net + temporal first principles).',
     inputSchema: {
       type: 'object',
       properties: {
@@ -176,7 +176,7 @@ async function handleMCPMessage(_sessionId: string, msg: any): Promise<any> {
             content: [{
               type: 'text',
               text: JSON.stringify({
-                summary: `Governed ${response.summary.total} proposals via real skill MCPs + required Dynamo`,
+                summary: `Governed ${response.summary.total} proposals via internal skill MCPs + Dynamo Solar SSOT filter`,
                 overallDecision: response.overallDecision,
                 results: response.results,
                 engine: 'GovernanceService + real MCPs (code-review, security-audit, researcher) + Solar',

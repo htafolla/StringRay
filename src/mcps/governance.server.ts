@@ -28,6 +28,8 @@ import * as path from "path";
 import { createGracefulShutdown } from "../utils/shutdown-handler.js";
 import type { InferenceProposal } from "../inference/inference-cycle.js";
 import { callInProcessSkill } from "./in-process-skill-registry.js";
+import { getGovernanceService } from "../governance/governance-service.js";
+import type { GovernanceRequest } from "../governance/governance-types.js";
 
 interface GovernanceProposalInput {
   id?: string;
@@ -240,74 +242,35 @@ class GovernanceServer {
   }
 
   private async handleGovernProposals(args: GovernProposalsArgs): Promise<CallToolResult> {
-    const { proposals, context, options } = args;
-    const requireExternal = options?.require_external ?? true;
+    const service = getGovernanceService();
 
-    frameworkLogger.log("governance-mcp", "proposals-received", "info", { count: proposals.length });
+    const request: GovernanceRequest = {
+      proposals: args.proposals.map((p, i) => ({
+        id: p.id || `prop-${Date.now()}-${i}`,
+        type: p.type as any,
+        title: p.title,
+        description: p.description,
+        evidence: p.evidence || [],
+        source: "manual",
+        confidence: p.confidence || 0.8,
+      })),
+      context: args.context || {},
+      options: {
+        requireExternalDynamo: args.options?.require_external ?? true,
+      },
+    };
 
-    // 1. Call the three real skill MCP servers in parallel
-    const internalPromises = [
-      this.callSkillServer("code-review", proposals, context),
-      this.callSkillServer("security-audit", proposals, context),
-      this.callSkillServer("researcher", proposals, context),
-    ];
+    frameworkLogger.log("governance-mcp", "delegating-to-governance-service", "info", {
+      proposalCount: request.proposals.length,
+    });
 
-    const [codeReviewResults, securityResults, researcherResults] = await Promise.all(internalPromises);
-
-    // 2. Always call external Dynamo/Solar governance (required, as per architecture)
-    const integration = await this.ensureGovernanceIntegration();
-    const externalResults: any[] = [];
-
-    for (let i = 0; i < proposals.length; i++) {
-      const p = proposals[i]!;
-      try {
-        const inferenceProposal: InferenceProposal = {
-          id: p.id || `proposal-${Date.now()}-${i}`,
-          type: p.type === 'strategic' || p.type === 'compliance' ? 'codify' : p.type,
-          title: p.title,
-          description: p.description,
-          evidence: p.evidence || [],
-          confidence: p.confidence || 0.8,
-          source: 'recurring_pattern',
-          status: 'pending',
-        };
-        const result = await integration.checkProposal(inferenceProposal);
-        externalResults.push({
-          proposalId: p.id || p.title,
-          decision: result.vote === 'YES' ? 'approve' : result.vote === 'NO' ? 'reject' : 'abstain',
-          confidence: result.governanceResponse?.confidence ?? p.confidence ?? 0.5,
-          reasoning: result.reason,
-        });
-      } catch (error) {
-        const errorMsg = error instanceof Error ? error.message : String(error);
-        frameworkLogger.log("governance-mcp", "external-dynamo-error", "warning", { proposal: p.title, error: errorMsg });
-        if (requireExternal) {
-          throw new Error(`External Dynamo/Solar governance is required but failed for "${p.title}": ${errorMsg}`);
-        }
-        externalResults.push({
-          proposalId: p.id || p.title,
-          decision: 'abstain',
-          confidence: 0.5,
-          reasoning: `External governance unavailable: ${errorMsg}`,
-        });
-      }
-    }
-    frameworkLogger.log("governance-mcp", "external-results", "info", { count: externalResults.length });
-
-    // 3. Merge internal + external results (simplified merging for MVP)
-    const mergedResults = this.mergeGovernanceResults(
-      proposals,
-      codeReviewResults || [],
-      securityResults || [],
-      researcherResults || [],
-      externalResults || []
-    );
+    const response = await service.govern(request);
 
     return {
       content: [
         {
           type: "text",
-          text: JSON.stringify(mergedResults, null, 2),
+          text: JSON.stringify(response, null, 2),
         },
       ],
     };

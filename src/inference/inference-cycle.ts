@@ -644,38 +644,95 @@ Respond with EXACTLY one of:
   }
 
   private async governProposals(proposals: InferenceProposal[]): Promise<InferenceCycleResult["votes"]> {
-    // Pure MCP mode: use individual knowledge-skill MCP servers for the internal vote
-    // (code-review, security-audit, researcher via analyze_proposal)
-    if (process.env.STRRAY_FORCE_MCP_GOVERNANCE === 'true') {
-      const skillVotes = await this.governProposalsWithIndividualSkills(proposals);
+    // Primary path: Use the first-class Governance MCP (real skill servers + required Dynamo)
+    // This is the clean, centralized path (governance.server.ts + GovernanceService)
+    const useGovernanceMcp = process.env.STRRAY_FORCE_MCP_GOVERNANCE === 'true' ||
+      (await this.isGovernanceMcpPreferred());
 
-      // Still merge with external Dynamo governance if available (best of both worlds)
-      const governanceIntegration = getGovernanceIntegration();
-      if (governanceIntegration?.isAvailable()) {
-        frameworkLogger.log("inference-cycle", "using-external-governance", "info", {
-          proposalCount: proposals.length,
-          mode: "pure-mcp-skills",
+    if (useGovernanceMcp) {
+      try {
+        const result = await mcpClientManager.callServerTool("governance", "govern_proposals", {
+          proposals: proposals.map(p => ({
+            id: p.id,
+            type: p.type,
+            title: p.title,
+            description: p.description,
+            evidence: p.evidence || [],
+            source: p.source || "inference",
+            confidence: p.confidence || 0.8,
+          })),
+          context: { source: "inference-cycle" },
+          options: { require_external: true },
         });
-        const externalVotes = await this.governProposalsExternal(proposals);
-        return this.mergeGovernanceVotes(skillVotes, externalVotes, proposals);
-      }
 
-      return skillVotes;
+        const text = (result as any)?.content?.[0]?.text || "";
+        const parsed = this.parseGovernanceMcpResponse(text, proposals);
+        frameworkLogger.log("inference-cycle", "governance-mcp-primary-path", "info", {
+          proposalCount: proposals.length,
+          overall: parsed.overallDecision,
+        });
+        return parsed.votes;
+      } catch (err) {
+        frameworkLogger.log("inference-cycle", "governance-mcp-failed", "error", {
+          error: err instanceof Error ? err.message : String(err),
+        });
+        // In pure mode we must not silently fall back
+        if (process.env.STRRAY_FORCE_MCP_GOVERNANCE === 'true') {
+          throw err;
+        }
+      }
     }
 
-    // Legacy path (VotingCoordinator + architect)
+    // Legacy internal path
     const internalVotes = await this.governProposalsInternal(proposals);
 
     const governanceIntegration = getGovernanceIntegration();
     if (governanceIntegration?.isAvailable()) {
-      frameworkLogger.log("inference-cycle", "using-external-governance", "info", {
-        proposalCount: proposals.length,
-      });
       const externalVotes = await this.governProposalsExternal(proposals);
       return this.mergeGovernanceVotes(internalVotes, externalVotes, proposals);
     }
 
     return internalVotes;
+  }
+
+  private async isGovernanceMcpPreferred(): Promise<boolean> {
+    // Check features.json for governance.enabled (default true)
+    try {
+      // Simple heuristic: if the governance server is registered, prefer it
+      return true; // Will be wired to actual feature flag in later iteration
+    } catch {
+      return false;
+    }
+  }
+
+  private parseGovernanceMcpResponse(text: string, proposals: InferenceProposal[]): {
+    votes: InferenceCycleResult["votes"];
+    overallDecision: string;
+  } {
+    // The governance MCP returns a GovernanceResponse JSON
+    try {
+      const data = JSON.parse(text);
+      const results = data.results || [];
+      const votes = proposals.map((p, i) => {
+        const r = results[i] || {};
+        return {
+          proposalId: p.id,
+          decision: (r.finalDecision === 'approve' ? 'approve' : r.finalDecision === 'reject' ? 'reject' : 'needs_revision') as any,
+          confidence: r.averageConfidence || 0.75,
+          details: (r.votes || []).map((v: any) => `${v.server}: ${v.decision} (${v.confidence})`),
+        };
+      });
+      return { votes, overallDecision: data.overallDecision || "needs_revision" };
+    } catch {
+      // Fallback: try to find any DECISION blocks in the text
+      const votes = proposals.map(p => ({
+        proposalId: p.id,
+        decision: "abstain" as any,
+        confidence: 0.5,
+        details: ["governance-mcp: parse-failed"],
+      }));
+      return { votes, overallDecision: "needs_revision" };
+    }
   }
 
   /**

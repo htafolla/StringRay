@@ -10,9 +10,7 @@ interface AnalyzeProposalArgs {
 }
 
 interface AnalyzeProposalResult {
-  decision: "approve" | "reject" | "abstain";
-  confidence: number;
-  reasoning: string;
+  content: Array<{ type: string; text: string }>;
 }
 
 interface InProcessSkillHandler {

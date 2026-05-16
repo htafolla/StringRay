@@ -14,6 +14,7 @@
 
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import type { Transport } from "@modelcontextprotocol/sdk/shared/transport.js";
 import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
@@ -21,15 +22,16 @@ import {
 } from "@modelcontextprotocol/sdk/types.js";
 import { mcpClientManager } from "./mcp-client.js";
 import { frameworkLogger } from "../core/framework-logger.js";
-import { InferenceGovernanceIntegration } from "../integrations/governance/index.js";
-import { GovernanceClient } from "../integrations/governance/governance-client.js";
+import { InferenceGovernanceIntegration, getGovernanceIntegration } from "../integrations/governance/index.js";
 import * as fs from "fs";
 import * as path from "path";
+import { createGracefulShutdown } from "../utils/shutdown-handler.js";
 import type { InferenceProposal } from "../inference/inference-cycle.js";
+import { callInProcessSkill } from "./in-process-skill-registry.js";
 
 interface GovernanceProposalInput {
   id?: string;
-  type: 'fix' | 'refactor' | 'guard' | 'automate' | 'codify' | 'strategic';
+  type: 'fix' | 'refactor' | 'guard' | 'automate' | 'codify' | 'strategic' | 'compliance';
   title: string;
   description: string;
   evidence?: string[];
@@ -77,19 +79,55 @@ class GovernanceServer {
 
   private async ensureGovernanceIntegration() {
     if (!this.governanceIntegration) {
-      this.governanceIntegration = new InferenceGovernanceIntegration();
-      // Note: In real usage this would be initialized via the integration system
-      // For the MCP server we initialize it directly
-      try {
-        await this.governanceIntegration.initialize();
-      } catch (error) {
-        frameworkLogger.log("governance-mcp", "external-init-warning", "warning", {
-          message: "External Dynamo governance integration not fully initialized. Some features may be limited.",
-          error: error instanceof Error ? error.message : String(error),
-        });
+      const global = getGovernanceIntegration();
+      if (global) {
+        this.governanceIntegration = global;
+      } else {
+        this.governanceIntegration = new InferenceGovernanceIntegration();
+        try {
+          await this.governanceIntegration.initialize();
+        } catch (error) {
+          frameworkLogger.log("governance-mcp", "external-init-warning", "warning", {
+            message: "External Dynamo governance integration not fully initialized. Some features may be limited.",
+            error: error instanceof Error ? error.message : String(error),
+          });
+        }
       }
     }
     return this.governanceIntegration;
+  }
+
+  private validateGovernProposalsArgs(value: unknown): GovernProposalsArgs {
+    if (!value || typeof value !== 'object') {
+      throw new Error('govern_proposals requires an object argument');
+    }
+    const obj = value as Record<string, unknown>;
+    if (!Array.isArray(obj.proposals)) {
+      throw new Error('govern_proposals requires a "proposals" array');
+    }
+    for (let i = 0; i < obj.proposals.length; i++) {
+      const p = obj.proposals[i] as Record<string, unknown>;
+      if (!p || typeof p !== 'object') {
+        throw new Error(`proposals[${i}] must be an object`);
+      }
+      if (typeof p.type !== 'string' || !['fix', 'refactor', 'guard', 'automate', 'codify', 'strategic', 'compliance'].includes(p.type)) {
+        throw new Error(`proposals[${i}].type must be one of: fix, refactor, guard, automate, codify, strategic, compliance`);
+      }
+      if (typeof p.title !== 'string') {
+        throw new Error(`proposals[${i}].title must be a string`);
+      }
+      if (typeof p.description !== 'string') {
+        throw new Error(`proposals[${i}].description must be a string`);
+      }
+    }
+    return value as GovernProposalsArgs;
+  }
+
+  private validateGovernReflectionArgs(value: unknown): GovernReflectionArgs {
+    if (!value || typeof value !== 'object') {
+      throw new Error('govern_reflection requires an object argument');
+    }
+    return value as GovernReflectionArgs;
   }
 
   private setupToolHandlers() {
@@ -101,7 +139,9 @@ class GovernanceServer {
             description:
               "Run one or more proposals through the full 0xRay governance system. " +
               "Always consults the three real skill MCP servers (code-review, security-audit, researcher) " +
-              "and the required external Dynamo/Solar governance. Returns merged structured decisions.",
+              "and the required external Dynamo/Solar governance. Returns merged structured decisions. " +
+              "Supports regulatory compliance proposals: AML/KYC, PSD2, GDPR content moderation, " +
+              "and other compliance-related governance scenarios.",
             inputSchema: {
               type: "object",
               properties: {
@@ -113,7 +153,7 @@ class GovernanceServer {
                       id: { type: "string" },
                       type: {
                         type: "string",
-                        enum: ["fix", "refactor", "guard", "automate", "codify", "strategic"],
+                        enum: ["fix", "refactor", "guard", "automate", "codify", "strategic", "compliance"],
                       },
                       title: { type: "string" },
                       description: { type: "string" },
@@ -174,9 +214,9 @@ class GovernanceServer {
       try {
         switch (name) {
           case "govern_proposals":
-            return await this.handleGovernProposals(args as unknown as GovernProposalsArgs);
+            return await this.handleGovernProposals(this.validateGovernProposalsArgs(args));
           case "govern_reflection":
-            return await this.handleGovernReflection(args as unknown as GovernReflectionArgs);
+            return await this.handleGovernReflection(this.validateGovernReflectionArgs(args));
           default:
             throw new Error(`Unknown tool: ${name}`);
         }
@@ -203,7 +243,7 @@ class GovernanceServer {
     const { proposals, context, options } = args;
     const requireExternal = options?.require_external ?? true;
 
-    console.error(`[GOVERNANCE-MCP] Received ${proposals.length} proposals for governance`);
+    frameworkLogger.log("governance-mcp", "proposals-received", "info", { count: proposals.length });
 
     // 1. Call the three real skill MCP servers in parallel
     const internalPromises = [
@@ -215,29 +255,44 @@ class GovernanceServer {
     const [codeReviewResults, securityResults, researcherResults] = await Promise.all(internalPromises);
 
     // 2. Always call external Dynamo/Solar governance (required, as per architecture)
+    const integration = await this.ensureGovernanceIntegration();
     const externalResults: any[] = [];
-    const govClient = new (await import("../integrations/governance/governance-client.js")).GovernanceClient();
 
-    for (const p of proposals) {
+    for (let i = 0; i < proposals.length; i++) {
+      const p = proposals[i]!;
       try {
-        const proposalText = `${p.title}\n\n${p.description}\n\nEvidence: ${(p.evidence || []).join('; ')}`;
-        const externalVote = await govClient.governWithSolar({
-          proposal: proposalText,
-          baseVoteWeight: p.confidence || 0.8,
-        });
+        const inferenceProposal: InferenceProposal = {
+          id: p.id || `proposal-${Date.now()}-${i}`,
+          type: p.type === 'strategic' || p.type === 'compliance' ? 'codify' : p.type,
+          title: p.title,
+          description: p.description,
+          evidence: p.evidence || [],
+          confidence: p.confidence || 0.8,
+          source: 'recurring_pattern',
+          status: 'pending',
+        };
+        const result = await integration.checkProposal(inferenceProposal);
         externalResults.push({
           proposalId: p.id || p.title,
-          ...externalVote,
+          decision: result.vote === 'YES' ? 'approve' : result.vote === 'NO' ? 'reject' : 'abstain',
+          confidence: result.governanceResponse?.confidence ?? p.confidence ?? 0.5,
+          reasoning: result.reason,
         });
       } catch (error) {
         const errorMsg = error instanceof Error ? error.message : String(error);
-        console.error(`[GOVERNANCE-MCP] External Dynamo call failed for proposal "${p.title}": ${errorMsg}`);
+        frameworkLogger.log("governance-mcp", "external-dynamo-error", "warning", { proposal: p.title, error: errorMsg });
         if (requireExternal) {
           throw new Error(`External Dynamo/Solar governance is required but failed for "${p.title}": ${errorMsg}`);
         }
+        externalResults.push({
+          proposalId: p.id || p.title,
+          decision: 'abstain',
+          confidence: 0.5,
+          reasoning: `External governance unavailable: ${errorMsg}`,
+        });
       }
     }
-    console.error(`[GOVERNANCE-MCP] External Dynamo governance returned ${externalResults.length} results`);
+    frameworkLogger.log("governance-mcp", "external-results", "info", { count: externalResults.length });
 
     // 3. Merge internal + external results (simplified merging for MVP)
     const mergedResults = this.mergeGovernanceResults(
@@ -273,7 +328,7 @@ class GovernanceServer {
       throw new Error("Either reflectionPath or reflectionContent must be provided");
     }
 
-    console.error(`[GOVERNANCE-MCP] Parsing reflection for proposals...`);
+    frameworkLogger.log("governance-mcp", "parsing-reflection", "info", { reflectionPath, contentLength: content.length });
 
     const proposals = this.parseCodexTermsFromReflection(content);
 
@@ -291,7 +346,7 @@ class GovernanceServer {
       };
     }
 
-    console.error(`[GOVERNANCE-MCP] Found ${proposals.length} proposals in reflection. Sending to governance...`);
+    frameworkLogger.log("governance-mcp", "reflection-proposals-found", "info", { count: proposals.length });
 
     // Delegate to the main govern_proposals logic
     return this.handleGovernProposals({
@@ -358,16 +413,25 @@ class GovernanceServer {
     context?: any
   ): Promise<any[]> {
     const results: any[] = [];
+    const useInProcess = process.env.VERCEL === "1";
 
     for (const proposal of proposals) {
       try {
-        const result = await mcpClientManager.callServerTool(serverName, "analyze_proposal", {
-          proposalTitle: proposal.title,
-          proposalDescription: proposal.description,
-          evidence: proposal.evidence || [],
-          proposalType: proposal.type,
-          context,
-        });
+        const result = useInProcess
+          ? await callInProcessSkill(serverName, "analyze_proposal", {
+              proposalTitle: proposal.title,
+              proposalDescription: proposal.description,
+              evidence: proposal.evidence || [],
+              proposalType: proposal.type,
+              context,
+            })
+          : await mcpClientManager.callServerTool(serverName, "analyze_proposal", {
+              proposalTitle: proposal.title,
+              proposalDescription: proposal.description,
+              evidence: proposal.evidence || [],
+              proposalType: proposal.type,
+              context,
+            });
         results.push({ proposalId: proposal.id || proposal.title, result });
       } catch (error) {
         results.push({
@@ -453,7 +517,14 @@ class GovernanceServer {
   async run() {
     const transport = new StdioServerTransport();
     await this.server.connect(transport);
-    console.error("[Governance MCP] Server started and listening on stdio");
+    createGracefulShutdown({
+      serverName: "governance.server",
+      server: this.server,
+    });
+  }
+
+  async connect(transport: Transport) {
+    await this.server.connect(transport);
   }
 }
 
@@ -461,7 +532,7 @@ class GovernanceServer {
 if (import.meta.url === `file://${process.argv[1]}`) {
   const server = new GovernanceServer();
   server.run().catch((error) => {
-    console.error("Failed to start Governance MCP Server:", error);
+    frameworkLogger.log("governance-mcp", "startup-error", "error", { error: String(error) });
     process.exit(1);
   });
 }

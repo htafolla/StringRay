@@ -61,6 +61,13 @@ interface CheckBestPracticesArgs {
   standards?: string[];
 }
 
+interface AnalyzeProposalArgs {
+  proposalTitle?: string;
+  proposalDescription?: string;
+  evidence?: string[];
+  proposalType?: string;
+}
+
 interface StandardsViolation {
   rule: string;
   description: string;
@@ -215,7 +222,7 @@ class StringRayCodeReviewServer {
         case "check_best_practices":
           return await this.checkBestPractices(args as unknown as CheckBestPracticesArgs) as CallToolResult;
         case "analyze_proposal":
-          return await this.analyzeProposal(args as any) as CallToolResult;
+          return await this.analyzeProposal(args as AnalyzeProposalArgs) as CallToolResult;
         default:
           throw new Error(`Unknown tool: ${name}`);
       }
@@ -456,7 +463,7 @@ class StringRayCodeReviewServer {
   /**
    * Governance-oriented proposal analysis from a code quality perspective.
    */
-  private async analyzeProposal(args: any) {
+  async analyzeProposal(args: AnalyzeProposalArgs) {
     const { proposalTitle = "", proposalDescription = "", evidence = [], proposalType = "" } = args;
     const text = `${proposalTitle} ${proposalDescription} ${evidence.join(" ")}`.toLowerCase();
 
@@ -464,7 +471,19 @@ class StringRayCodeReviewServer {
     let confidence = 0.82;
     let reasoning = "The proposal appears reasonable from a code quality and maintainability perspective.";
 
-    if (text.includes("extract method")) {
+    if (text.includes("aml") || text.includes("kyc") || text.includes("anti-money")) {
+      decision = "approve";
+      confidence = 0.88;
+      reasoning = "AML/KYC compliance code requires rigorous review: transaction monitoring must handle edge cases, avoid false positives from legitimate patterns, and maintain audit trails for regulatory inspection.";
+    } else if (text.includes("psd2") || text.includes("strong customer authentication") || text.includes("payment initiation")) {
+      decision = "approve";
+      confidence = 0.90;
+      reasoning = "PSD2 SCA implementation must balance security with user experience. Code should use well-audited MFA libraries, avoid rolling custom authentication, and include comprehensive test coverage for all authentication flows.";
+    } else if (text.includes("gdpr") || text.includes("right to erasure") || text.includes("data protection")) {
+      decision = "approve";
+      confidence = 0.92;
+      reasoning = "GDPR erasure pipelines require careful code review: cascading deletes must be transactional, audit logs must be preserved, and the 30-day SLA demands observability and monitoring integration.";
+    } else if (text.includes("extract method")) {
       decision = "approve";
       confidence = 0.93;
       reasoning = "Extract Method is a well-established refactoring pattern that improves readability and reduces cognitive load when applied consistently.";

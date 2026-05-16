@@ -77,6 +77,13 @@ interface GenerateSecurityReportArgs {
   includeRemediation?: boolean;
 }
 
+interface AnalyzeProposalArgs {
+  proposalTitle?: string;
+  proposalDescription?: string;
+  evidence?: string[];
+  proposalType?: string;
+}
+
 class StringRaySecurityAuditServer {
   private server: Server;
 
@@ -216,7 +223,7 @@ class StringRaySecurityAuditServer {
         case "generate_security_report":
           return await this.generateSecurityReport(args as unknown as GenerateSecurityReportArgs);
         case "analyze_proposal":
-          return await this.analyzeProposal(args as any) as CallToolResult;
+          return await this.analyzeProposal(args as AnalyzeProposalArgs) as CallToolResult;
         default:
           throw new Error(`Unknown tool: ${name}`);
       }
@@ -1113,7 +1120,7 @@ class StringRaySecurityAuditServer {
   /**
    * Governance-oriented proposal analysis from a security perspective.
    */
-  private async analyzeProposal(args: any) {
+  async analyzeProposal(args: AnalyzeProposalArgs) {
     const { proposalTitle = "", proposalDescription = "", evidence = [], proposalType = "" } = args;
     const text = `${proposalTitle} ${proposalDescription} ${evidence.join(" ")}`.toLowerCase();
 
@@ -1121,7 +1128,23 @@ class StringRaySecurityAuditServer {
     let confidence = 0.82;
     let reasoning = "The proposal does not appear to introduce significant new security surface area.";
 
-    if (text.includes("extract method")) {
+    if (text.includes("aml") || text.includes("kyc") || text.includes("anti-money")) {
+      decision = "approve";
+      confidence = 0.91;
+      reasoning = "AML/KYC compliance measures are critical for regulatory security posture. Automated transaction monitoring closes vulnerability gaps in financial crime detection and demonstrates due diligence for regulatory inspections.";
+    } else if (text.includes("psd2") || text.includes("strong customer authentication") || text.includes("payment initiation")) {
+      decision = "approve";
+      confidence = 0.93;
+      reasoning = "PSD2 SCA implementation is a mandatory security control for payment services. Multi-factor authentication with dynamic linking reduces unauthorized payment risk and satisfies EBA regulatory technical standards.";
+    } else if (text.includes("gdpr") || text.includes("right to erasure") || text.includes("data protection")) {
+      decision = "approve";
+      confidence = 0.94;
+      reasoning = "GDPR compliance controls are foundational to data security posture. Automated data erasure pipelines reduce data breach exposure windows and satisfy supervisory authority inspection requirements.";
+    } else if (text.includes("beneficial ownership") || text.includes("ubo") || text.includes("pep screening")) {
+      decision = "approve";
+      confidence = 0.87;
+      reasoning = "Beneficial ownership transparency and PEP screening are critical AML controls. Verifying ultimate beneficial owners reduces money laundering risk through corporate account structuring.";
+    } else if (text.includes("extract method")) {
       decision = "approve";
       confidence = 0.88;
       reasoning = "Extract Method refactoring improves security posture by reducing attack surface in large monolithic files and enabling better isolation of sensitive logic.";

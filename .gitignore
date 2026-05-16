@@ -66,3 +66,4 @@ tsconfig.tsbuildinfo
 
 # Docs inference (generated at runtime)
 docs/inference/
+.vercel

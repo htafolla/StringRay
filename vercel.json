@@ -1,22 +1,12 @@
 {
-  "builds": [
-    {
-      "src": "api/mcp.ts",
-      "use": "@vercel/node"
-    },
-    {
-      "src": "api/health.ts",
-      "use": "@vercel/node"
-    }
-  ],
   "routes": [
     {
       "src": "/health",
-      "dest": "api/health.ts"
+      "dest": "/api/health"
     },
     {
       "src": "/(.*)",
-      "dest": "api/mcp.ts"
+      "dest": "/api/mcp"
     }
   ]
 }

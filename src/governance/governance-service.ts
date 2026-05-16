@@ -15,8 +15,12 @@
  */
 
 import { mcpClientManager } from '../mcps/mcp-client.js';
-import { GovernanceClient } from '../integrations/governance/governance-client.js';
 import { callInProcessSkill } from '../mcps/in-process-skill-registry.js';
+import {
+  getGovernanceIntegration,
+  type InferenceGovernanceIntegration,
+} from '../integrations/governance/index.js';
+import type { InferenceProposal } from '../inference/inference-cycle.js';
 import {
   GovernanceProposal,
   GovernanceVote,
@@ -30,10 +34,11 @@ import { applyDecisionMatrix, mergeVotes } from './governance-core.js';
 import { frameworkLogger } from '../core/framework-logger.js';
 
 export class GovernanceService {
-  private externalClient: GovernanceClient;
+  private integration: InferenceGovernanceIntegration | null = null;
 
   constructor() {
-    this.externalClient = new GovernanceClient();
+    // Prefer the framework's managed governance integration (feature flags, lifecycle, config, retries)
+    this.integration = getGovernanceIntegration();
   }
 
   /**
@@ -155,29 +160,65 @@ export class GovernanceService {
     requireExternal: boolean
   ): Promise<GovernanceVote[][]> {
     const results: GovernanceVote[][] = [];
+    const integration = this.integration;
+
+    const useIntegration = integration?.isAvailable?.() === true;
 
     for (const proposal of proposals) {
       try {
-        const proposalText = `${proposal.title}\n\n${proposal.description}\n\nEvidence: ${(proposal.evidence || []).join('; ')}`;
+        let vote: GovernanceVote;
 
-        const external = await this.externalClient.governWithSolar({
-          proposal: proposalText,
-          baseVoteWeight: proposal.confidence || 0.8,
-        });
+        if (useIntegration) {
+          // Preferred path: Use the managed InferenceGovernanceIntegration
+          // (respects features.json, has lifecycle, retries, proper config)
+          const inferenceProposal: InferenceProposal = {
+            id: proposal.id,
+            type: proposal.type as any,
+            title: proposal.title,
+            description: proposal.description,
+            evidence: proposal.evidence || [],
+            confidence: proposal.confidence || 0.8,
+            source: 'recurring_pattern', // closest match in InferenceProposal source type
+            status: 'pending',
+          };
 
-        const decision = (external.finalRecommendation || external.originalRecommendation || 'NEEDS_REVISION').toLowerCase();
-        const conf = 0.85 + (external.confidenceAdjustment || 0);
+          const result = await integration!.checkProposal(inferenceProposal);
 
-        results.push([{
-          server: 'external-dynamo',
-          decision: decision.includes('pass') || decision === 'approve' ? 'approve' : 'needs_revision',
-          confidence: Math.min(0.99, Math.max(0.6, conf)),
-          reasoning: `Solar-adjusted governance (${(external.solarContext as any)?.activityLevel || 'unknown'} solar)`,
-          weight: external.adjustedVoteWeight || 1.0,
-        }]);
+          vote = {
+            server: 'external-dynamo',
+            decision: result.vote === 'YES' ? 'approve' : result.vote === 'NO' ? 'reject' : 'needs_revision',
+            confidence: result.governanceResponse?.confidence ?? 0.85,
+            reasoning: result.reason || 'External solar-modulated governance decision',
+            weight: 1.1,
+          };
+        } else {
+          // Fallback: direct client (less ideal, but keeps "Dynamo required" behavior working)
+          // Note: This path has fewer guarantees (no feature flag enforcement from integration)
+          const { GovernanceClient } = await import('../integrations/governance/governance-client.js');
+          const client = new GovernanceClient(); // still uses default config for now
+
+          const proposalText = `${proposal.title}\n\n${proposal.description}\n\nEvidence: ${(proposal.evidence || []).join('; ')}`;
+          const external = await client.governWithSolar({
+            proposal: proposalText,
+            baseVoteWeight: proposal.confidence || 0.8,
+          });
+
+          const decision = (external.finalRecommendation || external.originalRecommendation || 'NEEDS_REVISION').toLowerCase();
+          const conf = 0.85 + (external.confidenceAdjustment || 0);
+
+          vote = {
+            server: 'external-dynamo',
+            decision: decision.includes('pass') || decision === 'approve' ? 'approve' : 'needs_revision',
+            confidence: Math.min(0.99, Math.max(0.6, conf)),
+            reasoning: `Solar-adjusted governance (${(external.solarContext as any)?.activityLevel || 'unknown'} solar)`,
+            weight: external.adjustedVoteWeight || 1.0,
+          };
+        }
+
+        results.push([vote]);
       } catch (error) {
         const msg = error instanceof Error ? error.message : String(error);
-        frameworkLogger.log('governance-service', 'external-dynamo-error', 'error', { error: msg });
+        frameworkLogger.log('governance-service', 'external-dynamo-error', 'error', { error: msg, usedIntegration: useIntegration });
 
         if (requireExternal) {
           throw new Error(`External Dynamo governance is required but failed: ${msg}`);

@@ -32,7 +32,7 @@ interface Proposal {
 interface Session {
   id: string
   createdAt: number
-  clientInfo?: Record<string, unknown>
+  clientInfo: Record<string, unknown>
 }
 
 // ---- Session Registry ----
@@ -40,7 +40,7 @@ const sessions = new Map<string, Session>()
 
 function createSession(clientInfo?: Record<string, unknown>): Session {
   const id = crypto.randomUUID()
-  const session: Session = { id, createdAt: Date.now(), clientInfo }
+  const session: Session = { id, createdAt: Date.now(), clientInfo: clientInfo ?? {} }
   sessions.set(id, session)
   return session
 }

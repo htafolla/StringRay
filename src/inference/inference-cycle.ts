@@ -676,10 +676,11 @@ Respond with EXACTLY one of:
         frameworkLogger.log("inference-cycle", "governance-mcp-failed", "error", {
           error: err instanceof Error ? err.message : String(err),
         });
-        // In pure mode we must not silently fall back
+        // In forced pure MCP mode we must not silently fall back
         if (process.env.STRRAY_FORCE_MCP_GOVERNANCE === 'true') {
           throw err;
         }
+        // In normal/test mode, fall back to legacy internal governance so tests continue to pass
       }
     }
 

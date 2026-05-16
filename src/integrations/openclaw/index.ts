@@ -17,6 +17,8 @@ import type {
 import { OpenClawConfigLoader } from './config.js';
 import { OpenClawClient } from './client.js';
 import { StringRayAPIServer } from './api-server.js';
+import { initializeGovernanceIntegration } from '../governance/index.js';
+import { featuresConfigLoader } from '../../core/features-config.js';
 import { OpenClawHooksManager, StringRayToolEvent } from './hooks/strray-hooks.js';
 import { mcpClientManager, ToolBeforeEvent, ToolAfterEvent } from '../../mcps/mcp-client.js';
 import type { AgentInvoker } from './api-server.js';
@@ -78,6 +80,16 @@ export class OpenClawIntegration extends BaseIntegration {
       }
       
       await this.apiServer.start();
+    }
+
+    // Initialize governance (Dynamo Solar SSOT) if enabled
+    const govConfig = (featuresConfigLoader as any).config?.inference_governance;
+    if (govConfig?.enabled !== false) {
+      try {
+        await initializeGovernanceIntegration();
+      } catch (err) {
+        await this.log('warning', 'Failed to initialize governance during OpenClaw startup');
+      }
     }
 
     // Initialize WebSocket client

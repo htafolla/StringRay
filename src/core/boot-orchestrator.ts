@@ -1077,9 +1077,23 @@ export class BootOrchestrator {
       // Finalize security integration
       await this.finalizeSecurityIntegration();
 
-      // Initialize inference governance integration
-      // DISABLED: Auto-spawning of agents is disabled
-      // await this.initializeInferenceGovernance();
+      // Initialize governance (Dynamo Solar SSOT + GovernanceService)
+      // This must happen early so GovernanceService has the managed integration ready.
+      const govConfig = (featuresConfigLoader as any).config?.governance ?? 
+                        (featuresConfigLoader as any).config?.inference_governance;
+      if (govConfig?.enabled !== false) {
+        try {
+          await initializeGovernanceIntegration();
+          frameworkLogger.log("boot-orchestrator", "governance-initialized", "info", {
+            message: "Dynamo Solar SSOT integration initialized during boot",
+          });
+        } catch (err) {
+          frameworkLogger.log("boot-orchestrator", "governance-init-warning", "warning", {
+            message: "Failed to initialize governance integration during boot",
+            error: err instanceof Error ? err.message : String(err),
+          });
+        }
+      }
 
       result.success = true;
     } catch (error) {

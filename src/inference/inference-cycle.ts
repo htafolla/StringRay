@@ -680,11 +680,15 @@ Respond with EXACTLY one of:
         if (process.env.STRRAY_FORCE_MCP_GOVERNANCE === 'true') {
           throw err;
         }
-        // In normal/test mode, fall back to legacy internal governance so tests continue to pass
+        // In normal mode, fall back to legacy path with deprecation warning.
+        // The legacy path will be removed once all consumers have migrated to the Governance MCP + Dynamo Solar SSOT model.
+        frameworkLogger.log("inference-cycle", "governance-legacy-fallback", "warning", {
+          message: "Falling back to legacy governance path. This path is deprecated and will be removed in a future version.",
+        });
       }
     }
 
-    // Legacy internal path
+    // Legacy internal path (deprecated)
     const internalVotes = await this.governProposalsInternal(proposals);
 
     const governanceIntegration = getGovernanceIntegration();
@@ -697,10 +701,16 @@ Respond with EXACTLY one of:
   }
 
   private async isGovernanceMcpPreferred(): Promise<boolean> {
-    // Governance MCP is the preferred path when available.
-    // Controlled primarily via STRRAY_FORCE_MCP_GOVERNANCE env var for now.
-    // Future: wire to features.json governance.enabled flag.
-    return true
+    try {
+      const { featuresConfigLoader } = await import("../core/features-config.js");
+      const config = (featuresConfigLoader as any).config || {};
+
+      // Support both new top-level `governance.enabled` and legacy `inference_governance.enabled`
+      const gov = config.governance ?? config.inference_governance;
+      return gov?.enabled ?? true;
+    } catch {
+      return true;
+    }
   }
 
   private parseGovernanceMcpResponse(text: string, proposals: InferenceProposal[]): {

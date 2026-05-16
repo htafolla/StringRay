@@ -32,15 +32,15 @@ import {
   GovernanceRequest,
   GovernanceResponse,
 } from './governance-types';
-import { applyDecisionMatrix, mergeVotes } from './governance-core.js';
+import { mergeVotes } from './governance-core.js';
 import { frameworkLogger } from '../core/framework-logger.js';
 
 export class GovernanceService {
-  private integration: InferenceGovernanceIntegration | null = null;
-
   constructor() {
-    // Prefer the framework's managed governance integration (feature flags, lifecycle, config, retries)
-    this.integration = getGovernanceIntegration();
+    // We deliberately do *not* cache the integration here.
+    // On Vercel / serverless, initializeGovernanceIntegration() may be called
+    // after the first getGovernanceService() instance is created.
+    // We always fetch fresh via getGovernanceIntegration() on each govern() call.
   }
 
   /**
@@ -65,7 +65,7 @@ export class GovernanceService {
 
     // Early validation: Dynamo Solar SSOT is a hard requirement
     if (requireExternal) {
-      const integration = this.integration;
+      const integration = getGovernanceIntegration();
       if (!integration?.isAvailable?.()) {
         const message =
           'Dynamo Solar SSOT is required but InferenceGovernanceIntegration is not available. ' +
@@ -183,7 +183,7 @@ export class GovernanceService {
     requireExternal: boolean
   ): Promise<GovernanceVote[][]> {
     const results: GovernanceVote[][] = [];
-    const integration = this.integration;
+    const integration = getGovernanceIntegration();
 
     const integrationAvailable = integration?.isAvailable?.() === true;
 

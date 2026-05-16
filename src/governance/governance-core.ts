@@ -113,13 +113,19 @@ export function mergeVotes(votes: GovernanceVote[]): {
 
   const totalWeight = votes.reduce((sum, v) => sum + (v.weight ?? 1) * v.confidence, 0);
 
-  const avgConfidence = totalWeight / votes.length;
+  const avgConfidence = totalWeight > 0 ? totalWeight / votes.length : 0.5;
 
   let finalDecision: GovernanceResult['finalDecision'] = 'needs_revision';
-  if (approveWeight / totalWeight > 0.66) {
-    finalDecision = 'approve';
-  } else if (approveWeight / totalWeight < 0.33) {
-    finalDecision = 'reject';
+  if (totalWeight > 0) {
+    const approveRatio = approveWeight / totalWeight;
+    if (approveRatio > 0.66) {
+      finalDecision = 'approve';
+    } else if (approveRatio < 0.33) {
+      finalDecision = 'reject';
+    }
+  } else {
+    // All votes had zero confidence — default to needs_revision
+    finalDecision = 'needs_revision';
   }
 
   const reasons = votes.map(v => `${v.server}: ${v.reasoning}`).join(' | ');

@@ -230,7 +230,11 @@ describe('ServerConfigRegistry', () => {
       
       for (const config of configs) {
         expect(config.timeout).toBeGreaterThan(0);
-        expect(config.timeout).toBeLessThanOrEqual(60000);
+
+        // Governance (Dynamo Solar SSOT orchestrator) is allowed higher timeout
+        // because it coordinates multiple skill MCPs + required external filter.
+        const maxTimeout = config.serverName === 'governance' ? 120000 : 60000;
+        expect(config.timeout).toBeLessThanOrEqual(maxTimeout);
       }
     });
 

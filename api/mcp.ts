@@ -169,7 +169,7 @@ async function handleMCPMessage(_sessionId: string, msg: any): Promise<any> {
           }
 
           // Ensure Dynamo Solar SSOT integration is initialized (important for serverless cold starts)
-          const { initializeGovernanceIntegration } = await import('./src/integrations/governance/index.js')
+          const { initializeGovernanceIntegration } = await import('../src/integrations/governance/index.js')
           try {
             await initializeGovernanceIntegration()
           } catch {

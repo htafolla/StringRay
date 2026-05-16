@@ -3,6 +3,30 @@ import { cors } from 'hono/cors'
 import { streamSSE } from 'hono/streaming'
 import { EventEmitter } from 'node:events'
 import crypto from 'node:crypto'
+import fs from 'node:fs'
+import path from 'node:path'
+
+// ===== Governance Enabled Check (cold-start cached) =====
+let governanceEnabled = true
+let governanceReason = ''
+try {
+  const featuresPaths = [
+    path.join(process.cwd(), '.opencode', 'strray', 'features.json'),
+    path.join(process.cwd(), '.strray', 'features.json'),
+  ]
+  for (const fp of featuresPaths) {
+    if (fs.existsSync(fp)) {
+      const features = JSON.parse(fs.readFileSync(fp, 'utf-8'))
+      if (features.governance && features.governance.enabled === false) {
+        governanceEnabled = false
+        governanceReason = features.governance.default_free_message || 'Governance is disabled via features.json'
+      }
+      break
+    }
+  }
+} catch {
+  // features.json not available — default to enabled
+}
 
 // ===== Pub/Sub (in-memory EventEmitter, no Redis dep) =====
 const bus = new EventEmitter()
@@ -247,6 +271,23 @@ async function handleMCPMessage(_sessionId: string, msg: any): Promise<any> {
 // ===== SSE session registry =====
 const activeSessions = new Map<string, true>()
 
+// ===== Governance Gate Middleware =====
+async function governanceGate(c: Context, next: () => Promise<void>) {
+  if (!governanceEnabled) {
+    if (c.req.method === 'GET' && (c.req.path === '/' || c.req.path === '/health')) {
+      // Allow info/health endpoints even when disabled
+      return next()
+    }
+    c.status(503)
+    return c.json({
+      status: 'disabled',
+      reason: governanceReason,
+      doc: 'Set governance.enabled=true in .opencode/strray/features.json',
+    })
+  }
+  return next()
+}
+
 // ===== Hono App =====
 const app = new Hono()
 
@@ -255,6 +296,8 @@ app.use('/*', cors({
   allowMethods: ['GET', 'POST', 'OPTIONS'],
   allowHeaders: ['Content-Type', 'Authorization'],
 }))
+
+app.use('/*', governanceGate)
 
 // ===== GET /sse — SSE streaming =====
 app.get('/sse', (c: Context) => {

@@ -495,7 +495,15 @@ class GovernanceServer {
   }
 
   private extractVote(result: any): { decision: string; confidence: number; reasoning: string } {
-    // The skill servers return { content: [{ text: "DECISION: ...\nCONFIDENCE: ...\nREASONING: ..." }] }
+    // In-process path: result is { decision, confidence, reasoning } (structured)
+    if (result && typeof result === "object" && "decision" in result) {
+      return {
+        decision: result.decision?.toLowerCase() || "abstain",
+        confidence: typeof result.confidence === "number" ? result.confidence : 0.5,
+        reasoning: result.reasoning || "No detailed reasoning provided.",
+      };
+    }
+    // MCP client path: result is { content: [{ text: "DECISION: ...\nCONFIDENCE: ...\nREASONING: ..." }] }
     const text = result?.content?.[0]?.text || "";
     const decisionMatch = text.match(/DECISION:\s*(approve|reject|abstain)/i);
     const confidenceMatch = text.match(/CONFIDENCE:\s*([0-9.]+)/);
@@ -504,7 +512,7 @@ class GovernanceServer {
     return {
       decision: decisionMatch?.[1]?.toLowerCase() || "abstain",
       confidence: parseFloat(confidenceMatch?.[1] || "0.5"),
-      reasoning: reasoningMatch?.[1]?.trim() || "No reasoning provided",
+      reasoning: reasoningMatch?.[1]?.trim() || "No detailed reasoning provided.",
     };
   }
 

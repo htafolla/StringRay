@@ -32,7 +32,6 @@ import {
   getAllServerSimulations,
 } from './simulation/index.js';
 import { getConnectionPool } from './connection/connection-pool.js';
-import { ConnectionPool } from './connection/connection-pool.js';
 
 /**
  * Retry configuration for MCP tool execution
@@ -43,9 +42,6 @@ const DEFAULT_RETRY_CONFIG = {
   maxDelayMs: 5000,
   backoffMultiplier: 2,
 };
-
-// Shared pool for real MCP subprocess connections (critical for pure governance)
-const sharedConnectionPool = new ConnectionPool({ maxPoolSize: 4, maxIdleTimeMs: 180000 });
 
 interface RetryConfig {
   maxRetries: number;
@@ -84,7 +80,6 @@ export class MCPClient extends EventEmitter {
   private toolCache: ToolCache;
   private simulationEngine: SimulationEngine;
   private retryConfig: RetryConfig;
-  private connectionPool: ConnectionPool | null = null;
 
   constructor(config: MCPClientConfig, retryConfig?: Partial<RetryConfig>) {
     super();
@@ -136,7 +131,15 @@ export class MCPClient extends EventEmitter {
    */
   private async executeRealTool(toolName: string, args: unknown): Promise<MCPToolResult> {
     const pool = getConnectionPool();
-    const serverConfig = this.config as unknown as IServerConfig;
+    const registryConfig = defaultServerRegistry.get(this.config.serverName);
+    const serverConfig: IServerConfig = registryConfig ?? {
+      serverName: this.config.serverName,
+      command: this.config.command,
+      args: this.config.args,
+      timeout: this.config.timeout ?? 30000,
+      ...(this.config.env !== undefined ? { env: this.config.env } : {}),
+      ...(this.config.basePath !== undefined ? { basePath: this.config.basePath } : {}),
+    };
 
     const connection = await pool.acquire(this.config.serverName, serverConfig);
     try {
@@ -161,16 +164,6 @@ export class MCPClient extends EventEmitter {
     for (const [serverName, serverSimulations] of Object.entries(simulations)) {
       this.simulationEngine.registerServerSimulators(serverName, serverSimulations);
     }
-  }
-
-  /**
-   * Get or lazily create the shared ConnectionPool for real MCP transport.
-   */
-  private getConnectionPool(): ConnectionPool {
-    if (!this.connectionPool) {
-      this.connectionPool = sharedConnectionPool;
-    }
-    return this.connectionPool;
   }
 
   /**

@@ -36,7 +36,7 @@ export function applyDecisionMatrix(input: DecisionMatrixInput): DecisionMatrixO
   const {
     resonance,
     isotopicRatio,
-    vortexVolume = Infinity,
+    vortexVolume = Number.MAX_SAFE_INTEGER, // large default so the low-mass check only triggers on explicit small values
     historicalCoherence = 0.8,
     solarActivity = 'quiet',
   } = input;

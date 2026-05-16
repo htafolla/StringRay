@@ -7,7 +7,7 @@ import { VotingCoordinator } from "../delegation/voting-coordinator.js";
 import { StringRayStateManager } from "../state/state-manager.js";
 import { frameworkLogger } from "../core/framework-logger.js";
 import { getGovernanceIntegration, type GovernanceVoteResult } from "../integrations/governance/index.js";
-import { getAgentSpawn } from "../core/features-config.js";
+import { getAgentSpawn, featuresConfigLoader } from "../core/features-config.js";
 import { agentSpawnGovernor } from "../orchestrator/agent-spawn-governor.js";
 import { spawnGate } from "../core/opencode-spawn-gate.js";
 import { mcpClientManager } from "../mcps/mcp-client.js";
@@ -647,7 +647,7 @@ Respond with EXACTLY one of:
     // Primary path: Use the first-class Governance MCP (real skill servers + required Dynamo)
     // This is the clean, centralized path (governance.server.ts + GovernanceService)
     const useGovernanceMcp = process.env.STRRAY_FORCE_MCP_GOVERNANCE === 'true' ||
-      (await this.isGovernanceMcpPreferred());
+      this.isGovernanceMcpPreferred();
 
     if (useGovernanceMcp) {
       try {
@@ -700,14 +700,11 @@ Respond with EXACTLY one of:
     return internalVotes;
   }
 
-  private async isGovernanceMcpPreferred(): Promise<boolean> {
+  private isGovernanceMcpPreferred(): boolean {
     try {
-      const { featuresConfigLoader } = await import("../core/features-config.js");
-      const config = (featuresConfigLoader as any).config || {};
-
-      // Support both new top-level `governance.enabled` and legacy `inference_governance.enabled`
-      const gov = config.governance ?? config.inference_governance;
-      return gov?.enabled ?? true;
+      const config = featuresConfigLoader.loadConfig();
+      const inferenceGov = (config as { inference_governance?: { enabled?: boolean } }).inference_governance;
+      return inferenceGov?.enabled ?? true;
     } catch {
       return true;
     }
@@ -732,7 +729,10 @@ Respond with EXACTLY one of:
       });
       return { votes, overallDecision: data.overallDecision || "needs_revision" };
     } catch {
-      // Fallback: try to find any DECISION blocks in the text
+      frameworkLogger.log('inference-cycle', 'governance-mcp-parse-failed', 'warning', {
+        textPreview: text.substring(0, 200),
+        proposalCount: proposals.length,
+      });
       const votes = proposals.map(p => ({
         proposalId: p.id,
         decision: "abstain" as any,

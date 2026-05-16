@@ -259,7 +259,7 @@ export class GovernanceService {
   private parseVoteFromText(server: string, text: string): GovernanceVote {
     const decisionMatch = text.match(/DECISION:\s*(approve|reject|abstain|needs_revision)/i);
     const confidenceMatch = text.match(/CONFIDENCE:\s*([0-9.]+)/);
-    const reasoningMatch = text.match(/REASONING:\s*([\s\S]+?)(?:\n|$)/);
+    const reasoningMatch = text.match(/REASONING:\s*([\s\S]+)/);
 
     return {
       server,

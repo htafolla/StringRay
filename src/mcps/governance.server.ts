@@ -223,7 +223,7 @@ class GovernanceServer {
     const request: GovernanceRequest = {
       proposals: args.proposals.map((p, i) => ({
         id: p.id || `prop-${Date.now()}-${i}`,
-        type: p.type as any,
+        type: p.type,
         title: p.title,
         description: p.description,
         evidence: p.evidence || [],

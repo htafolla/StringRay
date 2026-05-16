@@ -99,11 +99,6 @@ const TOOLS: ToolDefinition[] = [
     },
   },
   {
-    name: 'govern_reflection',
-    description: 'Parse a reflection file and run extracted proposals through the full governance system.',
-    inputSchema: { type: 'object', properties: { reflectionPath: { type: 'string' }, reflectionContent: { type: 'string' } } },
-  },
-  {
     name: 'govern_health',
     description: 'Health check for the governance MCP server.',
     inputSchema: { type: 'object', properties: {} },
@@ -207,12 +202,6 @@ async function handleMCPMessage(_sessionId: string, msg: any): Promise<any> {
                 sessions: Array.from(sessions.entries()).map(([id, s]) => ({ id, createdAt: s.createdAt })),
               }, null, 2),
             }],
-          })
-        }
-
-        if (name === 'govern_reflection') {
-          return mcpResult(id, {
-            content: [{ type: 'text', text: JSON.stringify({ message: 'Reflection parsing requires GovernanceServer initialization.', args }, null, 2) }],
           })
         }
 

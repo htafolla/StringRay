@@ -22,12 +22,9 @@ import {
 } from "@modelcontextprotocol/sdk/types.js";
 import { mcpClientManager } from "./mcp-client.js";
 import { frameworkLogger } from "../core/framework-logger.js";
-import { InferenceGovernanceIntegration, getGovernanceIntegration } from "../integrations/governance/index.js";
 import * as fs from "fs";
 import * as path from "path";
 import { createGracefulShutdown } from "../utils/shutdown-handler.js";
-import type { InferenceProposal } from "../inference/inference-cycle.js";
-import { callInProcessSkill } from "./in-process-skill-registry.js";
 import { getGovernanceService } from "../governance/governance-service.js";
 import type { GovernanceRequest } from "../governance/governance-types.js";
 
@@ -61,7 +58,6 @@ interface GovernReflectionArgs {
 
 class GovernanceServer {
   private server: Server;
-  private governanceIntegration: InferenceGovernanceIntegration | null = null;
 
   constructor() {
     this.server = new Server(
@@ -77,26 +73,6 @@ class GovernanceServer {
     );
 
     this.setupToolHandlers();
-  }
-
-  private async ensureGovernanceIntegration() {
-    if (!this.governanceIntegration) {
-      const global = getGovernanceIntegration();
-      if (global) {
-        this.governanceIntegration = global;
-      } else {
-        this.governanceIntegration = new InferenceGovernanceIntegration();
-        try {
-          await this.governanceIntegration.initialize();
-        } catch (error) {
-          frameworkLogger.log("governance-mcp", "external-init-warning", "warning", {
-            message: "External Dynamo governance integration not fully initialized. Some features may be limited.",
-            error: error instanceof Error ? error.message : String(error),
-          });
-        }
-      }
-    }
-    return this.governanceIntegration;
   }
 
   private validateGovernProposalsArgs(value: unknown): GovernProposalsArgs {
@@ -368,121 +344,6 @@ class GovernanceServer {
     }
 
     return terms;
-  }
-
-  private async callSkillServer(
-    serverName: string,
-    proposals: GovernanceProposalInput[],
-    context?: any
-  ): Promise<any[]> {
-    const results: any[] = [];
-    const useInProcess = process.env.VERCEL === "1";
-
-    for (const proposal of proposals) {
-      try {
-        const result = useInProcess
-          ? await callInProcessSkill(serverName, "analyze_proposal", {
-              proposalTitle: proposal.title,
-              proposalDescription: proposal.description,
-              evidence: proposal.evidence || [],
-              proposalType: proposal.type,
-              context,
-            })
-          : await mcpClientManager.callServerTool(serverName, "analyze_proposal", {
-              proposalTitle: proposal.title,
-              proposalDescription: proposal.description,
-              evidence: proposal.evidence || [],
-              proposalType: proposal.type,
-              context,
-            });
-        results.push({ proposalId: proposal.id || proposal.title, result });
-      } catch (error) {
-        results.push({
-          proposalId: proposal.id || proposal.title,
-          error: error instanceof Error ? error.message : String(error),
-        });
-      }
-    }
-
-    return results;
-  }
-
-  private mergeGovernanceResults(
-    originalProposals: GovernanceProposalInput[],
-    codeReviewResults: any[],
-    securityResults: any[],
-    researcherResults: any[],
-    externalResults: any[] = []
-  ): any {
-    // This is a simplified merger. A production version would use a proper WeightedVotingAggregator.
-    const merged: any[] = [];
-
-    for (let i = 0; i < originalProposals.length; i++) {
-      const prop = originalProposals[i];
-      const votes: any[] = [];
-
-      // Collect votes from internal servers
-      const cr = codeReviewResults[i];
-      const sa = securityResults[i];
-      const re = researcherResults[i];
-
-      if (cr?.result) votes.push({ server: "code-review", ...this.extractVote(cr.result) });
-      if (sa?.result) votes.push({ server: "security-audit", ...this.extractVote(sa.result) });
-      if (re?.result) votes.push({ server: "researcher", ...this.extractVote(re.result) });
-
-      // Include external if available (Dynamo is required)
-      if (externalResults && externalResults[i]) {
-        votes.push({ server: "external-dynamo", ...externalResults[i] });
-      }
-
-      // Simple majority for now
-      const approveCount = votes.filter((v) => v.decision === "approve").length;
-      const finalDecision = approveCount > votes.length / 2 ? "approve" : "needs_revision";
-
-      merged.push({
-        proposal: prop,
-        votes,
-        finalDecision,
-        averageConfidence: this.calculateAverageConfidence(votes),
-      });
-    }
-
-    return {
-      results: merged,
-      summary: {
-        total: merged.length,
-        approved: merged.filter((r) => r.finalDecision === "approve").length,
-        needsRevision: merged.filter((r) => r.finalDecision === "needs_revision").length,
-      },
-    };
-  }
-
-  private extractVote(result: any): { decision: string; confidence: number; reasoning: string } {
-    // In-process path: result is { decision, confidence, reasoning } (structured)
-    if (result && typeof result === "object" && "decision" in result) {
-      return {
-        decision: result.decision?.toLowerCase() || "abstain",
-        confidence: typeof result.confidence === "number" ? result.confidence : 0.5,
-        reasoning: result.reasoning || "No detailed reasoning provided.",
-      };
-    }
-    // MCP client path: result is { content: [{ text: "DECISION: ...\nCONFIDENCE: ...\nREASONING: ..." }] }
-    const text = result?.content?.[0]?.text || "";
-    const decisionMatch = text.match(/DECISION:\s*(approve|reject|abstain)/i);
-    const confidenceMatch = text.match(/CONFIDENCE:\s*([0-9.]+)/);
-    const reasoningMatch = text.match(/REASONING:\s*(.+)/s);
-
-    return {
-      decision: decisionMatch?.[1]?.toLowerCase() || "abstain",
-      confidence: parseFloat(confidenceMatch?.[1] || "0.5"),
-      reasoning: reasoningMatch?.[1]?.trim() || "No detailed reasoning provided.",
-    };
-  }
-
-  private calculateAverageConfidence(votes: any[]): number {
-    if (votes.length === 0) return 0.5;
-    const sum = votes.reduce((acc, v) => acc + (v.confidence || 0.5), 0);
-    return sum / votes.length;
   }
 
   async run() {

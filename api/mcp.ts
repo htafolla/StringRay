@@ -5,8 +5,9 @@ import { EventEmitter } from 'node:events'
 import crypto from 'node:crypto'
 import fs from 'node:fs'
 import path from 'node:path'
-import { evaluateProposal, PHI, TAU } from '../src/mcps/governance-core.js'
-import type { ProposalInput } from '../src/mcps/governance-core.js'
+// New clean governance core (src/governance/)
+import { getGovernanceService } from '../src/governance/governance-service.js'
+import type { GovernanceRequest } from '../src/governance/governance-types.js'
 
 // ===== Governance Enabled Check (cold-start cached) =====
 let governanceEnabled = true
@@ -150,22 +151,35 @@ async function handleMCPMessage(_sessionId: string, msg: any): Promise<any> {
         if (!name) return mcpError(id, -32602, 'Missing tool name')
 
         if (name === 'govern_proposals') {
-          const proposals: Proposal[] = args?.proposals || []
-          const results = proposals.map(p => {
-            const gov = evaluateProposal(p)
-            return { id: p.id || p.title, type: p.type, title: p.title, ...gov }
-          })
-          const passed = results.filter(r => r.recommendation === 'PASS').length
-          const rejected = results.filter(r => r.recommendation === 'REJECT').length
-          const needsRevision = results.filter(r => r.recommendation === 'NEEDS_REVISION').length
+          const inputProposals = args?.proposals || []
+
+          // Map to the canonical GovernanceRequest shape
+          const request: GovernanceRequest = {
+            proposals: inputProposals.map((p: any, i: number) => ({
+              id: p.id || `prop-${Date.now()}-${i}`,
+              type: p.type || 'fix',
+              title: p.title || 'Untitled Proposal',
+              description: p.description || p.details || '',
+              evidence: p.evidence || [],
+              source: 'vercel-http',
+              confidence: p.confidence || 0.8,
+            })),
+            context: { source: 'vercel-governance-mcp' },
+            options: { requireExternalDynamo: true },
+          }
+
+          // Use the shared GovernanceService (supports in-process on Vercel)
+          const service = getGovernanceService()
+          const response = await service.govern(request)
 
           return mcpResult(id, {
             content: [{
               type: 'text',
               text: JSON.stringify({
-                summary: `Governed ${results.length} proposals: ${passed} passed, ${rejected} rejected, ${needsRevision} need revision`,
-                results,
-                governance: { engine: '0xRay Isotopic Temporal Vortex v4.8', constants: { PHI, TAU } },
+                summary: `Governed ${response.summary.total} proposals via real skill MCPs + required Dynamo`,
+                overallDecision: response.overallDecision,
+                results: response.results,
+                engine: 'GovernanceService + real MCPs (code-review, security-audit, researcher) + Solar',
               }, null, 2),
             }],
           })

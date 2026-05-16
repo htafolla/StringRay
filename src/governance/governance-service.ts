@@ -16,6 +16,7 @@
 
 import { mcpClientManager } from '../mcps/mcp-client.js';
 import { GovernanceClient } from '../integrations/governance/governance-client.js';
+import { callInProcessSkill } from '../mcps/in-process-skill-registry.js';
 import {
   GovernanceProposal,
   GovernanceVote,
@@ -99,19 +100,34 @@ export class GovernanceService {
     context?: GovernanceContext
   ): Promise<GovernanceVote[]> {
     const votes: GovernanceVote[] = [];
+    const useInProcess = process.env.VERCEL === '1';
 
     for (const proposal of proposals) {
       try {
-        const result = await mcpClientManager.callServerTool(serverName, 'analyze_proposal', {
-          proposalTitle: proposal.title,
-          proposalDescription: proposal.description,
-          evidence: proposal.evidence || [],
-          proposalType: proposal.type,
-          context,
-        });
+        let text = '';
 
-        // The skill servers return structured text in content[0].text
-        const text = (result as any)?.content?.[0]?.text || '';
+        if (useInProcess) {
+          // Vercel / serverless path — use in-process skill instances (no child processes)
+          const result = await callInProcessSkill(serverName, 'analyze_proposal', {
+            proposalTitle: proposal.title,
+            proposalDescription: proposal.description,
+            evidence: proposal.evidence || [],
+            proposalType: proposal.type,
+            context,
+          });
+          text = (result as any)?.content?.[0]?.text || '';
+        } else {
+          // Normal path — real MCP transport
+          const result = await mcpClientManager.callServerTool(serverName, 'analyze_proposal', {
+            proposalTitle: proposal.title,
+            proposalDescription: proposal.description,
+            evidence: proposal.evidence || [],
+            proposalType: proposal.type,
+            context,
+          });
+          text = (result as any)?.content?.[0]?.text || '';
+        }
+
         const vote = this.parseVoteFromText(serverName, text);
         votes.push(vote);
       } catch (error) {
@@ -119,6 +135,7 @@ export class GovernanceService {
           server: serverName,
           proposal: proposal.title,
           error: error instanceof Error ? error.message : String(error),
+          mode: useInProcess ? 'in-process' : 'mcp',
         });
 
         votes.push({

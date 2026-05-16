@@ -175,10 +175,10 @@ describe('POST / — JSON-RPC tools/call govern_proposals', () => {
     const text = JSON.parse(body.result.content[0].text)
     expect(text.summary).toContain('Governed 2 proposals')
     expect(text.results.length).toBe(2)
-    expect(text.results[0].type).toBe('fix')
-    expect(text.results[0].recommendation).toMatch(/PASS|REJECT|NEEDS_REVISION/)
-    expect(text.governance.constants.PHI).toBe(1.666)
-    expect(text.governance.constants.TAU).toBe(0.865)
+    // New GovernanceService response shape
+    expect(text.results[0].finalDecision).toMatch(/approve|reject|needs_revision/)
+    expect(typeof text.results[0].averageConfidence).toBe('number')
+    expect(text.overallDecision).toBeDefined()
   })
 })
 

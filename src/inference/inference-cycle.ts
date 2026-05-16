@@ -697,13 +697,10 @@ Respond with EXACTLY one of:
   }
 
   private async isGovernanceMcpPreferred(): Promise<boolean> {
-    // Check features.json for governance.enabled (default true)
-    try {
-      // Simple heuristic: if the governance server is registered, prefer it
-      return true; // Will be wired to actual feature flag in later iteration
-    } catch {
-      return false;
-    }
+    // Governance MCP is the preferred path when available.
+    // Controlled primarily via STRRAY_FORCE_MCP_GOVERNANCE env var for now.
+    // Future: wire to features.json governance.enabled flag.
+    return true
   }
 
   private parseGovernanceMcpResponse(text: string, proposals: InferenceProposal[]): {

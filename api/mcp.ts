@@ -8,6 +8,7 @@ import path from 'node:path'
 // New clean governance core (src/governance/)
 import { getGovernanceService } from '../src/governance/governance-service.js'
 import type { GovernanceRequest } from '../src/governance/governance-types.js'
+import { frameworkLogger } from '../src/core/framework-logger.js'
 
 // ===== Governance Enabled Check (cold-start cached) =====
 let governanceEnabled = true
@@ -299,7 +300,10 @@ app.post('/messages', async (c: Context) => {
   if (result) {
     const delivered = await publish(`session:${sessionId}`, JSON.stringify(result))
     if (!delivered) {
-      // no SSE subscriber listening
+      frameworkLogger.log('vercel-governance-mcp', 'sse-publish-failed', 'warning', {
+        sessionId,
+        reason: 'No active SSE subscriber for session',
+      })
     }
   }
 

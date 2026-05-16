@@ -31,7 +31,7 @@ import {
   GovernOptions,
   GovernanceRequest,
   GovernanceResponse,
-} from './governance-types';
+} from './governance-types.js';
 import { mergeVotes } from './governance-core.js';
 import { frameworkLogger } from '../core/framework-logger.js';
 

@@ -70,6 +70,14 @@ export class ServerConfigRegistry {
       timeout: 60000,
     });
 
+    // Governance Service (meta-MCP that orchestrates the three skill servers + required external Dynamo)
+    this.register({
+      serverName: 'governance',
+      command: 'node',
+      args: [`${basePath}/mcps/governance.server.js`],
+      timeout: 120000, // Governance can take longer because it calls multiple servers + external
+    });
+
     // Framework Help Server
     this.register({
       serverName: 'framework-help',

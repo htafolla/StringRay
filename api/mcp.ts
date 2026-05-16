@@ -5,6 +5,8 @@ import { EventEmitter } from 'node:events'
 import crypto from 'node:crypto'
 import fs from 'node:fs'
 import path from 'node:path'
+import { evaluateProposal, PHI, TAU } from '../src/mcps/governance-core.js'
+import type { ProposalInput } from '../src/mcps/governance-core.js'
 
 // ===== Governance Enabled Check (cold-start cached) =====
 let governanceEnabled = true
@@ -41,32 +43,11 @@ async function subscribe(channel: string, cb: (msg: string) => void): Promise<()
   return async () => { bus.off(channel, cb) }
 }
 
-// ===== Constants =====
-const PHI = 1.666
-const TAU = 0.865
-
 // ===== Types =====
 interface ToolDefinition {
   name: string
   description: string
   inputSchema: Record<string, unknown>
-}
-
-interface GovernanceResult {
-  recommendation: string
-  confidence: number
-  voteWeight: number
-  reasons: string[]
-}
-
-interface Proposal {
-  id?: string
-  type: string
-  title: string
-  description: string
-  evidence?: string[]
-  source?: string
-  confidence?: number
 }
 
 // ===== Session Registry =====
@@ -131,51 +112,6 @@ const TOOLS: ToolDefinition[] = [
     inputSchema: { type: 'object', properties: {} },
   },
 ]
-
-// ===== Governance Logic =====
-function applyDecisionMatrix(resonance: number, isotopicRatio: number, vortexVolume: number, historicalCoherence: number): GovernanceResult {
-  const reasons: string[] = []
-  let recommendation = 'NEEDS_REVISION'
-  let confidence = 0.75
-  let voteWeight = 1.0
-
-  if (resonance >= 0.92 && isotopicRatio >= 0.95) {
-    recommendation = 'PASS'; confidence = 0.97; voteWeight = 1.4
-    reasons.push('High symbiotic resonance (PHI-aligned)')
-  } else if (resonance >= 0.82 && isotopicRatio >= 0.88) {
-    recommendation = 'PASS'; confidence = 0.89; voteWeight = 1.15
-    reasons.push('Solid alignment above TAU threshold')
-  } else if (resonance < 0.75 || isotopicRatio < 0.80) {
-    recommendation = 'REJECT'; confidence = 0.84
-    reasons.push('Signal below critical threshold (1 - TAU)')
-  } else {
-    reasons.push('Moderate resonance - requires refinement')
-  }
-
-  if (vortexVolume < 2.5e25) {
-    reasons.push('Low inertial mass (W x M = V)')
-    if (recommendation === 'PASS') recommendation = 'NEEDS_REVISION'
-  }
-  if (historicalCoherence < 0.70) {
-    reasons.push('Weak historical alignment with past decisions')
-    if (recommendation === 'PASS') recommendation = 'NEEDS_REVISION'
-  } else if (historicalCoherence > 0.90) {
-    reasons.push('Strong continuity with previous governance')
-    voteWeight *= 1.1
-  }
-
-  return { recommendation, confidence, voteWeight, reasons }
-}
-
-function evaluateProposal(p: Proposal): GovernanceResult {
-  const hash = p.title.length + p.description.length
-  return applyDecisionMatrix(
-    Math.min(0.7 + ((hash * PHI) % 30) / 100, 1),
-    Math.min(0.75 + ((hash * TAU) % 25) / 100, 1),
-    1e25 + ((hash * PHI * TAU) % 1e26),
-    Math.min(0.6 + ((hash * PHI) % 40) / 100, 1),
-  )
-}
 
 // ===== JSON-RPC Helpers =====
 function mcpResult(id: unknown, result: unknown) {

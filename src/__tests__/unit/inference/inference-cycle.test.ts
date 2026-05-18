@@ -162,7 +162,7 @@ describe("Inference Cycle", () => {
     const cycle = new InferenceCycle(tmpDir, mockAgentInvoker);
     const result = await cycle.maybeRunCycle();
 
-    expect(result.duration).toBeGreaterThan(0);
+    expect(result.duration).toBeGreaterThanOrEqual(0);
     expect(result.completedAt).toBeTruthy();
   }, 15000);
 

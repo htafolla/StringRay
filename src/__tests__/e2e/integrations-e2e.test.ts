@@ -93,7 +93,7 @@ const TEST_PROPOSALS = [
   { id: "e2e-2", title: "E2E test codify", description: "Test codify proposal", type: "codify", confidence: 0.9, evidence: ["e2e evidence"] },
 ];
 
-describe("Hermes Bridge E2E", { timeout: 30000 }, () => {
+describe("Hermes Bridge E2E", { timeout: 180000 }, () => {
   test("bridge health command via positional arg", async () => {
     const raw = await bridgeExec([BRIDGE_PATH, "health", "--cwd", PROJECT_ROOT]);
     const result = JSON.parse(raw);

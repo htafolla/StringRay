@@ -20,6 +20,9 @@ import fs from 'fs';
 import path from 'path';
 import { execSync } from 'child_process';
 
+// ESM-compatible __dirname (this file is compiled to ESM)
+const __dirname = path.dirname(new URL(import.meta.url).pathname);
+
 export interface GrokInstallOptions {
   force?: boolean;
   dryRun?: boolean;

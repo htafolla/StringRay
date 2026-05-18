@@ -1069,6 +1069,11 @@ program
     removeMCPCommand(name);
   });
 
+// Grok CLI integration
+const grokCmd = program.command('grok').description('Grok CLI integration commands');
+const { registerGrokCommands } = await import('./commands/grok-install.js');
+registerGrokCommands(grokCmd);
+
 // Analytics enable command
 // TODO: Re-enable after fixing dashboard module
 // program

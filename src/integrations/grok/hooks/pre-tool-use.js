@@ -10,7 +10,7 @@
 import fs from 'fs';
 import path from 'path';
 
-const log = (msg) => { try { console.error(`[0xRay:GrokHook] ${msg}`); } catch {} };
+const log = (msg) => { try { console.error(`[0xRay:GrokHook] ${msg}`); } catch { /* noop */ } };
 
 function findGovernanceCore() {
   const here = path.dirname(new URL(import.meta.url).pathname);

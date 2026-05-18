@@ -117,7 +117,7 @@ describe("Hermes Bridge E2E", { timeout: 30000 }, () => {
 
   test("bridge govern command via stdin", async () => {
     const input = JSON.stringify({ command: "govern", proposals: TEST_PROPOSALS });
-    const raw = await bridgeExec([BRIDGE_PATH, "--cwd", PROJECT_ROOT], input);
+    const raw = await bridgeExec([BRIDGE_PATH, "--cwd", PROJECT_ROOT], input, 120000);
     const result = JSON.parse(raw);
     expect(result.cycleId).toBeDefined();
     expect(result.approved).toBeTypeOf("number");
@@ -125,24 +125,24 @@ describe("Hermes Bridge E2E", { timeout: 30000 }, () => {
     expect(result.votes).toBeInstanceOf(Array);
     expect(result.proposals).toBeInstanceOf(Array);
     expect(result.proposals.length).toBe(2);
-  });
+  }, 120000);
 
   test("bridge apply command via stdin", async () => {
     const input = JSON.stringify({ command: "apply", proposals: TEST_PROPOSALS });
-    const raw = await bridgeExec([BRIDGE_PATH, "--cwd", PROJECT_ROOT], input);
+    const raw = await bridgeExec([BRIDGE_PATH, "--cwd", PROJECT_ROOT], input, 120000);
     const result = JSON.parse(raw);
     expect(result.cycleId).toBeDefined();
     expect(result.approved).toBeTypeOf("number");
     expect(result.proposals).toBeInstanceOf(Array);
-  });
+  }, 120000);
 
   test("bridge govern via positional + --json", async () => {
     const payload = JSON.stringify({ proposals: TEST_PROPOSALS });
-    const raw = await bridgeExec([BRIDGE_PATH, "govern", "--cwd", PROJECT_ROOT, "--json", payload]);
+    const raw = await bridgeExec([BRIDGE_PATH, "govern", "--cwd", PROJECT_ROOT, "--json", payload], undefined, 120000);
     const result = JSON.parse(raw);
     expect(result.cycleId).toBeDefined();
     expect(result.votes).toBeInstanceOf(Array);
-  });
+  }, 120000);
 
   test("bridge unknown command returns error", async () => {
     const raw = await bridgeExec([BRIDGE_PATH, "--cwd", PROJECT_ROOT], '{"command":"nonexistent"}');

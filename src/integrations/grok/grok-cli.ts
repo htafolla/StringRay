@@ -36,8 +36,8 @@ export async function installForGrokCLI(options: GrokInstallOptions = {}): Promi
 
   // Try to find the plugin source from the installed package
   const possibleSources = [
-    path.join(__dirname, '..', '..', '..', '..', 'src/integrations/grok/plugin/strray-ai'), // dev
-    path.join(__dirname, '..', '..', '..', '..', '.grok/plugins/strray-ai'), // after build
+    path.join(__dirname, '..', '..', '..', 'src/integrations/grok/plugin/strray-ai'), // dev
+    path.join(__dirname, '..', '..', '..', '.grok/plugins/strray-ai'), // after build
   ];
 
   let sourceDir = possibleSources.find(p => fs.existsSync(p));

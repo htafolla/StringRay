@@ -651,19 +651,24 @@ Respond with EXACTLY one of:
 
     if (useGovernanceMcp) {
       try {
-        const result = await mcpClientManager.callServerTool("governance", "govern_proposals", {
-          proposals: proposals.map(p => ({
-            id: p.id,
-            type: p.type,
-            title: p.title,
-            description: p.description,
-            evidence: p.evidence || [],
-            source: p.source || "inference",
-            confidence: p.confidence || 0.8,
-          })),
-          context: { source: "inference-cycle" },
-          options: { require_external: true },
-        });
+        const result = await Promise.race([
+          mcpClientManager.callServerTool("governance", "govern_proposals", {
+            proposals: proposals.map(p => ({
+              id: p.id,
+              type: p.type,
+              title: p.title,
+              description: p.description,
+              evidence: p.evidence || [],
+              source: p.source || "inference",
+              confidence: p.confidence || 0.8,
+            })),
+            context: { source: "inference-cycle" },
+            options: { require_external: true },
+          }),
+          new Promise<never>((_, reject) =>
+            setTimeout(() => reject(new Error("Governance MCP timed out after 8s")), 8000)
+          ),
+        ]);
 
         const text = (result as any)?.content?.[0]?.text || "";
         const parsed = this.parseGovernanceMcpResponse(text, proposals);

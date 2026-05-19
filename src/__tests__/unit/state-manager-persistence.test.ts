@@ -231,7 +231,10 @@ describe("StringRayStateManager - Persistence Features", () => {
       // Advance timers to trigger persistence
       await vi.advanceTimersByTimeAsync(500);
 
-      const writtenData = JSON.parse(mockFs.writeFileSync.mock.calls[0][1]);
+      // Use the last write (persistToDisk always writes the full current filtered state)
+      const calls = mockFs.writeFileSync.mock.calls;
+      const lastCall = calls[calls.length - 1];
+      const writtenData = JSON.parse(lastCall[1]);
       expect(writtenData["normal"]).toBe("value");
       expect(writtenData["circular"]).toBeUndefined();
     });

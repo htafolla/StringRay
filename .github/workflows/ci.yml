@@ -257,7 +257,7 @@ jobs:
   ci-health:
     name: CI Health Monitor
     runs-on: ubuntu-latest
-    needs: [quality, test-unit, test-pipeline, test-package, security, enforcement, docs-build]
+    needs: [ci-summary, docs-build]
     if: always()
     steps:
       - name: Checkout

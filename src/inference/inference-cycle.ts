@@ -467,19 +467,26 @@ export class InferenceCycle {
     const targetFiles = this.extractTargetFiles(p.evidence);
 
     const prompt = [
-      `Apply approved inference proposal`,
+      `You are an autonomous code editor. Your ONLY job is to make the exact change described below by calling write/edit tools.`,
       ``,
-      `Type: ${p.type}`,
+      `Proposal Type: ${p.type}`,
       `Title: ${p.title}`,
       `Description: ${p.description}`,
-      targetFiles.length > 0 ? `Target files: ${targetFiles.join(", ")}` : "No specific target files identified",
-      `Evidence: ${p.evidence.slice(0, 5).join("; ")}`,
-      `Confidence: ${(p.confidence * 100).toFixed(0)}%`,
       ``,
-      `1. Read the relevant source files`,
-      `2. Apply the ${p.type} described above`,
-      `3. Make minimal, surgical changes`,
-      `4. If the change is unsafe or unclear, skip and explain`,
+      targetFiles.length > 0 
+        ? `Focus on these files: ${targetFiles.join(", ")}` 
+        : `First identify the correct files to modify based on the description and evidence.`,
+      `Supporting Evidence: ${p.evidence.slice(0, 5).join("; ")}`,
+      `Confidence in proposal: ${(p.confidence * 100).toFixed(0)}%`,
+      ``,
+      `CRITICAL INSTRUCTIONS:`,
+      `1. Read the relevant source files immediately.`,
+      `2. You MUST use actual write/edit tools (search_replace, edit_file, write_file, apply_patch, etc.) to make the change.`,
+      `3. Make the minimal, surgical modification that implements the proposal.`,
+      `4. After editing, explicitly state: "I used [tool_name] on [file_path]" and describe exactly what changed.`,
+      `5. Do NOT just describe the change or return analysis. You must perform the edit using tools.`,
+      `6. If you cannot safely make the change, clearly explain why instead of making partial edits.`,
+      `7. Confirm at the end whether the edit was successfully applied using a tool.`,
     ].join("\n");
 
     frameworkLogger.log("inference-cycle", "apply-invoking-agent", "info", {
@@ -489,14 +496,28 @@ export class InferenceCycle {
     });
 
     try {
-      let agentName = p.type === "refactor" ? "refactorer" : "code-reviewer";
+      // Prefer agents with write/edit capability over pure analysis agents
+      let agentName = p.type === "refactor" ? "refactorer" : "enforcer";
 
-      // In pure MCP mode, use real skill server names so the orchestrator dispatches to actual MCP tools
       if (process.env.STRRAY_FORCE_MCP_GOVERNANCE === 'true') {
-        agentName = p.type === "refactor" ? "refactoring-strategies" : "code-review";
+        agentName = p.type === "refactor" ? "refactoring-strategies" : "enforcer";
       }
 
-      await this.invokeAgentInternal(agentName, prompt);
+      const response = await this.invokeAgentInternal(agentName, prompt);
+
+      // Triage/monitor: if the response mentions a write or edit tool, the agent is doing real work
+      const writeEditTools = ["write_file", "edit_file", "search_replace", "apply_edit", "create_file", "modify_file", "patch", "fs.write"];
+      const lowerResp = (response || "").toLowerCase();
+      const usedWriteTool = writeEditTools.some(t => lowerResp.includes(t));
+
+      if (usedWriteTool) {
+        frameworkLogger.log("inference-cycle", "apply-write-tool-detected", "info", {
+          proposalId: p.id,
+          agentName,
+          responsePreview: response.substring(0, 400),
+        });
+      }
+
       return true;
     } catch (err) {
       frameworkLogger.log("inference-cycle", "apply-agent-failed", "warning", {
@@ -509,34 +530,49 @@ export class InferenceCycle {
 
   private async applyGuard(p: InferenceProposal): Promise<boolean> {
     const prompt = [
-      `Add guard/validation for the following issue:`,
+      `You are an autonomous code editor. Your ONLY job is to implement the guard or validation described below by calling write/edit tools.`,
       ``,
       `Title: ${p.title}`,
       `Description: ${p.description}`,
       `Evidence: ${p.evidence.join("; ")}`,
       `Confidence: ${(p.confidence * 100).toFixed(0)}%`,
       ``,
-      `1. Read the relevant source files`,
-      `2. Add the missing guard, validation, or edge case handling`,
-      `3. If this is a codex rule, add the term to .opencode/strray/codex.json`,
-      `4. Make minimal, surgical changes`,
+      `CRITICAL INSTRUCTIONS:`,
+      `1. Read the relevant source files.`,
+      `2. You MUST use write/edit tools (search_replace, edit_file, etc.) to add the guard/validation.`,
+      `3. If this involves a codex rule, also update .opencode/strray/codex.json using a write tool.`,
+      `4. After editing, explicitly state which tool you used and on which file(s).`,
+      `5. Do NOT return only analysis. Perform the actual code change.`,
+      `6. If you cannot implement the guard safely, clearly state why.`,
     ].join("\n");
 
     try {
+      // Use agents that can actually perform edits when possible
       const agentName = process.env.STRRAY_FORCE_MCP_GOVERNANCE === 'true' 
-        ? "code-review" 
-        : "code-reviewer";
-      await this.invokeAgentInternal(agentName, prompt);
+        ? "enforcer" 
+        : "enforcer";
+      const response = await this.invokeAgentInternal(agentName, prompt);
+
+      const writeEditTools = ["write_file", "edit_file", "search_replace", "apply_edit", "create_file", "modify_file", "patch", "fs.write", "codex"];
+      const lowerResp = (response || "").toLowerCase();
+      const usedWriteTool = writeEditTools.some(t => lowerResp.includes(t) || lowerResp.includes("write") || lowerResp.includes("edit"));
+
+      if (usedWriteTool) {
+        frameworkLogger.log("inference-cycle", "apply-write-tool-detected", "info", {
+          proposalId: p.id,
+          agentName,
+          responsePreview: response.substring(0, 400),
+        });
+      }
+
       return true;
     } catch (err) {
       frameworkLogger.log("inference-cycle", "apply-guard-failed", "warning", {
         proposalId: p.id,
         error: String(err),
       });
-      const guardPath = path.join(this.projectRoot, "docs", "guards", `${p.title.replace(/[^a-z0-9]/gi, "-")}.md`);
-      fs.mkdirSync(path.dirname(guardPath), { recursive: true });
-      fs.writeFileSync(guardPath, `# Guard: ${p.title}\n\n${p.description}\n\n## Evidence\n${p.evidence.join("\n")}`);
-      return true;
+      // Strict policy: do not pretend a guard was applied if the agent couldn't make the change.
+      return false;
     }
   }
 
@@ -549,34 +585,48 @@ export class InferenceCycle {
 
   private async applyAutomation(p: InferenceProposal): Promise<boolean> {
     const prompt = [
-      `Design automation for the following manual process:`,
+      `You are an autonomous automation implementer. Your job is to implement the automation described below using write/edit tools where possible.`,
       ``,
       `Title: ${p.title}`,
       `Description: ${p.description}`,
       `Evidence: ${p.evidence.join("; ")}`,
       `Confidence: ${(p.confidence * 100).toFixed(0)}%`,
       ``,
-      `1. Read the relevant source files`,
-      `2. Design the automation (script, processor, or config change)`,
-      `3. Implement it if straightforward, otherwise describe the design`,
+      `CRITICAL INSTRUCTIONS:`,
+      `1. Read the relevant source files.`,
+      `2. Design and implement the automation (script, processor, config, or code change).`,
+      `3. You MUST use write/edit tools to create or modify files when implementing.`,
+      `4. After making changes, explicitly state which tools you used and what files were created/modified.`,
+      `5. If full implementation is too complex, at minimum create a detailed implementation file or script using write tools.`,
+      `6. Do not stop at high-level design — produce concrete artifacts via file writes.`,
     ].join("\n");
 
     try {
       const agentName = process.env.STRRAY_FORCE_MCP_GOVERNANCE === 'true' 
         ? "architecture-patterns" 
         : "architect";
-      await this.invokeAgentInternal(agentName, prompt);
+      const response = await this.invokeAgentInternal(agentName, prompt);
+
+      const writeEditTools = ["write_file", "edit_file", "search_replace", "apply_edit", "create_file", "modify_file", "patch", "fs.write"];
+      const lowerResp = (response || "").toLowerCase();
+      const usedWriteTool = writeEditTools.some(t => lowerResp.includes(t));
+
+      if (usedWriteTool) {
+        frameworkLogger.log("inference-cycle", "apply-write-tool-detected", "info", {
+          proposalId: p.id,
+          agentName,
+          responsePreview: response.substring(0, 400),
+        });
+      }
+
       return true;
     } catch (err) {
       frameworkLogger.log("inference-cycle", "apply-automation-failed", "warning", {
         proposalId: p.id,
         error: String(err),
       });
-      const automationPath = path.join(this.projectRoot, "docs", "automation-proposals.md");
-      const entry = `\n## ${p.title}\n\n${p.description}\n\n**Evidence:** ${p.evidence.join(", ")}\n`;
-      fs.mkdirSync(path.dirname(automationPath), { recursive: true });
-      fs.appendFileSync(automationPath, entry);
-      return true;
+      // Strict policy: fail instead of writing a weak proposal artifact
+      return false;
     }
   }
 
@@ -1174,7 +1224,9 @@ Respond with EXACTLY one of:
     });
 
     return new Promise((resolve, reject) => {
-      const timeout = agentName === "architect" ? 300000 : 120000;
+      // Real autonomous apply work (refactor, guard, fix proposals) can legitimately take 5-10 minutes.
+      // Previous 2-minute timeout was guaranteed to kill agents before they could finish.
+      const timeout = 600000; // 10 minutes
       let settled = false;
       const timer = setTimeout(() => {
         if (!settled) {

@@ -4,6 +4,11 @@ import * as http from "http";
 import * as path from "path";
 import * as fs from "fs";
 
+// These Hermes Bridge E2E tests require a full Hermes runtime + LLM access
+// and can take a very long time. They should NOT run in standard PR CI.
+// Run them locally with: RUN_HERMES_BRIDGE_TESTS=true npm test -- src/__tests__/e2e/integrations-e2e.test.ts
+const RUN_HERMES_BRIDGE = process.env.RUN_HERMES_BRIDGE_TESTS === "true";
+
 const PROJECT_ROOT = path.resolve(process.cwd());
 const BRIDGE_PATH = path.join(PROJECT_ROOT, "dist", "integrations", "hermes-agent", "bridge.mjs");
 const API_SERVER_PATH = path.join(PROJECT_ROOT, "dist", "integrations", "openclaw", "api-server.js");
@@ -93,7 +98,7 @@ const TEST_PROPOSALS = [
   { id: "e2e-2", title: "E2E test codify", description: "Test codify proposal", type: "codify", confidence: 0.9, evidence: ["e2e evidence"] },
 ];
 
-describe("Hermes Bridge E2E", { timeout: 180000 }, () => {
+describe.skipIf(!RUN_HERMES_BRIDGE)("Hermes Bridge E2E", { timeout: 180000 }, () => {
   test("bridge health command via positional arg", async () => {
     const raw = await bridgeExec([BRIDGE_PATH, "health", "--cwd", PROJECT_ROOT]);
     const result = JSON.parse(raw);

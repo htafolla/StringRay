@@ -1045,16 +1045,22 @@ Respond with EXACTLY one of:
 
     try {
       const { mcpClientManager } = await import("../mcps/mcp-client.js");
-      const result = await mcpClientManager.callServerTool("orchestrator", "orchestrate-task", {
-        description: prompt,
-        tasks: [{
-          id: `task-${Date.now()}`,
+      const MCP_TIMEOUT_MS = 8000;
+      const result = await Promise.race([
+        mcpClientManager.callServerTool("orchestrator", "orchestrate-task", {
           description: prompt,
-          type: agentName,
-          priority: "high",
-        }],
-        executionMode: "sequential",
-      });
+          tasks: [{
+            id: `task-${Date.now()}`,
+            description: prompt,
+            type: agentName,
+            priority: "high",
+          }],
+          executionMode: "sequential",
+        }),
+        new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error(`Orchestrator MCP timed out after ${MCP_TIMEOUT_MS}ms`)), MCP_TIMEOUT_MS)
+        ),
+      ]);
       const content = (result as { content?: Array<{ text?: string }> }).content;
       let responseText = "";
       if (content && Array.isArray(content)) {

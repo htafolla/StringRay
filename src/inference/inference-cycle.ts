@@ -425,7 +425,8 @@ export class InferenceCycle {
       }
 
       if (!filesChanged) {
-        execSync(`git checkout master`, { cwd: this.projectRoot, stdio: "pipe" });
+        const defaultBranch = this.getDefaultBranch();
+        execSync(`git checkout ${defaultBranch}`, { cwd: this.projectRoot, stdio: "pipe" });
         execSync(`git branch -D ${branchName}`, { cwd: this.projectRoot, stdio: "pipe" });
         return false;
       }
@@ -441,7 +442,7 @@ export class InferenceCycle {
         const review = await this.researcherReview(p, prUrl);
         if (review === "no-go") {
           frameworkLogger.log("inference-cycle", "researcher-no-go", "warning", { prUrl });
-          execSync(`git checkout master`, { cwd: this.projectRoot, stdio: "pipe" });
+          execSync(`git checkout ${this.getDefaultBranch()}`, { cwd: this.projectRoot, stdio: "pipe" });
           execSync(`git branch -D ${branchName}`, { cwd: this.projectRoot, stdio: "pipe" });
           return false;
         } else if (review === "modify") {
@@ -449,12 +450,12 @@ export class InferenceCycle {
         }
       }
 
-      execSync(`git checkout master`, { cwd: this.projectRoot, stdio: "pipe" });
+      execSync(`git checkout ${this.getDefaultBranch()}`, { cwd: this.projectRoot, stdio: "pipe" });
 
       return true;
     } catch (err) {
       try {
-        execSync(`git checkout master`, { cwd: this.projectRoot, stdio: "pipe" });
+        execSync(`git checkout ${this.getDefaultBranch()}`, { cwd: this.projectRoot, stdio: "pipe" });
         execSync(`git branch -D ${branchName}`, { cwd: this.projectRoot, stdio: "pipe" });
       } catch {
         // ignore cleanup errors
@@ -595,6 +596,31 @@ export class InferenceCycle {
     }
 
     return [...files];
+  }
+
+  private getDefaultBranch(): string {
+    try {
+      const symRef = execSync('git symbolic-ref refs/remotes/origin/HEAD', {
+        cwd: this.projectRoot,
+        encoding: 'utf-8',
+        stdio: 'pipe'
+      }).trim();
+      if (symRef) {
+        const branch = symRef.replace('refs/remotes/origin/', '');
+        if (branch) return branch;
+      }
+    } catch {}
+
+    try {
+      const current = execSync('git branch --show-current', {
+        cwd: this.projectRoot,
+        encoding: 'utf-8',
+        stdio: 'pipe'
+      }).trim();
+      if (['main', 'master', 'develop'].includes(current)) return current;
+    } catch {}
+
+    return 'main';
   }
 
   private createPR(p: InferenceProposal, branchName: string): string {

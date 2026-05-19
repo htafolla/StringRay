@@ -424,8 +424,25 @@ export class InferenceCycle {
         filesChanged = await this.applyAutomation(p);
       }
 
+      // Critical fix: actually verify the agent made changes before committing
+      if (filesChanged) {
+        try {
+          const status = execSync('git status --porcelain', { cwd: this.projectRoot, encoding: 'utf-8' }).trim();
+          if (status.length === 0) {
+            frameworkLogger.log("inference-cycle", "no-actual-changes-after-agent", "warning", {
+              proposalId: p.id,
+              title: p.title,
+            });
+            filesChanged = false;
+          }
+        } catch (e) {
+          frameworkLogger.log("inference-cycle", "change-detection-failed", "warning", { error: String(e) });
+        }
+      }
+
       if (!filesChanged) {
-        execSync(`git checkout master`, { cwd: this.projectRoot, stdio: "pipe" });
+        const defaultBranch = this.getDefaultBranch();
+        execSync(`git checkout ${defaultBranch}`, { cwd: this.projectRoot, stdio: "pipe" });
         execSync(`git branch -D ${branchName}`, { cwd: this.projectRoot, stdio: "pipe" });
         return false;
       }
@@ -441,7 +458,8 @@ export class InferenceCycle {
         const review = await this.researcherReview(p, prUrl);
         if (review === "no-go") {
           frameworkLogger.log("inference-cycle", "researcher-no-go", "warning", { prUrl });
-          execSync(`git checkout master`, { cwd: this.projectRoot, stdio: "pipe" });
+          const defaultBranch = this.getDefaultBranch();
+          execSync(`git checkout ${defaultBranch}`, { cwd: this.projectRoot, stdio: "pipe" });
           execSync(`git branch -D ${branchName}`, { cwd: this.projectRoot, stdio: "pipe" });
           return false;
         } else if (review === "modify") {
@@ -449,12 +467,14 @@ export class InferenceCycle {
         }
       }
 
-      execSync(`git checkout master`, { cwd: this.projectRoot, stdio: "pipe" });
+      const defaultBranch = this.getDefaultBranch();
+      execSync(`git checkout ${defaultBranch}`, { cwd: this.projectRoot, stdio: "pipe" });
 
       return true;
     } catch (err) {
       try {
-        execSync(`git checkout master`, { cwd: this.projectRoot, stdio: "pipe" });
+        const db = this.getDefaultBranch();
+        execSync(`git checkout ${db}`, { cwd: this.projectRoot, stdio: "pipe" });
         execSync(`git branch -D ${branchName}`, { cwd: this.projectRoot, stdio: "pipe" });
       } catch {
         // ignore cleanup errors
@@ -489,9 +509,11 @@ export class InferenceCycle {
     });
 
     try {
-      let agentName = p.type === "refactor" ? "refactorer" : "code-reviewer";
+      // Better agent selection for actual code changes (not review)
+      let agentName = "refactorer";
+      if (p.type === "fix") agentName = "enforcer"; // enforcer often good at targeted fixes
 
-      // In pure MCP mode, use real skill server names so the orchestrator dispatches to actual MCP tools
+      // In pure MCP mode, use real skill servers
       if (process.env.STRRAY_FORCE_MCP_GOVERNANCE === 'true') {
         agentName = p.type === "refactor" ? "refactoring-strategies" : "code-review";
       }
@@ -523,9 +545,10 @@ export class InferenceCycle {
     ].join("\n");
 
     try {
+      // Prefer agents that can implement guards
       const agentName = process.env.STRRAY_FORCE_MCP_GOVERNANCE === 'true' 
-        ? "code-review" 
-        : "code-reviewer";
+        ? "enforcer" 
+        : "enforcer";
       await this.invokeAgentInternal(agentName, prompt);
       return true;
     } catch (err) {
@@ -595,6 +618,31 @@ export class InferenceCycle {
     }
 
     return [...files];
+  }
+
+  private getDefaultBranch(): string {
+    try {
+      const symRef = execSync('git symbolic-ref refs/remotes/origin/HEAD', {
+        cwd: this.projectRoot,
+        encoding: 'utf-8',
+        stdio: 'pipe'
+      }).trim();
+      if (symRef) {
+        const branch = symRef.replace('refs/remotes/origin/', '');
+        if (branch) return branch;
+      }
+    } catch {}
+
+    try {
+      const current = execSync('git branch --show-current', {
+        cwd: this.projectRoot,
+        encoding: 'utf-8',
+        stdio: 'pipe'
+      }).trim();
+      if (['main', 'master', 'develop'].includes(current)) return current;
+    } catch {}
+
+    return 'main';
   }
 
   private createPR(p: InferenceProposal, branchName: string): string {

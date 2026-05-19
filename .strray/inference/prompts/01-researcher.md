@@ -173,7 +173,6 @@ Analyze the following data sources to gather insights for inference improvement:
 - /Users/blaze/dev/stringray/logs/framework/activity-2026-05-11T23-32-16-547Z.log.gz
 - /Users/blaze/dev/stringray/logs/framework/activity-2026-05-15T14-01-55-740Z.log.gz
 - /Users/blaze/dev/stringray/logs/framework/activity-report.json
-- /Users/blaze/dev/stringray/logs/framework/activity.log
 - /Users/blaze/dev/stringray/logs/framework/activity.log.orig
 - /Users/blaze/dev/stringray/logs/framework/framework-activity-2026-03-18T11-30-14-805Z.log.gz
 - /Users/blaze/dev/stringray/logs/framework/framework-activity-2026-03-18T11-31-42-888Z.log.gz

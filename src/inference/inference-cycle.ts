@@ -489,12 +489,8 @@ export class InferenceCycle {
     });
 
     try {
-      let agentName = p.type === "refactor" ? "refactorer" : "code-reviewer";
-
-      // In pure MCP mode, use real skill server names so the orchestrator dispatches to actual MCP tools
-      if (process.env.STRRAY_FORCE_MCP_GOVERNANCE === 'true') {
-        agentName = p.type === "refactor" ? "refactoring-strategies" : "code-review";
-      }
+      // Primary agent for apply is always refactorer (enforcer is no longer used as an agent)
+      const agentName = "refactorer";
 
       await this.invokeAgentInternal(agentName, prompt);
       return true;
@@ -523,9 +519,8 @@ export class InferenceCycle {
     ].join("\n");
 
     try {
-      const agentName = process.env.STRRAY_FORCE_MCP_GOVERNANCE === 'true' 
-        ? "code-review" 
-        : "code-reviewer";
+      // Primary agent for apply is always refactorer (enforcer is no longer used as an agent)
+      const agentName = "refactorer";
       await this.invokeAgentInternal(agentName, prompt);
       return true;
     } catch (err) {
@@ -562,9 +557,8 @@ export class InferenceCycle {
     ].join("\n");
 
     try {
-      const agentName = process.env.STRRAY_FORCE_MCP_GOVERNANCE === 'true' 
-        ? "architecture-patterns" 
-        : "architect";
+      // Primary agent for apply is always refactorer (enforcer is no longer used as an agent)
+      const agentName = "refactorer";
       await this.invokeAgentInternal(agentName, prompt);
       return true;
     } catch (err) {

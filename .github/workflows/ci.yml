@@ -101,12 +101,16 @@ jobs:
         run: npm test
 
   # ═══════════════════════════════════════════════════════
-  # Pipeline Tests
+  # Pipeline Tests (gated: schedule, needs-pipeline, or ci:full)
   # ═══════════════════════════════════════════════════════
   test-pipeline:
     name: Pipeline Tests
     runs-on: ubuntu-latest
     needs: test-unit
+    if: |
+      github.event_name == 'schedule' ||
+      contains(github.event.pull_request.labels.*.name, 'needs-pipeline') ||
+      contains(github.event.pull_request.labels.*.name, 'ci:full')
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -127,12 +131,16 @@ jobs:
         run: npm run test:pipelines
 
   # ═══════════════════════════════════════════════════════
-  # Consumer Package Test
+  # Consumer Package Test (gated: schedule, needs-pipeline, or ci:full)
   # ═══════════════════════════════════════════════════════
   test-package:
     name: Package Installation
     runs-on: ubuntu-latest
     needs: test-pipeline
+    if: |
+      github.event_name == 'schedule' ||
+      contains(github.event.pull_request.labels.*.name, 'needs-pipeline') ||
+      contains(github.event.pull_request.labels.*.name, 'ci:full')
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -181,12 +189,16 @@ jobs:
           node node_modules/strray-ai/scripts/mjs/validate-mcp-connectivity.cjs || true
 
   # ═══════════════════════════════════════════════════════
-  # Security Audit
+  # Security Audit (gated: schedule, needs-pipeline, or ci:full)
   # ═══════════════════════════════════════════════════════
   security:
     name: Security Audit
     runs-on: ubuntu-latest
     needs: test-package
+    if: |
+      github.event_name == 'schedule' ||
+      contains(github.event.pull_request.labels.*.name, 'needs-pipeline') ||
+      contains(github.event.pull_request.labels.*.name, 'ci:full')
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -278,3 +290,26 @@ jobs:
         with:
           name: ci-health-report
           path: .opencode/logs/ci-cd-monitor-report.json
+
+  # ═══════════════════════════════════════════════════════
+  # CI Summary Job (single required status check)
+  # ═══════════════════════════════════════════════════════
+  ci-summary:
+    name: CI Summary
+    runs-on: ubuntu-latest
+    needs: [quality, test-unit, enforcement]
+    if: always()
+    steps:
+      - name: Check required jobs status
+        run: |
+          echo "Quality: ${{ needs.quality.result }}"
+          echo "Unit Tests: ${{ needs.test-unit.result }}"
+          echo "Codex Enforcement: ${{ needs.enforcement.result }}"
+
+          if [ "${{ needs.quality.result }}" != "success" ] || \
+             [ "${{ needs.test-unit.result }}" != "success" ] || \
+             [ "${{ needs.enforcement.result }}" != "success" ]; then
+            echo "❌ One or more required jobs failed"
+            exit 1
+          fi
+          echo "✅ All required CI checks passed"

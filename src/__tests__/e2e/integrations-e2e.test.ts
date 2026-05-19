@@ -14,7 +14,7 @@ const BRIDGE_PATH = path.join(PROJECT_ROOT, "dist", "integrations", "hermes-agen
 const API_SERVER_PATH = path.join(PROJECT_ROOT, "dist", "integrations", "openclaw", "api-server.js");
 const PLUGIN_PATH = path.join(PROJECT_ROOT, "dist", "plugin", "strray-codex-injection.js");
 
-function bridgeExec(args: string[], input?: string, timeout = 10000): Promise<string> {
+function bridgeExec(args: string[], input?: string, timeout = 10000, resolveOnFirstOutput = false): Promise<string> {
   return new Promise((resolve, reject) => {
     const child = spawn("node", args, {
       cwd: PROJECT_ROOT,
@@ -24,21 +24,34 @@ function bridgeExec(args: string[], input?: string, timeout = 10000): Promise<st
 
     let stdout = "";
     let stderr = "";
+    let resolved = false;
 
-    child.stdout?.on("data", (d: Buffer) => { stdout += d.toString(); });
+    child.stdout?.on("data", (d: Buffer) => {
+      stdout += d.toString();
+      if (resolveOnFirstOutput && !resolved) {
+        resolved = true;
+        clearTimeout(timer);
+        setTimeout(() => {
+          try { child.kill("SIGKILL"); } catch {}
+          resolve(stdout.trim());
+        }, 200);
+      }
+    });
     child.stderr?.on("data", (d: Buffer) => { stderr += d.toString(); });
 
     const timer = setTimeout(() => {
-      child.kill("SIGKILL");
+      try { child.kill("SIGKILL"); } catch {}
       reject(new Error(`Bridge timeout after ${timeout}ms: ${stderr}`));
     }, timeout);
 
     child.on("close", (code) => {
       clearTimeout(timer);
-      if (code !== 0 && !stdout) {
-        reject(new Error(`Bridge exited ${code}: ${stderr}`));
-      } else {
-        resolve(stdout.trim());
+      if (!resolved) {
+        if (code !== 0 && !stdout) {
+          reject(new Error(`Bridge exited ${code}: ${stderr}`));
+        } else {
+          resolve(stdout.trim());
+        }
       }
     });
 
@@ -122,7 +135,7 @@ describe.skipIf(!RUN_HERMES_BRIDGE)("Hermes Bridge E2E", { timeout: 180000 }, ()
 
   test("bridge govern command via stdin", async () => {
     const input = JSON.stringify({ command: "govern", proposals: TEST_PROPOSALS });
-    const raw = await bridgeExec([BRIDGE_PATH, "--cwd", PROJECT_ROOT], input, 120000);
+    const raw = await bridgeExec([BRIDGE_PATH, "--cwd", PROJECT_ROOT], input, 120000, true);
     const result = JSON.parse(raw);
     expect(result.cycleId).toBeDefined();
     expect(result.approved).toBeTypeOf("number");
@@ -134,7 +147,7 @@ describe.skipIf(!RUN_HERMES_BRIDGE)("Hermes Bridge E2E", { timeout: 180000 }, ()
 
   test("bridge apply command via stdin", async () => {
     const input = JSON.stringify({ command: "apply", proposals: TEST_PROPOSALS });
-    const raw = await bridgeExec([BRIDGE_PATH, "--cwd", PROJECT_ROOT], input, 120000);
+    const raw = await bridgeExec([BRIDGE_PATH, "--cwd", PROJECT_ROOT], input, 120000, true);
     const result = JSON.parse(raw);
     expect(result.cycleId).toBeDefined();
     expect(result.approved).toBeTypeOf("number");

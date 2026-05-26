@@ -36,7 +36,7 @@ These documents capture:
 | File Type | Save To | Example |
 |-----------|---------|---------|
 | **Reflections** | `docs/reflections/` or `docs/reflections/deep/` | `docs/reflections/my-fix-reflection.md` |
-| **Logs** | `logs/` | `logs/framework/activity.log` |
+| **Logs** | `.opencode/logs/` (primary) + `logs/framework/activity.log` (secondary) | `strray-plugin-2026-05-26.log` or `activity.log` |
 | **Scripts** | `scripts/` or `scripts/bash/` | `scripts/bash/my-script.sh` |
 | **Test Files** | `src/__tests__/` | `src/__tests__/unit/my-test.test.ts` |
 | **Source Code** | `src/` | `src/my-module.ts` |
@@ -248,9 +248,21 @@ When agents are first spawned:
 
 ### Activity Logging
 
-**Location**: `.opencode/logs/` directory
+**Location**: `.opencode/logs/` directory (primary)
 - **File Format**: `strray-plugin-YYYY-MM-DD.log`
+- **Secondary path** (older/legacy): `logs/framework/activity.log`
 - **Enabled by**: `activity_logging` feature in features.json
+
+### Debugging StringRay / 0xray
+
+When reviewing `activity.log` or `strray-plugin-*.log`:
+
+- **Governance spam** is common when `inference_governance.enabled` is false — the server still emits repetitive "dynamo-solar-ssot-disabled" messages.
+- Many `context-validation-failed` warnings for processors (`testExecution`, `testAutoCreation`) due to missing `tool` field in context. This is usually harmless but noisy.
+- The `rule-enforcer` and `processor-manager` are the most active components.
+- Test auto-execution and codex compliance processors do fire on edits.
+
+**Tip**: The most useful recent logs are usually in `.opencode/logs/strray-plugin-*.log` rather than the framework `activity.log`.
 
 ### Report Generation
 

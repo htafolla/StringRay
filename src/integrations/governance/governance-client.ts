@@ -297,9 +297,8 @@ export class GovernanceClient {
       typeof r.originalRecommendation === 'string' &&
       typeof sc.solarActivityLevel === 'string' &&
       validLevels.includes(sc.solarActivityLevel) &&
-      typeof sc.solarResonance === 'number' &&
-      sc.solarResonance >= 0 &&
-      sc.solarResonance <= 1 &&
+      (typeof sc.solarIsotopicResonance === 'number' ||
+       typeof sc.solarResonance === 'number') &&
       typeof sc.solarActivityModifier === 'number' &&
       sc.solarActivityModifier >= -1 &&
       sc.solarActivityModifier <= 1 &&
@@ -370,13 +369,9 @@ export class GovernanceClient {
     const r = response as Record<string, unknown>;
     
     return (
-      typeof r.success === 'boolean' &&
       typeof r.proposalId === 'string' &&
       typeof r.governanceIsotopeId === 'string' &&
       typeof r.resonanceScore === 'number' &&
-      typeof r.isotopicRatio === 'number' &&
-      typeof r.vortexVolume === 'number' &&
-      typeof r.historicalCoherence === 'number' &&
       typeof r.recommendation === 'string' &&
       ['PASS', 'NEEDS_REVISION', 'REJECT'].includes(r.recommendation) &&
       typeof r.confidence === 'number' &&

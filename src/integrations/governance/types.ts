@@ -100,8 +100,10 @@ export type SolarActivityLevel = 'quiet' | 'moderate' | 'active' | 'storm';
 export interface SolarContext {
   /** Current solar activity level */
   solarActivityLevel: SolarActivityLevel;
-  /** Solar resonance score (0-1) */
-  solarResonance: number;
+  /** Solar isotopic resonance score (0-1) — canonical field */
+  solarIsotopicResonance: number;
+  /** Alias for backward compatibility */
+  solarResonance?: number;
   /** Modifier applied to vote weight based on solar activity */
   solarActivityModifier: number;
   /** Human-readable recommendation based on solar conditions */

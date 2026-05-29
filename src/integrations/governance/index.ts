@@ -183,7 +183,7 @@ export class InferenceGovernanceIntegration extends BaseIntegration {
 
     const reasons: string[] = [
       solarResponse.solarContext.recommendation,
-      `Solar activity: ${solarResponse.solarContext.solarActivityLevel} (adjustment: ${(adjustment * 100).toFixed(0)}%, resonance: ${solarResponse.solarContext.solarResonance.toFixed(4)})`,
+      `Solar activity: ${solarResponse.solarContext.solarActivityLevel} (adjustment: ${(adjustment * 100).toFixed(0)}%, resonance: ${(solarResponse.solarContext.solarIsotopicResonance ?? solarResponse.solarContext.solarResonance ?? 0).toFixed(4)})`,
     ];
     if (solarResponse.finalRecommendation && solarResponse.finalRecommendation !== solarResponse.originalRecommendation) {
       reasons.push(solarResponse.finalRecommendation);
@@ -193,7 +193,7 @@ export class InferenceGovernanceIntegration extends BaseIntegration {
       success: true,
       proposalId: proposal.id,
       governanceIsotopeId: `solar-${solarResponse.solarContext.solarActivityLevel}`,
-      resonanceScore: solarResponse.solarContext.solarResonance,
+      resonanceScore: solarResponse.solarContext.solarIsotopicResonance ?? solarResponse.solarContext.solarResonance ?? 0,
       isotopicRatio: 0,
       vortexVolume: 0,
       historicalCoherence: 0,

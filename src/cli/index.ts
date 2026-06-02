@@ -1102,6 +1102,21 @@ const grokCmd = program.command('grok').description('Grok CLI integration comman
 const { registerGrokCommands } = await import('./commands/grok-install.js');
 registerGrokCommands(grokCmd);
 
+// Hermes Agent integration
+const hermesCmd = program.command('hermes').description('Hermes Agent integration commands');
+const { registerHermesCommands } = await import('./commands/hermes-install.js');
+registerHermesCommands(hermesCmd);
+
+// OpenClaw integration
+const openclawCmd = program.command('openclaw').description('OpenClaw integration commands');
+const { registerOpenClawCommands } = await import('./commands/openclaw-install.js');
+registerOpenClawCommands(openclawCmd);
+
+// OpenCode integration
+const opencodeCmd = program.command('opencode').description('OpenCode integration commands');
+const { registerOpencodeCommands } = await import('./commands/opencode-install.js');
+registerOpencodeCommands(opencodeCmd);
+
 // Analytics enable command
 // TODO: Re-enable after fixing dashboard module
 // program

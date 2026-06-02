@@ -1,0 +1,100 @@
+{
+  "version": "1.22.67",
+  "description": "0xRay Framework - Unified Feature Configuration",
+  "token_optimization": {
+    "enabled": true,
+    "max_context_tokens": 50000,
+    "prune_after_task": true,
+    "summarize_tool_outputs": true,
+    "context_compression": {
+      "enabled": true,
+      "threshold_tokens": 40000,
+      "compression_ratio": 0.5
+    }
+  },
+  "model_routing": {
+    "enabled": true
+  },
+  "batch_operations": {
+    "enabled": true,
+    "prefer_sed_for_replacements": true,
+    "parallel_file_updates": true,
+    "max_concurrent_edits": 10,
+    "auto_batch_threshold": 5
+  },
+  "multi_agent_orchestration": {
+    "enabled": true,
+    "coordination_model": "async-multi-agent",
+    "max_concurrent_agents": 3,
+    "task_distribution_strategy": "capability-based",
+    "conflict_resolution": "expert-priority",
+    "progress_tracking": true,
+    "session_persistence": true
+  },
+  "autonomous_reporting": {
+    "enabled": true,
+    "interval_minutes": 60,
+    "auto_schedule": true,
+    "include_health_assessment": true,
+    "include_agent_activities": true,
+    "include_pipeline_operations": true,
+    "include_critical_issues": true,
+    "include_recommendations": true,
+    "report_retention_days": 30,
+    "notification_channels": ["console"]
+  },
+  "agent_management": {
+    "disabled_agents": [],
+    "agent_models": {},
+    "performance_limits": {
+      "max_task_duration_ms": 30000,
+      "max_memory_usage_mb": 512,
+      "max_tokens_per_request": 16000
+    }
+  },
+  "refactoring": {
+    "enabled": true,
+    "automatic_detection": true,
+    "require_user_approval": false,
+    "max_complexity_threshold": 80,
+    "safe_mode": true,
+    "batch_mode": true
+  },
+  "activity_logging": {
+    "enabled": false,
+    "level": "warn",
+    "include_performance_metrics": false,
+    "include_agent_states": false,
+    "include_token_usage": true,
+    "retention_days": 3,
+    "log_to_file": false,
+    "log_path": ".opencode/logs"
+  },
+  "security": {
+    "enabled": true,
+    "prompt_sanitization": true,
+    "vulnerability_scanning": true,
+    "code_review_enforcement": true,
+    "security_score_threshold": 70
+  },
+  "performance_monitoring": {
+    "enabled": true,
+    "real_time_metrics": true,
+    "benchmark_tracking": true,
+    "token_tracking": true,
+    "cost_tracking": true,
+    "alerting": {
+      "enabled": true,
+      "performance_degradation_threshold": 20,
+      "error_rate_threshold": 5,
+      "cost_threshold_daily": 10
+    }
+  },
+  "caching": {
+    "enabled": true,
+    "file_content_cache": true,
+    "search_result_cache": true,
+    "cache_ttl_seconds": 300,
+    "max_cache_size_mb": 50
+  }
+}

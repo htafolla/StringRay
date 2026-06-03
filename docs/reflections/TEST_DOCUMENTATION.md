@@ -17,7 +17,7 @@ Skipped tests in 0xRay are **NOT** a sign of technical debt. Instead, they repre
 
 ### **Files**: `src/__tests__/unit/agent-delegator.test.ts`, `src/__tests__/integration/orchestrator-integration.test.ts`
 
-### **Skipped Tests**: 2,2579 tests
+### **Skipped Tests**: 2,2199 tests
 
 #### **Rationale**:
 These tests require sophisticated coordination between multiple specialized agents that are still evolving. The complexity involves:
@@ -56,7 +56,7 @@ it.skip("should execute complete end-to-end framework workflow")
 
 ### **Files**: `src/__tests__/integration/e2e-framework-integration.test.ts`, `src/__tests__/plugins/marketplace-service.test.ts`
 
-### **Skipped Tests**: 2,2579 tests
+### **Skipped Tests**: 2,2199 tests
 
 #### **Rationale**:
 These tests require external dependencies or complex setup that's challenging to replicate in a test environment:
@@ -92,7 +92,7 @@ describe.skip("Plugin Marketplace Service - Core Functionality")
 
 ### **Files**: `src/__tests__/integration/orchestrator/concurrent-execution.test.ts`, `src/__tests__/integration/e2e-orchestration-flow.test.ts`
 
-### **Skipped Tests**: 2,2579 tests
+### **Skipped Tests**: 2,2199 tests
 
 #### **Rationale**:
 These tests involve performance benchmarks and timing-sensitive operations that are unreliable in CI/CD environments:
@@ -126,7 +126,7 @@ it.skip("should validate system stability under prolonged operation")
 
 ### **Files**: `src/__tests__/plugins/marketplace-service.test.ts`
 
-### **Skipped Tests**: 2,2579 tests
+### **Skipped Tests**: 2,2199 tests
 
 #### **Rationale**:
 The plugin marketplace and sandboxing systems are still maturing. These tests require advanced plugin features that are not yet fully implemented:
@@ -155,7 +155,7 @@ describe.skip("Plugin Marketplace Service - Core Functionality")
 
 ### **Files**: `src/__tests__/integration/e2e-orchestration-flow.test.ts`
 
-### **Skipped Tests**: 2,2579 tests
+### **Skipped Tests**: 2,2199 tests
 
 #### **Rationale**:
 These tests involve complete end-to-end workflows that require the entire framework to be fully operational:

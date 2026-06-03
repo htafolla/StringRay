@@ -1,6 +1,6 @@
 # 0xRay API Reference
 
-**Version**: 1.22.60 | **Last Updated**: 2026-03-12 | **Framework**: 0xRay AI
+**Version**: 1.22.61 | **Last Updated**: 2026-03-12 | **Framework**: 0xRay AI
 
 ## Overview
 
@@ -500,7 +500,7 @@ await orchestrator.registerAgent(CustomAnalyticsAgent);
   },
   "framework": {
     "name": "strray",
-    "version": "1.22.60",
+    "version": "1.22.61",
     "performance_mode": "optimized",
     "monitoring_enabled": true,
     "plugin_security": "strict",

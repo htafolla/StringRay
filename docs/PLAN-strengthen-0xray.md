@@ -8,7 +8,7 @@
 
 ## Preamble
 
-0xRay has 30 processors, 2,2579 tests, a governance chain that blocks bad commits, a release pipeline that ships with one command, and a reflection system that reads real git history. The plumbing works. The child can read.
+0xRay has 30 processors, 2,2199 tests, a governance chain that blocks bad commits, a release pipeline that ships with one command, and a reflection system that reads real git history. The plumbing works. The child can read.
 
 But the codebase audit reveals cracks. Dead code. Circular dependencies. Version drift. Processors that nuke docs instead of appending to them. Stub processors that return string literals instead of doing work. Three competing pre-commit hook systems. And underneath it all — the core promise of inference capture is still a skeleton: the inference-improvement processor generates prompt files but never triggers analysis, the reflections capture "what" but not "why," and the `Inference Notes` section of every generated reflection is empty.
 

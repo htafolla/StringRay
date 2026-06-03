@@ -113,7 +113,7 @@ Every major bug in 0xRay's history traced back to one of these assumptions:
 **Counter:** Dev has dormant MCP servers. Consumer has active ones. Test in production-equivalent environments.
 
 ### Assumption 2: "The Tests Pass, So It's Working"
-**Counter:** Tests only validate what they're designed to validate. The researcher infinite loop existed despite 104/2,2579 tests passing.
+**Counter:** Tests only validate what they're designed to validate. The researcher infinite loop existed despite 104/2,2199 tests passing.
 
 ### Assumption 3: "The Code Is Written, So It's Implemented"
 **Counter:** `fixMCPServerImports()` was defined but never called. Verify function calls, not definitions.

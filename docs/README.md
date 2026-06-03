@@ -1,16 +1,16 @@
-# ⚡ 0xRay AI v1.22.66 – Enterprise AI Agent Coordination Platform
+# ⚡ 0xRay AI v1.22.61 – Enterprise AI Agent Coordination Platform
 
-[![Version](https://img.shields.io/badge/version-1.22.66-blue.svg)](https://github.com/htafolla/strray)
+[![Version](https://img.shields.io/badge/version-1.22.61-blue.svg)](https://github.com/htafolla/strray)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9+-blue.svg)](https://www.typescriptlang.org/)
-[![Tests](https://img.shields.io/badge/tests-2579-brightgreen.svg)](https://github.com/htafolla/strray)
+[![Tests](https://img.shields.io/badge/tests-2199-brightgreen.svg)](https://github.com/htafolla/strray)
 [![CI/CD](https://img.shields.io/badge/CI%2FCD-passing-brightgreen.svg)](https://github.com/htafolla/strray/actions)
 [![Error Prevention](https://img.shields.io/badge/error%20prevention-99.6%25-red.svg)](https://github.com/htafolla/strray)
 
 ## ⚠️ Important Notice
 
-**0xRay AI v1.22.66 - Enterprise CI/CD Automation Plugin**
+**0xRay AI v1.22.61 - Enterprise CI/CD Automation Plugin**
 
 0xRay Framework is available as both:
 
@@ -323,7 +323,7 @@ npm run init
 ### Core Performance Metrics
 
 - **Error Prevention Rate**: 99.6% systematic validation
-- **Test Pass Rate**: 2579 tests (100% success) + comprehensive CI/CD testing
+- **Test Pass Rate**: 2199 tests (100% success) + comprehensive CI/CD testing
 - **CI/CD Automation**: Automated remediation with canary deployments
 - **Response Time**: Sub-millisecond task processing
 - **Cache Hit Rate**: 85%+ with LRU/LFU optimization
@@ -361,7 +361,7 @@ npm run init
 
 ```bash
 npm run build          # TypeScript compilation with strict checks
-npm test               # Run complete test suite (2579 tests)
+npm test               # Run complete test suite (2199 tests)
 npm run dev            # Watch mode with hot reloading
 npm run lint           # Code quality and style checking
 npm run type-check     # TypeScript type validation
@@ -427,7 +427,7 @@ Update your `.opencode/OpenCode.json` for enterprise deployment:
   "$schema": "https://opencode.ai/OpenCode.schema.json",
   "framework": {
     "name": "strray",
-    "version": "1.22.66",
+    "version": "1.22.61",
     "performance_mode": "optimized",
     "monitoring_enabled": true,
     "plugin_security": "strict"
@@ -509,4 +509,4 @@ MIT License - see [LICENSE](LICENSE) file.
 
 ---
 
-**Version**: 1.22.66 | Architecture: Facade Pattern (3 facades, 26+ modules) | [GitHub](https://github.com/htafolla/stringray)
+**Version**: 1.22.61 | Architecture: Facade Pattern (3 facades, 26+ modules) | [GitHub](https://github.com/htafolla/stringray)

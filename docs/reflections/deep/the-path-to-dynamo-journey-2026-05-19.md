@@ -210,7 +210,7 @@ I sat there for a moment. This started as a ten-minute fix for a double-dist pat
 
 ## The Release
 
-I bumped to 1.22.66 and ran the release script. The pre-publish guard caught two test failures — one from our path resolution changes, one pre-existing flaky test. Fixed both, re-ran, 2772 tests passed. Published.
+I bumped to 1.22.66 and ran the release script. The pre-publish guard caught two test failures — one from our path resolution changes, one pre-existing flaky test. Fixed both, re-ran, 2199 tests passed. Published.
 
 Then I ran the full consumer validation:
 

@@ -304,7 +304,7 @@
 - **v1.22.41** (9aa06c6)
   289 files: .opencode/.strrayrc.json, .opencode/AGENTS-consumer.md, .opencode/activity-report.json, .opencode/codex.codex, .opencode/command/dependency-audit.md +263 more
 
-- **v1.22.40: auto-discovery - drop a BaseProcessor file in implementations/ and it registers automatically (2579 tests)** (81f18c6)
+- **v1.22.40: auto-discovery - drop a BaseProcessor file in implementations/ and it registers automatically (2199 tests)** (81f18c6)
   268 files: .opencode/.strrayrc.json, .opencode/AGENTS-consumer.md, .opencode/activity-report.json, .opencode/codex.codex, .opencode/command/dependency-audit.md +346 more
 
 - **v1.22.39: version bump for publish** (0e730bf)

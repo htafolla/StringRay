@@ -1,6 +1,6 @@
 # Pipeline Testing Methodology
 
-**Version**: 1.22.60  
+**Version**: 1.22.61  
 **Date**: 2026-03-22  
 **Purpose**: Formalize pipeline testing as a core 0xRay practice
 
@@ -117,14 +117,14 @@ Every major feature has a pipeline. Map yours:
 
 | Pipeline | Layers | Components | Tree | Status |
 |----------|--------|------------|------|--------|
-| Routing | 5 | 7 | ROUTING_PIPELINE_TREE.md | ✅ Tested (2,2579 tests) |
-| Governance | 5 | 6 | GOVERNANCE_PIPELINE_TREE.md | ✅ Tested (2,2579 tests) |
-| Boot Sequence | 7 | 10 | BOOT_PIPELINE_TREE.md | ✅ Tested (2,2579 tests) |
-| Orchestration | 5 | 4 | ORCHESTRATION_PIPELINE_TREE.md | ✅ Tested (2,2579 tests) |
-| Processor | 5 | 12 | PROCESSOR_PIPELINE_TREE.md | ✅ Tested (2,2579 tests) |
-| Reporting | 6 | 4 | REPORTING_PIPELINE_TREE.md | ✅ Tested (2,2579 tests) |
+| Routing | 5 | 7 | ROUTING_PIPELINE_TREE.md | ✅ Tested (2,2199 tests) |
+| Governance | 5 | 6 | GOVERNANCE_PIPELINE_TREE.md | ✅ Tested (2,2199 tests) |
+| Boot Sequence | 7 | 10 | BOOT_PIPELINE_TREE.md | ✅ Tested (2,2199 tests) |
+| Orchestration | 5 | 4 | ORCHESTRATION_PIPELINE_TREE.md | ✅ Tested (2,2199 tests) |
+| Processor | 5 | 12 | PROCESSOR_PIPELINE_TREE.md | ✅ Tested (2,2199 tests) |
+| Reporting | 6 | 4 | REPORTING_PIPELINE_TREE.md | ✅ Tested (2,2199 tests) |
 
-**Total: 2579 tests across 6 pipelines**
+**Total: 2199 tests across 6 pipelines**
 
 ### Step 2: Create the Pipeline Test
 
@@ -574,7 +574,7 @@ Every pipeline test MUST pass ALL of these checks:
 
 ## Detailed Implementation Tasks
 
-### Routing Pipeline ✅ COMPLETE (2579 tests)
+### Routing Pipeline ✅ COMPLETE (2199 tests)
 | Task ID | Description | Status |
 |---------|-------------|--------|
 | routing-1 | Add RoutingAnalytics import and verify routeAnalytics.getMetrics() | ✅ Done |
@@ -583,7 +583,7 @@ Every pipeline test MUST pass ALL of these checks:
 | routing-4 | Add RoutingRefiner and verify refineRouting() | ✅ Done |
 | routing-5 | Verify logs/framework/routing-outcomes.json exists | ✅ Done |
 
-### Governance Pipeline ✅ COMPLETE (2579 tests)
+### Governance Pipeline ✅ COMPLETE (2199 tests)
 | Task ID | Description | Status |
 |---------|-------------|--------|
 | governance-1 | Remove all stateManager.set() calls | ✅ Done |
@@ -593,7 +593,7 @@ Every pipeline test MUST pass ALL of these checks:
 | governance-5 | Verify ValidationReport has real errors (not mock arrays) | ✅ Done |
 | governance-6 | Add test that triggers console.log violation | ✅ Done |
 
-### Boot Sequence ✅ COMPLETE (2579 tests)
+### Boot Sequence ✅ COMPLETE (2199 tests)
 | Task ID | Description | Status |
 |---------|-------------|--------|
 | boot-1 | Remove all stateManager.set() calls | ✅ Done |
@@ -604,7 +604,7 @@ Every pipeline test MUST pass ALL of these checks:
 | boot-6 | Verify InferenceTuner.initialize() runs | ✅ Done |
 | boot-7 | Verify StateManager entries via get() not set() | ✅ Done |
 
-### Orchestration Pipeline ✅ COMPLETE (2579 tests)
+### Orchestration Pipeline ✅ COMPLETE (2199 tests)
 | Task ID | Description | Status |
 |---------|-------------|--------|
 | orchestration-1 | Remove mock task arrays | ✅ Done |
@@ -614,7 +614,7 @@ Every pipeline test MUST pass ALL of these checks:
 | orchestration-5 | Verify TaskResult[] has real success/error data | ✅ Done |
 | orchestration-6 | Add OutcomeTracker verification for orchestration | ✅ Done |
 
-### Processor Pipeline ✅ COMPLETE (2579 tests)
+### Processor Pipeline ✅ COMPLETE (2199 tests)
 | Task ID | Description | Status |
 |---------|-------------|--------|
 | processor-1 | Remove all stateManager.set() calls | ✅ Done |
@@ -628,7 +628,7 @@ Every pipeline test MUST pass ALL of these checks:
 | processor-9 | Verify ProcessorMetrics state entries | ✅ Done |
 | processor-10 | Register LogProtectionProcessor in processor-manager.ts | ✅ Done |
 
-### Reporting Pipeline ✅ COMPLETE (2579 tests)
+### Reporting Pipeline ✅ COMPLETE (2199 tests)
 | Task ID | Description | Status |
 |---------|-------------|--------|
 | reporting-1 | Remove mock log/insight/recommendation arrays | ✅ Done |

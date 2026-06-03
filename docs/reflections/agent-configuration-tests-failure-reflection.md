@@ -119,7 +119,7 @@ We would have "successfully published v1.6.21" but the real cost would have been
 **What I Did:** Searched for `model:` in yml files, found 8 files with `model: default`
 **What Happened:** Realized these yml files were causing ProviderModelNotFoundError
 **Emotional State:** Frustrated - this should have been caught
-**INNER DIALOGUE:** "We have 2579 tests but none check configuration files!"
+**INNER DIALOGUE:** "We have 2199 tests but none check configuration files!"
 
 ### Phase 4: The Second Issue (13:15 - 13:30)
 **What I Did:** Tested remaining agents, found 6 more with "Unknown agent type"
@@ -144,7 +144,7 @@ We would have "successfully published v1.6.21" but the real cost would have been
 ## 5. ROOT CAUSE ANALYSIS
 
 ### Root Cause 1: Test Scope Doesn't Include Configuration
-**Symptom:** 2579 tests pass but agents fail at runtime
+**Symptom:** 2199 tests pass but agents fail at runtime
 **Root Cause:** Our test suite runs TypeScript unit tests in Vitest, but OpenCode reads JSON/YML at runtime. These are separate worlds.
 **Why I Thought I Was Right:** "The tests pass" - I equated test success with code health
 **Why It Was Wrong:** Testing TypeScript ≠ Testing Configuration
@@ -251,7 +251,7 @@ We would have "successfully published v1.6.21" but the real cost would have been
 ## 8. PERSONAL JOURNEY - Struggle & Triumph
 
 ### My Struggle
-I fought against the assumption that "tests pass = ready to publish." When I manually tested agents and found failures, I had to confront the uncomfortable truth: our 2,2579 tests had given us false confidence. Every time I found another broken agent, I felt the ground shifting - if tests don't catch this, what else are we missing?
+I fought against the assumption that "tests pass = ready to publish." When I manually tested agents and found failures, I had to confront the uncomfortable truth: our 2,2199 tests had given us false confidence. Every time I found another broken agent, I felt the ground shifting - if tests don't catch this, what else are we missing?
 
 The emotional low point was realizing we'd been claiming "99.6% error prevention" while 25% of our agents were completely non-functional. The number was a lie we'd told ourselves.
 

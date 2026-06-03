@@ -92,7 +92,7 @@ describe("Report Formatter", () => {
     it("should not contain hardcoded test count 833", () => {
       const result = formatAsMarkdown(makeSampleData());
       expect(result).not.toContain("833/833");
-      expect(result).not.toContain("2579 tests");
+      expect(result).not.toContain("2199 tests");
     });
 
     it("should not contain PRODUCTION READY", () => {

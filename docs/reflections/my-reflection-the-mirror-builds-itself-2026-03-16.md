@@ -42,7 +42,7 @@ This is different from traditional development. In traditional dev, I write code
 
 ## The Test
 
-2579 tests pass. Every one of them tests real code. Today we deleted the tests for dead plugin infrastructure—104+ lines of tests for code that never existed. Now everything tested is something that actually runs.
+2199 tests pass. Every one of them tests real code. Today we deleted the tests for dead plugin infrastructure—104+ lines of tests for code that never existed. Now everything tested is something that actually runs.
 
 That's not an accident. That's what happens when you build incrementally, test continuously, and resist the temptation to over-engineer.
 

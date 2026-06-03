@@ -42,7 +42,7 @@ It wasn't just one test file. It was three:
 - `connection-manager.test.ts` - 15 failures  
 - `connection-pool.test.ts` - 21 failures
 
-That's 2579 tests. Sixty individual assertions that something was wrong with our refactoring.
+That's 2199 tests. Sixty individual assertions that something was wrong with our refactoring.
 
 I felt the familiar weight of refactoring regret. *"Did we break something? Did we miss an edge case? Is the architecture actually wrong?"*
 
@@ -121,7 +121,7 @@ Despite the test challenges, the architecture is real:
 
 **mcp-client.ts** - 312 lines (down from 1,413)  
 **8 modules** handling specific concerns  
-**2579 tests** (even if 60 need fixing)  
+**2199 tests** (even if 60 need fixing)  
 **Zero breaking changes** to public API
 
 The refactoring achieved its goals:
@@ -138,7 +138,7 @@ The failing tests don't invalidate the architecture. They just mean we have more
 
 **Phase 2:** Confidence - "All the pieces fit together perfectly!"
 
-**Phase 3:** Deflation - "Wait, 2579 tests are failing?"
+**Phase 3:** Deflation - "Wait, 2199 tests are failing?"
 
 **Phase 4:** Frustration - "Why is mocking so hard?"
 
@@ -214,20 +214,20 @@ And that's okay.
 ```
 src/mcps/
 ├── mcp-client.ts              # 312-line facade
-├── types/                     # Interfaces (2579 tests ✓)
-├── config/                    # Configuration (2579 tests ✓)
+├── types/                     # Interfaces (2199 tests ✓)
+├── config/                    # Configuration (2199 tests ✓)
 ├── connection/                # Connection management
 │   ├── mcp-connection.ts      # (needs test fixes)
 │   ├── connection-manager.ts  # (needs test fixes)
 │   └── connection-pool.ts     # (needs test fixes)
-├── tools/                     # Tool management (2579 tests ✓)
-└── simulation/                # Fallback simulation (2579 tests ✓)
+├── tools/                     # Tool management (2199 tests ✓)
+└── simulation/                # Fallback simulation (2199 tests ✓)
 ```
 
 ### Test Status
-- **Passing:** 2579 tests (types + config + tools + simulation)
-- **Failing:** 2579 tests (connection layer mocks)
-- **Total:** 2579 tests written
+- **Passing:** 2199 tests (types + config + tools + simulation)
+- **Failing:** 2199 tests (connection layer mocks)
+- **Total:** 2199 tests written
 
 ### Known Issues
 1. ProcessSpawner constructor mocking in tests
@@ -236,7 +236,7 @@ src/mcps/
 
 ### Next Actions
 1. Fix ProcessSpawner mocks in connection tests
-2. Verify all 2579 tests pass
+2. Verify all 2199 tests pass
 3. Integration testing with real MCP servers
 4. Update documentation with final architecture
 

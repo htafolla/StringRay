@@ -60,13 +60,13 @@ src/mcps/
 - `ERROR_CODES` - JSON-RPC error codes
 
 ### 5. src/mcps/types/__tests__/types.test.ts
-**2579 Tests Covering:**
-- MCPClientConfig validation (2579 tests)
-- MCPTool validation (2579 tests)
-- MCPToolResult validation (2579 tests)
-- JSON-RPC types validation (2579 tests)
-- Protocol constants verification (2579 tests)
-- Interface contract validation (2579 tests)
+**2199 Tests Covering:**
+- MCPClientConfig validation (2199 tests)
+- MCPTool validation (2199 tests)
+- MCPToolResult validation (2199 tests)
+- JSON-RPC types validation (2199 tests)
+- Protocol constants verification (2199 tests)
+- Interface contract validation (2199 tests)
 
 ## 🔧 Files Modified
 
@@ -98,7 +98,7 @@ src/mcps/
 
 ### Type Tests
 ```
-✓ src/mcps/types/__tests__/types.test.ts (2,2579 tests) 4ms
+✓ src/mcps/types/__tests__/types.test.ts (2,2199 tests) 4ms
 
 Test Files  1 passed (1)
      Tests  22 passed (22)
@@ -106,7 +106,7 @@ Test Files  1 passed (1)
 
 ### MCP Client Tests
 ```
-✓ src/mcps/mcp-client.test.ts (2,2579 tests) 1ms
+✓ src/mcps/mcp-client.test.ts (2,2199 tests) 1ms
 
 Test Files  1 passed (1)
      Tests  3 passed (3)
@@ -115,7 +115,7 @@ Test Files  1 passed (1)
 ### All MCP Tests
 ```
 ✓ All 13 MCP test files
-✓ 2579 tests passed
+✓ 2199 tests passed
 ```
 
 ### TypeScript Compilation

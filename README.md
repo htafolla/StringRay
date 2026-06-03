@@ -1,8 +1,8 @@
 # 0xRay — Multi-Agent Orchestration & Governance Framework
 
-**v1.22.68** — 41 MCP servers · 44 skills · 60 codex terms · 2,229 tests
+**v1.22.68** — 16 MCPs servers · 44 skills · 60 codex terms · 2,2199 tests
 
-0xRay extends [OpenCode](https://opencode.ai), [Hermes Agent](https://github.com/nilslice/hermes), [OpenClaw](https://github.com/openclaw/openclaw), and [Grok Build](https://x.ai/build) with multi-agent orchestration and Codex compliance validation via 41 MCP servers. Tasks route to specialized agents based on complexity with governance enforcement.
+0xRay extends [OpenCode](https://opencode.ai), [Hermes Agent](https://github.com/nilslice/hermes), [OpenClaw](https://github.com/openclaw/openclaw), and [Grok Build](https://x.ai/build) with multi-agent orchestration and Codex compliance validation via 16 MCPs servers. Tasks route to specialized agents based on complexity with governance enforcement.
 
 ## Quick Start
 
@@ -75,7 +75,7 @@ This installs only the MCP servers.
 
 ## MCP Server Ecosystem
 
-0xRay exposes 41 MCP servers that work across runtimes. Key servers include:
+0xRay exposes 16 MCPs servers that work across runtimes. Key servers include:
 
 | MCP Server | Tools | Purpose |
 |-----------|-------|---------|
@@ -340,7 +340,7 @@ npx strray-ai hermes install
 ```
 
 - `strray_validate` — Pre-commit validation with quality gates
-- `strray_codex_check` — Code review against 60 Codex rules
+- `strray_codex_check` — Code review against 60 codex rules
 - `strray_health` — Framework health check
 - `strray_hooks` — Git hooks management
 - `pre_tool_call` / `post_tool_call` hooks for tool awareness

@@ -13,7 +13,7 @@ Self-improving AI orchestration that learns from every task.
 
 The framework now learns from usage patterns and continuously improves routing decisions 📈
 
-Built with 2,2579 tests passing ✅
+Built with 2,2199 tests passing ✅
 
 Try it:
 npx strray-ai inference:tuner --run-once

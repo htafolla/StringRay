@@ -124,13 +124,13 @@ Use the working test infrastructure instead of mjs scripts:
 ## Working Test Commands
 
 ```bash
-# Core unit tests (2579 tests)
+# Core unit tests (2199 tests)
 npm run test:unit
 
-# Core framework tests (2579 tests)
+# Core framework tests (2199 tests)
 npm run test:core-framework
 
-# Security tests (2579 tests)
+# Security tests (2199 tests)
 npm run test:security
 
 # All integration tests

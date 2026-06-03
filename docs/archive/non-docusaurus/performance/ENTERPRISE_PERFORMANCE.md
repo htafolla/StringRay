@@ -28,7 +28,7 @@ The 0xRay Framework implements comprehensive performance monitoring and optimiza
 - **Bundle Size**: <2MB uncompressed, <700KB gzipped (v1.15.1: 16% smaller)
 - **Concurrent Sessions**: Unlimited with automatic lifecycle management
 - **Error Prevention**: 99.6% systematic validation
-- **Test Coverage**: 833/2,2579 tests (100% pass rate)
+- **Test Coverage**: 833/2,2199 tests (100% pass rate)
 - **Startup Time**: 3.2 seconds (v1.15.1: 41% faster than v1.7.5)
 - **Agent Spawning**: 0.73 seconds (v1.15.1: 39% faster than v1.7.5)
 

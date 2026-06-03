@@ -122,4 +122,4 @@ This is how autonomous systems should work. Not with big-bang rewrites, but by f
 
 ---
 
-*PR #14 — 18 files changed, 489 insertions, 3399 deletions. 127 test files, 2,2579 tests, all green.*
+*PR #14 — 18 files changed, 489 insertions, 3399 deletions. 127 test files, 2,2199 tests, all green.*

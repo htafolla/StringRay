@@ -4,6 +4,27 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Conventional Commits](https://www.conventionalcommits.org/).
 
+## [1.22.69] - 2026-06-03
+
+### 🔄 Changes
+
+### 🐛 Bug Fixes
+- fix: align governance client field names with Dynamo response (solarResonance -> solarIsotopicResonance, relax evaluate validation) (e5ecea0e7)
+- fix: update tests for new resolveFrameworkPaths behavior + deflake inference-e2e (470210930)
+
+### 📚 Documentation
+- docs: add reflection on the Aside subcontext pattern and its architectural implications (96b772d98)
+- docs: add aside on the growth arc and realization of 0xRay's deeper architecture (775088744)
+- docs: add 0xRay three-subsystem architecture vision reflection (0694f92f5)
+- docs: add deep journey reflection on Grok CLI MCP stability and publish pipeline fixes (cba8b872a)
+- docs: add deep journey reflection on double-dist fix and Dynamo governance pipeline (c297183d8)
+
+### 🔎 Other Changes
+- v1.22.69: Trinitarium Moral Overlay — governance moral tension scoring (e0b9cc1d5)
+- v1.22.68: multi-platform install commands, postinstall refactor, README rebuild (3ca8ec97e)
+
+---
+
 ## [1.22.61] - 2026-05-19
 
 ### 🔄 Changes

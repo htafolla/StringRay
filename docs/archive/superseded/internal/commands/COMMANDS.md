@@ -1,6 +1,6 @@
 # 0xRay Framework - Command Reference and Usage Guide
 
-**Version**: **Last Updated**: 2026-01-05 | **Framework**: 0xRay AI v1.22.60
+**Version**: **Last Updated**: 2026-01-05 | **Framework**: 0xRay AI v1.22.61
 
 ## Overview
 

@@ -40,4 +40,4 @@ And tomorrow it'll work even better.
 
 ---
 
-*420 words | 2579 tests | One good day's work*
+*420 words | 2199 tests | One good day's work*

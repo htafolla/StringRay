@@ -28,7 +28,7 @@ And the user was telling me: that's not the engine. That's the harness. The engi
 
 Here is what 0xRay looks like from the consumer's side:
 
-A governance framework. Codex of 60 error-prevention terms. 24 processor implementations. Auto-discovery. Reflection system. Release pipeline. 2,2579 tests. Plugin injection. MCP servers. The CLI commands: `status`, `health`, `validate`, `capabilities`.
+A governance framework. Codex of 60 error-prevention terms. 24 processor implementations. Auto-discovery. Reflection system. Release pipeline. 2,2199 tests. Plugin injection. MCP servers. The CLI commands: `status`, `health`, `validate`, `capabilities`.
 
 Here is what we actually spent this session doing:
 
@@ -89,7 +89,7 @@ Here is where it gets interesting.
 `scripts/mjs/test-mcp-functionality.mjs` — 507 lines.
 `scripts/mjs/validate-postinstall-config.mjs` — 308 lines.
 
-Plus 142 vitest test files containing 40,120 lines of test code, running 2,2579 tests.
+Plus 142 vitest test files containing 40,120 lines of test code, running 2,2199 tests.
 
 The paradox: these tests don't test 0xRay's consumer-facing features. They test the *build system itself*. The consumer readiness script installs `strray-ai` in a temp directory and validates every file, every config, every path. The Hermes E2E script spins up a real Hermes integration and tests the full lifecycle. The OpenClaw E2E script tests against actual AI model gateways — not mocks, real API calls.
 
@@ -133,7 +133,7 @@ A comprehensive validation system: checks framework integrity, validates documen
 | Release scripts | 353 | One-command npm publish |
 | Pre-publish guard | 265 | CI gate for npm packages |
 | E2E test scripts | 4,281 | Install-from-npm validation |
-| Vitest test suite | 40,120 | 2,2579 tests across 142 files |
+| Vitest test suite | 40,120 | 2,2199 tests across 142 files |
 | Postinstall system | 896 | Multi-environment installer |
 | Git hooks | 928 | Commit governance |
 | Validation suite | 1,391 | Framework integrity checks |
@@ -172,7 +172,7 @@ The consumer installs 0xRay and gets AI governance. They don't get the developme
 
 The deepest part of the dichotomy is the E2E test paradox.
 
-0xRay's test suite has 2,2579 tests across 142 files — 40,120 lines of test code. That's more test code than production code in many projects. These tests don't just test the governance logic. They test the installation process, the CLI commands, the plugin loading, the config file generation, the MCP server connectivity, the Hermes bridge, the OpenClaw integration.
+0xRay's test suite has 2,2199 tests across 142 files — 40,120 lines of test code. That's more test code than production code in many projects. These tests don't just test the governance logic. They test the installation process, the CLI commands, the plugin loading, the config file generation, the MCP server connectivity, the Hermes bridge, the OpenClaw integration.
 
 The test suite is a continuous validation system that says: "when someone installs this package from npm, here is everything that must work." It's not unit testing. It's acceptance testing against the published artifact.
 

@@ -4,7 +4,7 @@
 🎭 New @storyteller agent with Hero's Journey & narrative frameworks
 🔒 Fixed critical security/performance agent gaps
 📋 Added integration rules - agents MUST update docs & integrate fully
-🧪 All 2579 tests passing
+🧪 All 2199 tests passing
 📊 53 commits, 99 files, +9,077 lines
 
 Framework is production-ready!

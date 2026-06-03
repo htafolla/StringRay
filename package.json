@@ -1,6 +1,6 @@
 {
   "name": "strray-ai",
-  "version": "1.22.68",
+  "version": "1.22.69",
   "description": "Multi-agent orchestration and Codex governance for OpenCode, Hermes, Grok Build, and OpenClaw",
   "readme": "README.md",
   "license": "MIT",

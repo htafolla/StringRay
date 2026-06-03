@@ -1,6 +1,6 @@
 # 0xRay Integration Lessons & Best Practices
 
-**Version**: 1.22.60 | **Architecture**: Facade Pattern | **Framework**: 0xRay AI
+**Version**: 1.22.61 | **Architecture**: Facade Pattern | **Framework**: 0xRay AI
 
 ## Overview
 

@@ -148,7 +148,7 @@ The fix was to never call `quickVerify()` from inside vitest with the real proje
 
 ## The Night the Tests Taught Me Humility
 
-The full test suite had 147 files, 2,2579 tests. Every individual file passed when run alone. The full suite together? Chaos. Timeouts everywhere. 2579 tests failing, then 17, then 9, depending on the run.
+The full test suite had 147 files, 2,2199 tests. Every individual file passed when run alone. The full suite together? Chaos. Timeouts everywhere. 2199 tests failing, then 17, then 9, depending on the run.
 
 I spent hours chasing individual timeout numbers. Gave one test 15 seconds. Another 30. Another 60. The session-capture tests hung for 120 seconds straight. I thought the git commands were slow. I thought the dynamic imports were heavy. I thought the fork pool was overloaded.
 
@@ -158,7 +158,7 @@ The configuration file sat at `tests/config/vitest.config.ts`. Vitest looks for 
 
 Five seconds. For tests that dynamically import 30 processor implementations, each one pulling in the entire inference layer, the voting coordinator, the weighted voting aggregator, the learning engine, the kernel analyzer. Five seconds.
 
-The fix was a single file. `vitest.config.ts` in the project root. 28 lines. I wrote it, ran the suite, and watched 2,2579 tests pass.
+The fix was a single file. `vitest.config.ts` in the project root. 28 lines. I wrote it, ran the suite, and watched 2,2199 tests pass.
 
 The lesson wasn't about the config file. The lesson was about assumptions. I assumed the config was being used because it existed. I assumed the timeouts were applied because I'd seen them in a file. I never checked. I spent hours optimizing test code when the problem was a missing symlink.
 
@@ -188,7 +188,7 @@ That's the product hiding in plain sight. Not the governance framework itself �
 
 ## The Honest State of Things
 
-As of this writing, the inference layer has 2579 tests, all passing. The modules total 1,604 lines. The pipeline flows correctly from git history through session capture through accumulation through proposal through governance through deploy verification.
+As of this writing, the inference layer has 2199 tests, all passing. The modules total 1,604 lines. The pipeline flows correctly from git history through session capture through accumulation through proposal through governance through deploy verification.
 
 But the cycle has never run autonomously. The threshold hasn't been met in production — we don't have 3 sessions with 30+ commits in the inference data directory yet. Nobody has observed a full collect → govern → deploy → verify loop complete on its own.
 

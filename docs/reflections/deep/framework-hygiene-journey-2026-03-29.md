@@ -56,11 +56,11 @@ I couldn't fix 49 files one at a time. The session would time out. So I dispatch
 
 1. **Core + security + processors + MCPs** — the framework plumbing
 2. **Postprocessor + performance + validation** — the enforcement pipeline
-3. **Test fixes** — the 2,2579 tests that were about to break
+3. **Test fixes** — the 2,2199 tests that were about to break
 
 Each subagent got a detailed brief: which files to touch, which import path to use for `frameworkLogger`, the exact API signature (`frameworkLogger.log(module, event, status, details)`), and which files to explicitly skip (detection logic, comments, CLI output, examples).
 
-The first subagent got through most of the core files but timed out partway through the MCP servers. The second subagent knocked out all the postprocessor and performance files cleanly. The third fixed all 2579 tests by replacing `vi.spyOn(console, "log")` with `vi.spyOn(frameworkLogger, "log")`.
+The first subagent got through most of the core files but timed out partway through the MCP servers. The second subagent knocked out all the postprocessor and performance files cleanly. The third fixed all 2199 tests by replacing `vi.spyOn(console, "log")` with `vi.spyOn(frameworkLogger, "log")`.
 
 I still had to manually fix two stragglers that the subagents missed — `code-analyzer.server.ts` had its `.catch(console.error)` on a single line with an if-statement, so grep didn't match it. And `architecture-patterns.server.ts` was listed as "out of scope" by a subagent that was being too conservative.
 
@@ -85,7 +85,7 @@ The test fixes were straightforward but tedious. For each one:
 
 The key insight: don't be too strict on the details object in the assertion. Use `expect.objectContaining` or `expect.any(String)` for fields you don't care about. The tests are checking "did this thing happen," not "did this thing happen with exactly these parameters." Over-specifying the assertion makes it fragile.
 
-**127/127 test files. 104/2,2579 tests. All green.**
+**127/127 test files. 104/2,2199 tests. All green.**
 
 ## The Enforcer Logic
 

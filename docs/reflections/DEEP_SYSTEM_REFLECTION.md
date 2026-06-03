@@ -143,7 +143,7 @@ Early on, we thought "npm test" was enough. It wasn't.
 
 **Unit tests pass ≠ pipelines work.**
 
-Example: RuleEnforcer had 2579 tests, all passing. But when we traced actual code execution during agent operations, the validators were never invoked.
+Example: RuleEnforcer had 2199 tests, all passing. But when we traced actual code execution during agent operations, the validators were never invoked.
 
 Solution: Pipeline tests.
 - Each pipeline runs 3 consecutive times

@@ -1,4 +1,4 @@
-# 0xRay AI v1.22.60 Release Notes
+# 0xRay AI v1.22.61 Release Notes
 
 **Release Date**: 2026-01-31  
 **Codename**: "Multi-AI Orchestration"  
@@ -279,7 +279,7 @@ The missing piece that enables autonomous CI/CD recovery:
 **No breaking changes.** This is a validation and bugfix release.
 
 **Recommended steps**:
-1. Update version in package.json: `"version": "1.22.60"`
+1. Update version in package.json: `"version": "1.22.61"`
 2. Run `npm install` to refresh dependencies
 3. Run `npm run test:core-framework` to verify
 4. Deploy with confidence

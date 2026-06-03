@@ -107,7 +107,7 @@ We built a fallback: if researcher fails, default to GO. Which means... the chec
 5. ✅ Approved proposals → create branch → commit → PR
 6. ✅ Researcher reviews PR (with 15s timeout + fallback)
 7. ✅ Guarded: consumers can't run it (exits with message)
-8. ✅ All 148 test files pass (2,2579 tests, 0 failures)
+8. ✅ All 148 test files pass (2,2199 tests, 0 failures)
 
 **But the uncomfortable questions:**
 
@@ -175,7 +175,7 @@ Instead of building a self-improvement loop for 0xRay's own codebase, we should 
 2. `7bfa4ca6e` — feat: wire apply phase + researcher double-check
 3. `beefefb94` — fix: guard inference:run for StringRay internal use only
 
-**Test results:** 148 files, 2,2579 tests, 0 failures ✅
+**Test results:** 148 files, 2,2199 tests, 0 failures ✅
 
 **Reality check:** We built a sophisticated pipeline that:
 - Processes 106 session files (40MB of JSON?)

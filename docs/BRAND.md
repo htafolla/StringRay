@@ -3,7 +3,7 @@
 ## Brand Overview
 
 **Brand Name**: 0xRay (0xRay) – The AI Agent  
-**Version**: 1.22.60  
+**Version**: 1.22.61  
 **Architecture**: Facade Pattern with Modular Internal Structure  
 **Positioning**: Production-Ready Code. No Dead Ends.  
 **Core Value**: Delivers clean architecture, single sources of truth, modular components, and auto-generated tests — production-grade, every time.
@@ -62,7 +62,7 @@ Most AI coding tools fall into the same traps:
 - **Code Rot** → Modular, maintainable components with automated refactoring
 - **Concurrency & State Chaos** → Safe patterns + disciplined flow
 
-**99.6% error prevention. 2,2579 tests. Ship immediately.**
+**99.6% error prevention. 2,2199 tests. Ship immediately.**
 
 **Clean. Tested. Modular. Done.**
 
@@ -132,7 +132,7 @@ This is why the copy works — it's not trying to entertain or dazzle. It's spea
 
 **For New Users:**
 - Modern facade pattern architecture from day one
-- 25 specialized agents, 41 MCP servers, 2,2579 tests
+- 25 specialized agents, 41 MCP servers, 2,2199 tests
 - 99.6% error prevention, 100% backward compatibility
 
 **Technical Credibility:**

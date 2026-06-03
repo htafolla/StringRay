@@ -160,7 +160,7 @@ We need clear separation:
 
 ## Conclusion
 
-The system works—2579 tests pass, routing is enabled, logs are written. But the architecture has drifted from its intent. The Enforcer became a plugin function. The post-processors became unreachable. The activity log became fragile.
+The system works—2199 tests pass, routing is enabled, logs are written. But the architecture has drifted from its intent. The Enforcer became a plugin function. The post-processors became unreachable. The activity log became fragile.
 
 We don't need to rebuild. We need to:
 1. Acknowledge the plugin is the real enforcer (for now)

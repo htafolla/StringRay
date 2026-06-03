@@ -361,7 +361,7 @@
 - **v1.22.41** (9aa06c6)
   289 files: .opencode/.strrayrc.json, .opencode/AGENTS-consumer.md, .opencode/activity-report.json, .opencode/codex.codex, .opencode/command/dependency-audit.md +263 more
 
-- **v1.22.40: auto-discovery - drop a BaseProcessor file in implementations/ and it registers automatically (10 tests)** (81f18c6)
+- **v1.22.40: auto-discovery - drop a BaseProcessor file in implementations/ and it registers automatically (2199 tests)** (81f18c6)
   268 files: .opencode/.strrayrc.json, .opencode/AGENTS-consumer.md, .opencode/activity-report.json, .opencode/codex.codex, .opencode/command/dependency-audit.md +346 more
 
 - **v1.22.39: version bump for publish** (0e730bf)
@@ -592,7 +592,7 @@
 - **chore: delete 11 dead barrel files, fix metrics-endpoint import** (8991709)
   31 files: src/analytics/index.ts, src/hooks/index.ts, src/integrations/hermes-agent/index.ts, src/integrations/openclaw/index.ts, src/mcps/connection/index.ts +7 more
 
-- **feat: wire up 7 MCP servers, delete 3 dead modules (-2896 lines)** (0f3e9df)
+- **feat: wire up 41 MCP servers, delete 3 dead modules (-2896 lines)** (0f3e9df)
   12 files: opencode.json, src/circuit-breaker/circuit-breaker.ts, src/infrastructure/iac-validator.ts, src/infrastructure/schemas/cloud-schemas.ts, src/jobs/job-correlation-fix.ts +5 more
 
 - **feat: agent registry single source of truth - fix 12 broken agents** (0f71c41)
@@ -698,7 +698,7 @@
 - Fix: fix: defer timer auto-start to explicit start() calls in 6 modules
 - Removal: chore: delete 10 dead processor implementations, 2 dead integration clusters
 - Fix: chore: delete 11 dead barrel files, fix metrics-endpoint import
-- Removal: feat: wire up 7 MCP servers, delete 3 dead modules (-2896 lines)
+- Removal: feat: wire up 41 MCP servers, delete 3 dead modules (-2896 lines)
 - Fix: feat: agent registry single source of truth - fix 12 broken agents
 - Fix: fix: harden API key auth, type globalThis, remove console.log from production
 

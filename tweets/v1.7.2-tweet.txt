@@ -4,7 +4,7 @@
 • Full Kernel v2.0 with P9 adaptive learning
 • Privacy-first analytics with AnonymizationEngine + ConsentManager
 • Direct @agent resolution - now supports @architect, @code-reviewer, @security-auditor, @enforcer, @orchestrator, @refactorer, @testing-lead, @bug-triage-specialist, @strategist, @tech-writer
-• 2579 tests passing, 0 failures
+• 2199 tests passing, 0 failures
 
 📦 npm install -g strray-ai
 

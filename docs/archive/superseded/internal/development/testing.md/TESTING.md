@@ -113,9 +113,9 @@ npm run test:direct  # Bypasses smart runner for debugging
 
 ```
 src/__tests__/
-├── unit/           # Unit tests (2,2579 tests)
-├── integration/    # Integration tests (2,2579 tests)
-├── performance/    # Performance tests (2,2579 tests)
+├── unit/           # Unit tests (2,2199 tests)
+├── integration/    # Integration tests (2,2199 tests)
+├── performance/    # Performance tests (2,2199 tests)
 └── quarantine/     # Quarantined problematic tests
 ```
 

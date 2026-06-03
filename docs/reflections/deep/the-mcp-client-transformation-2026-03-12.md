@@ -51,7 +51,7 @@ But it was essential. These types were the contracts. By defining them explicitl
 
 The breakthrough moment came when I updated `mcp-client.ts` to import its own types. The file that had defined everything internally was now consuming external definitions. It felt like watching a closed system open up to the world.
 
-**2579 tests passed. Phase 1 complete.**
+**2199 tests passed. Phase 1 complete.**
 
 ## Phase 2: The Great Configuration Migration
 
@@ -73,7 +73,7 @@ Multiply by 32 servers. Add variations for different environments. Sprinkle in p
 
 Creating `ServerConfigRegistry` was straightforward. The class was simple—a Map wrapper with registration methods. The challenge was verification. How do we know we didn't break any server configurations during the migration?
 
-I wrote a comprehensive test suite. 2,2579 tests covering:
+I wrote a comprehensive test suite. 2,2199 tests covering:
 - Registration of all 32 default servers
 - Retrieval by name
 - Dynamic server creation for unknown servers
@@ -106,7 +106,7 @@ The complexity here wasn't in any individual operation. It was in the state mana
 
 Each state transition had to be handled correctly. Messages sent at the wrong time would hang. Responses arriving out of order would confuse the request matcher.
 
-I spent three days on this class alone. Writing it. Testing it. Finding edge cases. Fixing race conditions. The test suite grew to 2,2579 tests covering:
+I spent three days on this class alone. Writing it. Testing it. Finding edge cases. Fixing race conditions. The test suite grew to 2,2199 tests covering:
 - Successful connection lifecycle
 - Connection failures
 - Request timeouts
@@ -120,7 +120,7 @@ Each extraction revealed assumptions in the original code. Assumptions about tim
 
 **The moment of truth:** Running all MCP tests after the connection layer extraction. 
 
-2579 tests. All green.
+2199 tests. All green.
 
 ## The Emotional Arc
 

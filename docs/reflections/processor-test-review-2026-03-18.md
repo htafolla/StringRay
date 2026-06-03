@@ -79,7 +79,7 @@ The following processor tests pass because their implementations are **unit-test
 
 ---
 
-## 2. Why 2579 Tests Still Fail
+## 2. Why 2199 Tests Still Fail
 
 ### 2.1 TestExecutionProcessor — Timeout (5000ms exceeded)
 
@@ -171,7 +171,7 @@ If any of these are out of sync (common in development), validation fails.
 
 ---
 
-## 3. Recommendations for Fixing the Remaining 2579 Tests
+## 3. Recommendations for Fixing the Remaining 2199 Tests
 
 ### 3.1 Fix TestExecutionProcessor
 

@@ -1,6 +1,6 @@
 # 0xRay Framework - Complete System Architecture & Technical Reference
 
-**Version**: 1.22.66
+**Version**: 1.22.61
 **Purpose**: Enterprise AI orchestration with systematic error prevention and modular architecture
 **Last Updated**: 2026-04-29
 **System Complexity**: 75+ modular files, 9 core agents, 43 framework skills, 11 active MCP servers, 60 codex terms
@@ -250,7 +250,7 @@ These are the primary agents that form the foundation of the 0xRay framework.
 ---
 
 #### @enforcer
-**Version**: 1.22.66  
+**Version**: 1.22.61  
 **Role**: Codex compliance & error prevention  
 **Complexity Threshold**: All operations  
 **Primary Pipeline**: Rule Enforcement
@@ -312,7 +312,7 @@ The enforcer serves as the **central coordinator** for all codex compliance and 
 ---
 
 #### @architect
-**Version**: 1.22.66  
+**Version**: 1.22.61  
 **Role**: System design & technical decisions  
 **Complexity Threshold**: High complexity (>25)  
 **Primary Pipeline**: Agent Delegation
@@ -376,7 +376,7 @@ The architect agent specializes in system design, API architecture, and technica
 ---
 
 #### @orchestrator
-**Version**: 1.22.66  
+**Version**: 1.22.61  
 **Role**: Multi-agent workflow coordination  
 **Complexity Threshold**: Enterprise (>95)  
 **Primary Pipeline**: Agent Delegation
@@ -440,7 +440,7 @@ The orchestrator manages complex, multi-agent workflows for enterprise-level tas
 ---
 
 #### @bug-triage-specialist
-**Version**: 1.22.66  
+**Version**: 1.22.61  
 **Role**: Error investigation & fixes  
 **Complexity Threshold**: Debug operations  
 **Primary Pipeline**: Agent Delegation
@@ -500,7 +500,7 @@ Specializes in debugging, error analysis, and root cause investigation. Triages 
 ---
 
 #### @code-reviewer
-**Version**: 1.22.66  
+**Version**: 1.22.61  
 **Role**: Quality assessment & standards  
 **Complexity Threshold**: All code changes  
 **Primary Pipeline**: Rule Enforcement
@@ -563,7 +563,7 @@ Provides comprehensive code review services, assessing code quality, maintainabi
 ---
 
 #### @security-auditor
-**Version**: 1.22.66  
+**Version**: 1.22.61  
 **Role**: Vulnerability detection  
 **Complexity Threshold**: Security operations  
 **Primary Pipeline**: Security & Monitoring
@@ -623,7 +623,7 @@ Performs comprehensive security audits, vulnerability scanning, and compliance v
 ---
 
 #### @refactorer
-**Version**: 1.22.66  
+**Version**: 1.22.61  
 **Role**: Technical debt elimination  
 **Complexity Threshold**: Refactor operations  
 **Primary Pipeline**: Agent Delegation
@@ -683,7 +683,7 @@ Specializes in code refactoring, technical debt elimination, and code modernizat
 ---
 
 #### @testing-lead
-**Version**: 1.22.66  
+**Version**: 1.22.61  
 **Role**: Testing strategy & coverage  
 **Complexity Threshold**: Test operations  
 **Primary Pipeline**: Rule Enforcement
@@ -743,7 +743,7 @@ Designs comprehensive testing strategies, ensures test coverage targets are met,
 ---
 
 #### @researcher
-**Version**: 1.22.66  
+**Version**: 1.22.61  
 **Role**: Codebase exploration & documentation  
 **Complexity Threshold**: Analysis operations  
 **Primary Pipeline**: Agent Delegation

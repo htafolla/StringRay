@@ -32,7 +32,7 @@ export class PublishPreflightProcessor extends BaseProcessor {
 
 ### The Mistakes We Made
 - **JSON Syntax Error**: `features.json` had a duplicate `require_reflection` key. The parser choked.
-- **ESM Import Error**: Pipeline tests used `require('fs')` instead of ESM imports. 2,2579 tests needed conversion.
+- **ESM Import Error**: Pipeline tests used `require('fs')` instead of ESM imports. 2,2199 tests needed conversion.
 
 ### The Lesson
 *Always validate your configuration files. The parser will not forgive your typos.*
@@ -142,7 +142,7 @@ The culprit: **Missing `"readme": "README.md"` field in package.json**
 ```json
 {
   "name": "strray-ai",
-  "version": "1.22.60",
+  "version": "1.22.61",
   "readme": "README.md",  // <-- The hero we needed
   ...
 }
@@ -220,7 +220,7 @@ A diagnostic tool for understanding framework behavior over time.
 ## Chapter 8: The Consumer Validation Marathon
 
 ### The Test Suite
-2579 tests to validate consumer mode:
+2199 tests to validate consumer mode:
 
 1. CLI available (`--help`)
 2. `status` command works
@@ -281,7 +281,7 @@ CI now has enforcement - violations trigger build failures, not just warnings.
 1. Build succeeds
 2. Tests pass (104 unit tests, 21 pipeline tests)
 3. Pack creates tarball
-4. Consumer validation (2579 tests)
+4. Consumer validation (2199 tests)
 5. Publish to npm
 
 ### The Result

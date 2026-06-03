@@ -58,7 +58,7 @@ The user asked "where we at with stringray check all logs run all reports what a
 
 ### What I Found
 
-- 2579 tests passing
+- 2199 tests passing
 - Typecheck clean
 - Lint clean
 - Session report: 78.4% success rate

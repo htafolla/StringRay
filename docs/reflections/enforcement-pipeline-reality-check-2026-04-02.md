@@ -70,7 +70,7 @@ await this.codexLoader.load(); // 60 terms, 16+ with real validators
 Adding tests revealed the mock-vs-real tension:
 - Original loader tests used heavy mocks that prevented real codex.json access
 - New validator tests bypass mocks to use actual codex.json
-- Result: 2579 tests pass, 11 new validator tests work with real data
+- Result: 2199 tests pass, 11 new validator tests work with real data
 
 ## What's Still Rough
 

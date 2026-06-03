@@ -98,7 +98,7 @@ Let me break that down:
 
 - **Broken vitest config references** — `integration-setup.ts` and `security-setup.ts` referenced in the vitest config but not actually existing. These would cause warnings or errors during test setup. Changed to point to `setup.ts`, the actual file.
 
-After all this: **2579 tests passing, 0 failures, 0 TypeScript errors**.
+After all this: **2199 tests passing, 0 failures, 0 TypeScript errors**.
 
 The same number of tests as before. Because none of the deleted files were actually contributing tests. They were just... there. 104 lines of nothing. Dead weight that made the repo look bigger than it was and the test infrastructure look more complete than it was.
 

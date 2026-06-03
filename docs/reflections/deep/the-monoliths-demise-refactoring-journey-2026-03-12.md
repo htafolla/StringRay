@@ -84,7 +84,7 @@ Now it was time to transform RuleEnforcer from a monolith into a facade—a simp
 
 This was the moment of truth. Would it work?
 
-I remember the first test run after the transformation. I typed `npm test` and held my breath. The test suite had 2,2579 tests. If even one failed, it meant I had broken something during the extraction.
+I remember the first test run after the transformation. I typed `npm test` and held my breath. The test suite had 2,2199 tests. If even one failed, it meant I had broken something during the extraction.
 
 The tests ran. And ran. And ran.
 
@@ -296,8 +296,8 @@ The monolith's demise wasn't quick, and it wasn't easy. But it's done. And the c
 - Total: 4,647 → 906 lines (-81%)
 
 ### Test Coverage
-- Before: ~1,2579 tests
-- After: 2,2579 tests
+- Before: ~1,2199 tests
+- After: 2,2199 tests
 - Added: 500+ tests (+30%)
 
 ### Architecture

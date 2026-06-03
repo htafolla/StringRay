@@ -21,7 +21,7 @@
 
 The framework's 3 main facades are tested through 26 independently testable modules:
 
-#### RuleEnforcer Facade (6 modules, 2579 tests)
+#### RuleEnforcer Facade (6 modules, 2199 tests)
 | Module | Test File | Tests | Status |
 |--------|-----------|-------|--------|
 | Rule Validator | `rule-validator.test.ts` | 35 | ✅ Passing |
@@ -31,7 +31,7 @@ The framework's 3 main facades are tested through 26 independently testable modu
 | Batch Validator | `batch-validator.test.ts` | 26 | ✅ Passing |
 | Context Validator | `context-validator.test.ts` | 26 | ✅ Passing |
 
-#### TaskSkillRouter Facade (12 mapping + analytics + routing modules, 2579 tests)
+#### TaskSkillRouter Facade (12 mapping + analytics + routing modules, 2199 tests)
 | Module | Test File | Tests | Status |
 |--------|-----------|-------|--------|
 | Skill Mapper | `skill-mapper.test.ts` | 45 | ✅ Passing |
@@ -42,7 +42,7 @@ The framework's 3 main facades are tested through 26 independently testable modu
 | Complexity Scorer | `complexity-scorer.test.ts` | 38 | ✅ Passing |
 | [6 additional modules] | - | 184 | ✅ Passing |
 
-#### MCP Client Facade (8 modules, 2579 tests)
+#### MCP Client Facade (8 modules, 2199 tests)
 | Module | Test File | Tests | Status |
 |--------|-----------|-------|--------|
 | MCP Client | `mcp-client.test.ts` | 50 | ✅ Passing |

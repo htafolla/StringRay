@@ -382,7 +382,7 @@ node scripts/node/release-tweet-single.mjs --preview  # Preview only
 ## 🚀 Testing & Validation
 
 | Test Results
-- ✅ 2579 tests passing, 102 skipped, 0 failed
+- ✅ 2199 tests passing, 102 skipped, 0 failed
 - ✅ TypeScript compilation successful
 - ✅ Release workflow tested (generated 1.7.10 tweet successfully)
 
@@ -590,7 +590,7 @@ try {
 
 | Component | Status |
 |----------|--------|
-| Build | ✅ Passes all 2579 tests |
+| Build | ✅ Passes all 2199 tests |
 | Type Safety | ✅ Strict mode enabled |
 | Release Workflow | ✅ Fully functional |
 | Tweet Generation | ✅ Consumer-focused |

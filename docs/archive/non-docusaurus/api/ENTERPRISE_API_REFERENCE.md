@@ -1,6 +1,6 @@
 # 0xRay Framework - Enterprise API Reference
 
-**Version**: 1.22.60 | **Architecture**: Facade Pattern | **Framework**: 0xRay AI
+**Version**: 1.22.61 | **Architecture**: Facade Pattern | **Framework**: 0xRay AI
 
 ## Table of Contents
 
@@ -618,7 +618,7 @@ Get all available facades and their status.
   "facades": [
     {
       "name": "rule-enforcer",
-      "version": "1.22.60",
+      "version": "1.22.61",
       "status": "healthy",
       "modules": 6,
       "metrics": {
@@ -628,7 +628,7 @@ Get all available facades and their status.
     },
     {
       "name": "task-skill-router",
-      "version": "1.22.60",
+      "version": "1.22.61",
       "status": "healthy",
       "modules": 14,
       "metrics": {

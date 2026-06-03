@@ -115,7 +115,7 @@ The `tsc` compilation passed first try. That was a good sign.
 
 `npm run build:all` — clean. The TypeScript compiler didn't find a single broken import.
 
-`npm test` — 160 test files, 2,2579 tests passed, 0 failed. We'd deleted 25+ test files, and the remaining 160 all still passed. That told us something important: the code we deleted wasn't tested by anything that remained. The routing system was its own world, self-contained, and the rest of 0xRay never actually depended on it.
+`npm test` — 160 test files, 2,2199 tests passed, 0 failed. We'd deleted 25+ test files, and the remaining 160 all still passed. That told us something important: the code we deleted wasn't tested by anything that remained. The routing system was its own world, self-contained, and the rest of 0xRay never actually depended on it.
 
 Then the full e2e. Pack the tarball, install in a fresh directory, verify postinstall copies the 30 core skills. All good. Install the minimax skills manually (since we deleted the `skill:install` command — OpenCode doesn't need it, users can copy SKILL.md folders themselves or we can restore it later as a convenience command, not a routing mechanism). 41 total skills.
 

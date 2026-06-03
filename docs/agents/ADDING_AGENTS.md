@@ -1,4 +1,4 @@
-# How to Add an Agent to 0xRay AI v1.22.60
+# How to Add an Agent to 0xRay AI v1.22.61
 
 This guide documents how to add agents to 0xRay v1.15.1 and lists **every single file** that needs to be updated.
 
@@ -108,7 +108,7 @@ Create the agent YAML file:
 ```yaml
 name: my-agent
 description: "What this agent does"
-version: "1.22.60"
+version: "1.22.61"
 mode: subagent
 ```
 

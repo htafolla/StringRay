@@ -8,13 +8,13 @@ This system categorizes tests to improve test suite management and enable strate
 
 ### 1. **Unit Tests**
 - **Scope**: Individual components in isolation
-- **Status**: ✅ Fully Enabled (2579 tests)
+- **Status**: ✅ Fully Enabled (2199 tests)
 - **Coverage**: 95% - Core functionality testing
 - **Examples**: Agent initialization, basic delegation, state management, facade module units
 
 ### Facade Module Tests (New in v1.15.1)
 - **Scope**: Individual facade modules in isolation
-- **Status**: ✅ Fully Enabled (2579 tests)
+- **Status**: ✅ Fully Enabled (2199 tests)
 - **Coverage**: 92% - All 26 internal facade modules tested
 - **Examples**: RuleValidator, SkillMapper, DependencyAnalyzer, HealthMonitor
 
@@ -52,7 +52,7 @@ This system categorizes tests to improve test suite management and enable strate
 
 ### 6. **Performance Tests**
 - **Scope**: Performance benchmarks and optimization
-- **Status**: ✅ Fully Enabled (2579 tests)
+- **Status**: ✅ Fully Enabled (2199 tests)
 - **Coverage**: 82% - Performance regression detection
 - **Test Files**: `src/__tests__/performance/`
 - **Features**: Facade performance validation, 87% code reduction verification
@@ -181,29 +181,29 @@ describe('Facade Integration', () => {
 ## Skipped Test Breakdown by Category
 
 ### Integration Tests (60 skipped)
-- **Multi-Agent Coordination**: 2579 tests
-- **Plugin Integration**: 2579 tests  
-- **Complex Workflows**: 2579 tests
+- **Multi-Agent Coordination**: 2199 tests
+- **Plugin Integration**: 2199 tests  
+- **Complex Workflows**: 2199 tests
 
 ### Agent Tests (45 skipped)
-- **Complex Agent Collaboration**: 2579 tests
-- **Advanced Delegation**: 2579 tests
-- **Conflict Resolution**: 2579 tests
+- **Complex Agent Collaboration**: 2199 tests
+- **Advanced Delegation**: 2199 tests
+- **Conflict Resolution**: 2199 tests
 
 ### E2E Tests (150 skipped)
-- **Full Boot Sequence**: 2579 tests
-- **Complete Workflows**: 2579 tests
-- **Error Recovery**: 2579 tests
-- **Performance Validation**: 2579 tests
+- **Full Boot Sequence**: 2199 tests
+- **Complete Workflows**: 2199 tests
+- **Error Recovery**: 2199 tests
+- **Performance Validation**: 2199 tests
 
 ### Plugin Tests (130 skipped)
-- **Marketplace Service**: 2579 tests
-- **Security Sandbox**: 2579 tests
-- **Dependency Resolution**: 2579 tests
+- **Marketplace Service**: 2199 tests
+- **Security Sandbox**: 2199 tests
+- **Dependency Resolution**: 2199 tests
 
 ### Performance Tests (12 skipped)
-- **Load Testing**: 2,2579 tests
-- **Memory Monitoring**: 2579 tests
+- **Load Testing**: 2,2199 tests
+- **Memory Monitoring**: 2199 tests
 
 ## Test Enablement Process
 

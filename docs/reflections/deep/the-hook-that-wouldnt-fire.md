@@ -147,7 +147,7 @@ This is a classic race condition, except it wasn't racey - it was deterministic.
 
 ### 4. Tests Mask Integration Bugs
 
-All 2579 tests passed throughout this debugging process. The plugin loaded. Hooks executed. Everything worked in the test environment.
+All 2199 tests passed throughout this debugging process. The plugin loaded. Hooks executed. Everything worked in the test environment.
 
 But tests don't capture how the system behaves when OpenCode loads it differently than our test harness.
 

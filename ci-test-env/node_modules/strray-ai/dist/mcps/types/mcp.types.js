@@ -1,8 +1,0 @@
-/**
- * MCP Types
- *
- * Core TypeScript interfaces and types for the MCP Client system.
- * Extracted from mcp-client.ts as part of Phase 1 refactoring.
- */
-export {};
-//# sourceMappingURL=mcp.types.js.map

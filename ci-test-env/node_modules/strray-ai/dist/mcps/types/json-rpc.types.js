@@ -1,8 +1,0 @@
-/**
- * JSON-RPC Types
- *
- * TypeScript interfaces for JSON-RPC 2.0 protocol messages.
- * Used for MCP server communication.
- */
-export {};
-//# sourceMappingURL=json-rpc.types.js.map

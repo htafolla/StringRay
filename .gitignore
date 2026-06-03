@@ -71,3 +71,12 @@ tsconfig.tsbuildinfo
 # Docs inference (generated at runtime)
 docs/inference/
 .vercel
+
+# CI test environment (generated)
+ci-test-env/
+
+# Version-manager auto-backups
+backups/
+
+# Root-level config copy (artifact)
+strray/

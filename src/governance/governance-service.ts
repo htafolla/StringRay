@@ -235,6 +235,11 @@ export class GovernanceService {
           confidence: result.governanceResponse?.confidence ?? 0.85,
           reasoning: result.reason || 'Dynamo Solar SSOT filter decision',
           weight: 1.1,
+          moralTension: result.moralTension,
+          moralScore: result.moralScore,
+          moralFusion: result.moralFusion,
+          detectedVirtues: result.detectedVirtues,
+          detectedConcerns: result.detectedConcerns,
         }]);
       } catch (error) {
         const msg = error instanceof Error ? error.message : String(error);

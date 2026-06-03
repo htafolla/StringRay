@@ -189,6 +189,14 @@ export class InferenceGovernanceIntegration extends BaseIntegration {
       reasons.push(solarResponse.finalRecommendation);
     }
 
+    // Trinitarium Moral Overlay — add moral tension to reasoning
+    if (solarResponse.moralTension) {
+      reasons.push(`Moral tension: ${solarResponse.moralTension}${solarResponse.trinitariumMoralScore != null ? ` (${(solarResponse.trinitariumMoralScore * 100).toFixed(0)}%)` : ''}`);
+      if (solarResponse.detectedConcerns && solarResponse.detectedConcerns.length > 0) {
+        reasons.push(`Moral concerns: ${solarResponse.detectedConcerns.join(', ')}`);
+      }
+    }
+
     const mappedResponse: GovernanceCheckResponse = {
       success: true,
       proposalId: proposal.id,
@@ -209,6 +217,11 @@ export class InferenceGovernanceIntegration extends BaseIntegration {
       ...baseResult,
       solarContext: solarResponse.solarContext,
       solarConfidenceAdjustment: solarResponse.confidenceAdjustment,
+      moralTension: solarResponse.moralTension,
+      moralScore: solarResponse.trinitariumMoralScore,
+      moralFusion: solarResponse.trinitariumGematriaFusion,
+      detectedVirtues: solarResponse.detectedVirtues,
+      detectedConcerns: solarResponse.detectedConcerns,
     };
 
     frameworkLogger.log(

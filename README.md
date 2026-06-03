@@ -95,6 +95,7 @@ This installs only the MCP servers.
 
 **Framework-level** (inference cycle, MCP):
 - Dynamo Solar SSOT: Multi-factor decision matrix (resonance, isotopic ratio, vortex volume, historical coherence, solar activity)
+- **Trinitarium Moral Overlay**: Moral-numerological tension check — `Critical` tension rejects proposals, `Significant` downgrades PASS to NEEDS_REVISION, `Aligned` boosts confidence
 - Pure MCP transport — real proposal voting with researcher deliberation
 - CodexPolicyService — single source of truth for Codex loading
 - PreToolUse hooks enforce Codex before code changes
@@ -111,6 +112,7 @@ This installs only the MCP servers.
 | PHI weight | 1.666 | Proposal resonance sensitivity |
 | TAU weight | 0.865 | Temporal coherence threshold |
 | Min resonance | 0.70 | Minimum vote to proceed |
+| Moral tension threshold | `disabled` | `disabled` / `Aligned` / `Mild` / `Significant` / `Critical` |
 | Codex strictness | standard | `standard` / `strict` / `lenient` |
 
 ## 📦 OpenClaw Integration

@@ -19,6 +19,9 @@ export interface DecisionMatrixInput {
   vortexVolume?: number;
   historicalCoherence?: number;
   solarActivity?: 'quiet' | 'moderate' | 'active' | 'storm';
+  moralTension?: 'Aligned' | 'Mild' | 'Significant' | 'Critical';
+  moralScore?: number;
+  moralFusion?: number;
 }
 
 export interface DecisionMatrixOutput {
@@ -26,7 +29,17 @@ export interface DecisionMatrixOutput {
   confidence: number;
   voteWeight: number;
   reasons: string[];
+  moralOverride?: 'rejected_critical' | 'downgraded_significant' | 'none';
 }
+
+export const MORAL_OVERRIDE_LEVELS = {
+  Critical: 'rejected_critical' as const,
+  Significant: 'downgraded_significant' as const,
+  Mild: 'none' as const,
+  Aligned: 'none' as const,
+};
+
+export type MoralOverrideThreshold = 'Critical' | 'Significant' | 'Mild' | 'Aligned' | 'disabled';
 
 /**
  * The core PHI/TAU decision matrix.
@@ -39,12 +52,54 @@ export function applyDecisionMatrix(input: DecisionMatrixInput): DecisionMatrixO
     vortexVolume = Number.MAX_VALUE, // large default so the low-mass check only triggers on explicit small values
     historicalCoherence = 0.8,
     solarActivity = 'quiet',
+    moralTension,
+    moralScore,
+    moralFusion,
   } = input;
 
   const reasons: string[] = [];
   let recommendation: DecisionMatrixOutput['recommendation'] = 'NEEDS_REVISION';
   let confidence = 0.75;
   let voteWeight = 1.0;
+  let moralOverride: DecisionMatrixOutput['moralOverride'] = 'none';
+
+  // Log moral fusion if present — weighted signal for transparency
+  if (moralFusion != null) {
+    reasons.push(`Moral-numerological fusion: ${(moralFusion * 100).toFixed(0)}%`);
+  }
+
+  // Trinitarium Moral Overlay override
+  // Critical tension always rejects — proposal violates moral alignment regardless of physics
+  if (moralTension === 'Critical') {
+    recommendation = 'REJECT';
+    confidence = 0.92;
+    voteWeight = 1.6;
+    moralOverride = 'rejected_critical';
+    reasons.push(`Critical moral tension — proposal violates moral alignment (score: ${moralScore != null ? (moralScore * 100).toFixed(0) + '%' : 'unknown'})`);
+    return {
+      recommendation,
+      confidence: Math.min(0.99, Math.max(0.5, confidence)),
+      voteWeight: Math.max(0.5, Math.min(1.8, voteWeight)),
+      reasons,
+      moralOverride,
+    };
+  }
+
+  // Significant tension downgrades PASS → NEEDS_REVISION
+  let moralDowngrade = false;
+  if (moralTension === 'Significant') {
+    moralDowngrade = true;
+    moralOverride = 'downgraded_significant';
+    voteWeight *= 0.85;
+    reasons.push(`Significant moral tension — proceed with caution (score: ${moralScore != null ? (moralScore * 100).toFixed(0) + '%' : 'unknown'})`);
+  }
+
+  // Aligned tension boosts confidence slightly
+  if (moralTension === 'Aligned' && moralScore != null) {
+    confidence += 0.03;
+    voteWeight *= 1.05;
+    reasons.push(`Moral alignment confirmed (score: ${(moralScore * 100).toFixed(0)}%)`);
+  }
 
   if (resonance >= 0.92 && isotopicRatio >= 0.95) {
     recommendation = 'PASS';
@@ -62,6 +117,12 @@ export function applyDecisionMatrix(input: DecisionMatrixInput): DecisionMatrixO
     reasons.push('Signal below critical threshold (1 - TAU)');
   } else {
     reasons.push('Moderate resonance - requires refinement');
+  }
+
+  // Moral downgrade: Significant tension demotes PASS → NEEDS_REVISION
+  if (moralDowngrade && recommendation === 'PASS') {
+    recommendation = 'NEEDS_REVISION';
+    reasons.push('Moral tension downgraded recommendation from PASS to NEEDS_REVISION');
   }
 
   if (vortexVolume < 2.5e25) {
@@ -88,6 +149,7 @@ export function applyDecisionMatrix(input: DecisionMatrixInput): DecisionMatrixO
     confidence: Math.min(0.99, Math.max(0.5, confidence)),
     voteWeight: Math.max(0.5, Math.min(1.8, voteWeight)),
     reasons,
+    moralOverride,
   };
 }
 

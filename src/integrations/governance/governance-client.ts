@@ -101,6 +101,11 @@ export class GovernanceClient {
         adjustedVoteWeight: result.adjustedVoteWeight as number,
         finalRecommendation: result.finalRecommendation as string,
         confidenceAdjustment: result.confidenceAdjustment as number,
+        trinitariumMoralScore: result.trinitariumMoralScore as number | undefined,
+        moralTension: result.moralNumerologicalTension as SolarGovernanceCheckResponse['moralTension'],
+        trinitariumGematriaFusion: result.trinitariumGematriaFusion as number | undefined,
+        detectedVirtues: Array.isArray(result.trinitariumDetectedVirtues) ? result.trinitariumDetectedVirtues as string[] : undefined,
+        detectedConcerns: Array.isArray(result.trinitariumDetectedConcerns) ? result.trinitariumDetectedConcerns as string[] : undefined,
       };
 
       if (!this.isValidSolarResponse(response)) {

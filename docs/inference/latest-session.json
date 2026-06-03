@@ -1,162 +1,53 @@
 {
-  "sessionId": "session-2026-05-08",
-  "timestamp": "2026-05-08T00:15:51.647Z",
+  "sessionId": "session-2026-06-03",
+  "timestamp": "2026-06-03T13:42:07.574Z",
   "span": {
-    "from": "v1.22.46",
+    "from": "v1.22.66",
     "to": "HEAD"
   },
   "problems": [
-    "Bug: fix: remove unused imports and any type from processor-manager.interfaces.test.ts (processor-test-rules ESLint) (529d3d2)",
-    "Bug: fix: address all open bugs (#29-32, #34) and prevent noise PRs from inference cycle (c32d711)",
-    "Bug: fix: remove enforcer references from integration test, add fetch-depth:0 for e2e git tests (deb49f4)",
-    "Bug: fix: triage and fix all GitHub workflow pipelines (097b48c)",
-    "Bug: fix: restore package.json, mcp-install.ts, workflows, and govern-reflection.mjs gutted by 84dae31b1 (7417fd6)",
-    "Bug: fix: add npm audit fix to main CI workflow (84dae31)",
-    "Bug: fix: run npm audit fix to resolve moderate vulnerabilities (314cc06)",
-    "Bug: fix: remove duplicate case undefined in mcp-install.ts (lint error) (9b713b9)",
-    "Bug: fix: make trace-context more robust + fix ESM issues in govern-reflection (e665442)",
-    "Bug: fix: agent registry cleanup — remove skill-only entries, delete deprecated agents (1cafc3a)",
-    "Bug: fix: agent export naming + single-architect governance (b5c6100)",
-    "Bug: fix: complete inference-cycle.ts — all fixes applied. (cef1ecd)",
-    "Bug: fix: guard inference:run for StringRay internal use only (beefefb)",
-    "Bug: fix: governance pipeline — force flag, skipDeployVerify default, deploy failure handling (40ae8ae)",
-    "Bug: fix: increase timeout for processor auto-discovery tests to prevent flaky failures (baae755)",
-    "Bug: fix: inference processor double-joining absolute path created bogus Users/ dir (a795635)",
-    "Accumulated dead code: - .opencode/core/activity-logger.d.ts.map",
-    "Technical debt requiring stability focus"
+    "Bug: fix: align governance client field names with Dynamo response (solarResonance -> solarIsotopicResonance, relax evaluate validation) (e5ecea0)",
+    "Bug: fix: update tests for new resolveFrameworkPaths behavior + deflake inference-e2e (4702109)"
   ],
   "approaches": [
-    "Extract methods into dedicated files to reduce monolith size",
-    "Add tests alongside new implementations",
-    "Delete unused code to reduce maintenance burden",
-    "Automate version synchronization across config files",
-    "Structural guard to enforce invariants"
+    "Declare dependencies explicitly for testability and auto-wiring"
   ],
   "wrongTurns": [
-    "Approach was reverted — initial direction was wrong",
-    "Path handling bug: absolute vs relative path confusion",
-    "Timing issue: test assumptions violated in parallel execution"
+    "Path handling bug: absolute vs relative path confusion"
   ],
   "solutions": [
-    "Applied Extract Method pattern (confidence: 95%)",
-    "Applied Test Coverage Expansion pattern (confidence: 95%)",
-    "Applied Dead Code Removal pattern (confidence: 90%)",
-    "Applied Stability Sprint pattern (confidence: 75%)",
-    "Integration: feat: wire apply phase for real code changes instead of markdown markers (f190318)",
-    "Integration: feat: add centralized TraceContext + integrate Reflection Governance with ValidatorRegistry (1a79c88)",
-    "Integration: feat: wire apply phase + researcher double-check for PRs (7bfa4ca)",
-    "Integration: feat: unify governance — wire WeightedVotingAggregator, expand agents, connect orchestrator (fca44e6)",
-    "Integration: feat: unify governance — wire WeightedVotingAggregator, expand agents, connect orchestrator (191536d)",
-    "New tooling: fix: inference processor double-joining absolute path created bogus Users/ dir (a795635)"
+    "Applied Dependency Injection pattern (confidence: 82%)"
   ],
   "reasoningChain": [
     {
       "from": "approach",
       "to": "solution",
-      "reasoning": "Extract methods into dedicated files to reduce monolith size → Applied Extract Method pattern (confidence: 95%)"
-    },
-    {
-      "from": "approach",
-      "to": "solution",
-      "reasoning": "Add tests alongside new implementations → Applied Test Coverage Expansion pattern (confidence: 95%)"
-    },
-    {
-      "from": "approach",
-      "to": "solution",
-      "reasoning": "Delete unused code to reduce maintenance burden → Applied Dead Code Removal pattern (confidence: 90%)"
-    },
-    {
-      "from": "approach",
-      "to": "solution",
-      "reasoning": "Automate version synchronization across config files → Applied Stability Sprint pattern (confidence: 75%)"
-    },
-    {
-      "from": "approach",
-      "to": "solution",
-      "reasoning": "Structural guard to enforce invariants → Integration: feat: wire apply phase for real code changes instead of markdown markers (f190318)"
-    },
-    {
-      "from": "approach",
-      "to": "wrong_turn",
-      "reasoning": "Approach was reverted — initial direction was wrong"
+      "reasoning": "Declare dependencies explicitly for testability and auto-wiring → Applied Dependency Injection pattern (confidence: 82%)"
     },
     {
       "from": "approach",
       "to": "wrong_turn",
       "reasoning": "Path handling bug: absolute vs relative path confusion"
-    },
-    {
-      "from": "approach",
-      "to": "wrong_turn",
-      "reasoning": "Timing issue: test assumptions violated in parallel execution"
     }
   ],
   "patterns": [
     {
-      "name": "Extract Method",
-      "confidence": 0.95,
+      "name": "Dependency Injection",
+      "confidence": 0.82,
       "evidence": [
-        "1 new files + 4 modified in src/__tests__/integration/",
-        "  + inference-pipeline.test.ts",
-        "  ~ agent-registry-integration.test.ts (-1 lines)",
-        "  ~ codex-enforcement.test.ts (-3 lines)",
-        "  ~ processors.test.ts (-8 lines)",
-        "1 new files + 3 modified in src/core/",
-        "  + trace-context.ts",
-        "  ~ boot-orchestrator.ts (-1 lines)",
-        "  ~ features-config.ts (-1 lines)",
-        "  ~ framework-logger.ts (-1 lines)",
-        "1 new files + 13 modified in ./",
-        "  + vitest.config.ts",
-        "  ~ .gitignore (-1 lines)",
-        "  ~ .npmignore (-4 lines)",
-        "  ~ AGENTS-consumer.md (-1 lines)"
+        "DI container / injection logic",
+        "Constructor-based DI signatures"
       ],
-      "description": "Methods extracted from monolithic modules into dedicated files in the same directory. Classic decomposition pattern: one large file sheds responsibilities into focused modules."
-    },
-    {
-      "name": "Test Coverage Expansion",
-      "confidence": 0.95,
-      "evidence": [
-        "+ src/__tests__/e2e/inference-e2e.test.ts",
-        "+ src/__tests__/integration/inference-pipeline.test.ts",
-        "+ src/__tests__/unit/inference/deploy-verifier.test.ts",
-        "+ src/__tests__/unit/inference/inference-accumulator.test.ts",
-        "+ src/__tests__/unit/inference/inference-cycle.test.ts"
-      ],
-      "description": "7 new test files added. Test-first or test-alongside development — covering new code as it ships."
-    },
-    {
-      "name": "Dead Code Removal",
-      "confidence": 0.9,
-      "evidence": [
-        "- .opencode/core/activity-logger.d.ts.map",
-        "- .opencode/core/adaptive-kernel.d.ts.map",
-        "- .opencode/core/boot-orchestrator.d.ts.map",
-        "- .opencode/core/boot-phases.d.ts.map",
-        "- .opencode/core/codex-formatter.d.ts.map",
-        "... and 1748 more"
-      ],
-      "description": "1753 files deleted — unused code eliminated. Reduces maintenance burden, removes misleading signals for new readers."
-    },
-    {
-      "name": "Stability Sprint",
-      "confidence": 0.75,
-      "evidence": [
-        "1753 files deleted",
-        "Net 164692 lines removed",
-        "22 fix-related changes"
-      ],
-      "description": "Focus on removal and fixing over feature addition. Technical debt being paid down — a sign of mature development practice."
+      "description": "Explicit dependency declarations replacing hardcoded imports. Enables testing with mocks, runtime configuration, and auto-wiring."
     }
   ],
   "metrics": {
-    "commits": 42,
-    "filesChanged": 2070,
-    "insertions": 13145,
-    "deletions": 177837,
-    "filesAdded": 56,
-    "filesDeleted": 1753,
-    "uniqueDirs": 211
+    "commits": 8,
+    "filesChanged": 27,
+    "insertions": 1406,
+    "deletions": 538,
+    "filesAdded": 11,
+    "filesDeleted": 0,
+    "uniqueDirs": 14
   }
 }

@@ -4,6 +4,8 @@
 Analyze the following data sources to gather insights for inference improvement:
 
 ### Data Locations
+- /Users/blaze/dev/stringray/docs/reflections/0xray-growth-arc-aside-2026-05-19.md
+- /Users/blaze/dev/stringray/docs/reflections/0xray-three-subsystem-architecture-vision-2026-05-19.md
 - /Users/blaze/dev/stringray/docs/reflections/100-PERCENT-TEST-SUCCESS-2026-03-13.md
 - /Users/blaze/dev/stringray/docs/reflections/2026-03-05-kernel-confidence-fix.md
 - /Users/blaze/dev/stringray/docs/reflections/AUTONOMOUS_MODULE_TODO.md
@@ -37,10 +39,12 @@ Analyze the following data sources to gather insights for inference improvement:
 - /Users/blaze/dev/stringray/docs/reflections/any-type-elimination-journey.md
 - /Users/blaze/dev/stringray/docs/reflections/apply-phase-real-code-changes-via-mcp-routing.md
 - /Users/blaze/dev/stringray/docs/reflections/architectural-threshold-75-efficiency-reflection.md
+- /Users/blaze/dev/stringray/docs/reflections/aside-subcontext-pattern-2026-05-19.md
 - /Users/blaze/dev/stringray/docs/reflections/auto-commit-cadence-2026-04-29.md
 - /Users/blaze/dev/stringray/docs/reflections/auto-commit-cadence-2026-05-06.md
 - /Users/blaze/dev/stringray/docs/reflections/auto-commit-cadence-2026-05-11.md
 - /Users/blaze/dev/stringray/docs/reflections/auto-commit-cadence-2026-05-16.md
+- /Users/blaze/dev/stringray/docs/reflections/auto-commit-cadence-2026-06-02.md
 - /Users/blaze/dev/stringray/docs/reflections/automated-version-compliance-system.md
 - /Users/blaze/dev/stringray/docs/reflections/bug-triage-specialist-unsung-hero-2026-03-10.md
 - /Users/blaze/dev/stringray/docs/reflections/ci-cd-autonomous-recovery-implementation-reflection.md

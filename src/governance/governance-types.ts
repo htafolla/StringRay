@@ -30,6 +30,11 @@ export interface GovernanceVote {
   confidence: number; // 0-1
   reasoning: string;
   weight?: number; // for weighted voting
+  moralTension?: 'Aligned' | 'Mild' | 'Significant' | 'Critical' | undefined;
+  moralScore?: number | undefined;
+  moralFusion?: number | undefined;
+  detectedVirtues?: string[] | undefined;
+  detectedConcerns?: string[] | undefined;
 }
 
 export interface GovernanceResult {
@@ -40,6 +45,7 @@ export interface GovernanceResult {
   reasoningSummary: string;
   recommendedActions?: string[];
   externalContext?: Record<string, unknown>; // Solar activity, etc.
+  moralOverride?: 'rejected_critical' | 'downgraded_significant' | 'none';
 }
 
 export interface GovernanceContext {

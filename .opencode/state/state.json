@@ -1,1 +1,11 @@
-{}
+{
+  "workflow-test-framework-init-session": {
+    "initialized": true,
+    "timestamp": 1780409917960,
+    "components": [
+      "state-manager",
+      "framework-logger",
+      "codex-system"
+    ]
+  }
+}

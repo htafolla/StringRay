@@ -298,6 +298,15 @@ module.exports = async (context, tool) => {
 
 StringRay enforces Universal Development Codex (60 terms) for systematic error prevention. See [.opencode/strray/codex.json](https://github.com/htafolla/stringray/blob/master/.opencode/strray/codex.json) for full reference.
 
+## Governance System
+
+StringRay includes a governance engine with Dynamo Solar SSOT decision-making and the Trinitarium Moral Overlay:
+
+- **Decision Matrix**: Evaluates proposals on resonance, isotopic ratio, vortex volume, historical coherence, and solar activity
+- **Moral Overlay**: Moral-numerological tension scoring — `Critical` rejects, `Significant` downgrades, `Aligned` boosts confidence
+- **Integration**: Available via `strray-governance` MCP server (`evaluate_proposal`, `get_governance_status`)
+- **Hooks**: PreToolUse and pre-commit Codex enforcement
+
 ## Configuration Files Reference
 
 StringRay uses multiple configuration files to control behavior:
@@ -662,4 +671,4 @@ npx strray-ai --version
 - [Troubleshooting](https://github.com/htafolla/stringray/blob/master/docs/TROUBLESHOOTING.md)
 
 ---
-**Version**: 1.22.66 | [GitHub](https://github.com/htafolla/stringray)
+**Version**: 1.22.68 | [GitHub](https://github.com/htafolla/stringray)

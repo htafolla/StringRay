@@ -134,6 +134,12 @@ export interface SolarGovernanceCheckResponse {
   finalRecommendation: string;
   /** Confidence adjustment applied due to solar activity */
   confidenceAdjustment: number;
+  /** Trinitarium Moral Overlay — moral alignment score (0-1) */
+trinitariumMoralScore?: number | undefined;
+  moralTension?: 'Aligned' | 'Mild' | 'Significant' | 'Critical' | undefined;
+  trinitariumGematriaFusion?: number | undefined;
+  detectedVirtues?: string[] | undefined;
+  detectedConcerns?: string[] | undefined;
 }
 
 /**
@@ -164,6 +170,12 @@ export interface GovernanceVoteResult {
   governanceResponse: GovernanceCheckResponse;
   /** Whether the proposal passed governance */
   passed: boolean;
+  /** Moral-Numerological Tension from Trinitarium Moral Overlay */
+moralTension?: 'Aligned' | 'Mild' | 'Significant' | 'Critical' | undefined;
+  moralScore?: number | undefined;
+  moralFusion?: number | undefined;
+  detectedVirtues?: string[] | undefined;
+  detectedConcerns?: string[] | undefined;
 }
 
 /**

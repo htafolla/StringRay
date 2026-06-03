@@ -1,0 +1,113 @@
+# Release Reflection: 1.22.66 → HEAD
+
+**Generated:** 2026-06-03T13:42:06.502Z
+**Cadence:** release (since tag v1.22.66)
+**Commits examined:** 8
+**Span:** v1.22.66..HEAD
+
+## Scope
+
+- **8 commits** with **27 file changes**
+- **+1395 insertions / -528 deletions**
+- **11 files added, 16 modified, 0 deleted**
+
+## Areas Touched
+
+- `.` (7 files)
+- `.opencode/state` (1 files)
+- `.strray` (6 files)
+- `.strray/config` (3 files)
+- `docs/reflections` (5 files)
+- `docs/reflections/deep` (2 files)
+- `node_modules/.vite/vitest/da39a3ee5e6b4b0d3255bfef95601890afd80709` (1 files)
+- `scripts/node` (1 files)
+- `src/__tests__/e2e` (1 files)
+- `src/cli` (4 files)
+- `src/cli/commands` (3 files)
+- `src/integrations/governance` (3 files)
+- `src/integrations/openclaw` (2 files)
+- `src/mcps/config/__tests__` (1 files)
+
+## Commit Chronicle
+
+- **v1.22.68: multi-platform install commands, postinstall refactor, README rebuild** (3ca8ec9)
+  0 files: .strray/config/features.json, .strray/config/openclaw.json, README.md, package.json, scripts/node/postinstall.cjs +6 more
+
+- **fix: align governance client field names with Dynamo response (solarResonance -> solarIsotopicResonance, relax evaluate validation)** (e5ecea0)
+  11 files: src/integrations/governance/governance-client.ts, src/integrations/governance/index.ts, src/integrations/governance/types.ts
+
+- **docs: add reflection on the Aside subcontext pattern and its architectural implications** (96b772d)
+  3 files: docs/reflections/aside-subcontext-pattern-2026-05-19.md
+
+- **docs: add aside on the growth arc and realization of 0xRay's deeper architecture** (7750887)
+  1 files: docs/reflections/0xray-growth-arc-aside-2026-05-19.md
+
+- **docs: add 0xRay three-subsystem architecture vision reflection** (0694f92)
+  1 files: docs/reflections/0xray-three-subsystem-architecture-vision-2026-05-19.md
+
+- **docs: add deep journey reflection on Grok CLI MCP stability and publish pipeline fixes** (cba8b87)
+  1 files: docs/reflections/deep/grok-mcp-publish-stability-journey-2026-05-19.md
+
+- **docs: add deep journey reflection on double-dist fix and Dynamo governance pipeline** (c297183)
+  1 files: docs/reflections/deep/the-path-to-dynamo-journey-2026-05-19.md
+
+- **fix: update tests for new resolveFrameworkPaths behavior + deflake inference-e2e** (4702109)
+  1 files: .opencode/state/state.json, .strray/codex.json, .strray/config.json, .strray/features.json, .strray/integrations.json +3 more
+
+## Files Added
+
+- `.opencode/state/state.json`
+- `.strray/config/features.json`
+- `.strray/config/openclaw.json`
+- `docs/reflections/0xray-growth-arc-aside-2026-05-19.md`
+- `docs/reflections/0xray-three-subsystem-architecture-vision-2026-05-19.md`
+- `docs/reflections/aside-subcontext-pattern-2026-05-19.md`
+- `docs/reflections/deep/grok-mcp-publish-stability-journey-2026-05-19.md`
+- `docs/reflections/deep/the-path-to-dynamo-journey-2026-05-19.md`
+- `src/cli/commands/hermes-install.ts`
+- `src/cli/commands/openclaw-install.ts`
+- `src/cli/commands/opencode-install.ts`
+
+## Files Modified
+
+- `.strray/codex.json`
+- `.strray/config.json`
+- `.strray/features.json`
+- `.strray/integrations.json`
+- `README.md`
+- `node_modules/.vite/vitest/da39a3ee5e6b4b0d3255bfef95601890afd80709/results.json`
+- `package.json`
+- `scripts/node/postinstall.cjs`
+- `src/__tests__/e2e/inference-e2e.test.ts`
+- `src/cli/index.ts`
+- `src/integrations/governance/governance-client.ts`
+- `src/integrations/governance/index.ts`
+- `src/integrations/governance/types.ts`
+- `src/integrations/openclaw/README.md`
+- `src/integrations/openclaw/config.ts`
+- `src/mcps/config/__tests__/server-config-registry.test.ts`
+
+## Patterns Observed
+
+- Bug fixes present — stability improvement
+- Refactoring detected — architectural debt being addressed
+- Version bumps/releases present — release cadence active
+- Integration layer modified — external system interfaces changing
+
+## Key Decisions
+
+- Structural change: v1.22.68: multi-platform install commands, postinstall refactor, README rebuild
+- Fix: fix: align governance client field names with Dynamo response (solarResonance -> solarIsotopicResonance, relax evaluate validation)
+- Fix: docs: add deep journey reflection on Grok CLI MCP stability and publish pipeline fixes
+- Fix: docs: add deep journey reflection on double-dist fix and Dynamo governance pipeline
+- Fix: fix: update tests for new resolveFrameworkPaths behavior + deflake inference-e2e
+
+## Inference Notes
+
+- Dependency Injection pattern detected [82%]: Explicit dependency declarations replacing hardcoded imports. Enables testing with mocks, runtime configuration, and auto-wiring. (DI container / injection logic)
+- Structured inference captured → session-2026-06-03-1780494127574.json
+- Registry Pattern: factory/registry changes suggest switch-to-Map refactoring
+- Stability sprint: 4/8 commits are fixes — addressing accumulated issues
+
+---
+*Generated by StorytellingTriggerProcessor — release cadence — 2026-06-03T13:42:06.502Z*

@@ -5,6 +5,7 @@ docs-site/node_modules/
 
 # Generated runtime files
 performance-reports/
+logs/performance-reports/
 logs/framework/activity-report.json
 logs/framework/pattern-metrics.json
 logs/framework/routing-outcomes.json

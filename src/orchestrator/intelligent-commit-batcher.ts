@@ -185,7 +185,7 @@ export class IntelligentCommitBatcher {
    * Commit the current batch of changes
    */
   async commitBatch(commitMessage?: string): Promise<boolean> {
-    const jobId = `commit-batch-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const jobId = `commit-batch-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 
     if (this.pendingChanges.length === 0) return false;
 

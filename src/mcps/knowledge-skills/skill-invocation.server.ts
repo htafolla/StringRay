@@ -896,7 +896,7 @@ class SkillInvocationServer {
       try {
         await transport.handleRequest(req, res, req.body);
       } catch (error) {
-        process.stderr.write(`[skill-invocation.server] HTTP handler error: ${error}\n`);
+        frameworkLogger.log('skill-invocation', 'http-handler-error', 'error', { error: String(error) });
         if (!res.headersSent) {
           res.status(500).json({ jsonrpc: "2.0", error: { code: -32603, message: "Internal error" }, id: null });
         }
@@ -908,7 +908,7 @@ class SkillInvocationServer {
     });
 
     app.listen(port, () => {
-      process.stderr.write(`[skill-invocation.server] HTTP MCP listening on port ${port}\n`);
+      frameworkLogger.log('skill-invocation', 'http-listening', 'info', { port });
     });
 
     process.on("SIGINT", () => { transport.close(); process.exit(0); });
@@ -926,13 +926,13 @@ if (entryPoint && fileURLToPath(import.meta.url) === entryPoint) {
   if (!isNaN(port)) {
     const server = new SkillInvocationServer();
     server.runHttp(port).catch((error) => {
-      process.stderr.write(`[skill-invocation.server] HTTP startup error: ${error}\n`);
+      frameworkLogger.log('skill-invocation', 'http-startup-error', 'error', { error: String(error) });
       process.exit(1);
     });
   } else {
     const server = new SkillInvocationServer();
     server.run().catch((error) => {
-      process.stderr.write(`[skill-invocation.server] Fatal startup error: ${error}\n`);
+      frameworkLogger.log('skill-invocation', 'fatal-startup-error', 'error', { error: String(error) });
       process.exit(1);
     });
   }

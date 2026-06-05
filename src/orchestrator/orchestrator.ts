@@ -152,7 +152,7 @@ export class StringRayOrchestrator {
     tasks: TaskDefinition[],
     sessionId?: string,
   ): Promise<TaskResult[]> {
-    const jobId = `complex-task-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const jobId = `complex-task-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 
     // Task execution start - operational logging, keep for monitoring
 
@@ -408,7 +408,7 @@ export class StringRayOrchestrator {
     agentCoordination: string[];
     performanceImprovement: number;
   }> {
-    const jobId = `test-healing-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const jobId = `test-healing-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
     const startTime = Date.now();
     try {
       // Step 1: Analyze failure patterns and create healing strategy

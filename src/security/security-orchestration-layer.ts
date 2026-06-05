@@ -266,7 +266,7 @@ export class SecurityOrchestrationLayer extends EventEmitter {
     }
 
     const startTime = Date.now();
-    const auditId = `security-orchestration-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const auditId = `security-orchestration-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 
     this.isRunning = true;
     frameworkLogger.log("security-orchestration", "orchestration-start", "info", {
@@ -320,7 +320,7 @@ export class SecurityOrchestrationLayer extends EventEmitter {
     priority: SecurityTask["priority"],
   ): Promise<SecurityTask> {
     const task: SecurityTask = {
-      id: `task-${type}-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`,
+      id: `task-${type}-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
       type,
       priority,
       status: "pending",
@@ -565,7 +565,7 @@ export class SecurityOrchestrationLayer extends EventEmitter {
       votes.reduce((sum, v) => sum + v.weight, 0);
 
     return {
-      id: `decision-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`,
+      id: `decision-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
       title,
       description,
       type,

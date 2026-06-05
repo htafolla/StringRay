@@ -160,7 +160,7 @@ export class SessionMonitor {
   }
 
   async performHealthCheck(sessionId: string): Promise<SessionHealth> {
-    const jobId = `session-health-check-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const jobId = `session-health-check-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
     const startTime = Date.now();
     const health = this.healthChecks.get(sessionId);
 
@@ -445,7 +445,7 @@ export class SessionMonitor {
 
     for (const issue of issues) {
       const alert: Alert = {
-        id: `alert_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        id: `alert_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
         sessionId,
         type: "health",
         severity,

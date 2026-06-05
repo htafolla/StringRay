@@ -83,7 +83,7 @@ export class SecurityScanner {
    * Run comprehensive security scan
    */
   async runSecurityScan(): Promise<SecurityReport> {
-    const jobId = `security-scan-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const jobId = `security-scan-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
     const startTime = Date.now();
 
     if (!this.config.enabled) {

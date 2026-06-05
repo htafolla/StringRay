@@ -88,7 +88,7 @@ export class AgentConfigValidator {
    * Validate agent configuration from file
    */
   async validateConfigFile(filePath: string): Promise<ValidationResult> {
-    const jobId = `validate-config-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const jobId = `validate-config-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 
     try {
       // Check if file exists

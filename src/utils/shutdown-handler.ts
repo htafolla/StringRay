@@ -44,7 +44,7 @@ export function createGracefulShutdown(options: ShutdownOptions): ShutdownHandle
 
     // Force exit after timeout
     const timeout = setTimeout(() => {
-      process.stderr.write("Graceful shutdown timeout, forcing exit...\n");
+      frameworkLogger.log(serverName, "shutdown-timeout", "error", { message: "Graceful shutdown timeout, forcing exit..." });
       process.exit(1);
     }, shutdownTimeout);
 
@@ -62,7 +62,7 @@ export function createGracefulShutdown(options: ShutdownOptions): ShutdownHandle
       process.exit(0);
     } catch (error) {
       clearTimeout(timeout);
-      process.stderr.write(`Error during ${serverName} shutdown: ${error instanceof Error ? error.message : String(error)}\n`);
+      frameworkLogger.log(serverName, "shutdown-error", "error", { message: `Error during ${serverName} shutdown: ${error instanceof Error ? error.message : String(error)}` });
       process.exit(1);
     }
   };
@@ -78,13 +78,13 @@ export function createGracefulShutdown(options: ShutdownOptions): ShutdownHandle
 
   // Handle uncaught exceptions
   process.on("uncaughtException", (error) => {
-    process.stderr.write(`Uncaught Exception: ${error instanceof Error ? error.message : String(error)}\n`);
+    frameworkLogger.log(serverName, "uncaught-exception", "error", { message: `Uncaught Exception: ${error instanceof Error ? error.message : String(error)}` });
     cleanup("uncaughtException");
   });
 
   // Handle unhandled rejections
   process.on("unhandledRejection", (reason, promise) => {
-    process.stderr.write(`Unhandled Rejection at: ${String(promise)} reason: ${String(reason)}\n`);
+    frameworkLogger.log(serverName, "unhandled-rejection", "error", { message: `Unhandled Rejection at: ${String(promise)} reason: ${String(reason)}` });
     cleanup("unhandledRejection");
   });
 

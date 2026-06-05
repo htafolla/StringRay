@@ -578,7 +578,7 @@ export class ProcessorManager {
   }
 
   async initializeProcessors(): Promise<boolean> {
-    const jobId = `init-processors-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const jobId = `init-processors-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 
     frameworkLogger.log("processor-manager", "initializeProcessors called", "info", {
       jobId,
@@ -649,7 +649,7 @@ export class ProcessorManager {
     args?: Record<string, unknown>;
     context?: Record<string, unknown>;
   }): Promise<{ success: boolean; results: ProcessorResult[] }> {
-    const jobId = `execute-pre-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const jobId = `execute-pre-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
     const { tool, args, context } = input;
 
     frameworkLogger.log("processor-manager", "executePreProcessors called", "debug", {
@@ -754,7 +754,7 @@ export class ProcessorManager {
     data: any,
     preResults: ProcessorResult[],
   ): Promise<ProcessorResult[]> {
-    const jobId = `execute-post-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const jobId = `execute-post-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 
     frameworkLogger.log("processor-manager", "executePostProcessors called", "debug", {
       jobId,

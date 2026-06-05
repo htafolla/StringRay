@@ -171,7 +171,7 @@ export function createStringRayCodexInjectorHook() {
     name: "strray-codex-injector" as const,
     hooks: {
       "agent.start": async (sessionId: string) => {
-        const jobId = `agent-start-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+        const jobId = `agent-start-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 
         try {
           await frameworkLogger.log(
@@ -231,7 +231,7 @@ export function createStringRayCodexInjectorHook() {
         input: { tool: string; args?: Record<string, unknown> },
         sessionId: string,
       ) => {
-        const jobId = `tool-before-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+        const jobId = `tool-before-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 
         try {
           await frameworkLogger.log(
@@ -445,7 +445,7 @@ export function createStringRayCodexInjectorHook() {
         output: { output?: string; [key: string]: unknown },
         sessionId: string,
       ) => {
-        const jobId = `tool-after-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+        const jobId = `tool-after-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 
         try {
           frameworkLogger.log(

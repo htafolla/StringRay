@@ -356,7 +356,7 @@ class ComprehensiveValidator {
    * Run all comprehensive validation checks
    */
   async validate(): Promise<ComprehensiveValidationResult> {
-    const jobId = `comprehensive-validation-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const jobId = `comprehensive-validation-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 
     const allErrors: string[] = [];
     const allWarnings: string[] = [];

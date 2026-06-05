@@ -143,7 +143,7 @@ export class MultiAgentOrchestrationCoordinator {
     sessionId?: string,
   ): Promise<OrchestrationResult> {
     const startTime = Date.now();
-    const jobId = `workflow-${workflow.id}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const jobId = `workflow-${workflow.id}-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 
     frameworkLogger.log(
       "orchestration-coordinator",

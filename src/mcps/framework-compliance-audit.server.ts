@@ -301,7 +301,6 @@ ${results.recommendations.map((r) => `• 💡 ${r}`).join("\n")}
     try {
       // Check for required configuration files
       const requiredFiles = [
-        "src/strray/config/manager.py",
         "src/agents/types.ts",
       ];
 
@@ -446,13 +445,8 @@ ${results.recommendations.map((r) => `• 💡 ${r}`).join("\n")}
         );
       }
 
-      // Check for codex validation files
-      if (!fs.existsSync("src/strray/core/codex_loader.py")) {
-        results.warnings.push("Missing codex loader implementation");
-        results.recommendations.push(
-          "Implement codex_loader.py for runtime validation",
-        );
-      }
+      // Codex validation file check — Python-based loader not in this codebase
+
     } catch (error) {
       results.passed = false;
       results.issues.push(
@@ -495,13 +489,7 @@ ${results.recommendations.map((r) => `• 💡 ${r}`).join("\n")}
         }
       }
 
-      // Check for performance monitoring
-      if (!fs.existsSync("src/strray/performance/monitor.py")) {
-        results.warnings.push("Missing performance monitoring implementation");
-        results.recommendations.push(
-          "Implement performance monitoring for runtime metrics",
-        );
-      }
+      // Performance monitoring check — Python-based monitor not in this codebase
     } catch (error) {
       results.warnings.push(
         `Performance audit error: ${error instanceof Error ? error.message : String(error)}`,

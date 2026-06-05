@@ -448,10 +448,16 @@ class GovernanceServer {
     await this.server.connect(transport as any);
 
     app.post("/mcp", async (req: any, res: any) => {
+      const apiKey = req.headers?.['x-api-key'];
+      const expectedKey = process.env.GOVERNANCE_API_KEY;
+      if (expectedKey && apiKey !== expectedKey) {
+        res.status(401).json({ jsonrpc: "2.0", error: { code: -32001, message: "Unauthorized" }, id: null });
+        return;
+      }
       try {
         await transport.handleRequest(req, res, req.body);
       } catch (error) {
-        process.stderr.write(`[governance.server] HTTP handler error: ${error}\n`);
+        frameworkLogger.log('governance-mcp', 'http-handler-error', 'error', { error: String(error) });
         if (!res.headersSent) {
           res.status(500).json({ jsonrpc: "2.0", error: { code: -32603, message: "Internal error" }, id: null });
         }
@@ -463,7 +469,7 @@ class GovernanceServer {
     });
 
     app.listen(port, () => {
-      process.stderr.write(`[governance.server] HTTP MCP listening on port ${port}\n`);
+      frameworkLogger.log('governance-mcp', 'http-listening', 'info', { port });
     });
 
     process.on("SIGINT", () => { transport.close(); process.exit(0); });
@@ -481,13 +487,13 @@ if (entryPoint && fileURLToPath(import.meta.url) === entryPoint) {
   if (!isNaN(port)) {
     const server = new GovernanceServer();
     server.runHttp(port).catch((error) => {
-      process.stderr.write(`[governance.server] HTTP startup error: ${error}\n`);
+      frameworkLogger.log('governance-mcp', 'http-startup-error', 'error', { error: String(error) });
       process.exit(1);
     });
   } else {
     const server = new GovernanceServer();
     server.run().catch((error) => {
-      process.stderr.write(`[governance.server] Fatal startup error: ${error}\n`);
+      frameworkLogger.log('governance-mcp', 'fatal-startup-error', 'error', { error: String(error) });
       process.exit(1);
     });
   }

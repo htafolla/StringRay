@@ -21,7 +21,7 @@ StringRay provides intelligent multi-agent orchestration with automatic delegati
 
 Deep reflection documents capture development journeys and lessons learned:
 - **Location**: `docs/reflections/` (main) and `docs/reflections/deep/` (detailed)
-- **Examples**: `kernel-v2.0-skill-system-fix-journey.md`, `typescript-build-fix-journey-2026-03-09.md`, `stringray-framework-deep-reflection-v1.22.66.md`
+- **Examples**: `kernel-v2.0-skill-system-fix-journey.md`, `typescript-build-fix-journey-2026-03-09.md`, `stringray-framework-deep-reflection-v1.4.21.md`
 
 These documents capture:
 - Technical challenges encountered and solved
@@ -297,15 +297,6 @@ module.exports = async (context, tool) => {
 ## Codex
 
 StringRay enforces Universal Development Codex (60 terms) for systematic error prevention. See [.opencode/strray/codex.json](https://github.com/htafolla/stringray/blob/master/.opencode/strray/codex.json) for full reference.
-
-## Governance System
-
-StringRay includes a governance engine with Dynamo Solar SSOT decision-making and the Trinitarium Moral Overlay:
-
-- **Decision Matrix**: Evaluates proposals on resonance, isotopic ratio, vortex volume, historical coherence, and solar activity
-- **Moral Overlay**: Moral-numerological tension scoring — `Critical` rejects, `Significant` downgrades, `Aligned` boosts confidence
-- **Integration**: Available via `strray-governance` MCP server (`evaluate_proposal`, `get_governance_status`)
-- **Hooks**: PreToolUse and pre-commit Codex enforcement
 
 ## Configuration Files Reference
 
@@ -648,7 +639,7 @@ npx strray-ai --version
 ### Consumer Environment Limitations
 
 - **Features.json**: Automatically loaded from package, not project root
-- **Codex Version**: Frozen at v1.22.66 in consumer mode (stable)
+- **Codex Version**: Frozen at v1.7.5 in consumer mode (stable)
 - **Plugin Behavior**: Reduced functionality in consumer mode:
   - No dynamic codex term enrichment
   - Fixed codex version
@@ -660,7 +651,7 @@ npx strray-ai --version
 | Aspect | Development | Consumer |
 |--------|-----------|----------|
 | Features | Full (latest) | Optimized (stable) |
-| Codex | Latest terms | v1.22.66 fallback |
+| Codex | Latest terms | v1.7.5 fallback |
 | Discovery | Dynamic (MCP) | Static only |
 | Hot Reload | Yes | No |
 
@@ -671,4 +662,4 @@ npx strray-ai --version
 - [Troubleshooting](https://github.com/htafolla/stringray/blob/master/docs/TROUBLESHOOTING.md)
 
 ---
-**Version**: 1.22.61 | [GitHub](https://github.com/htafolla/stringray)
+**Version**: 1.22.60 | [GitHub](https://github.com/htafolla/stringray)

@@ -47,7 +47,7 @@ describe("Framework Enforcement Integration", () => {
           args: { test: true },
         },
         undefined,
-        `test-framework-enforcement-tool-operations-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        `test-framework-enforcement-tool-operations-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
       );
     }
 
@@ -83,7 +83,7 @@ describe("Framework Enforcement Integration", () => {
     expect(typeof hook.hooks["agent.start"]).toBe("function");
   });
   it("should validate codex compliance on critical operations", async () => {
-    const jobId = `test-codex-compliance-critical-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const jobId = `test-codex-compliance-critical-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
     const criticalTools = ["write", "edit", "multiedit", "batch"];
     const nonCriticalTools = ["read", "grep", "bash"];
 
@@ -133,7 +133,7 @@ describe("Framework Enforcement Integration", () => {
   });
 
   it("should maintain framework state across operations", async () => {
-    const jobId = `test-framework-state-operations-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const jobId = `test-framework-state-operations-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
     // Test implementation needed
     expect(true).toBe(true);
   });

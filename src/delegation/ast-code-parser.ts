@@ -252,7 +252,7 @@ export class ASTCodeParser {
    * Analyze code file using AST parsing
    */
   async analyzeFile(filePath: string): Promise<ASTAnalysis> {
-    const jobId = `ast-analysis-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const jobId = `ast-analysis-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 
     try {
       const content = fs.readFileSync(filePath, "utf8");

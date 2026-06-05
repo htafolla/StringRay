@@ -477,7 +477,7 @@ export class SessionStateManager {
    * Execute session migration
    */
   async executeMigration(plan: MigrationPlan): Promise<boolean> {
-    const jobId = `migration-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const jobId = `migration-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
     const rollbackData: Array<{ step: string; sessionState?: { active: boolean; agentCount: number } | null | undefined; dependencies?: SessionDependency | undefined; group?: SessionGroup | undefined }> = [];
 
     try {

@@ -64,7 +64,7 @@ export class RedeployCoordinator {
     context: PostProcessorContext,
     fixResult: FixResult,
   ): Promise<RedeployResult> {
-    const jobId = `redeploy-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const jobId = `redeploy-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
     const deploymentId = `deploy-${context.commitSha}-${Date.now()}`;
     const startTime = Date.now();
 

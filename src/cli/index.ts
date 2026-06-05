@@ -565,11 +565,6 @@ program
     }
   });
 
-import("./commands/analytics-disable.js");
-import("./commands/analytics-enable-action.js");
-import("./commands/analytics-status.js");
-import("./commands/analytics-preview.js");
-
 program
   .command("doctor")
   .description("Diagnose framework issues (does not fix them)")
@@ -1138,33 +1133,6 @@ registerOpencodeCommands(opencodeCmd);
 //     });
 //   });
 
-// Plugin management command
-program
-  .command('plugin')
-  .description('Manage 0xRay plugins')
-  .action(async () => {
-    console.log(`
-📦 0xRay Plugin Management
-
-Usage: npx strray-ai plugin <command>
-
-Commands:
-  list                 List all installed plugins
-  install <name>       Install a new plugin
-  enable <name>        Enable a plugin
-  disable <name>       Disable a plugin
-  status <name>        Show plugin details
-  uninstall <name>     Remove a plugin
-
-Examples:
-  npx strray-ai plugin list
-  npx strray-ai plugin status my-plugin
-  npx strray-ai plugin uninstall old-plugin
-
-Plugins are loaded from: .strray/plugins/
-`);
-  });
-
 // Plugin subcommands
 const pluginCmd = program.command('plugin').description('Manage plugins');
 
@@ -1245,11 +1213,9 @@ Quick Start:
    2. Check health: npx strray-ai health
    3. Use agents: @security-auditor scan
    4. Generate reports: npx strray-ai report
-   5. Monitor: npx strray-ai dashboard
-   6. Fix issues: npx strray-ai fix
-   7. View analytics: npx strray-ai analytics
-   8. Add skills: npx strray-ai skill:install agency-agents
-   9. Write stories: npx strray-ai storyteller saga "Release Journey"
+   5. Fix issues: npx strray-ai fix
+   6. Add skills: npx strray-ai skill:install agency-agents
+   7. Write stories: npx strray-ai storyteller saga "Release Journey"
 
 For more information, visit: https://github.com/htafolla/stringray
 `,

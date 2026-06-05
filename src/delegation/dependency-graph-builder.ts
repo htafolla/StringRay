@@ -82,7 +82,7 @@ export class DependencyGraphBuilder {
    * Build comprehensive dependency graph for the codebase
    */
   async buildDependencyGraph(): Promise<DependencyAnalysis> {
-    const jobId = `dependency-graph-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const jobId = `dependency-graph-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 
     await frameworkLogger.log(
       "dependency-graph-builder",

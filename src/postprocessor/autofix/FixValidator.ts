@@ -24,7 +24,7 @@ export class FixValidator {
     analysis: FailureAnalysis,
     context: PostProcessorContext,
   ): Promise<boolean> {
-    const jobId = `fix-validation-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const jobId = `fix-validation-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 
     await frameworkLogger.log(
       "fix-validator",
@@ -68,7 +68,7 @@ export class FixValidator {
    * Rollback applied fixes
    */
   async rollbackFixes(appliedFixes: AppliedFix[]): Promise<void> {
-    const jobId = `fix-rollback-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const jobId = `fix-rollback-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 
     await frameworkLogger.log(
       "fix-validator",

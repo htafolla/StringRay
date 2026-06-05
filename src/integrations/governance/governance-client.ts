@@ -32,12 +32,19 @@ export class GovernanceClient {
 
   constructor(config: Partial<GovernanceClientConfig> = {}) {
     this.config = {
-      baseUrl: 'https://mcp-production-80e2.up.railway.app',
+      baseUrl: process.env.GOVERNANCE_ENDPOINT || '',
       timeoutMs: 10000,
       retryAttempts: 3,
       retryDelayMs: 1000,
       ...config,
     };
+    if (!this.config.baseUrl) {
+      throw new GovernanceError(
+        'GOVERNANCE_ENDPOINT environment variable is not set',
+        GovernanceErrorCode.CONFIG_INVALID,
+        false,
+      );
+    }
     this.stats = {
       requestsTotal: 0,
       requestsSucceeded: 0,

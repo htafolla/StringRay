@@ -53,7 +53,7 @@ export class McpConnection extends EventEmitter implements IMcpConnection {
       return;
     }
 
-    const jobId = `mcp-connect-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const jobId = `mcp-connect-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 
     try {
       frameworkLogger.log(
@@ -113,7 +113,7 @@ export class McpConnection extends EventEmitter implements IMcpConnection {
       return;
     }
 
-    const jobId = `mcp-disconnect-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const jobId = `mcp-disconnect-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 
     frameworkLogger.log(
       'mcp-connection',

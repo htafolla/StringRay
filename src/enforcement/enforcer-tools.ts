@@ -569,7 +569,7 @@ export async function ruleValidation(
   operation: string,
   context: RuleValidationContext,
 ): Promise<EnforcementResult> {
-  const jobId = `rule-validation-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  const jobId = `rule-validation-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 
   // PRE-PROCESS: Get intelligent routing recommendation
   const { enhancedContext, routing } = await preProcessAndRoute(operation, context);
@@ -708,7 +708,7 @@ export async function contextAnalysisValidation(
   files: string[],
   operation: string,
 ): Promise<EnforcementResult> {
-  const jobId = `context-validation-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  const jobId = `context-validation-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 
   await frameworkLogger.log(
     "enforcer-tools",
@@ -777,7 +777,7 @@ export async function codexEnforcement(
   files: string[],
   newCode?: string,
 ): Promise<EnforcementResult> {
-  const jobId = `codex-enforcement-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  const jobId = `codex-enforcement-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 
   await frameworkLogger.log(
     "enforcer-tools",
@@ -853,7 +853,7 @@ export async function qualityGateCheck(
     dependencies?: string[];
   },
 ): Promise<EnforcementResult> {
-  const jobId = `quality-gate-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  const jobId = `quality-gate-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 
   await frameworkLogger.log("enforcer-tools", "quality-gate-start", "info", {
     jobId,
@@ -1151,7 +1151,7 @@ export async function runPreCommitValidation(
   files: string[],
   operation: string = "commit",
 ): Promise<EnforcementResult> {
-  const jobId = `pre-commit-validation-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  const jobId = `pre-commit-validation-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 
   await frameworkLogger.log(
     "enforcer-tools",

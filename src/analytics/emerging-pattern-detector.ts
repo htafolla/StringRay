@@ -195,7 +195,7 @@ export class EmergingPatternDetector {
 
       // Create emergent pattern
       const emergentPattern: EmergentPattern = {
-        id: `emergent-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        id: `emergent-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
         pattern: cluster.keywords.join(' | '),
         trigger: cluster.keywords,
         action: successRate < 0.7

@@ -17,7 +17,7 @@ export class FailureAnalysisEngine {
   async analyzeFailure(
     monitoringResult: MonitoringResult,
   ): Promise<FailureAnalysis> {
-    const jobId = `failure-analysis-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const jobId = `failure-analysis-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 
     await frameworkLogger.log(
       "-failure-analysis-engine",

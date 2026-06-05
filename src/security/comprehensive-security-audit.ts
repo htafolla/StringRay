@@ -445,7 +445,7 @@ export class ComprehensiveSecurityAuditSystem {
 
   async runAudit(): Promise<SecurityAuditReport> {
     const startTime = Date.now();
-    const auditId = `security-audit-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const auditId = `security-audit-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 
     frameworkLogger.log("comprehensive-security-audit", "audit-start", "info", {
       auditId,

@@ -204,7 +204,7 @@ export class SecurityAuditor {
    * Run comprehensive security audit
    */
   async auditProject(projectPath: string = "."): Promise<SecurityAuditResult> {
-    const jobId = `security-audit-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const jobId = `security-audit-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
     const issues: SecurityIssue[] = [];
     const files = this.getAllFiles(projectPath);
 

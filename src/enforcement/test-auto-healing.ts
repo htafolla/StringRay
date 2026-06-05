@@ -69,7 +69,7 @@ export class TestAutoHealingSystem {
     testResults: TestResults,
     context: RuleValidationContext,
   ): Promise<AutoHealingResult> {
-    const jobId = `test-healing-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const jobId = `test-healing-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
     const startTime = Date.now();
 
     frameworkLogger.log("test-auto-healing", "healing-start", "info", {

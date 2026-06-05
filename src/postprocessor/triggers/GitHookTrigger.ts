@@ -40,7 +40,7 @@ interface LogCleanupConfig {
 async function archiveLogFiles(
   config: LogArchiveConfig,
 ): Promise<{ archived: number; errors: string[] }> {
-  const jobId = `log-archive-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  const jobId = `log-archive-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 
   const result: { archived: number; errors: string[] } = {
     archived: 0,
@@ -201,7 +201,7 @@ async function archiveCriticalHistoricalLogs(): Promise<{
   archived: number;
   errors: string[];
 }> {
-  const jobId = `critical-archive-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  const jobId = `critical-archive-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 
   const result: { archived: number; errors: string[] } = {
     archived: 0,
@@ -270,7 +270,7 @@ async function archiveCriticalHistoricalLogs(): Promise<{
 async function cleanupLogFiles(
   config: any,
 ): Promise<{ cleaned: number; errors: string[] }> {
-  const jobId = `log-cleanup-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  const jobId = `log-cleanup-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 
   const result: { cleaned: number; errors: string[] } = {
     cleaned: 0,

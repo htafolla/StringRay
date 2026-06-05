@@ -45,7 +45,7 @@ export class SuccessHandler {
     result: PostProcessorResult,
     monitoringResults: MonitoringResult[],
   ): Promise<SuccessMetrics> {
-    const jobId = `success-handler-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const jobId = `success-handler-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 
     await frameworkLogger.log(
       "success-handler",

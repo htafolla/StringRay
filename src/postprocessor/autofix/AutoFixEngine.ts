@@ -33,7 +33,7 @@ export class AutoFixEngine {
     analysis: FailureAnalysis,
     context: PostProcessorContext,
   ): Promise<FixResult> {
-    const jobId = `auto-fix-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const jobId = `auto-fix-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 
     await frameworkLogger.log(
       "-auto-fix-engine",
@@ -303,7 +303,7 @@ export class AutoFixEngine {
     originalFailure: FailureAnalysis,
     context: PostProcessorContext,
   ): Promise<boolean> {
-    const jobId = `fix-validation-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const jobId = `fix-validation-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 
     await frameworkLogger.log(
       "-auto-fix-engine",

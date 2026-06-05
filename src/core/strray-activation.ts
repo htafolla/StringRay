@@ -32,7 +32,7 @@ export const defaultStringRayConfig: StringRayActivationConfig = {
 export async function activateStringRayFramework(
   config: Partial<StringRayActivationConfig> = {},
 ): Promise<void> {
-  const jobId = `activation-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  const jobId = `activation-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
   const activationConfig = { ...defaultStringRayConfig, ...config };
 
   // Banner display moved to init.sh execution in plugin

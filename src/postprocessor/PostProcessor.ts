@@ -830,7 +830,7 @@ All path violations will be automatically detected and blocked.
   async executePostProcessorLoop(
     context: PostProcessorContext,
   ): Promise<PostProcessorResult> {
-    const jobId = `post-processor-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const jobId = `post-processor-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
     const startTime = Date.now();
     const sessionId = `postprocessor-${context.commitSha}-${Date.now()}`;
 

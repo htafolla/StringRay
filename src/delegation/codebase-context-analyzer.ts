@@ -156,7 +156,7 @@ export class CodebaseContextAnalyzer {
    * Perform comprehensive codebase analysis with memory optimization
    */
   async analyzeCodebase(): Promise<CodebaseAnalysis> {
-    const jobId = `codebase-analysis-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const jobId = `codebase-analysis-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 
     await frameworkLogger.log(
       "codebase-context-analyzer",

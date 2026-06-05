@@ -142,8 +142,9 @@ export class GovernanceService {
             evidence: proposal.evidence || [],
             proposalType: proposal.type,
             context,
-          });
-          text = (result as any)?.content?.[0]?.text || '';
+          }) as unknown as Record<string, unknown>;
+          const content = result?.content as Array<Record<string, unknown>> | undefined;
+          text = content?.[0]?.text as string || '';
         } else {
           // Normal path — real MCP transport
           const result = await mcpClientManager.callServerTool(serverName, 'analyze_proposal', {
@@ -152,8 +153,9 @@ export class GovernanceService {
             evidence: proposal.evidence || [],
             proposalType: proposal.type,
             context,
-          });
-          text = (result as any)?.content?.[0]?.text || '';
+          }) as unknown as Record<string, unknown>;
+          const content = result?.content as Array<Record<string, unknown>> | undefined;
+          text = content?.[0]?.text as string || '';
         }
 
         const vote = this.parseVoteFromText(serverName, text);
@@ -218,7 +220,7 @@ export class GovernanceService {
       try {
         const inferenceProposal: InferenceProposal = {
           id: proposal.id,
-          type: proposal.type as any,
+          type: proposal.type as InferenceProposal['type'],
           title: proposal.title,
           description: proposal.description,
           evidence: proposal.evidence || [],
@@ -268,7 +270,7 @@ export class GovernanceService {
 
     return {
       server,
-      decision: (decisionMatch?.[1]?.toLowerCase() as any) || 'abstain',
+      decision: (decisionMatch?.[1]?.toLowerCase() as GovernanceVote['decision']) || 'abstain',
       confidence: parseFloat(confidenceMatch?.[1] || '0.5'),
       reasoning: reasoningMatch?.[1]?.trim() || 'No reasoning provided',
     };

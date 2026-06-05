@@ -170,7 +170,7 @@ export class MCPClient extends EventEmitter {
    * Initialize MCP client by discovering and caching tools
    */
   async initialize(): Promise<void> {
-    const jobId = `mcp-init-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const jobId = `mcp-init-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 
     try {
       frameworkLogger.log(
@@ -620,7 +620,7 @@ export class MCPClientManager {
    * Get all available MCP server tools
    */
   async getAllAvailableTools(): Promise<Record<string, MCPTool[]>> {
-    const jobId = `mcp-tools-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const jobId = `mcp-tools-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
     const result: Record<string, MCPTool[]> = {};
 
     const serverNames = [

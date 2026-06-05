@@ -137,7 +137,7 @@ export class EnhancedMultiAgentOrchestrator {
    * Enhanced agent spawning with clickable monitoring integration
    */
   async   spawnAgent(request: AgentSpawnRequest): Promise<SpawnedAgent> {
-    const jobId = `spawn-agent-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const jobId = `spawn-agent-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
     let spawnTrackingId: string | undefined;
 
     // 🚨 GATE: Check global spawn gate before any spawn attempt
@@ -194,7 +194,7 @@ export class EnhancedMultiAgentOrchestrator {
     }
     spawnTrackingId = auth.trackingId;
 
-    const agentId = `agent_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const agentId = `agent_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 
     const spawnedAgent: SpawnedAgent = {
       id: agentId,
@@ -271,7 +271,7 @@ export class EnhancedMultiAgentOrchestrator {
     request: AgentSpawnRequest,
     jobId: string,
   ): Promise<void> {
-    const executeJobId = `execute-agent-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const executeJobId = `execute-agent-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 
     try {
       agent.status = "active";

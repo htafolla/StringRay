@@ -204,7 +204,7 @@ export class AgentMetricsSystem {
   }
 
   private generateId(): string {
-    return `inv-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    return `inv-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
   }
 
   trackInvocation(params: {

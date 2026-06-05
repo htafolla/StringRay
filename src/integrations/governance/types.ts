@@ -75,7 +75,7 @@ export interface GovernanceIntegrationConfig {
  */
 export const DEFAULT_GOVERNANCE_CONFIG: GovernanceIntegrationConfig = {
   enabled: false,
-  endpointUrl: 'https://mcp-production-80e2.up.railway.app/governance',
+  endpointUrl: process.env.GOVERNANCE_ENDPOINT || '',
   requestTimeoutMs: 10000,
   minConfidenceThreshold: 0.5,
   decisionLogic: {

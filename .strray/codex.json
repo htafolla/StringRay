@@ -1,7 +1,7 @@
 {
-  "version": "1.22.61",
-  "lastUpdated": "2026-03-09",
-  "errorPreventionTarget": 0.996,
+  "version": "1.22.70",
+  "lastUpdated": "2026-06-05",
+  "errorPreventionTarget": 0.998,
   "terms": {
     "1": {
       "number": 1,
@@ -482,6 +482,70 @@
       "category": "governance",
       "zeroTolerance": false,
       "enforcementLevel": "high"
+    },
+    "61": {
+      "number": 61,
+      "title": "Do One Thing at a Time",
+      "description": "Focus on a single task until completion. Do not multitask or juggle multiple changes simultaneously. Complete one fix, feature, or refactor before starting the next. Context switching reduces quality and increases error rate.",
+      "category": "process",
+      "zeroTolerance": false,
+      "enforcementLevel": "high"
+    },
+    "62": {
+      "number": 62,
+      "title": "Triage. Fix. Loop.",
+      "description": "When addressing issues: first triage to assess scope and severity, then fix the root cause, then loop back to verify. Never skip triage. Never fix without verification. Repeat for each issue independently.",
+      "category": "process",
+      "zeroTolerance": false,
+      "enforcementLevel": "high"
+    },
+    "63": {
+      "number": 63,
+      "title": "Watch Commands for Errors",
+      "description": "Always monitor command output for errors, warnings, and unexpected behavior. Do not assume success based on exit codes alone. Read stderr and stdout for clues. Investigate any unexpected output before proceeding.",
+      "category": "core",
+      "zeroTolerance": true,
+      "enforcementLevel": "blocking"
+    },
+    "64": {
+      "number": 64,
+      "title": "Always Add .gitignore",
+      "description": "Every project must have an appropriate .gitignore file covering build artifacts, dependencies, environment files, OS files, IDE files, and runtime-generated files. Never commit generated, transient, or sensitive files.",
+      "category": "operations",
+      "zeroTolerance": false,
+      "enforcementLevel": "high"
+    },
+    "65": {
+      "number": 65,
+      "title": "Write Tests for New Code or Functions",
+      "description": "Any new code, function, module, or component must have corresponding tests. Unit tests for pure logic, integration tests for boundaries. No production code without test coverage. Tests must validate behavior, not implementation.",
+      "category": "testing",
+      "zeroTolerance": false,
+      "enforcementLevel": "high"
+    },
+    "66": {
+      "number": 66,
+      "title": "Modular Integration and E2E Tests",
+      "description": "Write integration and end-to-end tests in a modular, independently-runnable fashion so each test can be individually triaged and fixed. Run the full battery of integration/E2E tests only after major subsystem development, builds, commits, or releases. During active development, run only the relevant subset for fast feedback.",
+      "category": "testing",
+      "zeroTolerance": false,
+      "enforcementLevel": "high"
+    },
+    "67": {
+      "number": 67,
+      "title": "Use Best Subagents, Reuse Session Context",
+      "description": "Delegate work to the best-suited subagent for each task. Stay responsive to user inquiries, additional todos, and course corrections. Reuse the same subagent via session ID to preserve context and avoid restarting from zero. Do not spawn fresh agents when an existing one has the relevant context.",
+      "category": "process",
+      "zeroTolerance": false,
+      "enforcementLevel": "high"
+    },
+    "68": {
+      "number": 68,
+      "title": "Lead Dev Mindset — Ownership to Completion",
+      "description": "Act as the lead developer. Take ownership. Implement production-ready code without asking for permission or confirmation. Loop, iterate, and test until fully functional. Do not ask questions — make decisions and execute. Deliver complete, tested solutions.",
+      "category": "process",
+      "zeroTolerance": false,
+      "enforcementLevel": "high"
     }
   },
   "interweaves": [
@@ -518,6 +582,9 @@
     "Edge cases are covered": true,
     "TypeScript compilation succeeds": true,
     "Tests pass (unit, integration, E2E)": true,
+    "Integration and E2E tests are modular and individually triageable": true,
+    "Subagent selection uses best fit with context reuse": true,
+    "Lead dev ownership drives code to completion": true,
     "No security vulnerabilities": true,
     "No type errors or any usage": true,
     "Agent spawns go through governor": true,
@@ -526,6 +593,6 @@
   },
   "frameworkAlignment": {
     "OpenCode": "v1.1.1",
-    "0xRay": "v1.7.5"
+    "0xRay": "v1.22.70"
   }
 }
